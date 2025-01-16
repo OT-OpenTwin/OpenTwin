@@ -14,4 +14,18 @@ struct MongoDBSettings
     std::string m_logPath = "";
 
     std::string m_tlsUseSystemCA = "";
+
+    const std::string toString() const
+    {
+        std::string summary = "configurationFilePath: " + m_configFilePath + "\n"+
+            "config file content: " + m_configFileContent + "\n" +
+            "IP: " + m_bindIP + "\n" +
+            "Port: " + m_port + "\n" +
+            "cert file: " + m_certKeyFile + "\n" +
+            "exe path: " + m_executablePath + "\n" +
+            "data path: " + m_dataPath + "\n" +
+            "log path: " + m_logPath +"\n";
+        return summary;
+    }
+
 };
