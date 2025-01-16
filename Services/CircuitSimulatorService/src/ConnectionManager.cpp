@@ -56,18 +56,124 @@ void ConnectionManager::queueRequest(RequestType _type, const std::list<std::str
    
 }
 
+bool ConnectionManager::isSingleJsonObject(const QByteArray& data) {
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+
+    return parseError.error == QJsonParseError::NoError && doc.isObject();
+}
+
+bool ConnectionManager::isJsonArray(const QByteArray& data) {
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+
+    return parseError.error == QJsonParseError::NoError && doc.isArray();
+}
+
+bool ConnectionManager::isMixed(const QByteArray& data) {
+    return !isSingleJsonObject(data) && !isJsonArray(data);
+}
+
+int ConnectionManager::findEndOfJsonObject(const QByteArray& data) {
+
+    int openBraces = 0;
+    bool insideString = false;
+
+    for (int i = 0; i < data.size(); ++i) {
+        char c = data[i];
+
+        if (c == '"' && (i == 0 || data[i - 1] != '\\')) {
+            insideString = !insideString; 
+        }
+
+        if (!insideString) {
+            if (c == '{') {
+                openBraces++;
+            }
+            else if (c == '}') {
+                openBraces--;
+                if (openBraces == 0) {
+                    return i; 
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
+QList<QJsonObject> ConnectionManager::handleMultipleJsonObjects(const QByteArray& jsonStream) {
+
+
+    QList<QJsonObject> parsedObjects; 
+    int startIndex = 0;
+
+    while (startIndex < jsonStream.size()) {
+        
+        int openBrace = jsonStream.indexOf('{', startIndex);
+        int closeBrace = jsonStream.indexOf('}', openBrace);
+
+        
+        if (openBrace == -1 || closeBrace == -1) {
+            break;
+        }
+
+        
+        QByteArray singleObject = jsonStream.mid(openBrace, closeBrace - openBrace + 1);
+
+        
+        QJsonParseError parseError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(singleObject, &parseError);
+
+        
+        if (parseError.error == QJsonParseError::NoError && jsonDoc.isObject()) {
+            parsedObjects.append(jsonDoc.object());
+        }
+        else {
+            qDebug() << "Fehler beim Parsen des JSON-Objekts:" << parseError.errorString();
+        }
+
+        
+        startIndex = closeBrace + 1;
+    }
+
+    return parsedObjects;
+}
+
 void ConnectionManager::handleReadyRead() {
     QByteArray rawData = m_socket->readAll();
 
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(rawData);
-
-    if (!jsonDoc.isObject() && !jsonDoc.isArray()) {
-        OT_LOG_E("Incorrect json format");
-        return;
+    if (isMixed(rawData))         {
+        QList<QJsonObject> jsonObjects = handleMultipleJsonObjects(rawData);
     }
-    QJsonObject jsonObject = jsonDoc.object();
+    else if (isSingleJsonObject(rawData)) {
 
-    handleWithJson(jsonObject);
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(rawData);
+
+        if (!jsonDoc.isObject() && !jsonDoc.isArray()) {
+            OT_LOG_E("Incorrect json format");
+            return;
+        }
+        QJsonObject jsonObject = jsonDoc.object();
+
+        handleWithJson(jsonObject);
+    }
+    else if(isJsonArray(rawData)) {
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(rawData);
+        QJsonArray jsonArray = jsonDoc.array();
+
+        for (const QJsonValue& value : jsonArray) {
+            if (value.isObject())                 {
+                QJsonObject obj = value.toObject();
+                handleWithJson(obj);
+            }
+            else {
+                OT_LOG_E("Incorrect json format");
+            }
+        }
+    }
+    
+   
 }
 
     

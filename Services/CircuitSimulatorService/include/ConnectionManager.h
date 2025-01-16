@@ -28,6 +28,13 @@ public:
 	void queueRequest(RequestType _type, const std::list<std::string>& _data);
 
 
+	// Json Functions
+	bool isSingleJsonObject(const QByteArray& data);
+	bool isJsonArray(const QByteArray& data);
+	bool isMixed(const QByteArray& data);
+	int findEndOfJsonObject(const QByteArray& data);
+	QList<QJsonObject> handleMultipleJsonObjects(const QByteArray& jsonStram);
+
 private Q_SLOTS:
 	void handleConnection();
 	void handleReadyRead();
