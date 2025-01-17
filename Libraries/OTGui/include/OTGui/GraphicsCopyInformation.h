@@ -35,6 +35,9 @@ namespace ot {
 		static std::string getGraphicsCopyInformationType(void) { return "GraphicsCopy"; };
 		virtual std::string getCopyType(void) const override { return GraphicsCopyInformation::getGraphicsCopyInformationType(); };
 
+		static int getGraphicsCopyInformationVersion(void) { return 1; };
+		virtual int getCopyVersion(void) const override { return GraphicsCopyInformation::getGraphicsCopyInformationVersion(); };
+
 		virtual void addToJsonObject(ot::JsonValue & _object, ot::JsonAllocator & _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 

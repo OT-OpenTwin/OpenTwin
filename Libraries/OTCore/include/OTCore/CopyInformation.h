@@ -19,6 +19,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT CopyInformation : public Serializable {
 	public:
 		static std::string getCopyTypeJsonKey(void);
+		static std::string getCopyVersionJsonKey(void);
 
 		CopyInformation() = default;
 		CopyInformation(const CopyInformation&) = default;
@@ -32,6 +33,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		virtual std::string getCopyType(void) const = 0;
+		virtual int getCopyVersion(void) const = 0;
 
 	};
 
