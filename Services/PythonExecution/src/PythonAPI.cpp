@@ -7,7 +7,6 @@
  * \date   July 2023
  *********************************************************************/
 #include "PythonAPI.h"
-#include "OTServiceFoundation/ModelComponent.h"
 #include "ClassFactory.h"
 #include "Application.h"
 #include "EntityAPI.h"

@@ -5,7 +5,7 @@
 #include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
 #include "EntityTableSelectedRanges.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
+#include "OTGui/TableIndexSchemata.h"
 #include "EntityAPI.h"
 
 EntityBuffer& EntityBuffer::instance() {

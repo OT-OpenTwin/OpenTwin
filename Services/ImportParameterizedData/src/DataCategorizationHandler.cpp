@@ -10,7 +10,7 @@
 #include "SelectionCategorisationColours.h"
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
+#include "OTGui/TableIndexSchemata.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 

@@ -113,6 +113,7 @@
     <ClInclude Include="include\OTGui\SyntaxHighlighterRule.h" />
     <ClInclude Include="include\OTGui\TableCfg.h" />
     <ClInclude Include="include\OTGui\TableHeaderItemCfg.h" />
+    <ClInclude Include="include\OTGui\TableIndexSchemata.h" />
     <ClInclude Include="include\OTGui\TableRange.h" />
     <ClInclude Include="include\OTGui\TextEditorCfg.h" />
     <ClInclude Include="include\OTGui\ToolButtonCfg.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="src\SyntaxHighlighterRule.cpp" />
     <ClCompile Include="src\TableCfg.cpp" />
     <ClCompile Include="src\TableHeaderItemCfg.cpp" />
+    <ClCompile Include="src\TableIndexSchemata.cpp" />
     <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TextEditorCfg.cpp" />
     <ClCompile Include="src\ToolButtonCfg.cpp" />

@@ -111,9 +111,6 @@
     <ClInclude Include="include\OTServiceFoundation\ErrorWarningLogFrontendNotifier.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\TableIndexSchemata.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h">
       <Filter>include</Filter>
     </ClInclude>

@@ -6,7 +6,7 @@
 
 // OpenTwin header
 #include "OTCore/RuntimeTests.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
+#include "OTGui/TableIndexSchemata.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityAPI.h"
 

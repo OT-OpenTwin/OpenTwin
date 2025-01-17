@@ -3,8 +3,7 @@
 #include "OTCore/StringToNumericCheck.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "Documentation.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
-
+#include "OTGui/TableIndexSchemata.h"
 
 void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<IVisualisationTable>>& _allTablesByName)
 {

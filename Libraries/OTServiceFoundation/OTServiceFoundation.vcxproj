@@ -229,7 +229,6 @@
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
-    <ClInclude Include="include\OTServiceFoundation\TableIndexSchemata.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h" />
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h" />

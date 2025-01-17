@@ -1,6 +1,7 @@
 #include "PreviewAssemblerRMD.h"
 #include "DataCategorizationHandler.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
+#include "OTGui/TableIndexSchemata.h"
+
 void PreviewAssemblerRMD::InitiatePreviewTable(std::shared_ptr<EntityResultTableData<std::string>> previewTableData)
 {
 	previewTableData->setNumberOfRows(1);

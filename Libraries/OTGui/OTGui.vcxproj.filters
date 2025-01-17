@@ -393,6 +393,9 @@
     <ClInclude Include="include\OTGui\GraphicsCopyInformation.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\TableIndexSchemata.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -700,6 +703,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsCopyInformation.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableIndexSchemata.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
