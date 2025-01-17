@@ -108,8 +108,14 @@ void Result1DData::readDataLine(std::stringstream& dataContent, double& x, doubl
 
 		if (yValue[yValue.size() - 1] == 'j')
 		{
-			// We have an imaginary value (and we may or may not have a real part as well
+			// We have an imaginary value (and we may or may not have a real part as well)
 			index = yValue.find_last_of("+-");
+			
+			while (index != line.npos && index > 0)
+			{
+				if (yValue[index - 1] != 'e' && yValue[index - 1] != 'E') break;
+				index = yValue.find_last_of("+-", index-1);
+			}
 
 			if (index == line.npos|| index == 0)
 			{
