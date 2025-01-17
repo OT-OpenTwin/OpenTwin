@@ -68,6 +68,8 @@ public:
 	virtual ViewerUIDtype addMenuGroup(ViewerUIDtype menuPageID, const std::string &groupName) override;
 	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName) override;
 	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) override;
+	virtual void setCurrentMenuPage(const std::string& _pageName) override;
+
 	virtual void removeUIElements(std::list<ViewerUIDtype> &itemIDList) override;
 
 	virtual void displayText(const std::string &text) override;

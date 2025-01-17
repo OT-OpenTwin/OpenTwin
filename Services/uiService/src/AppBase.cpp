@@ -1218,12 +1218,12 @@ void AppBase::setRelayURLs(const std::string & _url) {
 
 std::string AppBase::getRelayURLs(void) const { return m_relayURLs; }
 
-void AppBase::switchToViewTab(void) {
+void AppBase::switchToViewMenuTab(void) {
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
 }
 
-void AppBase::switchToTab(const std::string &menu) {
-	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, menu.c_str());
+void AppBase::switchToMenuTab(const std::string& _menu) {
+	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, QString::fromStdString(_menu));
 }
 
 void AppBase::closeAllViewerTabs(void) {

@@ -2193,7 +2193,7 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 	// Here we know that all services completed the startup -> switch to main view and restore state
 	m_servicesUiSetupCompleted = true;
 
-	AppBase::instance()->switchToViewTab();
+	AppBase::instance()->switchToViewMenuTab();
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 
 	AppBase::instance()->restoreSessionState();
@@ -2793,7 +2793,7 @@ std::string ExternalServicesComponent::handleSetLineEditValue(ot::JsonDocument& 
 std::string ExternalServicesComponent::handleSwitchMenuTab(ot::JsonDocument& _document) {
 	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	AppBase::instance()->switchToTab(pageName);
+	AppBase::instance()->switchToMenuTab(pageName);
 
 	return "";
 }

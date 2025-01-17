@@ -351,6 +351,10 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 	return uid;
 }
 
+void ViewerComponent::setCurrentMenuPage(const std::string& _pageName) {
+	AppBase::instance()->switchToMenuTab(_pageName);
+}
+
 void ViewerComponent::removeUIElements(std::list<ViewerUIDtype> &itemIDList)
 {
 	try {

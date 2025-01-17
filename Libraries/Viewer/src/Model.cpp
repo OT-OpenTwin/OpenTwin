@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "Viewer.h"
 #include "Notifier.h"
+#include "ViewerToolBar.h"
 
 #include <osg/BlendFunc>
 #include <osg/CullFace>
@@ -71,7 +72,7 @@ Model::~Model()
 	delete 	sceneNodesRoot;
 	sceneNodesRoot = nullptr;
 
-	removeUIControls();
+	ViewerToolBar::instance().removeUIControls();
 }
 
 void Model::attachViewer(Viewer *viewer)
@@ -83,7 +84,7 @@ void Model::attachViewer(Viewer *viewer)
 	if (viewerList.size() == 1)
 	{
 		// The first viewer was registered. We assume that the 3D tab is active
-		setupUIControls3D();
+		ViewerToolBar::instance().setupUIControls3D();
 	}
 }
 
@@ -97,7 +98,7 @@ void Model::detachViewer(Viewer *viewer)
 	if (viewerList.size() == 0)
 	{
 		// The last viewer was deregistered
-		removeUIControls();
+		ViewerToolBar::instance().removeUIControls();
 	}
 }
 
@@ -125,7 +126,7 @@ void Model::activateModel(void)
 		std::list<ot::UID> selectedTreeItemID;
 		getSelectedTreeItemIDs(selectedTreeItemID);
 
-		updateUIControlState(selectedTreeItemID);
+		ViewerToolBar::instance().updateEnabledState(selectedTreeItemID);
 	}
 }
 
@@ -1038,7 +1039,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
 		
-		updateUIControlState(_selectedTreeItems);
+		ViewerToolBar::instance().updateEnabledState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
 		return;
@@ -1074,7 +1075,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
 	
 	// Update the UI state and the view
-	updateUIControlState(_selectedTreeItems);
+	ViewerToolBar::instance().updateEnabledState(_selectedTreeItems);
 	refreshAllViews();
 
 	// reset the 1d view, if necessary
@@ -1429,82 +1430,35 @@ void Model::toggleCutplane(void) {
 	}
 }
 
-void Model::setupUIControls3D(void)
-{
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
+void Model::exportTextEditor(void) {
 
-	removeItemIDList.push_front(uiControls.viewPageID					= getNotifier()->addMenuPage("View"));
-
-	removeItemIDList.push_front(uiControls.operationsGroupID			= getNotifier()->addMenuGroup(uiControls.viewPageID, "Operations"));
-	removeItemIDList.push_front(uiControls.visiblityGroupID				= getNotifier()->addMenuGroup(uiControls.viewPageID, "Visibility"));
-	removeItemIDList.push_front(uiControls.styleGroupID					= getNotifier()->addMenuGroup(uiControls.viewPageID, "Display Style"));
-
-	removeItemIDList.push_front(uiControls.resetView3DButtonID			= getNotifier()->addMenuPushButton(uiControls.operationsGroupID, "Reset View", "ResetView", "Space"));
-
-	removeItemIDList.push_front(uiControls.showAllButtonID				= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Show All", "ShowAll"));
-	removeItemIDList.push_front(uiControls.showSelectedButtonID			= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
-	removeItemIDList.push_front(uiControls.hideSelectedButtonID			= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
-	removeItemIDList.push_front(uiControls.hideUnselectedButtonID		= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Unselected", "HideUnselected"));
-
-	removeItemIDList.push_front(uiControls.stateWireframeButtonID		= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Wireframe", "Wireframe"));
-	removeItemIDList.push_front(uiControls.stateWorkingPlaneButtonID	= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Working plane", "WorkingPlane"));
-	removeItemIDList.push_front(uiControls.stateAxisCrossButtonID       = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Axis cross", "AxisCross"));
-	removeItemIDList.push_front(uiControls.stateCenterAxisCrossButtonID = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Center axis cross", "CenterAxisCross"));
-	removeItemIDList.push_front(uiControls.cutplaneButtonID             = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Cutplane", "Cutplane"));
-
-	// Send an initial notification to properly set the state of the new controls
-	std::list<ot::UID> selectedTreeItemID;
-	updateUIControlState(selectedTreeItemID);
 }
 
-void Model::setupUIControls1D(void)
-{
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
+void Model::saveTextEditor(void) {
 
-	removeItemIDList.push_front(uiControls.viewPageID = getNotifier()->addMenuPage("View"));
-
-	removeItemIDList.push_front(uiControls.operationsGroupID = getNotifier()->addMenuGroup(uiControls.viewPageID, "Operations"));
-	removeItemIDList.push_front(uiControls.visiblityGroupID = getNotifier()->addMenuGroup(uiControls.viewPageID, "Visibility"));
-
-	removeItemIDList.push_front(uiControls.resetView1DButtonID = getNotifier()->addMenuPushButton(uiControls.operationsGroupID, "Reset View", "ResetView", "Space"));
-
-	removeItemIDList.push_front(uiControls.showSelectedButtonID = getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
-	removeItemIDList.push_front(uiControls.hideSelectedButtonID = getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
-
-	// Send an initial notification to properly set the state of the new controls
-	std::list<ot::UID> selectedTreeItemID;
-	updateUIControlState(selectedTreeItemID);
 }
 
-void Model::removeUIControls(void)
-{
-	if (removeItemIDList.empty()) return;
-
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-
-	getNotifier()->removeUIElements(removeItemIDList);
-	removeItemIDList.clear();
-}
-
-void Model::executeAction(unsigned long long buttonID)
-{
-	     if (buttonID == uiControls.resetView3DButtonID)   	         resetAllViews3D();
-	else if (buttonID == uiControls.resetView1DButtonID)	         resetAllViews1D();
-	else if (buttonID == uiControls.showAllButtonID)                 showAllSceneNodesAction();
-	else if (buttonID == uiControls.showSelectedButtonID)	         showSelectedSceneNodesAction();
-	else if (buttonID == uiControls.hideSelectedButtonID)            hideSelectedSceneNodesAction();
-	else if (buttonID == uiControls.hideUnselectedButtonID)          hideUnselectedSceneNodesAction();
-	else if (buttonID == uiControls.stateWireframeButtonID)          toggleWireframeView();
-	else if (buttonID == uiControls.stateWorkingPlaneButtonID)       toggleWorkingPlane();
-	else if (buttonID == uiControls.stateAxisCrossButtonID)          toggleAxisCross();
-	else if (buttonID == uiControls.stateCenterAxisCrossButtonID)    toggleCenterAxisCross();
-	else if (buttonID == uiControls.cutplaneButtonID)				 toggleCutplane();
-	else assert(0); // Unhandled button action
+void Model::executeAction(unsigned long long _buttonID) {
+	ViewerToolBar::ButtonType button = ViewerToolBar::instance().getButtonTypeFromUID(_buttonID);
+	switch (button) {
+	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
+	case ViewerToolBar::Reset1DViewButton: resetAllViews1D(); break;
+	case ViewerToolBar::ShowAllButton: showAllSceneNodesAction(); break;
+	case ViewerToolBar::ShowSelectedButton: showSelectedSceneNodesAction(); break;
+	case ViewerToolBar::HideSelectedButton: hideSelectedSceneNodesAction(); break;
+	case ViewerToolBar::HideUnselectedButton: hideUnselectedSceneNodesAction(); break;
+	case ViewerToolBar::WireframeButton: toggleWireframeView(); break;
+	case ViewerToolBar::WorkingPlaneButton: toggleWorkingPlane(); break;
+	case ViewerToolBar::AxisCrossButton: toggleAxisCross(); break;
+	case ViewerToolBar::CenterAxisCrossButton: toggleCenterAxisCross(); break;
+	case ViewerToolBar::CutplaneButton: toggleCutplane(); break;
+	case ViewerToolBar::TextEditorSaveButton: saveTextEditor(); break;
+	case ViewerToolBar::TextEditorExportButton: exportTextEditor(); break;
+	case ViewerToolBar::NoButton: break;
+	default:
+		OT_LOG_W("Unknown button (" + std::to_string(_buttonID) + ")");
+		break;
+	}
 
 	refreshAllViews();
 }
@@ -1887,28 +1841,6 @@ void Model::clearHoverView(void)
 		setCursorText("");
 		updateSelectedFacesHighlight();
 		refreshAllViews();
-	}
-}
-
-void Model::updateUIControlState(const ot::UIDList& _selectedTreeItemID)
-{
-	if (!removeItemIDList.empty())
-	{
-		std::list<unsigned long long> enabled;
-		std::list<unsigned long long> disabled;
-
-		if (_selectedTreeItemID.size() > 0) {
-			enabled.push_back(uiControls.showSelectedButtonID);
-			enabled.push_back(uiControls.hideSelectedButtonID);
-			enabled.push_back(uiControls.hideUnselectedButtonID);
-		}
-		else {
-			disabled.push_back(uiControls.showSelectedButtonID);
-			disabled.push_back(uiControls.hideSelectedButtonID);
-			disabled.push_back(uiControls.hideUnselectedButtonID);
-		}
-
-		getNotifier()->enableDisableControls(enabled, disabled);
 	}
 }
 
@@ -3063,15 +2995,18 @@ void Model::visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config)
 
 void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type)
 {
-	removeUIControls();
+	ViewerToolBar::instance().removeUIControls();
 
 	if (_type == ot::WidgetViewBase::View3D)
 	{
-		setupUIControls3D();
+		ViewerToolBar::instance().setupUIControls3D();
 	}
 	else if(_type == ot::WidgetViewBase::View1D)
 	{
-		setupUIControls1D();
+		ViewerToolBar::instance().setupUIControls1D();
+	}
+	else if (_type == ot::WidgetViewBase::ViewText) {
+		ViewerToolBar::instance().setupUIControlsText();
 	}
 	else
 	{

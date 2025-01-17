@@ -260,9 +260,9 @@ public:
 
 	std::string getCollectionName() const { return m_collectionName; }
 
-	void switchToViewTab(void);
+	void switchToViewMenuTab(void);
 
-	void switchToTab(const std::string &menu);
+	void switchToMenuTab(const std::string& _menu);
 
 	void closeAllViewerTabs(void);
 

@@ -142,6 +142,9 @@
     <ClCompile Include="src\Visualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\ViewerToolBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -289,6 +292,9 @@
       <Filter>include\Visualiser</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewChangedStates.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ViewerToolBar.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

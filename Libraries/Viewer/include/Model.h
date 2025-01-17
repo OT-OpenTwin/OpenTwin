@@ -8,6 +8,7 @@
 #include "Geometry.h"
 #include "SceneNodeBase.h"
 #include "ViewChangedStates.h"
+
 // std header
 #include <list>
 #include <tuple>
@@ -23,44 +24,6 @@ class SceneNodeGeometry;
 class SceneNodePlot1D;
 class SceneNodePlot1DCurve;
 class ManipulatorBase;
-
-class UIControls
-{
-public:
-	UIControls() :
-		viewPageID(0),
-		operationsGroupID(0),
-		visiblityGroupID(0),
-		styleGroupID(0),
-		resetView1DButtonID(0),
-		resetView3DButtonID(0),
-		showAllButtonID(0),
-		showSelectedButtonID(0),
-		hideSelectedButtonID(0),
-		hideUnselectedButtonID(0),
-		stateWireframeButtonID(0),
-		stateWorkingPlaneButtonID(0),
-		stateAxisCrossButtonID(0),
-		stateCenterAxisCrossButtonID(0),
-		cutplaneButtonID(0)
-	{};
-
-	unsigned long long viewPageID;
-	unsigned long long operationsGroupID;
-	unsigned long long visiblityGroupID;
-	unsigned long long styleGroupID;
-	unsigned long long resetView1DButtonID;
-	unsigned long long resetView3DButtonID;
-	unsigned long long showAllButtonID;
-	unsigned long long showSelectedButtonID;
-	unsigned long long hideSelectedButtonID;
-	unsigned long long hideUnselectedButtonID;
-	unsigned long long stateWireframeButtonID;
-	unsigned long long stateWorkingPlaneButtonID;
-	unsigned long long stateAxisCrossButtonID;
-	unsigned long long stateCenterAxisCrossButtonID;
-	unsigned long long cutplaneButtonID;
-};
 
 class FaceSelection
 {
@@ -195,7 +158,7 @@ public:
 	void updateObjectFacetsFromDataBase(unsigned long long modelEntityID, unsigned long long entityID, unsigned long long entityVersion);
 
 	void setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree);
-	void executeAction(unsigned long long buttonID);
+	void executeAction(unsigned long long _buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
 	void clearHoverView(void);
 	void setHoverView(SceneNodeBase *selectedItem);
@@ -273,10 +236,7 @@ public:
 private:
 	// Methods
 	void	   fillTree(void);
-	void	   setupUIControls3D(void);
-	void	   setupUIControls1D(void);
-	void	   removeUIControls(void);
-	void	   updateUIControlState(const ot::UIDList& _selectedTreeItemID);
+	
 	void	   showAllSceneNodes(SceneNodeBase *root);
 	void	   hideAllSceneNodes(SceneNodeBase *root);
 	void	   showSelectedSceneNodes(SceneNodeBase *root);
@@ -289,6 +249,10 @@ private:
 	void       toggleAxisCross(void);
 	void       toggleCenterAxisCross(void);
 	void	   toggleCutplane(void);
+
+	void exportTextEditor(void);
+	void saveTextEditor(void);
+
 	void	   resetSelection(SceneNodeBase *root);
 	void       setAllShapesOpaque(SceneNodeBase *root);
 	void       setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root);
@@ -348,11 +312,9 @@ private:
 	std::map <unsigned long long, SceneNodeBase *> modelItemToSceneNodesMap;
 	std::map <osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;
 	bool										   isActive;
-	UIControls									   uiControls;
 	bool										   wireFrameState;
 	SceneNodeBase*								   currentHoverItem;
 	unsigned long long							   dataModelID;
-	std::list<unsigned long long>				   removeItemIDList;
 	eSelectionMode								   currentSelectionMode;
 	ot::serviceID_t								   currentSelectionReplyTo;
 	std::string									   currentSelectionAction;
