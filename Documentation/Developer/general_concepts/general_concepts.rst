@@ -15,4 +15,5 @@ See here for more details:
    json
    logging
    session_management
+   service_api_structure
    
