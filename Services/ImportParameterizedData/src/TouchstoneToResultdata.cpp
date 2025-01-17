@@ -3,6 +3,8 @@
 #include "OTCore/FolderNames.h"
 #include "Application.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "DataBase.h"
 
 #include "ResultCollectionExtender.h"
@@ -47,7 +49,8 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		
 		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
 		
-		TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
+		TouchstoneHandler handler(m_fileName);
+		importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts, handler);
 		DatasetDescription dataset = std::move(extractDatasetDescription(handler));
 			
 		auto& optionSettings = handler.getOptionSettings();
@@ -83,7 +86,7 @@ const std::string TouchstoneToResultdata::createSeriesName(const std::string& _f
 
 bool TouchstoneToResultdata::seriesAlreadyExists(const std::string& _seriesName)
 {
-	std::list<std::string> folderContent =	_modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder,true);
+	std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder,true);
 	for (const std::string& entityName : folderContent)
 	{
 		if (entityName == _seriesName)
@@ -94,7 +97,7 @@ bool TouchstoneToResultdata::seriesAlreadyExists(const std::string& _seriesName)
 	return false;
 }
 
-TouchstoneHandler TouchstoneToResultdata::importTouchstoneFile(const std::string& _fileName, const std::string& _fileContent, uint64_t _uncompressedLength, int _numberOfPorts)
+void TouchstoneToResultdata::importTouchstoneFile(const std::string& _fileName, const std::string& _fileContent, uint64_t _uncompressedLength, int _numberOfPorts, TouchstoneHandler& _handler)
 {
 	// Decode the encoded string into binary data
 	int decoded_compressed_data_length = Base64decode_len(_fileContent.c_str());
@@ -112,17 +115,14 @@ TouchstoneHandler TouchstoneToResultdata::importTouchstoneFile(const std::string
 	decodedCompressedString = nullptr;
 
 	std::string unpackedFileContent(decodedString, _uncompressedLength);
-	TouchstoneHandler handler(_fileName);
 	try
 	{
-		handler.analyseFile(unpackedFileContent, _numberOfPorts);
+		_handler.analyseFile(unpackedFileContent, _numberOfPorts);
 	}
 	catch (const std::exception& e)
 	{
 		_uiComponent->displayMessage("Failed to anaylse touchstone file due to following issue: " + std::string(e.what()));
 	}
-	//ToDo: Display summary of touchstone data import
-	return handler;
 }
 
 DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneHandler& _touchstoneHandler)

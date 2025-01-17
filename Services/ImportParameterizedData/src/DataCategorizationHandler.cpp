@@ -11,6 +11,8 @@
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "OTServiceFoundation/TableIndexSchemata.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include <algorithm>
 #include <bitset>
@@ -41,7 +43,7 @@ void DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 		for (const ot::EntityInformation& entityInfo : _selectedEntities)
 		{
 			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityInfo.getEntityID());
-			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
+			EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
 			selectedEntities.push_back(baseEnt);
 		}
 		std::string tableName("");
@@ -121,8 +123,8 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<Entit
 	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
 		ot::EntityInformation entityInfo;
-		_modelComponent->getEntityInformation(m_rmdEntityName, entityInfo);
-		EntityBase* entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+		ot::ModelServiceAPI::getEntityInformation(m_rmdEntityName, entityInfo);
+		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 		auto dataCatEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
 		assert(dataCatEntity != nullptr);
 		assert(dataCatEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
@@ -366,7 +368,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		return;
 	}
 
-	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion, Application::instance()->getClassFactory());
+	auto tableBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion, Application::instance()->getClassFactory());
 	m_bufferedTableID = -1;
 	m_bufferedTableVersion = -1;
 	auto tableEntity = dynamic_cast<IVisualisationTable*>(tableBase);
@@ -411,11 +413,11 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		
 			// We need to initialise the entityProperty with the python folder
 			ot::EntityInformation entityInfo;
-			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
+			std::list<std::string> allScripts = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
 
 			if (allScripts.size() > 0)
 			{
-				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+				ot::ModelServiceAPI::getEntityInformation(*allScripts.begin(), entityInfo);
 				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, entityInfo.getEntityName(), entityInfo.getEntityID(), dataType);
 			}
 			else
@@ -507,8 +509,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		topologyEntityForceVisible.push_back(false);
 	}
 
-	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
 }
 
 std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges)
@@ -588,9 +589,9 @@ std::map<std::string, ot::UID> DataCategorizationHandler::getAllScripts()
 {
 	std::map<std::string, ot::UID> scriptUIDsByName;
 	
-	std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
+	std::list<std::string> allScripts = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(allScripts, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(allScripts, entityInfos);
 
 	for (const auto& entityInfo : entityInfos)
 	{
@@ -604,14 +605,14 @@ inline void DataCategorizationHandler::ensureEssentials()
 	if (m_rmdEntityName == "")
 	{
 		ot::EntityInformation entityInfo;
-		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
-		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
+		std::list<std::string> allItems = ot::ModelServiceAPI::getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
+		ot::ModelServiceAPI::getEntityInformation(*allItems.begin(), entityInfo);
 		m_rmdEntityName = entityInfo.getEntityName();
 	}
 	if (m_scriptFolderUID == -1)
 	{
 		ot::EntityInformation entityInfo;
-		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
+		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
 		m_scriptFolderUID = entityInfo.getEntityID();
 	}
 }

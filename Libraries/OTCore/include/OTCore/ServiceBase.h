@@ -5,7 +5,6 @@
 
 
 #pragma once
-#pragma warning(disable : 4251)
 
 // Open Twin header
 #include "OTCore/CoreAPIExport.h"
@@ -14,6 +13,8 @@
 
 // C++ header
 #include <string>
+
+#pragma warning(disable : 4251)
 
 namespace ot {
 	

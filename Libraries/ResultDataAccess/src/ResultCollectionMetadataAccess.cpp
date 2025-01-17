@@ -4,8 +4,10 @@
 #include "CrossCollectionAccess.h"
 #include "MetadataEntityInterface.h"
 #include "OTCore/FolderNames.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "ClassFactory.h"
 #include "DataBase.h"
+#include "EntityAPI.h"
 #include "EntityMetadataCampaign.h"
 #include "EntityMetadataSeries.h"
 
@@ -255,9 +257,9 @@ void ResultCollectionMetadataAccess::loadExistingCampaignData(ClassFactory* _cla
 
 std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata(ClassFactory *_classFactory)
 {
-	std::list<std::string> allExistingMetadataNames = m_modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder);
+	std::list<std::string> allExistingMetadataNames = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder);
 	std::list<ot::EntityInformation> entityInfos;
-	m_modelComponent->getEntityInformation(allExistingMetadataNames, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(allExistingMetadataNames, entityInfos);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
 	for (auto& entityInfo : entityInfos)
 	{
@@ -269,7 +271,7 @@ std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata
 	allExistingMetadata.reserve(entityInfos.size());
 	for (auto& entityInfo : entityInfos)
 	{
-		allExistingMetadata.push_back(m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *_classFactory));
+		allExistingMetadata.push_back(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *_classFactory));
 	}
 	
 	return allExistingMetadata;

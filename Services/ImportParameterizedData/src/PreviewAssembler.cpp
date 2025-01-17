@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ClassFactory.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 std::shared_ptr<EntityParameterizedDataPreviewTable> PreviewAssembler::AssembleTable(ot::UIDList& existingRanges)
 {
@@ -26,7 +28,7 @@ void PreviewAssembler::LoadSelectedRangesAndTableSources(ot::UIDList & existingR
 	std::list<std::string> tableSources;
 	for (ot::UID existingRange : existingRanges)
 	{
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(existingRange, Application::instance()->getPrefetchedEntityVersion(existingRange), Application::instance()->getClassFactory());
+		auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(existingRange, Application::instance()->getPrefetchedEntityVersion(existingRange), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEnt));
 		if (rangeEntity == nullptr)
 		{
@@ -42,9 +44,9 @@ void PreviewAssembler::LoadSelectedRangesAndTableSources(ot::UIDList & existingR
 
 void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 {
-	std::list<std::string> tableSources = _modelComponent->getListOfFolderItems(_tableFolder);
+	std::list<std::string> tableSources = ot::ModelServiceAPI::getListOfFolderItems(_tableFolder);
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(tableSources, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(tableSources, entityInfos);
 	for (std::string tableName : tableNames)
 	{
 		bool referencedTableExists = false;
@@ -53,7 +55,7 @@ void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 			
 			if (entityInfo.getEntityName() == tableName)
 			{
-				auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+				auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 				std::shared_ptr<EntityParameterizedDataTable> sourceTable(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
 				if (sourceTable == nullptr)
 				{

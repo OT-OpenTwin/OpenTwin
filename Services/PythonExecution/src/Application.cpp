@@ -2,6 +2,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
+#include "OTModelAPI/ModelAPIManager.h"
 
 Application& Application::instance(void) {
 	static Application g_instance;
@@ -10,7 +11,7 @@ Application& Application::instance(void) {
 
 void Application::setModelServiceURL(const std::string& url)
 {
-	m_modelServiceAPI = new ot::ModelServiceAPI("", url);
+	ot::ModelAPIManager::setModelServiceURL(url);
 }
 
 void Application::setUIServiceURL(const std::string& url)
@@ -26,7 +27,7 @@ void Application::prefetchDocumentsFromStorage(const std::list<ot::UID>& entitie
 {
 	// First get the version information for all entities
 	std::list<ot::EntityInformation> entityInfo;
-	m_modelServiceAPI->getEntityInformation(entities, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entities, entityInfo);
 
 	// Now prefetch the documents
 	prefetchDocumentsFromStorage(entityInfo);
@@ -54,9 +55,7 @@ ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 	return m_prefetchedEntityVersions[entityID];
 }
 
-Application::Application() 
-	: m_modelServiceAPI(nullptr)
-{
+Application::Application() {
 	m_classFactory.SetNextHandler(&m_classFactoryBlock);
 	m_classFactoryBlock.SetChainRoot(&m_classFactory);
 }

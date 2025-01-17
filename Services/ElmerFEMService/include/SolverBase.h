@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OTCore/TypeNames.h"
+#include "EntityProperties.h"
 #include "EntityInformation.h"
 
 #include <fstream>
@@ -18,8 +19,6 @@ namespace ot {
 		class UiComponent;
 	}
 }
-
-#include "EntityProperties.h"
 
 class SolverBase {
 public:

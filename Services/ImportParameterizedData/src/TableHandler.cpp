@@ -1,6 +1,9 @@
 #include "TableHandler.h"
 #include "FileToTableExtractorFactory.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "TableStatisticAnalyser.h"
 
 #include "ClassFactory.h"
@@ -13,7 +16,7 @@ TableHandler::TableHandler(const std::string tableFolder) : _tableFolder(tableFo
 
 void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 {	
-	auto sourceFile = dynamic_cast<EntityFile*>(_modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersionID, Application::instance()->getClassFactory()));
+	auto sourceFile = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(sourceID, sourceVersionID, Application::instance()->getClassFactory()));
 	if (sourceFile == nullptr)
 	{
 		assert(0); // Only EntityFile should reach here.
@@ -62,7 +65,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	std::list<ot::UID> dataEntityVersionList{ tableData->getEntityStorageVersion()};
 	std::list<ot::UID> dataEntityParentList{ topoEnt->getEntityID() };
 
-	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table");
 	_uiComponent->displayMessage("Created table " + fullName + "\n");
 }

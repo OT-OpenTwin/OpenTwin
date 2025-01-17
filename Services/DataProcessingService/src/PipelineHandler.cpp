@@ -15,6 +15,8 @@
 #include "BlockHandlerFileWriter.h"
 #include "BlockHandlerStorage.h"
 
+#include "OTCore/Logger.h"
+
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
 	try

@@ -24,6 +24,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
@@ -117,9 +119,9 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			if (m_selectedEntities.size() == 1)
 			{
 				std::list<ot::EntityInformation> entityInfos;
-				m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
+				ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, entityInfos);
 
-				auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), getClassFactory());
+				auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), getClassFactory());
 				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 				if (dbAccess != nullptr)
 				{
@@ -140,7 +142,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			if (dependencies.getPythonScriptFolderID() == 0)
 			{
 				ot::EntityInformation entityInfo;
-				m_modelComponent->getEntityInformation("Scripts", entityInfo);
+				ot::ModelServiceAPI::getEntityInformation("Scripts", entityInfo);
 				ExternalDependencies dependencies;
 				dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
 			}

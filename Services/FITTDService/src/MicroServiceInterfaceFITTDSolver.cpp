@@ -4,7 +4,6 @@
 #include "SystemDependencies/Allignments.h"
 #include "SystemDependencies/SystemDependentDefines.h"
 
-
 #include "CurlCoefficients/CurlCoefficients3D.h"
 #include "Simulation/FITTD3DBuilder.h"
 
@@ -30,7 +29,9 @@
 #include "ResultHandling/ExecutionBarrierFixedTimesteps.h"
 #include "ResultHandling/ExecutionBarrierFrequencyAndLast.h"
 #include "ResultHandling/ResultSinkFilePrinter.h"
-						 
+
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "FolderNames.h"
 
 #include <chrono>
@@ -80,7 +81,7 @@ void MicroServiceInterfaceFITTDSolver::LoadEntityInformation(std::string solverN
 	uiComponent->displayMessage("Mesh loaded successfully.\n");
 
 	_signals.clear();
-	std::list<std::string> ports = modelComponent->getListOfFolderItems(solverName + "/" + FolderNames::GetFolderNamePorts());
+	std::list<std::string> ports = ot::ModelServiceAPI::getListOfFolderItems(solverName + "/" + FolderNames::GetFolderNamePorts());
 	for (std::string port : ports)
 	{
 		PortSettings newPort = LoadPortSetting(port, solverName);
@@ -112,7 +113,7 @@ void MicroServiceInterfaceFITTDSolver::LoadEntityInformation(std::string solverN
 	}
 
 	//Load all monitor settings
-	std::list<std::string> monitors = modelComponent->getListOfFolderItems(solverName + "/" + FolderNames::GetFolderNameMonitors());
+	std::list<std::string> monitors = ot::ModelServiceAPI::getListOfFolderItems(solverName + "/" + FolderNames::GetFolderNameMonitors());
 	for (std::string monitor : monitors)
 	{
 		_monitorSettings.push_back(LoadMonitorSetting(monitor));

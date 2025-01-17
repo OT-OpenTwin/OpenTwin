@@ -11,6 +11,9 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include <string>
 #include <list>
 #include <map>
@@ -38,7 +41,7 @@ void Transformations::enterTransformMode(const std::list<ot::EntityInformation> 
 		count++;
 	}
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM, 
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM,
 		false, "", ot::components::UiComponent::entitySelectionAction::TRANSFORM_SHAPES, "transform", options, serviceID);
 }
 
@@ -138,7 +141,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 	}
 
 	std::list<ot::EntityInformation> geometryEntityInfo;
-	modelComponent->getEntityInformation(shapeNames, geometryEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(shapeNames, geometryEntityInfo);
 
 	// Now prefetch all geometry entities (except for the ones which are already in the cache)
 	entityCache->prefetchEntities(geometryEntityInfo);
@@ -149,7 +152,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 
 	for (auto entity : geometryEntityInfo)
 	{
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entity.getEntityID(), entity.getEntityVersion(), *classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entity.getEntityID(), entity.getEntityVersion(), *classFactory));
 
 		if (geometryEntity != nullptr)
 		{
@@ -160,14 +163,14 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 
 	// Now get the information about all the breps
 	std::list<ot::EntityInformation> brepEntityInfo;
-	modelComponent->getEntityInformation(requiredBreps, brepEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(requiredBreps, brepEntityInfo);
 
 	// Prefetch all the brep entities
 	entityCache->prefetchEntities(brepEntityInfo);
 
 	// Now we go through all geometry entities and update their transformation information
 
-	modelComponent->enableMessageQueueing(true);
+	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	// Read the transformation properties
 	rapidjson::Document doc;
@@ -300,9 +303,9 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 	getUpdateManager()->checkParentUpdates(modifiedEntities);
 
 	// Finally, store the new model state
-	modelComponent->modelChangeOperationCompleted("transform shapes");
-	modelComponent->enableMessageQueueing(false);
-	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
+	ot::ModelServiceAPI::modelChangeOperationCompleted("transform shapes");
+	ot::ModelServiceAPI::enableMessageQueueing(false);
+	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
 	// Unlock the ui
 	uiComponent->unlockUI(lockFlags);

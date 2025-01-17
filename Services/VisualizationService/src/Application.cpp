@@ -17,6 +17,8 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityAPI.h"
 
 // Application specific includes
 #include "EntityVis2D3D.h"
@@ -154,7 +156,7 @@ void Application::EnsureVisualizationModelIDKnown(void)
 	}
 	
 	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
+	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
 }
 
 void Application::updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, bool itemsVisible)
@@ -218,7 +220,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 
 void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bool itemsVisible)
 {
-	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D*>(m_modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, getClassFactory()));
+	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, getClassFactory()));
 	if (visEntity == nullptr)
 	{
 		assert(0); // Wrong entity type of entity id / version

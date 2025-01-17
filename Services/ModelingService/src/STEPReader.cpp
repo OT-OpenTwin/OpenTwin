@@ -8,6 +8,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/uiComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "XSControl_WorkSession.hxx"
 #include "XSControl_TransferReader.hxx"
@@ -83,7 +84,7 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 
 	// Enable write caching to database and message queueing
 	DataBase::GetDataBase()->queueWriting(true);
-	application->modelComponent()->enableMessageQueueing(true);
+	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	std::string messages;
 	readStepFile(fileName, rootName, removeFile, messages);
@@ -116,17 +117,16 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 		delete entity;
 	}
 
-	application->modelComponent()->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-												      dataEntityIDList, dataEntityVersionList, dataEntityParentList, "import STEP file" );
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "import STEP file" );
 
 	messages = std::to_string(entityList.size()) + " shape(s) imported.\n\n" + messages;
 	application->uiComponent()->displayMessage(messages);
 
 	// Disable message queueing. This will send all messages.
-	application->modelComponent()->enableMessageQueueing(false);
+	ot::ModelServiceAPI::enableMessageQueueing(false);
 
 	// Refresh the view
-	application->uiComponent()->refreshAllViews(application->modelComponent()->getCurrentVisualizationModelID());
+	application->uiComponent()->refreshAllViews(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
 	application->uiComponent()->setProgress(100);
 	application->uiComponent()->closeProgressInformation();
@@ -450,7 +450,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					std::list<std::string> entityList{ materialsFolder };
 					std::list<ot::EntityInformation> entityInfo;
 
-					application->modelComponent()->getEntityInformation(entityList, entityInfo);
+					ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 					assert(entityInfo.size() == 1);
 					assert(entityInfo.front().getEntityName() == materialsFolder);
@@ -615,7 +615,7 @@ std::string STEPReader::determineUniqueRootName(const std::string &fileName)
 	std::string baseName = "Geometry/" + std::filesystem::path(fileName).stem().string();
 
 	// First get a list of all folder items of the Geometries folder
-	std::list<std::string> geometryItems = application->modelComponent()->getListOfFolderItems("Geometry");
+	std::list<std::string> geometryItems = ot::ModelServiceAPI::getListOfFolderItems("Geometry");
 
 	// Create a unique name for the new solver item
 	std::string rootName = baseName;

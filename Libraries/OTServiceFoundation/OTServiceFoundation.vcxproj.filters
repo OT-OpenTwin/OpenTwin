@@ -22,9 +22,6 @@
     <ClCompile Include="src\ModelComponent.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelServiceAPI.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\PythonServiceInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -94,9 +91,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h">

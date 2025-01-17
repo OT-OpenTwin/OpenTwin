@@ -41,6 +41,7 @@
 #include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyStringList.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -396,7 +397,7 @@ bool Application::settingChanged(const ot::Property * _item) {
 std::list<ot::EntityInformation> Application::getSelectedGeometryEntities(void)
 {
 	std::list<ot::EntityInformation> entityInfo;
-	m_modelComponent->getSelectedEntityInformation(entityInfo, "EntityGeometry");
+	ot::ModelServiceAPI::getSelectedEntityInformation(entityInfo, "EntityGeometry");
 
 	// Now we filter those which are under the "Geometry" folder
 	std::list<ot::EntityInformation> entityInfoGeometry;

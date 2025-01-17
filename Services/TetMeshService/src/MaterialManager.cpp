@@ -10,6 +10,9 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityInformation.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)
 {
 	application->modelComponent()->loadMaterialInformation();
@@ -48,14 +51,14 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 
 	// In a next step, we get the information for all materials from the model service
 	std::list<ot::EntityInformation> materialInformation;
-	application->modelComponent()->getEntityInformation(materialNames, materialInformation);
+	ot::ModelServiceAPI::getEntityInformation(materialNames, materialInformation);
 
 	// Finally, load all materials and add them to the material map
 	application->prefetchDocumentsFromStorage(materialInformation);
 
 	for (auto mat : materialInformation)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *> (ot::EntityAPI::readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{

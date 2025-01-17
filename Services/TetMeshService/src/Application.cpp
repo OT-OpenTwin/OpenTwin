@@ -21,6 +21,8 @@
 // Open twin header
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityAPI.h"
 
 #include "ModelState.h"
 
@@ -234,7 +236,7 @@ void Application::createMesh(void)
 	}
 
 	// First get a list of all folder items of the Solvers folder
-	std::list<std::string> meshItems = m_modelComponent->getListOfFolderItems("Meshes");
+	std::list<std::string> meshItems = ot::ModelServiceAPI::getListOfFolderItems("Meshes");
 
 	// Create a unique name for the new mesh item
 	int count = 1;
@@ -262,7 +264,7 @@ void Application::createMesh(void)
 		std::list<std::string> entityList{materialsFolder};
 		std::list<ot::EntityInformation> entityInfo;
 
-		m_modelComponent->getEntityInformation(entityList, entityInfo);
+		ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 		assert(entityInfo.size() == 1);
 		assert(entityInfo.front().getEntityName() == materialsFolder);
@@ -282,8 +284,7 @@ void Application::createMesh(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create tet mesh");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create tet mesh");
 }
 
 void Application::updateMesh(void)
@@ -305,7 +306,7 @@ void Application::updateMesh(void)
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> mesherRunMap;
@@ -343,7 +344,7 @@ void Application::updateMesh(void)
 
 	// Now we retrieve information about the mesh items
 	std::list<ot::EntityInformation> mesherInfo;
-	m_modelComponent->getEntityInformation(mesherRunList, mesherInfo);
+	ot::ModelServiceAPI::getEntityInformation(mesherRunList, mesherInfo);
 
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsMesher;
@@ -359,7 +360,7 @@ void Application::updateMesh(void)
 	std::map<std::string, EntityMeshTet *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory()));
+		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory()));
 		assert(entity != nullptr);
 
 		if (entity != nullptr)
@@ -491,7 +492,7 @@ std::string Application::getCurrentlySelectedMeshName(void)
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	std::string selectedMeshItem;
 
@@ -545,7 +546,7 @@ ot::UID Application::getCurrentlySelectedMeshDataID(void)
 
 	entityList.push_back(currentMeshDataName);
 
-	m_modelComponent->getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 	if (entityInfo.empty()) return 0;
 
 	return entityInfo.front().getEntityID();
@@ -567,7 +568,7 @@ void Application::importMeshFile(const std::string& originalName, const std::str
 	std::string meshBaseName = "Meshes/" + std::filesystem::path(originalName).stem().string();
 
 	// First get a list of all folder items of the Solvers folder
-	std::list<std::string> meshItems = m_modelComponent->getListOfFolderItems("Meshes");
+	std::list<std::string> meshItems = ot::ModelServiceAPI::getListOfFolderItems("Meshes");
 
 	// Determine a unique name for the new mesh
 	std::string meshName = meshBaseName;

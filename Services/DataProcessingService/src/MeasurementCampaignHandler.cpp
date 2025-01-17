@@ -3,6 +3,7 @@
 #include "ClassFactory.h"
 #include "OTCore/FolderNames.h"
 #include "DataBase.h"
+#include "EntityAPI.h"
 
 void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName, ClassFactory *classFactory)
 {
@@ -20,7 +21,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 
 		for (auto& entityInfo : allMeasurementMetadata)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *classFactory);
+			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *classFactory);
 			auto metadata = dynamic_cast<EntityMetadataSeries*>(baseEnt);
 			assert(metadata != nullptr);
 			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));

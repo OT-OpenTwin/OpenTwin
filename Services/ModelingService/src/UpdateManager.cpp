@@ -11,6 +11,8 @@
 #include "entityCache.h"
 #include "PrimitiveManager.h"
 
+#include "EntityAPI.h"
+
 #include <map>
 
 #include "TopoDS.hxx"
@@ -115,7 +117,7 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 {
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
 
 	if (geomEntity == nullptr)
 	{
@@ -385,7 +387,7 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 {
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
 	if (geomEntity == nullptr)
 	{
 		// We cannot update this entity

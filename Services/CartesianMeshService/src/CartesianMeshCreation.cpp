@@ -33,6 +33,8 @@
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #undef max
 #undef min
@@ -140,7 +142,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		for (auto entityID : geometryEntitiesID)
 		{
 			ot::UID entityVersion = getApplication()->getPrefetchedEntityVersion(entityID);
-			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 
 			if (geom == nullptr)
 			{
@@ -184,8 +186,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 				ot::UID brepID = geomEntity->getBrepStorageObjectID();
 				ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(facetID, facetVersion, application->getClassFactory()));
-				EntityBrep *brep = dynamic_cast<EntityBrep *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
+				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetID, facetVersion, application->getClassFactory()));
+				EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
 
 				geomEntity->setFacetEntity(facet);
 				geomEntity->setBrepEntity(brep);
@@ -354,8 +356,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		topologyEntityForceVisible.push_front(false);
 
 		// Add the newly created entities to the model service
-		getApplication()->modelComponent()->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-															   dataEntityIDList, dataEntityVersionList, dataEntityParentList, "update cartesian mesh");
+		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "update cartesian mesh");
 	}
 	catch (std::string &error)
 	{
@@ -499,7 +500,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	}
 
 	std::list<ot::EntityInformation> materialInfo;
-	getApplication()->modelComponent()->getEntityInformation(materialNamesList, materialInfo);
+	ot::ModelServiceAPI::getEntityInformation(materialNamesList, materialInfo);
 
 	// Now we load the materials one by one and store them in the materials map
 
@@ -512,7 +513,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 
 	for (auto info : materialInfo)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{
@@ -568,7 +569,7 @@ void CartesianMeshCreation::deleteMesh(void)
 
 	// Delete previous mesh data from the model (if it exsits)
 	std::list<std::string> entityList{getEntityMesh()->getName() + "/Mesh"};
-	getApplication()->modelComponent()->deleteEntitiesFromModel(entityList);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(entityList);
 }
 
 void CartesianMeshCreation::reportTime(const std::string &message, std::time_t &timer)

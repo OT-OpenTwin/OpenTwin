@@ -6,6 +6,8 @@
 #include "ClassFactory.h"
 #include "EntityFaceAnnotation.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include "TopExp_Explorer.hxx"
@@ -16,7 +18,7 @@
 
 void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 {
-	std::list<ot::UID> annotationEntityIDs = application->modelComponent()->getIDsOfFolderItemsOfType("", "EntityFaceAnnotation", true);
+	std::list<ot::UID> annotationEntityIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("", "EntityFaceAnnotation", true);
 
 	if (annotationEntityIDs.empty()) return;
 
@@ -29,7 +31,7 @@ void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 		ot::UID entityID = annotation;
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
 
-		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 		assert(annotationEntity != nullptr);
 
 		if (annotationEntity != nullptr)

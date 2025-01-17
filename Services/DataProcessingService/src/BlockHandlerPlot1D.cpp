@@ -4,6 +4,7 @@
 #include "GraphNode.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity ,handlerMap)
@@ -143,7 +144,7 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		topoEntID.push_back(plotID->getEntityID());
 		topoEntVers.push_back(plotID->getEntityStorageVersion());
 		forceVis.push_back(false);
-		_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
+		ot::ModelServiceAPI::addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
 	}
 	return allSet;
 }

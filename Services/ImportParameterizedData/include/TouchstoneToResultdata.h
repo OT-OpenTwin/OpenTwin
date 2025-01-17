@@ -29,7 +29,7 @@ private:
 	const std::string createSeriesName(const std::string& fileName);
 	bool seriesAlreadyExists(const std::string& seriesName);
 
-	TouchstoneHandler importTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts);
+	void importTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts, TouchstoneHandler& _handler);
 	DatasetDescription extractDatasetDescription(TouchstoneHandler& _handler);
 };
 

@@ -16,6 +16,8 @@
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include <windows.h> // winapi
 
@@ -62,7 +64,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 
 	// Get the properties for all entities of the current mesh
 	std::map<ot::UID, EntityProperties> entityProperties;
-	application->modelComponent()->getEntityProperties(meshDataID, true, "Solver", entityProperties);
+	ot::ModelServiceAPI::getEntityProperties(meshDataID, true, "Solver", entityProperties);
 
 	// Get all the material property infomation
 	std::map<std::string, EntityProperties> materialProperties;
@@ -138,7 +140,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo)
 {
 	std::list<ot::EntityInformation> info;
-	application->modelComponent()->getEntityChildInformation(meshDataID, info, true);
+	ot::ModelServiceAPI::getEntityChildInformation(meshDataID, info, true);
 
 	for (auto item : info)
 	{
@@ -151,7 +153,7 @@ void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityPropertie
 	application->modelComponent()->loadMaterialInformation();
 
 	std::map<ot::UID, EntityProperties> entityProperties;
-	application->modelComponent()->getEntityProperties("Materials", true, "", entityProperties);
+	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", entityProperties);
 
 	ot::UIDList entityIDList;
 	for (auto item : entityProperties)
@@ -160,7 +162,7 @@ void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityPropertie
 	}
 
 	std::list<ot::EntityInformation> entityInformation;
-	application->modelComponent()->getEntityInformation(entityIDList, entityInformation);
+	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInformation);
 
 	for (auto &entity : entityInformation)
 	{
@@ -240,7 +242,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 
 	entityList.push_back(currentMeshDataName);
 
-	application->modelComponent()->getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 	if (entityInfo.empty()) return "";
 
 	meshDataID = entityInfo.front().getEntityID();
@@ -250,7 +252,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	entityIDList.push_back(meshDataID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (application->modelComponent()->readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID), application->getClassFactory()));
+	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID), application->getClassFactory()));
 	if (entity == nullptr) return "";
 
 	ot::UID gmshDataStorageID = entity->getGmshDataStorageId();
@@ -263,7 +265,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	entityIDList.push_back(gmshDataStorageID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (application->modelComponent()->readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
+	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
 	if (entityData == nullptr) return "";
 
 	std::vector<char> meshContent = entityData->getData();

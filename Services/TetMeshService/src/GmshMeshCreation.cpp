@@ -63,6 +63,9 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 GmshMeshCreation::GmshMeshCreation(Application *app) : 
 	application(app),
 	entityMesh(nullptr),
@@ -93,7 +96,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	std::list<std::string> entityList{ materialsFolder };
 	std::list<ot::EntityInformation> entityInfo;
 
-	application->modelComponent()->getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
 	assert(entityInfo.front().getEntityName() == materialsFolder);
@@ -114,7 +117,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	gmsh::initialize();
 
 	DataBase::GetDataBase()->queueWriting(true);
-	application->modelComponent()->enableMessageQueueing(true);
+	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	Properties properties;
 	ModelBuilder meshModelBuilder(application);		
@@ -396,7 +399,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 
 	// Turn off the write queue (this will store all entities in the data base)
 	DataBase::GetDataBase()->queueWriting(false);
-	application->modelComponent()->enableMessageQueueing(false);
+	ot::ModelServiceAPI::enableMessageQueueing(false);
 
 	reportTime("\tTime: Mesh items stored to data base", timer, properties.getVerbose());
 
@@ -414,7 +417,7 @@ void GmshMeshCreation::deleteMesh(void)
 	entityNameList.push_back(getEntityMesh()->getName() + "/Mesh");
 	entityNameList.push_back(getEntityMesh()->getName() + "/Mesh Errors");
 
-	application->modelComponent()->deleteEntitiesFromModel(entityNameList, false);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(entityNameList, false);
 
 	getEntityMesh()->deleteMeshData();
 }
@@ -465,7 +468,7 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 	for (auto entityID : geometryEntitiesID)
 	{
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
-		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(application->modelComponent()->readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
 
 		if (geom == nullptr)
 		{
@@ -497,7 +500,7 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 		ot::UID brepID = geomEntity->getBrepStorageObjectID();
 		ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-		EntityBrep *brep = dynamic_cast<EntityBrep *>(application->modelComponent()->readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
+		EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
 
 		geomEntity->setBrepEntity(brep);
 	}
@@ -618,7 +621,7 @@ void GmshMeshCreation::hideAllOtherEntities(EntityMeshTet *thisMesh)
 {
 	ot::JsonDocument docHideGeometry;
 	docHideGeometry.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
-	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
 	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Geometry", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	std::string tmp;
@@ -626,14 +629,14 @@ void GmshMeshCreation::hideAllOtherEntities(EntityMeshTet *thisMesh)
 
 	ot::JsonDocument docHideMeshes;
 	docHideMeshes.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
-	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
 	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Meshes", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	application->uiComponent()->sendMessage(true, docHideMeshes, tmp);
 
 	ot::JsonDocument docShowMesh;
 	docShowMesh.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
-	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ID, application->modelComponent()->getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
+	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
 	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString(thisMesh->getName(), docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	application->uiComponent()->sendMessage(true, docShowMesh, tmp);

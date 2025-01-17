@@ -7,6 +7,8 @@
 #include "EntityBase.h"
 #include "ClassFactory.h"
 
+#include "EntityAPI.h"
+
 std::map<std::pair<ot::UID, ot::UID>, DataSourceManagerItem *> DataSourceManager::dataItems;
 
 DataSourceManager::DataSourceManager()
@@ -24,12 +26,12 @@ DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID 
 	if (!isDataItemLoaded(sourceID, sourceVersion))
 	{
 		// Now load the data item to determine its type
-		EntityBase *resultEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(sourceID, sourceVersion, *classFactory));
+		EntityBase *resultEntity = dynamic_cast<EntityBase*>(ot::EntityAPI::readEntityFromEntityIDandVersion(sourceID, sourceVersion, *classFactory));
 		EntityBase *meshEntity = nullptr;
 
 		if (meshID > 0)
 		{
-			meshEntity = dynamic_cast<EntityBase*>(modelComponent->readEntityFromEntityIDandVersion(meshID, meshVersion, *classFactory));
+			meshEntity = dynamic_cast<EntityBase*>(ot::EntityAPI::readEntityFromEntityIDandVersion(meshID, meshVersion, *classFactory));
 		}
 
 		if (resultEntity != nullptr)

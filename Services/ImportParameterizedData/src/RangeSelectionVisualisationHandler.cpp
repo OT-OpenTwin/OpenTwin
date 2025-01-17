@@ -7,6 +7,8 @@
 // OpenTwin header
 #include "OTCore/RuntimeTests.h"
 #include "OTServiceFoundation/TableIndexSchemata.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityAPI.h"
 
 // std header
 #include <map>
@@ -134,7 +136,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisatio
 		throw std::exception("Model is not connected");
 	}
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	modelComponent->getEntityInformation(_selectedEntityIDs, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(_selectedEntityIDs, selectedEntityInfo);
 
 	//First we do a preselection on the base of the name. 
 	ot::UIDList relevantIDs, relevantVersions;
@@ -153,7 +155,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisatio
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities;
 	for (const ot::UID& uid : relevantIDs)
 	{
-		EntityBase* entBase = modelComponent->readEntityFromEntityIDandVersion(uid, *version, Application::instance()->getClassFactory());
+		EntityBase* entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(uid, *version, Application::instance()->getClassFactory());
 		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
 		if (selectionRange != nullptr)
 		{
@@ -187,8 +189,8 @@ const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisual
 bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
 {
 	ot::EntityInformation entityInfo;
-	Application::instance()->modelComponent()->getEntityInformation(_tableName, entityInfo);
-	EntityBase* entityBase = Application::instance()->modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+	ot::ModelServiceAPI::getEntityInformation(_tableName, entityInfo);
+	EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
 	if (table == nullptr)
 	{

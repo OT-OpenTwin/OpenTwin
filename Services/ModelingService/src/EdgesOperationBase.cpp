@@ -11,6 +11,8 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"
 #include "TopExp_Explorer.hxx"
@@ -26,8 +28,7 @@ void EdgesOperationBase::enterSelectEdgesMode(void)
 {
 	std::map<std::string, std::string> options;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, 
-									      true, "", getSelectionAction(), getOperationDescription(), options, serviceID);
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, true, "", getSelectionAction(), getOperationDescription(), options, serviceID);
 }
 
 void EdgesOperationBase::addParametricProperty(EntityGeometry* geometryEntity, const std::string &name, double value)
@@ -78,7 +79,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 		uiComponent->displayErrorPrompt("All selected edges must belong to the same shape.");
 
 		// Request a view refresh and release the user interface
-		uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
+		uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 		uiComponent->unlockUI(lockFlags);
 
 		return;
@@ -89,7 +90,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	assert(affectedEntities.size() == 1);
 
 	std::list<ot::EntityInformation> entityInfo;
-	modelComponent->getEntityInformation(affectedEntities, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(affectedEntities, entityInfo);
 
 	// Prefetch the geometry entity
 	entityCache->prefetchEntities(entityInfo);
@@ -103,7 +104,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	ot::UID entityBrepID = baseEntity->getBrepStorageObjectID();
 
 	std::list<ot::EntityInformation> entityBrepInfo;
-	modelComponent->getEntityInformation(std::list<ot::UID>{entityBrepID}, entityBrepInfo);
+	ot::ModelServiceAPI::getEntityInformation(std::list<ot::UID>{entityBrepID}, entityBrepInfo);
 
 	// Prefetch the brep entity
 	entityCache->prefetchEntities(entityBrepInfo);
@@ -179,13 +180,13 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	std::list<ot::UID> dataEntityVersionList = { brepVersion , facetsVersion };
 	std::list<ot::UID> dataEntityParentList = { entityID, entityID };
 
-	modelComponent->addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "chamfer edges: " + geometryEntity->getName());
+	ot::ModelServiceAPI::addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "chamfer edges: " + geometryEntity->getName());
 
 	delete geometryEntity;
 	geometryEntity = nullptr;
 
 	// Request a view refresh and release the user interface
-	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
+	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 	uiComponent->unlockUI(lockFlags);
 }
 
@@ -241,7 +242,7 @@ void EdgesOperationBase::updateShape(EntityGeometry* geometryEntity, TopoDS_Shap
 	ot::UID baseShapeID = std::stoull(baseShapeProperty->getValue());
 
 	std::list<ot::EntityInformation> entityInfo;
-	modelComponent->getEntityInformation(ot::UIDList{ baseShapeID }, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(ot::UIDList{ baseShapeID }, entityInfo);
 	ot::UID baseShapeVersion = entityInfo.front().getEntityVersion();
 
 	EntityGeometry *baseGeometry = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
@@ -249,7 +250,7 @@ void EdgesOperationBase::updateShape(EntityGeometry* geometryEntity, TopoDS_Shap
 	ot::UID brepID = baseGeometry->getBrepStorageObjectID();
 
 	entityInfo.clear();
-	modelComponent->getEntityInformation(ot::UIDList{ brepID }, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(ot::UIDList{ brepID }, entityInfo);
 	ot::UID brepVersion = entityInfo.front().getEntityVersion();
 
 	EntityBrep* baseBrep = dynamic_cast<EntityBrep*>(entityCache->getEntity(brepID, brepVersion));

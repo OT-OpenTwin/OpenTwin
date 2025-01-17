@@ -2,8 +2,10 @@
 #include "SubprocessHandler.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
+#include "OTCore/Logger.h"
+
 #include "QtCore/qcoreapplication.h"
-#include"QtCore/qtimer.h"
+#include "QtCore/qtimer.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
 

@@ -9,8 +9,7 @@
 #pragma once
 
  // OpenTwin header
-#include "OTCore/ServiceBase.h"			// Base class
-#include "OTServiceFoundation/ModelServiceAPI.h"
+#include "OTCore/ServiceBase.h" // Base class
 #include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
@@ -40,7 +39,7 @@ namespace ot {
 
 	namespace components {
 
-		class OT_SERVICEFOUNDATION_API_EXPORT ModelComponent : public ServiceBase, public ModelServiceAPI {
+		class OT_SERVICEFOUNDATION_API_EXPORT ModelComponent : public ServiceBase {
 		public:
 			ModelComponent(
 				const std::string &			_name,
@@ -77,9 +76,6 @@ namespace ot {
 		private:
 			
 			ApplicationBase * m_application = nullptr;
-
-			virtual const std::string& getModelServiceURL() override;
-			virtual const std::string& getThisServiceURL() override;
 
 			ModelComponent() = delete;
 			ModelComponent(const ModelComponent &) = delete;

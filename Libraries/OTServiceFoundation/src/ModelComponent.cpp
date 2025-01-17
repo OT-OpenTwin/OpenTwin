@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTCommunication/Msg.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 
@@ -212,18 +213,8 @@ void ot::components::ModelComponent::addNewDataEntity(UID entityID, UID entityVe
 
 void ot::components::ModelComponent::storeNewEntities(const std::string &description, bool askForBranchCreation, bool saveModel)
 {
-	addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, askForBranchCreation, saveModel);
+	ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, description, askForBranchCreation, saveModel);
 	clearNewEntityList();
-}
-
-const std::string& ot::components::ModelComponent::getModelServiceURL()
-{
-	return m_serviceURL;
-}
-
-const std::string& ot::components::ModelComponent::getThisServiceURL()
-{
-	return m_application->getServiceURL();
 }
 
 void ot::components::ModelComponent::loadMaterialInformation()
@@ -231,10 +222,10 @@ void ot::components::ModelComponent::loadMaterialInformation()
 	materialIDToNameMap.clear();
 	materialNameToIDMap.clear();
 
-	ot::UIDList materialIDList = getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
+	ot::UIDList materialIDList = ModelServiceAPI::getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
 	
 	std::list<ot::EntityInformation> materialInformation;
-	getEntityInformation(materialIDList, materialInformation);
+	ModelServiceAPI::getEntityInformation(materialIDList, materialInformation);
 
 	for (auto matItem : materialInformation)
 	{

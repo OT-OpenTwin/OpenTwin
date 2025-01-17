@@ -3,6 +3,8 @@
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
 #include "ExternalDependencies.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "Application.h"
 #include "ClassFactoryBlock.h"
@@ -41,7 +43,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	InitSpecialisedBlockEntity(blockEntity);
 
 	blockEntity->StoreToDataBase();
-	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
+	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
 void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& editorName)
@@ -117,7 +119,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			topoEntIDs.push_back(entityForUpdate->getEntityID());
 			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
 		}
-		_modelComponent->updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
+		ot::ModelServiceAPI::updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
 	}
 }
 
@@ -142,19 +144,19 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 {
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };
-	_modelComponent->getEntityInformation(entityIDList, entityInfos);
-	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
+	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
+	auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	
 	ot::UID positionID = blockEnt->getCoordinateEntityID();
 	entityInfos.clear();
 	entityIDList = { positionID };
-	_modelComponent->getEntityInformation(entityIDList, entityInfos);
-	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
+	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
+	entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
-	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
+	ot::ModelServiceAPI::addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
 }
 
 void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
@@ -251,15 +253,15 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
 {
-	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
+	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_blockFolder + "/" + _packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));

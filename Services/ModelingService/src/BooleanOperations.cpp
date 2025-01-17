@@ -10,6 +10,8 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include <string>
 #include <list>
 #include <map>
@@ -44,7 +46,7 @@ void BooleanOperations::enterAddMode(const std::list<ot::EntityInformation> &sel
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE,
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_ADD, "add", options, serviceID);
 }
 
@@ -63,7 +65,7 @@ void BooleanOperations::enterSubtractMode(const std::list<ot::EntityInformation>
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE,
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_SUBTRACT, "subtract", options, serviceID);
 }
 
@@ -82,7 +84,7 @@ void BooleanOperations::enterIntersectMode(const std::list<ot::EntityInformation
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE,
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_INTERSECT, "intersect", options, serviceID);
 }
 
@@ -92,7 +94,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	std::string baseEntityName = options["BaseShape"];
 
 	ot::EntityInformation baseEntityInfo;
-	modelComponent->getEntityInformation(baseEntityName, baseEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(baseEntityName, baseEntityInfo);
 
 	// Get the information about the selected entities.
 	ot::JsonDocument doc;
@@ -100,7 +102,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	std::list<ot::UID> selectedEntities = ot::json::getUInt64List(doc, "modelID");
 
 	std::list<ot::EntityInformation> entityInfo;
-	modelComponent->getEntityInformation(selectedEntities, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(selectedEntities, entityInfo);
 
 	// Build a list of all geometry shapes and check whether the original shape is also selected as tool shape
 	std::list<ot::EntityInformation> geometryEntities;
@@ -146,7 +148,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 	// Now get the information about all the breps
 	std::list<ot::EntityInformation> brepEntityInfo;
-	modelComponent->getEntityInformation(requiredBreps, brepEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(requiredBreps, brepEntityInfo);
 
 	// Prefetch all the brep entities
 	entityCache->prefetchEntities(brepEntityInfo);
@@ -282,7 +284,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		//modelComponent->deleteEntitiesFromModel(entityNameList, false);
 
-		modelComponent->addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "boolean operation: " + geometryEntity->getName());
+		ot::ModelServiceAPI::addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "boolean operation: " + geometryEntity->getName());
 
 		delete geometryEntity;
 		geometryEntity = nullptr;

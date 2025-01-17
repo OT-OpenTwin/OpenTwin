@@ -2,6 +2,8 @@
 #include "Application.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "EntityFile.h"
 #include <algorithm>
@@ -23,10 +25,10 @@ void InfoFileManager::readInformation()
 	infoEntityVersion = 0;
 
 	ot::EntityInformation triangleInfoItem;
-	if (application->modelComponent()->getEntityInformation("Files/Information", triangleInfoItem))
+	if (ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The triangulation exists -> load the item
-		EntityFile* fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
+		EntityFile* fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
 
 		if (fileEntity != nullptr)
 		{
@@ -152,7 +154,7 @@ void InfoFileManager::writeInformation()
 
 	EntityFile* fileEntity;
 	ot::EntityInformation triangleInfoItem;
-	if (!application->modelComponent()->getEntityInformation("Files/Information", triangleInfoItem))
+	if (!ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The item does not exist -> create a new item
 		fileEntity = new EntityFile(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
@@ -164,7 +166,7 @@ void InfoFileManager::writeInformation()
 	else
 	{
 		// Load the existing item
-		fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
+		fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
 	}
 
 	// Now create a new data item

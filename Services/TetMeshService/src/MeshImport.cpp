@@ -11,6 +11,7 @@
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include <gmsh.h_cwrap>
 
@@ -55,7 +56,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	std::list<std::string> entityList{ materialsFolder };
 	std::list<ot::EntityInformation> entityInfo;
 
-	application->modelComponent()->getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
 	assert(entityInfo.front().getEntityName() == materialsFolder);

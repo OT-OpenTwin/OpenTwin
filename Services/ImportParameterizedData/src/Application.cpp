@@ -22,7 +22,7 @@
 #include "OTGui/PropertyInt.h"
 #include "EntityFileCSV.h"
 #include "CategorisationFolderNames.h"
-
+#include "OTModelAPI/ModelServiceAPI.h"
 
 //Application specific includes
 #include "TemplateDefaultManager.h"
@@ -236,28 +236,28 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
 			}
 			else if (action == _buttonCreateParameterEntry.GetFullDescription())
 			{			
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
 			}
 			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())

@@ -3,6 +3,9 @@
 #include "CategorisationFolderNames.h"
 #include "Application.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 {
 	ensureEssentials();
@@ -53,14 +56,14 @@ inline void BatchedCategorisationHandler::ensureEssentials()
 	if (m_rmdEntityName == "")
 	{
 		ot::EntityInformation entityInfo;
-		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
-		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
+		std::list<std::string> allItems = ot::ModelServiceAPI::getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
+		ot::ModelServiceAPI::getEntityInformation(*allItems.begin(), entityInfo);
 		m_rmdEntityName = entityInfo.getEntityName();
 	}
 	if (m_scriptFolderUID == -1)
 	{
 		ot::EntityInformation entityInfo;
-		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
+		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
 		m_scriptFolderUID = entityInfo.getEntityID();
 	}
 	if (m_pythonInterface == nullptr)
@@ -73,13 +76,13 @@ inline void BatchedCategorisationHandler::ensureEssentials()
 std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandler::findAllTableSelectionsWithConsiderForBatching()
 {
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		if (rangeEntity->getConsiderForBatchprocessing())
@@ -197,8 +200,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 		}
 	}
 	allMSMDNames = allMSMDNames.substr(0, allMSMDNames.size() - 2);
-	_modelComponent->addEntitiesToModel(topoIDs, topoVers, forceVis, dataEnt, dataEnt, dataEnt, "Automatic creation of " + allMSMDNames);
-
+	ot::ModelServiceAPI::addEntitiesToModel(topoIDs, topoVers, forceVis, dataEnt, dataEnt, dataEnt, "Automatic creation of " + allMSMDNames);
 
 	return batchUpdateInformationByPriority;
 }
@@ -218,7 +220,7 @@ std::map<std::string, ot::UID> BatchedCategorisationHandler::getTableUIDByNames(
 
 	tableNames.unique();
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(tableNames, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(tableNames, entityInfos);
 	std::map<std::string, ot::UID> tableUIDByNames;
 	for (const ot::EntityInformation& entityInfo : entityInfos)
 	{
@@ -243,7 +245,7 @@ std::map<std::string, ot::UID> BatchedCategorisationHandler::getPythonScriptUIDB
 
 	scriptNames.unique();
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(scriptNames, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(scriptNames, entityInfos);
 	std::map<std::string, ot::UID> scriptUIDByNames;
 	for (const ot::EntityInformation& entityInfo : entityInfos)
 	{

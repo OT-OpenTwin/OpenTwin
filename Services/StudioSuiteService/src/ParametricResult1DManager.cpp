@@ -6,6 +6,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/FolderNames.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataSeries.h"
@@ -38,7 +39,7 @@ void ParametricResult1DManager::clear()
 	// We delete all previous result data (series), since there was a non-parametric change
 	std::list<std::string> resultEntity{ m_resultFolderName + "/1D Results" };
 
-	m_application->modelComponent()->deleteEntitiesFromModel(resultEntity, false);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(resultEntity, false);
 }
 
 void ParametricResult1DManager::extractData(Result1DManager& result1DManager)

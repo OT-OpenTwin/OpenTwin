@@ -394,6 +394,9 @@
     <ClInclude Include="include\EntityInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -667,6 +670,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityInformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

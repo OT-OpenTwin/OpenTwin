@@ -1,8 +1,10 @@
 #include "BusinessLogicHandler.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+
 std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName)
 {
-	std::list<std::string> folderContent = _modelComponent->getListOfFolderItems(folderName);
+	std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(folderName);
 	int count = 1;
 	std::string fullFileName = folderName + "/" + fileName + "_" + std::to_string(count);
 	while (std::find(folderContent.begin(), folderContent.end(), fullFileName) != folderContent.end())
@@ -15,7 +17,7 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string&
 
 std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const std::string& folderName, const std::string& fileName, std::list<std::string>& additionallyTakenNames)
 {
-	std::list<std::string> folderContent = _modelComponent->getListOfFolderItems(folderName);
+	std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(folderName);
 	for (const std::string& takenName : additionallyTakenNames)
 	{
 		folderContent.push_back(takenName);
@@ -34,7 +36,7 @@ std::string BusinessLogicHandler::CreateNewUniqueTopologyNamePlainPossible(const
 
 std::vector<std::string> BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles)
 {
-	std::list<std::string> uniqueFileNames = _modelComponent->getListOfFolderItems(folderName);
+	std::list<std::string> uniqueFileNames = ot::ModelServiceAPI::getListOfFolderItems(folderName);
 	std::vector<std::string> newNames;
 	int count = 1;
 	std::string fullFileName = folderName + "/" + fileName;

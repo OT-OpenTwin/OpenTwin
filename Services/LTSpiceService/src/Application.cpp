@@ -19,6 +19,9 @@
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccessBase.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
@@ -228,7 +231,7 @@ void Application::EnsureVisualizationModelIDKnown(void)
 	}
 
 	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
+	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
 }
 
 
@@ -299,7 +302,7 @@ void Application::showInformation(void)
 		return;
 	}
 
-	std::string currentVersion = modelComponent()->getCurrentModelVersion();
+	std::string currentVersion = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	// Send the information message to the UI
 	ot::JsonDocument doc;
@@ -323,7 +326,7 @@ void Application::getChanges(void)
 	}
 
 	// Get the current model version
-	std::string version = modelComponent()->getCurrentModelVersion();
+	std::string version = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	// Send the commit message to the UI
 	ot::JsonDocument doc;
@@ -385,10 +388,10 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 void Application::downloadNeeded(ot::JsonDocument& _doc)
 {
 	// Determine all files in the Files folder
-	std::list<std::string> fileNames = modelComponent()->getListOfFolderItems("Files", true);
+	std::list<std::string> fileNames = ot::ModelServiceAPI::getListOfFolderItems("Files", true);
 
 	std::list<ot::EntityInformation> fileInfo;
-	modelComponent()->getEntityInformation(fileNames, fileInfo);
+	ot::ModelServiceAPI::getEntityInformation(fileNames, fileInfo);
 
 	ot::UIDList entityID, versionID;
 
@@ -402,7 +405,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	}
 
 	// Get the current model version
-	std::string version = modelComponent()->getCurrentModelVersion();
+	std::string version = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
@@ -442,7 +445,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 		modelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
 	}
 
-	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(deletedNameList, false);
 
 	modelComponent()->storeNewEntities("", false, false);
 
@@ -451,7 +454,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	modelComponent()->storeNewEntities("LTSpice project uploaded", false);
 
 	// Determine the new version
-	std::string newVersion = modelComponent()->getCurrentModelVersion();
+	std::string newVersion = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	// Set the label for the new version
 	ot::JsonDocument doc1;
@@ -474,8 +477,8 @@ void Application::changeUnits(const std::string &content)
 {
 	// Load the current units entity
 	ot::EntityInformation entityInformation;
-	modelComponent()->getEntityInformation("Units", entityInformation);
-	EntityUnits* units = dynamic_cast<EntityUnits*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+	ot::ModelServiceAPI::getEntityInformation("Units", entityInformation);
+	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
 	assert(units != nullptr);
 	if (units == nullptr) return;
 
@@ -525,9 +528,9 @@ void Application::changeMaterials(const std::string &content)
 {
 	std::stringstream buffer(content);
 
-	ot::UIDList currentMaterials = modelComponent()->getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
+	ot::UIDList currentMaterials = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
 	std::list<ot::EntityInformation> currentMaterialInfo;
-	modelComponent()->getEntityInformation(currentMaterials, currentMaterialInfo);
+	ot::ModelServiceAPI::getEntityInformation(currentMaterials, currentMaterialInfo);
 	std::map<std::string, bool> materialProcessed;
 
 	while (processSingleMaterial(buffer, materialProcessed));
@@ -547,7 +550,7 @@ void Application::changeMaterials(const std::string &content)
 
 	if (!obsoleteMaterials.empty())
 	{
-		modelComponent()->deleteEntitiesFromModel(obsoleteMaterials, false);
+		ot::ModelServiceAPI::deleteEntitiesFromModel(obsoleteMaterials, false);
 	}
 }
 
@@ -595,9 +598,9 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	EntityMaterial* material = nullptr;
 
 	ot::EntityInformation entityInformation;
-	if (modelComponent()->getEntityInformation("Materials/" + materialName, entityInformation))
+	if (ot::ModelServiceAPI::getEntityInformation("Materials/" + materialName, entityInformation))
 	{
-		material = dynamic_cast<EntityMaterial*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
 	}
 
 	bool changed = false;
@@ -782,7 +785,7 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 	std::list<std::string> entityList{ materialsFolder };
 	std::list<ot::EntityInformation> entityInfo;
 
-	modelComponent()->getEntityInformation(entityList, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
 	assert(entityInfo.front().getEntityName() == materialsFolder);
@@ -1131,9 +1134,9 @@ void Application::getParametricCombinations(const std::string& logFileName, std:
 
 	// Read the data of the log file entity into a string logFileContent
 	ot::EntityInformation entityInfo;
-	modelComponent()->getEntityInformation(logFileName, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(logFileName, entityInfo);
 	
-	EntityFile *fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
+	EntityFile *fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
 	if (fileEntity == nullptr) return;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
@@ -1181,9 +1184,9 @@ LTSpiceData Application::getCurveData(const std::string& rawFileName)
 	LTSpiceData result;
 
 	ot::EntityInformation entityInfo;
-	modelComponent()->getEntityInformation(rawFileName, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(rawFileName, entityInfo);
 
-	EntityFile* fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
+	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
 	if (fileEntity == nullptr) return result;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();

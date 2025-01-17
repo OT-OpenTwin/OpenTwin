@@ -15,6 +15,8 @@
 
 #include "ResultDataStorageAPI.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataEntryArray.h"
@@ -224,7 +226,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		importReport.createProperties();
 		importReport.StoreToDataBase();
 
-		_modelComponent->addEntitiesToModel({ importReport.getEntityID() }, 
+		ot::ModelServiceAPI::addEntitiesToModel({ importReport.getEntityID() },
 			{ importReport.getEntityStorageVersion() }, 
 			{ false }, 
 			{ static_cast<ot::UID>(importReport.getTextDataStorageId()) }, 
@@ -239,14 +241,14 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAll
 {
 	//Load all selection ranges
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
 
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		allRangeEntities.push_back(rangeEntity);
@@ -571,9 +573,9 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 	//Load all missing tables
 	if (_requiredTables.size() != 0)
 	{
-		auto allTables = _modelComponent->getListOfFolderItems(ot::FolderNames::FilesFolder);
+		auto allTables = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::FilesFolder);
 		std::list<ot::EntityInformation> entityInfos;
-		_modelComponent->getEntityInformation(allTables, entityInfos);
+		ot::ModelServiceAPI::getEntityInformation(allTables, entityInfos);
 		ot::UIDList tableToLoadIDs;
 		for (std::string requiredTable : _requiredTables)
 		{
@@ -590,7 +592,7 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 		Application::instance()->prefetchDocumentsFromStorage(tableToLoadIDs);
 		for (ot::UID tableID : tableToLoadIDs)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
+			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
 			IVisualisationTable* visEnt = dynamic_cast<IVisualisationTable*>(baseEnt);
 			std::shared_ptr<IVisualisationTable>tableEntity(visEnt);
 			_loadedTables.insert({ baseEnt->getName(), tableEntity });

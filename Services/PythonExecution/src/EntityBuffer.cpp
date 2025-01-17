@@ -6,15 +6,11 @@
 #include "PythonObjectBuilder.h"
 #include "EntityTableSelectedRanges.h"
 #include "OTServiceFoundation/TableIndexSchemata.h"
+#include "EntityAPI.h"
 
 EntityBuffer& EntityBuffer::instance() {
 	static EntityBuffer g_instance;
 	return g_instance;
-}
-
-void EntityBuffer::setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI) {
-	assert(_modelServiceAPI != nullptr);
-	m_modelServiceAPI = _modelServiceAPI;
 }
 
 PyObject* EntityBuffer::getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName)
@@ -75,8 +71,8 @@ void EntityBuffer::saveChangedEntities()
 
 	if (topoEntID.size() > 0)
 	{
-		m_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
-		m_modelServiceAPI->updatePropertyGrid();
+		ot::ModelServiceAPI::addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		ot::ModelServiceAPI::updatePropertyGrid();
 	}
 	clearBuffer();
 }
@@ -91,7 +87,7 @@ bool EntityBuffer::saveChangedEntities(const std::string& _absoluteEntityName)
 		std::list<bool> forceVis;
 		topoEntID.push_back(entity->getEntityID());
 		topoEntVersion.push_back(entity->getEntityStorageVersion());
-		m_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		ot::ModelServiceAPI::addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
 		m_bufferedEntities.erase(_absoluteEntityName);
 		return true;
 	}
@@ -240,12 +236,12 @@ std::shared_ptr<EntityBase> EntityBuffer::loadEntity(const std::string& _absolut
 	{
 		ot::EntityInformation entityInfo;
 
-		m_modelServiceAPI->getEntityInformation(_absoluteEntityName, entityInfo);
+		ot::ModelServiceAPI::getEntityInformation(_absoluteEntityName, entityInfo);
 		if (entityInfo.getEntityName() == "")
 		{
 			throw std::exception(("Requested entity " + _absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = m_modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance().getClassFactory());
+		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance().getClassFactory());
 		m_bufferedEntities[_absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return m_bufferedEntities[_absoluteEntityName];
@@ -258,8 +254,6 @@ void EntityBuffer::clearBuffer()
 	m_bufferedTableEntities.clear();
 }
 
-EntityBuffer::EntityBuffer()
-	: m_modelServiceAPI(nullptr)
-{
+EntityBuffer::EntityBuffer() {
 
 }

@@ -5,6 +5,7 @@
 #include "MetadataEntrySingle.h"
 
 #include "OTCore/VariableListToStringListConverter.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include <vector>
 
 MetadataEntityInterface::MetadataEntityInterface(const std::string& _ownerServiceName):m_ownerServiceName(_ownerServiceName)
@@ -300,7 +301,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 
 	std::list<bool> visibillity(m_newEntityIDs.size(), false);
 	assert(m_newEntityIDs.size() == m_newEntityVersions.size() && m_newEntityVersions.size() == visibillity.size());
-	_modelComponent.addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
+	ot::ModelServiceAPI::addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
 }
 
 void MetadataEntityInterface::extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd)

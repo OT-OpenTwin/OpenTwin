@@ -18,6 +18,10 @@
 #include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+#include "EntityAPI.h"
+
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include <fstream>
 #include <iomanip>
 
@@ -99,7 +103,7 @@ std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, con
 	if (!error.empty()) return error;
 
 	// Now we get a list of all EntityMeshTetItem entites below the Mesh folder
-	ot::UIDList allMeshItems = application->modelComponent()->getIDsOfFolderItemsOfType(meshName + "/Mesh", "EntityMeshTetItem", true);
+	ot::UIDList allMeshItems = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(meshName + "/Mesh", "EntityMeshTetItem", true);
 
 	application->prefetchDocumentsFromStorage(allMeshItems);
 
@@ -312,7 +316,7 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 	}
 
 	std::list<ot::EntityInformation> materialInfo;
-	modelComponent->getEntityInformation(materialNamesList, materialInfo);
+	ot::ModelServiceAPI::getEntityInformation(materialNamesList, materialInfo);
 
 	// Load the materials one by one and attach them to the map
 
@@ -326,7 +330,7 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 
 	for (auto info : materialInfo)
 	{
-		materialMap[info.getEntityName()] = dynamic_cast<EntityMaterial *>(modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
+		materialMap[info.getEntityName()] = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
 	}
 
 	// Finally process the list of sections and create the material

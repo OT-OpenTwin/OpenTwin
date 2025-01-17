@@ -16,6 +16,8 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityInformation.h"
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 // Application specific includes
 #include "EntitySolverFITTD.h"
@@ -158,7 +160,7 @@ void Application::EnsureVisualizationModelIDKnown(void)
 	}
 
 	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
+	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
 }
 
 void Application::addMonitor(void)
@@ -177,11 +179,11 @@ void Application::addMonitor(void)
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	assert(m_modelComponent != nullptr);
-	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 	
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 	
 	//Create new monitor
@@ -191,7 +193,7 @@ void Application::addMonitor(void)
 	// Get a list of all items of this specific solver
 	std::string solverName = selectedSolver->getEntityName();
 	std::string fullMonitorPath = solverName + "/" + FolderNames::GetFolderNameMonitors();
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(fullMonitorPath);
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems(fullMonitorPath);
 
 	std::string monitorName;
 	int count(0);
@@ -215,8 +217,7 @@ void Application::addMonitor(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
 }
 
 void Application::addPort(void)
@@ -235,11 +236,11 @@ void Application::addPort(void)
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	assert(m_modelComponent != nullptr);
-	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	//Create new monitor
@@ -249,7 +250,7 @@ void Application::addPort(void)
 	// Find the next free numbered entity name
 	std::string solverName = selectedSolver->getEntityName();
 	std::string fullPortPath = solverName + "/" + FolderNames::GetFolderNamePorts();
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(fullPortPath);
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems(fullPortPath);
 
 	std::string portName;
 	int count(0);
@@ -264,9 +265,9 @@ void Application::addPort(void)
 
 	std::string signalTypeFolderName = solverName + "/" + FolderNames::GetFolderNameSignalType();
 	ot::EntityInformation entityInfos;
-	m_modelComponent->getEntityInformation(signalTypeFolderName, entityInfos);
+	ot::ModelServiceAPI::getEntityInformation(signalTypeFolderName, entityInfos);
 	std::list<ot::EntityInformation> childInfos;
-	m_modelComponent->getEntityChildInformation(entityInfos.getEntityID(), childInfos, false);
+	ot::ModelServiceAPI::getEntityChildInformation(entityInfos.getEntityID(), childInfos, false);
 	std::string firstSignalName;
 	ot::UID firstSignalID;
 	childInfos.size() != 0 ? firstSignalName = childInfos.front().getEntityName() : firstSignalName = "";
@@ -285,8 +286,7 @@ void Application::addPort(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
 }
 
 void Application::addSignalType(void)
@@ -305,18 +305,18 @@ void Application::addSignalType(void)
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	assert(m_modelComponent != nullptr);
-	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	// Get a list of all items of this specific solver
 	const std::string folderName = FolderNames::GetFolderNameSignalType();
 	std::string solverName = selectedSolver->getEntityName();
 	const std::string signalTypeFolderPath = solverName + "/" + folderName;
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(signalTypeFolderPath);
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems(signalTypeFolderPath);
 	std::string signalName;
 	int count(0);
 	do
@@ -344,8 +344,7 @@ void Application::addSignalType(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new signal type");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new signal type");
 
 }
 
@@ -363,7 +362,7 @@ void Application::addSolver(void)
 
 	// First get a list of all folder items of the Solvers folder
 	std::string solverFolder = FolderNames::GetFolderNameSolver();
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(solverFolder);
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems(solverFolder);
 
 	// Now get a new entity ID for creating the new item
 	ot::UID entityID = m_modelComponent->createEntityUID();
@@ -381,7 +380,7 @@ void Application::addSolver(void)
 	std::string meshFolderName, meshName;
 	ot::UID meshFolderID{ 0 }, meshID{ 0 };
 
-	m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
+	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
 	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
@@ -409,8 +408,7 @@ void Application::addSolver(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, 
-										 dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
 void Application::runSolver(void)
@@ -432,7 +430,7 @@ void Application::runSolver(void)
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;

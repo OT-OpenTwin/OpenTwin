@@ -10,6 +10,9 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
+#include "EntityAPI.h"
 
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"
@@ -25,8 +28,7 @@ void SimplifyRemoveFaces::enterRemoveFacesMode(void)
 {
 	std::map<std::string, std::string> options;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::FACE, 
-									      true, "", ot::components::UiComponent::entitySelectionAction::REMOVE_FACE, "remove", options, serviceID);
+	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::FACE, true, "", ot::components::UiComponent::entitySelectionAction::REMOVE_FACE, "remove", options, serviceID);
 }
 
 void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
@@ -64,7 +66,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	// Now get the current versions for these entities
 	std::list<ot::UID> affectedEntities(affectedEntitiesSet.begin(), affectedEntitiesSet.end());
 	std::list<ot::EntityInformation> entityInfo;
-	modelComponent->getEntityInformation(affectedEntities, entityInfo);
+	ot::ModelServiceAPI::getEntityInformation(affectedEntities, entityInfo);
 
 	// Prefetch the geometry entities
 	entityCache->prefetchEntities(entityInfo);
@@ -88,7 +90,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	}
 
 	std::list<ot::EntityInformation> entityBrepInfo;
-	modelComponent->getEntityInformation(entityBreps, entityBrepInfo);
+	ot::ModelServiceAPI::getEntityInformation(entityBreps, entityBrepInfo);
 
 	// Prefetch the brep entities
 	entityCache->prefetchEntities(entityBrepInfo);
@@ -107,7 +109,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 		facesMap[face.getEntityID()].push_back(face);
 	}
 
-	modelComponent->enableMessageQueueing(true);
+	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	bool anySuccess = false;
 	std::string error;
@@ -119,7 +121,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	{
 		// Here we need to load the geometry entity, since we are going to modify it later. If we took it from the cache, it would be modified there.
 
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(shape.first, entityVersionMap[shape.first], *classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(shape.first, entityVersionMap[shape.first], *classFactory));
 
 		if (geometryEntity != nullptr)
 		{
@@ -144,17 +146,17 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	// Now we ask the model service to check for the potential updates of the parent entities
 	getUpdateManager()->checkParentUpdates(modifiedEntities);
 
-	modelComponent->enableMessageQueueing(false);
-	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
+	ot::ModelServiceAPI::enableMessageQueueing(false);
+	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
 	if (anySuccess)
 	{
 		// Now we note the end of the model change operation
-		modelComponent->modelChangeOperationCompleted("remove faces");
+		ot::ModelServiceAPI::modelChangeOperationCompleted("remove faces");
 	}
 
 	// Request a view refresh and release the user interface
-	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
+	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 	uiComponent->unlockUI(lockFlags);
 
 	// Notify the error, if any

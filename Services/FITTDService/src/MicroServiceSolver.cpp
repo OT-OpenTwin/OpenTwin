@@ -11,6 +11,9 @@
 #include "FolderNames.h"
 #include "PhysicalQuantities.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 MicroServiceSolver::MicroServiceSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory& _classFactory) :
 	solverName(solverName),
 	modelComponent(nullptr), 
@@ -141,8 +144,8 @@ std::list<ot::UID> MicroServiceSolver::getResultDataParentList(void)
 EntityBase * MicroServiceSolver::LoadEntityFromName(std::string name)
 {
 	ot::EntityInformation entityInformation;
-	modelComponent->getEntityInformation(name, entityInformation);
-	return modelComponent->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), *classFactory);
+	ot::ModelServiceAPI::getEntityInformation(name, entityInformation);
+	return ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), *classFactory);
 }
 
 
@@ -150,9 +153,9 @@ EntityBase * MicroServiceSolver::LoadEntityFromName(std::string name)
 void MicroServiceSolver::RemoveOldResults()
 {
 	std::string rowDataFolder = solverName + "/" + FolderNames::GetFolderNameRawResultBase();
-	std::list<std::string> entityList =	modelComponent->getListOfFolderItems(rowDataFolder);
+	std::list<std::string> entityList = ot::ModelServiceAPI::getListOfFolderItems(rowDataFolder);
 
-	modelComponent->deleteEntitiesFromModel(entityList);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(entityList);
 }
 
 
@@ -314,7 +317,7 @@ void MicroServiceSolver::ApplyFrequencyUnit(double & value, std::string & former
 
 void MicroServiceSolver::UpdateModel(void)
 {
-	modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added FIT-TD results");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added FIT-TD results");
 }
 
 std::pair<ot::UID, std::string> MicroServiceSolver::addResultCurve(const std::string &name,
@@ -406,7 +409,7 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 		dataEntityVersionList.insert(dataEntityVersionList.end(), { xVersion, yVersion, zVersion, dataEntity->getEntityStorageVersion() });
 		dataEntityParentList.insert(dataEntityParentList.end(), { dataEntity->getEntityID(), dataEntity->getEntityID() ,dataEntity->getEntityID(), topoEntity->getEntityID() });
 
-		modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new DFT vector result");
+		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new DFT vector result");
 	}
 	catch (std::exception & e)
 	{

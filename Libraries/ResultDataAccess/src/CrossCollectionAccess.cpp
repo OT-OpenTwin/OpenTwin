@@ -5,10 +5,12 @@
 #include "DataBase.h"
 #include "OTCore/FolderNames.h"
 #include "ClassFactory.h"
+#include "EntityAPI.h"
 #include "OTCore/ReturnMessage.h"
 
-class ClassFactory;
+#include "OTModelAPI/ModelServiceAPI.h"
 
+class ClassFactory;
 
 CrossCollectionAccess::CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
 	:_collectionName(collectionName), _modelServiceURL(modelServiceURL)
@@ -24,11 +26,11 @@ std::list<std::shared_ptr<EntityMetadataSeries>> CrossCollectionAccess::getMeasu
 
 	std::list<std::shared_ptr<EntityMetadataSeries>> measurementMetadata;
 	auto entityVersion = entityVersions.begin();
-	DataBaseWrapper wrapper(_collectionName);
+	DataBaseWrapper wrapper(_collectionName);	
 	
 	for(auto entityID= entityIDs.begin(); entityID != entityIDs.end(); entityID++)
 	{
-		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(*entityID, *entityVersion, *classFactory);
+		auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(*entityID, *entityVersion, *classFactory);
 		const std::shared_ptr<EntityMetadataSeries> metadata(dynamic_cast<EntityMetadataSeries*>(baseEnt));
 		assert(metadata != nullptr);
 		measurementMetadata.push_back(metadata);
@@ -48,7 +50,7 @@ std::shared_ptr<EntityMetadataCampaign>  CrossCollectionAccess::getMeasurementCa
 		ot::UID& entityID = *entityIdentifier.first.begin();
 		ot::UID& entityVersion = *entityIdentifier.second.begin();
 
-		auto baseEnt = modelComponent.readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory);
+		auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory);
 		const std::shared_ptr<EntityMetadataCampaign> metadata(dynamic_cast<EntityMetadataCampaign*>(baseEnt));
 		assert(metadata != nullptr);
 		return metadata;

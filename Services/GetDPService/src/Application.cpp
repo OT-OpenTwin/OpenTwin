@@ -15,6 +15,8 @@
 #include "OTCommunication/actionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "EntityAPI.h"
 
 // Application specific includes
 #include "GetDPLauncher.h"
@@ -174,15 +176,15 @@ void Application::EnsureVisualizationModelIDKnown(void)
 	}
 
 	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
+	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
 }
 
 void Application::definePotential(void)
 {
 	// Get the list of all geometry entities from the model service
 	std::list<ot::EntityInformation> selectedGeometryEntities, selectedTetMeshEntities;
-	m_modelComponent->getSelectedEntityInformation(selectedGeometryEntities, "EntityGeometry");
-	m_modelComponent->getSelectedEntityInformation(selectedTetMeshEntities, "EntityMeshTetItem");
+	ot::ModelServiceAPI::getSelectedEntityInformation(selectedGeometryEntities, "EntityGeometry");
+	ot::ModelServiceAPI::getSelectedEntityInformation(selectedTetMeshEntities, "EntityMeshTetItem");
 
 	// Get an entity list
 	ot::UIDList updateEntities;
@@ -198,9 +200,9 @@ void Application::definePotential(void)
 	properties.addToConfiguration(nullptr, false, cfg);
 
 	// Set the message to the model service
-	m_modelComponent->addPropertiesToEntities(updateEntities, cfg);
+	ot::ModelServiceAPI::addPropertiesToEntities(updateEntities, cfg);
 
-	m_modelComponent->modelChangeOperationCompleted("Added electrostatic potential definitions");
+	ot::ModelServiceAPI::modelChangeOperationCompleted("Added electrostatic potential definitions");
 }
 
 void Application::addSolver(void)
@@ -216,7 +218,7 @@ void Application::addSolver(void)
 	}
 
 	// First get a list of all folder items of the Solvers folder
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems("Solvers");
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
 	// Now get a new entity ID for creating the new item
 	ot::UID entityID = m_modelComponent->createEntityUID();
@@ -234,7 +236,7 @@ void Application::addSolver(void)
 	std::string meshFolderName, meshName;
 	ot::UID meshFolderID{ 0 }, meshID{ 0 };
 
-	m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
+	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
 	EntitySolverGetDP *solverEntity = new EntitySolverGetDP(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
@@ -252,8 +254,7 @@ void Application::addSolver(void)
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-										 dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
 void Application::runSolver(void)
@@ -275,7 +276,7 @@ void Application::runSolver(void)
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
@@ -313,7 +314,7 @@ void Application::runSolver(void)
 
 	// Now we retrieve information about the solver items
 	std::list<ot::EntityInformation> solverInfo;
-	m_modelComponent->getEntityInformation(solverRunList, solverInfo);
+	ot::ModelServiceAPI::getEntityInformation(solverRunList, solverInfo);
 
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
@@ -330,12 +331,12 @@ void Application::runSolver(void)
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
 		solverMap[info.getEntityName()] = entity;
 	}
 
 	std::list<ot::EntityInformation> meshInfo;
-	m_modelComponent->getEntityChildInformation("Meshes", meshInfo, false);
+	ot::ModelServiceAPI::getEntityChildInformation("Meshes", meshInfo, false);
 
 	// Finally start the worker thread to run the solvers
 	std::thread workerThread(&Application::solverThread, this, solverInfo, meshInfo, solverMap);
@@ -445,5 +446,5 @@ void Application::deleteSingleSolverResults(EntityBase* solverEntity)
 	entityNameList.push_back(solverEntity->getName() + "/Results");
 	entityNameList.push_back(solverEntity->getName() + "/Output");
 
-	modelComponent()->deleteEntitiesFromModel(entityNameList, false);
+	ot::ModelServiceAPI::deleteEntitiesFromModel(entityNameList, false);
 }

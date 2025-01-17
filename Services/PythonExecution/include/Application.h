@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTServiceFoundation/ModelServiceAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 #include "CommunicationHandler.h"
 #include "ClassFactory.h"
 #include "ClassFactoryBlock.h"
@@ -14,7 +14,6 @@ class Application : public QObject {
 public:
 	static Application& instance(void);
 
-	ot::ModelServiceAPI& getModelServiceAPI() { return *m_modelServiceAPI; };
 	void setModelServiceURL(const std::string& url);
 	void setUIServiceURL(const std::string& url);
 
@@ -32,7 +31,6 @@ private:
 
 	ClassFactory m_classFactory;
 	ClassFactoryBlock m_classFactoryBlock;
-	ot::ModelServiceAPI* m_modelServiceAPI;
 
 	std::map<ot::UID, ot::UID> m_prefetchedEntityVersions;
 	std::string m_uiURL;

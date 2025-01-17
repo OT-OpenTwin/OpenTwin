@@ -10,18 +10,14 @@
 #include "EntityBase.h"
 #include <string>
 #include <memory>
-#include "OTServiceFoundation/ModelServiceAPI.h"
 #include "IVisualisationTable.h"
 #include "ClassFactory.h"
-
 
 class EntityBuffer
 {
 public:
 	friend class FixtureEntityBuffer;
 	static EntityBuffer& instance();
-
-	void setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI);
 
 	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName);
 	PyObject* getTableCellValue(const std::string& _absoluteEntityName, uint32_t _row, uint32_t _column);
@@ -39,9 +35,7 @@ private:
 	std::map<std::string, std::shared_ptr<EntityBase>> m_bufferedEntities;
 	std::map<std::string, IVisualisationTable*> m_bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
-
-	ot::ModelServiceAPI* m_modelServiceAPI;
-	
+		
 	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);
 	void ensureTableToBeLoaded(const std::string& _absoluteEntityName);
 	void ensureValidRangeSelections(EntityBase* _entityBase);

@@ -5,11 +5,13 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 #include <map>
-
 
 #include "TDataStd_Name.hxx"
 #include "TopoDS_Iterator.hxx"
@@ -56,7 +58,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	std::list<ot::UID> requiredBreps;
 	for (auto shape : selectedGeometryEntities)
 	{
-		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion(), application->getClassFactory()));
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion(), application->getClassFactory()));
 
 		if (geometryEntity->getEditable())
 		{
@@ -87,7 +89,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	
 	// Now get the information about all the breps
 	std::list<ot::EntityInformation> brepEntityInfo;
-	application->modelComponent()->getEntityInformation(requiredBreps, brepEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(requiredBreps, brepEntityInfo);
 
 	// Prefetch all the brep entities
 	application->getEntityCache()->prefetchEntities(brepEntityInfo);
@@ -107,7 +109,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 
 	std::time_t timer = time(nullptr);
 
-	application->modelComponent()->enableMessageQueueing(true);
+	ot::ModelServiceAPI::enableMessageQueueing(true);
 
 	auto brepInfo = brepEntityInfo.begin();
 
@@ -200,9 +202,9 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	}
 
 	// Finally, store the new model state
-	application->modelComponent()->modelChangeOperationCompleted("heal shapes");
-	application->modelComponent()->enableMessageQueueing(false);
-	application->uiComponent()->refreshSelection(application->modelComponent()->getCurrentVisualizationModelID());
+	ot::ModelServiceAPI::modelChangeOperationCompleted("heal shapes");
+	ot::ModelServiceAPI::enableMessageQueueing(false);
+	application->uiComponent()->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
 	application->uiComponent()->setProgress(100);
 	application->uiComponent()->closeProgressInformation();

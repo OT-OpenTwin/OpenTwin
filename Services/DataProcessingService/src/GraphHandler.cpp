@@ -3,6 +3,7 @@
 #include "EntityBlockConnection.h"
 #include "ClassFactoryBlock.h"
 #include "Application.h"
+#include "EntityAPI.h"
 
 bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
 {
@@ -54,7 +55,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> GraphHandler::loadAllC
 	for (ot::UID connectionID : allConnectionIDs)
 	{
 		ot::UID connectionVersion =	Application::instance()->getPrefetchedEntityVersion(connectionID);
-		EntityBase * connectionEntBase = _modelComponent->readEntityFromEntityIDandVersion(connectionID, connectionID, classFactory);
+		EntityBase * connectionEntBase = ot::EntityAPI::readEntityFromEntityIDandVersion(connectionID, connectionID, classFactory);
 		if (connectionEntBase == nullptr)
 		{
 			OT_LOG_E("referenced connection not part of model.");

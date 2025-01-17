@@ -11,6 +11,8 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "EntityInformation.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+
 #include <BRepBuilderAPI_Transform.hxx>
 #include <STEPControl_Writer.hxx>
 #include "TopExp_Explorer.hxx"
@@ -73,7 +75,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 		std::list<std::string> entityList{materialsFolder};
 		std::list<ot::EntityInformation> entityInfo;
 
-		modelComponent->getEntityInformation(entityList, entityInfo);
+		ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 
 		assert(entityInfo.size() == 1);
 		assert(entityInfo.front().getEntityName() == materialsFolder);
@@ -91,7 +93,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	}
 
 	// Get the list of items in the parent folder
-	std::list<std::string> folderItems = modelComponent->getListOfFolderItems(parentFolder);
+	std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(parentFolder);
 
 	// Now make sure that the new name of the item is unique
 	std::string itemName = _name;
@@ -185,8 +187,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	std::list<ot::UID> dataEntityVersionList = { brepVersion , facetsVersion };
 	std::list<ot::UID> dataEntityParentList = { entityID, entityID };
 
-	modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new object: " + itemName);
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new object: " + itemName);
 }
 
 void ShapesBase::applyFaceNames(EntityGeometry* geomEntity, const TopoDS_Shape& _shape, std::list<std::string>& faceNames)

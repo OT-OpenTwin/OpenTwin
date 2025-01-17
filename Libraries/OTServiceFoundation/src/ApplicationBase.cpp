@@ -17,6 +17,9 @@
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/IpConverter.h"
 
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelAPI/ModelAPIManager.h"
+
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -32,6 +35,7 @@
 #include "TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
+
 // Third party header
 #include "curl/curl.h"
 
@@ -559,6 +563,7 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
 		assert(m_modelComponent == nullptr);
+		ot::ModelAPIManager::setModelServiceURL(_url);
 		m_modelComponent = new components::ModelComponent(_name, _type, _url, _id, this);
 		info.service = m_modelComponent;
 		m_serviceIdMap.insert_or_assign(_id, info);
@@ -588,6 +593,7 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 	}
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
 		assert(itm->second.service == (ServiceBase *)m_modelComponent);
+		ot::ModelAPIManager::setModelServiceURL(std::string());
 		modelDisconnected(m_modelComponent);
 
 		delete m_modelComponent;
@@ -621,7 +627,7 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<UID> &ent
 {
 	// First get the version information for all entities
 	std::list<ot::EntityInformation> entityInfo;
-	m_modelComponent->getEntityInformation(entities, entityInfo);
+	ModelServiceAPI::getEntityInformation(entities, entityInfo);
 
 	// Now prefetch the documents
 	prefetchDocumentsFromStorage(entityInfo);

@@ -12,6 +12,7 @@
 #include "UiNotifier.h"
 #include "QtWrapper.h"
 #include "SimulationResults.h"
+
 // Open twin header
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -35,7 +36,8 @@
 #include "DataBase.h"
 #include "ClassFactoryBlock.h"
 #include "ClassFactory.h"
-
+#include "EntityAPI.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -127,7 +129,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 // Trying to create more circuits
 void Application::createNewCircuit() {
-	std::list<std::string> circuits = m_modelComponent->getListOfFolderItems("Circuits");
+	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
 
 	int count = 1;
 	std::string circuitName;
@@ -136,7 +138,6 @@ void Application::createNewCircuit() {
 		count++;
 	} while (std::find(circuits.begin(), circuits.end(), circuitName) != circuits.end());
 
-	
 	circuitName = extractStringAfterDelimiter(circuitName, '/', 1);
 
 	EntityContainer* entityCircuitRoot;
@@ -144,10 +145,8 @@ void Application::createNewCircuit() {
 	entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setName(getCircuitRootName()+circuitName);
 
-	entityCircuitRoot->StoreToDataBase(),
-	m_modelComponent->addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
-		
-	
+	entityCircuitRoot->StoreToDataBase();
+	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
 	
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
 	ot::JsonDocument doc;
@@ -168,9 +167,6 @@ void Application::createNewCircuit() {
 	std::string tmp;
 	m_uiComponent->sendMessage(true, doc, tmp);
 }
-
-
-
 
 std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
 	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
@@ -206,7 +202,7 @@ void Application::addSolver()
 	}
 
 	//First get a list of all folder items of the Solvers folder
-	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems("Solvers");
+	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
 	// Get new Entity Id for the new item
 	ot::UID entityID = m_modelComponent->createEntityUID();
@@ -231,7 +227,7 @@ void Application::addSolver()
 	solverEntity->setEditable(true);
 
 	ot::EntityInformation entityInfo;
-	m_modelComponent->getEntityInformation("Circuits", entityInfo);
+	ot::ModelServiceAPI::getEntityInformation("Circuits", entityInfo);
 
 	solverEntity->createProperties("Circuits", entityInfo.getEntityID(), circuitName, circuitID);
 	solverEntity->StoreToDataBase();
@@ -244,10 +240,7 @@ void Application::addSolver()
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
-		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
-
-	
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
 void Application::runCircuitSimulation() {
@@ -266,7 +259,7 @@ void Application::runCircuitSimulation() {
 	//First we get a list of all selected Entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	m_modelComponent->getEntityInformation(selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
@@ -297,7 +290,7 @@ void Application::runCircuitSimulation() {
 
 	//Now we retrieve information about the solver items
 	std::list<ot::EntityInformation> solverInfo;
-	m_modelComponent->getEntityInformation(solverRunList, solverInfo);
+	ot::ModelServiceAPI::getEntityInformation(solverRunList, solverInfo);
 
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
@@ -311,14 +304,12 @@ void Application::runCircuitSimulation() {
 	//Now read the solver objects for each solver
 	std::map<std::string, EntityBase*> solverMap;
 	for (auto info : solverInfo) {
-		EntityBase* entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
 		solverMap[info.getEntityName()] = entity;
 	}
 
 	// Get the current model version
-	std::string modelVersion = m_modelComponent->getCurrentModelVersion();
-
-
+	std::string modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
 
 	// Finally start the worker thread to run the solvers
 	std::thread workerThread(&Application::solverThread, this, solverInfo, modelVersion, solverMap);
