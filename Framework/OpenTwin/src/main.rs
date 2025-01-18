@@ -51,6 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 	let mut site_id = "";
 	let mut db_url  = "";
 	let mut dir_url = "";
+    let mut download_port = "80";
 
     if args.len() > 2
     {
@@ -70,6 +71,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 	if args.len() > 5
     {
         dir_url = &args[5];
+    }
+
+    if args.len() > 6
+    {
+        download_port = &args[6];
     }
 
     // Setting the Library path
@@ -119,14 +125,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 
         let installer_route = warp::path("installer")
             .and(warp::fs::file(installer_path));
+
+        let port_number: u16 = download_port.parse().unwrap();
         
         tokio::task::spawn(async move {
             warp::serve(download_route.or(installer_route))
-            .run(([0, 0, 0, 0], 80))
+            .run(([0, 0, 0, 0], port_number))
             .await;
         });
 
-        println!("HTTP Server listening on \"0.0.0.0:80\"");
+        println!("HTTP Server listening on \"0.0.0.0:{:?}\"", download_port);
     }
     
     // GET /any path

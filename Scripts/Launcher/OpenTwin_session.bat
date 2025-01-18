@@ -11,6 +11,7 @@ REM OPEN_TWIN_LSS_PORT         : The port where the local session service shall 
 REM OPEN_TWIN_GDS_PORT         : The port where the global directory service shall be running, default: 9094
 REM OPEN_TWIN_LDS_PORT         : The port where the local directory service shall be running, default: 9095
 REM OPEN_TWIN_SITE_ID          : The ID of the current site, default: 1
+REM OPEN_TWIN_DOWNLOAD_PORT    : The port where the global session service will provide the download option for the frontend installer, default: 80
 
 CALL OpenTwin_set_up_certificates.bat
 CALL OpenTwin_set_up_services.bat
@@ -46,7 +47,7 @@ REM 3) IP address of this global session service
 REM 4) IP address if MongoDB data base
 REM 5) Port url of the authorisation service
 
-START "GLOBAL SESSION SERVICE" %pause_prefix%open_twin.exe GlobalSessionService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "%OPEN_TWIN_MONGODB_ADDRESS%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_AUTH_PORT%"%pause_suffix%
+START "GLOBAL SESSION SERVICE" %pause_prefix%open_twin.exe GlobalSessionService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "%OPEN_TWIN_MONGODB_ADDRESS%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_AUTH_PORT%" "%OPEN_TWIN_DOWNLOAD_PORT%"%pause_suffix%
 
 REM ===========================================================================
 REM Launch the session service 
