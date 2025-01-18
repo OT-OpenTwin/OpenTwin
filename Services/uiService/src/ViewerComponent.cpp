@@ -399,15 +399,16 @@ void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls,
 {
 	try {
 		try {
+			LockManager* lockManager = AppBase::instance()->lockManager();
+			OTAssertNullptr(lockManager);
+
+			ot::BasicServiceInformation bsi = this->getBasicServiceInformation();
+
 			for (ot::UID objectID : _enabledControls) {
-				if (ak::uiAPI::object::exists(objectID)) {
-					ak::uiAPI::object::setEnabled(objectID, true);
-				}
+				lockManager->enable(bsi, objectID);
 			}
 			for (ot::UID objectID : _disabledControls) {
-				if (ak::uiAPI::object::exists(objectID)) {
-					ak::uiAPI::object::setEnabled(objectID, false);
-				}
+				lockManager->disable(bsi, objectID);
 			}
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::enableDisableControls()"); }

@@ -442,7 +442,10 @@ void LockManager::disable(const ot::BasicServiceInformation& _serviceInfo, ak::U
 	else {
 		service->insert_or_assign(_element, serviceEnabledVal->second + 1);
 	}
-	uiElement(_element)->disable(1);
+	LockManagerElement* element = this->uiElement(_element);
+	if (element) {
+		element->disable(1);
+	}
 }
 
 void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element, bool _resetCounter) {
@@ -456,11 +459,17 @@ void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ak::UI
 		if (oldValue > 0) {
 			if (_resetCounter) {
 				service->insert_or_assign(_element, 0);
-				uiElement(_element)->enable(oldValue);
+				LockManagerElement* element = this->uiElement(_element);
+				if (element) {
+					element->enable(oldValue);
+				}
 			}
 			else {
 				service->insert_or_assign(_element, oldValue -1);
-				uiElement(_element)->enable(1);
+				LockManagerElement* element = this->uiElement(_element);
+				if (element) {
+					element->enable(1);
+				}
 			}
 		}
 	}
@@ -472,7 +481,10 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 
 	for (auto e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
-			uiElement(e.first)->enable(e.second);
+			LockManagerElement* element = this->uiElement(e.first);
+			if (element) {
+				element->enable(e.second);
+			}
 		}
 		if (_eraseUiElements) {
 			auto uiItm = m_uiElements.find(e.first);
@@ -536,9 +548,13 @@ std::map<ot::LockTypeFlag, int> * LockManager::generateDefaultLockMap(void) cons
 }
 
 LockManagerElement * LockManager::uiElement(ak::UID _uid) {
-	auto itm{ m_uiElements.find(_uid) };
-	assert(itm != m_uiElements.end());	// Item does not exist
-	return itm->second;
+	auto itm = m_uiElements.find(_uid);
+	if (itm == m_uiElements.end()) {
+		return nullptr;
+	}
+	else {
+		return itm->second;
+	}
 }
 
 std::map<ot::LockTypeFlag, int> * LockManager::serviceLockLevel(const ot::BasicServiceInformation& _serviceInfo) {
@@ -657,7 +673,9 @@ void LockManagerElement::enable(int _value) {
 			m_lockable->setWidgetLocked(false);
 		}
 		else {
-			ak::uiAPI::object::setEnabled(m_uid, true);
+			if (ak::uiAPI::object::exists(m_uid)) {
+				ak::uiAPI::object::setEnabled(m_uid, true);
+			}
 		}
 	}
 }
