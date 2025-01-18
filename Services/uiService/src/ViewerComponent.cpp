@@ -1012,16 +1012,6 @@ void ViewerComponent::setColors(const ot::Color & _background, const ot::Color &
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::registerAtNotifier(void) {
-	try {
-		try { ViewerAPI::registerNotifier(this); }
-		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::registerAtNotifier()"); }
-		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::registerAtNotifier()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::registerAtNotifier()"); }
-	}
-	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
-}
-
 void ViewerComponent::setDataBaseConnectionInformation(const std::string &databaseURL, const std::string &userName, const std::string &encryptedPassword)
 {
 	try {

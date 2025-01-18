@@ -7,9 +7,6 @@
     <ClCompile Include="src\Model.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Notifier.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -145,12 +142,12 @@
     <ClCompile Include="src\ViewerToolBar.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\FrontendAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Notifier.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\stdafx.h">
@@ -295,6 +292,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerToolBar.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FrontendAPI.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

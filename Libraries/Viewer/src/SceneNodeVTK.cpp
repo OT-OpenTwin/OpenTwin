@@ -6,7 +6,7 @@
 
 #include "DataBase.h"
 #include "Model.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 
 #include <iomanip>
 
@@ -163,7 +163,7 @@ void SceneNodeVTK::setVisible(bool v)
 		if (dataID == 0)
 		{
 			// Here we need to send a message to the model for updating the item data
-			getNotifier()->updateVTKEntity(getModelEntityID());
+			FrontendAPI::instance()->updateVTKEntity(getModelEntityID());
 		}
 		else
 		{
@@ -173,7 +173,7 @@ void SceneNodeVTK::setVisible(bool v)
 			{
 				// This entity might have been deleted and needs to be regenerated
 				// This will also an update message to be queued which will then update the entity in a next step.
-				getNotifier()->updateVTKEntity(getModelEntityID());
+				FrontendAPI::instance()->updateVTKEntity(getModelEntityID());
 			}
 			else
 			{
@@ -240,7 +240,7 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 		{
 			// This entity might have been deleted and needs to be regenerated
 			// This will also an update message to be queued which will then update the entity in a next step.
-			getNotifier()->updateVTKEntity(getModelEntityID());
+			FrontendAPI::instance()->updateVTKEntity(getModelEntityID());
 		}
 		else
 		{
@@ -337,7 +337,7 @@ void SceneNodeVTK::reportTime(const std::string &message, std::time_t &timer)
 	std::stringstream msg;
 	msg << message << ": " << std::setprecision(6) << seconds << " sec." << std::endl;
 
-	getNotifier()->displayText(msg.str());
+	FrontendAPI::instance()->displayText(msg.str());
 
 	timer = time(nullptr);
 }

@@ -3,7 +3,7 @@
 #include "ViewerAPI.h"
 #include "Viewer.h"
 #include "Model.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "Rubberband.h"
 #include "WorkingPlane.h"
 #include "AxisCross.h"
@@ -232,8 +232,8 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	ot::PropertyGridCfg dataset = createSettings();
 
 	// Load
-	getNotifier()->loadSettings(dataset);
-	getNotifier()->updateSettings(dataset);
+	FrontendAPI::instance()->loadSettings(dataset);
+	FrontendAPI::instance()->updateSettings(dataset);
 	
 	settingsSynchronized(dataset);
 
@@ -255,8 +255,8 @@ void Viewer::slotColorStyleChanged(const ot::ColorStyle& _style)
 
 void Viewer::slotUpdateViewerSettings(void) {
 	ot::PropertyGridCfg settings = createSettings();
-	getNotifier()->updateSettings(settings);
-	getNotifier()->saveSettings(settings);
+	FrontendAPI::instance()->updateSettings(settings);
+	FrontendAPI::instance()->saveSettings(settings);
 }
 
 Viewer::~Viewer()
@@ -321,7 +321,7 @@ void Viewer::refresh(bool _ignoreUpdateSettingsRequest)
 	{
 		if (workingPlane) {
 			if (workingPlane->refreshAfterModelChange() && !_ignoreUpdateSettingsRequest) {
-				getNotifier()->updateSettings(createSettings());
+				FrontendAPI::instance()->updateSettings(createSettings());
 			}
 		}
 		if (axisCenterCross) { axisCenterCross->refreshAfterGeometryChange(); }
@@ -857,7 +857,7 @@ void Viewer::createRubberband(ot::serviceID_t _senderId, std::string & _note, co
 	{
 		std::string msg{"Current rubberband (Creator: "};
 		msg.append(std::to_string(rubberband->creator())).append("; Note: ").append(rubberband->note()).append(") execution was stopped\n");
-		getNotifier()->displayText(msg);
+		FrontendAPI::instance()->displayText(msg);
 		delete rubberband;
 		rubberband = nullptr;
 	}
@@ -880,7 +880,7 @@ void Viewer::finishRubberbandExecution(void)
 			transform.push_back(transformMatrix.ptr()[i]);
 		}
 
-		getNotifier()->rubberbandFinished(rubberband->creator(), rubberband->note(), rubberband->createPointDataJson(), transform);
+		FrontendAPI::instance()->rubberbandFinished(rubberband->creator(), rubberband->note(), rubberband->createPointDataJson(), transform);
 		removeOverlay();
 
 		delete rubberband;
@@ -1217,7 +1217,7 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 
 void Viewer::toggleWorkingPlane(void) {
 	if (workingPlane->setVisible(!workingPlane->isVisible())) {
-		getNotifier()->updateSettings(createSettings());
+		FrontendAPI::instance()->updateSettings(createSettings());
 	}
 }
 

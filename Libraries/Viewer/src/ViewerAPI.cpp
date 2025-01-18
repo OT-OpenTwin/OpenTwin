@@ -3,7 +3,7 @@
 #include "ViewerAPI.h"
 #include "Model.h"
 #include "ViewerView.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "DataBase.h"
 #include "PlotManager.h"
 #include "Rubberband.h"
@@ -19,8 +19,6 @@ std::map<ot::UID, Model*> osgModelManager;
 ot::UID viewerCount = 0;
 std::map<ot::UID, ot::ViewerView*> viewerManager;
 
-ViewerAPI::Notifier *globalNotifier = nullptr;
-
 Model *globalActiveModel = nullptr;
 
 std::string globalFontPath;
@@ -28,6 +26,10 @@ std::string globalFontPath;
 void ViewerAPI::setFontPath(const std::string &fontPath)
 {
 	globalFontPath = fontPath;
+}
+
+void ViewerAPI::setFrontendAPI(FrontendAPI* _api) {
+	FrontendAPI::setInstance(_api);
 }
 
 ot::UID ViewerAPI::createModel(void)
@@ -38,8 +40,9 @@ ot::UID ViewerAPI::createModel(void)
 	osgModelManager[modelCount] = model;
 	model->setID(modelCount);
 
-	assert(getNotifier() != nullptr);
-	if (getNotifier() != nullptr) getNotifier()->createTree();
+	if (FrontendAPI::instance() != nullptr) {
+		FrontendAPI::instance()->createTree();
+	}
 
 	return modelCount;
 }
@@ -77,8 +80,8 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 
 	for (auto viewer : viewerList)
 	{
-		assert(getNotifier() != nullptr);
-		if (getNotifier() != nullptr) getNotifier()->removeViewer(viewer->getViewerID());
+		assert(FrontendAPI::instance() != nullptr);
+		if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->removeViewer(viewer->getViewerID());
 
 		viewerManager.erase(viewer->getViewerID());
 		viewer->detachFromModel();
@@ -132,11 +135,6 @@ ot::WidgetView* ViewerAPI::getViewerWidget(ot::UID viewerID)
 	}
 
 	return nullptr;
-}
-
-void ViewerAPI::registerNotifier(ViewerAPI::Notifier *notifier)
-{
-	globalNotifier = notifier;
 }
 
 void ViewerAPI::resetAllViews1D(ot::UID osgModelID)

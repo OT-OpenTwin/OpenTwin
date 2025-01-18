@@ -964,7 +964,7 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Creating viewer component");
 
 			m_viewerComponent = new ViewerComponent();
-			ViewerAPI::registerNotifier(m_viewerComponent);
+			ViewerAPI::setFrontendAPI(m_viewerComponent);
 
 			m_viewerComponent->setDataBaseConnectionInformation(m_loginData.getDatabaseUrl(), m_loginData.getSessionUser(), m_loginData.getSessionPassword());
 			

@@ -2,7 +2,7 @@
 #include "TransformManipulator.h"
 
 #include "Viewer.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "SceneNodeBase.h"
 #include "SceneNodeGeometry.h"
 #include "HandleArrow.h"
@@ -173,7 +173,7 @@ void TransformManipulator::performOperation(void)
 	std::string selectionInfo = doc.toJson();
 
 	// Send the selection message to the model
-	getNotifier()->entitiesSelected(messageReplyTo, messageSelectionAction, selectionInfo, messageOptionNames, messageOptionValues);
+	FrontendAPI::instance()->entitiesSelected(messageReplyTo, messageSelectionAction, selectionInfo, messageOptionNames, messageOptionValues);
 }
 
 void TransformManipulator::storeTransformations(void)

@@ -2,7 +2,7 @@
 
 #include "Model.h"
 #include "Viewer.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "ViewerToolBar.h"
 
 #include <osg/BlendFunc>
@@ -105,9 +105,9 @@ void Model::detachViewer(Viewer *viewer)
 void Model::deactivateModel(void)
 {
 	// Clear the tree entries
-	if (getNotifier() != nullptr)
+	if (FrontendAPI::instance() != nullptr)
 	{
-		getNotifier()->clearTree();
+		FrontendAPI::instance()->clearTree();
 	}
 
 	if (isActive)
@@ -132,17 +132,17 @@ void Model::activateModel(void)
 
 void Model::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
 {
-	getNotifier()->fillPropertyGrid(_configuration);
+	FrontendAPI::instance()->fillPropertyGrid(_configuration);
 }
 
 void Model::setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value)
 {
-	getNotifier()->setDoublePropertyValue(_groupName, _itemName, value);
+	FrontendAPI::instance()->setDoublePropertyValue(_groupName, _itemName, value);
 }
 
 double Model::getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName)
 {
-	return getNotifier()->getDoublePropertyValue(_groupName, _itemName);
+	return FrontendAPI::instance()->getDoublePropertyValue(_groupName, _itemName);
 }
 
 bool Model::propertyGridValueChanged(const ot::Property* _property)
@@ -157,7 +157,7 @@ bool Model::propertyGridValueChanged(const ot::Property* _property)
 
 void Model::lockSelectionAndModification(bool flag)
 {
-	getNotifier()->lockSelectionAndModification(flag);
+	FrontendAPI::instance()->lockSelectionAndModification(flag);
 }
 
 void Model::addSceneNodesToTree(SceneNodeBase *root)
@@ -167,13 +167,13 @@ void Model::addSceneNodesToTree(SceneNodeBase *root)
 
 	if (isActive)
 	{
-		assert(getNotifier() != nullptr);
-		if (getNotifier() != nullptr)
+		assert(FrontendAPI::instance() != nullptr);
+		if (FrontendAPI::instance() != nullptr)
 		{
 			if (root != sceneNodesRoot)  // The toplevel scene node is invisible and therefore not added to the tree.
 			{
-				ot::UID treeItemID = getNotifier()->addTreeItem(root->getName(), root->isEditable(), root->getSelectChildren());
-				getNotifier()->setTreeItemIcon(treeItemID, root->getOldTreeIcons().size, root->isVisible() ? root->getOldTreeIcons().visibleIcon : root->getOldTreeIcons().hiddenIcon);
+				ot::UID treeItemID = FrontendAPI::instance()->addTreeItem(root->getName(), root->isEditable(), root->getSelectChildren());
+				FrontendAPI::instance()->setTreeItemIcon(treeItemID, root->getOldTreeIcons().size, root->isVisible() ? root->getOldTreeIcons().visibleIcon : root->getOldTreeIcons().hiddenIcon);
 
 				root->setTreeItemID(treeItemID);
 
@@ -197,7 +197,7 @@ void Model::addSceneNodesToTree(SceneNodeBase *root)
 			{
 				if (root->getParent()->isSelected())
 				{
-					getNotifier()->selectTreeItem(root->getTreeItemID());
+					FrontendAPI::instance()->selectTreeItem(root->getTreeItemID());
 				}
 			}
 
@@ -212,10 +212,10 @@ void Model::addSceneNodesToTree(SceneNodeBase *root)
 
 void Model::fillTree(void)
 {
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
 
-	getNotifier()->clearTree();
+	FrontendAPI::instance()->clearTree();
 
 	addSceneNodesToTree(sceneNodesRoot);
 }
@@ -326,7 +326,7 @@ void Model::setTreeStateRecording(bool flag)
 					SceneNodeBase *sceneItem = nameToSceneNodesMap[item.first];
 					assert(sceneItem != nullptr);
 
-					getNotifier()->expandSingleTreeItem(sceneItem->getTreeItemID());
+					FrontendAPI::instance()->expandSingleTreeItem(sceneItem->getTreeItemID());
 				}
 			}
 		}
@@ -850,7 +850,7 @@ void Model::setEntityName(unsigned long long modelEntityID, const std::string &n
 
 		item->setName(newName);
 
-		getNotifier()->setTreeItemText(item->getTreeItemID(), newText);
+		FrontendAPI::instance()->setTreeItemText(item->getTreeItemID(), newText);
 	}
 }
 
@@ -885,7 +885,7 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 					newText = newPath.substr(index + 1);
 				}
 
-				getNotifier()->setTreeItemText(item.second->getTreeItemID(), newText);
+				FrontendAPI::instance()->setTreeItemText(item.second->getTreeItemID(), newText);
 			}
 		}
 		else if (name.size() > oldPath.size())
@@ -1102,17 +1102,17 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 
 void Model::ensure1DView(void)
 {
-	if (getNotifier()->getCurrentVisualizationTabTitle() != "Versions")
+	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions")
 	{
-		getNotifier()->setCurrentVisualizationTabFromTitle("1D");
+		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("1D");
 	}
 }
 
 void Model::ensure3DView(void)
 {
-	if (getNotifier()->getCurrentVisualizationTabTitle() != "Versions")
+	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions")
 	{
-		getNotifier()->setCurrentVisualizationTabFromTitle("3D");
+		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("3D");
 	}
 }
 
@@ -1154,7 +1154,7 @@ void Model::setItemVisibleState(SceneNodeBase *item, bool visible)
 	if (visible != item->isVisible())
 	{
 		item->setVisible(visible);
-		getNotifier()->setTreeItemIcon(item->getTreeItemID(), item->getOldTreeIcons().size, item->isVisible() ? item->getOldTreeIcons().visibleIcon : item->getOldTreeIcons().hiddenIcon);
+		FrontendAPI::instance()->setTreeItemIcon(item->getTreeItemID(), item->getOldTreeIcons().size, item->isVisible() ? item->getOldTreeIcons().visibleIcon : item->getOldTreeIcons().hiddenIcon);
 
 		manageParentVisibility(item);
 	}
@@ -1476,7 +1476,7 @@ void Model::showAllSceneNodesAction(void)
 	}
 
 	showAllSceneNodes(sceneNodesRoot);
-	if (getNotifier() != nullptr) getNotifier()->refreshSelection();
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
 void Model::showSelectedSceneNodesAction(void)
@@ -1492,21 +1492,21 @@ void Model::showSelectedSceneNodesAction(void)
 	}
 
 	showSelectedSceneNodes(sceneNodesRoot);
-	if (getNotifier() != nullptr) getNotifier()->refreshSelection();
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
 void Model::hideSelectedSceneNodesAction(void)
 {
 	hideSelectedSceneNodes(sceneNodesRoot);
 
-	if (getNotifier() != nullptr) getNotifier()->refreshSelection();
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
 void Model::hideUnselectedSceneNodesAction(void)
 {
 	hideUnselectedSceneNodes(sceneNodesRoot);
 
-	if (getNotifier() != nullptr) getNotifier()->refreshSelection();
+	if (FrontendAPI::instance() != nullptr) FrontendAPI::instance()->refreshSelection();
 }
 
 SceneNodeBase *Model::findSelectedItemByLineSegment(osgUtil::Intersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex)
@@ -1704,26 +1704,26 @@ void Model::selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed)
 	if (selectedItem == nullptr)
 	{
 		// Nothing was selected
-		if (getNotifier() != nullptr)
+		if (FrontendAPI::instance() != nullptr)
 		{
 			if (!bCtrlKeyPressed)
 			{
-				getNotifier()->clearTreeSelection();
+				FrontendAPI::instance()->clearTreeSelection();
 			}
 		}
 	}
 	else
 	{
 		// Select the corresponding tree item
-		if (getNotifier() != nullptr)
+		if (FrontendAPI::instance() != nullptr)
 		{
 			if (!bCtrlKeyPressed)
 			{
-				getNotifier()->selectSingleTreeItem(selectedItem->getTreeItemID());
+				FrontendAPI::instance()->selectSingleTreeItem(selectedItem->getTreeItemID());
 			}
 			else
 			{
-				getNotifier()->toggleTreeItemSelection(selectedItem->getTreeItemID(), true);
+				FrontendAPI::instance()->toggleTreeItemSelection(selectedItem->getTreeItemID(), true);
 			}
 		}
 	}
@@ -1905,7 +1905,7 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 	treeItemDeleteList.push_back(node->getTreeItemID());
 	
 	//Deletes graphics item if one is associated
-	getNotifier()->removeGraphicsElements(node->getModelEntityID());
+	FrontendAPI::instance()->removeGraphicsElements(node->getModelEntityID());
 
 	// Ensure that we are not deleting the current hover item
 	if (currentHoverItem == node)
@@ -1916,7 +1916,7 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 	// Store the current status of the item, if tree state recording is turned on
 	if (treeStateRecording)
 	{
-		bool isExpanded = getNotifier()->isTreeItemExpanded(node->getTreeItemID());
+		bool isExpanded = FrontendAPI::instance()->isTreeItemExpanded(node->getTreeItemID());
 		treeInfoMap[node->getName()] = (node->isSelected() ? ITEM_SELECTED : 0) | (isExpanded ? ITEM_EXPANDED : 0);
 	}
 
@@ -1958,7 +1958,7 @@ void Model::removeShapes(std::list<unsigned long long> modelEntityIDList)
 	}
 
 	// Remove the shapes from the tree
-	getNotifier()->removeTreeItems(treeItemDeleteList);
+	FrontendAPI::instance()->removeTreeItems(treeItemDeleteList);
 	
 	// Refresh the views 
 	refreshAllViews();
@@ -2269,7 +2269,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			getNotifier()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
 
 			currentFaceSelection.clear();
 		}
@@ -2307,7 +2307,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			getNotifier()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
 
 			clearEdgeSelection();
 		}
@@ -2344,7 +2344,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 			std::string selectionInfo = buffer.GetString();
 
 			// Send the selection message to the model
-			getNotifier()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
+			FrontendAPI::instance()->entitiesSelected(currentSelectionReplyTo, currentSelectionAction, selectionInfo, currentSelectionOptionNames, currentSelectionOptionValues);
 		}
 	}
 	else
@@ -3018,7 +3018,7 @@ void Model::set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPresse
 {
 	if (!ctrlPressed)
 	{
-		getNotifier()->selectSingleTreeItem(treeItemID);
+		FrontendAPI::instance()->selectSingleTreeItem(treeItemID);
 	}
 	else
 	{
@@ -3039,20 +3039,20 @@ void Model::set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPresse
 					{
 						if (plot->isSelected())
 						{
-							getNotifier()->toggleTreeItemSelection(plot->getTreeItemID(), false);
+							FrontendAPI::instance()->toggleTreeItemSelection(plot->getTreeItemID(), false);
 						}
 					}
 				}
 			}
 
-			getNotifier()->toggleTreeItemSelection(treeItemID, false);
+			FrontendAPI::instance()->toggleTreeItemSelection(treeItemID, false);
 		}
 	}
 }
 
 void Model::reset1DPlotItemSelection(void)
 {
-	getNotifier()->clearTreeSelection();
+	FrontendAPI::instance()->clearTreeSelection();
 }
 
 void Model::addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
@@ -3176,7 +3176,7 @@ void Model::removedSelectedCurveNodes()
 		}
 	}
 	// Remove the shapes from the tree
-	getNotifier()->removeTreeItems(treeItemDeleteList);
+	FrontendAPI::instance()->removeTreeItems(treeItemDeleteList);
 }
 
 void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point)

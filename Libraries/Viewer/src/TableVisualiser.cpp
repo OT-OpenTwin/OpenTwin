@@ -2,7 +2,7 @@
 #include "TableVisualiser.h"
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "SceneNodeBase.h"
 
 TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode) 
@@ -20,5 +20,5 @@ void TableVisualiser::visualise(bool _setFocus)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setFocus, doc.GetAllocator());
 
-	getNotifier()->messageModelService(doc.toJson());
+	FrontendAPI::instance()->messageModelService(doc.toJson());
 }

@@ -3,7 +3,7 @@
 #include <osg/Node>
 #include <osg/Switch>
 #include "TableVisualiser.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 
 SceneNodeMultiVisualisation::~SceneNodeMultiVisualisation()
 {
@@ -81,7 +81,7 @@ void SceneNodeMultiVisualisation::setSelected(bool _selection, bool _selectionFr
 				}
 				else if (visualiser->viewIsCurrentlyOpen() && _selectionFromNavigationTree)
 				{
-					getNotifier()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
 				}
 			}
 		}

@@ -29,6 +29,7 @@
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
     <ClCompile Include="src\EntityHandler.cpp" />
     <ClCompile Include="src\Factory.cpp" />
+    <ClCompile Include="src\FrontendAPI.cpp" />
     <ClCompile Include="src\HandleArrow.cpp" />
     <ClCompile Include="src\HandlerBase.cpp" />
     <ClCompile Include="src\HandlerIntersector.cpp" />
@@ -44,7 +45,6 @@
     </ClCompile>
     <ClCompile Include="src\MaterialRough.cpp" />
     <ClCompile Include="src\Model.cpp" />
-    <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\PlotManager.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
@@ -95,6 +95,7 @@
     <ClInclude Include="include\ClipPlaneManipulator.h" />
     <ClInclude Include="include\EntityHandler.h" />
     <ClInclude Include="include\Factory.h" />
+    <ClInclude Include="include\FrontendAPI.h" />
     <ClInclude Include="include\HandleArrow.h" />
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
@@ -110,7 +111,6 @@
     <ClInclude Include="include\MaterialRough.h" />
     <ClInclude Include="include\MaterialBase.h" />
     <ClInclude Include="include\Model.h" />
-    <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\PlotManager.h" />
     <ClInclude Include="include\Rubberband.h" />
     <ClInclude Include="include\SceneNodeAnnotation.h" />

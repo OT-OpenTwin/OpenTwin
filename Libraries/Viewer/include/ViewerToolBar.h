@@ -42,7 +42,7 @@ private:
 	ViewerToolBar();
 	~ViewerToolBar();
 
-	std::list<ot::UID> removeItemIDList;
+	std::list<ot::UID> m_removeItemIDList;
 
 	ot::UID m_viewPageID;
 	ot::UID m_operationsGroupID;

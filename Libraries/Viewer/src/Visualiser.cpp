@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "Visualiser.h"
 #include "SceneNodeBase.h"
 #include "OTCore/OTAssert.h"
@@ -12,6 +12,6 @@ Visualiser::Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _
 
 Visualiser::~Visualiser() {
 	if (m_viewIsOpen) {
-		getNotifier()->closeView(m_node->getName(), m_viewType);
+		FrontendAPI::instance()->closeView(m_node->getName(), m_viewType);
 	}
 }

@@ -16,6 +16,7 @@
 
 // Viewer header
 #include "ViewerAPI.h"
+#include "FrontendAPI.h"
 
 // openTwin header
 #include "OTCore/ServiceBase.h"
@@ -29,7 +30,7 @@ namespace ot { class WidgetView; }
 
 #define VIEWER_SETTINGS_NAME "Viewer"
 
-class ViewerComponent : public ViewerAPI::Notifier , public ak::aNotifier, public ot::ServiceBase
+class ViewerComponent : public FrontendAPI, public ak::aNotifier, public ot::ServiceBase
 {
 public:
 	ViewerComponent();
@@ -169,9 +170,6 @@ public:
 	void deactivateCurrentlyActiveModel(void);
 
 	void setColors(const ot::Color & _background, const ot::Color & _foreground);
-
-	//! @brief Will register this component as notifier in the Viewer API
-	void registerAtNotifier(void);
 
 	void setDataBaseConnectionInformation(const std::string &databaseURL, const std::string &userName, const std::string &encryptedPassword);
 	

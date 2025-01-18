@@ -1,6 +1,6 @@
 // Viewer header
 #include "stdafx.h"
-#include "Notifier.h"
+#include "FrontendAPI.h"
 #include "ViewerToolBar.h"
 
 // OpenTwin header
@@ -31,81 +31,82 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 }
 
 void ViewerToolBar::setupUIControls3D(void) {
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
 
-	removeItemIDList.push_front(m_viewPageID = getNotifier()->addMenuPage("View"));
+	m_removeItemIDList.push_front(m_viewPageID = FrontendAPI::instance()->addMenuPage("View"));
 
-	removeItemIDList.push_front(m_operationsGroupID = getNotifier()->addMenuGroup(m_viewPageID, "Operations"));
-	removeItemIDList.push_front(m_visiblityGroupID = getNotifier()->addMenuGroup(m_viewPageID, "Visibility"));
-	removeItemIDList.push_front(m_styleGroupID = getNotifier()->addMenuGroup(m_viewPageID, "Display Style"));
+	m_removeItemIDList.push_front(m_operationsGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Operations"));
+	m_removeItemIDList.push_front(m_visiblityGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Visibility"));
+	m_removeItemIDList.push_front(m_styleGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Display Style"));
 
-	removeItemIDList.push_front(m_resetView3DButtonID = getNotifier()->addMenuPushButton(m_operationsGroupID, "Reset View", "ResetView", "Space"));
+	m_removeItemIDList.push_front(m_resetView3DButtonID = FrontendAPI::instance()->addMenuPushButton(m_operationsGroupID, "Reset View", "ResetView", "Space"));
 
-	removeItemIDList.push_front(m_showAllButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Show All", "ShowAll"));
-	removeItemIDList.push_front(m_showSelectedButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
-	removeItemIDList.push_front(m_hideSelectedButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
-	removeItemIDList.push_front(m_hideUnselectedButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Hide Unselected", "HideUnselected"));
+	m_removeItemIDList.push_front(m_showAllButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show All", "ShowAll"));
+	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
+	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
+	m_removeItemIDList.push_front(m_hideUnselectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Unselected", "HideUnselected"));
 
-	removeItemIDList.push_front(m_wireframeButtonID = getNotifier()->addMenuPushButton(m_styleGroupID, "Wireframe", "Wireframe"));
-	removeItemIDList.push_front(m_workingPlaneButtonID = getNotifier()->addMenuPushButton(m_styleGroupID, "Working plane", "WorkingPlane"));
-	removeItemIDList.push_front(m_axisCrossButtonID = getNotifier()->addMenuPushButton(m_styleGroupID, "Axis cross", "AxisCross"));
-	removeItemIDList.push_front(m_centerAxisCrossButtonID = getNotifier()->addMenuPushButton(m_styleGroupID, "Center axis cross", "CenterAxisCross"));
-	removeItemIDList.push_front(m_cutplaneButtonID = getNotifier()->addMenuPushButton(m_styleGroupID, "Cutplane", "Cutplane"));
+	m_removeItemIDList.push_front(m_wireframeButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Wireframe", "Wireframe"));
+	m_removeItemIDList.push_front(m_workingPlaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Working plane", "WorkingPlane"));
+	m_removeItemIDList.push_front(m_axisCrossButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Axis cross", "AxisCross"));
+	m_removeItemIDList.push_front(m_centerAxisCrossButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Center axis cross", "CenterAxisCross"));
+	m_removeItemIDList.push_front(m_cutplaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Cutplane", "Cutplane"));
 
 	// Send an initial notification to properly set the state of the new controls
 	this->updateEnabledState(ot::UIDList());
 }
 
 void ViewerToolBar::setupUIControls1D(void) {
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
 
-	removeItemIDList.push_front(m_viewPageID = getNotifier()->addMenuPage("View"));
+	m_removeItemIDList.push_front(m_viewPageID = FrontendAPI::instance()->addMenuPage("View"));
 
-	removeItemIDList.push_front(m_operationsGroupID = getNotifier()->addMenuGroup(m_viewPageID, "Operations"));
-	removeItemIDList.push_front(m_visiblityGroupID = getNotifier()->addMenuGroup(m_viewPageID, "Visibility"));
+	m_removeItemIDList.push_front(m_operationsGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Operations"));
+	m_removeItemIDList.push_front(m_visiblityGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Visibility"));
 
-	removeItemIDList.push_front(m_resetView1DButtonID = getNotifier()->addMenuPushButton(m_operationsGroupID, "Reset View", "ResetView", "Space"));
+	m_removeItemIDList.push_front(m_resetView1DButtonID = FrontendAPI::instance()->addMenuPushButton(m_operationsGroupID, "Reset View", "ResetView", "Space"));
 
-	removeItemIDList.push_front(m_showSelectedButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
-	removeItemIDList.push_front(m_hideSelectedButtonID = getNotifier()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
+	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
+	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
 
 	// Send an initial notification to properly set the state of the new controls
 	this->updateEnabledState(ot::UIDList());
 }
 
 void ViewerToolBar::setupUIControlsText(void) {
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
 
-	removeItemIDList.push_front(m_textEditorPageID = getNotifier()->addMenuPage("Text Editor"));
+	m_removeItemIDList.push_front(m_textEditorPageID = FrontendAPI::instance()->addMenuPage("Text Editor"));
 
-	removeItemIDList.push_front(m_textEditorDataID = getNotifier()->addMenuGroup(m_textEditorPageID, "Data"));
+	m_removeItemIDList.push_front(m_textEditorDataID = FrontendAPI::instance()->addMenuGroup(m_textEditorPageID, "Data"));
 
-	removeItemIDList.push_front(m_textEditorSaveID = getNotifier()->addMenuPushButton(m_textEditorDataID, "Save", "Save"));
-	removeItemIDList.push_front(m_textEditorExportID = getNotifier()->addMenuPushButton(m_textEditorDataID, "Save To File", "Export"));
+	m_removeItemIDList.push_front(m_textEditorSaveID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save", "Save"));
+	m_removeItemIDList.push_front(m_textEditorExportID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save To File", "Export"));
 
 	// Send an initial notification to properly set the state of the new controls
 	this->updateEnabledState(ot::UIDList());
-	getNotifier()->setCurrentMenuPage("Text Editor");
+	FrontendAPI::instance()->setCurrentMenuPage("Text Editor");
 }
 
 void ViewerToolBar::removeUIControls(void) {
-	if (removeItemIDList.empty()) return;
+	if (m_removeItemIDList.empty()) return;
 
-	OTAssert(getNotifier() != nullptr, "No notifier found");
-	if (getNotifier() == nullptr) return;
+	OTAssert(FrontendAPI::instance() != nullptr, "No notifier found");
+	if (FrontendAPI::instance() == nullptr) return;
 
-	getNotifier()->removeUIElements(removeItemIDList);
-	removeItemIDList.clear();
+	FrontendAPI::instance()->removeUIElements(m_removeItemIDList);
+	m_removeItemIDList.clear();
+	this->resetControlsData();
 }
 
 void ViewerToolBar::updateEnabledState(const ot::UIDList& _selectedTreeItems) {
-	if (!removeItemIDList.empty()) {
+	if (!m_removeItemIDList.empty()) {
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
 
@@ -123,7 +124,7 @@ void ViewerToolBar::updateEnabledState(const ot::UIDList& _selectedTreeItems) {
 			enabled.push_back(m_hideUnselectedButtonID);
 		}
 
-		getNotifier()->enableDisableControls(enabled, disabled);
+		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
 	}
 }
 
