@@ -30,6 +30,7 @@
     <ClCompile Include="src\EntityHandler.cpp" />
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
+    <ClCompile Include="src\GlobalModel.cpp" />
     <ClCompile Include="src\HandleArrow.cpp" />
     <ClCompile Include="src\HandlerBase.cpp" />
     <ClCompile Include="src\HandlerIntersector.cpp" />
@@ -97,6 +98,8 @@
     <ClInclude Include="include\EntityHandler.h" />
     <ClInclude Include="include\Factory.h" />
     <ClInclude Include="include\FrontendAPI.h" />
+    <ClInclude Include="include\GlobalFontPath.h" />
+    <ClInclude Include="include\GlobalModel.h" />
     <ClInclude Include="include\HandleArrow.h" />
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />

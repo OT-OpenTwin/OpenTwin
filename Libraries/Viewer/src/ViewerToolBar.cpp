@@ -98,7 +98,7 @@ void ViewerToolBar::setupUIControlsText(void) {
 
 	m_removeItemIDList.push_front(m_textEditorDataID = FrontendAPI::instance()->addMenuGroup(m_textEditorPageID, "Data"));
 
-	m_removeItemIDList.push_front(m_textEditorSaveID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save", "Save"));
+	m_removeItemIDList.push_front(m_textEditorSaveID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save (Ctrl+S)", "Save"));
 	m_removeItemIDList.push_front(m_textEditorExportID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save To File", "Export"));
 
 	// Send an initial notification to properly set the state of the new controls

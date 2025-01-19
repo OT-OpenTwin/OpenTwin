@@ -63,6 +63,8 @@ public:
 	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {};
 	virtual std::string getCurrentVisualizationTabTitle(void) { return ""; };
 
+	virtual void requestSaveForCurrentVisualizationTab(void) {};
+
 	virtual void enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls) {};
 
 	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues) {};

@@ -52,6 +52,7 @@
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsPicker.h"
@@ -1485,7 +1486,10 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		m_serviceIdMap.clear();
 
 		// Close all the tabs in the tab widget for the viewer
-		app->closeAllViewerTabs();
+		{
+			ot::SignalBlockWrapper sigBlock(&ot::WidgetViewManager::instance());
+			app->closeAllViewerTabs();
+		}
 
 		//NOTE, add service notification to close the session, or deregister the uiService
 		app->setServiceID(ot::invalidServiceID);

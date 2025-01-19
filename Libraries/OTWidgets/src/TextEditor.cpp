@@ -247,6 +247,13 @@ ot::SyntaxHighlighter* ot::TextEditor::takeSyntaxHighlighter(void) {
 	return result;
 }
 
+void ot::TextEditor::slotSaveRequested(void) {
+	if (!this->document()->isModified()) {
+		return;
+	}
+	Q_EMIT saveRequested();
+}
+
 void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Tab && m_tabSpaces > 0) {
 		QTextCursor cursor = this->textCursor();
@@ -335,13 +342,6 @@ void ot::TextEditor::slotUpdateLineNumberArea(const QRect & _rect, int _dy) {
 	else m_lineNumberArea->update(0, _rect.y(), m_lineNumberArea->width(), _rect.height());
 
 	if (_rect.contains(viewport()->rect())) slotUpdateLineNumberAreaWidth(0);
-}
-
-void ot::TextEditor::slotSaveRequested(void) {
-	if (!this->document()->isModified()) {
-		return;
-	}
-	Q_EMIT saveRequested();
 }
 
 void ot::TextEditor::slotFindRequested(void) {

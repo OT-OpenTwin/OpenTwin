@@ -10,17 +10,22 @@
 #include <OTSystem/ArchitectureInfo.h>
 
 //! \def OT_DECL_NOCOPY
-//! \brief Removes the default copy constructor and assignment operator
+//! \brief Removes the default copy constructor and assignment operator.
 #define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class& operator = (const ___class&) = delete;
 
 //! \def OT_DECL_NOMOVE
-//! \brief Removes the default move constructor and move operator
+//! \brief Removes the default move constructor and move operator.
 #define OT_DECL_NOMOVE(___class) ___class(___class&&) = delete; ___class& operator = (___class&&) = delete;
 
 //! \def OT_DECL_NODEFAULT
-//! \brief Removes the default copy constructor and assignment operator
+//! \brief Removes the default copy constructor and assignment operator.
 #define OT_DECL_NODEFAULT(___class) ___class(void) = delete;
 
+//! \def OT_DECL_STATICONLY
+//! \ref OT_DECL_NODEFAULT
+//! \ref OT_DECL_NOCOPY
+//! \ref OT_DECL_NOMOVE
+#define OT_DECL_STATICONLY(___class) OT_DECL_NODEFAULT(___class) OT_DECL_NOCOPY(___class) OT_DECL_NOMOVE(___class)
 
 #if defined(OT_COMPILER_MSC)
 

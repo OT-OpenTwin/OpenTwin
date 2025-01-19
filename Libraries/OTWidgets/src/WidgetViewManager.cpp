@@ -120,6 +120,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	// Remove the toggle dock action
 	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
 	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
+	_view->getViewDockWidget()->blockSignals(true);
+	_view->blockSignals(true);
 
 	// Remove the dock widget itself
 	m_dockManager->removeDockWidget(_view->getViewDockWidget());

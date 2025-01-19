@@ -62,7 +62,8 @@ Model::Model() :
 	viewerModelID(0),
 	singleItemSelected(false),
 	treeStateRecording(false),
-	currentManipulator(nullptr)
+	currentManipulator(nullptr),
+	m_currentViewType(ot::WidgetViewBase::ViewType::CustomView)
 {
 	sceneNodesRoot = new SceneNodeContainer();
 	osgRootNode = sceneNodesRoot->getShapeNode();
@@ -1437,7 +1438,9 @@ void Model::exportTextEditor(void) {
 }
 
 void Model::saveTextEditor(void) {
-
+	if (FrontendAPI::instance()) {
+		FrontendAPI::instance()->requestSaveForCurrentVisualizationTab();
+	}
 }
 
 void Model::executeAction(unsigned long long _buttonID) {

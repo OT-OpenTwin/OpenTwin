@@ -81,6 +81,8 @@ public:
 	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
 	virtual std::string getCurrentVisualizationTabTitle(void) override;
 
+	virtual void requestSaveForCurrentVisualizationTab(void) override;
+
 	virtual void enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls) override;
 
 	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues) override;

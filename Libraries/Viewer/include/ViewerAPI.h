@@ -120,7 +120,7 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void enterEntitySelectionMode(ot::UID osgModelID, ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
 
-	__declspec(dllexport) void setFontPath(const std::string &fontPath);
+	__declspec(dllexport) void setFontPath(const std::string& _fontPath);
 
 	__declspec(dllexport) void setDataBaseConnection(const std::string &databaseURL, const std::string &userName, const std::string &password);
 

@@ -148,6 +148,9 @@
     <ClCompile Include="src\PlotManagerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\GlobalModel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -302,6 +305,12 @@
     </ClInclude>
     <ClInclude Include="include\PlotManagerView.h">
       <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalModel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalFontPath.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

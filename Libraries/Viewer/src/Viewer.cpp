@@ -7,6 +7,7 @@
 #include "Rubberband.h"
 #include "WorkingPlane.h"
 #include "AxisCross.h"
+#include "GlobalFontPath.h"
 #include "AxisCenterCross.h"
 #include "ClipPlaneManipulator.h"
 
@@ -61,8 +62,6 @@
 #include "SceneNodeVTK.h"
 
 #include "ViewerSettings.h"
-
-extern std::string globalFontPath;
 
 Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB) :
 	viewerUID(viewerID),
@@ -129,7 +128,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgOverlayCamera = createOverlayCamera(0, width(), 0, height());
 
 	// Create the overlay text
-	overlayFont = osgText::readFontFile(globalFontPath);
+	overlayFont = osgText::readFontFile(GlobalFontPath::instance());
 
 	// Create new manipulator
 	osgCameraManipulator = new osgGA::ViewManipulator;

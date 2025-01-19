@@ -331,5 +331,8 @@ private:
 	osg::Matrix									   currentWorkingplaneTransform;
 	osg::Matrix									   currentWorkingplaneTransformTransposedInverse;
 	ManipulatorBase							      *currentManipulator;
+
+	std::string m_currentTabTitle;
+	ot::WidgetViewBase::ViewType m_currentViewType;
 };
 

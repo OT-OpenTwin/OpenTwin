@@ -24,6 +24,10 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/Table.h"
+#include "OTWidgets/TableView.h"
+#include "OTWidgets/TextEditor.h"
+#include "OTWidgets/TextEditorView.h"
 
 // C++ header
 #include <exception>
@@ -404,6 +408,60 @@ void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string & _t
 std::string ViewerComponent::getCurrentVisualizationTabTitle(void)
 {
 	return AppBase::instance()->getCurrentVisualizationTabTitle();
+}
+
+void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	if (!view) {
+		OT_LOG_W("No view focused");
+		return;
+	}
+
+	if (!(view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral)) {
+		OT_LOG_E("Non central view in focus");
+		return;
+	}
+
+	switch (view->getViewData().getViewType()) {
+	case ot::WidgetViewBase::View3D:
+		break;
+	case ot::WidgetViewBase::View1D:
+		break;
+	case ot::WidgetViewBase::ViewText:
+	{
+		ot::TextEditorView* actualView = dynamic_cast<ot::TextEditorView*>(view);
+		if (!actualView) {
+			OT_LOG_E("View cast failed");
+			return;
+		}
+		actualView->getTextEditor()->slotSaveRequested();
+	}
+		break;
+	case ot::WidgetViewBase::ViewTable:
+	{
+		ot::TableView* actualView = dynamic_cast<ot::TableView*>(view);
+		if (!actualView) {
+			OT_LOG_E("View cast failed");
+			return;
+		}
+		actualView->getTable()->slotSaveRequested();
+	}
+	break;
+	case ot::WidgetViewBase::ViewVersion:
+		break;
+	case ot::WidgetViewBase::ViewGraphics:
+		break;
+	case ot::WidgetViewBase::ViewGraphicsPicker:
+		break;
+	case ot::WidgetViewBase::ViewProperties:
+		break;
+	case ot::WidgetViewBase::ViewNavigation:
+		break;
+	case ot::WidgetViewBase::CustomView:
+		break;
+	default:
+		break;
+	}
 }
 
 void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls)

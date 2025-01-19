@@ -96,6 +96,9 @@ namespace ot {
 	Q_SIGNALS:							
 		void saveRequested(void);
 
+	public Q_SLOTS:
+		void slotSaveRequested(void);
+
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent * _event) override;
@@ -105,7 +108,6 @@ namespace ot {
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
 		void slotHighlightCurrentLine();
 		void slotUpdateLineNumberArea(const QRect & _rect, int _dy);
-		void slotSaveRequested(void);
 		void slotFindRequested(void);
 		void slotFindClosing(void);
 		void slotDuplicateLine(void);
