@@ -264,6 +264,8 @@ public:
 
 	void switchToMenuTab(const std::string& _menu);
 
+	std::string getCurrentMenuTab(void);
+
 	void closeAllViewerTabs(void);
 
 	//! @brief Will clear the session information such as the project name, collection name and user name

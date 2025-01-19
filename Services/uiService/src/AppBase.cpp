@@ -1235,6 +1235,10 @@ void AppBase::switchToMenuTab(const std::string& _menu) {
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, QString::fromStdString(_menu));
 }
 
+std::string AppBase::getCurrentMenuTab(void) {
+	return uiAPI::window::getCurrentToolBarTabText(m_mainWindow);
+}
+
 void AppBase::closeAllViewerTabs(void) {
 	LockManager* manager = this->lockManager();
 

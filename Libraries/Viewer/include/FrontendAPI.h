@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+namespace ot { class WidgetView; };
 namespace ot { class TextEditor; };
 
 class __declspec(dllexport) FrontendAPI {
@@ -49,8 +50,10 @@ public:
 	virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string& groupName) { return 0; };
 	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName) { return 0; };
 	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName, const std::string& keySequence) { return 0; };
+	virtual void setMenuPushButtonToolTip(unsigned long long _buttonID, const std::string& _toolTip) {};
 
 	virtual void setCurrentMenuPage(const std::string& _pageName) {};
+	virtual std::string getCurrentMenuPage(void) { return std::string(); };
 
 	virtual void removeUIElements(std::list<unsigned long long>& itemIDList) {};
 	virtual void removeGraphicsElements(ot::UID _modelID) {};

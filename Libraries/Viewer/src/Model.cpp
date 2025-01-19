@@ -63,6 +63,7 @@ Model::Model() :
 	singleItemSelected(false),
 	treeStateRecording(false),
 	currentManipulator(nullptr),
+	m_hasModalMenu(false),
 	m_currentViewType(ot::WidgetViewBase::ViewType::CustomView)
 {
 	sceneNodesRoot = new SceneNodeContainer();
@@ -1433,14 +1434,23 @@ void Model::toggleCutplane(void) {
 	}
 }
 
-void Model::exportTextEditor(void) {
-
-}
-
 void Model::saveTextEditor(void) {
 	if (FrontendAPI::instance()) {
 		FrontendAPI::instance()->requestSaveForCurrentVisualizationTab();
 	}
+}
+
+void Model::exportTextEditor(void) {
+
+}
+
+void Model::saveTable(void) {
+	if (FrontendAPI::instance()) {
+		FrontendAPI::instance()->requestSaveForCurrentVisualizationTab();
+	}
+}
+
+void Model::exportTableAsCSV(void) {
 }
 
 void Model::executeAction(unsigned long long _buttonID) {
@@ -1459,6 +1469,8 @@ void Model::executeAction(unsigned long long _buttonID) {
 	case ViewerToolBar::CutplaneButton: toggleCutplane(); break;
 	case ViewerToolBar::TextEditorSaveButton: saveTextEditor(); break;
 	case ViewerToolBar::TextEditorExportButton: exportTextEditor(); break;
+	case ViewerToolBar::TableSaveButton: saveTable(); break;
+	case ViewerToolBar::TableExportCSVButton: exportTableAsCSV(); break;
 	case ViewerToolBar::NoButton: break;
 	default:
 		OT_LOG_W("Unknown button (" + std::to_string(_buttonID) + ")");
@@ -3000,7 +3012,15 @@ void Model::visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config)
 
 void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type)
 {
+	if (m_hasModalMenu) {
+		if (m_currentMenu == FrontendAPI::instance()->getCurrentMenuPage()) {
+			FrontendAPI::instance()->setCurrentMenuPage(m_previousMenu);
+		}
+	}
+
 	ViewerToolBar::instance().removeUIControls();
+
+	m_hasModalMenu = false;
 
 	if (_type == ot::WidgetViewBase::View3D)
 	{
@@ -3011,7 +3031,20 @@ void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::V
 		ViewerToolBar::instance().setupUIControls1D();
 	}
 	else if (_type == ot::WidgetViewBase::ViewText) {
+		m_hasModalMenu = true;
+		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
+		
 		ViewerToolBar::instance().setupUIControlsText();
+		
+		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
+	}
+	else if (_type == ot::WidgetViewBase::ViewTable) {
+		m_hasModalMenu = true;
+		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
+		
+		ViewerToolBar::instance().setupUIControlsTable();
+
+		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
 	}
 	else
 	{

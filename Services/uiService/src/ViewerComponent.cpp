@@ -361,13 +361,21 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 	newHandler->attachToEvent(uid, ak::etClicked, 0, 0);
 	AppBase::instance()->shortcutManager()->addHandler(newHandler);
 
-	ak::uiAPI::toolButton::setToolTip(uid, (buttonName + " (" + keySequence + ")").c_str());
+	ak::uiAPI::toolButton::setToolTip(uid, QString::fromStdString(buttonName + " (" + keySequence + ")"));
 
 	return uid;
 }
 
+void ViewerComponent::setMenuPushButtonToolTip(unsigned long long _buttonID, const std::string& _toolTip) {
+	ak::uiAPI::toolButton::setToolTip(_buttonID, QString::fromStdString(_toolTip));
+}
+
 void ViewerComponent::setCurrentMenuPage(const std::string& _pageName) {
 	AppBase::instance()->switchToMenuTab(_pageName);
+}
+
+std::string ViewerComponent::getCurrentMenuPage(void) {
+	return AppBase::instance()->getCurrentMenuTab();
 }
 
 void ViewerComponent::removeUIElements(std::list<ViewerUIDtype> &itemIDList)

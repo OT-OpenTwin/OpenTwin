@@ -37,6 +37,9 @@ void ViewerToolBar::viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _typ
 	case ot::WidgetViewBase::ViewText:
 		this->updateTextEditorSaveEnabledState();
 		break;
+	case ot::WidgetViewBase::ViewTable:
+		this->updateTableSaveEnabledState();
+		break;
 	default:
 		break;
 	}
@@ -99,11 +102,33 @@ void ViewerToolBar::setupUIControlsText(void) {
 	m_removeItemIDList.push_front(m_textEditorDataID = FrontendAPI::instance()->addMenuGroup(m_textEditorPageID, "Data"));
 
 	m_removeItemIDList.push_front(m_textEditorSaveID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save (Ctrl+S)", "Save"));
+	FrontendAPI::instance()->setMenuPushButtonToolTip(m_textEditorSaveID, "Save (Ctrl + S)");
+
 	m_removeItemIDList.push_front(m_textEditorExportID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save To File", "Export"));
 
 	// Send an initial notification to properly set the state of the new controls
 	this->updateTextEditorEnabledState();
+
 	FrontendAPI::instance()->setCurrentMenuPage("Text Editor");
+}
+
+void ViewerToolBar::setupUIControlsTable(void) {
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
+	
+	m_removeItemIDList.push_front(m_tablePageID = FrontendAPI::instance()->addMenuPage("Table"));
+
+	m_removeItemIDList.push_front(m_tableDataID = FrontendAPI::instance()->addMenuGroup(m_tablePageID, "Data"));
+
+	m_removeItemIDList.push_front(m_tableSaveID = FrontendAPI::instance()->addMenuPushButton(m_tableDataID, "Save", "Save"));
+	FrontendAPI::instance()->setMenuPushButtonToolTip(m_tableSaveID, "Save (Ctrl + S)");
+
+	//m_removeItemIDList.push_front(m_tableExportCSVID = FrontendAPI::instance()->addMenuPushButton(m_tableDataID, "Export As CSV", "Export"));
+
+	// Send an initial notification to properly set the state of the new controls
+	this->updateTextEditorEnabledState();
+	FrontendAPI::instance()->setCurrentMenuPage("Table");
 }
 
 void ViewerToolBar::removeUIControls(void) {
@@ -152,6 +177,27 @@ void ViewerToolBar::updateTextEditorSaveEnabledState(void) {
 		}
 		else {
 			disabled.push_back(m_textEditorSaveID);
+		}
+
+		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
+	}
+}
+
+void ViewerToolBar::updateTableEnabledState(void) {
+	this->updateTableSaveEnabledState();
+}
+
+void ViewerToolBar::updateTableSaveEnabledState(void) {
+	if (!m_removeItemIDList.empty()) {
+		std::list<unsigned long long> enabled;
+		std::list<unsigned long long> disabled;
+
+		// The table tab is only visible when a table is currently focused
+		if (FrontendAPI::instance()->getCurrentViewIsModified()) {
+			enabled.push_back(m_tableSaveID);
+		}
+		else {
+			disabled.push_back(m_tableSaveID);
 		}
 
 		FrontendAPI::instance()->enableDisableControls(enabled, disabled);

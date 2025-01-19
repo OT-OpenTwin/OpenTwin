@@ -838,6 +838,18 @@ ak::ID ak::uiAPI::window::getCurrentTabToolBarTab(
 	UID												_windowUID
 ) { return object::get<aWindowManager>(_windowUID)->currentTabToolbarTab(); }
 
+std::string ak::uiAPI::window::getCurrentToolBarTabText(UID _windowUID) {
+	aWindowManager* manager = object::get<aWindowManager>(_windowUID);
+	if (manager) {
+		ID id = manager->currentTabToolbarTab();
+		if (id != invalidID) {
+			return manager->getTabToolBarTabText(id).toStdString();
+		}
+	}
+	
+	return std::string();
+}
+
 int ak::uiAPI::window::getTabToolBarTabCount(
 	UID												_windowUID
 ) { return object::get<aWindowManager>(_windowUID)->tabToolbarTabCount(); }

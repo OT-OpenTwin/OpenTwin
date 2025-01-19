@@ -22,6 +22,8 @@ public:
 		CutplaneButton,
 		TextEditorSaveButton,
 		TextEditorExportButton,
+		TableSaveButton,
+		TableExportCSVButton,
 
 		NoButton
 	};
@@ -35,10 +37,16 @@ public:
 	void setupUIControls3D(void);
 	void setupUIControls1D(void);
 	void setupUIControlsText(void);
+	void setupUIControlsTable(void);
+	
 	void removeUIControls(void);
+
 	void updateViewEnabledState(const ot::UIDList& _selectedTreeItems);
 	void updateTextEditorEnabledState(void);
 	void updateTextEditorSaveEnabledState(void);
+
+	void updateTableEnabledState(void);
+	void updateTableSaveEnabledState(void);
 
 private:
 	void resetControlsData(void);
@@ -66,6 +74,11 @@ private:
 
 	ot::UID m_textEditorPageID;
 	ot::UID m_textEditorDataID;
-	ot::UID m_textEditorExportID;
 	ot::UID m_textEditorSaveID;
+	ot::UID m_textEditorExportID;
+
+	ot::UID m_tablePageID;
+	ot::UID m_tableDataID;
+	ot::UID m_tableSaveID;
+	//ot::UID m_tableExportCSVID;
 };

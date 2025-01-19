@@ -250,8 +250,11 @@ private:
 	void       toggleCenterAxisCross(void);
 	void	   toggleCutplane(void);
 
-	void exportTextEditor(void);
 	void saveTextEditor(void);
+	void exportTextEditor(void);
+
+	void saveTable(void);
+	void exportTableAsCSV(void);
 
 	void	   resetSelection(SceneNodeBase *root);
 	void       setAllShapesOpaque(SceneNodeBase *root);
@@ -332,7 +335,9 @@ private:
 	osg::Matrix									   currentWorkingplaneTransformTransposedInverse;
 	ManipulatorBase							      *currentManipulator;
 
-	std::string m_currentTabTitle;
+	bool m_hasModalMenu;
+	std::string m_currentMenu;
+	std::string m_previousMenu;
 	ot::WidgetViewBase::ViewType m_currentViewType;
 };
 

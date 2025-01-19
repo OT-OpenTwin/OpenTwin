@@ -859,6 +859,8 @@ namespace ak {
 				UID												_windowUID
 			);
 
+			UICORE_API_EXPORT std::string getCurrentToolBarTabText(UID _windowUID);
+
 			//! @brief Will return the tab count of the tab tool bar at the specified window
 			//! @param _windowUID The UID of the window
 			UICORE_API_EXPORT int getTabToolBarTabCount(
