@@ -111,22 +111,22 @@ QList<QJsonObject> ConnectionManager::handleMultipleJsonObjects(const QByteArray
     for (int i = 0; i < jsonStream.size(); ++i) {
         char currentChar = jsonStream[i];
 
-        // Wenn eine öffnende geschweifte Klammer gefunden wird
+        
         if (currentChar == '{') {
             if (braceCount == 0) {
-                objectStart = i; // Start eines neuen JSON-Objekts
+                objectStart = i; 
             }
             braceCount++;
         }
-        // Wenn eine schließende geschweifte Klammer gefunden wird
+        
         else if (currentChar == '}') {
             braceCount--;
-            // Wenn alle Klammern geschlossen sind
+           
             if (braceCount == 0 && objectStart != -1) {
-                // Das vollständige JSON-Objekt extrahieren
+              
                 QByteArray singleObject = jsonStream.mid(objectStart, i - objectStart + 1);
 
-                // Versuchen, das Objekt zu parsen
+              
                 QJsonParseError parseError;
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(singleObject, &parseError);
 
@@ -137,7 +137,7 @@ QList<QJsonObject> ConnectionManager::handleMultipleJsonObjects(const QByteArray
                     OT_LOG_E("Error by parsing of JSON_Objects");
                 }
 
-                // Startindex zurücksetzen
+                
                 objectStart = -1;
             }
         }
