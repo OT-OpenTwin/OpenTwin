@@ -16,6 +16,7 @@
 #include "OTWidgets/TextEditorSearchPopup.h"
 
 // Qt header
+#include <QtCore/qfile.h>
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 #include <QtGui/qtextlist.h>
@@ -230,6 +231,22 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 	this->blockSignals(tmp);
 
 	this->setContentChanged();
+}
+
+bool ot::TextEditor::saveToFile(const QString& _fileName) {
+	bool result = false;
+	QFile file(_fileName);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing: \"" + _fileName.toStdString() + "\"");
+		return false;
+	}
+	else {
+		QByteArray data = QByteArray::fromStdString(this->toPlainText().toStdString());
+		result = file.write(data) == data.size();
+		file.close();
+	}
+
+	return result;
 }
 
 QStringList ot::TextEditor::code(void) const {

@@ -63,6 +63,8 @@ public:
 
 	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 
+	virtual ot::WidgetView* getCurrentView(void) override;
+
 	virtual bool getCurrentViewIsModified(void) override;
 
 	// Menu/Widgets
@@ -103,6 +105,10 @@ public:
 	virtual void messageModelService(const std::string& _message) override;
 
 	virtual void removeGraphicsElements(ot::UID _modelID) override;
+
+	virtual std::string getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) override;
+
+	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) override;
 
 	// #####################################################################################################################################
 

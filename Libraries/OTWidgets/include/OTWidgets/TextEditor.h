@@ -66,6 +66,8 @@ namespace ot {
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
 
+		bool saveToFile(const QString& _fileName);
+
 		QStringList code(void) const;
 
 		//! \brief Stores the syntax highlighter.

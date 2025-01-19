@@ -6,6 +6,11 @@
 #include "FrontendAPI.h"
 #include "ViewerToolBar.h"
 
+#include "OTWidgets/Table.h"
+#include "OTWidgets/TableView.h"
+#include "OTWidgets/TextEditor.h"
+#include "OTWidgets/TextEditorView.h"
+
 #include <osg/BlendFunc>
 #include <osg/CullFace>
 #include <osg/Switch>
@@ -1441,7 +1446,32 @@ void Model::saveTextEditor(void) {
 }
 
 void Model::exportTextEditor(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+	
+	if (!api) {
+		return;
+	}
 
+	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	if (view->getViewContentModified()) {
+		view->getTextEditor()->slotSaveRequested();
+	}
+	
+	std::string filePath = api->getSaveFileName("Export To File", "", "Text Files (*.txt);;All Files (*.*)");
+	if (!filePath.empty()) {
+		if (view->getTextEditor()->saveToFile(QString::fromStdString(filePath))) {
+			api->displayText("Exported successfully: \"" + filePath + "\"\n");
+		}
+		else {
+			OT_LOG_E("File export failed");
+		}
+	}
 }
 
 void Model::saveTable(void) {
@@ -1451,6 +1481,27 @@ void Model::saveTable(void) {
 }
 
 void Model::exportTableAsCSV(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	if (view->getViewContentModified()) {
+		view->getTable()->slotSaveRequested();
+	}
+
+	std::string filePath = api->getSaveFileName("Export To File", "", "CSV File (*.csv);;All Files (*.*)");
+	if (!filePath.empty()) {
+		// todo: export...
+	}
 }
 
 void Model::executeAction(unsigned long long _buttonID) {

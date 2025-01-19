@@ -60,6 +60,8 @@ public:
 
 	virtual void displayText(const std::string& text) {};
 
+	virtual ot::WidgetView* getCurrentView(void) { return nullptr; };
+
 	virtual bool getCurrentViewIsModified(void) { return false; };
 
 	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
@@ -85,6 +87,9 @@ public:
 	virtual void updateVTKEntity(unsigned long long modelEntityID) {};
 
 	virtual void messageModelService(const std::string& _message) {};
+
+	virtual std::string getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
+	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) { return std::string(); };
 
 private:
 	static FrontendAPI*& getInstance(void);

@@ -34,6 +34,7 @@
 
 // Qt header
 #include <qwidget.h>
+#include <QtWidgets/qfiledialog.h>
 
 // AK header
 #include <akAPI/uiAPI.h>
@@ -286,8 +287,12 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 	}
 }
 
+ot::WidgetView* ViewerComponent::getCurrentView(void) {
+	return ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+}
+
 bool ViewerComponent::getCurrentViewIsModified(void) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	ot::WidgetView* view = this->getCurrentView();
 	if (view) {
 		return view->getViewContentModified();
 	}
@@ -549,6 +554,24 @@ void ViewerComponent::removeGraphicsElements(ot::UID _modelID)
 		view->getGraphicsView()->removeConnection(_modelID);
 	}
 
+}
+
+std::string ViewerComponent::getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
+	return QFileDialog::getOpenFileName(
+		AppBase::instance()->mainWindow(),
+		QString::fromStdString(_title),
+		QString::fromStdString(_path),
+		QString::fromStdString(_filters)
+	).toStdString();
+}
+
+std::string ViewerComponent::getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
+	return QFileDialog::getSaveFileName(
+		AppBase::instance()->mainWindow(),
+		QString::fromStdString(_title),
+		QString::fromStdString(_path),
+		QString::fromStdString(_filters)
+	).toStdString();
 }
 
 void ViewerComponent::setProcessingGroupOfMessages(bool flag)
