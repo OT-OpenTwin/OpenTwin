@@ -149,14 +149,14 @@ namespace DataStorageAPI
 	{
 		//if (!mongoURL.empty()) return mongoURL;  Deactivate caching, since the connection needs to be checked with different accounts.
 
-		// Get the path of the CA file. First choice: The explicitly defined path.
-		char* explicitCertPath = ot::os::getEnvironmentVariable("OPEN_TWIN_CA_CERT");
+		// Get the path of the certificate key file. First choice: The explicitly defined path.
+		char* explicitCertPath = ot::os::getEnvironmentVariable("OPEN_TWIN_CERT_KEY");
 		std::string certKeyPath;
 		if (explicitCertPath == nullptr)
 		{
 			// Second choice, check the file relative to the local executable 
 			certKeyPath = ot::os::getExecutablePath();
-			certKeyPath += "\\Certificates\\ca.pem";
+			certKeyPath += "\\Certificates\\certificateKeyFile.pem";
 
 			if (!std::filesystem::exists(certKeyPath))
 			{
@@ -164,12 +164,12 @@ namespace DataStorageAPI
 				char* devRootPath = ot::os::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
 				if (devRootPath == nullptr)
 				{
-					throw std::exception("No CA file found.");
+					throw std::exception("No CertificateKeyFile found.");
 				}
 				else
 				{
 					certKeyPath = std::string(devRootPath);
-					certKeyPath += "\\Certificates\\Generated\\ca.pem";
+					certKeyPath += "\\Certificates\\Generated\\certificateKeyFile.pem";
 				}
 			}
 		}
@@ -178,16 +178,16 @@ namespace DataStorageAPI
 			certKeyPath = std::string(explicitCertPath);
 		}
 
-		// Check whether local cert file ca.pem exists
+		// Check whether local cert file certificateKeyFile.pem exists
 		if (!std::filesystem::exists(certKeyPath))
 		{
-			throw std::exception(("CA file could not be found at path: " + certKeyPath).c_str());
+			throw std::exception(("CertificateKeyFile could not be found at path: " + certKeyPath).c_str());
 		}
 
 		std::string uriStr = "mongodb://" + ot::url::urlEncode(dbUsername) + ":" + ot::url::urlEncode(dbPassword) + "@" + databaseURL;
 
 		//CA file is not explicitly added since the system root ca is used.
-		std::string mongoURL = uriStr + "/?tls=true&tlsCAFile=" + certKeyPath;
+		std::string mongoURL = uriStr + "/?tls=true&tlsCertificateKeyFile=" + certKeyPath;
 
 		return mongoURL;
 	}
