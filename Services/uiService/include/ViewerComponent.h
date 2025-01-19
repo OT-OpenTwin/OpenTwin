@@ -63,6 +63,8 @@ public:
 
 	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 
+	virtual bool getCurrentViewIsModified(void) override;
+
 	// Menu/Widgets
 
 	virtual ViewerUIDtype addMenuPage(const std::string &pageName) override;
@@ -185,6 +187,8 @@ public:
 
 	bool propertyGridValueChanged(const ot::Property* _property);
 	
+	void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified);
+
 private:
 	std::vector<ViewerUIDtype>		m_viewers;
 

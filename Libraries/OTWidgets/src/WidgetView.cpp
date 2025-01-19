@@ -69,9 +69,14 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
+	bool old = m_isModified;
 	m_isModified = _isModified;
 	QString title = (m_data.getTitle().empty() ? QString::fromStdString(m_data.getEntityName()) : QString::fromStdString(m_data.getTitle()));
 	m_dockWidget->setWindowTitle((m_isModified ? title + "*" : title));
+
+	if (old != m_isModified) {
+		Q_EMIT viewDataModifiedChanged();
+	}
 }
 
 QString ot::WidgetView::getCurrentViewTitle(void) const {

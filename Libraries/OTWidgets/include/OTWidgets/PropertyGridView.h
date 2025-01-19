@@ -7,14 +7,15 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/PropertyGrid.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PropertyGridView : public PropertyGrid, public WidgetView {
+	class PropertyGrid;
+
+	class OT_WIDGETS_API_EXPORT PropertyGridView : public WidgetView {
 		OT_DECL_NOCOPY(PropertyGridView)
 	public:
-		PropertyGridView();
+		PropertyGridView(PropertyGrid* _propertyGrid = (PropertyGrid*)nullptr);
 		virtual ~PropertyGridView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -23,8 +24,10 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-	private:
+		PropertyGrid* getPropertyGrid(void) const { return m_propertyGrid; };
 
+	private:
+		PropertyGrid* m_propertyGrid;
 	};
 
 }

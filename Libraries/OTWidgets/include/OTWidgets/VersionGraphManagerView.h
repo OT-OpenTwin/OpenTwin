@@ -7,18 +7,24 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/VersionGraphManager.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT VersionGraphManagerView : public VersionGraphManager, public WidgetView {
+	class VersionGraphManager;
+
+	class OT_WIDGETS_API_EXPORT VersionGraphManagerView : public WidgetView {
 	public:
-		VersionGraphManagerView();
+		VersionGraphManagerView(VersionGraphManager* _versionGraphManager = (VersionGraphManager*)nullptr);
 		virtual ~VersionGraphManagerView();
 
 		virtual QWidget* getViewWidget(void) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		VersionGraphManager* getVersionGraphManager(void) const { return m_versionGraphManager; };
+
 	private:
+		VersionGraphManager* m_versionGraphManager;
 
 	};
 

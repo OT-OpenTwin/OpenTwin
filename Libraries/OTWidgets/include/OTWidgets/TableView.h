@@ -6,15 +6,17 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/Table.h"
 #include "OTWidgets/WidgetView.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT TableView : public Table, public WidgetView {
+	class Table;
+
+	class OT_WIDGETS_API_EXPORT TableView : public WidgetView {
+		Q_OBJECT
 		OT_DECL_NOCOPY(TableView)
 	public:
-		TableView();
+		TableView(Table* _table = (Table*)nullptr);
 		virtual ~TableView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -23,15 +25,15 @@ namespace ot {
 
 		virtual QWidget* getViewWidget(void) override;
 
-		virtual void setupFromConfig(const TableCfg& _config) override;
-		virtual TableCfg createConfig(void) const override;
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-	protected:
-		virtual void contentSaved(void) override;
-		virtual void contentChanged(void) override;
+		Table* getTable(void) const { return m_table; };
 
+	private Q_SLOTS:
+		void slotModifiedChanged(bool _isModified);
+
+	private:
+		Table* m_table;
 	};
 
 }

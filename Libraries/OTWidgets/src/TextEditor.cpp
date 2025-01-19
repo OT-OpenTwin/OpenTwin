@@ -93,7 +93,6 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	this->connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
 	this->connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TextEditor::slotCurrentColorStyleChanged);
-	this->connect(this->document(), &QTextDocument::modificationChanged, this, &TextEditor::slotContentChange);
 }
 
 ot::TextEditor::~TextEditor() {
@@ -383,15 +382,6 @@ void ot::TextEditor::slotCurrentColorStyleChanged(const ot::ColorStyle& _style) 
 void ot::TextEditor::slotSelectionChanged(void) {
 	if (!m_enableSameTextHighlighting) return;
 	this->slotHighlightCurrentLine();
-}
-
-void ot::TextEditor::slotContentChange(bool _changed) {
-	if (_changed) {
-		this->contentChanged();
-	}
-	else {
-		this->contentSaved();
-	}
 }
 
 void ot::TextEditor::getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections) {

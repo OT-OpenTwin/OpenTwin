@@ -7,14 +7,14 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/Plot.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PlotView : public Plot, public WidgetView {
+	class Plot;
+
+	class OT_WIDGETS_API_EXPORT PlotView : public WidgetView {
 	public:
-		PlotView();
+		PlotView(Plot* _plot = (Plot*)nullptr);
 		virtual ~PlotView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -24,6 +24,11 @@ namespace ot {
 		virtual QWidget* getViewWidget(void) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
+
+		Plot* getPlot(void) const { return m_plot; };
+
+	private:
+		Plot* m_plot;
 
 	};
 

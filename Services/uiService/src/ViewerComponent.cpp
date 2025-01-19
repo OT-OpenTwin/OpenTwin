@@ -21,7 +21,9 @@
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsViewView.h"
+#include "OTWidgets/WidgetViewManager.h"
 
 // C++ header
 #include <exception>
@@ -280,6 +282,15 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 	}
 }
 
+bool ViewerComponent::getCurrentViewIsModified(void) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	if (view) {
+		return view->getViewContentModified();
+	}
+	else {
+		return false;
+	}
+}
 
 // Menu/Widgets
 
@@ -468,8 +479,8 @@ void ViewerComponent::removeGraphicsElements(ot::UID _modelID)
 	//If entity is has a block item associated, it gets removed from all editors.
 	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 	for (auto view : views) {
-		view->removeItem(_modelID, true);
-		view->removeConnection(_modelID);
+		view->getGraphicsView()->removeItem(_modelID, true);
+		view->getGraphicsView()->removeConnection(_modelID);
 	}
 
 }
@@ -1046,4 +1057,8 @@ bool ViewerComponent::propertyGridValueChanged(const ot::Property* _property) {
 	}
 
 	return false;  // No viewer has handled the change
+}
+
+void ViewerComponent::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType, bool _isModified) {
+	ViewerAPI::viewDataModifiedChanged(_entityName, _viewType, _isModified);
 }

@@ -1,4 +1,4 @@
-//! @file PlainTextEditView.h
+//! @file PlotManagerView.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -10,24 +10,26 @@
 
 namespace ot {
 
-	class PlainTextEdit;
+	class PlotManager;
 
-	class OT_WIDGETS_API_EXPORT PlainTextEditView : public WidgetView {
-		OT_DECL_NOCOPY(PlainTextEditView)
+	class __declspec(dllexport) PlotManagerView : public WidgetView {
 	public:
-		PlainTextEditView(PlainTextEdit* _textEdit = (PlainTextEdit*)nullptr);
-		virtual ~PlainTextEditView();
+		PlotManagerView();
+		virtual ~PlotManagerView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		PlainTextEdit* getPlainTextEdit(void) const { return m_textEdit; };
+		PlotManager* getPlotManager(void) const { return m_plotManager; };
 
 	private:
-		PlainTextEdit* m_textEdit;
+		PlotManager* m_plotManager;
+
 	};
 
 }

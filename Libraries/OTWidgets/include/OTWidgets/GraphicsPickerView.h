@@ -6,14 +6,15 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/WidgetView.h"
-#include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/BasicWidgetView.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsPickerView : public GraphicsPicker, public WidgetView {
+	class GraphicsPicker;
+
+	class OT_WIDGETS_API_EXPORT GraphicsPickerView : public WidgetView {
 	public:
-		GraphicsPickerView();
+		GraphicsPickerView(GraphicsPicker* _graphicsPicker = (GraphicsPicker*)nullptr);
 		virtual ~GraphicsPickerView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -24,7 +25,10 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		GraphicsPicker* getGraphicsPicker(void) const { return m_graphicsPicker; };
+
 	private:
+		GraphicsPicker* m_graphicsPicker;
 
 	};
 

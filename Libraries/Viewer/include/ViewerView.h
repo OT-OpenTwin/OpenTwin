@@ -8,11 +8,11 @@
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
 
-#include "Viewer.h"
+class Viewer;
 
 namespace ot {
 
-	class ViewerView : public Viewer, public WidgetView {
+	class __declspec(dllexport) ViewerView : public WidgetView {
 	public:
 		ViewerView() = delete;
 		ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWidth, double _scaleHeight, int _backgroundR, int _backgroundG, int _backgroundB, int _overlayTextR, int _overlayTextG, int _overlayTextB);
@@ -26,7 +26,10 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		Viewer* getViewer(void) const { return m_viewer; };
+
 	private:
+		Viewer* m_viewer;
 
 	};
 

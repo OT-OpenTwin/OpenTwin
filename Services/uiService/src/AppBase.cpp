@@ -49,14 +49,19 @@
 #include "OTGui/PropertyStringList.h"
 
 #include "OTWidgets/Label.h"
+#include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsView.h"
+#include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GraphicsViewView.h"
@@ -70,6 +75,7 @@
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
+#include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/CreateProjectDialog.h"
 #include "OTWidgets/StyledTextConverter.h"
@@ -80,6 +86,8 @@
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+
+#include "akWidgets/aTreeWidget.h"
 
 // ADS header
 #include <ads/DockManager.h>
@@ -486,7 +494,7 @@ void AppBase::lockSelectionAndModification(bool flag)
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 	}
 
-	m_projectNavigation->setEnabled(!flag);
+	m_projectNavigation->getTree()->setEnabled(!flag);
 }
 
 void AppBase::lockUI(bool flag)
@@ -837,25 +845,25 @@ void AppBase::createUi(void) {
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_output->setViewIsPermanent(true);
-			m_output->setContextMenuPolicy(Qt::CustomContextMenu);
+			m_output->getPlainTextEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
 			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
-			this->connect(m_output, &ot::PlainTextEditView::customContextMenuRequested, this, &AppBase::slotShowOutputContextMenu);
+			this->connect(m_output->getPlainTextEdit(), &ot::PlainTextEdit::customContextMenuRequested, this, &AppBase::slotShowOutputContextMenu);
 
 			m_propertyGrid = new ot::PropertyGridView;
 			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsPermanent(true);
-			//m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_propertyGrid->getPropertyGrid()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
 			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewNavigation, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsPermanent(true);
-			//m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_projectNavigation->getTree()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
 			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewGraphicsPicker, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_graphicsPicker->setViewIsPermanent(true);
-			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
-			//m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_graphicsPicker->getGraphicsPicker()->setInitialiDockLocation(ot::WidgetViewCfg::Left);
+			//m_graphicsPicker->getGraphicsPicker()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
@@ -866,12 +874,12 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Seting up widgets");
 
 			{
-				QFont f = m_output->font();
+				QFont f = m_output->getPlainTextEdit()->font();
 				f.setFamily("Courier");
 				f.setFixedPitch(true);
-				m_output->setFont(f);
+				m_output->getPlainTextEdit()->setFont(f);
 
-				m_output->appendPlainText(BUILD_INFO);
+				m_output->getPlainTextEdit()->appendPlainText(BUILD_INFO);
 			}
 
 			m_welcomeScreen = new ProjectOverviewWidget(m_ttb->getStartPage());
@@ -885,14 +893,14 @@ void AppBase::createUi(void) {
 			this->connect(m_welcomeScreen, &ProjectOverviewWidget::projectAccessRequest, this, &AppBase::slotManageProjectAccess);
 			this->connect(m_welcomeScreen, &ProjectOverviewWidget::projectOwnerRequest, this, &AppBase::slotManageProjectOwner);
 
-			m_projectNavigation->setChildItemsVisibleWhenApplyingFilter(true);
-			m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(true);
-			m_projectNavigation->setMultiSelectionEnabled(true);
-			m_projectNavigation->setFilterVisible(true);
-			m_projectNavigation->setSortingEnabled(true);
+			m_projectNavigation->getTree()->setChildItemsVisibleWhenApplyingFilter(true);
+			m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(true);
+			m_projectNavigation->getTree()->setMultiSelectionEnabled(true);
+			m_projectNavigation->getTree()->setFilterVisible(true);
+			m_projectNavigation->getTree()->setSortingEnabled(true);
 
-			m_output->setReadOnly(true);
-			m_output->setAutoScrollToBottomEnabled(true);
+			m_output->getPlainTextEdit()->setReadOnly(true);
+			m_output->getPlainTextEdit()->setAutoScrollToBottomEnabled(true);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
@@ -940,16 +948,17 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Register notifier
-			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
-			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 			
-			this->connect(m_projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
-			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
-			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewDataModifiedChanged, this, &AppBase::slotViewDataModifiedChanged);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 			
@@ -997,7 +1006,7 @@ void AppBase::createUi(void) {
 			lockManager->registerLockable(this->getBasicServiceInformation(), m_welcomeScreen, f);
 
 			f.setFlag(ot::LockProperties);
-			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid, f);
+			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid->getPropertyGrid(), f);
 
 			if (m_graphicsPicker) {
 				lockManager->uiViewCreated(this->getBasicServiceInformation(), m_graphicsPicker, f);
@@ -1006,7 +1015,7 @@ void AppBase::createUi(void) {
 			f.removeFlag(ot::LockProperties);
 			f.setFlag(ot::LockNavigationAll);
 			f.setFlag(ot::LockNavigationWrite);
-			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation, f);
+			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation->getTree(), f);
 
 			// Update status
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Done");
@@ -1091,26 +1100,26 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		if (m_versionGraph) {
 			OT_LOG_EA("Version graph already exists");
 		
-			this->lockManager()->uiElementDestroyed(m_versionGraph->getGraph());
+			this->lockManager()->uiElementDestroyed(m_versionGraph->getVersionGraphManager()->getGraph());
 			
-			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
-			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
-			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
+			this->disconnect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
+			this->disconnect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
+			this->disconnect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
-		m_versionGraph->getGraph()->setVersionGraphConfigFlags(ot::VersionGraph::IgnoreActivateRequestOnReadOnly);
+		m_versionGraph->getVersionGraphManager()->getGraph()->setVersionGraphConfigFlags(ot::VersionGraph::IgnoreActivateRequestOnReadOnly);
 		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
-		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
-		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
-		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
+		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
+		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
+		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 		
-		this->lockManager()->uiElementCreated(this->getViewerComponent()->getBasicServiceInformation(), m_versionGraph->getGraph(), ot::LockAll | ot::LockModelWrite);
+		this->lockManager()->uiElementCreated(this->getViewerComponent()->getBasicServiceInformation(), m_versionGraph->getVersionGraphManager()->getGraph(), ot::LockAll | ot::LockModelWrite);
 		
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	
-	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
+	m_graphicsPicker->getGraphicsPicker()->pickerWidget()->setVisible(getVisibleBlockPicker());
 
 	// #######################################################################
 
@@ -1230,16 +1239,16 @@ void AppBase::closeAllViewerTabs(void) {
 	LockManager* manager = this->lockManager();
 
 	for (auto element : m_graphicsViews) {
-		manager->uiElementDestroyed(static_cast<ot::GraphicsView*>(element.second));
+		manager->uiElementDestroyed(static_cast<ot::GraphicsView*>(element.second->getGraphicsView()));
 	}
 	for (auto element : m_textEditors) {
-		manager->uiElementDestroyed(static_cast<ot::TextEditor*>(element.second));
+		manager->uiElementDestroyed(static_cast<ot::TextEditor*>(element.second->getTextEditor()));
 	}
 	for (auto element : m_tables) {
 		manager->uiViewDestroyed(element.second);
 	}
 	if (m_versionGraph) {
-		manager->uiElementDestroyed(m_versionGraph->getGraph());
+		manager->uiElementDestroyed(m_versionGraph->getVersionGraphManager()->getGraph());
 	}
 	
 
@@ -1268,7 +1277,7 @@ void AppBase::restoreSessionState(void) {
 	if (m_versionGraph) {
 		std::string mode = uM.restoreSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType);
 		if (!mode.empty()) {
-			m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::stringToViewMode(mode));
+			m_versionGraph->getVersionGraphManager()->setCurrentViewMode(ot::VersionGraphManager::stringToViewMode(mode));
 		}
 	}
 
@@ -1308,7 +1317,7 @@ void AppBase::storeSessionState(void) {
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
 
 	if (m_versionGraph) {
-		std::string mode = ot::VersionGraphManager::viewModeToString(m_versionGraph->getCurrentViewMode());
+		std::string mode = ot::VersionGraphManager::viewModeToString(m_versionGraph->getVersionGraphManager()->getCurrentViewMode());
 		uM.storeSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType, mode);
 	}
 }
@@ -1430,21 +1439,21 @@ void AppBase::activateToolBarTab(const QString& _tab) {
 // Navigation
 
 void AppBase::setNavigationTreeSortingEnabled(bool _enabled) {
-	m_projectNavigation->setSortingEnabled(_enabled);
+	m_projectNavigation->getTree()->setSortingEnabled(_enabled);
 }
 
 void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
-	m_projectNavigation->setMultiSelectionEnabled(_enabled);
+	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
 }
 
 void AppBase::clearNavigationTree(void) {
-	m_projectNavigation->clear();
+	m_projectNavigation->getTree()->clear();
 }
 
 ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
-	ID id = m_projectNavigation->add(_treePath, _delimiter);
-	m_projectNavigation->setItemIsEditable(id, _isEditable);
-	m_projectNavigation->setItemSelectChildren(id, selectChildren);
+	ID id = m_projectNavigation->getTree()->add(_treePath, _delimiter);
+	m_projectNavigation->getTree()->setItemIsEditable(id, _isEditable);
+	m_projectNavigation->getTree()->setItemSelectChildren(id, selectChildren);
 	return id;
 }
 
@@ -1463,51 +1472,51 @@ void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, c
 	{
 		fullIconPath += ".png";
 	}
-	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
+	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
 }
 
 void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {
-	m_projectNavigation->setItemText(_itemID, _itemName);
+	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
 }
 
 void AppBase::setNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	m_projectNavigation->setItemSelected(_itemID, _isSelected);
+	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::setSingleNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
-	m_projectNavigation->setSingleItemSelected(_itemID, _isSelected);
+	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
 }
 
 void AppBase::expandSingleNavigationTreeItem(ID _itemID, bool _isExpanded) {
-	m_projectNavigation->expandItem(_itemID, _isExpanded);
+	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
 }
 
 bool AppBase::isTreeItemExpanded(ID _itemID) {
-	return m_projectNavigation->isItemExpanded(_itemID);
+	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
 }
 
 void AppBase::toggleNavigationTreeItemSelection(ID _itemID, bool _considerChilds) {
-	bool autoConsiderChilds = m_projectNavigation->getAutoSelectAndDeselectChildrenEnabled();
+	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
 
-	m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
-	m_projectNavigation->toggleItemSelection(_itemID);
-	m_projectNavigation->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
+	m_projectNavigation->getTree()->toggleItemSelection(_itemID);
+	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
 }
 
 void AppBase::removeNavigationTreeItems(const std::vector<ID> & itemIds) {
-	m_projectNavigation->deleteItems(itemIds);
+	m_projectNavigation->getTree()->deleteItems(itemIds);
 }
 
 void AppBase::clearNavigationTreeSelection(void) {
-	m_projectNavigation->deselectAllItems(true);
+	m_projectNavigation->getTree()->deselectAllItems(true);
 }
 
 QString AppBase::getNavigationTreeItemText(ID _itemID) {
-	return m_projectNavigation->getItemText(_itemID);
+	return m_projectNavigation->getTree()->getItemText(_itemID);
 }
 
 std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
-	return m_projectNavigation->selectedItems();
+	return m_projectNavigation->getTree()->selectedItems();
 }
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
@@ -1526,13 +1535,13 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 		actualProp->setList(userProjects);
 	}
 
-	m_propertyGrid->setupGridFromConfig(_configuration);
+	m_propertyGrid->getPropertyGrid()->setupGridFromConfig(_configuration);
 }
 
 void AppBase::focusPropertyGridItem(const std::string& _group, const std::string& _name) {
 	OTAssertNullptr(m_propertyGrid);
 
-	m_propertyGrid->focusProperty(_group, _name);
+	m_propertyGrid->getPropertyGrid()->focusProperty(_group, _name);
 }
 
 // ##############################################################################################
@@ -1540,18 +1549,18 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 // Info text output
 
 void AppBase::replaceInfoMessage(const QString& _message) {
-	m_output->setPlainText(_message);
+	m_output->getPlainTextEdit()->setPlainText(_message);
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
 	if (m_output) {
-		m_output->appendPlainText(_message);
+		m_output->getPlainTextEdit()->appendPlainText(_message);
 	}
 }
 
 void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	if (m_output) {
-		m_output->appendHtml(_html);
+		m_output->getPlainTextEdit()->appendHtml(_html);
 	}
 }
 
@@ -1561,7 +1570,7 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 
 void AppBase::lockPropertyGrid(bool flag)
 {
-	m_propertyGrid->getTreeWidget()->setEnabled(!flag);
+	m_propertyGrid->getPropertyGrid()->getTreeWidget()->setEnabled(!flag);
 }
 
 void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo) {
@@ -1573,15 +1582,15 @@ void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage
 }
 
 ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
-	return m_propertyGrid->findItem(_groupName, _itemName);
+	return m_propertyGrid->getPropertyGrid()->findItem(_groupName, _itemName);
 }
 
 ot::PropertyGridItem* AppBase::findProperty(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	return m_propertyGrid->findItem(_groupPath, _itemName);
+	return m_propertyGrid->getPropertyGrid()->findItem(_groupPath, _itemName);
 }
 
 std::string AppBase::getPropertyType(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
+	const ot::PropertyGridItem* itm = m_propertyGrid->getPropertyGrid()->findItem(_groupName, _itemName);
 	if (itm) {
 		return itm->getPropertyType();
 	}
@@ -1592,7 +1601,7 @@ std::string AppBase::getPropertyType(const std::string& _groupName, const std::s
 }
 
 bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName) {
-	const ot::PropertyGridItem* itm = m_propertyGrid->findItem(_groupName, _itemName);
+	const ot::PropertyGridItem* itm = m_propertyGrid->getPropertyGrid()->findItem(_groupName, _itemName);
 	if (!itm) {
 		OT_LOG_E("Property cast failed");
 		return false;
@@ -1601,7 +1610,7 @@ bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::s
 }
 
 void AppBase::clearPropertyGrid(void) {
-	m_propertyGrid->clear();
+	m_propertyGrid->getPropertyGrid()->clear();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1609,7 +1618,7 @@ void AppBase::clearPropertyGrid(void) {
 // Graphics
 
 void AppBase::clearGraphicsPickerData(void) {
-	m_graphicsPicker->clear();
+	m_graphicsPicker->getGraphicsPicker()->clear();
 	m_graphicsPickerManager.clear();
 	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
@@ -1628,31 +1637,34 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 
 	newEditor = new ot::GraphicsViewView;
 	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
-	newEditor->setOwner(_serviceInfo);
-	newEditor->setGraphicsViewName(_entityName);
-	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
-	newEditor->setDropsEnabled(true);
-	newEditor->setSceneMargins(QMarginsF(200., 200., 200., 200.));
-	newEditor->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::AutoScaleGrid);
-	newEditor->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
+
+	ot::GraphicsView* graphics = newEditor->getGraphicsView();
+
+	graphics->setOwner(_serviceInfo);
+	graphics->setGraphicsViewName(_entityName);
+	graphics->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
+	graphics->setDropsEnabled(true);
+	graphics->setSceneMargins(QMarginsF(200., 200., 200., 200.));
+	graphics->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::AutoScaleGrid);
+	graphics->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
 	ot::OutlineF newOutline;
 	newOutline.setWidth(.8);
 	newOutline.setCap(ot::RoundCap);
 	newOutline.setStyle(ot::DotLine);
-	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
+	graphics->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	//m_ExternalServicesComponent->service
-	this->lockManager()->uiElementCreated(_serviceInfo, newEditor, ot::LockAll | ot::LockModelWrite);
+	this->lockManager()->uiElementCreated(_serviceInfo, graphics, ot::LockAll | ot::LockModelWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
-	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
-	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
-	connect(newEditor, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
-	connect(newEditor, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotCopyRequested);
-	connect(newEditor, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
-	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
+	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
+	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
+	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
+	connect(graphics, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotCopyRequested);
+	connect(graphics, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
+	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
 	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
@@ -1701,16 +1713,17 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	}
 
 	newEditor = new ot::TextEditorView;
-	newEditor->setupFromConfig(_config, false);
-	newEditor->getViewData().getViewType();
-	newEditor->getViewData().getEntityName();
+	newEditor->setViewData(_config);
 
-	this->lockManager()->uiElementCreated(_serviceInfo, newEditor, ot::LockAll | ot::LockModelWrite);
+	ot::TextEditor* textEdit = newEditor->getTextEditor();
+	textEdit->setupFromConfig(_config, false);
+
+	this->lockManager()->uiElementCreated(_serviceInfo, textEdit, ot::LockAll | ot::LockModelWrite);
 
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
-	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
+	this->connect(newEditor, &ot::TextEditorView::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
 	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
@@ -1730,7 +1743,7 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName) {
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName());
 	if (v) {
-		v->setupFromConfig(_config, true);
+		v->getTextEditor()->setupFromConfig(_config, true);
 		return v;
 	}
 
@@ -1772,14 +1785,15 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	}
 
 	newTable = new ot::TableView;
-	newTable->setupFromConfig(_config);
+	newTable->setViewData(_config);
+	newTable->getTable()->setupFromConfig(_config);
 
 	this->lockManager()->uiViewCreated(_serviceInfo, newTable, ot::LockAll | ot::LockModelWrite);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable, _viewInsertFlags);
 
-	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
+	this->connect(newTable->getTable(), &ot::Table::saveRequested, this, &AppBase::slotTableSaveRequested);
 
 	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
@@ -1799,7 +1813,7 @@ ot::TableView* AppBase::findTable(const std::string& _entityName) {
 ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TableView* v = this->findTable(_config.getEntityName());
 	if (v) {
-		v->setupFromConfig(_config);
+		v->getTable()->setupFromConfig(_config);
 		return v;
 	}
 
@@ -1893,8 +1907,8 @@ AppBase * AppBase::instance(void) {
 }
 
 void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _pos) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
 		return;
 	}
@@ -1909,9 +1923,15 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
 
 	try {
-		
+		// Find the view from the graphics view widget
+		ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView->getQWidget()));
+		if (!view) {
+			OT_LOG_E("View not found");
+			return;
+		}
+
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -1934,9 +1954,15 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 }
 
 void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
 
@@ -1949,7 +1975,7 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -1972,16 +1998,22 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 }
 
 void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
+	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
 	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
 	pckg.addConnection(connectionConfig);
@@ -2013,16 +2045,22 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 }
 
 void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
+	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
 	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	pckg.addConnection(connectionConfig);
@@ -2105,9 +2143,15 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
 
@@ -2133,9 +2177,15 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 }
 
 void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
-	if (view == nullptr) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
 
@@ -2161,12 +2211,12 @@ void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
 }
 
 void AppBase::slotTextEditorSaveRequested(void) {
-	ot::TextEditorView* editor = dynamic_cast<ot::TextEditorView*>(sender());
-	if (editor == nullptr) {
-		OT_LOG_E("Text Editor cast failed");
+	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(sender());
+	if (!view) {
+		OT_LOG_E("View not found");
 		return;
 	}
-
+	
 	/*
 	ot::MessageDialogCfg cfg;
 
@@ -2184,8 +2234,8 @@ void AppBase::slotTextEditorSaveRequested(void) {
 
 		try {
 			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(view->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(view->getTextEditor()->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 			std::string response;
 			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2200,11 +2250,9 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			}
 			else
 			{
-				editor->setContentSaved();
-				const std::string& name = editor->getViewData().getEntityName();
-				const auto& viewerType =	editor->getViewData().getViewType();
+				view->getTextEditor()->setContentSaved();
 				ot::UID globalActiveViewModel = -1;
-				ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewerType);
+				ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
 			}
 		}
 		catch (const std::exception& _e) {
@@ -2217,7 +2265,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 }
 
 void AppBase::slotTableSaveRequested(void) {
-	ot::TableView* table = dynamic_cast<ot::TableView*>(sender());
+	ot::Table* table = dynamic_cast<ot::Table*>(sender());
 	if (table == nullptr) {
 		OT_LOG_E("Table cast failed");
 		return;
@@ -2228,10 +2276,18 @@ void AppBase::slotTableSaveRequested(void) {
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
+		ot::TableView* view = dynamic_cast<ot::TableView*>(ot::WidgetViewManager::instance().findViewFromWidget(table));
+		if (!view) {
+			OT_LOG_W("View not found");
+			return;
+		}
+
 		ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 
 		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();
+		cfg.setEntityInformation(view->getViewData());
+		
 		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
@@ -2246,14 +2302,12 @@ void AppBase::slotTableSaveRequested(void) {
 			OT_LOG_E("Request failed: " + rMsg.getWhat());
 			return;
 		}
-		else
-		{
-			table->setContentChanged(false);
-			const auto& viewType = table->getViewData().getViewType();
-			const std::string& name = table->getViewData().getEntityName();
-			ot::UID globalActiveViewModel = -1;
-			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewType);
-		}
+
+		table->setContentChanged(false);
+		
+		const ot::UID globalActiveViewModel = -1;
+		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
+
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
@@ -2272,7 +2326,7 @@ void AppBase::slotVersionSelected(const std::string& _versionName) {
 }
 
 void AppBase::slotVersionDeselected(void) {
-	if (m_propertyGrid) m_propertyGrid->clear();
+	if (m_propertyGrid) m_propertyGrid->getPropertyGrid()->clear();
 	m_ExternalServicesComponent->versionDeselected();
 }
 
@@ -2287,10 +2341,10 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	if (_previousView) {
 		// Select corresponding tree entry if exists
 		if (_previousView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) { // Focus out is from central
-			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(_previousView->getViewData().getEntityName()), '/');
+			itemToDeselect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_previousView->getViewData().getEntityName()), '/');
 		}
 		else if (m_lastFocusedCentralView) { // Use last focused central for deselect
-			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(m_lastFocusedCentralView->getViewData().getEntityName()), '/');
+			itemToDeselect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(m_lastFocusedCentralView->getViewData().getEntityName()), '/');
 		}
 	}
 
@@ -2313,7 +2367,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				return;
 			}
 
-			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
+			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
 
 			// Change item selection according to focused view
 			if (itemToSelect == itemToDeselect) {
@@ -2322,8 +2376,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 			if (itemToSelect || itemToDeselect) {
 				bool changed = false;
-				bool blocked = m_projectNavigation->signalsBlocked();
-				m_projectNavigation->blockSignals(true);
+				bool blocked = m_projectNavigation->getTree()->signalsBlocked();
+				m_projectNavigation->getTree()->blockSignals(true);
 
 				// Deselect
 				if (itemToDeselect) {
@@ -2341,11 +2395,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 					}
 				}
 
-				m_projectNavigation->blockSignals(blocked);
+				m_projectNavigation->getTree()->blockSignals(blocked);
 
 				// Notify if needed
 				if (changed) {
-					m_projectNavigation->selectionChangedEvent(false);
+					m_projectNavigation->getTree()->selectionChangedEvent(false);
 					m_viewerComponent->handleSelectionChanged(false);
 				}
 			}
@@ -2377,12 +2431,12 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
 	// Deselect navigation item if exists
-	auto itm = m_projectNavigation->itemFromPath(QString::fromStdString(viewName), '/');
+	auto itm = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(viewName), '/');
 	if (itm) {
-		bool blocked = m_projectNavigation->signalsBlocked();
-		m_projectNavigation->blockSignals(true);
-		m_projectNavigation->setItemSelected(itm->id(), false);
-		m_projectNavigation->blockSignals(blocked);
+		bool blocked = m_projectNavigation->getTree()->signalsBlocked();
+		m_projectNavigation->getTree()->blockSignals(true);
+		m_projectNavigation->getTree()->setItemSelected(itm->id(), false);
+		m_projectNavigation->getTree()->blockSignals(blocked);
 	}
 	else {
 		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
@@ -2405,13 +2459,13 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 			return;
 		}
 
-		ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_view->getViewData().getEntityName()), '/');
+		ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_view->getViewData().getEntityName()), '/');
 
 		// Change item selection according to focused view
 		if (itemToSelect) {
 			bool changed = false;
-			bool blocked = m_projectNavigation->signalsBlocked();
-			m_projectNavigation->blockSignals(true);
+			bool blocked = m_projectNavigation->getTree()->signalsBlocked();
+			m_projectNavigation->getTree()->blockSignals(true);
 
 			// Select
 			if (itemToSelect) {
@@ -2421,14 +2475,29 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 				}
 			}
 
-			m_projectNavigation->blockSignals(blocked);
+			m_projectNavigation->getTree()->blockSignals(blocked);
 
 			// Notify if needed
 			if (changed) {
-				m_projectNavigation->selectionChangedEvent(false);
+				m_projectNavigation->getTree()->selectionChangedEvent(false);
 				m_viewerComponent->handleSelectionChanged(false);
 			}
 		}
+	}
+}
+
+void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
+	if (!_view) {
+		return;
+	}
+
+	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		if (!m_viewerComponent) {
+			OT_LOG_W("No viewer set");
+			return;
+		}
+
+		m_viewerComponent->viewDataModifiedChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType(), _view->getViewContentModified());
 	}
 }
 
@@ -2443,8 +2512,8 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 
 void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 	OTAssertNullptr(m_output);
-	QMenu menu(m_output);
-	menu.move(m_output->mapToGlobal(_pos));
+	QMenu menu(m_output->getPlainTextEdit());
+	menu.move(m_output->getPlainTextEdit()->mapToGlobal(_pos));
 	
 	QAction* copyAction = new QAction("Copy");
 	copyAction->setShortcut(QKeySequence("Ctrl+C"));
@@ -2462,13 +2531,13 @@ void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 	QAction* action = menu.exec();
 	if (action) {
 		if (action->text() == "Copy") {
-			m_output->copy();
+			m_output->getPlainTextEdit()->copy();
 		}
 		else if (action->text() == "Paste") {
-			m_output->paste();
+			m_output->getPlainTextEdit()->paste();
 		}
 		else if (action->text() == "Clear") {
-			m_output->clear();
+			m_output->getPlainTextEdit()->clear();
 		}
 	}
 }
@@ -2951,14 +3020,14 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
 	this->clearGraphicsPicker();
 
-	m_graphicsPicker->setOwner(_serviceInfo);
-	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
+	m_graphicsPicker->getGraphicsPicker()->setOwner(_serviceInfo);
+	m_graphicsPicker->getGraphicsPicker()->add(m_graphicsPickerManager.getCollections(_serviceInfo));
 	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
 }
 
 void AppBase::clearGraphicsPicker(void) {
-	m_graphicsPicker->clear();
-	m_graphicsPicker->setOwner(ot::BasicServiceInformation());
+	m_graphicsPicker->getGraphicsPicker()->clear();
+	m_graphicsPicker->getGraphicsPicker()->setOwner(ot::BasicServiceInformation());
 	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
@@ -2968,11 +3037,11 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	if (graphics) {
 		ot::removeFromMapByValue(m_graphicsViews, graphics);
-		this->lockManager()->uiElementDestroyed(graphics);
+		this->lockManager()->uiElementDestroyed(graphics->getGraphicsView());
 	}
 	if (txt) {
 		ot::removeFromMapByValue(m_textEditors, txt);
-		this->lockManager()->uiElementDestroyed(txt);
+		this->lockManager()->uiElementDestroyed(txt->getTextEditor());
 	}
 	if (table) {
 		ot::removeFromMapByValue(m_tables, table);

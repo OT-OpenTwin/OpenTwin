@@ -287,8 +287,8 @@
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h" />
     <QtMoc Include="include\OTWidgets\Table.h" />
     <ClInclude Include="include\OTWidgets\TableItemDelegate.h" />
-    <ClInclude Include="include\OTWidgets\TableView.h" />
-    <ClInclude Include="include\OTWidgets\TextEditorView.h" />
+    <QtMoc Include="include\OTWidgets\TableView.h" />
+    <QtMoc Include="include\OTWidgets\TextEditorView.h" />
     <QtMoc Include="include\OTWidgets\ToolButton.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItem.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h" />
@@ -298,7 +298,7 @@
     <ClInclude Include="include\OTWidgets\VersionGraphManagerView.h" />
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\Positioning.h" />
-    <ClInclude Include="include\OTWidgets\WidgetView.h" />
+    <QtMoc Include="include\OTWidgets\WidgetView.h" />
     <QtMoc Include="include\OTWidgets\WidgetViewManager.h" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <QtMoc Include="include\OTWidgets\CheckBox.h" />

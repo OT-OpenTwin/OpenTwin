@@ -656,9 +656,6 @@
     <ClInclude Include="include\OTWidgets\BasicWidgetView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\TextEditorView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -685,9 +682,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetProperties.h">
       <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetView.h">
-      <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h">
       <Filter>include\Graphics</Filter>
@@ -742,9 +736,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h">
       <Filter>include\Syntax</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\TableView.h">
-      <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetManager.h">
       <Filter>include\General</Filter>
@@ -1053,6 +1044,15 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h">
       <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\WidgetView.h">
+      <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TableView.h">
+      <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TextEditorView.h">
+      <Filter>include\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

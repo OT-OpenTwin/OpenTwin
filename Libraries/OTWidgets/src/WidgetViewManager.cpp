@@ -303,6 +303,15 @@ ot::BasicServiceInformation ot::WidgetViewManager::getOwnerFromView(WidgetView* 
 	return BasicServiceInformation();
 }
 
+ot::WidgetView* ot::WidgetViewManager::findViewFromWidget(QWidget* _widget) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewWidget() == _widget) {
+			return view.second;
+		}
+	}
+	return nullptr;
+}
+
 bool ot::WidgetViewManager::getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
 	return this->findView(_entityName, _type) != nullptr;
 }
@@ -412,6 +421,15 @@ void ot::WidgetViewManager::slotViewTabClicked(void) {
 	}
 
 	Q_EMIT viewTabClicked(view);
+}
+
+void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
+	ot::WidgetView* view = dynamic_cast<ot::WidgetView*>(sender());
+	if (!view) {
+		return;
+	}
+
+	Q_EMIT viewDataModifiedChanged(view);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -532,6 +550,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	// Connect signals
 	this->connect(_view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
 	if (_view->getViewDockWidget()->tabWidget()) {
 		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
 	}

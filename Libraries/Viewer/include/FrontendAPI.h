@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+namespace ot { class TextEditor; };
+
 class __declspec(dllexport) FrontendAPI {
 public:
 	static void setInstance(FrontendAPI* _api);
@@ -54,6 +56,8 @@ public:
 	virtual void removeGraphicsElements(ot::UID _modelID) {};
 
 	virtual void displayText(const std::string& text) {};
+
+	virtual bool getCurrentViewIsModified(void) { return false; };
 
 	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
 	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {};

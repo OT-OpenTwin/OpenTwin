@@ -97,8 +97,6 @@ namespace ot {
 		void saveRequested(void);
 
 	protected:
-		virtual void contentSaved(void) {};
-		virtual void contentChanged(void) {};
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent * _event) override;
 		virtual void wheelEvent(QWheelEvent* _event) override;
@@ -113,7 +111,6 @@ namespace ot {
 		void slotDuplicateLine(void);
 		void slotCurrentColorStyleChanged(const ot::ColorStyle& _style);
 		void slotSelectionChanged(void);
-		void slotContentChange(bool _changed); 
 
 	private:
 		friend class TextEditorSearchPopup;

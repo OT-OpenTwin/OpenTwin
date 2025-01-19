@@ -6,11 +6,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/PlotView.h"
+#include "OTWidgets/Plot.h"
 
 namespace ot {
 
-	class __declspec(dllexport) PlotManager : public PlotView {
+	class __declspec(dllexport) PlotManager : public Plot {
 	public:
 		PlotManager();
 		virtual ~PlotManager();

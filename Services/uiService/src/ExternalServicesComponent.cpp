@@ -48,6 +48,7 @@
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -56,6 +57,7 @@
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TextEditorView.h"
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/PropertyDialog.h"
@@ -66,6 +68,7 @@
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/StyledTextConverter.h"
+#include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
 #include "OTCommunication/ActionTypes.h"
@@ -3498,7 +3501,7 @@ std::string ExternalServicesComponent::handleSetVersionGraph(ot::JsonDocument& _
 	config.setActiveVersionName(ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE));
 	config.setActiveBranchName(ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH));
 
-	graphManager->setupConfig(std::move(config));
+	graphManager->getVersionGraphManager()->setupConfig(std::move(config));
 		
 	return "";
 }
@@ -3515,7 +3518,7 @@ std::string ExternalServicesComponent::handleSetVersionGraphActive(ot::JsonDocum
 
 	OT_LOG_D("Activating version { \"Version\": \"" + activeVersion + "\", \"Branch\": \"" + activeBranch + "\" }");
 
-	graphManager->activateVersion(activeVersion, activeBranch);
+	graphManager->getVersionGraphManager()->activateVersion(activeVersion, activeBranch);
 
 	return "";
 }
@@ -3529,7 +3532,7 @@ std::string ExternalServicesComponent::handleRemoveVersionGraphVersions(ot::Json
 
 	std::list<std::string> versions = ot::json::getStringList(_document, OT_ACTION_PARAM_List);
 
-	graphManager->removeVersions(versions);
+	graphManager->getVersionGraphManager()->removeVersions(versions);
 
 	return "";
 }
@@ -3542,9 +3545,9 @@ std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(o
 	}
 
 	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-	ot::VersionGraphVersionCfg* newVersion = graphManager->insertVersion(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::VersionGraphVersionCfg* newVersion = graphManager->getVersionGraphManager()->insertVersion(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	if (newVersion) {
-		graphManager->activateVersion(newVersion->getName(), activeBranch);
+		graphManager->getVersionGraphManager()->activateVersion(newVersion->getName(), activeBranch);
 	}
 
 	return "";
@@ -3595,7 +3598,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 			//const double xCoordinate = graphicsItemCfg->getPosition().x();
 			//const double yCoordinate = graphicsItemCfg->getPosition().y();
 			//graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
-			editor->addItem(graphicsItem);
+			editor->getGraphicsView()->addItem(graphicsItem);
 		}
 	}
 
@@ -3616,11 +3619,11 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags);
 
 		if (editor) {
 			for (auto itemUID : itemUids) {
-				editor->removeItem(itemUID);
+				editor->getGraphicsView()->removeItem(itemUID);
 			}
 		}
 	}
@@ -3630,7 +3633,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto v : views) {
 			for (auto uid : itemUids) {
-				v->removeItem(uid);
+				v->getGraphicsView()->removeItem(uid);
 			}
 		}
 	}
@@ -3649,7 +3652,7 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
 
 	for (const auto& connection : pckg.connections()) {
-		editor->addConnectionIfConnectedItemsExist(connection);
+		editor->getGraphicsView()->addConnectionIfConnectedItemsExist(connection);
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
@@ -3667,10 +3670,10 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 	if (!pckg.name().empty()) {
 		// Specific editor
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
 
 		for (auto connection : pckg.connections()) {
-			editor->removeConnection(connection.getUid());
+			editor->getGraphicsView()->removeConnection(connection.getUid());
 		}
 	}
 	else {
@@ -3679,7 +3682,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views) {
 			for (auto connection : pckg.connections()) {
-				view->removeConnection(connection.getUid());
+				view->getGraphicsView()->removeConnection(connection.getUid());
 			}
 		}
 	}
@@ -3741,7 +3744,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
 	if (editor) {
-		editor->setupFromConfig(config, true);
+		editor->getTextEditor()->setupFromConfig(config, true);
 		
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
 			AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
@@ -3751,7 +3754,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
 	}
 
-	editor->setContentSaved();
+	editor->getTextEditor()->setContentSaved();
 	
 	const std::string& name = editor->getViewData().getEntityName();
 	const auto& viewerType = editor->getViewData().getViewType();
@@ -3766,7 +3769,7 @@ std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
 
 	if (editor) {
-		editor->setContentSaved();
+		editor->getTextEditor()->setContentSaved();
 	}
 
 	return "";
@@ -3777,7 +3780,7 @@ std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocum
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
 
 	if (editor) {
-		editor->setContentChanged();
+		editor->getTextEditor()->setContentChanged();
 	}
 
 	return "";
@@ -3835,11 +3838,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		table = AppBase::instance()->createNewTable(config, info, insertFlags);
 	}
 	else if (overrideCurrentContent) {
-		table->setupFromConfig(config);
+		table->getTable()->setupFromConfig(config);
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
 			AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 		}
-		table->setContentChanged(false);
+		table->getTable()->setContentChanged(false);
 	}
 	
 	AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags);
@@ -3861,7 +3864,7 @@ std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _do
 		return "";
 	}
 
-	table->setContentChanged(false);
+	table->getTable()->setContentChanged(false);
 	return "";
 }
 
@@ -3874,7 +3877,7 @@ std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& 
 		return "";
 	}
 
-	table->setContentChanged(true);
+	table->getTable()->setContentChanged(true);
 	return "";
 }
 
@@ -3888,8 +3891,8 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 	}
 
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->insertRow(rowIndex + 1);
-	table->setContentChanged(true);
+	table->getTable()->insertRow(rowIndex + 1);
+	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -3906,8 +3909,8 @@ std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocume
 	}
 
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->insertRow(rowIndex);
-	table->setContentChanged(true);
+	table->getTable()->insertRow(rowIndex);
+	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -3924,8 +3927,8 @@ std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _d
 	}
 
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->removeRow(rowIndex);
-	table->setContentChanged(true);
+	table->getTable()->removeRow(rowIndex);
+	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -3942,8 +3945,8 @@ std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocu
 	}
 
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->insertColumn(columnIndex + 1);
-	table->setContentChanged(true);
+	table->getTable()->insertColumn(columnIndex + 1);
+	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -3960,8 +3963,8 @@ std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDoc
 	}
 
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->insertColumn(columnIndex);
-	table->setContentChanged(true);
+	table->getTable()->insertColumn(columnIndex);
+	table->getTable()->setContentChanged(true);
 	
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -3978,8 +3981,8 @@ std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument&
 	}
 
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
-	table->removeColumn(columnIndex);
-	table->setContentChanged(true);
+	table->getTable()->removeColumn(columnIndex);
+	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
 
@@ -4025,10 +4028,10 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 
 	// Apply selection
 	if (clearSelection) {
-		table->clearSelection();
+		table->getTable()->clearSelection();
 	}
 	for (const ot::TableRange& range : ranges) {		
-		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
+		table->getTable()->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
@@ -4106,14 +4109,14 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 
 	// Apply selection
 	if (clearSelection) {
-		table->clearSelection();
+		table->getTable()->clearSelection();
 	}
 	for (const ot::TableRange& range : ranges) {
-		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
+		table->getTable()->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
 	}
 	
 	// Apply color
-	table->setSelectedCellsBackground(color);
+	table->getTable()->setSelectedCellsBackground(color);
 
 	// Callback if required
 	if (callback) {
@@ -4121,7 +4124,7 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	}
 
 	if (clearSelectionAfter) {
-		table->clearSelection();
+		table->getTable()->clearSelection();
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
@@ -4247,7 +4250,7 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
 
 	ot::JsonArray rangesArray;
-	for (const QTableWidgetSelectionRange& qrange : _table->selectedRanges()) {
+	for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
 		ot::JsonObject rangeObject;
 		ot::TableRange range = ot::QtFactory::toTableRange(qrange);
 		range.addToJsonObject(rangeObject, doc.GetAllocator());

@@ -4,12 +4,18 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/Table.h"
 #include "OTWidgets/TableView.h"
 
-ot::TableView::TableView() 
-	: WidgetView(WidgetViewBase::ViewTable)
+ot::TableView::TableView(Table* _table)
+	: WidgetView(WidgetViewBase::ViewTable), m_table(_table)
 {
-	this->addWidgetToDock(this);
+	if (!m_table) {
+		m_table = new Table;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
+	this->connect(m_table, &Table::modifiedChanged, this, &TableView::slotModifiedChanged);
 }
 
 ot::TableView::~TableView() {
@@ -21,28 +27,13 @@ ot::TableView::~TableView() {
 // Base class functions
 
 QWidget* ot::TableView::getViewWidget(void) {
-	return this;
-}
-
-void ot::TableView::setupFromConfig(const TableCfg& _config) {
-	Table::setupFromConfig(_config);
-	this->setViewData(_config);
-}
-
-ot::TableCfg ot::TableView::createConfig(void) const {
-	ot::TableCfg config = Table::createConfig();
-	config.setEntityInformation(this->getViewData());
-	return config;
+	return m_table;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Base class functions
+// Private slots
 
-void ot::TableView::contentSaved(void) {
-	this->setViewContentModified(false);
-}
-
-void ot::TableView::contentChanged(void) {
-	this->setViewContentModified(true);
+void ot::TableView::slotModifiedChanged(bool _isModified) {
+	this->setViewContentModified(_isModified);
 }

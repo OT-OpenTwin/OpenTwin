@@ -30,6 +30,18 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 	else return ButtonType::NoButton;
 }
 
+void ViewerToolBar::viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _type, bool _hasChanges) {
+	// The method is only called when changing from content unchanged->changed or content changed->unchanged
+
+	switch (_type) {
+	case ot::WidgetViewBase::ViewText:
+		this->updateTextEditorSaveEnabledState();
+		break;
+	default:
+		break;
+	}
+}
+
 void ViewerToolBar::setupUIControls3D(void) {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
@@ -55,7 +67,7 @@ void ViewerToolBar::setupUIControls3D(void) {
 	m_removeItemIDList.push_front(m_cutplaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Cutplane", "Cutplane"));
 
 	// Send an initial notification to properly set the state of the new controls
-	this->updateEnabledState(ot::UIDList());
+	this->updateViewEnabledState(ot::UIDList());
 }
 
 void ViewerToolBar::setupUIControls1D(void) {
@@ -74,7 +86,7 @@ void ViewerToolBar::setupUIControls1D(void) {
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
 
 	// Send an initial notification to properly set the state of the new controls
-	this->updateEnabledState(ot::UIDList());
+	this->updateViewEnabledState(ot::UIDList());
 }
 
 void ViewerToolBar::setupUIControlsText(void) {
@@ -90,7 +102,7 @@ void ViewerToolBar::setupUIControlsText(void) {
 	m_removeItemIDList.push_front(m_textEditorExportID = FrontendAPI::instance()->addMenuPushButton(m_textEditorDataID, "Save To File", "Export"));
 
 	// Send an initial notification to properly set the state of the new controls
-	this->updateEnabledState(ot::UIDList());
+	this->updateTextEditorEnabledState();
 	FrontendAPI::instance()->setCurrentMenuPage("Text Editor");
 }
 
@@ -105,7 +117,7 @@ void ViewerToolBar::removeUIControls(void) {
 	this->resetControlsData();
 }
 
-void ViewerToolBar::updateEnabledState(const ot::UIDList& _selectedTreeItems) {
+void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems) {
 	if (!m_removeItemIDList.empty()) {
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
@@ -114,14 +126,32 @@ void ViewerToolBar::updateEnabledState(const ot::UIDList& _selectedTreeItems) {
 			disabled.push_back(m_showSelectedButtonID);
 			disabled.push_back(m_hideSelectedButtonID);
 			disabled.push_back(m_hideUnselectedButtonID);
-
-			disabled.push_back(m_textEditorSaveID);
-			disabled.push_back(m_textEditorExportID);
 		}
 		else {
 			enabled.push_back(m_showSelectedButtonID);
 			enabled.push_back(m_hideSelectedButtonID);
 			enabled.push_back(m_hideUnselectedButtonID);
+		}
+
+		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
+	}
+}
+
+void ViewerToolBar::updateTextEditorEnabledState(void) {
+	this->updateTextEditorSaveEnabledState();
+}
+
+void ViewerToolBar::updateTextEditorSaveEnabledState(void) {
+	if (!m_removeItemIDList.empty()) {
+		std::list<unsigned long long> enabled;
+		std::list<unsigned long long> disabled;
+
+		// The text editor tab is only visible when a text editor is currently focused
+		if (FrontendAPI::instance()->getCurrentViewIsModified()) {
+			enabled.push_back(m_textEditorSaveID);
+		}
+		else {
+			disabled.push_back(m_textEditorSaveID);
 		}
 
 		FrontendAPI::instance()->enableDisableControls(enabled, disabled);

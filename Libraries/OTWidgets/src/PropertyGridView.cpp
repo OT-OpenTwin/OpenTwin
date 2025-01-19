@@ -5,12 +5,17 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyGridView.h"
 
-ot::PropertyGridView::PropertyGridView() 
-	: WidgetView(WidgetViewBase::ViewProperties) 
+ot::PropertyGridView::PropertyGridView(PropertyGrid* _propertyGrid)
+	: WidgetView(WidgetViewBase::ViewProperties), m_propertyGrid(_propertyGrid)
 {
-	this->addWidgetToDock(this->getQWidget());
+	if (!m_propertyGrid) {
+		m_propertyGrid = new PropertyGrid;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
 }
 
 ot::PropertyGridView::~PropertyGridView() {
@@ -20,7 +25,7 @@ ot::PropertyGridView::~PropertyGridView() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 QWidget* ot::PropertyGridView::getViewWidget(void) {
-	return this->getQWidget();
+	return m_propertyGrid->getQWidget();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

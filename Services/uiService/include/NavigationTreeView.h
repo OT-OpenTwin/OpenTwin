@@ -8,11 +8,11 @@
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
 
-#include "akWidgets/aTreeWidget.h"
+namespace ak { class aTreeWidget; };
 
 namespace ot {
 
-	class NavigationTreeView : public ak::aTreeWidget, public WidgetView {
+	class NavigationTreeView : public WidgetView {
 	public:
 		NavigationTreeView();
 		virtual ~NavigationTreeView();
@@ -25,8 +25,10 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-	private:
+		ak::aTreeWidget* getTree(void) const { return m_tree; };
 
+	private:
+		ak::aTreeWidget* m_tree;
 	};
 
 }

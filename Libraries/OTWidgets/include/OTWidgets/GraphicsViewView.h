@@ -7,13 +7,14 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/GraphicsView.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsViewView : public GraphicsView, public WidgetView {
+	class GraphicsView;
+
+	class OT_WIDGETS_API_EXPORT GraphicsViewView : public WidgetView {
 	public:
-		GraphicsViewView();
+		GraphicsViewView(GraphicsView* _graphicsView = (GraphicsView*)nullptr);
 		virtual ~GraphicsViewView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -24,8 +25,10 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-	private:
+		GraphicsView* getGraphicsView(void) const { return m_graphicsView; };
 
+	private:
+		GraphicsView* m_graphicsView;
 	};
 
 }

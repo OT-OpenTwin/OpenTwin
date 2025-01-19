@@ -7,13 +7,15 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/TextEditor.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT TextEditorView : public TextEditor, public WidgetView {
+	class TextEditor;
+
+	class OT_WIDGETS_API_EXPORT TextEditorView : public WidgetView {
+		Q_OBJECT
 	public:
-		TextEditorView();
+		TextEditorView(TextEditor* _textEditor = (TextEditor*)nullptr);
 		virtual ~TextEditorView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -22,15 +24,19 @@ namespace ot {
 
 		virtual QWidget* getViewWidget(void) override;
 
-		virtual void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) override;
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-	protected:
-		virtual void contentSaved(void) override;
-		virtual void contentChanged(void) override;
+		TextEditor* getTextEditor(void) const { return m_textEditor; };
 
+	Q_SIGNALS:
+		void saveRequested(void);
+
+	private Q_SLOTS:
+		void slotSaveRequested(void);
+		void slotModifiedChanged(bool _isModified);
+		
 	private:
+		TextEditor* m_textEditor;
 
 	};
 

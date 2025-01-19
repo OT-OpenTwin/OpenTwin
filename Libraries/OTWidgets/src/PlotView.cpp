@@ -4,12 +4,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/Plot.h"
 #include "OTWidgets/PlotView.h"
 
-ot::PlotView::PlotView() 
-	: WidgetView(WidgetViewBase::View1D)
+ot::PlotView::PlotView(Plot* _plot)
+	: WidgetView(WidgetViewBase::View1D), m_plot(_plot)
 {
-	this->addWidgetToDock(this->getQWidget());
+	if (!m_plot) {
+		m_plot = new Plot;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
 }
 
 ot::PlotView::~PlotView() {
@@ -21,5 +26,5 @@ ot::PlotView::~PlotView() {
 // Base class functions
 
 QWidget* ot::PlotView::getViewWidget(void) {
-	return this->getQWidget();
+	return m_plot->getQWidget();
 }

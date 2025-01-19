@@ -2,6 +2,7 @@
 
 #include "Model.h"
 #include "Viewer.h"
+#include "ViewerView.h"
 #include "FrontendAPI.h"
 #include "ViewerToolBar.h"
 
@@ -39,6 +40,7 @@
 
 #include "DataBase.h"
 #include "PlotManager.h"
+#include "PlotManagerView.h"
 
 #include "TextVisualiser.h"
 #include "TableVisualiser.h"
@@ -126,7 +128,7 @@ void Model::activateModel(void)
 		std::list<ot::UID> selectedTreeItemID;
 		getSelectedTreeItemIDs(selectedTreeItemID);
 
-		ViewerToolBar::instance().updateEnabledState(selectedTreeItemID);
+		ViewerToolBar::instance().updateViewEnabledState(selectedTreeItemID);
 	}
 }
 
@@ -233,7 +235,7 @@ void Model::resetAllViews1D(void)
 {
 	for (auto viewer : viewerList)
 	{
-		viewer->get1DPlot()->resetView();
+		viewer->get1DPlot()->getPlotManager()->resetView();
 	}
 }
 
@@ -1039,7 +1041,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
 		
-		ViewerToolBar::instance().updateEnabledState(_selectedTreeItems);
+		ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
 		return;
@@ -1075,7 +1077,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
 	
 	// Update the UI state and the view
-	ViewerToolBar::instance().updateEnabledState(_selectedTreeItems);
+	ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
 	refreshAllViews();
 
 	// reset the 1d view, if necessary
@@ -3222,7 +3224,7 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 void Model::clear1DPlot(void) {
 	for (auto viewer : viewerList) {
 		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->clear(false);
+			viewer->get1DPlot()->getPlotManager()->clear(false);
 		}
 	}
 }
@@ -3230,7 +3232,7 @@ void Model::clear1DPlot(void) {
 void Model::set1DPlotIncompatibleData(void) {
 	for (auto viewer : viewerList) {
 		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->setIncompatibleData();
+			viewer->get1DPlot()->getPlotManager()->setIncompatibleData();
 		}
 	}
 }
@@ -3238,7 +3240,7 @@ void Model::set1DPlotIncompatibleData(void) {
 void Model::remove1DPlotErrorState(void) {
 	for (auto viewer : viewerList) {
 		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->setErrorState(false);
+			viewer->get1DPlot()->getPlotManager()->setErrorState(false);
 		}
 	}
 }
@@ -3268,7 +3270,7 @@ void Model::update1DPlot(SceneNodeBase* root) {
 
 	for (auto viewer : viewerList) {
 		if (viewer->get1DPlot() != nullptr) {
-			viewer->get1DPlot()->setFromDataBaseConfig(config);
+			viewer->get1DPlot()->getPlotManager()->setFromDataBaseConfig(config);
 		}
 	}
 }

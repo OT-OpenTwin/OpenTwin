@@ -60,11 +60,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) void addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 														double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion,
 													    bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	__declspec(dllexport) void addMeshNodeFromDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons,
-											    	   bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
-	__declspec(dllexport) void addMeshItemNodeFromDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons,
-													       bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
-
+	
 	__declspec(dllexport) void addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable);
 	
 	__declspec(dllexport) void addVisualizationNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes);
@@ -137,6 +133,8 @@ namespace ViewerAPI {
 	/********************************************************************************************/
 
 	__declspec(dllexport) void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
+
+	__declspec(dllexport) void viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified);
 
 	__declspec(dllexport) void shortcutActivated(const std::string & _keySequence);
 

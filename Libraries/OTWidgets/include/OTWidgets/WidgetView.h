@@ -11,6 +11,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
 
 // std header
@@ -29,7 +30,8 @@ namespace ot {
 	
 	//! @class WidgetView
 	//! @brief The WidgetView class is used to integrate the Qt-ADS functionallity into open twin.
-	class OT_WIDGETS_API_EXPORT WidgetView {
+	class OT_WIDGETS_API_EXPORT WidgetView : public QObject {
+		Q_OBJECT
 		OT_DECL_NODEFAULT(WidgetView)
 		OT_DECL_NOCOPY(WidgetView)
 	public:
@@ -90,6 +92,9 @@ namespace ot {
 		void setAsCurrentViewTab(void);
 
 		bool isCurrentViewTab(void) const;
+
+	Q_SIGNALS:
+		void viewDataModifiedChanged(void);
 
 	protected:
 

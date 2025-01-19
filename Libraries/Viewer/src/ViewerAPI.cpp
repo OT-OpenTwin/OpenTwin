@@ -2,13 +2,16 @@
 
 #include "ViewerAPI.h"
 #include "Model.h"
+#include "Viewer.h"
 #include "ViewerView.h"
 #include "FrontendAPI.h"
 #include "DataBase.h"
 #include "PlotManager.h"
+#include "PlotManagerView.h"
 #include "Rubberband.h"
 #include "EntityBase.h"
 #include "Factory.h"
+#include "ViewerToolBar.h"
 
 #include "OTCore/Logger.h"
 #include "OTCore/VariableToStringConverter.h"
@@ -515,9 +518,9 @@ void ViewerAPI::updateObjectFacetsFromDataBase(ot::UID osgModelID, unsigned long
 }
 
 void ViewerAPI::setClearColor(ot::UID viewerID, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB) {
-	Viewer * v = viewerManager[viewerID];
+	ot::ViewerView * v = viewerManager[viewerID];
 	if (v != nullptr) {
-		v->setClearColorAutomatic(backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
+		v->getViewer()->setClearColorAutomatic(backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
 	}
 }
 
@@ -702,16 +705,16 @@ void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std
 }
 
 void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
-	Viewer * v = viewerManager[_viewerID];
+	ot::ViewerView * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		v->setTabNames(_osgViewTabName, _plotTabName, _versionGraphTabName);
+		v->getViewer()->setTabNames(_osgViewTabName, _plotTabName, _versionGraphTabName);
 	}
 }
 
 ot::WidgetView* ViewerAPI::getPlotWidget(ot::UID _viewerID) {
-	Viewer * v = viewerManager[_viewerID];
+	ot::ViewerView * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		return v->get1DPlot();
+		return v->getViewer()->get1DPlot();
 	}
 	else {
 		return nullptr;
@@ -724,6 +727,10 @@ void ViewerAPI::viewerTabChanged(const std::string & _tabTitle, ot::WidgetViewBa
 	{
 		globalActiveModel->viewerTabChanged(_tabTitle, _type);
 	}
+}
+
+void ViewerAPI::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified) {
+	ViewerToolBar::instance().viewDataModifiedHasChanged(_type, _isModified);
 }
 
 void ViewerAPI::shortcutActivated(const std::string & _keySequence) {
@@ -739,13 +746,13 @@ void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, s
 		return;
 	}
 
-	Rubberband * rubberband = viewer->second->getRubberband();
+	Rubberband * rubberband = viewer->second->getViewer()->getRubberband();
 	if (rubberband) {
 		OT_LOG_W("A rubberband is already active. Created by service: " + std::to_string(rubberband->creator()));
 		return;
 	}
 
-	viewer->second->createRubberband(_senderId, _note, _configurationJson);
+	viewer->second->getViewer()->createRubberband(_senderId, _note, _configurationJson);
 }
 
 void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item) {
@@ -754,7 +761,7 @@ void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item
 		assert(0);
 		return;
 	}
-	viewer->second->settingsItemChanged(_item);
+	viewer->second->getViewer()->settingsItemChanged(_item);
 }
 
 bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property)
@@ -764,5 +771,5 @@ bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* 
 		assert(0);
 		return false;
 	}
-	return viewer->second->propertyGridValueChanged(_property);
+	return viewer->second->getViewer()->propertyGridValueChanged(_property);
 }

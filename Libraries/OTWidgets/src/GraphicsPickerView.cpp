@@ -4,16 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsPickerView.h"
 
-ot::GraphicsPickerView::GraphicsPickerView() 
-	: WidgetView(WidgetViewBase::ViewGraphicsPicker)
+ot::GraphicsPickerView::GraphicsPickerView(GraphicsPicker* _graphicsPicker)
+	: WidgetView(WidgetViewBase::ViewGraphicsPicker), m_graphicsPicker(_graphicsPicker)
 {
-	this->addWidgetToDock(this->pickerWidget());
+	if (!m_graphicsPicker) {
+		m_graphicsPicker = new GraphicsPicker;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
 }
 
 ot::GraphicsPickerView::~GraphicsPickerView() {
-
+	delete m_graphicsPicker;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -21,5 +26,5 @@ ot::GraphicsPickerView::~GraphicsPickerView() {
 // Base class functions
 
 QWidget* ot::GraphicsPickerView::getViewWidget(void) {
-	return this->pickerWidget();
+	return m_graphicsPicker->pickerWidget();
 }

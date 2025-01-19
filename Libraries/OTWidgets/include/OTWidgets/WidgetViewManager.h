@@ -163,6 +163,10 @@ namespace ot {
 		//! Returns default BasicServiceInformation if the view is not stored in this manager.
 		BasicServiceInformation getOwnerFromView(WidgetView* _view) const;
 
+		//! @brief Returns the widget view from the provided widget.
+		//! This only works if the view was registered.
+		WidgetView* findViewFromWidget(QWidget* _widget) const;
+
 		//! @brief Returns true if a view with the given name exists
 		//! @param _entityName Name to check
 		bool getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const;
@@ -194,12 +198,14 @@ namespace ot {
 		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
 		void viewCloseRequested(WidgetView* _view);
 		void viewTabClicked(WidgetView* _view);
+		void viewDataModifiedChanged(ot::WidgetView* _view);
 
 	private Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
 		void slotViewCloseRequested(void);
 		void slotUpdateViewVisibility(void);
 		void slotViewTabClicked(void);
+		void slotViewDataModifiedChanged(void);
 
 	private:
 		enum ManagerState {

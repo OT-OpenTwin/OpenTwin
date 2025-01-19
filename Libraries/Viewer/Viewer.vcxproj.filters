@@ -94,9 +94,6 @@
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotManager.cpp">
-      <Filter>src\WidgetView</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneNodePlot1D.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
@@ -144,6 +141,12 @@
     </ClCompile>
     <ClCompile Include="src\FrontendAPI.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotManagerView.cpp">
+      <Filter>src\WidgetView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,9 +282,6 @@
     <ClInclude Include="include\TextVisualiser.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
-    <ClInclude Include="include\PlotManager.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\SceneNodeMultiVisualisation.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
@@ -296,6 +296,12 @@
     </ClInclude>
     <ClInclude Include="include\FrontendAPI.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotManagerView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

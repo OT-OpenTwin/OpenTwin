@@ -148,8 +148,7 @@ ot::TableCfg ot::Table::createConfig(void) const {
 void ot::Table::setContentChanged(bool _changed) {
 	if (m_contentChanged == _changed) return;
 	m_contentChanged = _changed;
-	if (m_contentChanged) this->contentChanged();
-	else this->contentSaved();
+	Q_EMIT modifiedChanged(m_contentChanged);
 }
 
 void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
@@ -235,7 +234,7 @@ void ot::Table::slotSaveRequested(void) {
 
 void ot::Table::slotCellDataChanged(int _row, int _column) {
 	m_contentChanged = true;
-	this->contentChanged();
+	Q_EMIT modifiedChanged(m_contentChanged);
 }
 
 void ot::Table::slotRestoreColumnSize(int _column) {

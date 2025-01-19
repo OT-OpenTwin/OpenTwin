@@ -8,10 +8,13 @@
 // OpenTwin header
 #include "NavigationTreeView.h"
 
+#include "akWidgets/aTreeWidget.h"
+
 ot::NavigationTreeView::NavigationTreeView()
 	: WidgetView(WidgetViewBase::ViewNavigation)
 {
-	this->addWidgetToDock(this->widget());
+	m_tree = new ak::aTreeWidget;
+	this->addWidgetToDock(m_tree->widget());
 }
 
 ot::NavigationTreeView::~NavigationTreeView() {
@@ -23,5 +26,5 @@ ot::NavigationTreeView::~NavigationTreeView() {
 // Base class functions
 
 QWidget* ot::NavigationTreeView::getViewWidget(void) {
-	return this->widget();
+	return m_tree->widget();
 }

@@ -33,6 +33,7 @@
 #include "OTGui/CheckerboardPainter2D.h"
 #include "OTCommunication/actionTypes.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/PlainTextEditView.h"
@@ -278,7 +279,7 @@ void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 
 	m_logMutex.lock();
 	
-	QTextCursor cursor = m_output->textCursor();
+	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
 	cursor.movePosition(QTextCursor::End);
 
 	QTextCharFormat format = cursor.charFormat();
@@ -302,15 +303,15 @@ void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 	}
 
 	cursor.insertText(_message);
-	m_output->setTextCursor(cursor);
-	m_output->appendPlainText("");
+	m_output->getPlainTextEdit()->setTextCursor(cursor);
+	m_output->getPlainTextEdit()->appendPlainText("");
 	m_logMutex.unlock();
 }
 
 void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 	m_logMutex.lock();
 	
-	QTextCursor cursor = m_output->textCursor();
+	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
 	cursor.movePosition(QTextCursor::End);
 
 	QTextCharFormat format = cursor.charFormat();
@@ -342,15 +343,15 @@ void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 	cursor.insertText("] ");
 
 	cursor.insertText(_message);
-	m_output->setTextCursor(cursor);
-	m_output->appendPlainText("");
+	m_output->getPlainTextEdit()->setTextCursor(cursor);
+	m_output->getPlainTextEdit()->appendPlainText("");
 	m_logMutex.unlock();
 }
 
 void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 	m_logMutex.lock();
 	
-	QTextCursor cursor = m_output->textCursor();
+	QTextCursor cursor = m_output->getPlainTextEdit()->textCursor();
 	cursor.movePosition(QTextCursor::End);
 
 	QTextCharFormat format = cursor.charFormat();
@@ -382,8 +383,8 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 	cursor.insertText("] ");
 
 	cursor.insertText(_message);
-	m_output->setTextCursor(cursor);
-	m_output->appendPlainText("");
+	m_output->getPlainTextEdit()->setTextCursor(cursor);
+	m_output->getPlainTextEdit()->appendPlainText("");
 	m_logMutex.unlock();
 }
 
@@ -500,20 +501,20 @@ AppBase::AppBase(QApplication* _app)
 	ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
 	defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
 	defaultView->setViewIsPermanent(true);
-	defaultView->setPlainText(BUILD_INFO);
+	defaultView->getPlainTextEdit()->setPlainText(BUILD_INFO);
 	defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 	m_toolManager->getToolViewManager()->addIgnoredView(defaultView);
 
 	// Create output
 	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewFlag::ViewIsSide | ot::WidgetViewBase::ViewFlag::ViewIsCloseable | ot::WidgetViewBase::ViewFlag::ViewDefaultCloseHandling));
-	m_output->setObjectName("OToolkit_Output");
-	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_output->getPlainTextEdit()->setObjectName("OToolkit_Output");
+	m_output->getPlainTextEdit()->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_toolManager->getToolViewManager()->addIgnoredView(m_output);
 
-	QFont f = m_output->font();
+	QFont f = m_output->getPlainTextEdit()->font();
 	f.setFamily("Consolas");
-	m_output->setFont(f);
-	m_output->setReadOnly(true);
+	m_output->getPlainTextEdit()->setFont(f);
+	m_output->getPlainTextEdit()->setReadOnly(true);
 	
 	this->setCentralWidget(ot::WidgetViewManager::instance().getDockManager());
 	this->setWindowTitle("OToolkit");

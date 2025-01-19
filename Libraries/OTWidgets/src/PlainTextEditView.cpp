@@ -5,12 +5,17 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/PlainTextEditView.h"
 
-ot::PlainTextEditView::PlainTextEditView() 
-	: WidgetView(WidgetViewBase::ViewText)
+ot::PlainTextEditView::PlainTextEditView(PlainTextEdit* _textEdit)
+	: WidgetView(WidgetViewBase::ViewText), m_textEdit(_textEdit)
 {
-	this->addWidgetToDock(this);
+	if (!m_textEdit) {
+		m_textEdit = new PlainTextEdit;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
 }
 
 ot::PlainTextEditView::~PlainTextEditView() {
@@ -18,3 +23,9 @@ ot::PlainTextEditView::~PlainTextEditView() {
 }
 	
 // ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions
+
+QWidget* ot::PlainTextEditView::getViewWidget(void) {
+	return m_textEdit;
+}

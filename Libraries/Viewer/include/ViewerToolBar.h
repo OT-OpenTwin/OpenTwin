@@ -30,11 +30,15 @@ public:
 
 	ButtonType getButtonTypeFromUID(ot::UID _uid) const;
 
+	void viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _type, bool _isModified);
+
 	void setupUIControls3D(void);
 	void setupUIControls1D(void);
 	void setupUIControlsText(void);
 	void removeUIControls(void);
-	void updateEnabledState(const ot::UIDList& _selectedTreeItems);
+	void updateViewEnabledState(const ot::UIDList& _selectedTreeItems);
+	void updateTextEditorEnabledState(void);
+	void updateTextEditorSaveEnabledState(void);
 
 private:
 	void resetControlsData(void);

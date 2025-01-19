@@ -4,12 +4,19 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TextEditorView.h"
 
-ot::TextEditorView::TextEditorView()
-	: WidgetView(WidgetViewBase::ViewText)
+ot::TextEditorView::TextEditorView(TextEditor* _textEditor)
+	: WidgetView(WidgetViewBase::ViewText), m_textEditor(_textEditor)
 {
-	this->addWidgetToDock(this);
+	if (!m_textEditor) {
+		m_textEditor = new TextEditor;
+	}
+
+	this->addWidgetToDock(this->getViewWidget());
+	this->connect(m_textEditor, &TextEditor::modificationChanged, this, &TextEditorView::slotModifiedChanged);
+	this->connect(m_textEditor, &TextEditor::saveRequested, this, &TextEditorView::slotSaveRequested);
 }
 
 ot::TextEditorView::~TextEditorView() {
@@ -21,24 +28,18 @@ ot::TextEditorView::~TextEditorView() {
 // Base class functions
 
 QWidget* ot::TextEditorView::getViewWidget(void) {
-	return this;
-}
-
-void ot::TextEditorView::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
-	TextEditor::setupFromConfig(_config, _isUpdate);
-	if (!_isUpdate) {
-		this->setViewData(_config);
-	}
+	return m_textEditor;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Base class functions
+// Private slots
 
-void ot::TextEditorView::contentSaved(void) {
-	this->setViewContentModified(false);
+void ot::TextEditorView::slotSaveRequested(void) {
+	Q_EMIT saveRequested();
 }
 
-void ot::TextEditorView::contentChanged(void) {
-	this->setViewContentModified(true);
+void ot::TextEditorView::slotModifiedChanged(bool _isModified) {
+	this->setViewContentModified(_isModified);
 }
+

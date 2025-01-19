@@ -56,6 +56,7 @@
 #include "ViewerObjectSelectionHandler.h"
 
 #include "PlotManager.h"
+#include "PlotManagerView.h"
 
 #include "SceneNodeVTK.h"
 
@@ -226,7 +227,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgAxisViewer->realize();
 
 	// Create new Plot
-	m_plot = new ot::PlotManager;
+	m_plot = new ot::PlotManagerView;
 
 	// Create settings
 	ot::PropertyGridCfg dataset = createSettings();

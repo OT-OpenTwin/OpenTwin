@@ -46,6 +46,7 @@
     <ClCompile Include="src\MaterialRough.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\PlotManager.cpp" />
+    <ClCompile Include="src\PlotManagerView.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
     <ClCompile Include="src\SceneNodeCartesianMesh.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
     <ClInclude Include="include\HandleWheel.h" />
+    <ClInclude Include="include\PlotManagerView.h" />
     <ClInclude Include="include\ViewChangedStates.h" />
     <ClInclude Include="include\ViewerToolBar.h" />
     <ClInclude Include="include\Visualiser.h" />

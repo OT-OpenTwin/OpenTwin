@@ -35,7 +35,7 @@ namespace osgText   { class Text; };
 namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
-namespace ot        { class PlotManager; }
+namespace ot        { class PlotManagerView; }
 
 class Viewer : public QOpenGLWidget
 {
@@ -56,7 +56,7 @@ public:
 
 	void detachFromModel(void);
 
-	ot::PlotManager* get1DPlot(void) const { return m_plot; }
+	ot::PlotManagerView* get1DPlot(void) const { return m_plot; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
@@ -190,7 +190,7 @@ private:
 	osg::ref_ptr<osg::Switch>          handlerNode;
 	HandlerBase						  *currentHandler;
 
-	ot::PlotManager*						m_plot;
+	ot::PlotManagerView*				m_plot;
 	std::string							m_plotTabName;
 
 	std::string							m_versionGraphTabName;
