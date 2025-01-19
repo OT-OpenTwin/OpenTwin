@@ -127,7 +127,7 @@ namespace DataStorageAPI
 	void ConnectionAPI::establishConnection(const std::string &serverURL, const std::string &siteID, const std::string &userName, const std::string &userPassword)
 	{
 		std::string fixedServerURL(serverURL);
-		if (serverURL.find("tls@") != std::string::npos)
+		if (serverURL.find("tls@") == 0)
 		{
 			fixedServerURL = fixedServerURL.substr(4);
 		}

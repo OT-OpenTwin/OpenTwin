@@ -20,7 +20,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 {
 	serviceURL  = _ownIP;
 	databaseURL = _databaseIP;
-	if (databaseURL.find("tls@") != std::string::npos)
+	if (databaseURL.find("tls@") == 0)
 	{
 		databaseURL = databaseURL.substr(4);
 	}
