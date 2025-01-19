@@ -131,8 +131,13 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
 }
 
 void ConnectionManager::handleRunSimulation(std::list<std::string> _netlist) {
-    
-   
+  
+    //Initialize Callbacks of NGSpice
+    m_ngSpice->initializeCallbacks();
+
+    //Intialize NGSpice
+    m_ngSpice->intializeNGSpice();
+
     //Executing run from NGSpice
     m_ngSpice->runSimulation(_netlist);
 

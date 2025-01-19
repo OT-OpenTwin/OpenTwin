@@ -20,10 +20,10 @@ public:
 	
 
 	void runSimulation(std::list<std::string>& _netlist);
-
-
-private:
 	void initializeCallbacks();
 	void intializeNGSpice();
+
+private:
+
 	static double calculateMagnitude(double real, double imag);
 };
