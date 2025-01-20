@@ -27,7 +27,9 @@ namespace ot
 		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& _other) noexcept = default;
 
 
+		GenericDataStructMatrix(uint32_t _rows, uint32_t _columns);
 		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer);
+		GenericDataStructMatrix(uint32_t _rows, uint32_t _columns, ot::Variable _defaultValue);
 		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue);
 		
 		void setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value);

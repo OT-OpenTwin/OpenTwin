@@ -266,57 +266,63 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 }
 
 ot::GenericDataStructMatrix ot::TableCfg::createMatrix(void) const {
-	ot::MatrixEntryPointer matrixDimension;
-	matrixDimension.m_column = static_cast<uint32_t>(this->getColumnCount());
-	matrixDimension.m_row = static_cast<uint32_t>(this->getRowCount());
-	auto horizontalHeaderPtr = this->getColumnHeader(0);
-	auto verticalHeaderPtr = this->getRowHeader(0);
-	if (horizontalHeaderPtr != nullptr) {
-		matrixDimension.m_row++;
-		assert(verticalHeaderPtr == nullptr);
-	}
-	else if (verticalHeaderPtr != nullptr) {
-		matrixDimension.m_column++;
-		assert(horizontalHeaderPtr == nullptr);
-	}
+	MatrixEntryPointer dimensions;
+	dimensions.m_row = m_rows;
+	dimensions.m_column = m_columns;
 
-	ot::GenericDataStructMatrix matrix(matrixDimension);
-	ot::MatrixEntryPointer matrixEntry;
-	uint32_t startRow(0), startColumn(0);
-	if (horizontalHeaderPtr != nullptr) {
-		startRow = 1;
-		matrixEntry.m_row = 0;
-		for (matrixEntry.m_column = 0; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++) {
-			const TableHeaderItemCfg* headerCfg = this->getColumnHeader(matrixEntry.m_column);
-			if (headerCfg) {
-				const ot::Variable cellValue(headerCfg->getText());
-				matrix.setValue(matrixEntry, cellValue);
-			}
-			else {
-				matrix.setValue(matrixEntry, ot::Variable());
-			}
-			
+	bool hasRowHeader = false;
+	for (const TableHeaderItemCfg* itm : m_rowHeader) {
+		if (itm) {
+			hasRowHeader = true;
+			dimensions.m_column++;
+			break;
 		}
 	}
-	if (verticalHeaderPtr != nullptr) {
-		startColumn = 1;
-		matrixEntry.m_column = 0;
-		for (matrixEntry.m_row = 0; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++) {
-			const TableHeaderItemCfg* headerCfg = this->getRowHeader(matrixEntry.m_row);
-			if (headerCfg) {
-				const ot::Variable cellValue(headerCfg->getText());
-				matrix.setValue(matrixEntry, cellValue);
+
+	bool hasColumnHeader = false;
+	for (const TableHeaderItemCfg* itm : m_columnHeader) {
+		if (itm) {
+			hasColumnHeader = true;
+			dimensions.m_row++;
+			break;
+		}
+	}
+
+	if ((dimensions.m_column * dimensions.m_row) == 0) {
+		return GenericDataStructMatrix();
+	}
+	
+	ot::GenericDataStructMatrix matrix(dimensions);
+	MatrixEntryPointer destPtr;
+	destPtr.m_column = 0;
+	destPtr.m_row = 0;
+
+	if (hasColumnHeader) {
+		for (size_t c = 0; c < m_columns; c++, destPtr.m_column++) {
+			if (m_columnHeader[c]) {
+				matrix.setValue(destPtr, Variable(m_columnHeader[c]->getText()));
 			}
 			else {
-				matrix.setValue(matrixEntry, ot::Variable());
+				matrix.setValue(destPtr, ot::Variable());
 			}
 		}
 	}
 
-	for (matrixEntry.m_row = startRow; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++) {
-		for (matrixEntry.m_column = startColumn; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++) {
-			const std::string& tableCell = this->getCellText(matrixEntry.m_row - startRow, matrixEntry.m_column - startColumn);
-			matrix.setValue(matrixEntry, ot::Variable(tableCell));
+	for (size_t r = 0; r < m_rows; r++, destPtr.m_row++) {
+		destPtr.m_column = 0;
+		if (hasRowHeader) {
+			OTAssert(r < m_rowHeader.size() && r >= 0, "Index out of range");
+			if (m_rowHeader[r]) {
+				matrix.setValue(destPtr, Variable(m_rowHeader[r]->getText()));
+			}
+			else {
+				matrix.setValue(destPtr, ot::Variable());
+			}
+			destPtr.m_column++;
+		}
+
+		for (int c = 0; c < m_columns; c++, destPtr.m_column++) {
+			matrix.setValue(destPtr, Variable(m_data[r][c]));
 		}
 	}
 

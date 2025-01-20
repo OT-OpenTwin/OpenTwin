@@ -33,8 +33,9 @@ std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix&
 		for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
 		{
 			const ot::Variable& cellValue =	_matrix.getValue(matrixEntry);
-			assert(cellValue.isConstCharPtr());
-			csvText += cellValue.getConstCharPtr();
+			if (cellValue.isConstCharPtr()) {
+				csvText += cellValue.getConstCharPtr();
+			}			
 			if (matrixEntry.m_column < numberOfColumns - 1)
 			{
 				csvText += _properties.m_columnDelimiter;

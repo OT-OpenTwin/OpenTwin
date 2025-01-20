@@ -50,6 +50,8 @@
 #include "TextVisualiser.h"
 #include "TableVisualiser.h"
 
+#include <QtWidgets/qheaderview.h>
+
 bool operator==(const FaceSelection& left, const FaceSelection& right) 
 { 
 	return (left.getSelectedItem() == right.getSelectedItem() && left.getFaceId() == right.getFaceId()); 
@@ -1519,12 +1521,22 @@ void Model::addTableRowBefore(void) {
 	}
 
 	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	int ix = 0;
 	if (selectionRect.isValid()) {
-		view->getTable()->insertRow(selectionRect.top());
+		ix = selectionRect.top();
 	}
-	else {
-		view->getTable()->insertRow(0);
+
+	bool isHeader = false;
+	if (ix < view->getTable()->rowCount()) {
+		isHeader = (view->getTable()->verticalHeaderItem(ix) != nullptr);
 	}
+
+	view->getTable()->insertRow(ix);
+
+	if (isHeader) {
+		view->getTable()->setVerticalHeaderItem(ix, new QTableWidgetItem);
+	}
+
 	view->getTable()->setContentChanged(true);
 }
 
@@ -1543,12 +1555,22 @@ void Model::addTableRowAfter(void) {
 	}
 
 	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	int ix = view->getTable()->rowCount();
 	if (selectionRect.isValid()) {
-		view->getTable()->insertRow(selectionRect.bottom() + 1);
+		ix = selectionRect.bottom() + 1;
 	}
-	else {
-		view->getTable()->insertRow(view->getTable()->rowCount());
+
+	bool isHeader = false;
+	if (ix <= view->getTable()->rowCount() && ix > 0) {
+		isHeader = (view->getTable()->verticalHeaderItem(ix - 1) != nullptr);
 	}
+
+	view->getTable()->insertRow(ix);
+
+	if (isHeader) {
+		view->getTable()->setVerticalHeaderItem(ix, new QTableWidgetItem);
+	}
+
 	view->getTable()->setContentChanged(true);
 }
 
@@ -1591,12 +1613,22 @@ void Model::addTableColumnBefore(void) {
 	}
 
 	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	int ix = 0;
 	if (selectionRect.isValid()) {
-		view->getTable()->insertColumn(selectionRect.left());
+		ix = selectionRect.left();
 	}
-	else {
-		view->getTable()->insertColumn(0);
+
+	bool isHeader = false;
+	if (ix < view->getTable()->columnCount()) {
+		isHeader = (view->getTable()->horizontalHeaderItem(ix) != nullptr);
 	}
+
+	view->getTable()->insertColumn(ix);
+
+	if (isHeader) {
+		view->getTable()->setHorizontalHeaderItem(ix, new QTableWidgetItem);
+	}
+
 	view->getTable()->setContentChanged(true);
 }
 
@@ -1615,11 +1647,20 @@ void Model::addTableColumnAfter(void) {
 	}
 
 	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	int ix = view->getTable()->columnCount();
 	if (selectionRect.isValid()) {
-		view->getTable()->insertColumn(selectionRect.right() + 1);
+		ix = selectionRect.bottom() + 1;
 	}
-	else {
-		view->getTable()->insertColumn(view->getTable()->columnCount());
+
+	bool isHeader = false;
+	if (ix <= view->getTable()->columnCount() && ix > 0) {
+		isHeader = (view->getTable()->horizontalHeaderItem(ix - 1) != nullptr);
+	}
+
+	view->getTable()->insertColumn(ix);
+
+	if (isHeader) {
+		view->getTable()->setHorizontalHeaderItem(ix, new QTableWidgetItem);
 	}
 	view->getTable()->setContentChanged(true);
 }

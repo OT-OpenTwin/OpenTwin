@@ -4,32 +4,44 @@
 
 using namespace ot;
 
-GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
-	:GenericDataStruct(getClassName(), _matrixEntryPointer.m_row* _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
+ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns) 
+	: GenericDataStruct(getClassName(), _rows * _columns), m_numberOfColumns(_columns), m_numberOfRows(_rows)
 {
 	allocateValueMemory();
 }
 
+GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
+	: GenericDataStruct(getClassName(), _matrixEntryPointer.m_row * _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
+{
+	allocateValueMemory();
+}
+
+ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns, ot::Variable _defaultValue)
+	: GenericDataStruct(getClassName(), _rows* _columns), m_numberOfColumns(_columns), m_numberOfRows(_rows) 
+{
+	allocateValueMemory(_defaultValue);
+}
+
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue)
-	:GenericDataStruct(getClassName(), _matrixEntryPointer.m_row* _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
+	: GenericDataStruct(getClassName(), _matrixEntryPointer.m_row * _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
 {
 	allocateValueMemory(_defaultValue);
 }
 
 GenericDataStructMatrix::GenericDataStructMatrix()
-	:GenericDataStruct(getClassName())
+	: GenericDataStruct(getClassName())
 {}
 
 GenericDataStructMatrix::~GenericDataStructMatrix()
 {}
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const GenericDataStructMatrix& _other)
-	:GenericDataStruct(getClassName(),_other.m_numberOfEntries),m_values(_other.m_values), m_numberOfColumns(_other.m_numberOfColumns), m_numberOfRows(_other.m_numberOfRows)
+	: GenericDataStruct(getClassName(),_other.m_numberOfEntries),m_values(_other.m_values), m_numberOfColumns(_other.m_numberOfColumns), m_numberOfRows(_other.m_numberOfRows)
 {
 }
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& _other)noexcept
-	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values)), m_numberOfColumns(std::move(_other.m_numberOfColumns)), m_numberOfRows(std::move(_other.m_numberOfRows))
+	: GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values)), m_numberOfColumns(std::move(_other.m_numberOfColumns)), m_numberOfRows(std::move(_other.m_numberOfRows))
 {
 	_other.m_numberOfEntries = 0;
 }
