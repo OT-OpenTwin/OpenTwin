@@ -8,6 +8,7 @@
 #include "OTCore/Logger.h"
 
 // std header
+#include <map>
 #include <algorithm>
 
 std::string ot::String::toLower(const std::string& _string)
@@ -288,25 +289,48 @@ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std
 	return result;
 }
 
+std::string ot::String::addEscapeCharacters(const std::string& _str) {
+	std::string result = _str;
+
+	const std::map<std::string, std::string> replacementData({
+		{ "\t", "\\t" },
+		{ "\\\\t", "\\t" },
+		{ "\n", "\\n" },
+		{ "\\\\n", "\\n" }
+		});
+
+	for (const auto& it : replacementData) {
+		String::replaced(result, it.first, it.second);
+	}
+
+	return result;
+}
+
+void ot::String::replaced(std::string& _str, const std::string& _what, const std::string& _with) {
+	size_t startPos = _str.find(_what);
+	while (startPos != std::string::npos) {
+		_str.replace(startPos, _what.length(), _with);
+		startPos = _str.find(_what, startPos + _with.length());
+	}
+}
+
 std::string ot::String::replace(const std::string& _str, const std::string& _what, const std::string& _with) {
 	std::string result = _str;
-	size_t start_pos = result.find(_what);
-	while (start_pos != std::string::npos) {
-		start_pos = result.find(_what);
-		result.replace(start_pos, _what.length(), _with);
-		start_pos = result.find(_what, start_pos + _with.length());
-	}
+	String::replaced(result, _what, _with);
 	return result;
+}
+
+void ot::String::replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
+	size_t startPos = _str.find(_what);
+	while (startPos != std::wstring::npos) {
+		_str.replace(startPos, _what.length(), _with);
+		startPos = _str.find(_what, startPos + _with.length());
+	}
 }
 
 std::wstring ot::String::replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
 	std::wstring result = _str;
-	size_t start_pos = result.find(_what);
-	while (start_pos != std::wstring::npos) {
-		start_pos = result.find(_what);
-		result.replace(start_pos, _what.length(), _with);
-		start_pos = result.find(_what, start_pos + _with.length());
-	}
+	String::replaced(result, _what, _with);
 	return result;
 }
 

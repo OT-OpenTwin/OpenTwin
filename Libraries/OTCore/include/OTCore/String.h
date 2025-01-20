@@ -52,10 +52,16 @@ namespace ot {
 
 		static std::list<std::string> smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters = true, bool _skipEmpty = false);
 
+		//! @brief Replaces all valid escape character sequence with the corresponding sequence.
+		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
+		static std::string addEscapeCharacters(const std::string& _str);
+
 		//! \brief Replaces all what occurances in the provided string and returns the result.
+		static void replaced(std::string& _str, const std::string& _what, const std::string& _with);
 		static std::string replace(const std::string& _str, const std::string& _what, const std::string& _with);
 
 		//! \brief Replaces all what occurances in the provided string and returns the result.
+		static void replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 		static std::wstring replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 
 		//! \brief Creates a C-String copy of the provided C++ String
