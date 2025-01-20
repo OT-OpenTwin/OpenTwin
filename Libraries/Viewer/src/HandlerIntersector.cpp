@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+#undef min
+#undef max
+
 #include "HandlerIntersector.h"
 #include <osg/Geometry>
 
