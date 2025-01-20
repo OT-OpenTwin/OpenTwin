@@ -16,7 +16,8 @@ public:
 	enum RequestType {
 		ExecuteNetlist,
 		Message,
-		Error
+		Error,
+		Disconnect
 	};
 
 	static QString toString(RequestType _type);
@@ -34,7 +35,7 @@ public:
 	bool isMixed(const QByteArray& data);
 	int findEndOfJsonObject(const QByteArray& data);
 	QList<QJsonObject> handleMultipleJsonObjects(const QByteArray& jsonStram);
-
+	void send(std::string messageType, std::string message);
 private Q_SLOTS:
 	void handleConnection();
 	void handleReadyRead();

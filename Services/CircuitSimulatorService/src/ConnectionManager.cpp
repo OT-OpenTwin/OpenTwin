@@ -21,7 +21,7 @@ QString ConnectionManager::toString(RequestType _type) {
     case ConnectionManager::ExecuteNetlist: return "ExecuteNetlist";
     case ConnectionManager::Message: return "Message";
     case ConnectionManager::Error: return "Error";
-
+    case ConnectionManager::Disconnect: return "Disconnect";
     default:
         OT_LOG_EAS("Unknown request type (" + std::to_string((int)_type) + ")");
         return "";
@@ -146,6 +146,19 @@ QList<QJsonObject> ConnectionManager::handleMultipleJsonObjects(const QByteArray
     return parsedObjects;
 }
 
+void ConnectionManager::send(std::string messageType, std::string message) {
+    QJsonObject jsonObject;
+
+    jsonObject["type"] = messageType.c_str();
+    jsonObject["results"] = message.c_str();
+
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray data = jsonDoc.toJson();
+
+    m_socket->write(data);
+    m_socket->flush();
+}
+
 
 void ConnectionManager::handleReadyRead() {
     QByteArray rawData = m_socket->readAll();
@@ -185,12 +198,6 @@ void ConnectionManager::handleReadyRead() {
     
    
 }
-
-    
-
-    
-    
- 
 
 
 void ConnectionManager::handleDisconnected() {
@@ -269,7 +276,7 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
         else if (_actionType.toStdString() == "Message") {
             if (data.isString()) {
                 SimulationResults::getInstance()->displayMessage(data.toString().toStdString());
-
+               
             }
             else {
                 OT_LOG_E("JSON array entry is not a string");
@@ -279,6 +286,7 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
         else if (_actionType.toStdString() == "SendResults") {
 
             SimulationResults::getInstance()->handleResults(data);
+            send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
         }
         else {
             if (data.isString()) {

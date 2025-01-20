@@ -85,7 +85,7 @@ void ConnectionManager::receiveResponse() {
     handleActionType(typeString, jsonArray);
 
     //After Simulating I send back the results
-    sendBackResults(SimulationResults::getInstance()->getResultMap());
+    //sendBackResults(SimulationResults::getInstance()->getResultMap());
 
 
 
@@ -122,7 +122,9 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
         }
         handleRunSimulation(netlist);
     }
-    else {
+    else if (_actionType.toStdString() == "Disconnect") {
+        handleDisconnected();
+    } else {
         QJsonDocument doc(_data);
         QByteArray byteArray = doc.toJson(QJsonDocument::Indented);
         QString message = QString::fromUtf8(byteArray);
@@ -142,6 +144,7 @@ void ConnectionManager::handleRunSimulation(std::list<std::string> _netlist) {
     m_ngSpice->runSimulation(_netlist);
 
     //The results are being pushed in the callbacks to SimulationResults map
+    sendBackResults(SimulationResults::getInstance()->getResultMap());
 
 }
 
@@ -181,5 +184,5 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     m_socket->write(data);
     m_socket->flush();
 
-    handleDisconnected();
+    //handleDisconnected();
 }
