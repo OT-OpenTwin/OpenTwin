@@ -5,13 +5,15 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCommunication/ActionTypes.h"
+#include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -25,24 +27,16 @@
 // ####################################################################################################
 // Table Widget 
 
-ManageGroupsTable::ManageGroupsTable()
-	: m_selectedRow(-1)
-{
-	verticalHeader()->setVisible(false);
-	setFocusPolicy(Qt::NoFocus);
-
-	setMouseTracking(true);
-	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-}
-
 ManageGroupsTable::ManageGroupsTable(int _rows, int _columns)
 	: ot::Table(_rows, _columns), m_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
+	setSelectionBehavior(QAbstractItemView::SelectRows);
+	setSelectionMode(QAbstractItemView::SingleSelection);
 
 	setMouseTracking(true);
-	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
+	connect(this, &ot::Table::itemSelectionChanged, this, &ManageGroupsTable::slotSelectionChanged);
 }
 
 ManageGroupsTable::~ManageGroupsTable() {
@@ -111,22 +105,20 @@ void ManageGroupsTable::leaveEvent(QEvent * _event) {
 
 void ManageGroupsTable::slotSelectionChanged() {
 	m_selectedRow = -1;
-	disconnect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-	QList<QTableWidgetItem *> selection = selectedItems();
-	for (auto itm : selection) {
-		for (auto c : m_dataRowItems.at(itm->row())) {
-			c->setSelected(false);
-		}
-		m_selectedRow = itm->row();
-	}
-	for (int r = 0; r < m_dataRowItems.size(); r++) {
-		if (r != m_selectedRow) {
-			for (auto c : m_dataRowItems.at(r)) {
+
+	QList<QTableWidgetItem*> selection = selectedItems();
+	if (!selection.empty()) {
+		m_selectedRow = selection.front()->row();
+
+		for (QTableWidgetItem* itm : selection) {
+			if (itm->row() != m_selectedRow) {
+				OT_LOG_E("Unexpected selection");
+				return;
 			}
 		}
 	}
-	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
-	Q_EMIT selectionChanged();
+
+	Q_EMIT selectionHasChanged();
 }
 
 void ManageGroupsTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetItem *&second)
@@ -469,15 +461,15 @@ ManageGroups::ManageGroups(const std::string &authServerURL)
 	connect(m_btnRename, &ot::PushButton::clicked, this, &ManageGroups::slotRenameGroup);
 	connect(m_btnOwner, &ot::PushButton::clicked, this, &ManageGroups::slotChangeGroupOwner);
 	connect(m_btnDelete, &ot::PushButton::clicked, this, &ManageGroups::slotDeleteGroup);
-	connect(m_showMembersOnly, &ot::CheckBox::stateChanged, this, &ManageGroups::slotShowMembersOnly);
-	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageGroups::slotGroupFilter);
-	connect(m_filterMembers, &ot::LineEdit::textChanged, this, &ManageGroups::slotMemberFilter);
-	connect(m_groupsList, &ManageGroupsTable::selectionChanged, this, &ManageGroups::slotGroupsSelection);
+	connect(m_showMembersOnly, &ot::CheckBox::stateChanged, this, &ManageGroups::slotFillMembersList);
+	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageGroups::slotFillGroupsList);
+	connect(m_filterMembers, &ot::LineEdit::textChanged, this, &ManageGroups::slotFillMembersList);
+	connect(m_groupsList, &ManageGroupsTable::selectionHasChanged, this, &ManageGroups::slotFillMembersList);
 	
 	readUserList();
 
-	fillGroupsList();
-	fillMembersList();
+	slotFillGroupsList();
+	slotFillMembersList();
 }
 
 ManageGroups::~ManageGroups() {
@@ -494,7 +486,7 @@ void ManageGroups::slotAddGroup(void)
 
 	if (dialog.showDialog() == ot::Dialog::Ok)
 	{
-		fillGroupsList();
+		slotFillGroupsList();
 	}
 }
 
@@ -511,7 +503,7 @@ void ManageGroups::slotRenameGroup(void)
 	RenameGroupDialog dialog(groupName, m_authServerURL);
 
 	if (dialog.showDialog() == ot::Dialog::Ok) {
-		fillGroupsList();
+		slotFillGroupsList();
 	}
 }
 
@@ -530,7 +522,7 @@ void ManageGroups::slotChangeGroupOwner(void)
 
 	ownerManager.showDialog();
 
-	fillGroupsList();
+	slotFillGroupsList();
 }
 
 void ManageGroups::slotDeleteGroup(void)
@@ -570,24 +562,8 @@ void ManageGroups::slotDeleteGroup(void)
 
 		assert(hasSuccessful(response));
 
-		fillGroupsList();
+		slotFillGroupsList();
 	}
-}
-
-void ManageGroups::slotShowMembersOnly(void) {
-	fillMembersList();
-}
-
-void ManageGroups::slotGroupFilter(void) {
-	fillGroupsList();
-}
-
-void ManageGroups::slotMemberFilter(void) {
-	fillMembersList();
-}
-
-void ManageGroups::slotGroupsSelection(void) {
-	fillMembersList();
 }
 
 void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
@@ -648,8 +624,7 @@ bool ManageGroups::hasSuccessful(const std::string &response) {
 	}
 }
 
-void ManageGroups::fillGroupsList(void)
-{
+void ManageGroups::slotFillGroupsList(void) {
 	// Store selection
 
 	// Clear list
@@ -658,7 +633,7 @@ void ManageGroups::fillGroupsList(void)
 	// Add new content to list
 	assert(!m_authServerURL.empty());
 
-	AppBase * app{ AppBase::instance() };
+	AppBase* app{ AppBase::instance() };
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
@@ -666,8 +641,7 @@ void ManageGroups::fillGroupsList(void)
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
 		assert(0);
 		return;
 	}
@@ -675,16 +649,15 @@ void ManageGroups::fillGroupsList(void)
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	std::string filterText = tolower(m_filterGroups->text().toStdString());
+	std::string filterText = ot::String::toLower(m_filterGroups->text().toStdString());
 
-	const rapidjson::Value& groupArray = responseDoc[ "groups" ];
+	const rapidjson::Value& groupArray = responseDoc["groups"];
 	assert(groupArray.IsArray());
 
 	std::list<std::string> groupNames;
 	std::map<std::string, std::string> groupOwners;
 
-	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
-	{
+	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr) {
 		const rapidjson::Value& group = *itr;
 		std::string groupData = group.GetString();
 
@@ -693,29 +666,26 @@ void ManageGroups::fillGroupsList(void)
 
 		std::string groupName = groupDoc[OT_PARAM_AUTH_GROUP].GetString();
 		std::string groupOwner = groupDoc[OT_PARAM_AUTH_GROUPOWNER].GetString();
-		
+
 		groupNames.push_back(groupName);
 		groupOwners[groupName] = groupOwner;
 	}
 
 	groupNames.sort();
 
-	for (auto groupName : groupNames)
-	{
+	for (auto groupName : groupNames) {
 		std::string groupOwner = groupOwners[groupName];
 
-		if (!filterText.empty())
-		{
-			if (tolower(groupName).find(filterText) == groupName.npos)
-			{
+		if (!filterText.empty()) {
+			if (ot::String::toLower(groupName).find(filterText) == groupName.npos) {
 				continue;
 			}
 		}
 
-		std::array<QTableWidgetItem *, 2> dataRowItems;
+		std::array<QTableWidgetItem*, 2> dataRowItems;
 
 		{
-			QTableWidgetItem * hItm = new QTableWidgetItem(groupName.c_str());
+			QTableWidgetItem* hItm = new QTableWidgetItem(groupName.c_str());
 			auto flags = hItm->flags();
 			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
 			hItm->setFlags(flags);
@@ -723,7 +693,7 @@ void ManageGroups::fillGroupsList(void)
 		}
 
 		{
-			QTableWidgetItem * hItm = new QTableWidgetItem(groupOwner.c_str());
+			QTableWidgetItem* hItm = new QTableWidgetItem(groupOwner.c_str());
 			auto flags = hItm->flags();
 			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
 			hItm->setFlags(flags);
@@ -736,28 +706,20 @@ void ManageGroups::fillGroupsList(void)
 	// Restore selection if possible
 
 
-	fillMembersList();
+	slotFillMembersList();
 }
 
-std::string ManageGroups::tolower(std::string s) 
-{
-	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::tolower(c); });
-	return s;
-}
-
-void ManageGroups::fillMembersList(void)
-{
+void ManageGroups::slotFillMembersList(void) {
 	// Store selection
 
 	// Clear list
 	m_membersList->Clear();
 
-	QTableWidgetItem *groupNameItem = nullptr;
-	QTableWidgetItem *groupOwnerItem = nullptr;
+	QTableWidgetItem* groupNameItem = nullptr;
+	QTableWidgetItem* groupOwnerItem = nullptr;
 	m_groupsList->getSelectedItems(groupNameItem, groupOwnerItem);
 
-	if (groupNameItem == nullptr || groupOwnerItem == nullptr)
-	{
+	if (groupNameItem == nullptr || groupOwnerItem == nullptr) {
 		m_btnRename->setEnabled(false);
 		m_btnOwner->setEnabled(false);
 		m_btnDelete->setEnabled(false);
@@ -767,16 +729,14 @@ void ManageGroups::fillMembersList(void)
 	std::string groupName = groupNameItem->text().toStdString();
 	std::string groupOwner = groupOwnerItem->text().toStdString();
 
-	AppBase * app{ AppBase::instance() };
+	AppBase* app{ AppBase::instance() };
 
-	if (app->getCurrentLoginData().getUserName() != groupOwner)
-	{
+	if (app->getCurrentLoginData().getUserName() != groupOwner) {
 		m_btnRename->setEnabled(false);
 		m_btnOwner->setEnabled(false);
 		m_btnDelete->setEnabled(false);
 	}
-	else
-	{
+	else {
 		m_btnRename->setEnabled(true);
 		m_btnOwner->setEnabled(true);
 		m_btnDelete->setEnabled(true);
@@ -792,8 +752,7 @@ void ManageGroups::fillMembersList(void)
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
 		assert(0);
 		return;
 	}
@@ -802,17 +761,15 @@ void ManageGroups::fillMembersList(void)
 	responseDoc.fromJson(response);
 
 	// Reset in group flag for all members
-	for (auto user : m_userInGroup)
-	{
+	for (auto user : m_userInGroup) {
 		m_userInGroup[user.first] = false;
 	}
 
 	// Now update the group flag according to the group membership
-	const rapidjson::Value& userArray = responseDoc[ "users" ];
+	const rapidjson::Value& userArray = responseDoc["users"];
 	assert(userArray.IsArray());
 
-	for (rapidjson::Value::ConstValueIterator itr = userArray.Begin(); itr != userArray.End(); ++itr)
-	{
+	for (rapidjson::Value::ConstValueIterator itr = userArray.Begin(); itr != userArray.End(); ++itr) {
 		const rapidjson::Value& user = *itr;
 		std::string userName = user.GetString();
 
@@ -821,34 +778,30 @@ void ManageGroups::fillMembersList(void)
 
 	// Fill the list (considering filter and show group members only flag)
 
-	std::string filterText = tolower(m_filterMembers->text().toStdString());
+	std::string filterText = ot::String::toLower(m_filterMembers->text().toStdString());
 
 	m_userList.sort();
 
-	for (auto userName : m_userList)
-	{
-		if (!filterText.empty())
-		{
-			if (tolower(userName).find(filterText) == userName.npos)
-			{
+	for (auto userName : m_userList) {
+		if (!filterText.empty()) {
+			if (ot::String::toLower(userName).find(filterText) == userName.npos) {
 				continue;
 			}
 		}
 
-		if (m_showMembersOnly->isChecked() && !m_userInGroup[userName])
-		{
+		if (m_showMembersOnly->isChecked() && !m_userInGroup[userName]) {
 			continue;
 		}
 
-		std::array<QTableWidgetItem *, 2> dataRowItems;
+		std::array<QTableWidgetItem*, 2> dataRowItems;
 
 		{
-			QTableWidgetItem * hItm = new QTableWidgetItem();
+			QTableWidgetItem* hItm = new QTableWidgetItem();
 			dataRowItems[0] = hItm;
 		}
 
 		{
-			QTableWidgetItem * hItm = new QTableWidgetItem(userName.c_str());
+			QTableWidgetItem* hItm = new QTableWidgetItem(userName.c_str());
 			auto flags = hItm->flags();
 			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
 			hItm->setFlags(flags);
@@ -857,27 +810,24 @@ void ManageGroups::fillMembersList(void)
 
 		m_membersList->addRow(dataRowItems);
 
-		QWidget *pWidget = new QWidget();
-		QCheckBox *pCheckBox = new QCheckBox();
-		QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
+		QWidget* pWidget = new QWidget();
+		QCheckBox* pCheckBox = new QCheckBox();
+		QHBoxLayout* pLayout = new QHBoxLayout(pWidget);
 		pLayout->addWidget(pCheckBox);
 		pLayout->setAlignment(Qt::AlignCenter);
-		pLayout->setContentsMargins(0,0,0,0);
+		pLayout->setContentsMargins(0, 0, 0, 0);
 		pWidget->setLayout(pLayout);
-		m_membersList->setCellWidget(m_membersList->rowCount()-1, 0, pWidget);
-		
-		if (m_userInGroup[userName])
-		{
+		m_membersList->setCellWidget(m_membersList->rowCount() - 1, 0, pWidget);
+
+		if (m_userInGroup[userName]) {
 			pCheckBox->setChecked(true);
 		}
 
-		if (userName == groupOwner)
-		{
+		if (userName == groupOwner) {
 			pCheckBox->setEnabled(false);
 		}
 
-		if (app->getCurrentLoginData().getUserName() != groupOwner)
-		{
+		if (app->getCurrentLoginData().getUserName() != groupOwner) {
 			pCheckBox->setEnabled(false);
 		}
 

@@ -12,8 +12,8 @@ namespace ot { class PushButton; }
 class ManageGroupsTable : public ot::Table {
 	Q_OBJECT
 	OT_DECL_NOCOPY(ManageGroupsTable)
+	OT_DECL_NODEFAULT(ManageGroupsTable)
 public:
-	ManageGroupsTable();
 	ManageGroupsTable(int _row, int _column);
 	virtual ~ManageGroupsTable();
 
@@ -28,7 +28,7 @@ public:
 	void getSelectedItems(QTableWidgetItem*& _first, QTableWidgetItem*& _second);
 
 Q_SIGNALS:
-	void selectionChanged();
+	void selectionHasChanged();
 
 private Q_SLOTS:
 	void slotSelectionChanged();
@@ -100,17 +100,12 @@ public Q_SLOTS:
 	void slotRenameGroup(void);
 	void slotChangeGroupOwner(void);
 	void slotDeleteGroup(void);
-	void slotShowMembersOnly(void);
-	void slotGroupFilter(void);
-	void slotMemberFilter(void);
-	void slotGroupsSelection(void);
 	void slotMemberCheckBoxChanged(bool state, int row);
+	void slotFillGroupsList(void);
+	void slotFillMembersList(void);
 
 private:
-	void fillGroupsList(void);
-	void fillMembersList(void);
 	void readUserList(void);
-	std::string tolower(std::string s);
 	bool hasSuccessful(const std::string &response);
 
 	ot::LineEdit*								m_filterGroups;
