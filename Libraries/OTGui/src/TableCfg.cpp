@@ -297,26 +297,34 @@ ot::GenericDataStructMatrix ot::TableCfg::createMatrix(void) const {
 	destPtr.m_column = 0;
 	destPtr.m_row = 0;
 
+	// If column header exists, make it the first row
 	if (hasColumnHeader) {
+		if (hasRowHeader) {
+			matrix.setValue(destPtr, ot::Variable(std::string()));
+			destPtr.m_column++;
+		}
+
 		for (size_t c = 0; c < m_columns; c++, destPtr.m_column++) {
 			if (m_columnHeader[c]) {
 				matrix.setValue(destPtr, Variable(m_columnHeader[c]->getText()));
 			}
 			else {
-				matrix.setValue(destPtr, ot::Variable());
+				matrix.setValue(destPtr, ot::Variable(std::string()));
 			}
 		}
+
+		destPtr.m_row++;
 	}
 
 	for (size_t r = 0; r < m_rows; r++, destPtr.m_row++) {
 		destPtr.m_column = 0;
 		if (hasRowHeader) {
-			OTAssert(r < m_rowHeader.size() && r >= 0, "Index out of range");
+			OTAssert(r < m_rowHeader.size(), "Index out of range");
 			if (m_rowHeader[r]) {
 				matrix.setValue(destPtr, Variable(m_rowHeader[r]->getText()));
 			}
 			else {
-				matrix.setValue(destPtr, ot::Variable());
+				matrix.setValue(destPtr, ot::Variable(std::string()));
 			}
 			destPtr.m_column++;
 		}

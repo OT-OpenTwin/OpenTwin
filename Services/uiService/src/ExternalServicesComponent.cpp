@@ -816,7 +816,9 @@ void ExternalServicesComponent::sendToModelService(const std::string& _message, 
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
 {
-	try { return sendHttpRequest(operation, url, doc.toJson(), response); }
+	try { 
+		return sendHttpRequest(operation, url, doc.toJson(), response); 
+	}
 	catch (...) {
 		assert(0); // Error handling
 		return false;

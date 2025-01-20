@@ -2290,7 +2290,8 @@ void AppBase::slotTableSaveRequested(void) {
 
 		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();
-		cfg.setEntityInformation(view->getViewData());
+		ot::BasicEntityInformation entityInfo(view->getViewData());
+		cfg.setEntityInformation(entityInfo);
 		
 		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());

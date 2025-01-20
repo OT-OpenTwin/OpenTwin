@@ -142,17 +142,23 @@ ot::TableCfg ot::Table::createConfig(void) const {
 
 	TableCfg cfg(this->rowCount(), this->columnCount());
 	
+	bool hasColumnHeader = false;
 	for (int column = 0; column < columnCount(); column++) {
 		const auto item = horizontalHeaderItem(column);
 		if (item != nullptr) {
+			hasColumnHeader = true;
+
 			const std::string text = item->text().toStdString();
 			cfg.setColumnHeader(column, text);
 		}
 	}
 
+	bool hasRowHeader = false;
 	for (int row = 0; row < this->rowCount(); row++) {
 		const auto item = verticalHeaderItem(row);
 		if (item != nullptr) {
+			hasRowHeader = true;
+
 			const std::string text = item->text().toStdString();
 			cfg.setRowHeader(row, text);
 		}
@@ -161,6 +167,21 @@ ot::TableCfg ot::Table::createConfig(void) const {
 			QTableWidgetItem* itm = this->item(row, column);
 			if (itm) {
 				cfg.setCellText(row, column, itm->text().toStdString());
+			}
+		}
+	}
+
+	if (hasRowHeader) {
+		for (int row = 0; row < cfg.getRowCount(); row++) {
+			if (!cfg.getRowHeader(row)) {
+				cfg.setRowHeader(row, new TableHeaderItemCfg());
+			}
+		}
+	}
+	if (hasColumnHeader) {
+		for (int column = 0; column < cfg.getColumnCount(); column++) {
+			if (!cfg.getColumnHeader(column)) {
+				cfg.setColumnHeader(column, new TableHeaderItemCfg());
 			}
 		}
 	}
