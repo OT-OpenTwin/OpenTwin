@@ -113,6 +113,9 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 		return;
 	}
 
+	auto bck = m_state;
+	m_state |= CloseViewState;
+
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
 	_view->m_isDeletedByManager = true;
 	this->forgetView(_view);
@@ -128,6 +131,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 
 	// Finally destroy the view
 	delete _view;
+
+	m_state = bck;
 }
 
 void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
@@ -145,9 +150,12 @@ void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 	ViewNameTypeList* lst = this->findViewNameTypeList(_owner);
 	if (lst) {
 		ViewNameTypeList tmp = *lst;
+		auto bck = m_state;
+		m_state |= MulticloseViewState;
 		for (const ViewNameTypeListEntry& i : tmp) {
 			this->closeView(i.first, i.second);
 		}
+		m_state = bck;
 	}
 }
 
@@ -161,9 +169,13 @@ void ot::WidgetViewManager::closeViews(void) {
 		entry.second = view.second->getViewData().getViewType();
 		tmp.push_back(entry);
 	}
+
+	auto bck = m_state;
+	m_state |= MulticloseViewState;
 	for (const ViewNameTypeListEntry& i : tmp) {
 		this->closeView(i.first, i.second);
 	}
+	m_state = bck;
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
@@ -358,6 +370,10 @@ ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
+	if (m_state & MulticloseViewState) {
+		return;
+	}
+
 	WidgetView* o = this->getViewFromDockWidget(_oldFocus);
 	WidgetView* n = this->getViewFromDockWidget(_newFocus);
 
@@ -386,6 +402,11 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 }
 
 void ot::WidgetViewManager::slotViewCloseRequested(void) {
+	if (m_state & MulticloseViewState) {
+		OT_LOG_E("Enexpected event");
+		return;
+	}
+
 	WidgetView* view = this->getViewFromDockWidget(dynamic_cast<ads::CDockWidget*>(sender()));
 	if (!view) {
 		OT_LOG_E("View not found");
@@ -401,6 +422,10 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 }
 
 void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
+	if (m_state & MulticloseViewState) {
+		return;
+	}
+
 	for (const ViewEntry& entry : m_views) {
 		if (!(entry.second->getViewData().getViewFlags() & WidgetViewBase::ViewFlag::ViewIsCloseable) && 
 			!entry.second->getViewDockWidget()->dockAreaWidget()) 
@@ -412,6 +437,11 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 }
 
 void ot::WidgetViewManager::slotViewTabClicked(void) {
+	if (m_state & MulticloseViewState) {
+		OT_LOG_E("Enexpected event");
+		return;
+	}
+
 	ads::CDockWidgetTab* tab = dynamic_cast<ads::CDockWidgetTab*>(sender());
 	if (!tab) {
 		return;
@@ -426,6 +456,10 @@ void ot::WidgetViewManager::slotViewTabClicked(void) {
 }
 
 void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
+	if (m_state & MulticloseViewState) {
+		return;
+	}
+
 	ot::WidgetView* view = dynamic_cast<ot::WidgetView*>(sender());
 	if (!view) {
 		return;

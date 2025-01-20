@@ -335,6 +335,12 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 	return 0;
 }
 
+ViewerUIDtype ViewerComponent::addMenuSubGroup(ViewerUIDtype _menuGroupID, const std::string& _subGroupName) {
+	ak::UID subGroup = AppBase::instance()->getToolBar()->addSubGroup(AppBase::instance()->getViewerUID(), _menuGroupID, QString::fromStdString(_subGroupName));
+	AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), subGroup, false);
+	return subGroup;
+}
+
 ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName)
 {
 	try {
@@ -371,7 +377,7 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 	return uid;
 }
 
-void ViewerComponent::setMenuPushButtonToolTip(unsigned long long _buttonID, const std::string& _toolTip) {
+void ViewerComponent::setMenuPushButtonToolTip(ViewerUIDtype _buttonID, const std::string& _toolTip) {
 	ak::uiAPI::toolButton::setToolTip(_buttonID, QString::fromStdString(_toolTip));
 }
 

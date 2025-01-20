@@ -48,6 +48,7 @@ public:
 
 	virtual unsigned long long addMenuPage(const std::string& pageName) { return 0; };
 	virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string& groupName) { return 0; };
+	virtual unsigned long long addMenuSubGroup(unsigned long long _menuGroupID, const std::string& _subGroupName) { return 0; };
 	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName) { return 0; };
 	virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string& buttonName, const std::string& iconName, const std::string& keySequence) { return 0; };
 	virtual void setMenuPushButtonToolTip(unsigned long long _buttonID, const std::string& _toolTip) {};

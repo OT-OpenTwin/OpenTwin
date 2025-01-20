@@ -30,6 +30,33 @@
 #define OT_TEST_TABLE_Interval(___testText)
 #endif
 
+QRect ot::Table::getSelectionBoundingRect(const QList<QTableWidgetSelectionRange>& _selections) {
+	if (_selections.empty()) {
+		return QRect();
+	}
+	else {
+		QPoint minPt(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+		QPoint maxPt(std::numeric_limits<int>::lowest(), std::numeric_limits<int>::lowest());
+
+		for (const QTableWidgetSelectionRange& range : _selections) {
+			if (range.leftColumn() < minPt.x()) {
+				minPt.setX(range.leftColumn());
+			}
+			if (range.rightColumn() > maxPt.x()) {
+				maxPt.setX(range.rightColumn());
+			}
+			if (range.topRow() < minPt.y()) {
+				minPt.setY(range.topRow());
+			}
+			if (range.bottomRow() > maxPt.y()) {
+				maxPt.setY(range.bottomRow());
+			}
+		}
+
+		return QRect(minPt, maxPt);
+	}
+}
+
 ot::Table::Table(QWidget* _parentWidget)
 	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false), m_stopResizing(true)
 {
@@ -117,18 +144,23 @@ ot::TableCfg ot::Table::createConfig(void) const {
 	
 	for (int r = 0; r < this->rowCount(); r++) {
 		for (int c = 0; c < this->columnCount(); c++) {
-			OTAssertNullptr(this->item(r, c));
-			cfg.setCellText(r, c, this->item(r, c)->text().toStdString());
+			QTableWidgetItem* itm = this->item(r, c);
+			if (itm) {
+				cfg.setCellText(r, c, itm->text().toStdString());
+			}
 		}
 	}
 
 	for (int row = 0; row < rowCount(); row++)
 	{
-		const auto item =	verticalHeaderItem(row);
+		const auto item = verticalHeaderItem(row);
 		if (item != nullptr)
 		{
 			const std::string text = item->text().toStdString();
 			cfg.setRowHeader(row, text);
+		}
+		else {
+			cfg.setRowHeader(row, nullptr);
 		}
 	}
 	
@@ -139,6 +171,9 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		{
 			const std::string text = item->text().toStdString();
 			cfg.setColumnHeader(column, text);
+		}
+		else {
+			cfg.setColumnHeader(column, nullptr);
 		}
 	}
 
@@ -237,6 +272,10 @@ void ot::Table::hideEvent(QHideEvent* _event) {
 // Private slots
 
 void ot::Table::slotCellDataChanged(int _row, int _column) {
+	if (m_contentChanged) {
+		return;
+	}
+
 	m_contentChanged = true;
 	Q_EMIT modifiedChanged(m_contentChanged);
 }

@@ -44,7 +44,6 @@ private:
 
 	void handleChangedText(ot::JsonDocument& _doc);
 	void handleChangedTable(ot::JsonDocument& _doc);
-	ot::GenericDataStructMatrix createMatrix(const ot::TableCfg& _tableCfg);
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
 	void storeChangedTable(IVisualisationTable* _entity ,ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);

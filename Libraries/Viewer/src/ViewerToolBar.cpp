@@ -27,6 +27,15 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 	else if (_uid == m_textEditorSaveID) return ButtonType::TextEditorSaveButton;
 	else if (_uid == m_textEditorExportID) return ButtonType::TextEditorExportButton;
 
+	else if (_uid == m_tableSaveID) return ButtonType::TableSaveButton;
+	//else if (_uid == m_tableExportCSVID) return ButtonType::TableExportCSVButton;
+	else if (_uid == m_tableAddRowBeforeID) return ButtonType::TableAddRowBefore;
+	else if (_uid == m_tableAddRowAfterID) return ButtonType::TableAddRowAfter;
+	else if (_uid == m_tableRemoveRowID) return ButtonType::TableRemoveRow;
+	else if (_uid == m_tableAddColumnBeforeID) return ButtonType::TableAddColumnBefore;
+	else if (_uid == m_tableAddColumnAfterID) return ButtonType::TabbleAddColumnAfter;
+	else if (_uid == m_tableRemoveColumnID) return ButtonType::TableRemoveColumn;
+
 	else return ButtonType::NoButton;
 }
 
@@ -117,12 +126,29 @@ void ViewerToolBar::setupUIControlsTable(void) {
 	if (FrontendAPI::instance() == nullptr) return;
 	if (!m_removeItemIDList.empty()) return;
 	
-	m_removeItemIDList.push_front(m_tablePageID = FrontendAPI::instance()->addMenuPage("Table"));
+	ot::UID pageID = FrontendAPI::instance()->addMenuPage("Table");
+	ot::UID dataGroupID = FrontendAPI::instance()->addMenuGroup(pageID, "Data");
+	ot::UID modifyGroupID = FrontendAPI::instance()->addMenuGroup(pageID, "Modify");
 
-	m_removeItemIDList.push_front(m_tableDataID = FrontendAPI::instance()->addMenuGroup(m_tablePageID, "Data"));
+	m_removeItemIDList.push_front(pageID);
+	m_removeItemIDList.push_front(dataGroupID);
+	m_removeItemIDList.push_front(modifyGroupID);
 
-	m_removeItemIDList.push_front(m_tableSaveID = FrontendAPI::instance()->addMenuPushButton(m_tableDataID, "Save", "Save"));
+	m_removeItemIDList.push_front(m_tableSaveID = FrontendAPI::instance()->addMenuPushButton(dataGroupID, "Save", "Save"));
 	FrontendAPI::instance()->setMenuPushButtonToolTip(m_tableSaveID, "Save (Ctrl + S)");
+
+
+	ot::UID rowGroupID = FrontendAPI::instance()->addMenuSubGroup(modifyGroupID, "Row");
+	m_removeItemIDList.push_front(rowGroupID);
+	m_removeItemIDList.push_front(m_tableAddRowBeforeID = FrontendAPI::instance()->addMenuPushButton(rowGroupID, "Add Row Before", "TableInsertRowTop"));
+	m_removeItemIDList.push_front(m_tableAddRowAfterID = FrontendAPI::instance()->addMenuPushButton(rowGroupID, "Add Row After", "TableInsertRowBottom"));
+	m_removeItemIDList.push_front(m_tableRemoveRowID = FrontendAPI::instance()->addMenuPushButton(rowGroupID, "Remove Row", "TableDeleteRow"));
+
+	ot::UID columnGroupID = FrontendAPI::instance()->addMenuSubGroup(modifyGroupID, "Column");
+	m_removeItemIDList.push_front(columnGroupID);
+	m_removeItemIDList.push_front(m_tableAddColumnBeforeID = FrontendAPI::instance()->addMenuPushButton(columnGroupID, "Add Column Before", "TableInsertColumnLeft"));
+	m_removeItemIDList.push_front(m_tableAddColumnAfterID = FrontendAPI::instance()->addMenuPushButton(columnGroupID, "Add Column After", "TableInsertColumnRight"));
+	m_removeItemIDList.push_front(m_tableRemoveColumnID = FrontendAPI::instance()->addMenuPushButton(columnGroupID, "Remove Column", "TableDeleteColumn"));
 
 	//m_removeItemIDList.push_front(m_tableExportCSVID = FrontendAPI::instance()->addMenuPushButton(m_tableDataID, "Export As CSV", "Export"));
 

@@ -319,9 +319,9 @@ void Model::setTreeStateRecording(bool flag)
 		{
 			if (item.second & ITEM_SELECTED)
 			{
-				if (nameToSceneNodesMap.count(item.first) != 0)
+				if (m_nameToSceneNodesMap.count(item.first) != 0)
 				{
-					SceneNodeBase *sceneItem = nameToSceneNodesMap[item.first];
+					SceneNodeBase *sceneItem = m_nameToSceneNodesMap[item.first];
 					assert(sceneItem != nullptr);
 
 					selectSceneNode(sceneItem, true);
@@ -330,9 +330,9 @@ void Model::setTreeStateRecording(bool flag)
 
 			if (item.second & ITEM_EXPANDED)
 			{
-				if (nameToSceneNodesMap.count(item.first) != 0)
+				if (m_nameToSceneNodesMap.count(item.first) != 0)
 				{
-					SceneNodeBase *sceneItem = nameToSceneNodesMap[item.first];
+					SceneNodeBase *sceneItem = m_nameToSceneNodesMap[item.first];
 					assert(sceneItem != nullptr);
 
 					FrontendAPI::instance()->expandSingleTreeItem(sceneItem->getTreeItemID());
@@ -354,9 +354,9 @@ void Model::centerMouseCursor(void)
 void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable)
 {
 	// Check whether we already have a container node
-	if (nameToSceneNodesMap.count(treeName) != 0)
+	if (m_nameToSceneNodesMap.count(treeName) != 0)
 	{
-		if (dynamic_cast<SceneNodeContainer *>(nameToSceneNodesMap[treeName]) != nullptr) return;
+		if (dynamic_cast<SceneNodeContainer *>(m_nameToSceneNodesMap[treeName]) != nullptr) return;
 		assert(0); // This is not a container node -> overwrite
 	}
 
@@ -390,7 +390,7 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	addSceneNodesToTree(containerNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = containerNode;
+	m_nameToSceneNodesMap[treeName] = containerNode;
 	osgNodetoSceneNodesMap[containerNode->getShapeNode()] = containerNode;
 	treeItemToSceneNodesMap[containerNode->getTreeItemID()] = containerNode;
 	modelItemToSceneNodesMap[modelEntityID] = containerNode;
@@ -410,9 +410,9 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 	bool nodeAlreadyExists = false;
 
 	// Check whether we already have a container node
-	if (nameToSceneNodesMap.count(treeName) != 0)
+	if (m_nameToSceneNodesMap.count(treeName) != 0)
 	{
-		annotationNode = dynamic_cast<SceneNodeAnnotation *>(nameToSceneNodesMap[treeName]);
+		annotationNode = dynamic_cast<SceneNodeAnnotation *>(m_nameToSceneNodesMap[treeName]);
 		if (annotationNode == nullptr)
 		{
 			assert(0); // There already exists a node with this name, but it is not an annotation node
@@ -456,7 +456,7 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 	}
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = annotationNode;
+	m_nameToSceneNodesMap[treeName] = annotationNode;
 	osgNodetoSceneNodesMap[annotationNode->getShapeNode()] = annotationNode;
 	treeItemToSceneNodesMap[annotationNode->getTreeItemID()] = annotationNode;
 	modelItemToSceneNodesMap[modelEntityID] = annotationNode;
@@ -705,8 +705,8 @@ void Model::addNodeFromFacetDataBase(const std::string &treeName, double surface
 void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const OldTreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes)
 {
 	// Check whether we already have a container node
-	auto existingSceneNode = nameToSceneNodesMap.find(_treeName);
-	if (existingSceneNode != nameToSceneNodesMap.end())
+	auto existingSceneNode = m_nameToSceneNodesMap.find(_treeName);
+	if (existingSceneNode != m_nameToSceneNodesMap.end())
 	{
 		if (dynamic_cast<SceneNodeMultiVisualisation*>(existingSceneNode->second) != nullptr) 
 		{
@@ -757,7 +757,7 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	addSceneNodesToTree(sceneNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[_treeName] = sceneNode;
+	m_nameToSceneNodesMap[_treeName] = sceneNode;
 	osgNodetoSceneNodesMap[sceneNode->getShapeNode()] = sceneNode;
 	treeItemToSceneNodesMap[sceneNode->getTreeItemID()] = sceneNode;
 	modelItemToSceneNodesMap[_modelEntityID] = sceneNode;
@@ -827,7 +827,7 @@ SceneNodeGeometry *Model::createNewGeometryNode(const std::string &treeName, uns
 		geometryNode->setModel(this);
 
 		// Add the node to the maps for faster access
-		nameToSceneNodesMap[treeName] = geometryNode;
+		m_nameToSceneNodesMap[treeName] = geometryNode;
 		treeItemToSceneNodesMap[geometryNode->getTreeItemID()] = geometryNode;
 		modelItemToSceneNodesMap[modelEntityID] = geometryNode;
 	}
@@ -854,8 +854,8 @@ void Model::setEntityName(unsigned long long modelEntityID, const std::string &n
 			newText = newName.substr(index + 1);
 		}
 
-		nameToSceneNodesMap[newName] = item;
-		nameToSceneNodesMap.erase(item->getName());
+		m_nameToSceneNodesMap[newName] = item;
+		m_nameToSceneNodesMap.erase(item->getName());
 
 		item->setName(newName);
 
@@ -865,7 +865,7 @@ void Model::setEntityName(unsigned long long modelEntityID, const std::string &n
 
 void Model::renameEntityPath(const std::string &oldPath, const std::string &newPath)
 {
-	std::map<std::string, SceneNodeBase *> entityMap = nameToSceneNodesMap;
+	std::map<std::string, SceneNodeBase *> entityMap = m_nameToSceneNodesMap;
 	std::string filter = oldPath + "/";
 
 	for (auto item : entityMap)
@@ -879,8 +879,8 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 				// This is the item which needs to be renamed (item + tree item)
 
 				item.second->setName(newPath);
-				nameToSceneNodesMap[newPath] = item.second;
-				nameToSceneNodesMap.erase(name);
+				m_nameToSceneNodesMap[newPath] = item.second;
+				m_nameToSceneNodesMap.erase(name);
 
 				std::string newText;
 
@@ -905,8 +905,8 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 
 				// Here we just need to rename the item itself and don't need to update the tree
 				item.second->setName(newName);
-				nameToSceneNodesMap[newName] = item.second;
-				nameToSceneNodesMap.erase(name);
+				m_nameToSceneNodesMap[newName] = item.second;
+				m_nameToSceneNodesMap.erase(name);
 			}
 		}
 	}
@@ -998,7 +998,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 	std::string parentName = treeName.substr(0, pos);
 
 	// Now get the parent item from the map
-	SceneNodeBase *parent = nameToSceneNodesMap[parentName];
+	SceneNodeBase *parent = m_nameToSceneNodesMap[parentName];
 	assert(parent != nullptr);
 
 	return parent;
@@ -1280,9 +1280,9 @@ void Model::hideEntities(std::list<unsigned long long> hiddenID)
 
 void Model::showBranch(const std::string &branchName)
 {
-	if (nameToSceneNodesMap.count(branchName) > 0)
+	if (m_nameToSceneNodesMap.count(branchName) > 0)
 	{
-		SceneNodeBase *rootNode = nameToSceneNodesMap[branchName];
+		SceneNodeBase *rootNode = m_nameToSceneNodesMap[branchName];
 
 		// Now show the entities of the selected branch
 		std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
@@ -1303,9 +1303,9 @@ void Model::showBranch(const std::string &branchName)
 
 void Model::hideBranch(const std::string &branchName)
 {
-	if (nameToSceneNodesMap.count(branchName) > 0)
+	if (m_nameToSceneNodesMap.count(branchName) > 0)
 	{
-		SceneNodeBase *rootNode = nameToSceneNodesMap[branchName];
+		SceneNodeBase *rootNode = m_nameToSceneNodesMap[branchName];
 
 		hideAllSceneNodes(rootNode);
 	}
@@ -1504,6 +1504,150 @@ void Model::exportTableAsCSV(void) {
 	}
 }
 
+void Model::addTableRowBefore(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		view->getTable()->insertRow(selectionRect.top());
+	}
+	else {
+		view->getTable()->insertRow(0);
+	}
+	view->getTable()->setContentChanged(true);
+}
+
+void Model::addTableRowAfter(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		view->getTable()->insertRow(selectionRect.bottom() + 1);
+	}
+	else {
+		view->getTable()->insertRow(view->getTable()->rowCount());
+	}
+	view->getTable()->setContentChanged(true);
+}
+
+void Model::removeTableRow(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		int ix = selectionRect.top();
+		for (int i = ix; i <= selectionRect.bottom(); i++) {
+			view->getTable()->removeRow(ix);
+		}
+		view->getTable()->setContentChanged(true);
+	}
+}
+
+void Model::addTableColumnBefore(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		view->getTable()->insertColumn(selectionRect.left());
+	}
+	else {
+		view->getTable()->insertColumn(0);
+	}
+	view->getTable()->setContentChanged(true);
+}
+
+void Model::addTableColumnAfter(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		view->getTable()->insertColumn(selectionRect.right() + 1);
+	}
+	else {
+		view->getTable()->insertColumn(view->getTable()->columnCount());
+	}
+	view->getTable()->setContentChanged(true);
+}
+
+void Model::removeTableColumn(void) {
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api) {
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(api->getCurrentView());
+
+	if (!view) {
+		OT_LOG_E("Current view is not a table");
+		return;
+	}
+
+	QRect selectionRect = view->getTable()->getSelectionBoundingRect();
+	if (selectionRect.isValid()) {
+		int ix = selectionRect.left();
+		for (int i = ix; i <= selectionRect.right(); i++) {
+			view->getTable()->removeColumn(ix);
+		}
+		view->getTable()->setContentChanged(true);
+	}
+}
+
 void Model::executeAction(unsigned long long _buttonID) {
 	ViewerToolBar::ButtonType button = ViewerToolBar::instance().getButtonTypeFromUID(_buttonID);
 	switch (button) {
@@ -1522,6 +1666,12 @@ void Model::executeAction(unsigned long long _buttonID) {
 	case ViewerToolBar::TextEditorExportButton: exportTextEditor(); break;
 	case ViewerToolBar::TableSaveButton: saveTable(); break;
 	case ViewerToolBar::TableExportCSVButton: exportTableAsCSV(); break;
+	case ViewerToolBar::TableAddRowBefore: addTableRowBefore(); break;
+	case ViewerToolBar::TableAddRowAfter: addTableRowAfter(); break;
+	case ViewerToolBar::TableRemoveRow: removeTableRow(); break;
+	case ViewerToolBar::TableAddColumnBefore: addTableColumnBefore(); break;
+	case ViewerToolBar::TabbleAddColumnAfter: addTableColumnAfter(); break;
+	case ViewerToolBar::TableRemoveColumn: removeTableColumn(); break;
 	case ViewerToolBar::NoButton: break;
 	default:
 		OT_LOG_W("Unknown button (" + std::to_string(_buttonID) + ")");
@@ -1989,7 +2139,7 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 	}
 
 	// Remove the current scene node from the maps  
-	nameToSceneNodesMap.erase(node->getName());
+	m_nameToSceneNodesMap.erase(node->getName());
 	osgNodetoSceneNodesMap.erase(node->getShapeNode());
 	treeItemToSceneNodesMap.erase(node->getTreeItemID());
 	modelItemToSceneNodesMap.erase(node->getModelEntityID());
@@ -2147,9 +2297,9 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::list<SceneNodeBase *> objects;
 			for (auto item : optionValues)
 			{
-				if (nameToSceneNodesMap.count(item) != 0)
+				if (m_nameToSceneNodesMap.count(item) != 0)
 				{
-					objects.push_back(nameToSceneNodesMap[item]);
+					objects.push_back(m_nameToSceneNodesMap[item]);
 				}
 				else
 				{
@@ -2714,8 +2864,8 @@ void Model::removeSceneNode(osg::Node *node)
 
 void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
-	auto sceneNodeIt = nameToSceneNodesMap.find(_sceneNodeName);
-	if (sceneNodeIt == nameToSceneNodesMap.end()) {
+	auto sceneNodeIt = m_nameToSceneNodesMap.find(_sceneNodeName);
+	if (sceneNodeIt == m_nameToSceneNodesMap.end()) {
 		OT_LOG_EAS("Scene node \"" + _sceneNodeName + "\" not found");
 		return;
 	}
@@ -2745,7 +2895,7 @@ void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeNam
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = meshNode;
+	m_nameToSceneNodesMap[treeName] = meshNode;
 	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
 	modelItemToSceneNodesMap[modelEntityID] = meshNode;
 
@@ -2777,7 +2927,7 @@ void Model::addVisualizationMeshItemNodeFromFacetDataBase(const std::string &tre
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = meshNode;
+	m_nameToSceneNodesMap[treeName] = meshNode;
 	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
 	modelItemToSceneNodesMap[modelEntityID] = meshNode;
 
@@ -2831,7 +2981,7 @@ void Model::addVisualizationCartesianMeshNode(const std::string &treeName, unsig
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = meshNode;
+	m_nameToSceneNodesMap[treeName] = meshNode;
 	osgNodetoSceneNodesMap[meshNode->getShapeNode()] = meshNode;
 	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
 	modelItemToSceneNodesMap[modelEntityID] = meshNode;
@@ -2902,7 +3052,7 @@ void Model::addVisualizationCartesianMeshItemNode(const std::string &treeName, u
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = meshNode;
+	m_nameToSceneNodesMap[treeName] = meshNode;
 	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
 	modelItemToSceneNodesMap[modelEntityID] = meshNode;
 
@@ -2944,7 +3094,7 @@ void Model::addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
 	addSceneNodesToTree(plotNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[_config.getName()] = plotNode;
+	m_nameToSceneNodesMap[_config.getName()] = plotNode;
 	treeItemToSceneNodesMap[plotNode->getTreeItemID()] = plotNode;
 	modelItemToSceneNodesMap[_config.getUid()] = plotNode;
 
@@ -2990,7 +3140,7 @@ void Model::addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInf
 	addSceneNodesToTree(curveNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[_curveInfo.getName()] = curveNode;
+	m_nameToSceneNodesMap[_curveInfo.getName()] = curveNode;
 	treeItemToSceneNodesMap[curveNode->getTreeItemID()] = curveNode;
 	modelItemToSceneNodesMap[_curveInfo.getId()] = curveNode;
 		
@@ -3205,7 +3355,7 @@ void Model::addVTKNode(const std::string &treeName, unsigned long long modelEnti
 		vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
 
 		// Add the node to the maps for faster access
-		nameToSceneNodesMap[treeName] = vtkNode;
+		m_nameToSceneNodesMap[treeName] = vtkNode;
 		treeItemToSceneNodesMap[vtkNode->getTreeItemID()] = vtkNode;
 		modelItemToSceneNodesMap[modelEntityID] = vtkNode;
 	}

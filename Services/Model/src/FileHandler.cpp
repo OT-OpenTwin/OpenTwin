@@ -173,70 +173,13 @@ void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
 	}
 }
 
-ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _tableCfg)
-{
-	ot::MatrixEntryPointer matrixDimension;
-	matrixDimension.m_column = static_cast<uint32_t>(_tableCfg.getColumnCount());
-	matrixDimension.m_row = static_cast<uint32_t>(_tableCfg.getRowCount());
-	auto horizontalHeaderPtr =	_tableCfg.getColumnHeader(0);
-	auto verticalHeaderPtr =	_tableCfg.getRowHeader(0);
-	if (horizontalHeaderPtr != nullptr )
-	{
-		matrixDimension.m_row++;
-		assert(verticalHeaderPtr == nullptr);
-	}
-	else if (verticalHeaderPtr != nullptr)
-	{
-		matrixDimension.m_column++;
-		assert(horizontalHeaderPtr == nullptr);
-	}
-	
-	ot::GenericDataStructMatrix matrix(matrixDimension);
-	ot::MatrixEntryPointer matrixEntry;
-	uint32_t startRow(0), startColumn(0);
-	if (horizontalHeaderPtr != nullptr)
-	{
-		startRow = 1;
-		matrixEntry.m_row = 0;
-		for (matrixEntry.m_column = 0; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
-		{
-			const auto headerCfg = _tableCfg.getColumnHeader(matrixEntry.m_column);
-			const ot::Variable cellValue(headerCfg->getText());
-			matrix.setValue(matrixEntry, cellValue);
-		}
-	}
-	if (verticalHeaderPtr != nullptr)
-	{
-		startColumn = 1;
-		matrixEntry.m_column = 0;
-		for (matrixEntry.m_row= 0; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++)
-		{
-			const auto headerCfg = _tableCfg.getRowHeader(matrixEntry.m_row);
-			const ot::Variable cellValue(headerCfg->getText());
-			matrix.setValue(matrixEntry, cellValue);
-		}
-	}
-	
-	for (matrixEntry.m_row = startRow; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++)
-	{
-		for (matrixEntry.m_column = startColumn; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
-		{
-			const std::string& tableCell = _tableCfg.getCellText(matrixEntry.m_row - startRow, matrixEntry.m_column - startColumn);
-			matrix.setValue(matrixEntry, ot::Variable(tableCell));
-		}
-	}
-
-	return matrix;
-}
-
 void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& _cfg)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
 	assert(_entity != nullptr);
 
-	ot::GenericDataStructMatrix matrix = createMatrix(_cfg);
-	_entity->setTable(matrix);
+	_entity->setTable(_cfg.createMatrix());
 	model->setModified();
 	model->modelChangeOperationCompleted("Updated Table.");
 }

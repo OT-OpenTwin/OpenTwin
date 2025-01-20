@@ -265,6 +265,64 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 }
 
+ot::GenericDataStructMatrix ot::TableCfg::createMatrix(void) const {
+	ot::MatrixEntryPointer matrixDimension;
+	matrixDimension.m_column = static_cast<uint32_t>(this->getColumnCount());
+	matrixDimension.m_row = static_cast<uint32_t>(this->getRowCount());
+	auto horizontalHeaderPtr = this->getColumnHeader(0);
+	auto verticalHeaderPtr = this->getRowHeader(0);
+	if (horizontalHeaderPtr != nullptr) {
+		matrixDimension.m_row++;
+		assert(verticalHeaderPtr == nullptr);
+	}
+	else if (verticalHeaderPtr != nullptr) {
+		matrixDimension.m_column++;
+		assert(horizontalHeaderPtr == nullptr);
+	}
+
+	ot::GenericDataStructMatrix matrix(matrixDimension);
+	ot::MatrixEntryPointer matrixEntry;
+	uint32_t startRow(0), startColumn(0);
+	if (horizontalHeaderPtr != nullptr) {
+		startRow = 1;
+		matrixEntry.m_row = 0;
+		for (matrixEntry.m_column = 0; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++) {
+			const TableHeaderItemCfg* headerCfg = this->getColumnHeader(matrixEntry.m_column);
+			if (headerCfg) {
+				const ot::Variable cellValue(headerCfg->getText());
+				matrix.setValue(matrixEntry, cellValue);
+			}
+			else {
+				matrix.setValue(matrixEntry, ot::Variable());
+			}
+			
+		}
+	}
+	if (verticalHeaderPtr != nullptr) {
+		startColumn = 1;
+		matrixEntry.m_column = 0;
+		for (matrixEntry.m_row = 0; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++) {
+			const TableHeaderItemCfg* headerCfg = this->getRowHeader(matrixEntry.m_row);
+			if (headerCfg) {
+				const ot::Variable cellValue(headerCfg->getText());
+				matrix.setValue(matrixEntry, cellValue);
+			}
+			else {
+				matrix.setValue(matrixEntry, ot::Variable());
+			}
+		}
+	}
+
+	for (matrixEntry.m_row = startRow; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++) {
+		for (matrixEntry.m_column = startColumn; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++) {
+			const std::string& tableCell = this->getCellText(matrixEntry.m_row - startRow, matrixEntry.m_column - startColumn);
+			matrix.setValue(matrixEntry, ot::Variable(tableCell));
+		}
+	}
+
+	return matrix;
+}
+
 void ot::TableCfg::clear(void) {
 	OT_TEST_TABLECFG_Interval("Clear");
 

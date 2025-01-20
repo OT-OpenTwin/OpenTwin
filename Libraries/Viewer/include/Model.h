@@ -255,6 +255,13 @@ private:
 
 	void saveTable(void);
 	void exportTableAsCSV(void);
+	void addTableRowBefore(void);
+	void addTableRowAfter(void);
+	void removeTableRow(void);
+	void addTableColumnBefore(void);
+	void addTableColumnAfter(void);
+	void removeTableColumn(void);
+
 
 	void	   resetSelection(SceneNodeBase *root);
 	void       setAllShapesOpaque(SceneNodeBase *root);
@@ -310,7 +317,7 @@ private:
 	osg::ref_ptr<osg::Group>					   osgRootNode;
 	std::list<Viewer *>							   viewerList;
 	SceneNodeBase*     							   sceneNodesRoot;
-	std::map<std::string, SceneNodeBase *>		   nameToSceneNodesMap;
+	std::map<std::string, SceneNodeBase *>		   m_nameToSceneNodesMap;
 	std::map <ot::UID, SceneNodeBase *>			   treeItemToSceneNodesMap;
 	std::map <unsigned long long, SceneNodeBase *> modelItemToSceneNodesMap;
 	std::map <osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;

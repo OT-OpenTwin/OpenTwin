@@ -46,6 +46,8 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		GenericDataStructMatrix createMatrix(void) const;
+
 		//! \brief Clears all the data.
 		//! Resets the row and column count back to 0.
 		void clear(void);

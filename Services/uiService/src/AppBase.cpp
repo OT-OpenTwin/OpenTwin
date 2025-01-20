@@ -2411,6 +2411,9 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
 		}
+		else {
+			m_viewerComponent->viewerTabChanged("", ot::WidgetViewBase::CustomView);
+		}
 
 	}
 }

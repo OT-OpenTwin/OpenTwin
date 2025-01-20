@@ -209,8 +209,10 @@ namespace ot {
 
 	private:
 		enum ManagerState {
-			DefaultState    = 0 << 0, //! \brief Default manager state.
-			InsertViewState = 1 << 0 //! \brief View insert in progress.
+			DefaultState        = 0 << 0, //! \brief Default manager state.
+			InsertViewState     = 1 << 0, //! \brief View insert in progress.
+			CloseViewState      = 1 << 1, //! \brief View Remove in progress.
+			MulticloseViewState = 1 << 2 //! \brief Multiple views are closed at the same time.
 		};
 		typedef Flags<ManagerState> ManagerStateFlags;
 

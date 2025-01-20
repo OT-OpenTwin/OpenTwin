@@ -23,6 +23,8 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Table)
 	public:
+		static QRect getSelectionBoundingRect(const QList<QTableWidgetSelectionRange>& _selections);
+
 		Table(QWidget* _parentWidget = (QWidget*)nullptr);
 		Table(int _rows, int _columns, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~Table();
@@ -41,6 +43,8 @@ namespace ot {
 		void setSelectedCellsBackground(const QColor& _color);
 
 		void prepareForDataChange(void);
+
+		QRect getSelectionBoundingRect(void) const { return Table::getSelectionBoundingRect(this->selectedRanges()); };
 
 	Q_SIGNALS:
 		void saveRequested(void);

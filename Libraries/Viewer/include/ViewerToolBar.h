@@ -24,6 +24,12 @@ public:
 		TextEditorExportButton,
 		TableSaveButton,
 		TableExportCSVButton,
+		TableAddRowBefore,
+		TableAddRowAfter,
+		TableRemoveRow,
+		TableAddColumnBefore,
+		TabbleAddColumnAfter,
+		TableRemoveColumn,
 
 		NoButton
 	};
@@ -77,8 +83,12 @@ private:
 	ot::UID m_textEditorSaveID;
 	ot::UID m_textEditorExportID;
 
-	ot::UID m_tablePageID;
-	ot::UID m_tableDataID;
 	ot::UID m_tableSaveID;
 	//ot::UID m_tableExportCSVID;
+	ot::UID m_tableAddRowBeforeID;
+	ot::UID m_tableAddRowAfterID;
+	ot::UID m_tableRemoveRowID;
+	ot::UID m_tableAddColumnBeforeID;
+	ot::UID m_tableAddColumnAfterID;
+	ot::UID m_tableRemoveColumnID;
 };
