@@ -46,13 +46,18 @@ namespace ot {
 
 		QRect getSelectionBoundingRect(void) const { return Table::getSelectionBoundingRect(this->selectedRanges()); };
 
+		//! @brief Enables multiline handling for cells.
+		//! This must be called before filling the table since it affects the text edit created by the item delegate.
+		void setMultilineCells(bool _multiline = true) { m_multilineCells = _multiline; };
+		bool getMultilineCells(void) const { return m_multilineCells; };
+
 	Q_SIGNALS:
 		void saveRequested(void);
 		void modifiedChanged(bool _isModified);
 
 	public Q_SLOTS:
 		void slotSaveRequested(void);
-
+		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:
@@ -74,6 +79,7 @@ namespace ot {
 		void resizeRowsToContentIfNeeded(void);
 		void setResizeRequired(void);
 
+		bool m_multilineCells;
 		bool m_stopResizing;
 		bool m_resizeRequired;
 		bool m_contentChanged;

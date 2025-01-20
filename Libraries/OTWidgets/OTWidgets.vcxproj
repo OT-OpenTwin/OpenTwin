@@ -89,6 +89,7 @@
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
+    <ClCompile Include="src\TableTextEdit.cpp" />
     <ClCompile Include="src\WidgetManager.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\ImagePainterManager.cpp" />
@@ -210,6 +211,7 @@
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
+    <QtMoc Include="include\OTWidgets\TableTextEdit.h" />
     <ClInclude Include="include\OTWidgets\TabToolBar.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarGroup.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarPage.h" />

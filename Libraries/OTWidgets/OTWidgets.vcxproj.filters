@@ -454,6 +454,9 @@
     <ClCompile Include="src\PropertyGridTree.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="src\TableTextEdit.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1053,6 +1056,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TextEditorView.h">
       <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TableTextEdit.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

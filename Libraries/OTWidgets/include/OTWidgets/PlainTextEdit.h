@@ -33,6 +33,10 @@ namespace ot {
 	public Q_SLOTS:
 		void slotTextChanged(void);
 
+	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+		virtual void keyReleaseEvent(QKeyEvent* _event) override;
+
 	private:
 		bool m_autoScrollToBottom;
 

@@ -1790,6 +1790,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setViewData(_config);
+	newTable->getTable()->setMultilineCells(true);
 	newTable->getTable()->setupFromConfig(_config);
 
 	this->lockManager()->uiViewCreated(_serviceInfo, newTable, ot::LockAll | ot::LockModelWrite);

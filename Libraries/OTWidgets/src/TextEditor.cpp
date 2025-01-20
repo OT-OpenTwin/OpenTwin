@@ -71,8 +71,9 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	f.setFixedPitch(true);
 	f.setFamily("Consolas");
 	setFont(f);
+
 	QFontMetrics fm(f);
-	this->setTabStopDistance(4);
+	this->setTabStopDistance(4 * fm.horizontalAdvance(QChar(' ')));
 
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 

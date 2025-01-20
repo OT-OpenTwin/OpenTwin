@@ -1699,6 +1699,19 @@ QHeaderView::up-arrow {
 
 /* ##################################################################################### */
 
+/* QAbstractView */
+
+QAbstractView:hover {
+    border-color: %color:Border Hover Color%;
+}
+
+QAbstractView:selected {
+    background: %color:Widget Selection Background%;
+    color: %color:Widget Selection Foreground%;
+}
+
+/* ##################################################################################### */
+
 /* QTreeView */
 
 QTreeView:branch:hover {
@@ -1889,6 +1902,14 @@ QTableCornerButton::section {
 
 /* ##################################################################################### */
 
+/* Table Text Edit */
+
+ot--TableTextEdit {
+    text-align: top left;
+}
+
+/* ##################################################################################### */
+
 /* QToolBox */
 
 QToolBox {
@@ -2069,19 +2090,6 @@ QDateTimeEdit QAbstractItemView {
 QColorDialog {
     background-color: %color:Dialog Background%;
     color: %color:Dialog Foreground%;
-}
-
-/* ##################################################################################### */
-
-/* QAbstractView */
-
-QAbstractView:hover {
-    border-color: %color:Border Hover Color%;
-}
-
-QAbstractView:selected {
-    background: %color:Widget Selection Background%;
-    color: %color:Widget Selection Foreground%;
 }
 
 /* ##################################################################################### */

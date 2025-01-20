@@ -281,6 +281,11 @@ void ot::Table::hideEvent(QHideEvent* _event) {
 // Private slots
 
 void ot::Table::slotCellDataChanged(int _row, int _column) {
+	if (_row >= 0 && _row < this->rowCount()) {
+		SignalBlockWrapper sigBlock(this);
+		this->resizeRowToContents(_row);
+	}
+
 	if (m_contentChanged) {
 		return;
 	}
@@ -299,10 +304,12 @@ void ot::Table::slotRestoreColumnSize(int _column) {
 		}
 	}
 	else { // Resize column and queue next
+		SignalBlockWrapper sigBlock(this);
+
 		OTAssert(m_columnWidthBuffer.size() == this->columnCount(), "Invalid data");
 		this->setColumnWidth(_column, m_columnWidthBuffer[_column]);
+		
 		_column++;
-
 		QTimer::singleShot(0, [=]() { Table::slotRestoreColumnSize(_column); });
 	}
 }
@@ -315,8 +322,9 @@ void ot::Table::slotResizeColumnToContent(int _column) {
 		this->resizeRowsToContentIfNeeded();
 	}
 	else { // Resize column and queue next
-		this->resizeColumnToContents(_column++);
+		SignalBlockWrapper sigBlock(this);
 
+		this->resizeColumnToContents(_column++);
 		QTimer::singleShot(0, [=]() { Table::slotResizeColumnToContent(_column); });
 	}
 }
@@ -326,6 +334,8 @@ void ot::Table::slotRestoreRowSize(int _row) {
 		return;
 	}
 	else { // Resize column and queue next
+		SignalBlockWrapper sigBlock(this);
+
 		OTAssert(m_rowHeightBuffer.size() == this->rowCount(), "Invalid data");
 		this->setRowHeight(_row, m_rowHeightBuffer[_row]);
 		_row++;
@@ -339,8 +349,9 @@ void ot::Table::slotResizeRowToContent(int _row) {
 		return;
 	}
 	else { // Resize column and queue next
-		this->resizeRowToContents(_row++);
+		SignalBlockWrapper sigBlock(this);
 
+		this->resizeRowToContents(_row++);
 		QTimer::singleShot(0, [=]() { Table::slotResizeRowToContent(_row); });
 	}
 }
@@ -354,7 +365,7 @@ void ot::Table::ini(void) {
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
-
+	
 	this->connect(this, &Table::cellChanged, this, &Table::slotCellDataChanged);
 	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
 }

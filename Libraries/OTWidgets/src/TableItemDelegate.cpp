@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/Table.h"
+#include "OTWidgets/TableTextEdit.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/TableItemDelegate.h"
 
@@ -71,4 +72,25 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
         
     // Restore the painter state
     _painter->restore();
+}
+
+QWidget* ot::TableItemDelegate::createEditor(QWidget* _parent, const QStyleOptionViewItem& _option, const QModelIndex& _index) const {
+    TableTextEdit* newEditor = new TableTextEdit(_parent, m_table, _index);
+    newEditor->setContentsMargins(QMargins(2, 2, 2, 2));
+    return newEditor;
+}
+
+void ot::TableItemDelegate::setEditorData(QWidget* _editor, const QModelIndex& _index) const {
+    TableTextEdit* textEdit = qobject_cast<TableTextEdit*>(_editor);
+    if (textEdit) {
+        textEdit->setPlainText(_index.data(Qt::EditRole).toString());
+        m_table->resizeColumnToContents(_index.column());
+        if (m_table->getMultilineCells()) {
+            m_table->resizeRowToContents(_index.row());
+        }
+    }
+}
+
+void ot::TableItemDelegate::updateEditorGeometry(QWidget* _editor, const QStyleOptionViewItem& _option, const QModelIndex& _index) const {
+    _editor->setGeometry(_option.rect);
 }

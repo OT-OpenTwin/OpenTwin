@@ -25,6 +25,12 @@ namespace ot {
 
 		virtual void paint(QPainter* _painter, const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;
 
+		virtual QWidget* createEditor(QWidget* _parent, const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;
+
+		virtual void setEditorData(QWidget* _editor, const QModelIndex& _index) const override;
+
+		virtual void updateEditorGeometry(QWidget* _editor, const QStyleOptionViewItem& option, const QModelIndex& _index) const override;
+
 	private:
 		Table* m_table;
 
