@@ -31,7 +31,22 @@ int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 
 int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata) {
 	
+	if (immediate || (exitstatus >= 1 && !quitexit)) {
+		SimulationResults::getInstance()->triggerCallback("Error", "NGSpice fatal error, check Circuit and try again");
+		
+	}
+	else if (quitexit && immediate) {
+		SimulationResults::getInstance()->triggerCallback("Error", "NGSpice fata error, check Circuit and try again");
+	}
+	else if (exitstatus == 1 && !immediate && quitexit) {
+		SimulationResults::getInstance()->triggerCallback("Message", "Simulation ended normally without error");
+	}
+	else {
+		SimulationResults::getInstance()->triggerCallback("Error", "Unexpected exit condition, restarting ngspice");
+	}
 
+	OT_LOG_E(std::to_string(immediate));
+	OT_LOG_E(std::to_string(quitexit));
 	OT_LOG_E(std::to_string(exitstatus));
 
 	SimulationResults::getInstance()->getResultMap().clear();

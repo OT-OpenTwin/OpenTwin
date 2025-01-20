@@ -266,7 +266,11 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             // ot::StyledTextBuilder textBuilder;
 
             if (data.isString()){
+
                 SimulationResults::getInstance()->displayError(data.toString().toStdString());
+
+                // If we get an error we need to shut down the subservice
+                send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
             }
             else {
                 OT_LOG_E("JSON array entry is not a string");

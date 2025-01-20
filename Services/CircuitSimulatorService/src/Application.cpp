@@ -366,6 +366,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	sendNetlistToSubService(_netlist);
 
 	m_ngSpice.clearBufferStructure(name);
+
 	//And start the subprocess
 	const int sessionCount = Application::instance()->getSessionCount();
 	const int serviceID = Application::instance()->getServiceIDAsInt();
