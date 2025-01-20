@@ -32,8 +32,6 @@ ManageGroupsTable::ManageGroupsTable(int _rows, int _columns)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
-	setSelectionBehavior(QAbstractItemView::SelectRows);
-	setSelectionMode(QAbstractItemView::SingleSelection);
 
 	setMouseTracking(true);
 	connect(this, &ot::Table::itemSelectionChanged, this, &ManageGroupsTable::slotSelectionChanged);
@@ -368,6 +366,8 @@ ManageGroups::ManageGroups(const std::string &authServerURL)
 	m_btnOwner->setToolTip("Change owner of selected group");
 
 	m_groupsList = new ManageGroupsTable(0, 2);
+	m_groupsList->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_groupsList->setSelectionMode(QAbstractItemView::SingleSelection);
 
 	m_filterGroups = new ot::LineEdit;
 
@@ -379,6 +379,7 @@ ManageGroups::ManageGroups(const std::string &authServerURL)
 	m_filterMembers = new ot::LineEdit;
 
 	m_membersList = new ManageGroupsTable(0, 2);
+	m_membersList->setSelectionMode(QAbstractItemView::NoSelection);
 
 	// Setup controls
 	QFont font = labelGroups->font();

@@ -28,6 +28,7 @@ namespace ot {
 	public Q_SLOTS:
 		void setInputErrorStateProperty(void);
 		void unsetInputErrorStateProperty(void);
+		void setInputFocus(void);
 
 	Q_SIGNALS:
 		void leftMouseButtonPressed(void);

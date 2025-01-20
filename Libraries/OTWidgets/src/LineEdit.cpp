@@ -34,6 +34,10 @@ void ot::LineEdit::unsetInputErrorStateProperty(void) {
 	this->style()->polish(this);
 }
 
+void ot::LineEdit::setInputFocus(void) {
+	this->setFocus();
+}
+
 void ot::LineEdit::mousePressEvent(QMouseEvent* _event) {
 	QLineEdit::mousePressEvent(_event);
 	if (_event->button() == Qt::LeftButton) {
