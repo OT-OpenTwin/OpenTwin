@@ -5,6 +5,10 @@
 #include "MongoVersion.h"
 #include "Logger.h"
 #include "Varifier.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCore/TextEncoding.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
+
 
 #include <iostream>
 #include <string>
@@ -13,6 +17,8 @@
 #include <conio.h>
 #include <any>
 #include <boost/program_options.hpp>
+
+
 //!brief:
 //! Check if a mongodb service exists
 //! if yes, get the configuration
@@ -283,8 +289,16 @@ int main(int argc, char* argv[])
             }
             else
             {
-                const auto& value = variableMap["AdminPsw"].value();
-                const std::string adminPSw = boost::any_cast<std::string>(value);
+                auto& value = variableMap["AdminPsw"].value();
+                std::string adminPSw = boost::any_cast<std::string>(value);
+                ot::EncodingGuesser guesser;
+                ot::TextEncoding::EncodingStandard standard = guesser(adminPSw.c_str(), adminPSw.size());
+                if (standard == ot::TextEncoding::EncodingStandard::ANSI)
+                {
+                    Logger::INSTANCE().write("Admin password is given in ISO88591 encoding. Convert.");
+                    ot::EncodingConverter_ISO88591ToUTF8 converter;
+                    adminPSw = converter(adminPSw);
+                }
                 performUpgrade(adminPSw);
                 close(ERROR_SUCCESS);
             }

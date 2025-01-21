@@ -106,14 +106,14 @@
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(BOOST_INCD);$(MONGO_CXX_INC);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(BOOST_INCD);$(MONGO_CXX_INC);$(R_JSON_INCD);$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc143-mt-gd-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD);$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>boost_filesystem-vc143-mt-gd-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);OTSystem.lib;OTCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,7 +124,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;NDEBUG;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(BOOST_INCR);$(MONGO_CXX_INC);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(BOOST_INCR);$(MONGO_CXX_INC);$(R_JSON_INCR);$(OT_SYSTEM_ROOT)\include;$(OT_CORE_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
@@ -136,8 +136,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc143-mt-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR);$(OT_SYSTEM_ROOT)\$(OT_DLLR);$(OT_CORE_ROOT)\$(OT_DLLR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>boost_filesystem-vc143-mt-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);OTSystem.lib;OTCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -62,6 +62,11 @@ Section "Upgrade data collection" Sec_Upgr
 		;MessageBox MB_OK "Execute Upgrade: ${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
 		DetailPrint "Upgrading MongoDB data feature compatibility version ..."
 		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --Upgrade --AdminPsw "$UPGRADER_MONGODB_ADMIN_PASSWORD" --ServiceName "$UPGRADER_MONGODB_SERVICE_NAME" --LogPath "${LOG_PATH}"'
+		Pop $0
+		${If} $0 == 1 
+			MessageBox MB_OK "Execution of MongoDB Upgrader failed. See log file for details."
+			Quit
+		${EndIf}
 SectionEnd
 
 Section "Install MongoDB version 7.0" Sec_Inst

@@ -4,14 +4,18 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <rapidjson/document.h>
+#include "OTSystem/UrlEncoding.h"
+
 
 MongoDBShellExecutor::MongoDBShellExecutor(const MongoDBSettings& _settings)
 {
-    const std::string connectionString = "mongodb://admin:" + _settings.m_adminPsw + "@" + _settings.m_bindIP + ":" + _settings.m_port + "/?tls=true&tlsCertificateKeyFile=" + _settings.m_certKeyFile;
+    Logger::INSTANCE().write("Starting shell executor.");
+    Logger::INSTANCE().write("Admin psw: " + _settings.m_adminPsw);
+    const std::string connectionString = "mongodb://"+ot::url::urlEncode("admin") + ":" + ot::url::urlEncode(_settings.m_adminPsw) + "@" + _settings.m_bindIP + ":" + _settings.m_port + "/?tls=true&tlsCertificateKeyFile=" + _settings.m_certKeyFile;
+    Logger::INSTANCE().write("Connecting shell with MongoDB: " + connectionString);
 
     //const std::string temp = "mongodb://admin:admin@127.0.0.1:27017/?tls=true&tlsCertificateKeyFile=C:\\Users\\JWagner\\OpenTwin_Cert\\certificateKeyFile.pem";
     mongocxx::uri uri(connectionString);
-    Logger::INSTANCE().write("Connecting shell with MongoDB: " + connectionString);
     try
     {
         m_client = mongocxx::client(uri);

@@ -49,7 +49,7 @@ BrandingText "OpenTwin Simulation Platform"
 ################################ Functions ###############################
 
 Function BeforeUpgrade
-	!insertmacro MUI_HEADER_TEXT "Information about running MongoDB installation" "Software for upgrading MongoDB. Please verify the following information:" 
+	!insertmacro MUI_HEADER_TEXT "Information about running MongoDB installation" "Software for upgrading MongoDB. Logfile located at: ${LOG_PATH} Please verify the following information:" 
 	;MessageBox MB_OK "Entry"
 	nsDialogs::Create 1018
 	Pop $Dialog
@@ -79,6 +79,12 @@ Function BeforeUpgrade
   
 FunctionEnd
 
+
+Function BeforeUpgrade_OnLeave
+	${NSD_GetText} $AdminPswHandle $UPGRADER_MONGODB_ADMIN_PASSWORD
+	${NSD_GetText} $ServiceNameHandle $UPGRADER_MONGODB_SERVICE_NAME
+	${NSD_GetText} $InstallPathHandle $UPGRADER_MONGODB_INSTALL_PATH
+FunctionEnd
 
 Function Upgrader_Failed
 	MessageBox MB_OK "Failed to determine the current MongoDB version: $1"
@@ -117,7 +123,7 @@ FunctionEnd
 !define MUI_ICON ${MUI_ICON_PATH}
 
 
-Page custom BeforeUpgrade
+Page custom BeforeUpgrade BeforeUpgrade_OnLeave
 
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Upgrader_On_Init
 !define MUI_COMPONENTSPAGE_TEXT_TOP $MONGODB_SETUP_MSG

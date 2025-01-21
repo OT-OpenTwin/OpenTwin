@@ -18,7 +18,13 @@ FileWriter::FileWriter(const std::string& _filePath, bool _append)
 
 void FileWriter::write(const std::string& _content)
 {
-    m_fStream.write(_content.c_str(), _content.size());
+
+    std::string line = _content;
+    if (line.back() != '\n')
+    {
+        line += "\n";
+    }
+    m_fStream.write(line.c_str(), line.size());
 }
 
 void FileWriter::close()
