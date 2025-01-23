@@ -143,7 +143,7 @@ public:
 
 	bool sendHttpRequest(RequestType operation, const std::string& url, ot::JsonDocument& doc, std::string& response);
 	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response);
-	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument& doc, std::string& response);
+	bool sendHttpRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response);
 	bool sendHttpRequest(RequestType operation, const std::string& url, const std::string& message, std::string& response);
 	bool sendRelayedRequest(RequestType operation, const std::string& url, const std::string& json, std::string& response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler* _sender);

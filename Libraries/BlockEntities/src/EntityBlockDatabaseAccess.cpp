@@ -303,6 +303,14 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	return graphicsItemConfig;
 }
 
+EntityBase* EntityBlockDatabaseAccess::clone()
+{
+	auto clonedEntity = std::make_unique<EntityBlockDatabaseAccess>(*this);
+	clonedEntity->setObserver(nullptr);
+	clonedEntity->setParent(nullptr);
+	return clonedEntity.release();
+}
+
 bool EntityBlockDatabaseAccess::updateFromProperties()
 {
 	auto baseProperty = getProperties().getProperty(m_propertyNameDimension);

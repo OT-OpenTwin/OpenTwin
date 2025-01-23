@@ -11,6 +11,7 @@
 #include "SelectionHandler.h"
 #include "FileHandler.h"
 #include "ViewVisualisationHandler.h"
+#include "BlockHandler.h"
 
 // std header
 #include <list>
@@ -74,6 +75,7 @@ public:
 		OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleVisualisationDataRequest, Application, OT_ACTION_CMD_MODEL_RequestVisualisationData, ot::SECURE_MESSAGE_TYPES);
 		OT_HANDLER(handleShowTable, Application, OT_ACTION_CMD_UI_TABLE_Setup, ot::SECURE_MESSAGE_TYPES);
+		
 	// Versions
 
 	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
@@ -195,6 +197,7 @@ private:
 	ActionAndFunctionHandler m_baseHandler;
 	FileHandler m_fileHandler;
 	ViewVisualisationHandler m_visualisationHandler;
+	BlockHandler m_blockHandler;
 	Application();
 	~Application();
 };

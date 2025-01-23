@@ -22,6 +22,9 @@
     <Filter Include="Header Files\RAIIWrapper">
       <UniqueIdentifier>{df148f67-57dc-4718-a51f-1f5da447fc32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Handler">
+      <UniqueIdentifier>{20c80464-607f-4443-bf6f-e1fbefcb6d3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -75,23 +78,26 @@
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SelectionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UIControlsHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FileHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ViewVisualisationHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ActionAndFunctionHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SelectionHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ViewVisualisationHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +165,9 @@
       <Filter>Header Files\RAIIWrapper</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewVisualisationHandler.h">
+      <Filter>Header Files\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
   </ItemGroup>

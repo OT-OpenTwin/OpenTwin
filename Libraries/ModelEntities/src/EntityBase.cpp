@@ -103,29 +103,7 @@ void EntityBase::StoreToDataBase(ot::UID givenEntityVersion) {
 	entityIsStored();
 
 	// This item collects all information about the entity and adds it to the storage data 
-	auto doc = bsoncxx::builder::basic::document{};
-
-	doc.append(bsoncxx::builder::basic::kvp("SchemaType", getClassName()));
-
-	assert(!m_owningService.empty());
-
-	bsoncxx::document::value bsonObj = bsoncxx::from_json(m_properties.createJSON(nullptr, false));
-
-	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
-		bsoncxx::builder::basic::kvp("EntityID", (long long)m_entityID),
-		bsoncxx::builder::basic::kvp("Version", (long long)m_entityStorageVersion),
-		bsoncxx::builder::basic::kvp("Name", m_name),
-		bsoncxx::builder::basic::kvp("isDeletable", m_isDeletable),
-		bsoncxx::builder::basic::kvp("initiallyHidden", m_initiallyHidden),
-		bsoncxx::builder::basic::kvp("isEditable", m_isEditable),
-		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
-		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
-		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
-		bsoncxx::builder::basic::kvp("Owner", m_owningService),
-		bsoncxx::builder::basic::kvp("Properties", bsonObj)
-	);
-
-	AddStorageData(doc);
+	auto doc = serialiseAsMongoDocument();
 
 	DataBase::GetDataBase()->StoreDataItem(doc);
 
@@ -140,6 +118,13 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	readSpecificDataFromDataBase(doc_view, entityMap);
 
 	entityMap[getEntityID()] = this;
+}
+
+std::string EntityBase::serialiseAsJSON()
+{
+	auto doc =	serialiseAsMongoDocument();
+	const std::string jsonDoc = bsoncxx::to_json(doc);
+	return jsonDoc;
 }
 
 void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
@@ -287,6 +272,35 @@ void EntityBase::entityIsStored(void) {
 	}
 }
 
+bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
+{
+	auto doc = bsoncxx::builder::basic::document{};
+
+	doc.append(bsoncxx::builder::basic::kvp("SchemaType", getClassName()));
+
+	assert(!m_owningService.empty());
+
+	bsoncxx::document::value bsonObj = bsoncxx::from_json(m_properties.createJSON(nullptr, false));
+
+	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
+		bsoncxx::builder::basic::kvp("EntityID", (long long)m_entityID),
+		bsoncxx::builder::basic::kvp("Version", (long long)m_entityStorageVersion),
+		bsoncxx::builder::basic::kvp("Name", m_name),
+		bsoncxx::builder::basic::kvp("isDeletable", m_isDeletable),
+		bsoncxx::builder::basic::kvp("initiallyHidden", m_initiallyHidden),
+		bsoncxx::builder::basic::kvp("isEditable", m_isEditable),
+		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
+		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
+		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
+		bsoncxx::builder::basic::kvp("Owner", m_owningService),
+		bsoncxx::builder::basic::kvp("Properties", bsonObj)
+	);
+
+	AddStorageData(doc);
+
+	return doc;
+}
+
 void EntityBase::detachFromHierarchy(void) {
 	// Here we detach the entity from the hierarcy which means detaching from the parent.
 	if (getParent() != nullptr) {
@@ -294,3 +308,5 @@ void EntityBase::detachFromHierarchy(void) {
 		setParent(nullptr);
 	}
 }
+
+

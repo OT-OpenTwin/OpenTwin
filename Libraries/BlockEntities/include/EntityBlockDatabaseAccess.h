@@ -26,20 +26,6 @@ public:
 	const bool isQueryDimension2D();
 	const bool isQueryDimension3D();
 
-	//const std::string& getPropertyNameMeasurementSeries() { return m_propertyNameSeriesMetadata; }
-	//const std::string& getPropertyValueDimension1() { return m_propertyValueDimension1; }
-	//const std::string& getPropertyValueDimension2() { return m_propertyValueDimension2; }
-	//const std::string& getPropertyValueDimension3() { return m_propertyValueDimension3; }
-
-	//const std::string& getGroupQuerySettings() { return m_groupQuerySettings; }
-	//const std::string& getGroupQuantity() { return m_groupQuantitySetttings; }
-	//const std::string& getGroupParameter1() { return m_groupParamSettings1; }
-	//const std::string& getGroupParameter2() { return m_groupParamSettings2; }
-	//const std::string& getGroupParameter3() { return m_groupParamSettings3; }
-
-	/*const std::string& getPropertyName() { return m_propertyName; }
-	const std::string& getPropertyDataType() { return m_propertyDataType; }*/
-
 	EntityPropertiesSelection* getSeriesSelection();
 	EntityPropertiesSelection* getQuantityValueDescriptionSelection();
 	
@@ -58,6 +44,8 @@ public:
 	const ot::Connector getConnectorParameter1() const { return m_connectorParameter1; }
 	const ot::Connector getConnectorParameter2() const { return m_connectorParameter2; }
 	const ot::Connector getConnectorParameter3() const { return m_connectorParameter3; }
+
+	virtual EntityBase* clone() override;
 
 	virtual bool updateFromProperties() override;
 

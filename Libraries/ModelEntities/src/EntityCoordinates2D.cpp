@@ -11,6 +11,14 @@ bool EntityCoordinates2D::getEntityBox(double& xmin, double& xmax, double& ymin,
 	return false;
 }
 
+EntityBase* EntityCoordinates2D::clone()
+{
+	auto clonedEntity = std::make_unique<EntityCoordinates2D>(*this);
+	clonedEntity->setObserver(nullptr);
+	clonedEntity->setParent(nullptr);
+	return clonedEntity.release();
+}
+
 void EntityCoordinates2D::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);

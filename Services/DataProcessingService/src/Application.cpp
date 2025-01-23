@@ -166,27 +166,6 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
 
 		}
-		else if (_action == OT_ACTION_CMD_CopyItems) {
-			ot::CopyInformation* info = ot::CopyInformationFactory::create(ot::json::getObject(_doc, OT_ACTION_PARAM_Package));
-			if (info) {
-				if (info->getCopyType() == ot::GraphicsCopyInformation::getGraphicsCopyInformationType()) {
-					const ot::GraphicsCopyInformation* actualInfo = dynamic_cast<const ot::GraphicsCopyInformation*>(info);
-					if (!actualInfo) {
-						OT_LOG_E("Copy information cast failed");
-						ot::ReturnMessage result(ot::ReturnMessage::Failed, "Copy information cast failed");
-						return result.toJson();
-					}
-
-					/*std::string dbg("Copy requested. Target view: \"" + actualInfo->getViewName() + "\".");
-					for (const ot::GraphicsCopyInformation::ItemInformation& item : actualInfo->getItemInformation()) {
-						dbg.append("\n - Item { \"UID\": " + std::to_string(item.uid) + ", \"NewPos.X\": " + std::to_string(item.pos.x()) + ", \"NewPos.Y\": " + std::to_string(item.pos.y()) + " }");
-					}
-					OT_LOG_W(dbg);*/
-				}
-			}
-			
-			
-		}
 	}
 	catch (const std::exception& e)
 	{

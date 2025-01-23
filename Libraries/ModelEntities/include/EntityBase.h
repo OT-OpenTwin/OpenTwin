@@ -34,6 +34,9 @@ class  __declspec(dllexport) EntityBase
 {
 public:
 	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	EntityBase(const EntityBase& _other) = default;
+	EntityBase(EntityBase&& _other) = default;
+
 	virtual ~EntityBase();
 
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
@@ -116,6 +119,11 @@ public:
 	void setDeletable(bool deletable) { m_isDeletable = deletable; };
 	const bool deletable() const { return m_isDeletable; }
 
+	//! @brief Creates a copy of the entity. The override from instantiable classes need to set the observer=nullptr and the parent=nullptr.
+	//! @return 
+	virtual EntityBase* clone() { return nullptr; }
+
+	std::string serialiseAsJSON();
 protected:
 	virtual int getSchemaVersion(void) { return 1; };
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) {};
@@ -126,7 +134,7 @@ protected:
 	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory = nullptr);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
 	void entityIsStored(void);
-
+	
 private:
 	// Persistent attributes
 	std::string		     m_name;
@@ -147,5 +155,7 @@ private:
 	bool			     m_isModified;
 	ModelState*          m_modelState;
 	ClassFactoryHandler* m_classFactory;
+	
+	bsoncxx::builder::basic::document serialiseAsMongoDocument();
 };
 

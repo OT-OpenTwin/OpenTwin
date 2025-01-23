@@ -2197,13 +2197,11 @@ void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
 	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CopyItems, doc.GetAllocator()), doc.GetAllocator());
-	ot::JsonObject pckg;
-	_info->addToJsonObject(pckg, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Package, pckg, doc.GetAllocator());
-
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
+	
 	std::string response;
-	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 		OT_LOG_EA("Failed to send http request");
 		return;
 	}

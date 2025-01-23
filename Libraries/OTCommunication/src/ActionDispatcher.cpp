@@ -34,7 +34,7 @@ void ot::ActionDispatcher::add(ActionHandleConnectorBase* _item, bool _overwrite
 			m_data.insert_or_assign(action, _item);
 		}
 		else {
-			OT_LOG_WAS("Handler for \"" + action + "\" already exist. Ignoring");
+			//OT_LOG_WAS("Handler for \"" + action + "\" already exist. Ignoring");
 		}
 	}
 

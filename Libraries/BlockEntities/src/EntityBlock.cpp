@@ -71,6 +71,7 @@ std::string EntityBlock::CreateBlockHeadline()
 	else return nameWithoutRootDirectory;
 }
 
+
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);

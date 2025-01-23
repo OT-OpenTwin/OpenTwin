@@ -799,10 +799,10 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::Owner
 	return sendHttpRequest(operation, it->second->getServiceURL(), doc, response);
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument& doc, std::string& response) {
-	auto s = this->getService(_service);
-	if (s) {
-		return this->sendHttpRequest(operation, s->getServiceURL(), doc, response);
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response) {
+	auto service = this->getService(_serviceInformation);
+	if (service) {
+		return this->sendHttpRequest(operation, service->getServiceURL(), _doc, _response);
 	}
 	else {
 		return false;

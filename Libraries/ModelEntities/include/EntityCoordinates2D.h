@@ -11,6 +11,9 @@ public:
 	void setCoordinates(const ot::Point2DD& position) { _location = position; setModified(); }
 	ot::Point2DD getCoordinates() { return _location; }
 	virtual std::string getClassName(void) { return "EntityCoordinates2D"; };
+
+	virtual EntityBase* clone() override;
+
 private:
 	ot::Point2DD _location;
 

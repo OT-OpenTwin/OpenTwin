@@ -16,6 +16,10 @@ class __declspec(dllexport) EntityBlock : public EntityBase
 {
 public:
 	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlock(const EntityBlock& _other) = default;
+	EntityBlock(EntityBlock&& _other) = default;
+	EntityBlock& operator=(const EntityBlock& _other) = default;
+	EntityBlock& operator=(EntityBlock&& _other) = default;
 	virtual ~EntityBlock();
 
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
@@ -54,7 +58,6 @@ protected:
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
 	std::list<ot::UID> _connectionIDs;
-
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
