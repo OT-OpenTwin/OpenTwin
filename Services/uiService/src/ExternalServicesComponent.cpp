@@ -2425,8 +2425,10 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 					std::string fileContent;
 					unsigned long long uncompressedDataLength{ 0 };
 
+					std::string localEncodingFileName = fileName.toLocal8Bit().constData();
+
 					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-					ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
+					ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
 					// We need to send the file content
