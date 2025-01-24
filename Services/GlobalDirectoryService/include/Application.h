@@ -15,7 +15,6 @@
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/IDManager.h"
 #include "OTSystem/SystemInformation.h"
 
@@ -34,7 +33,8 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ServiceBase, public ot::ActionHandler {
+class Application : public ot::ServiceBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

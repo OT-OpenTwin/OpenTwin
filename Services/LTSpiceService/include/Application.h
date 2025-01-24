@@ -47,6 +47,7 @@ struct LTSpiceData {
 };
 
 class Application : public ot::ApplicationBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	Application();
 	virtual ~Application();

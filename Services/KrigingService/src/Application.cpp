@@ -60,7 +60,7 @@ void Application::run(void)
 	//krig.initializePython();
 }
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
+std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{

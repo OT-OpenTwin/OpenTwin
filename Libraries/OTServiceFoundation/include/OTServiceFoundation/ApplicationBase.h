@@ -14,7 +14,6 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "EntityInformation.h"
 
@@ -41,9 +40,9 @@ namespace ot {
 	class AbstractSettingsItem;
 	class AbstractModelNotifier;
 
-	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase, public ActionHandler
-	{
+	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase {
 		OT_DECL_NOCOPY(ApplicationBase)
+		OT_DECL_ACTION_HANDLER(ApplicationBase)
 	public:
 		ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier = nullptr, AbstractModelNotifier * _modelNotifier = nullptr);
 		virtual ~ApplicationBase();

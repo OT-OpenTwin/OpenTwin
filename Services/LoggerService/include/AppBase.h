@@ -11,15 +11,16 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/ActionHandler.h"
 
 // std header
 #include <mutex>
 #include <string>
 #include <list>
 
-class AppBase : public ot::ServiceBase, public ot::ActionHandler, public ot::AbstractLogNotifier {
+class AppBase : public ot::ServiceBase, public ot::AbstractLogNotifier {
 	OT_DECL_NOCOPY(AppBase)
+	OT_DECL_ACTION_HANDLER(AppBase)
 public:
 	static AppBase& instance(void);
 

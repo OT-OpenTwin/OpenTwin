@@ -441,7 +441,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 }
 
 
-std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {	
+std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 	ot::UIDList items;
 
 	// Add Item UIDs to the list above (Items to be removed)

@@ -46,7 +46,6 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
 
 class AppBase;
 class LockManager;
@@ -59,8 +58,9 @@ namespace ot { class TableView; };
 namespace ot { class WidgetView; };
 namespace ot { class ServiceBase; };
 
-class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
+class ExternalServicesComponent : public QObject, public ak::aNotifier {
 	Q_OBJECT
+	OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
 public:
 	enum RequestType { EXECUTE, QUEUE };
 

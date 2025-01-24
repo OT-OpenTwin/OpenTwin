@@ -2,12 +2,12 @@
 
 #include "ActionAndFunctionHandler.h"
 #include "OTGui/GraphicsCopyInformation.h"
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
-class BlockHandler : public BusinessLogicHandler, public ot::ActionHandler
-{
+class BlockHandler : public BusinessLogicHandler {
+	OT_DECL_ACTION_HANDLER(BlockHandler)
 public:
 	std::string selectedEntitiesSerialiseAction(ot::JsonDocument& _document);
 	std::string pasteEntitiesAction(ot::JsonDocument& _document);

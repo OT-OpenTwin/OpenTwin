@@ -74,7 +74,7 @@ void Application::run(void)
 	}
 }
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
+std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	return OT_ACTION_RETURN_UnknownAction;
 }

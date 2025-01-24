@@ -608,5 +608,3 @@ void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCP
 
 	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCPULoad, processMemoryLoad);
 }
-
-

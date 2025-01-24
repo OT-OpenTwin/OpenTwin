@@ -31,6 +31,7 @@ namespace ot {
 }
 
 class Application : public ot::ApplicationBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

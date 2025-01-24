@@ -21,11 +21,12 @@ namespace ot {
 	class ApplicationBase;
 
 	namespace intern {
-
+		
 		//! This is the main class interacting with external services.
 		//! Use the static instance() function to get the global component that should be used in this service
-		class ExternalServicesComponent : public ActionHandler {
+		class ExternalServicesComponent {
 			OT_DECL_NOCOPY(ExternalServicesComponent)
+			OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
 		public:
 			enum ComponentState {
 				WaitForStartup,

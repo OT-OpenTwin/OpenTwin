@@ -61,7 +61,7 @@ void Application::run(void)
 	// Add code that should be executed when the service is started and may start its work
 }
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
+std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	return OT_ACTION_RETURN_UnknownAction;
 }

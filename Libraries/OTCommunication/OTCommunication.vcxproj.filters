@@ -9,11 +9,14 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\ActionHandling">
+      <UniqueIdentifier>{c4c86399-5bce-48ee-9a02-f01003c7413c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ActionHandling">
+      <UniqueIdentifier>{d3f1e531-3469-4963-a7da-327069e99005}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CommunicationTypes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -26,16 +29,19 @@
     <ClCompile Include="src\ServiceLogNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ActionDispatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ActionHandleConnectorBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ActionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DownloadFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionDispatcher.cpp">
+      <Filter>Source Files\ActionHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionDispatcherBase.cpp">
+      <Filter>Source Files\ActionHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionHandleConnector.cpp">
+      <Filter>Source Files\ActionHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommunicationTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -58,20 +64,32 @@
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionHandleConnectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionHandleConnector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCommunication\DownloadFile.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionDispatcher.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnector.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandler.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.h">
+      <Filter>Header Files\ActionHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.hpp">
+      <Filter>Header Files\ActionHandling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

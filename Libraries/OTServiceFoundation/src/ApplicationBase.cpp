@@ -613,7 +613,7 @@ void ot::ApplicationBase::__shuttingDown(bool _requestedAsCommand) {
 	else shuttingDown();
 }
 
-std::string ot::ApplicationBase::__processMessage(const std::string & _message, JsonDocument & _doc, serviceID_t _senderID) {
+std::string ot::ApplicationBase::__processMessage(const std::string & _message, JsonDocument& _doc, serviceID_t _senderID) {
 #ifdef _DEBUG
 	auto sender{ getConnectedServiceByID(_senderID) };
 	assert(sender != nullptr); // Sender was not registered

@@ -311,13 +311,12 @@ std::string ServiceBase::dispatchAction(const char * _json, ot::MessageType _mes
 	// Ping may be multithreaded, others have to be handled one by one
 	if (action == OT_ACTION_PING) { return OT_ACTION_PING; }
 
-	m_mutex.lock();
-
 	try {
+		std::lock_guard<std::mutex> mtxLock(m_mutex);
+
 		OT_LOG("Dispatchig action: \"" + action + "\"", ot::messageTypeToLogFlag(_messageType));
 		std::string response = dispatchAction(action, actionDoc, _messageType);
 		OT_LOG(".. Completed: Dispatchig action: \"" + action + "\": Returning: \"" + response + "\"", ot::messageTypeToLogFlag(_messageType));
-		m_mutex.unlock();
 		return response;
 	}
 	catch (std::exception _e)
@@ -328,11 +327,9 @@ std::string ServiceBase::dispatchAction(const char * _json, ot::MessageType _mes
 		json.AddMember("error", 1, json.GetAllocator());
 		json.AddMember("description", ot::JsonString(_e.what(), json.GetAllocator()), json.GetAllocator());
 
-		m_mutex.unlock();
 		return json.toJson();
 	}
 	catch (...) {
-		m_mutex.unlock();
 		return OT_ACTION_RETURN_UnknownError;
 	}
 }

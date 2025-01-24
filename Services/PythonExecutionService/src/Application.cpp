@@ -85,7 +85,7 @@ void Application::run(void) {
 }
 
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc) {
+std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc) {
 	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
 }
 

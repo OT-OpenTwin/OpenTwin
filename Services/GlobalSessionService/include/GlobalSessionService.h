@@ -13,7 +13,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
+
 #include "OTServiceFoundation/IDManager.h"
 #include "OTSystem/SystemInformation.h"
 
@@ -25,7 +25,8 @@
 
 class LocalSessionService;
 
-class GlobalSessionService : public ot::ActionHandler, public ot::ServiceBase {
+class GlobalSessionService : public ot::ServiceBase {
+	OT_DECL_ACTION_HANDLER(GlobalSessionService)
 public:
 	static GlobalSessionService * instance(void);
 	static bool hasInstance(void);

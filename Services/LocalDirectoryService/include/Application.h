@@ -12,11 +12,10 @@
 #include "ServiceManager.h"
 
 // Open twin header
+#include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
-#include "OTSystem/SystemInformation.h"
 
 // C++ header
 #include <string>
@@ -33,7 +32,8 @@ namespace ot {
 //! Short form to get the Application instance
 #define LDS_APP Application::instance()
 
-class Application : public ot::ServiceBase, public ot::ActionHandler {
+class Application : public ot::ServiceBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

@@ -21,6 +21,7 @@ class Model;
 class MicroserviceNotifier;
 
 class Application : public ot::ApplicationBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	enum class ActionType {
 		SelectionChanged

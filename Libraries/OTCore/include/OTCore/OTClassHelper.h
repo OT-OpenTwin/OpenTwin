@@ -9,6 +9,9 @@
 // OpenTwin header
 #include <OTSystem/ArchitectureInfo.h>
 
+// std header
+#include <type_traits>
+
 //! \def OT_DECL_NOCOPY
 //! \brief Removes the default copy constructor and assignment operator.
 #define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class& operator = (const ___class&) = delete;
@@ -43,4 +46,5 @@
 
 //! \def OT_UNUSED
 //! \brief Avoid "warning C4101: unreferenced local variable".
+//! Use only when working with preprocessor definitions, unused locals should not occur in the first place :)
 #define OT_UNUSED(___unusedVariable) (void)(___unusedVariable);

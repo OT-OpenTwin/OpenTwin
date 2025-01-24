@@ -18,7 +18,7 @@
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTCommunication/ActionHandleConnector.h"
+
 #include "OTSystem/SystemInformation.h"
 
 // C++ header
@@ -30,7 +30,8 @@ class Session;
 class RelayService;
 class GlobalSessionService;
 
-class SessionService : public ot::ActionHandler {
+class SessionService {
+	OT_DECL_ACTION_HANDLER(SessionService)
 public:
 	SessionService();
 	virtual ~SessionService() {}; // todo: add cleanup

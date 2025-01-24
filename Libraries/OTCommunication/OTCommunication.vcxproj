@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ActionDispatcher.cpp" />
-    <ClCompile Include="src\ActionHandleConnectorBase.cpp" />
-    <ClCompile Include="src\ActionHandler.cpp" />
+    <ClCompile Include="src\ActionDispatcherBase.cpp" />
+    <ClCompile Include="src\ActionHandleConnector.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DownloadFile.cpp" />
@@ -31,8 +31,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
+    <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnector.h" />
-    <ClInclude Include="include\OTCommunication\ActionHandleConnectorBase.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.hpp" />
     <ClInclude Include="include\OTCommunication\ActionHandler.h" />
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />

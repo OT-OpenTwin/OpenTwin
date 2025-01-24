@@ -27,6 +27,7 @@ namespace ot {
 }
 
 class Application : public ot::ApplicationBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	Application();
 	virtual ~Application();
@@ -100,8 +101,8 @@ public:
 	
 	// ##################################################################################################################################
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
 
 	void modelSelectionChangedNotification(void);
 

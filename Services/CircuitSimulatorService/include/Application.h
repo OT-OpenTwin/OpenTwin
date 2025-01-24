@@ -31,15 +31,13 @@ namespace ot {
 
 class QtWrapper;
 
-
 class Application : public ot::ApplicationBase {
+	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
 	
-
 private:
-	
 	Application();
 	virtual ~Application();
 	NGSpice m_ngSpice;
@@ -102,7 +100,7 @@ public:
 	//! @param _sender The service that this message was sent from
 	//! @param _message The message that should be processed
 	//! @param _doc The document containing all the information
-	virtual std::string processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) override;
+	virtual std::string processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;

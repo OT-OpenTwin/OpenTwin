@@ -174,7 +174,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
+std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc)
 {
 	return ""; // Return empty string if the request does not expect a return
 }
