@@ -16,6 +16,11 @@ first time a user launches the application.
 
 !define NAME "OpenTwin_Frontend"
 !define REGPATH_UNINSTSUBKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
+
+!define MUI_WELCOMEFINISHPAGE_BITMAP "..\Installer\Graphics\Wizard\openTwin_headerImage_01.bmp"
+!define MUI_ICON_PATH '"..\Installer\Graphics\Icons\openTwin_icon_48x48.ico"'
+!define MUI_UNICON_PATH '"..\Installer\Graphics\Icons\opentwin_uninstall_icon_48x48.ico"'
+	
 Name "${NAME}"
 OutFile "Install_${NAME}.exe"
 Unicode True
@@ -30,6 +35,9 @@ InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 
 !include LogicLib.nsh
 !include Integration.nsh
+
+!define MUI_ICON ${MUI_ICON_PATH}
+!define MUI_UNICON ${MUI_UNICON_PATH} 
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\..\License.md"
