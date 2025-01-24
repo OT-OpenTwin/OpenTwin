@@ -213,7 +213,7 @@ bool PHREECLauncher::runExecutableAndWaitForCompletion(std::string commandLine)
 
 	bool success = true;
 
-	if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, penv, NULL, &info, &processInfo))
+	if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | ABOVE_NORMAL_PRIORITY_CLASS, penv, NULL, &info, &processInfo))
 	{
 		WaitForSingleObject(processInfo.hProcess, INFINITE);
 		CloseHandle(processInfo.hProcess);

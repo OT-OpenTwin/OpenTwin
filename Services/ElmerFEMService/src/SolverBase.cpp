@@ -119,7 +119,7 @@ bool SolverBase::runExecutableAndWaitForCompletion(std::string commandLine, std:
 
 			ZeroMemory(&processInfo, sizeof(processInfo));
 
-			if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, penv, wd, &info, &processInfo))
+			if (CreateProcess(NULL, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | ABOVE_NORMAL_PRIORITY_CLASS, penv, wd, &info, &processInfo))
 			{
 				CloseHandle(g_hChildStd_OUT_Wr);
 				ReadFromPipe(g_hChildStd_OUT_Rd, uiComponent);
