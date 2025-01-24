@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCommunication/ActionHandleConnectorManager.h"
 
-#define OT_INTERN_DEFAULT_ACTION_HANDLER_NAME ot_intern_actionhandleconnectormanager
+#define OT_DEFAULT_ACTION_HANDLER_NAME ot_intern_actionhandleconnectormanager
 
 namespace ot {
 
