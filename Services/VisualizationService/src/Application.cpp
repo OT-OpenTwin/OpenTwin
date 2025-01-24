@@ -79,6 +79,8 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		bool itemsVisible			      = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
 		updateEntities(entityIDs, entityVersions, itemsVisible);
+
+		ot::ModelServiceAPI::modelChangeOperationCompleted("visualization item created / updated");
 	}
 	else {
 		return OT_ACTION_RETURN_UnknownAction;

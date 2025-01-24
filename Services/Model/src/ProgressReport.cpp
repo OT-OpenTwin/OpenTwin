@@ -10,6 +10,8 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
+std::mutex ProgressReportLockGuard;
+
 void ProgressReport::setProgressInformation(std::string message, bool continuous)
 {
 	ot::JsonDocument doc;
@@ -46,6 +48,8 @@ void ProgressReport::closeProgressInformation(void)
 
 void ProgressReport::setUILock(bool flag, lockType type)
 {
+	std::lock_guard<std::mutex> lock(ProgressReportLockGuard);
+	
 	static int count = 0;
 
 	if (flag)

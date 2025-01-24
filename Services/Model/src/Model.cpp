@@ -4713,7 +4713,7 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 	ProgressReport::setUILock(true, ProgressReport::MODEL_CHANGE);
 
 	assert(visEntity != nullptr);
-
+	
 	std::list<ot::UID> entityIDs;
 	std::list<ot::UID> entityVersions;
 	std::list<ot::UID> brepVersions;
@@ -4736,9 +4736,6 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, true, notify.GetAllocator());
 
 	Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
-
-	// The model service has added new items -> store the model change.
-	modelChangeOperationCompleted("visualization item created / updated");
 
 	ProgressReport::setUILock(false, ProgressReport::MODEL_CHANGE);
 }
