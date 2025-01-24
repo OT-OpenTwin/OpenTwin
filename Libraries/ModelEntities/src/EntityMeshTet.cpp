@@ -71,7 +71,7 @@ void EntityMeshTet::createProperties(const std::string materialsFolder, ot::UID 
 
 	EntityPropertiesSelection::createProperty("Algorithm", "Element order", order, "Low (1)", "Tetrahedral Meshing", getProperties());
 	EntityPropertiesSelection::createProperty("Algorithm", "2D mesh algorithm", algorithms, "Automatic", "Tetrahedral Meshing", getProperties());
-	EntityPropertiesSelection::createProperty("Algorithm", "3D mesh algorithm", mesh3d,		"HXT",		 "Tetrahedral Meshing", getProperties());
+	EntityPropertiesSelection::createProperty("Algorithm", "3D mesh algorithm", mesh3d,		"Delauney",		 "Tetrahedral Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Algorithm", "Optimization", false, "Tetrahedral Meshing", getProperties());
 	EntityPropertiesSelection::createProperty("Algorithm", "Proximity meshing", selfintersections, "None", "Tetrahedral Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Algorithm", "Distance based refinement", true, "Tetrahedral Meshing", getProperties());
