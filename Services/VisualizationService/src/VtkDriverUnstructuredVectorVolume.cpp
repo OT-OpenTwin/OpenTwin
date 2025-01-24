@@ -116,33 +116,33 @@ std::string VtkDriverUnstructuredVectorVolume::buildSceneNode(DataSourceManagerI
 	osg::Node *node = new osg::Switch;
 	
 	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
-	assert(dataSource != nullptr);
 
-	if (dataSource == nullptr) return "";
-
-	vtkNew<vtkCellDataToPointData> cellToPoint;
-
-	dataConnection = nullptr;
-
-	if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
+	if (dataSource != nullptr)
 	{
-		cellToPoint->SetInputData(dataSource->GetVtkGrid());
-		cellToPoint->ProcessAllArraysOn();
-		cellToPoint->Update();
+		vtkNew<vtkCellDataToPointData> cellToPoint;
 
-		dataConnection = cellToPoint->GetOutputPort();
-	}
+		dataConnection = nullptr;
 
-	if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Arrows3D)
-	{
-		Assemble3DNode(node);
-	}
-	else
-	{
-		Assemble2DNode(node);
-	}
+		if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
+		{
+			cellToPoint->SetInputData(dataSource->GetVtkGrid());
+			cellToPoint->ProcessAllArraysOn();
+			cellToPoint->Update();
 
-	CheckForModelUpdates();
+			dataConnection = cellToPoint->GetOutputPort();
+		}
+
+		if (visData->GetSelectedVisType() == PropertiesVisUnstructuredVector::VisualizationType::Arrows3D)
+		{
+			Assemble3DNode(node);
+		}
+		else
+		{
+			Assemble2DNode(node);
+		}
+
+		CheckForModelUpdates();
+	}
 
 	for (auto item : objectsToDelete)
 	{

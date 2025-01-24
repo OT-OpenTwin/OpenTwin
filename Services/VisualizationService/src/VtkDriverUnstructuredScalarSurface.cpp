@@ -108,32 +108,32 @@ std::string VtkDriverUnstructuredScalarSurface::buildSceneNode(DataSourceManager
 	osg::Node* node = new osg::Switch;
 
 	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
-	assert(dataSource != nullptr);
 
-	if (dataSource == nullptr) return "";
-
-	vtkNew<vtkCellDataToPointData> cellToPoint;
-
-	dataConnection = nullptr;
-
-	if (dataSource->GetHasCellScalar())
+	if (dataSource != nullptr)
 	{
-		cellToPoint->SetInputData(dataSource->GetVtkGrid());
-		cellToPoint->ProcessAllArraysOn();
-		cellToPoint->Update();
+		vtkNew<vtkCellDataToPointData> cellToPoint;
 
-		scalarRange = cellToPoint->GetOutput()->GetScalarRange();
+		dataConnection = nullptr;
 
-		dataConnection = cellToPoint->GetOutputPort();
+		if (dataSource->GetHasCellScalar())
+		{
+			cellToPoint->SetInputData(dataSource->GetVtkGrid());
+			cellToPoint->ProcessAllArraysOn();
+			cellToPoint->Update();
+
+			scalarRange = cellToPoint->GetOutput()->GetScalarRange();
+
+			dataConnection = cellToPoint->GetOutputPort();
+		}
+		else
+		{
+			scalarRange = dataSource->GetVtkGrid()->GetScalarRange();
+		}
+
+		AssembleNode(node);
+
+		CheckForModelUpdates();
 	}
-	else
-	{
-		scalarRange = dataSource->GetVtkGrid()->GetScalarRange();
-	}
-
-	AssembleNode(node);
-
-	CheckForModelUpdates();
 
 	for (auto item : objectsToDelete)
 	{

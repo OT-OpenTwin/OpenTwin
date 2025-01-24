@@ -113,40 +113,40 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 	osg::Node* node = new osg::Switch;
 
 	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
-	assert(dataSource != nullptr);
 
-	if (dataSource == nullptr) return "";
-
-	vtkNew<vtkCellDataToPointData> cellToPoint;
-
-	dataConnection = nullptr;
-
-	if (dataSource->GetHasCellScalar())
+	if (dataSource != nullptr)
 	{
-		cellToPoint->SetInputData(dataSource->GetVtkGrid());
-		cellToPoint->ProcessAllArraysOn();
-		cellToPoint->Update();
+		vtkNew<vtkCellDataToPointData> cellToPoint;
 
-		scalarRange = cellToPoint->GetOutput()->GetScalarRange();
+		dataConnection = nullptr;
 
-		dataConnection = cellToPoint->GetOutputPort();
-	}
-	else
-	{
-		scalarRange = dataSource->GetVtkGrid()->GetScalarRange();
-	}
+		if (dataSource->GetHasCellScalar())
+		{
+			cellToPoint->SetInputData(dataSource->GetVtkGrid());
+			cellToPoint->ProcessAllArraysOn();
+			cellToPoint->Update();
 
-	if (   visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface
-		|| visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Points)
-	{
-		Assemble3DNode(node);
-	}
-	else
-	{
-		Assemble2DNode(node);
-	}
+			scalarRange = cellToPoint->GetOutput()->GetScalarRange();
 
-	CheckForModelUpdates();
+			dataConnection = cellToPoint->GetOutputPort();
+		}
+		else
+		{
+			scalarRange = dataSource->GetVtkGrid()->GetScalarRange();
+		}
+
+		if (visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface
+			|| visData->GetSelectedVisType() == PropertiesVisUnstructuredScalar::VisualizationType::Points)
+		{
+			Assemble3DNode(node);
+		}
+		else
+		{
+			Assemble2DNode(node);
+		}
+
+		CheckForModelUpdates();
+	}
 
 	for (auto item : objectsToDelete)
 	{

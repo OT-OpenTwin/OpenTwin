@@ -99,76 +99,15 @@ std::string VtkDriverCartesianVectorfield::buildSceneNode(DataSourceManagerItem 
 	osg::Node *node = new osg::Switch;
 	
 	auto * dataSource = dynamic_cast<DataSourceResult3D*>(dataItem);
-	assert(dataSource != nullptr);
 
+	if (dataSource != nullptr)
+	{
+		auto output = ApplyCutplane(dataSource, node);
 
-	////Settup grid
-	//vtkRectilinearGrid* grid = vtkRectilinearGrid::New();
-	//vtkNew<vtkDoubleArray> xCoo, yCoo, zCoo;
-	//
-	//int numberOfNodesPerDimension = 13;
-	//int numberOfNodesTotal = std::pow(numberOfNodesPerDimension, 3);
+		AssembleNode(output, node);
 
-	//grid->SetDimensions(numberOfNodesPerDimension, numberOfNodesPerDimension, numberOfNodesPerDimension);
-	//int answ = xCoo->Resize(numberOfNodesPerDimension);
-	//answ = yCoo->Resize(numberOfNodesPerDimension);
-	//answ = zCoo->Resize(numberOfNodesPerDimension);
-	//for (double i = 0; i < numberOfNodesPerDimension; i++)
-	//{
-	//	xCoo->InsertNextValue(i);
-	//	yCoo->InsertNextValue(i);
-	//	zCoo->InsertNextValue(i);
-	//}
-	//grid->SetXCoordinates(xCoo);
-	//grid->SetYCoordinates(yCoo);
-	//grid->SetZCoordinates(zCoo);
-
-	//vtkNew<vtkDoubleArray> vectorData;
-	//vectorData->SetNumberOfComponents(3);
-	//vectorData->SetNumberOfTuples(numberOfNodesTotal);
-
-	//for (int i = 0; i < numberOfNodesTotal; i++)
-	//{
-	//	int value = 13;
-	//	vectorData->SetTuple3(i, value, value, value);
-	//}
-	//grid->GetPointData()->SetVectors(vectorData);
-	//grid->GetPointData()->Update();
-
-	//auto temp = grid->GetPointData()->GetVectors();
-
-	////Cutting data set
-	//vtkNew<vtkPlane> plane;
-	//plane->SetNormal(0, 0, 1);
-	//double minOffset = (grid->GetXCoordinates()->GetTuple1(1) - grid->GetXCoordinates()->GetTuple1(0)) / 1000;
-	////double minDyn = grid->GetXCoordinates()->GetTuple1(0) * minOffset;
-	//double x = grid->GetXCoordinates()->GetTuple1(0) + minOffset;
-	//double y = grid->GetYCoordinates()->GetTuple1(0) + minOffset;
-	//double z = grid->GetZCoordinates()->GetTuple1(0) + minOffset;
-	//
-	//plane->SetOrigin(x,y,z);
-
-	////vtkNew<vtkPlaneCutter> cutter;
-
-	//vtkCutter* cutter = vtkCutter::New();
-	//cutter->SetInputData(grid);
-	//cutter->SetCutFunction(plane);
-	//
-	////cutter->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, vtkDataSetAttributes::VECTORS);
-	//cutter->Update();
-	//auto cutterTemp = cutter->GetOutput();
-
-	//vtkNew<vtkVectorNorm> norm;
-	//norm->SetInputConnection(cutter->GetOutputPort());
-	//norm->NormalizeOff();
-	//norm->Update();
-	//double* range = norm->GetOutput()->GetScalarRange();
-
-	auto output = ApplyCutplane(dataSource, node);
-
-	AssembleNode(output, node);
-
-	//CheckForModelUpdates();
+		//CheckForModelUpdates();
+	}
 
 	// Now we serialize the node information and return it as a string
 	std::stringstream dataOut;

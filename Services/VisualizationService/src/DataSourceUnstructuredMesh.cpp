@@ -106,7 +106,6 @@ bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity, ClassFacto
 	}
 	else
 	{
-		assert(0); // Unknown mesh
 		return false;
 	}
 
