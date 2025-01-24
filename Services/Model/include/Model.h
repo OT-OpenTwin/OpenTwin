@@ -205,7 +205,7 @@ public:
 	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
-
+	ClassFactoryModel& getClassFactory() { return m_classFactory; }
 private:
 	// Methods
 	void clearAll(void);
@@ -331,7 +331,7 @@ private:
 	ModelState *stateManager;
 
 	// Class factory
-	ClassFactoryModel classFactory;
+	ClassFactoryModel m_classFactory;
 
 	// Flag indicating whether the model is currently shutting down (no more modified messages are sent)
 	bool shutdown;

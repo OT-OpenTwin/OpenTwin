@@ -14,6 +14,8 @@ public:
 
 private:
 	void copyItem(const ot::GraphicsCopyInformation* _copyInformation);
+	void updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _newEntities);
+
 	ot::ActionHandleConnector<BlockHandler> m_blockHandler_Serialise = ot::ActionHandleConnector<BlockHandler>(OT_ACTION_CMD_SelectedEntitiesSerialise, ot::SECURE_MESSAGE_TYPES, this, &BlockHandler::selectedEntitiesSerialiseAction);
 	ot::ActionHandleConnector<BlockHandler> m_blockHandler_Copy = ot::ActionHandleConnector<BlockHandler>(OT_ACTION_CMD_PasteEntities, ot::SECURE_MESSAGE_TYPES, this, &BlockHandler::pasteEntitiesAction);
 };

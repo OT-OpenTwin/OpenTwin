@@ -9,6 +9,8 @@
 #include "OTCore/ReturnMessage.h"
 #include "SelectionHandler.h"
 
+#pragma warning(disable:4996)
+
 void BlockHandler::copyItem(const ot::GraphicsCopyInformation* _copyInformation)
 {
 	if(_modelComponent == nullptr)
@@ -90,6 +92,14 @@ void BlockHandler::copyItem(const ot::GraphicsCopyInformation* _copyInformation)
 	model->addEntitiesToModel(entityIDsTopo, entityVersionsTopo, forceVisible, entityIDsData, entityVersionsData, entityIDsTopo, "Copied block entities", true, false);
 }
 
+void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _newEntities)
+{
+	//Rename
+	//Set obs and parent zu nullptr
+	//Set name
+
+}
+
 std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document)
 {
 	SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
@@ -117,5 +127,34 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 
 std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document)
 {
-	return std::string();
+	Model* model = Application::instance()->getModel();
+	ClassFactoryModel& classFactory =	model->getClassFactory();
+	std::map<ot::UID, EntityBase*> entityMap;
+	
+	auto listOfConfigs = _document["ListOfSerialisedEntitiesConfigs"].GetObjectW();
+
+	std::list<std::unique_ptr<EntityBase>> pasteEntities;
+	for (auto& config : listOfConfigs)
+	{
+		std::string serialisedEntityJSON = _document.toJson();
+		std::string_view serialisedEntityJSONView(serialisedEntityJSON);
+		auto serialisedEntityBSON= bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView =serialisedEntityBSON.view();
+		std::string entityType = serialisedEntityBSON["SchemaType"].get_utf8().value.data();
+
+		std::unique_ptr<EntityBase>entity(classFactory.CreateEntity(entityType));
+		entity->restoreFromDataBase(nullptr, model, model->getStateManager(),serialisedEntityBSONView,entityMap);
+
+		auto blockEntity =	dynamic_cast<EntityBlock*>(entity.get());
+		if (blockEntity != nullptr)
+		{
+			auto coordinates =	config.value["Coordinates"].GetObjectW();
+		}
+
+		pasteEntities.push_back(std::move(entity));
+	}
+
+
+
+	return ot::ReturnMessage().toJson();
 }
