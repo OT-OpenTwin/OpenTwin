@@ -7,7 +7,6 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 
 class BlockHandler : public BusinessLogicHandler {
-	OT_DECL_ACTION_HANDLER(BlockHandler)
 public:
 	std::string selectedEntitiesSerialiseAction(ot::JsonDocument& _document);
 	std::string pasteEntitiesAction(ot::JsonDocument& _document);
@@ -16,6 +15,8 @@ private:
 	void copyItem(const ot::GraphicsCopyInformation* _copyInformation);
 	void updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _newEntities);
 
-	ot::ActionHandleConnector<BlockHandler> m_blockHandler_Serialise = ot::ActionHandleConnector<BlockHandler>(OT_ACTION_CMD_SelectedEntitiesSerialise, ot::SECURE_MESSAGE_TYPES, this, &BlockHandler::selectedEntitiesSerialiseAction);
-	ot::ActionHandleConnector<BlockHandler> m_blockHandler_Copy = ot::ActionHandleConnector<BlockHandler>(OT_ACTION_CMD_PasteEntities, ot::SECURE_MESSAGE_TYPES, this, &BlockHandler::pasteEntitiesAction);
+	ot::ActionHandleConnectorManager<BlockHandler> m_connectionManager{ this, &ot::ActionDispatcher::instance() };
+	ot::ActionHandleInlineConnector<BlockHandler> m_blockHandlerSerialise{ this, &BlockHandler::selectedEntitiesSerialiseAction, OT_ACTION_CMD_SelectedEntitiesSerialise, ot::SECURE_MESSAGE_TYPES, m_connectionManager };
+	ot::ActionHandleInlineConnector<BlockHandler> m_blockHandlerCopy{ this, &BlockHandler::pasteEntitiesAction, OT_ACTION_CMD_PasteEntities, ot::SECURE_MESSAGE_TYPES, m_connectionManager };
+
 };

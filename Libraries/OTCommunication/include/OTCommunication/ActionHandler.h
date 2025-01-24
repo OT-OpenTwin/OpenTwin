@@ -1,4 +1,5 @@
 //! @file ActionHandler.h
+//! 
 //! @author Alexander Kuester (alexk95)
 //! @date September 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -27,6 +28,18 @@ ot::ActionHandleInlineConnector<___className> ActionHandleInlineConnector##___cl
 	___connectorManager  \
 };
 
+//! 
+//!		ot::ActionHandleInlineConnector<className> ActionHandleInlineConnector<className><functionName> { <br>
+//!			<object>, <function>, <actionName>, <messageTypeFlags>, <connectorManager> <br>
+//!		};
+//! 
+#define OT_CONNECT_HANDLE_IMPL(___object, ___className, ___function, ___functionName, ___actionName, ___messageTypeFlags, ___connectorManager) \
+ot::ActionHandleInlineConnector<___className> ActionHandleInlineConnector##___className##___functionName { \
+	___object, ___function, \
+	___actionName, ___messageTypeFlags, \
+	___connectorManager  \
+};
+
 //! \brief Conveinienve layer to connect the action handler inline.
 #define OT_CONNECT_HANDLE_CUSTOM(___functionName, ___className, ___actionName, ___messageTypeFlags, ___connectorManager) \
 OT_CONNECT_HANDLE_IMPL(this, ___className, &___className::___functionName, ___functionName, ___actionName, ___messageTypeFlags, ___connectorManager);
@@ -34,7 +47,7 @@ OT_CONNECT_HANDLE_IMPL(this, ___className, &___className::___functionName, ___fu
 //! \brief Conveinienve layer to connect the action handler inline.
 //! Will use the default action handle connector manager.
 #define OT_CONNECT_HANDLE(___functionName, ___className, ___actionName, ___messageTypeFlags) \
-OT_CONNECT_HANDLE_CUSTOM(___functionName, ___className, ___actionName, ___messageTypeFlags, OT_INTERN_DEFAULT_ACTION_HANDLER_NAME)
+OT_CONNECT_HANDLE_CUSTOM(___functionName, ___className, ___actionName, ___messageTypeFlags, OT_DEFAULT_ACTION_HANDLER_NAME)
 
 //! @brief Creates a function that will be registered in the dispatch system.
 //! The generated function will look like this: <br>
@@ -64,9 +77,10 @@ OT_CONNECT_HANDLE_CUSTOM(___functionName, ___className, ___actionName, ___messag
 //! @param ___className The name of the class where the function is created at.
 //! @param ___actionName The action that should be registered in the dispatch system.
 #define OT_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags) \
- OT_HANDLER_CUSTOM(___functionName, ___className, ___actionName, ___messageTypeFlags, OT_INTERN_DEFAULT_ACTION_HANDLER_NAME)
+ OT_HANDLER_CUSTOM(___functionName, ___className, ___actionName, ___messageTypeFlags, OT_DEFAULT_ACTION_HANDLER_NAME)
 
 //! \brief Creates a string list.
+//! Use this whenever multiple actions should be connected to the same handler.
 #define OT_ACTIONLIST(...) std::list<std::string>({__VA_ARGS__})
 
 //! \def OT_DECL_ACTION_HANDLER
@@ -77,9 +91,9 @@ OT_CONNECT_HANDLE_CUSTOM(___functionName, ___className, ___actionName, ___messag
 //! \param ___dispatcher Will use the provided ActionDispatcherBase to register at.
 #define OT_DECL_ACTION_HANDLER_CUSTOM(___class, ___dispatcher) \
 private: \
-	ot::ActionHandleConnectorManager<___class> OT_INTERN_DEFAULT_ACTION_HANDLER_NAME{ this, ___dispatcher }; \
+	ot::ActionHandleConnectorManager<___class> OT_DEFAULT_ACTION_HANDLER_NAME{ this, ___dispatcher }; \
 	void addActionHandler(ot::ActionHandleConnectorManager<___class>::HandlerMethodType _method, const std::string& _actionName, const ot::MessageTypeFlags& _messageTypes) { \
-		OT_INTERN_DEFAULT_ACTION_HANDLER_NAME.bindHandler(this, _method, _actionName, _messageTypes); \
+		OT_DEFAULT_ACTION_HANDLER_NAME.bindHandler(this, _method, _actionName, _messageTypes); \
 	}
 
 //! \def OT_DECL_ACTION_HANDLER
