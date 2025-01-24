@@ -67,7 +67,7 @@ The following example demonstrates how register a class to receive actions at de
 Manual Declaration Example
 ==========================
 
-Use the following approach if the not all IDE features are working when using OT_HANDLER
+Use the following approach if the not all IDE features are working when using OT_HANDLER.
 
 .. code-block:: c++
 
@@ -91,12 +91,46 @@ Use the following approach if the not all IDE features are working when using OT
         // Add the OT_CONNECT_HANDLE to receive the "MyAction" action at handleMyActionPrivate method.
         OT_CONNECT_HANDLE(handleMyActionPrivate, MyClass, "MyAction", ot::MessageType::ALL_MESSAGE_TYPES)
 
-        // A compact example:
-
         //! @brief My description
         //! My detailed description.
         std::string handleMyActionPrivate2(ot::JsonDocument& _document);
+
+
         OT_CONNECT_HANDLE(handleMyActionPrivate2, MyClass, "MyAction2", ot::MessageType::ALL_MESSAGE_TYPES)
+    };
+
+Macroless Implementation
+************************
+
+The next example shows how to connect action handlers without the use of action handling related definitions.
+Here macro definitions could be/are used for the action keys.
+
+.. code-block:: c++
+
+    // MyClass.h
+    
+    #include "OTCommunication/ActionHandler.h"
+
+    class MyClass {
+    public:
+        MyClass() = default;
+
+        std::string handler1(ot::JsonDocument& _document);
+
+    private:
+        // The connection manager is required to handle the bin requests.
+        ot::ActionHandleConnectorManager<MyClass> m_connectionManager{ this, &ot::ActionDispatcher::instance() };
+
+        // This handler will be called by the dispatcher anyway trough the connector
+        std::string handler2(ot::JsonDocument& _document);
+
+        // Instead of providing the default action dispatcher a custom action dispatcher may be provided instead.
+        // ot::ActionHandleConnectorManager<MyClass> m_connectionManager{ this, &MyActionDispatcher::instance() };
+
+        // The connectors need to be declared private to ensure private handler methos could be binded.
+
+	    ot::ActionHandleInlineConnector<MyClass> m_handler1{ this, &MyClass::handler1, "ActionType1", ot::SECURE_MESSAGE_TYPES, m_connectionManager };
+	    ot::ActionHandleInlineConnector<MyClass> m_handler2{ this, &MyClass::handler2, MY_ACTION_KEY_DEFINE, ot::ALL_MESSAGE_TYPES, m_connectionManager };
     };
 
 Custom Action Handling Example
