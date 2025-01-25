@@ -9,6 +9,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/SelectionInformation.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -93,6 +94,9 @@ namespace ot {
 
 		bool isCurrentViewTab(void) const;
 
+		void setSelectionInformation(const SelectionInformation& _info) { m_selectionInfo = _info; };
+		const SelectionInformation& getSelectionInformation(void) const { return m_selectionInfo; };
+
 	Q_SIGNALS:
 		void viewDataModifiedChanged(void);
 
@@ -110,6 +114,8 @@ namespace ot {
 		bool m_isDeletedByManager; //! @brief If false the widget will deregister from the manager upon deleting
 		bool m_isPermanent; //! @brief If set the widget wont be removed by the manager
 		bool m_isModified; //! @brief If set the current view content was modified
+
+		SelectionInformation m_selectionInfo;
 	};
 
 }

@@ -186,7 +186,7 @@ namespace ot {
 		bool m_dropEnabled;
 		
 		QPoint m_lastPanPos;
-
+	
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
 		std::list<GraphicsConnectionCfg> m_connectionCreationBuffer;

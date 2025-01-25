@@ -89,6 +89,7 @@
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
+    <ClCompile Include="src\SelectionInformation.cpp" />
     <ClCompile Include="src\TableTextEdit.cpp" />
     <ClCompile Include="src\WidgetManager.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
+    <ClInclude Include="include\OTWidgets\SelectionInformation.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
     <QtMoc Include="include\OTWidgets\TableTextEdit.h" />

@@ -457,6 +457,9 @@
     <ClCompile Include="src\TableTextEdit.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\SelectionInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -886,6 +889,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
       <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SelectionInformation.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

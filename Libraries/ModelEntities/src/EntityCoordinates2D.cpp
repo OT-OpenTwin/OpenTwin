@@ -1,7 +1,7 @@
 #include "EntityCoordinates2D.h"
 
 EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner), _location(0.,0.)
+	:EntityBase(ID,parent,obs,ms,factory,owner), m_location(0.,0.)
 {
 
 }
@@ -23,8 +23,8 @@ void EntityCoordinates2D::AddStorageData(bsoncxx::builder::basic::document& stor
 {
 	EntityBase::AddStorageData(storage);
 	storage.append(
-		bsoncxx::builder::basic::kvp("LocationX", _location.x()),
-		bsoncxx::builder::basic::kvp("LocationY", _location.y())
+		bsoncxx::builder::basic::kvp("LocationX", m_location.x()),
+		bsoncxx::builder::basic::kvp("LocationY", m_location.y())
 	);
 }
 
@@ -33,6 +33,6 @@ void EntityCoordinates2D::readSpecificDataFromDataBase(bsoncxx::document::view& 
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	double locationX = doc_view["LocationX"].get_double().value;
 	double locationY = doc_view["LocationY"].get_double().value;
-	_location.setX(locationX);
-	_location.setY(locationY);
+	m_location.setX(locationX);
+	m_location.setY(locationY);
 }
