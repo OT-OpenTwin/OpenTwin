@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\BasicServiceInformation.cpp" />
     <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="src\CopyEntityInformation.cpp" />
     <ClCompile Include="src\CopyInformation.cpp" />
     <ClCompile Include="src\CopyInformationFactory.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
+    <ClInclude Include="include\OTCore\CopyEntityInformation.h" />
     <ClInclude Include="include\OTCore\CopyInformation.h" />
     <ClInclude Include="include\OTCore\CopyInformationFactory.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />

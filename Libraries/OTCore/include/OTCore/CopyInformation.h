@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CopyEntityInformation.h"
+#include "OTCore/BasicServiceInformation.h"
 
 // std header
 #include <string>
@@ -20,8 +20,8 @@ namespace ot {
 	public:
 		static std::string getCopyTypeJsonKey(void);
 		static std::string getCopyVersionJsonKey(void);
-
-		CopyInformation() = default;
+		
+		CopyInformation();
 		CopyInformation(const CopyInformation&) = default;
 		CopyInformation(CopyInformation&&) = default;
 		virtual ~CopyInformation() = default;
@@ -35,6 +35,37 @@ namespace ot {
 		virtual std::string getCopyType(void) const = 0;
 		virtual int getCopyVersion(void) const = 0;
 
+		void setProjectName(const std::string& _projectName) { m_projectName = _projectName; };
+		const std::string& getProjectName(void) const { return m_projectName; };
+
+		void setViewName(const std::string& _name) { m_viewName = _name; };
+		const std::string& getViewName(void) const { return m_viewName; };
+
+		void setViewOwner(const BasicServiceInformation& _owner) { m_serviceInfo = _owner; };
+		const BasicServiceInformation& getViewOwner(void) const { return m_serviceInfo; };
+
+		void addEntity(UID _uid, const std::string& _name, const std::string& _rawData = std::string());
+		void addEntity(const CopyEntityInformation& _entityInfo) { m_entities.push_back(_entityInfo); };
+		void setEntities(const std::list<CopyEntityInformation>& _entities) { m_entities = _entities; };
+		std::list<CopyEntityInformation>& getEntities(void) { return m_entities; };
+		const std::list<CopyEntityInformation>& getEntities(void) const { return m_entities; };
+
+		void setScenePos(const Point2DD& _pos) { m_scenePos = _pos; m_scenePosSet = true; };
+		const Point2DD& getScenePos(void) const { return m_scenePos; };
+		bool getScenePosSet(void) const { return m_scenePosSet; };
+
+		virtual bool isValid(void) const;
+
+	private:
+		std::string m_projectName;
+
+		std::string m_viewName;
+		BasicServiceInformation m_serviceInfo;
+
+		Point2DD m_scenePos;
+		bool m_scenePosSet;
+
+		std::list<CopyEntityInformation> m_entities;
 	};
 
 }

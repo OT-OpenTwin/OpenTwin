@@ -356,6 +356,73 @@ void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid
 	Q_EMIT connectionToConnectionRequested(_fromItemUid, _fromItemConnector, _toConnectionUid, _newControlPoint);
 }
 
+bool ot::GraphicsView::requestCopyCurrentSelection(void) {
+	std::list<GraphicsItem*> selection = this->getSelectedGraphicsItems();
+	if (selection.empty()) {
+		return false;
+	}
+
+	GraphicsCopyInformation copyInfo;
+	copyInfo.setViewOwner(this->getOwner());
+
+	for (GraphicsItem* itm : selection) {
+		// Copy top level items only
+		if (!itm->getParentGraphicsItem()) {
+			copyInfo.addEntity(itm->getGraphicsItemUid(), itm->getGraphicsItemName());
+		}
+	}
+
+	Q_EMIT itemCopyRequested(&copyInfo);
+
+	return true;
+}
+
+bool ot::GraphicsView::requestPasteFromClipboard(void) {
+	QClipboard* clip = QApplication::clipboard();
+	if (!clip) {
+		OT_LOG_E("No clipboard found");
+		return false;
+	}
+
+	// Get data
+	std::string importString = clip->text().toStdString();
+	if (importString.empty()) {
+		return false;
+	}
+
+	JsonDocument importDoc;
+	if (!importDoc.fromJson(importString)) {
+		return false;
+	}
+	if (!importDoc.IsObject()) {
+		return false;
+	}
+
+	std::unique_ptr<GraphicsCopyInformation> info(dynamic_cast<GraphicsCopyInformation*>(CopyInformationFactory::create(importDoc.GetConstObject())));
+	if (!info.get()) {
+		return false;
+	}
+
+	// Ensure same view owner
+	if (info->getViewOwner() != m_owner) {
+		return false;
+	}
+
+	// Create paste info
+	info->setViewName(m_viewName);
+
+	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
+	if (this->rect().contains(mousePos)) {
+		// If mouse is over the view paste at cursor
+		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
+		info->setScenePos(QtFactory::toPoint2D(mouseScenePos));
+	}
+
+	Q_EMIT itemPasteRequested(info.get());
+
+	return true;
+}
+
 void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
@@ -381,8 +448,7 @@ QRectF ot::GraphicsView::getVisibleSceneRect(void) const {
 
 // Protected: Slots
 
-void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
-{
+void ot::GraphicsView::wheelEvent(QWheelEvent* _event) {
 	if ((m_viewStateFlags & MiddleMousePressedState) || !m_wheelEnabled) return;
 	const ViewportAnchor anchor = transformationAnchor();
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -658,91 +724,11 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 }
 
 void ot::GraphicsView::slotCopy(void) {
-	QClipboard* clip = QApplication::clipboard();
-	if (!clip) {
-		OT_LOG_E("No clipboard found");
-		return;
-	}
-
-	std::list<GraphicsItem*> selection = this->getSelectedGraphicsItems();
-	if (selection.empty()) {
-		return;
-	}
-
-	GraphicsCopyInformation copyInfo;
-	copyInfo.setViewOwner(this->getOwner());
-
-	for (GraphicsItem* itm : selection) {
-		// Copy top level items only
-		if (!itm->getParentGraphicsItem()) {
-			copyInfo.addItemInformation(itm->getGraphicsItemUid(), itm->getGraphicsItemPos());
-		}
-	}
-
-	JsonDocument exportDoc;
-	copyInfo.addToJsonObject(exportDoc, exportDoc.GetAllocator());
-
-	clip->setText(QString::fromStdString(exportDoc.toJson()));
+	this->requestCopyCurrentSelection();
 }
 
 void ot::GraphicsView::slotPaste(void) {
-	QClipboard* clip = QApplication::clipboard();
-	if (!clip) {
-		OT_LOG_E("No clipboard found");
-		return;
-	}
-
-	// Get data
-	std::string importString = clip->text().toStdString();
-	if (importString.empty()) {
-		return;
-	}
-
-	JsonDocument importDoc;
-	if (!importDoc.fromJson(importString)) {
-		return;
-	}
-	if (!importDoc.IsObject()) {
-		return;
-	}
-
-	GraphicsCopyInformation* info = dynamic_cast<GraphicsCopyInformation*>(CopyInformationFactory::create(importDoc.GetConstObject()));
-	if (!info) {
-		return;
-	}
-
-	// Ensure same view owner
-	if (info->getViewOwner() != m_owner) {
-		return;
-	}
-
-	// Create paste info
-	info->setViewName(m_viewName);
-	
-	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
-	if (this->rect().contains(mousePos)) {
-		// If mouse is over the view paste at cursor
-		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
-		info->moveItemsToPoint(QtFactory::toPoint2D(mouseScenePos));
-	}
-	else {
-		// If mouse is outside the view move by 2*grid size or 20 in X and Y directions.
-		Point2DD moveDistance(20., 20.);
-
-		const Grid& grid = m_scene->getGrid();
-		if (grid.getGridStep().x() > 0) {
-			moveDistance.setX(grid.getGridStep().x() * 2.);
-		}
-		if (grid.getGridStep().y() > 0) {
-			moveDistance.setY(grid.getGridStep().y() * 2.);
-		}
-
-		info->moveItemsBy(moveDistance);
-	}
-	
-	Q_EMIT itemCopyRequested(info);
-
-	delete info;
+	this->requestPasteFromClipboard();
 }
 
 void ot::GraphicsView::beginItemMove(void) {

@@ -457,7 +457,8 @@ public Q_SLOTS:
 	void slotGraphicsSelectionChanged(void);
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 
-	void slotCopyRequested(const ot::CopyInformation* _info);
+	void slotCopyRequested(ot::CopyInformation* _info);
+	void slotPasteRequested(ot::CopyInformation* _info);
 
 	void slotTextEditorSaveRequested(void);
 	void slotTableSaveRequested(void);

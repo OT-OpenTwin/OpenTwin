@@ -62,7 +62,10 @@ class ExternalServicesComponent : public QObject, public ak::aNotifier {
 	Q_OBJECT
 	OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
 public:
-	enum RequestType { EXECUTE, QUEUE };
+	enum RequestType {
+		EXECUTE,
+		QUEUE
+	};
 
 	ExternalServicesComponent(AppBase* _owner);
 	virtual ~ExternalServicesComponent(void);

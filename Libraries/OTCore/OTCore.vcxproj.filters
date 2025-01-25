@@ -127,6 +127,9 @@
     <ClCompile Include="src\CopyInformationFactory.cpp">
       <Filter>src\CopyInformation</Filter>
     </ClCompile>
+    <ClCompile Include="src\CopyEntityInformation.cpp">
+      <Filter>src\CopyInformation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -307,6 +310,9 @@
       <Filter>include\CopyInformation</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\CopyInformationFactory.h">
+      <Filter>include\CopyInformation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CopyEntityInformation.h">
       <Filter>include\CopyInformation</Filter>
     </ClInclude>
   </ItemGroup>

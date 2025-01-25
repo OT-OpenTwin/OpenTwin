@@ -96,6 +96,7 @@
 // Qt header
 #include <QtCore/qfile.h>
 #include <QtGui/qscreen.h>
+#include <QtGui/qclipboard.h>
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qstatusbar.h>
 #include <QtWidgets/qfiledialog.h>
@@ -2181,24 +2182,16 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	}
 }
 
-void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
-	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
-	if (graphicsView == nullptr) {
-		OT_LOG_E("GraphicsView cast failed");
-		return;
-	}
-
-	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
-	if (!view) {
-		OT_LOG_E("View not found");
-		return;
-	}
-
-	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+void AppBase::slotCopyRequested(ot::CopyInformation* _info) {
+	_info->setProjectName(m_currentProjectName);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
-	
+
+	ot::JsonObject infoObj;
+	_info->addToJsonObject(infoObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
+
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
@@ -2211,6 +2204,19 @@ void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
 		OT_LOG_E("Request failed: " + rMsg.getWhat());
 		return;
 	}
+
+	if (rMsg.getWhat().empty()) {
+		OT_LOG_E("Invalid response");
+		return;
+	}
+
+	// Copy serialized config to clipboard
+	QClipboard* clip = QApplication::clipboard();
+	clip->setText(QString::fromStdString(rMsg.getWhat()));
+}
+
+void AppBase::slotPasteRequested(ot::CopyInformation* _info) {
+
 }
 
 void AppBase::slotTextEditorSaveRequested(void) {

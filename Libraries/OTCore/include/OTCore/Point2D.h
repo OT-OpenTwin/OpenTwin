@@ -62,6 +62,28 @@ namespace ot {
 		//! @param _y The y value to set
 		void set(int _x, int _y) { m_x = _x; m_y = _y; };
 
+		//! @brief Returns a new Point with the lowest coordinates.
+		Point2D minPoint(const Point2D& _other) { return ot::Point2D(std::min(m_x, _other.m_x), std::min(m_y, _other.m_y)); }
+
+		//! @brief Returns a new Point with the greatest coordinates.
+		Point2D maxPoint(const Point2D& _other) { return ot::Point2D(std::max(m_x, _other.m_x), std::min(m_y, _other.m_y)); };
+
+		//! @brief Moves the x value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2D& moveLeft(int _leftBound) { m_x = std::min(m_x, _leftBound); return *this; };
+
+		//! @brief Moves the y value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2D& moveTop(int _topBound) { m_y = std::min(m_y, _topBound); return *this; };
+
+		//! @brief Moves the x value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2D& moveRight(int _rightBound) { m_x = std::max(m_x, _rightBound); return *this; };
+
+		//! @brief Moves the y value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2D& moveBottom(int _bottomBount) { m_y = std::max(m_y, _bottomBount); return *this; };
+
 		Point2DF toPoint2DF(void) const;
 
 		Point2DD toPoint2DD(void) const;
@@ -124,6 +146,28 @@ namespace ot {
 		//! @param _y The y value to set
 		void set(float _x, float _y) { m_x = _x; m_y = _y; };
 
+		//! @brief Returns a new Point with the lowest coordinates.
+		Point2DF minPoint(const Point2DF& _other) { return ot::Point2DF(std::min(m_x, _other.m_x), std::min(m_y, _other.m_y)); }
+
+		//! @brief Returns a new Point with the greatest coordinates.
+		Point2DF maxPoint(const Point2DF& _other) { return ot::Point2DF(std::max(m_x, _other.m_x), std::min(m_y, _other.m_y)); };
+
+		//! @brief Moves the x value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2DF& moveLeft(float _leftBound) { m_x = std::min(m_x, _leftBound); return *this; };
+
+		//! @brief Moves the y value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2DF& moveTop(float _topBound) { m_y = std::min(m_y, _topBound); return *this; };
+
+		//! @brief Moves the x value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2DF& moveRight(float _rightBound) { m_x = std::max(m_x, _rightBound); return *this; };
+
+		//! @brief Moves the y value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2DF& moveBottom(float _bottomBount) { m_y = std::max(m_y, _bottomBount); return *this; };
+
 		Point2D toPoint2D(void) const;
 
 		Point2DD toPoint2DD(void) const;
@@ -185,6 +229,28 @@ namespace ot {
 		//! @param _x The X value to set
 		//! @param _y The y value to set
 		void set(double _x, double _y) { m_x = _x; m_y = _y; };
+
+		//! @brief Returns a new Point with the lowest coordinates.
+		Point2DD minPoint(const Point2DD& _other) { return ot::Point2DD(std::min(m_x, _other.m_x), std::min(m_y, _other.m_y)); }
+
+		//! @brief Returns a new Point with the greatest coordinates.
+		Point2DD maxPoint(const Point2DD& _other) { return ot::Point2DD(std::max(m_x, _other.m_x), std::min(m_y, _other.m_y)); };
+
+		//! @brief Moves the x value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2DD& moveLeft(double _leftBound) { m_x = std::min(m_x, _leftBound); return *this; };
+
+		//! @brief Moves the y value towards negative infinity bound to the value specified.
+		//! If the current value is lower than the bound it will be ignored.
+		Point2DD& moveTop(double _topBound) { m_y = std::min(m_y, _topBound); return *this; };
+
+		//! @brief Moves the x value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2DD& moveRight(double _rightBound) { m_x = std::max(m_x, _rightBound); return *this; };
+
+		//! @brief Moves the y value towards positive infinity bound to the value specified.
+		//! If the current value is greater than the bound it will be ignored.
+		Point2DD& moveBottom(double _bottomBount) { m_y = std::max(m_y, _bottomBount); return *this; };
 
 		Point2D toPoint2D(void) const;
 

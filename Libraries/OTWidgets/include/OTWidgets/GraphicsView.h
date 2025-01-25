@@ -103,6 +103,12 @@ namespace ot {
 
 		void requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
+		//! @brief Returns true if any item is selected and the itemCopyRequested signal was emitted.
+		bool requestCopyCurrentSelection(void);
+
+		//! @brief Returns true if the paste request succeeded and the itemPasteRequested signal was emitted.
+		bool requestPasteFromClipboard(void);
+
 		void notifyItemMoved(const ot::GraphicsItem* _item);
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
@@ -133,7 +139,11 @@ namespace ot {
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
-		void itemCopyRequested(const GraphicsCopyInformation* _info);
+		//! @brief Is emitted when 
+		//! @param _info 
+		void itemCopyRequested(GraphicsCopyInformation* _info);
+
+		void itemPasteRequested(GraphicsCopyInformation* _info);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

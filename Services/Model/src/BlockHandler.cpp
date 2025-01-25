@@ -18,7 +18,7 @@ void BlockHandler::copyItem(const ot::GraphicsCopyInformation* _copyInformation)
 		setModelComponent(Application::instance()->modelComponent());
 	}
 
-	const auto itemInfos =	_copyInformation->getItemInformation();
+	const auto itemInfos =	_copyInformation->getEntities();
 	Model* model = Application::instance()->getModel();
 	
 	ot::UIDList entityIDsTopo;
@@ -27,66 +27,106 @@ void BlockHandler::copyItem(const ot::GraphicsCopyInformation* _copyInformation)
 	ot::UIDList entityVersionsData;
 	std::list<bool> forceVisible;
 
-	for (const ot::GraphicsCopyInformation::ItemInformation& itemInfo : itemInfos)
+	ot::Point2DD topLeftPos(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	std::list<std::unique_ptr<EntityCoordinates2D>> coordinateEntities;
+
+	for (const ot::CopyEntityInformation& itemInfo : itemInfos)
 	{
-		//First we clone the block entity
-		ot::UID itemUID = itemInfo.uid;
+		// First we clone the block entity
+		ot::UID itemUID = itemInfo.getUid();
 		EntityBase* baseEnt = model->getEntityByID(itemUID);
-		if (baseEnt == nullptr)
-		{
+		if (baseEnt == nullptr) {
 			throw std::exception(("Copied block with ID " + std::to_string(itemUID) + " does not exist in model.").c_str());
 		}
 		
+		// Ensure entity type
 		EntityBlock* blockEntityOrigin = dynamic_cast<EntityBlock*>(baseEnt);
-		if (blockEntityOrigin == nullptr)
-		{
+		if (blockEntityOrigin == nullptr) {
 			throw std::exception(("Copied block with ID " + std::to_string(itemUID) + " is not a block.").c_str());
 		}
-		EntityBase *clonedEntity = blockEntityOrigin->clone();
-		if (clonedEntity == nullptr)
-		{
+
+		// Clone block
+		EntityBase* clonedEntity = blockEntityOrigin->clone();
+		if (clonedEntity == nullptr) {
 			throw std::exception("Block does not support copy function yet.");
 		}
-		
 		std::unique_ptr<EntityBlock> newBlock(dynamic_cast<EntityBlock*>(clonedEntity));
-		
-		//Now we clone the coo data entity
+		if (!newBlock.get()) {
+			throw std::exception("Unexpected cloned entity type");
+		}
+
+		// Read coordinate entity
 		ot::UID originCooEntityID = blockEntityOrigin->getCoordinateEntityID();
 
-		std::map<ot::UID,EntityBase*>	entMap;
+		std::map<ot::UID,EntityBase*> entMap;
 		EntityBase* originCooEntity = model->readEntityFromEntityID(blockEntityOrigin, originCooEntityID, entMap);
 
-		if (originCooEntity== nullptr)
-		{
+		if (originCooEntity== nullptr) {
 			throw std::exception(("Copied block with ID " + std::to_string(itemUID) + " does not have coordinates stored.").c_str());
 		}
 
-		EntityBase* clonedCooEntity = originCooEntity->clone();
+		// Ensure entity type
+		EntityCoordinates2D* actualOriginCooEntity = dynamic_cast<EntityCoordinates2D*>(originCooEntity);
+		if (!actualOriginCooEntity) {
+			throw std::exception(("Copied block with ID " + std::to_string(itemUID) + " has unexpeceted coordinates stored.").c_str());
+		}
+
+		// Update top left coordiante
+		topLeftPos.moveLeft(actualOriginCooEntity->getCoordinates().x()).moveTop(actualOriginCooEntity->getCoordinates().y());
+
+		// Clone coordiante entity
+		EntityBase* clonedCooEntity = actualOriginCooEntity->clone();
 		assert(clonedCooEntity != nullptr);
-		std::unique_ptr<EntityCoordinates2D> newCoordinateEntity(dynamic_cast<EntityCoordinates2D*>(clonedCooEntity));
+
+		// Ensure cloned type
+		EntityCoordinates2D* actualClonedCooEntity = dynamic_cast<EntityCoordinates2D*>(clonedCooEntity);
+		if (!actualClonedCooEntity) {
+			throw std::exception("Coordinate entity clone generated unexpected object type");
+		}
+
+		// Store cloned coordinate entity to move after reading all
+		coordinateEntities.push_back(std::unique_ptr<EntityCoordinates2D>(actualClonedCooEntity));
 		
-		//Now we give the cloned coo entity new values
-		const ot::Point2DD& newPosition = itemInfo.pos;
-		newCoordinateEntity->setCoordinates(newPosition);
-		newCoordinateEntity->setEntityID(model->createEntityUID());
+		// Now we give the cloned coordinate entity new values
+		coordinateEntities.back()->setEntityID(model->createEntityUID());
+
 		//?Name
 
-		//Now we give the cloned block entity new values
-		newBlock->setCoordinateEntityID(newCoordinateEntity->getEntityID());
+		// Now we give the cloned block entity new values
+		newBlock->setCoordinateEntityID(coordinateEntities.back()->getEntityID());
 		newBlock->setEntityID(model->createEntityUID());
 		std::string path =	newBlock->getName();
 		const std::string name = path.substr(path.find_last_of('/') +1);
 		path = path.substr(0,path.find_last_of('/'));
 		const std::string newName =	CreateNewUniqueTopologyName(path, name);
 		newBlock->setName(newName);
-		//Now we store the cloned entities and prepare them for the add to model
+
+		// Now we store the cloned block entity and prepare them for the add to model
 		newBlock->StoreToDataBase();
-		newCoordinateEntity->StoreToDataBase();
 		entityIDsTopo.push_back(newBlock->getEntityID());
 		entityVersionsTopo.push_back(newBlock->getEntityStorageVersion());
-		entityIDsData.push_back(newCoordinateEntity->getEntityID());
-		entityVersionsData.push_back(newCoordinateEntity->getEntityStorageVersion());
 		forceVisible.push_back(false);
+	}
+
+	// Check move distance
+	ot::Point2DD moveAdder(0., 0.);
+	if (_copyInformation->getScenePosSet()) {
+		moveAdder = _copyInformation->getScenePos() - topLeftPos;
+	}
+	else {
+		// If no scene pos is provided we move all block by 20
+		moveAdder.set(20., 20.);
+	}
+
+	// Adjust coordinates
+	for (auto& coord : coordinateEntities) {
+		// Update coordinate
+		coord->setCoordinates(coord->getCoordinates() + moveAdder);
+
+		// Now we store the cloned entity and prepare it for adding to model
+		coord->StoreToDataBase();
+		entityIDsData.push_back(coord->getEntityID());
+		entityVersionsData.push_back(coord->getEntityStorageVersion());
 	}
 
 	model->addEntitiesToModel(entityIDsTopo, entityVersionsTopo, forceVisible, entityIDsData, entityVersionsData, entityIDsTopo, "Copied block entities", true, false);
@@ -102,27 +142,29 @@ void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _new
 
 std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document)
 {
-	SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
-	ot::UIDList selectedEntities = selectionHandler.getSelectedEntityIDs();
+	ot::CopyInformation* info = ot::CopyInformationFactory::create(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	//SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
+	//ot::UIDList selectedEntities = selectionHandler.getSelectedEntityIDs();
 	
 	Model* model = Application::instance()->getModel();
-	std::list<std::string> serialisedEntities;
-	for (ot::UID selectedEntityID : selectedEntities)
-	{
-		EntityBase* entity = model->getEntityByID(selectedEntityID);
-		serialisedEntities.push_back(entity->serialiseAsJSON());
+
+	for (ot::CopyEntityInformation& entityInfo : info->getEntities()) {
+		EntityBase* entity = model->getEntityByID(entityInfo.getUid());
+
+		if (entity) {
+			entityInfo.setRawData(entity->serialiseAsJSON());
+		}
+		else {
+			OT_LOG_E("Failed to load entity (" + std::to_string(entityInfo.getUid()) + ")");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+		}
 	}
 	
-	ot::JsonDocument document;
-	ot::JsonArray serialisedEntitiesJson(serialisedEntities, document.GetAllocator());
+	ot::JsonDocument responseDocument;
+	info->addToJsonObject(responseDocument, responseDocument.GetAllocator());
 
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
-	std::list < std::pair<ot::UID, ot::UID>> prefetchedDocs;
-	model->sendMessageToViewer(document,prefetchedDocs);
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDocument.toJson()).toJson();
 }
 
 std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document)
