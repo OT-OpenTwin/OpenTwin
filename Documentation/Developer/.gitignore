@@ -6,3 +6,4 @@ _static
 
 # DrawIO temporary file
 *.drawio.dtmp
+*.$*.xml.bkp
