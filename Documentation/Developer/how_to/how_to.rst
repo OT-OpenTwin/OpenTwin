@@ -12,3 +12,4 @@ How To
    project_templates
    create_documentation
    document_the_code
+   create_uml_diagrams
