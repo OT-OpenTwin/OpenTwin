@@ -16,4 +16,5 @@ See here for more details:
    logging
    session_management
    service_api_structure
+   entity_copy_request
    
