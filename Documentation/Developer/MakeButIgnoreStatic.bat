@@ -16,19 +16,15 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
+REN %OPENTWIN_DEV_ROOT%\Documentation\Developer\_static _staticTMP
+CALL "%OPENTWIN_DEV_ROOT%\Documentation\Developer\make.bat" html
+REN %OPENTWIN_DEV_ROOT%\Documentation\Developer\_staticTMP _static
+
+if "%1" == "silent" (
 	goto END
 )
 
-ECHO :)
-
-code "%OPENTWIN_DEV_ROOT%\Documentation\Developer"
-
-GOTO END
-
 :PAUSE_END
 pause
-GOTO END
 
 :END

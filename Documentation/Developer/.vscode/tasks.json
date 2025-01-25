@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OpenTwin Build Sphinx Documentation",
+            "type": "shell",
+            "command": "${env:OPENTWIN_DEV_ROOT}\\Documentation\\Developer\\MakeButIgnoreStatic.bat silent",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${env:OPENTWIN_DEV_ROOT}\\Documentation\\Developer"
+            }
+        }
+    ]
+}
