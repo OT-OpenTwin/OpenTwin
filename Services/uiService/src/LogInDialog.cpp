@@ -528,13 +528,14 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		if (msgBox.exec() == QMessageBox::Yes)
 		{
 			// We try to update the frontend installation
-			std::string gssUrl = m_loginData.getGss().getUrl().toStdString();
-			std::string tmpFile = "Install_OpenTwin_Frontend.exe";
-			std::string tempFolder, error;
-			if (ot::DownloadFile::download(gssUrl + "/installer/" + tmpFile, tmpFile, tempFolder, error))
+
+			std::string tempFolder;
+			std::string fileName = "Install_OpenTwin_Frontend.exe";
+			std::string error;
+
+			if (ot::DownloadFile::downloadFrontendInstaller(m_loginData.getGss().getConnectionUrl().toStdString(), fileName, tempFolder, error))
 			{
-				// The installer could be successfully downloaded. Now run the installer and close the application
-				std::string applicationPath = tempFolder + "\\" + tmpFile;
+				std::string applicationPath = tempFolder + "\\" + fileName;
 				std::string commandLine = "\"" + applicationPath + "\" /S";
 				OT_PROCESS_HANDLE processHandle;
 				ot::app::runApplication(applicationPath, commandLine, processHandle, false);
