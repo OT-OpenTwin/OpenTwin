@@ -24,6 +24,10 @@
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccess.h"
 
+// Third party header
+#include "base64.h"
+#include "zlib.h"
+
 // std header
 #include <iostream>
 #include <fstream>
@@ -300,6 +304,67 @@ std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _d
 
 	return buildInfo;
 }
+
+std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _doc)
+{
+	std::string installerPath;
+
+#ifdef OT_OS_WINDOWS
+	char path[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+	installerPath = path;
+#else
+	char result[PATH_MAX];
+	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+	installerPath = std::string(result, (count > 0) ? count : 0);
+#endif
+
+	installerPath = installerPath.substr(0, installerPath.rfind('\\'));
+	installerPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+
+	if (!std::filesystem::exists(installerPath)) {
+		// Get the development root environment variable and build the path to the deployment cert file
+		char buffer[4096];
+		size_t environmentVariableValueStringLength;
+		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
+
+		std::string dev_root(buffer);
+		installerPath = dev_root + "\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+	}
+
+	std::string fileContent;
+	readFileContent(installerPath, fileContent);
+
+	return fileContent;
+}
+
+void GlobalSessionService::readFileContent(const std::string& fileName, std::string& fileContent)
+{
+	fileContent.clear();
+
+	// Read the file content
+	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
+	int data_length = (int)file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	char* data = new char[data_length];
+	if (!file.read(data, data_length)) return;
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(data_length);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, data, data_length); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	fileContent = std::string(base64_string);
+
+	delete[] base64_string;
+	base64_string = nullptr;
+
+	delete[] data;
+	data = nullptr;
+}
+
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 

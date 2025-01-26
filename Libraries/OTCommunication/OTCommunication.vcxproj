@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\ActionDispatcher.cpp" />
     <ClCompile Include="src\ActionDispatcherBase.cpp" />
     <ClCompile Include="src\ActionHandleConnector.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp" />
@@ -129,7 +131,7 @@
       <PreprocessorDefinitions>_DEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(CURL_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(CURL_INCD);$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -177,7 +179,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(CURL_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(CURL_INCR);$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

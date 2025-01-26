@@ -101,7 +101,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -144,7 +144,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(ZLIB_ROOT)\Release\include;$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -183,12 +183,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\GlobalSessionService.cpp" />
     <ClCompile Include="src\Session.cpp" />
     <ClCompile Include="src\LocalSessionService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
     <ClInclude Include="include\GlobalSessionService.h" />
     <ClInclude Include="include\Session.h" />
     <ClInclude Include="include\LocalSessionService.h" />

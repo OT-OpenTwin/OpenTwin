@@ -62,6 +62,7 @@ private:
 	OT_HANDLER(handleCheckProjectOpen, GlobalSessionService, OT_ACTION_CMD_IsProjectOpen, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetProjectTemplatesList, GlobalSessionService, OT_ACTION_CMD_GetListOfProjectTemplates, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetBuildInformation, GlobalSessionService, OT_ACTION_CMD_GetBuildInformation, ot::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetFrontendInstaller, GlobalSessionService, OT_ACTION_CMD_GetFrontendInstaller, ot::ALL_MESSAGE_TYPES)
 
 	OT_HANDLER(handleGetSystemInformation, GlobalSessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterSessionService, GlobalSessionService, OT_ACTION_CMD_RegisterNewSessionService, ot::SECURE_MESSAGE_TYPES)
@@ -89,6 +90,7 @@ private:
 	// ###################################################################################################
 
 	void setHealthCheckRunning(bool _isRunning) { m_healthCheckRunning = _isRunning; };
+	void readFileContent(const std::string& fileName, std::string& fileContent);
 
 	std::string m_url;
 	std::string m_databaseUrl;
