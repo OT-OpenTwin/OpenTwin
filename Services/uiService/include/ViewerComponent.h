@@ -20,6 +20,7 @@
 
 // openTwin header
 #include "OTCore/ServiceBase.h"
+#include "OTWidgets/SelectionInformation.h"
 
 // AK header
 #include <akCore/aNotifier.h>
@@ -118,7 +119,7 @@ public:
 	// Intern calls
 
 	virtual void notify(
-		ak::UID							_senderId,
+		ot::UID							_senderId,
 		ak::eventType					_event,
 		int								_info1,
 		int								_info2
@@ -130,12 +131,12 @@ public:
 	void refreshAllViews(ViewerUIDtype visualizationModelID);
 	void clearSelection(ViewerUIDtype visualizationModelID);
 	void refreshSelection(ViewerUIDtype visualizationModelID);
-	void selectObject(ModelUIDtype visualizationModelID, ak::UID entityID);
+	void selectObject(ModelUIDtype visualizationModelID, ot::UID entityID);
 	void addNodeFromFacetData(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3],
 		double edgeColorRGB[3], ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
 		std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
 	void addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
+		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
 	void addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool editable);
 
 	virtual void addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion);
@@ -189,7 +190,8 @@ public:
 	
 	//! \brief Handle navigation tree selection changed event.
 	//! \param _selectionFromTree If true the selection event was emitted from the tree or tree operation.
-	void handleSelectionChanged(bool _selectionFromTree);
+	//! \return Returns true if the selection has requested a new view.
+	ot::SelectionResultFlags handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectedItems);
 
 	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
 

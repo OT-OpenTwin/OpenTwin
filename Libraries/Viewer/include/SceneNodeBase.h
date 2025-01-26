@@ -1,12 +1,17 @@
 #pragma once
 
+// OpenTwin header
+#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
+#include "OTGui/GuiTypes.h"
+
 #include "Visualiser.h"
+#include "OldTreeIcon.h"
+
+// std header
 #include <string>
 #include <list>
 #include <cassert>
-
-#include "OldTreeIcon.h"
 
 namespace osg { class Switch; };
 
@@ -53,13 +58,10 @@ public:
 	virtual void setVisible(bool v) { visible = v; };
 
 	bool isSelected(void) { return selected; };
-	virtual void setSelected(bool _selected, bool _selectionFromNavigationTree) 
-	{ 
-		selected = _selected; 
 
-	};
+	//! \return Returns true if the selection has requested a new view.
+	virtual ot::SelectionResultFlags setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin) { selected = _selected; return ot::SelectionResultFlags(ot::SelectionResult::Default); };
 	
-
 	bool isTransparent(void) { return transparent; };
 	virtual void setTransparent(bool t) { transparent = t; };
 
@@ -69,11 +71,11 @@ public:
 	bool isHighlighted(void) { return highlighted; };
 	virtual void setHighlighted(bool h) { if (highlighted != h) { highlighted = h; if (selectChildren) { for (auto child : children) child->setHighlighted(h); } } };
 
-	void        setErrors(std::string &e) { errors = e; };
-	bool        hasErrors(void) { return !errors.empty(); };
+	void setErrors(std::string &e) { errors = e; };
+	bool hasErrors(void) { return !errors.empty(); };
 	std::string getErrors(void) { return errors; };
 
-	void   setOffset(double value) { offset = value; };
+	void setOffset(double value) { offset = value; };
 	double getOffset(void) { return offset; };
 
 	void setSelectChildren(bool flag) { selectChildren = flag; }
@@ -104,7 +106,7 @@ public:
 	const std::list<Visualiser*>& getVisualiser() { return m_visualiser; }
 
 protected:
-	osg::Switch *      shapeNode;
+	osg::Switch* shapeNode;
 	const float transparency = 0.15;
 
 private:
@@ -129,4 +131,3 @@ private:
 
 	std::list<Visualiser*> m_visualiser;
 };
-

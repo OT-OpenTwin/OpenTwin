@@ -41,6 +41,7 @@
     <ClCompile Include="src\ManageAccess.cpp" />
     <ClCompile Include="src\ManageGroups.cpp" />
     <ClCompile Include="src\ManageOwner.cpp" />
+    <ClCompile Include="src\NavigationSelectionManager.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\ProjectInformation.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
@@ -58,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
+    <QtMoc Include="include\NavigationSelectionManager.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="include\CopyProjectDialog.h" />
@@ -148,14 +150,14 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Debug\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
@@ -163,14 +165,14 @@
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\DataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)\Release\include</IncludePath>
     <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
     <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
     <TargetName>uiFrontend</TargetName>

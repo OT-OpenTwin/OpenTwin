@@ -7,18 +7,9 @@
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 
-std::list<ot::LockTypeFlag> ot::getAllLockTypeFlags(void) {
-	return std::list<ot::LockTypeFlag>({
-		LockTypeFlag::LockViewWrite,
-		LockTypeFlag::LockViewRead,
-		LockTypeFlag::LockModelWrite,
-		LockTypeFlag::LockModelRead,
-		LockTypeFlag::LockProperties,
-		LockTypeFlag::LockNavigationWrite,
-		LockTypeFlag::LockNavigationAll,
-		LockTypeFlag::LockAll,
-		});
-}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Alignment
 
 std::string ot::toString(ot::Alignment _alignment) {
 	switch (_alignment)
@@ -54,6 +45,10 @@ ot::Alignment ot::stringToAlignment(const std::string& _string) {
 	}
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Orientation
+
 std::string ot::toString(Orientation _orientation) {
 	switch (_orientation)
 	{
@@ -73,6 +68,10 @@ ot::Orientation ot::stringToOrientation(const std::string& _string) {
 		throw std::exception("Unknown Orientation provided");
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Font Family
 
 std::string ot::toString(ot::FontFamily _fontFamily) {
 	switch (_fontFamily)
@@ -112,6 +111,10 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	}
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Size Policy
+
 std::string ot::toString(SizePolicy _policy) {
 	switch (_policy)
 	{
@@ -131,6 +134,10 @@ ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
 		throw std::exception("Unknown size policy");
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Connections
 
 std::string ot::toString(ot::ConnectionDirection _direction) {
 	switch (_direction)
@@ -191,6 +198,10 @@ std::list<ot::ConnectionDirection> ot::getAllConnectionDirections(void)
 		});
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Gradient
+
 std::string ot::toString(GradientSpread _spread) {
 	switch (_spread)
 	{
@@ -213,77 +224,12 @@ ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
 	}
 }
 
-ot::BasicKey ot::toBasicKey(const std::string& _key) {
-	if (_key == toString(Key_A)) return Key_A;
-	else if (_key == toString(Key_B)) return Key_B;
-	else if (_key == toString(Key_C)) return Key_C;
-	else if (_key == toString(Key_D)) return Key_D;
-	else if (_key == toString(Key_E)) return Key_E;
-	else if (_key == toString(Key_F)) return Key_F;
-	else if (_key == toString(Key_G)) return Key_G;
-	else if (_key == toString(Key_H)) return Key_H;
-	else if (_key == toString(Key_I)) return Key_I;
-	else if (_key == toString(Key_J)) return Key_J;
-	else if (_key == toString(Key_K)) return Key_K;
-	else if (_key == toString(Key_L)) return Key_L;
-	else if (_key == toString(Key_M)) return Key_M;
-	else if (_key == toString(Key_N)) return Key_N;
-	else if (_key == toString(Key_O)) return Key_O;
-	else if (_key == toString(Key_P)) return Key_P;
-	else if (_key == toString(Key_Q)) return Key_Q;
-	else if (_key == toString(Key_R)) return Key_R;
-	else if (_key == toString(Key_S)) return Key_S;
-	else if (_key == toString(Key_T)) return Key_T;
-	else if (_key == toString(Key_U)) return Key_U;
-	else if (_key == toString(Key_V)) return Key_V;
-	else if (_key == toString(Key_W)) return Key_W;
-	else if (_key == toString(Key_X)) return Key_X;
-	else if (_key == toString(Key_Y)) return Key_Y;
-	else if (_key == toString(Key_Z)) return Key_Z;
-	else if (_key == toString(Key_1)) return Key_1;
-	else if (_key == toString(Key_2)) return Key_2;
-	else if (_key == toString(Key_3)) return Key_3;
-	else if (_key == toString(Key_4)) return Key_4;
-	else if (_key == toString(Key_5)) return Key_5;
-	else if (_key == toString(Key_6)) return Key_6;
-	else if (_key == toString(Key_7)) return Key_7;
-	else if (_key == toString(Key_8)) return Key_8;
-	else if (_key == toString(Key_9)) return Key_9;
-	else if (_key == toString(Key_0)) return Key_0;
-	else if (_key == toString(Key_Alt)) return Key_Alt;
-	else if (_key == toString(Key_Shift)) return Key_Shift;
-	else if (_key == toString(Key_Control)) return Key_Control;
-	else if (_key == toString(Key_CapsLock)) return Key_CapsLock;
-	else if (_key == toString(Key_Tab)) return Key_Tab;
-	else if (_key == toString(Key_Return)) return Key_Return;
-	else if (_key == toString(Key_Space)) return Key_A;
-	else if (_key == toString(Key_Backspace)) return Key_A;
-	else if (_key == toString(Key_Delete)) return Key_A;
-	else if (_key == toString(Key_Up)) return Key_Up;
-	else if (_key == toString(Key_Down)) return Key_Down;
-	else if (_key == toString(Key_Left)) return Key_Left;
-	else if (_key == toString(Key_Right)) return Key_Right;
-	else if (_key == toString(Key_F1)) return Key_F1;
-	else if (_key == toString(Key_F2)) return Key_F2;
-	else if (_key == toString(Key_F3)) return Key_F3;
-	else if (_key == toString(Key_F4)) return Key_F4;
-	else if (_key == toString(Key_F5)) return Key_F5;
-	else if (_key == toString(Key_F6)) return Key_F6;
-	else if (_key == toString(Key_F7)) return Key_F7;
-	else if (_key == toString(Key_F8)) return Key_F8;
-	else if (_key == toString(Key_F9)) return Key_F9;
-	else if (_key == toString(Key_F10)) return Key_F10;
-	else if (_key == toString(Key_F11)) return Key_F11;
-	else if (_key == toString(Key_F12)) return Key_F12;
-	else {
-		OT_LOG_E("Unknown basic key \"" + _key + "\"");
-		return Key_A;
-	}
-}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Basic Key
 
 std::string ot::toString(BasicKey _key) {
-	switch (_key)
-	{
+	switch (_key) {
 	case ot::Key_A: return "A";
 	case ot::Key_B: return "B";
 	case ot::Key_C: return "C";
@@ -351,14 +297,77 @@ std::string ot::toString(BasicKey _key) {
 	}
 }
 
-ot::DocumentSyntax ot::toDocumentSyntax(const std::string& _syntax) {
-	if (_syntax == toString(DocumentSyntax::PlainText)) return DocumentSyntax::PlainText;
-	else if (_syntax == toString(DocumentSyntax::PythonScript)) return DocumentSyntax::PythonScript;
+ot::BasicKey ot::stringToBasicKey(const std::string& _key) {
+	if (_key == toString(Key_A)) return Key_A;
+	else if (_key == toString(Key_B)) return Key_B;
+	else if (_key == toString(Key_C)) return Key_C;
+	else if (_key == toString(Key_D)) return Key_D;
+	else if (_key == toString(Key_E)) return Key_E;
+	else if (_key == toString(Key_F)) return Key_F;
+	else if (_key == toString(Key_G)) return Key_G;
+	else if (_key == toString(Key_H)) return Key_H;
+	else if (_key == toString(Key_I)) return Key_I;
+	else if (_key == toString(Key_J)) return Key_J;
+	else if (_key == toString(Key_K)) return Key_K;
+	else if (_key == toString(Key_L)) return Key_L;
+	else if (_key == toString(Key_M)) return Key_M;
+	else if (_key == toString(Key_N)) return Key_N;
+	else if (_key == toString(Key_O)) return Key_O;
+	else if (_key == toString(Key_P)) return Key_P;
+	else if (_key == toString(Key_Q)) return Key_Q;
+	else if (_key == toString(Key_R)) return Key_R;
+	else if (_key == toString(Key_S)) return Key_S;
+	else if (_key == toString(Key_T)) return Key_T;
+	else if (_key == toString(Key_U)) return Key_U;
+	else if (_key == toString(Key_V)) return Key_V;
+	else if (_key == toString(Key_W)) return Key_W;
+	else if (_key == toString(Key_X)) return Key_X;
+	else if (_key == toString(Key_Y)) return Key_Y;
+	else if (_key == toString(Key_Z)) return Key_Z;
+	else if (_key == toString(Key_1)) return Key_1;
+	else if (_key == toString(Key_2)) return Key_2;
+	else if (_key == toString(Key_3)) return Key_3;
+	else if (_key == toString(Key_4)) return Key_4;
+	else if (_key == toString(Key_5)) return Key_5;
+	else if (_key == toString(Key_6)) return Key_6;
+	else if (_key == toString(Key_7)) return Key_7;
+	else if (_key == toString(Key_8)) return Key_8;
+	else if (_key == toString(Key_9)) return Key_9;
+	else if (_key == toString(Key_0)) return Key_0;
+	else if (_key == toString(Key_Alt)) return Key_Alt;
+	else if (_key == toString(Key_Shift)) return Key_Shift;
+	else if (_key == toString(Key_Control)) return Key_Control;
+	else if (_key == toString(Key_CapsLock)) return Key_CapsLock;
+	else if (_key == toString(Key_Tab)) return Key_Tab;
+	else if (_key == toString(Key_Return)) return Key_Return;
+	else if (_key == toString(Key_Space)) return Key_A;
+	else if (_key == toString(Key_Backspace)) return Key_A;
+	else if (_key == toString(Key_Delete)) return Key_A;
+	else if (_key == toString(Key_Up)) return Key_Up;
+	else if (_key == toString(Key_Down)) return Key_Down;
+	else if (_key == toString(Key_Left)) return Key_Left;
+	else if (_key == toString(Key_Right)) return Key_Right;
+	else if (_key == toString(Key_F1)) return Key_F1;
+	else if (_key == toString(Key_F2)) return Key_F2;
+	else if (_key == toString(Key_F3)) return Key_F3;
+	else if (_key == toString(Key_F4)) return Key_F4;
+	else if (_key == toString(Key_F5)) return Key_F5;
+	else if (_key == toString(Key_F6)) return Key_F6;
+	else if (_key == toString(Key_F7)) return Key_F7;
+	else if (_key == toString(Key_F8)) return Key_F8;
+	else if (_key == toString(Key_F9)) return Key_F9;
+	else if (_key == toString(Key_F10)) return Key_F10;
+	else if (_key == toString(Key_F11)) return Key_F11;
+	else if (_key == toString(Key_F12)) return Key_F12;
 	else {
-		OT_LOG_EAS("Unknown document syntax \"" + _syntax + "\"");
-		return DocumentSyntax::PlainText;
+		OT_LOG_E("Unknown basic key \"" + _key + "\"");
+		return Key_A;
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Orientation
 
 std::string ot::toString(DocumentSyntax _syntax) {
 	switch (_syntax) {
@@ -370,30 +379,44 @@ std::string ot::toString(DocumentSyntax _syntax) {
 	}
 }
 
-std::list<std::string> ot::getAllSupportedDocumentSyntax(void) {
+ot::DocumentSyntax ot::stringToDocumentSyntax(const std::string& _syntax) {
+	if (_syntax == toString(DocumentSyntax::PlainText)) return DocumentSyntax::PlainText;
+	else if (_syntax == toString(DocumentSyntax::PythonScript)) return DocumentSyntax::PythonScript;
+	else {
+		OT_LOG_EAS("Unknown document syntax \"" + _syntax + "\"");
+		return DocumentSyntax::PlainText;
+	}
+}
+
+std::list<std::string> ot::getSupportedDocumentSyntaxStringList(void) {
 	return std::list<std::string>({
 		ot::toString(DocumentSyntax::PlainText),
 		ot::toString(DocumentSyntax::PythonScript)
 	});
 }
 
-ot::LockTypeFlags ot::toLockTypeFlags(const std::vector<std::string>& _flags) {
-	LockTypeFlags flags(NoLockFlags);
-	for (const std::string& flag : _flags) {
-		flags |= toLockTypeFlag(flag);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Lock Type
+
+std::string ot::toString(LockTypeFlag _type) {
+	switch (_type) {
+	case ot::NoLockFlags: return "None";
+	case ot::LockViewWrite: return "LockViewWrite";
+	case ot::LockViewRead: return "LockViewRead";
+	case ot::LockModelWrite: return "LockModelWrite";
+	case ot::LockModelRead: return "LockModelRead";
+	case ot::LockProperties: return "LockProperties";
+	case ot::LockNavigationWrite: return "LockNavigationWrite";
+	case ot::LockNavigationAll: return "LockNavigationAll";
+	case ot::LockAll: return "LockAll";
+	default:
+		OT_LOG_E("Unknown lock type (" + std::to_string((int)_type) + ")");
+		return "None";
 	}
-	return flags;
 }
 
-ot::LockTypeFlags ot::toLockTypeFlags(const std::list<std::string>& _flags) {
-	LockTypeFlags flags(NoLockFlags);
-	for (const std::string& flag : _flags) {
-		flags |= toLockTypeFlag(flag);
-	}
-	return flags;
-}
-
-ot::LockTypeFlag ot::toLockTypeFlag(const std::string& _flag) {
+ot::LockTypeFlag ot::stringToLockTypeFlag(const std::string& _flag) {
 	if (_flag == toString(ot::LockViewWrite)) return ot::LockViewWrite;
 	else if (_flag == toString(ot::LockViewRead)) return ot::LockViewRead;
 	else if (_flag == toString(ot::LockModelWrite)) return ot::LockModelWrite;
@@ -406,21 +429,6 @@ ot::LockTypeFlag ot::toLockTypeFlag(const std::string& _flag) {
 		OT_LOG_E("Unknown lock type flag \"" + _flag + "\"");
 	}
 	return ot::NoLockFlags;
-}
-
-std::list<ot::LockTypeFlag> ot::getAllSetFlags(const LockTypeFlags& _lockFlags) {
-	std::list<LockTypeFlag> result;
-
-	if (_lockFlags & LockViewWrite) result.push_back(LockViewWrite);
-	if (_lockFlags & LockViewRead) result.push_back(LockViewRead);
-	if (_lockFlags & LockModelWrite) result.push_back(LockModelWrite);
-	if (_lockFlags & LockModelRead) result.push_back(LockModelRead);
-	if (_lockFlags & LockProperties) result.push_back(LockProperties);
-	if (_lockFlags & LockNavigationWrite) result.push_back(LockNavigationWrite);
-	if (_lockFlags & LockNavigationAll) result.push_back(LockNavigationAll);
-	if (_lockFlags & LockAll) result.push_back(LockAll);
-
-	return result;
 }
 
 std::list<std::string> ot::toStringList(const LockTypeFlags& _flags) {
@@ -438,20 +446,129 @@ std::list<std::string> ot::toStringList(const LockTypeFlags& _flags) {
 	return ret;
 }
 
-std::string ot::toString(LockTypeFlag _type) {
-	switch (_type)
-	{
-	case ot::NoLockFlags: return "None";
-	case ot::LockViewWrite: return "LockViewWrite";
-	case ot::LockViewRead: return "LockViewRead";
-	case ot::LockModelWrite: return "LockModelWrite";
-	case ot::LockModelRead: return "LockModelRead";
-	case ot::LockProperties: return "LockProperties";
-	case ot::LockNavigationWrite: return "LockNavigationWrite";
-	case ot::LockNavigationAll: return "LockNavigationAll";
-	case ot::LockAll: return "LockAll";
-	default:
-		OT_LOG_E("Unknown lock type (" + std::to_string((int)_type) + ")");
-		return "None";
+ot::LockTypeFlags ot::stringListToLockTypeFlags(const std::vector<std::string>& _flags) {
+	LockTypeFlags flags(NoLockFlags);
+	for (const std::string& flag : _flags) {
+		flags |= stringToLockTypeFlag(flag);
 	}
+	return flags;
+}
+
+ot::LockTypeFlags ot::stringListToLockTypeFlags(const std::list<std::string>& _flags) {
+	LockTypeFlags flags(NoLockFlags);
+	for (const std::string& flag : _flags) {
+		flags |= stringToLockTypeFlag(flag);
+	}
+	return flags;
+}
+
+std::list<ot::LockTypeFlag> ot::getAllSetFlags(const LockTypeFlags& _lockFlags) {
+	std::list<LockTypeFlag> result;
+
+	if (_lockFlags & LockViewWrite) result.push_back(LockViewWrite);
+	if (_lockFlags & LockViewRead) result.push_back(LockViewRead);
+	if (_lockFlags & LockModelWrite) result.push_back(LockModelWrite);
+	if (_lockFlags & LockModelRead) result.push_back(LockModelRead);
+	if (_lockFlags & LockProperties) result.push_back(LockProperties);
+	if (_lockFlags & LockNavigationWrite) result.push_back(LockNavigationWrite);
+	if (_lockFlags & LockNavigationAll) result.push_back(LockNavigationAll);
+	if (_lockFlags & LockAll) result.push_back(LockAll);
+
+	return result;
+}
+
+std::list<ot::LockTypeFlag> ot::getAllLockTypeFlags(void) {
+	return std::list<ot::LockTypeFlag>({
+		LockTypeFlag::LockViewWrite,
+		LockTypeFlag::LockViewRead,
+		LockTypeFlag::LockModelWrite,
+		LockTypeFlag::LockModelRead,
+		LockTypeFlag::LockProperties,
+		LockTypeFlag::LockNavigationWrite,
+		LockTypeFlag::LockNavigationAll,
+		LockTypeFlag::LockAll,
+		});
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Selection Result
+
+std::string ot::toString(SelectionOrigin _flag) {
+	switch (_flag) {
+	case ot::SelectionOrigin::User: return "User";
+	case ot::SelectionOrigin::View: return "View";
+	case ot::SelectionOrigin::Custom: return "Custom";
+	default:
+		OT_LOG_E("Unknown selection origin (" + std::to_string(static_cast<size_t>(_flag)) + ")");
+		return "Custom";
+	}
+}
+
+ot::SelectionOrigin ot::stringToSelectionOrigin(const std::string& _flag) {
+	if (_flag == toString(SelectionOrigin::User)) return SelectionOrigin::User;
+	else if (_flag == toString(SelectionOrigin::View)) return SelectionOrigin::View;
+	else if (_flag == toString(SelectionOrigin::Custom)) return SelectionOrigin::Custom;
+	else {
+		OT_LOG_E("Unknown selection origin \"" + _flag + "\"");
+		return SelectionOrigin::Custom;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Selection Result
+
+std::string ot::toString(SelectionResult _flag) {
+	switch (_flag) {
+	case SelectionResult::Default: return "Default";
+	case SelectionResult::NewViewRequested: return "NewViewRequested";
+	case SelectionResult::ActiveViewChanged: return "ActiveViewChanged";
+	case SelectionResult::ActiveViewChangeRequested: return "ActiveViewChangeRequested";
+	default:
+		OT_LOG_E("Unknown selection result (" + std::to_string((int)_flag) + ")");
+		return "Default";
+	}
+}
+
+ot::SelectionResult ot::stringToSelectionResult(const std::string& _flag) {
+	if (_flag == toString(SelectionResult::NewViewRequested)) return SelectionResult::NewViewRequested;
+	if (_flag == toString(SelectionResult::ActiveViewChanged)) return SelectionResult::ActiveViewChanged;
+	if (_flag == toString(SelectionResult::ActiveViewChangeRequested)) return SelectionResult::ActiveViewChangeRequested;
+	else if (_flag != toString(SelectionResult::Default)) {
+		OT_LOG_E("Unknown selection result \"" + _flag + "\"");
+	}
+	return SelectionResult::Default;
+}
+
+std::list<std::string> ot::toStringList(const SelectionResultFlags& _flags) {
+	std::list<std::string> result;
+	if (_flags & SelectionResult::NewViewRequested) result.push_back(toString(SelectionResult::NewViewRequested));
+	if (_flags & SelectionResult::ActiveViewChanged) result.push_back(toString(SelectionResult::ActiveViewChanged));
+	if (_flags & SelectionResult::ActiveViewChangeRequested) result.push_back(toString(SelectionResult::ActiveViewChangeRequested));
+	return result;
+}
+
+ot::SelectionResultFlags ot::stringListToSelectionResultFlags(const std::list<std::string>& _flags) {
+	SelectionResultFlags result(SelectionResult::Default);
+	for (const std::string& flag : _flags) {
+		result |= stringToSelectionResult(flag);
+	}
+	return result;
+}
+
+ot::SelectionResultFlags ot::stringListToSelectionResultFlags(const std::vector<std::string>& _flags) {
+	SelectionResultFlags result(SelectionResult::Default);
+	for (const std::string& flag : _flags) {
+		result |= stringToSelectionResult(flag);
+	}
+	return result;
+}
+
+std::list<ot::SelectionResult> ot::getAllSetFlags(const SelectionResultFlags& _flags) {
+	std::list<SelectionResult> result;
+	if (_flags & SelectionResult::NewViewRequested) result.push_back(SelectionResult::NewViewRequested);
+	if (_flags & SelectionResult::ActiveViewChanged) result.push_back(SelectionResult::ActiveViewChanged);
+	if (_flags & SelectionResult::ActiveViewChangeRequested) result.push_back(SelectionResult::ActiveViewChangeRequested);
+	return result;
 }

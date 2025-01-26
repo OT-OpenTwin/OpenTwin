@@ -132,6 +132,9 @@
     <ClCompile Include="src\ProjectInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NavigationSelectionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -225,6 +228,9 @@
     </QtMoc>
     <QtMoc Include="include\RenameProjectDialog.h">
       <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\NavigationSelectionManager.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

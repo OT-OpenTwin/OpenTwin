@@ -71,7 +71,7 @@ public:
 
 	ot::ServiceBase * creator(void) const { return m_creator; }
 
-	ak::UID attatchedSender(void) const { return m_eventSender; }
+	ot::UID attatchedSender(void) const { return m_eventSender; }
 
 	ak::eventType eventType(void) const { return m_eventType; }
 
@@ -87,7 +87,7 @@ public:
 
 	void setAsViewerHandler(bool _isViewerHandler) { m_isViewerHandler = _isViewerHandler; }
 
-	void attachToEvent(ak::UID _sender, ak::eventType _event, int _info1 = 0, int _info2 = 0);
+	void attachToEvent(ot::UID _sender, ak::eventType _event, int _info1 = 0, int _info2 = 0);
 
 private Q_SLOTS:
 	void slotActivated(void);
@@ -103,7 +103,7 @@ private:
 	QShortcut *			m_shortcut;
 	QString				m_sequence;
 	bool				m_isEnabled;
-	ak::UID				m_eventSender;
+	ot::UID				m_eventSender;
 	ak::eventType		m_eventType;
 	int					m_eventInfo1;
 	int					m_eventInfo2;

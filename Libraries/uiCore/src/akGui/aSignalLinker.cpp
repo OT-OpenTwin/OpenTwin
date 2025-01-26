@@ -330,29 +330,29 @@ void ak::aSignalLinker::slotKeyCombinationPressed(void) {
 
 // ##### Items
 
-void ak::aSignalLinker::slotItemChanged(ak::ID _itemID) {
+void ak::aSignalLinker::slotItemChanged(ak::UID _itemUID) {
 	if (!aSingletonAllowedMessages::instance()->changedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etChanged, _itemID, 0);
+	raiseEvent(getSenderUid(sender()), etChanged, _itemUID, 0);
 }
 
-void ak::aSignalLinker::slotItemDeleted(ak::ID _itemID) {
+void ak::aSignalLinker::slotItemDeleted(ak::UID _itemUID) {
 	if (!aSingletonAllowedMessages::instance()->changedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etDeleted, _itemID, 0);
+	raiseEvent(getSenderUid(sender()), etDeleted, _itemUID, 0);
 }
 
-void ak::aSignalLinker::slotItemClicked(ak::ID _itemID) {
+void ak::aSignalLinker::slotItemClicked(ak::UID _itemUID) {
 	if (!aSingletonAllowedMessages::instance()->clickedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etClicked, _itemID, 0);
+	raiseEvent(getSenderUid(sender()), etClicked, _itemUID, 0);
 }
 
-void ak::aSignalLinker::slotItemCloseRequested(ak::ID _itemID) {
+void ak::aSignalLinker::slotItemCloseRequested(ak::UID _itemUID) {
 	if (!aSingletonAllowedMessages::instance()->closeRequestedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etClosing, _itemID, 0);
+	raiseEvent(getSenderUid(sender()), etClosing, _itemUID, 0);
 }
 
-void ak::aSignalLinker::slotItemDoubleClicked(ak::ID _itemID) {
+void ak::aSignalLinker::slotItemDoubleClicked(ak::UID _itemUID) {
 	if (!aSingletonAllowedMessages::instance()->doubleClickedEvent()) { return; }
-	raiseEvent(getSenderUid(sender()), etDoubleClicked, _itemID, 0);
+	raiseEvent(getSenderUid(sender()), etDoubleClicked, _itemUID, 0);
 }
 
 // ##### Table

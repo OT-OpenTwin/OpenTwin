@@ -855,7 +855,7 @@ namespace ak {
 
 			//! @brief Will return the current tab of the tab tool bar at the specified window
 			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT ID getCurrentTabToolBarTab(
+			UICORE_API_EXPORT UID getCurrentTabToolBarTab(
 				UID												_windowUID
 			);
 
@@ -878,10 +878,10 @@ namespace ak {
 
 			//! @brief Will set the specified tab toolbar tab as current at the specified window
 			//! @param _windowUID The UID of the window
-			//! @param _tabID The tab to set as current
+			//! @param _tabUID The tab to set as current
 			UICORE_API_EXPORT void setCurrentTabToolBarTab(
 				UID												_windowUID,
-				ID												_tabID
+				UID												_tabUID
 			);
 
 			UICORE_API_EXPORT void setCurrentTabToolBarTab(

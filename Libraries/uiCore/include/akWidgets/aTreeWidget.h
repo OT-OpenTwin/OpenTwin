@@ -66,14 +66,9 @@ namespace ak {
 
 		// Data manipulation
 
-		//! @brief Will add a new item to the tree widget and return its ID
-		//! @param _parentUid The ID of the parent item. If Id is -1, the item will be added as top level item
-		ID add(
-			ID							_parentId = -1,
-			const QString &				_text = "",
-			textAlignment				_textAlignment = alignLeft,
-			QIcon						_icon = QIcon()
-		);
+		//! @brief Will add a new item to the tree widget and return its UID
+		//! @param _parentUid The UID of the parent item. If Id is -1, the item will be added as top level item
+		UID add(UID _parentId = -1, const QString& _text = "", textAlignment _textAlignment = alignLeft, const QIcon& _icon = QIcon());
 
 		//! @brief Will add new items to the tree according to the provided command
 		//! The command consists of the root item and the childs.
@@ -88,21 +83,16 @@ namespace ak {
 		//! Will return the UID of the very last item.
 		//! @param _cmd The tree command
 		//! @param _delimiter The delimiter used in the command which seperates the items
-		ID add(
-			const QString &				_cmd,
-			char						_delimiter = '|',
-			textAlignment				_textAlignment = alignLeft,
-			const QIcon  &				_icon = QIcon()
-		);
+		UID add(const QString& _cmd, char _delimiter = '|', textAlignment _textAlignment = alignLeft, const QIcon& _icon = QIcon());
 
 		//! @brief Will clear all tree items, receivers will get a destroyed message for each item
 		void clear(bool _emitEvent = true);
 
 		//! @brief Will set enabled state of the provided item
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _enabled The enabled state of the item
 		void setItemEnabled(
-			ID							_itemId,
+			UID							_itemId,
 			bool						_enabled = true
 		);
 
@@ -115,44 +105,44 @@ namespace ak {
 
 		//! @brief Will set the selected state of the provided item.
 		//! Will also set the selected state of the items childs if the selectAndDeselectChilds option is true
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _selected The selected state of the item
 		void setItemSelected(
-			ID							_itemId,
+			UID							_itemId,
 			bool						_selected = true
 		);
 
 		//! @brief Will set enabled state of the provided item
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _enabled The enabled state of the item
 		void setItemVisible(
-			ID							_itemId,
+			UID							_itemId,
 			bool						_visible
 		);
 
 		//! @brief Will set the text of the provided item
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _text The text to set
 		void setItemText(
-			ID							_itemId,
+			UID							_itemId,
 			const QString &				_text
 		);
 
 		//! @brief Will set the selected state of the provided item.
 		//! Will not change the selected state of the childs item even if the selectAndDeselectChilds option is true
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _selected The selected state of the item
 		void setSingleItemSelected(
-			ID							_itemId,
+			UID							_itemId,
 			bool						_selected
 		);
 
 		//! @brief Will toggle the selected state of the provided item.
 		//! Will also set the selected state of the items childs if the selectAndDeselectChilds option is true
-		//! @param _itemId The ID of the item
+		//! @param _itemId The UID of the item
 		//! @param _selected The selected state of the item
 		void toggleItemSelection(
-			ID							_itemId
+			UID							_itemId
 		);
 
 		//! @brief Will deselect all items
@@ -172,10 +162,10 @@ namespace ak {
 		);
 
 		//! @brief Will set the item icon of the specified item
-		//! @param _itemId The ID of the item to set the icon at
+		//! @param _itemId The UID of the item to set the icon at
 		//! @param _icon The icon to set
 		void setItemIcon(
-			ID							_itemId,
+			UID							_itemId,
 			const QIcon &				_icon
 		);
 
@@ -229,12 +219,12 @@ namespace ak {
 		void expandAllItems(void);
 
 		void expandItem(
-			ak::ID			_itemID,
+			ak::UID			_itemUID,
 			bool		_expanded
 		);
 
 		bool isItemExpanded(
-			ak::ID			_itemID
+			ak::UID			_itemUID
 		);
 
 		//! @brief Will collapse all items in this tree
@@ -243,14 +233,14 @@ namespace ak {
 		//! @brief Will delete the provided item from this tree
 		//! @param _item The item to delete
 		void deleteItem(
-			ID							_itemID,
+			UID							_itemUID,
 			bool						_supressSelectionChangedEvent = false
 		);
 
 		//! @brief Will delete the provided items from this tree
 		//! @param _items The items to delete
 		void deleteItems(
-			const std::vector<ID> &		_itemIDs,
+			const std::vector<UID> &		_itemUIDs,
 			bool						_supressSelectionChangedEvent = false
 		);
 
@@ -266,7 +256,7 @@ namespace ak {
 		//! @param _item The item id
 		//! @param _editable If true, the item can be modified by the user
 		void setItemIsEditable(
-			ID							_itemID,
+			UID							_itemUID,
 			bool						_editable
 		);
 
@@ -274,7 +264,7 @@ namespace ak {
 		//! @param _item The item id
 		//! @param _editable If true, the item can be modified by the user
 		void setItemIsEditable(
-			const std::vector<ID> &		_itemIDs,
+			const std::vector<UID> &		_itemUIDs,
 			bool						_editable
 		);
 
@@ -282,7 +272,7 @@ namespace ak {
 		//! @param _item The item id
 		//! @param _editable If true, the item will select its children when it is selected
 		void setItemSelectChildren(
-			ID							_itemID,
+			UID							_itemUID,
 			bool						_selectChildren
 		);
 
@@ -294,39 +284,39 @@ namespace ak {
 		// Information gathering
 
 		//! @brief Returns a list of all selected items
-		std::vector<ID> selectedItems(void);
+		std::list<UID> selectedItems(void);
 
 		//! @brief Will return all items from root to specified item as a vector where the first item is the root item
-		//! @param _itemId The ID of the requested item
+		//! @param _itemId The UID of the requested item
 		std::vector<QString> getItemPath(
-			ID							_itemId
+			UID							_itemId
 		);
 
 		//! @brief Will return all items from root to specified item as a string seperated with the provided delimiter where the first item is the root item
-		//! @param _itemId The ID of the requested item
+		//! @param _itemId The UID of the requested item
 		//! @param _delimiter The delimiter between the items
 		QString getItemPathString(
-			ID							_itemId,
+			UID							_itemId,
 			char						_delimiter = '|'
 		);
 
-		//! @brief Will return the ID of the specified item
+		//! @brief Will return the UID of the specified item
 		//! @param _itemPath The path of the requested item
 		//! @param _delimiter The delimiter of the item path
-		ID getItemID(
+		UID getItemUID(
 			const QString &				_itemPath,
 			char						_delimiter = '|'
 		);
 
 		//! @brief Will return the text of the specified item
-		//! @param _itemId The ID of the item to get the text of
+		//! @param _itemId The UID of the item to get the text of
 		QString getItemText(
-			ID							_itemId
+			UID							_itemId
 		);
 
-		//! @brief Will return the item with the specified ID
-		//! @param _itemID The ID of the item
-		aTreeWidgetItem * item(ID _itemID);
+		//! @brief Will return the item with the specified UID
+		//! @param _itemUID The UID of the item
+		aTreeWidgetItem * item(UID _itemUID);
 
 		aTreeWidgetItem* itemFromPath(const QString& _itemPath, char _delimiter = '|');
 
@@ -357,7 +347,7 @@ namespace ak {
 		//! @param _info1 Additional information 1
 		//! @param _info2 Additional information 2
 		/*void raiseItemEvent(
-			ID							_itemId,
+			UID							_itemId,
 			eventType					_eventType,
 			int							_info2 = 0
 		);
@@ -386,7 +376,7 @@ namespace ak {
 		void itemExpanded(QTreeWidgetItem *);
 		void itemTextChanged(QTreeWidgetItem *, int);
 		void itemLocationChanged(QTreeWidgetItem *, int);
-		void itemsMoved(const QList<ID>& _itemIds, const QList<ID>& _oldParentIds, const QList<ID>& _newParentIds);
+		void itemsMoved(const QList<UID>& _itemIds, const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds);
 		void customContextMenuRequested(const QPoint& _pos);
 
 	public Q_SLOTS:
@@ -426,8 +416,8 @@ namespace ak {
 			QIcon							_icon = QIcon()
 		);
 
-		void refreshAfterItemsMoved(const QList<aTreeWidgetItem *>& _items, const QList<ID>& _itemIds,
-			const QList<ID>& _oldParentIds, const QList<ID>& _newParentIds);
+		void refreshAfterItemsMoved(const QList<aTreeWidgetItem *>& _items, const QList<UID>& _itemIds,
+			const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds);
 
 		//! @brief Will clear the memory
 		void memFree(void);
@@ -448,13 +438,13 @@ namespace ak {
 		bool										m_isReadOnly;
 		bool										m_displayChildsOnFilter;
 
-		ID											m_focusedItem;
+		UID											m_focusedItem;
 
 		QString										m_headerText;				//! The header text of the tree
 
-		ID											m_currentId;				//! The current id of the items
+		UID											m_currentId;				//! The current id of the items
 
-		std::map<ID, aTreeWidgetItem *>				m_items;
+		std::map<UID, aTreeWidgetItem *>				m_items;
 
 		bool										m_selectAndDeselectChildren;
 		bool										m_itemsAreEditable;		//! If true then the items in this tree are editable
@@ -517,10 +507,10 @@ namespace ak {
 			const QString &				_text
 		);
 
-		//! @brief Will return the top level item with the provided ID
+		//! @brief Will return the top level item with the provided UID
 		//! Returns nullptr if the item does not exist
 		aTreeWidgetItem * topLevelItem(
-			ID							_id
+			UID							_id
 		);
 
 		//! @brief Will return the names of all top level items
@@ -529,21 +519,21 @@ namespace ak {
 		//! @brief Will clear the tree
 		void Clear(void);
 
-		//! @brief Will remove the topLevelItem with the provided ID
+		//! @brief Will remove the topLevelItem with the provided UID
 		//! Will not destroy the item
 		void removeTopLevelItem(
-			ID							_id
+			UID							_id
 		);
 		
 		// ####################################################################################################################################
 
 		//! @brief Will extract the id form the QTreeWidgetItem (which must be a treeItem)
-		static ID getItemId(
+		static UID getItemId(
 			QTreeWidgetItem *				_item
 		);
 
 		QList<aTreeWidgetItem *> selectedItemsRef(void) const;
-		void extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<ID>& _selectedItemIds, QList<ID>& _itemParentIds) const;
+		void extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<UID>& _selectedItemIds, QList<UID>& _itemParentIds) const;
 
 	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
@@ -553,7 +543,7 @@ namespace ak {
 
 	private:
 		aTreeWidget *						m_ownerTree;
-		std::map<ID, aTreeWidgetItem *>		m_topLevelItems;
+		std::map<UID, aTreeWidgetItem *>		m_topLevelItems;
 		
 		aTreeWidgetBase(aTreeWidgetBase &) = delete;
 		aTreeWidgetBase& operator = (aTreeWidgetBase &) = delete;
@@ -569,21 +559,21 @@ namespace ak {
 	public:
 
 		//! @brief Constructor
-		//! @param _newId The ID of this item
+		//! @param _newId The UID of this item
 		//! @param _type The type of this item
 		aTreeWidgetItem(
-			ID								_newId,
+			UID								_newId,
 			aTreeWidgetItem *				_parent = nullptr,
 			int								_type = 0
 		);
 
 		//! @brief Constructor
 		//! @param _view The view that creates this item
-		//! @param _newId The ID of this item
+		//! @param _newId The UID of this item
 		//! @param _type The type of this item
 		aTreeWidgetItem(
 			aTreeWidgetBase *				_view,
-			ID								_newId,
+			UID								_newId,
 			aTreeWidgetItem *				_parent = nullptr,
 			int								_type = 0
 		);
@@ -655,7 +645,7 @@ namespace ak {
 		//! @brief Will return a pointer to a top level child with the provided id.
 		//! Returns nullptr if the item does not exist.
 		aTreeWidgetItem * findChild(
-			ID							_id
+			UID							_id
 		);
 
 		//! @brief Will return a pointer to a top level child with the provided text.
@@ -664,19 +654,19 @@ namespace ak {
 			const QString &					_text
 		);
 
-		//! @brief Will return the ID of the specified item
+		//! @brief Will return the UID of the specified item
 		//! @param _itemPath The path of the requested item
 		//! @param _delimiter The delimiter of the item path
-		ID getItemID(
+		UID getItemUID(
 			const QStringList &				_itemPath,
 			int								_currentIndex
 		);
 
 		//! @brief Will erase this child from the information storage
 		//! This function should only be called from the child itself to clear up its data
-		//! @param _id The ID of the item to erase
+		//! @param _id The UID of the item to erase
 		void eraseChild(
-			ID							_id
+			UID							_id
 		);
 
 		//! @brief Will return true if this item has childs
@@ -691,18 +681,18 @@ namespace ak {
 		//! @brief Will return all childs of this item
 		const std::list<aTreeWidgetItem *> & allChilds(void);
 
-		//! @brief Will return the IDs of all childs at this item
-		const std::list<ID> & allChildsIDs(void);
+		//! @brief Will return the UIDs of all childs at this item
+		const std::list<UID> & allChildsUIDs(void);
 
 		//! @brief Will return the ammound of childs this item has
 		int childCount(void) const;
 
 		//! @brief Will return the id of the child
-		ID id(void) const;
+		UID id(void) const;
 
 		//! @brief Will return the id of the parent item
 		//! Returns -1 if there is no parent item
-		ID parentId(void) const;
+		UID parentId(void) const;
 
 		//! @brief Will set the stored text, this value is only used to evaluate the changed event
 		void setStoredText(const QString & _text) { m_text = _text; }
@@ -714,7 +704,7 @@ namespace ak {
 		std::list<QString> getItemPath();
 
 		//! @brief Will return all items from root to this item as a string seperated with the provided delimiter where the first item is the root item
-		//! @param _itemId The ID of the requested item
+		//! @param _itemId The UID of the requested item
 		//! @param _delimiter The delimiter between the items
 		QString getItemPathString(
 			char							_delimiter = '|'
@@ -734,8 +724,8 @@ namespace ak {
 		aTreeWidgetItem *				m_parent;
 		std::list<aTreeWidgetItem *>	m_childs;			//! Contains all childs of this item
 		std::list<aTreeWidgetItem *>	m_allChilds;
-		std::list<ID>					m_allChildsIDs;
-		ID								m_id;
+		std::list<UID>					m_allChildsUIDs;
+		UID								m_id;
 		QString							m_text;
 		bool							m_isEditable;
 		bool							m_isLockedForEdit;

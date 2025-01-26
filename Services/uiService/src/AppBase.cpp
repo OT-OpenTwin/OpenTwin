@@ -75,6 +75,7 @@
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/CreateProjectDialog.h"
@@ -955,6 +956,7 @@ void AppBase::createUi(void) {
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
+			this->connect(&m_navigationManager, &ot::NavigationSelectionManager::selectionHasChanged, this, &AppBase::slotHandleSelectionHasChanged);
 
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
@@ -1079,6 +1081,8 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::View3D, ot::WidgetViewBase::ViewIsCentral));
+		this->setupNewCentralView(wv);
+
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1090,6 +1094,8 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::View1D, ot::WidgetViewBase::ViewIsCentral));
+		this->setupNewCentralView(wv);
+
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
 	else
@@ -1455,17 +1461,14 @@ void AppBase::clearNavigationTree(void) {
 	m_projectNavigation->getTree()->clear();
 }
 
-ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
-	ID id = m_projectNavigation->getTree()->add(_treePath, _delimiter);
+ot::UID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren) {
+	ot::UID id = m_projectNavigation->getTree()->add(_treePath, _delimiter);
 	m_projectNavigation->getTree()->setItemIsEditable(id, _isEditable);
 	m_projectNavigation->getTree()->setItemSelectChildren(id, selectChildren);
 	return id;
 }
 
-void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {
-
-
-
+void AppBase::setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {
 	QString fullIconPath;
 	if (_iconName.indexOf('/') == -1)
 	{
@@ -1480,27 +1483,27 @@ void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, c
 	m_projectNavigation->getTree()->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
 }
 
-void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {
+void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName) {
 	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
 }
 
-void AppBase::setNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
+void AppBase::setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
 	m_projectNavigation->getTree()->setItemSelected(_itemID, _isSelected);
 }
 
-void AppBase::setSingleNavigationTreeItemSelected(ID _itemID, bool _isSelected) {
+void AppBase::setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected) {
 	m_projectNavigation->getTree()->setSingleItemSelected(_itemID, _isSelected);
 }
 
-void AppBase::expandSingleNavigationTreeItem(ID _itemID, bool _isExpanded) {
+void AppBase::expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded) {
 	m_projectNavigation->getTree()->expandItem(_itemID, _isExpanded);
 }
 
-bool AppBase::isTreeItemExpanded(ID _itemID) {
+bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
 	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
 }
 
-void AppBase::toggleNavigationTreeItemSelection(ID _itemID, bool _considerChilds) {
+void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
 	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
 
 	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(_considerChilds);
@@ -1508,7 +1511,7 @@ void AppBase::toggleNavigationTreeItemSelection(ID _itemID, bool _considerChilds
 	m_projectNavigation->getTree()->setAutoSelectAndDeselectChildrenEnabled(autoConsiderChilds);
 }
 
-void AppBase::removeNavigationTreeItems(const std::vector<ID> & itemIds) {
+void AppBase::removeNavigationTreeItems(const std::vector<ot::UID> & itemIds) {
 	m_projectNavigation->getTree()->deleteItems(itemIds);
 }
 
@@ -1516,12 +1519,12 @@ void AppBase::clearNavigationTreeSelection(void) {
 	m_projectNavigation->getTree()->deselectAllItems(true);
 }
 
-QString AppBase::getNavigationTreeItemText(ID _itemID) {
+QString AppBase::getNavigationTreeItemText(UID _itemID) {
 	return m_projectNavigation->getTree()->getItemText(_itemID);
 }
 
-std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
-	return m_projectNavigation->getTree()->selectedItems();
+const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems(void) {
+	return m_navigationManager.getSelectionInformation();
 }
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
@@ -1642,6 +1645,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 
 	newEditor = new ot::GraphicsViewView;
 	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
+	this->setupNewCentralView(newEditor);
 
 	ot::GraphicsView* graphics = newEditor->getGraphicsView();
 
@@ -1719,6 +1723,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setViewData(_config);
+	this->setupNewCentralView(newEditor);
 
 	ot::TextEditor* textEdit = newEditor->getTextEditor();
 	textEdit->setupFromConfig(_config, false);
@@ -1791,6 +1796,8 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setViewData(_config);
+	this->setupNewCentralView(newTable);
+
 	newTable->getTable()->setMultilineCells(true);
 	newTable->getTable()->setupFromConfig(_config);
 
@@ -2139,6 +2146,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 	}
 	
+	m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
 	clearNavigationTreeSelection();
 	
 	for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
@@ -2345,21 +2353,14 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 }
 
 void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {
-	ak::aTreeWidgetItem* itemToDeselect = nullptr;
-
-	// Previous (focus lost)
 	if (_previousView) {
-		// Select corresponding tree entry if exists
-		if (_previousView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) { // Focus out is from central
-			itemToDeselect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_previousView->getViewData().getEntityName()), '/');
-		}
-		else if (m_lastFocusedCentralView) { // Use last focused central for deselect
-			itemToDeselect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(m_lastFocusedCentralView->getViewData().getEntityName()), '/');
-		}
+		m_navigationManager.slotViewDeselected();
 	}
 
 	// Newly focused (focus in)
 	if (_focusedView) {
+		m_navigationManager.slotViewSelected();
+
 		// Update graphics picker content
 		ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
 		if (graphicsView) {
@@ -2371,48 +2372,16 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+			const ot::SelectionInformation& sel = _focusedView->getSelectionInformation();
+
+			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+
+			m_projectNavigation->getTree()->deselectAllItems(false);
+			for (ot::UID uid : sel.getSelectedNavigationItems()) {
+				m_projectNavigation->getTree()->setItemSelected(uid, true);
+			}
+
 			m_viewerComponent->viewerTabChanged(_focusedView->getViewData().getEntityName(), _focusedView->getViewData().getViewType());
-
-			if (m_viewHandling & ViewHandlingConfig::SkipEntitySelection) {
-				return;
-			}
-
-			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
-
-			// Change item selection according to focused view
-			if (itemToSelect == itemToDeselect) {
-				itemToDeselect = nullptr;
-			}
-
-			if (itemToSelect || itemToDeselect) {
-				bool changed = false;
-				bool blocked = m_projectNavigation->getTree()->signalsBlocked();
-				m_projectNavigation->getTree()->blockSignals(true);
-
-				// Deselect
-				if (itemToDeselect) {
-					if (itemToDeselect->isSelected()) {
-						itemToDeselect->setSelected(false);
-						changed = true;
-					}
-				}
-
-				// Select
-				if (itemToSelect) {
-					if (!itemToSelect->isSelected()) {
-						itemToSelect->setSelected(true);
-						changed = true;
-					}
-				}
-
-				m_projectNavigation->getTree()->blockSignals(blocked);
-
-				// Notify if needed
-				if (changed) {
-					m_projectNavigation->getTree()->selectionChangedEvent(false);
-					m_viewerComponent->handleSelectionChanged(false);
-				}
-			}
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
@@ -2477,8 +2446,7 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 		// Change item selection according to focused view
 		if (itemToSelect) {
 			bool changed = false;
-			bool blocked = m_projectNavigation->getTree()->signalsBlocked();
-			m_projectNavigation->getTree()->blockSignals(true);
+			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
 
 			// Select
 			if (itemToSelect) {
@@ -2488,12 +2456,9 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 				}
 			}
 
-			m_projectNavigation->getTree()->blockSignals(blocked);
-
 			// Notify if needed
 			if (changed) {
-				m_projectNavigation->getTree()->selectionChangedEvent(false);
-				m_viewerComponent->handleSelectionChanged(false);
+				this->runSelectionHandling(ot::SelectionOrigin::View);
 			}
 		}
 	}
@@ -3004,7 +2969,7 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
-	m_viewerComponent->handleSelectionChanged(true);
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
@@ -3028,6 +2993,17 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 		OT_LOG_EA("Item cast failed");
 	}
 	
+}
+
+void AppBase::slotHandleSelectionHasChanged(ot::SelectionResultFlags* _result, ot::SelectionOrigin _eventOrigin) {
+	// If true is returned a new view was requested
+	if (!m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems())) {
+		if (m_lastFocusedCentralView) {
+			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
+		}
+	}
+
+
 }
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
@@ -3065,4 +3041,22 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 		m_lastFocusedCentralView = nullptr;
 	}
 	
+}
+
+void AppBase::setupNewCentralView(ot::WidgetView* _view) {
+	ot::SelectionInformation selectionInfo;
+	selectionInfo.setSelectedNavigationItems(m_projectNavigation->getTree()->selectedItems());
+	_view->setSelectionInformation(selectionInfo);
+}
+
+void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
+	ot::SelectionResultFlags selectionResult = m_navigationManager.runSelectionHandling(ot::SelectionOrigin::View, m_projectNavigation->getTree()->selectedItems());
+
+	if ((selectionResult | ot::SelectionResult::NoViewChangeMask) == ot::SelectionResult::NoViewChangeMask) {
+		if (m_lastFocusedCentralView) {
+			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
+		}
+	}
+
+	//m_lastNavigationSelection.setSelectedNavigationItems(m_projectNavigation->getTree()->selectedItems());
 }

@@ -27,7 +27,7 @@
 ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
 	m_tree(nullptr), m_filter(nullptr), m_layout(nullptr),
 	m_filterCaseSensitive(false), m_filterRefreshOnChange(true), m_currentId(0), m_itemsAreEditable(false),
-	m_selectAndDeselectChildren(false), m_ignoreEvents(false), m_focusedItem(invalidID), m_isReadOnly(false),
+	m_selectAndDeselectChildren(false), m_ignoreEvents(false), m_focusedItem(invalidUID), m_isReadOnly(false),
 	m_displayChildsOnFilter(false)
 {
 	// Create tree
@@ -87,12 +87,7 @@ QWidget * ak::aTreeWidget::widget(void) { return m_widget; }
 
 // Data manipulation
 
-ak::ID ak::aTreeWidget::add(
-	ak::ID							_parentId,
-	const QString &					_text,
-	ak::textAlignment		_textAlignment,
-	QIcon							_icon
-) {
+ak::UID ak::aTreeWidget::add(UID _parentId, const QString& _text, textAlignment _textAlignment, const QIcon& _icon) {
 	if (_parentId == -1) {
 		// Check if top level item already exists
 		ak::aTreeWidgetItem * itm = m_tree->topLevelItem(_text);
@@ -107,7 +102,7 @@ ak::ID ak::aTreeWidget::add(
 	else {
 		// Find parent object
 		auto parent = m_items.find(_parentId);
-		assert(parent != m_items.end()); // Invalid ID provided
+		assert(parent != m_items.end()); // Invalid UID provided
 		ak::aTreeWidgetItem * itm = parent->second->findChild(_text);
 		if (itm == nullptr) {
 			itm = createItem(_text, _textAlignment, _icon);
@@ -119,12 +114,7 @@ ak::ID ak::aTreeWidget::add(
 	}
 }
 
-ak::ID ak::aTreeWidget::add(
-	const QString &					_cmd,
-	char							_delimiter,
-	ak::textAlignment		_textAlignment,
-	const QIcon  &					_icon
-) {
+ak::UID ak::aTreeWidget::add(const QString& _cmd, char _delimiter, textAlignment _textAlignment, const QIcon& _icon) {
 	assert(_cmd.length() > 0); // Provided command is empty
 	QStringList items = _cmd.split(_delimiter);
 
@@ -136,7 +126,10 @@ ak::ID ak::aTreeWidget::add(
 	// Search for the root element
 	for (auto itm = m_items.begin(); itm != m_items.end(); itm++) {
 		if (itm->second != nullptr) {
-			if (itm->second->parent() == nullptr && itm->second->text(0) == items.at(0)) { currentItem = itm->second; break; }
+			if (itm->second->parent() == nullptr && itm->second->text(0) == items.at(0)) {
+				currentItem = itm->second;
+				break;
+			}
 		}
 	}
 
@@ -181,11 +174,11 @@ void ak::aTreeWidget::clear(bool _emitEvent) {
 }
 
 void ak::aTreeWidget::setItemEnabled(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	bool							_enabled
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid ID provided
+	assert(itm != m_items.end()); // Invalid UID provided
 	m_ignoreEvents = true;
 	itm->second->setDisabled(!_enabled);
 	if (m_selectAndDeselectChildren) { itm->second->setChildsEnabled(_enabled); }
@@ -202,11 +195,11 @@ void ak::aTreeWidget::setIsReadOnly(
 }
 
 void ak::aTreeWidget::setItemSelected(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	bool							_selected
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	if (itm == m_items.end()) return;
 
 	m_ignoreEvents = true;
@@ -217,11 +210,11 @@ void ak::aTreeWidget::setItemSelected(
 }
 
 void ak::aTreeWidget::setItemVisible(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	bool							_visible
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	m_ignoreEvents = true;
 	itm->second->setVisible(_visible);
 	m_ignoreEvents = false;
@@ -229,18 +222,18 @@ void ak::aTreeWidget::setItemVisible(
 }
 
 void ak::aTreeWidget::setItemText(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	const QString &					_text
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	m_ignoreEvents = true;
 	itm->second->setText(0, _text);
 	m_ignoreEvents = false;
 }
 
 void ak::aTreeWidget::setSingleItemSelected(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	bool							_selected
 ) {
 	deselectAllItems(false);
@@ -248,10 +241,10 @@ void ak::aTreeWidget::setSingleItemSelected(
 }
 
 void ak::aTreeWidget::toggleItemSelection(
-	ak::ID							_itemId
+	ak::UID							_itemId
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	m_ignoreEvents = true;
 	bool state = itm->second->isSelected();
 	itm->second->setSelected(!state);
@@ -279,11 +272,11 @@ void ak::aTreeWidget::setVisible(
 ) { m_tree->setVisible(_visible); }
 
 void ak::aTreeWidget::setItemIcon(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	const QIcon &					_icon
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	if (itm != m_items.end())
 	{
 		itm->second->setIcon(0, _icon);
@@ -388,21 +381,21 @@ void ak::aTreeWidget::expandAllItems(void) {
 }
 
 void ak::aTreeWidget::expandItem(
-	ak::ID			_itemID,
+	ak::UID			_itemUID,
 	bool		_expanded
 ) 
 {
-	auto itm = m_items.find(_itemID);
+	auto itm = m_items.find(_itemUID);
 	if (itm == m_items.end()) return;
 
 	itm->second->setExpanded(_expanded);
 }
 
 bool ak::aTreeWidget::isItemExpanded(
-	ak::ID			_itemID
+	ak::UID			_itemUID
 ) 
 {
-	auto itm = m_items.find(_itemID);
+	auto itm = m_items.find(_itemUID);
 	if (itm == m_items.end()) return false;
 
 	return itm->second->isExpanded();
@@ -414,7 +407,7 @@ void ak::aTreeWidget::collapseAllItems(void) {
 }
 
 void ak::aTreeWidget::deleteItem(
-	ak::ID												_itemID,
+	ak::UID												_itemUID,
 	bool												_supressSelectionChangedEvent
 ) {
 	m_ignoreEvents = true;
@@ -422,15 +415,15 @@ void ak::aTreeWidget::deleteItem(
 	bool prevMultiselectionState = getMultiSelectionEnabled();
 	setMultiSelectionEnabled(true);
 
-	auto itm = m_items.find(_itemID);
+	auto itm = m_items.find(_itemUID);
 	assert(itm != m_items.end());		// Invalid item id
 	aTreeWidgetItem * item = itm->second;
-	for (auto cId : item->allChildsIDs()) { m_items.erase(cId); }
-	if (item->parentId() == ak::invalidID) {
+	for (auto cId : item->allChildsUIDs()) { m_items.erase(cId); }
+	if (item->parentId() == ak::invalidUID) {
 		m_tree->removeTopLevelItem(item->id());
 	}
 	delete item;
-	m_items.erase(_itemID);
+	m_items.erase(_itemUID);
 
 	setMultiSelectionEnabled(prevMultiselectionState);
 	m_ignoreEvents = false;
@@ -439,7 +432,7 @@ void ak::aTreeWidget::deleteItem(
 }
 
 void ak::aTreeWidget::deleteItems(
-	const std::vector<ak::ID> &							_itemIDs,
+	const std::vector<ak::UID> &							_itemUIDs,
 	bool												_supressSelectionChangedEvent
 ) {
 	m_ignoreEvents = true;
@@ -447,15 +440,15 @@ void ak::aTreeWidget::deleteItems(
 	bool prevMultiselectionState = getMultiSelectionEnabled();
 	setMultiSelectionEnabled(true);
 
-	for (auto id : _itemIDs) {
+	for (auto id : _itemUIDs) {
 		auto itm = m_items.find(id);
 		if (itm != m_items.end()) {
 			aTreeWidgetItem * item = itm->second;
-			for (auto cId : item->allChildsIDs()) 
+			for (auto cId : item->allChildsUIDs()) 
 			{ 		
 				m_items.erase(cId); 
 			}
-			if (item->parentId() == ak::invalidID) {
+			if (item->parentId() == ak::invalidUID) {
 				m_tree->removeTopLevelItem(item->id());
 			}
 			delete item;
@@ -482,27 +475,27 @@ void ak::aTreeWidget::setItemsAreEditable(
 }
 
 void ak::aTreeWidget::setItemIsEditable(
-	ak::ID												_itemID,
+	ak::UID												_itemUID,
 	bool												_editable
 ) {
-	auto itm = m_items.find(_itemID);
-	assert(itm != m_items.end()); // Invalid item ID
+	auto itm = m_items.find(_itemUID);
+	assert(itm != m_items.end()); // Invalid item UID
 	itm->second->setEditable(_editable);
 }
 
 void ak::aTreeWidget::setItemIsEditable(
-	const std::vector<ak::ID> &							_itemIDs,
+	const std::vector<ak::UID> &							_itemUIDs,
 	bool												_editable
 ) {
-	for (auto id : _itemIDs) { setItemIsEditable(id, _editable); }
+	for (auto id : _itemUIDs) { setItemIsEditable(id, _editable); }
 }
 
 void ak::aTreeWidget::setItemSelectChildren(
-	ak::ID												_itemID,
+	ak::UID												_itemUID,
 	bool												_selectChildren
 ) {
-	auto itm = m_items.find(_itemID);
-	assert(itm != m_items.end()); // Invalid item ID
+	auto itm = m_items.find(_itemUID);
+	assert(itm != m_items.end()); // Invalid item UID
 	itm->second->setSelectChilds(_selectChildren);
 }
 
@@ -510,8 +503,8 @@ void ak::aTreeWidget::setItemSelectChildren(
 
 // Information gathering
 
-std::vector<ak::ID> ak::aTreeWidget::selectedItems(void) {
-	std::vector<ak::ID> r;
+std::list<ak::UID> ak::aTreeWidget::selectedItems(void) {
+	std::list<ak::UID> r;
 	for (QTreeWidgetItem * itm : m_tree->selectedItems()) {
 		r.push_back(aTreeWidgetBase::getItemId(itm));
 	}
@@ -519,23 +512,23 @@ std::vector<ak::ID> ak::aTreeWidget::selectedItems(void) {
 }
 
 std::vector<QString> ak::aTreeWidget::getItemPath(
-	ak::ID							_itemId
+	ak::UID							_itemId
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	return toVector(itm->second->getItemPath());
 }
 
 QString ak::aTreeWidget::getItemPathString(
-	ak::ID							_itemId,
+	ak::UID							_itemId,
 	char							_delimiter
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	return itm->second->getItemPathString(_delimiter);
 }
 
-ak::ID ak::aTreeWidget::getItemID(
+ak::UID ak::aTreeWidget::getItemUID(
 	const QString &					_itemPath,
 	char							_delimiter
 ) {
@@ -545,22 +538,22 @@ ak::ID ak::aTreeWidget::getItemID(
 	for (auto itm = m_items.begin(); itm != m_items.end(); itm++) {
 		if (itm->second->text(0) == lst.at(0)) {
 			if (lst.count() == 1) { return itm->second->id(); }
-			return itm->second->getItemID(lst, 1);
+			return itm->second->getItemUID(lst, 1);
 		}
 	}
-	return ak::invalidID;
+	return ak::invalidUID;
 }
 
 QString ak::aTreeWidget::getItemText(
-	ak::ID							_itemId
+	ak::UID							_itemId
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item ID
+	assert(itm != m_items.end()); // Invalid item UID
 	return itm->second->text(0);
 }
 
-ak::aTreeWidgetItem * ak::aTreeWidget::item(ID _itemID) {
-	auto itm = m_items.find(_itemID);
+ak::aTreeWidgetItem * ak::aTreeWidget::item(UID _itemUID) {
+	auto itm = m_items.find(_itemUID);
 	assert(itm != m_items.end());
 	return itm->second;
 }
@@ -690,8 +683,8 @@ void ak::aTreeWidget::slotTreeSelectionChanged() {
 void ak::aTreeWidget::slotTreeMouseMove(QMouseEvent * _event) {
 	QTreeWidgetItem * item = m_tree->itemAt(_event->pos());
 	if (item == nullptr) {
-		if (m_focusedItem != invalidID) {
-			m_focusedItem = invalidID;
+		if (m_focusedItem != invalidUID) {
+			m_focusedItem = invalidUID;
 			if (m_ignoreEvents) { return; }
 			Q_EMIT focusLost();
 		}
@@ -709,8 +702,8 @@ void ak::aTreeWidget::slotTreeMouseMove(QMouseEvent * _event) {
 }
 
 void ak::aTreeWidget::slotTreeLeave(QEvent * _event) {
-	if (m_focusedItem != invalidID) {
-		m_focusedItem = invalidID;
+	if (m_focusedItem != invalidUID) {
+		m_focusedItem = invalidUID;
 		if (m_ignoreEvents) { return; }
 		Q_EMIT focusLost();
 	}
@@ -737,6 +730,8 @@ ak::aTreeWidgetItem * ak::aTreeWidget::createItem(
 	ak::textAlignment		_textAlignment,
 	QIcon							_icon
 ) {
+	m_currentId++;
+
 	// Create item
 	ak::aTreeWidgetItem * itm = nullptr;
 	itm = new ak::aTreeWidgetItem(m_currentId);
@@ -748,12 +743,11 @@ ak::aTreeWidgetItem * ak::aTreeWidget::createItem(
 	itm->setEditable(m_itemsAreEditable);
 	itm->setLocked(m_isReadOnly);
 
-	m_currentId++;
 	return itm;
 }
 
-void ak::aTreeWidget::refreshAfterItemsMoved(const QList<aTreeWidgetItem *>& _items, const QList<ID>& _itemIds,
-	const QList<ID>& _oldParentIds, const QList<ID>& _newParentIds) 
+void ak::aTreeWidget::refreshAfterItemsMoved(const QList<aTreeWidgetItem *>& _items, const QList<UID>& _itemIds,
+	const QList<UID>& _oldParentIds, const QList<UID>& _newParentIds) 
 {
 
 
@@ -858,8 +852,8 @@ void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
 		break;
 	}
 
-	QList<ID> itemIdList;
-	QList<ID> oldParentList;
+	QList<UID> itemIdList;
+	QList<UID> oldParentList;
 
 	extendedItemSelectionInformation(actualItemList, itemIdList, oldParentList);
 
@@ -867,7 +861,7 @@ void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
 	QTreeWidget::dropEvent(_event);
 
 	// Get the new parents and refresh the item parents
-	QList<ID> newParentList;
+	QList<UID> newParentList;
 	for (auto itm : actualItemList) {
 		QTreeWidgetItem * par = itm->parent();
 		if (par) {
@@ -879,23 +873,23 @@ void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
 			else {
 				assert(0); // Item cast failed
 				itm->setParentItem(nullptr);
-				newParentList.push_back(invalidID);
+				newParentList.push_back(invalidUID);
 			}
 		}
 		else {
 			itm->setParentItem(nullptr);
-			newParentList.push_back(invalidID);
+			newParentList.push_back(invalidUID);
 		}
 	}
 
 	// Update the top level item list
 	for (int i = 0; i < itemIdList.count(); i++) {
 		// Item moved to lower level than top
-		if (oldParentList[i] == invalidID && newParentList[i] != invalidID) {
+		if (oldParentList[i] == invalidUID && newParentList[i] != invalidUID) {
 			m_topLevelItems.erase(itemIdList[i]);
 		}
 		// Item moved from lower level to top
-		if (oldParentList[i] != invalidID && newParentList[i] == invalidID) {
+		if (oldParentList[i] != invalidUID && newParentList[i] == invalidUID) {
 			m_topLevelItems.insert_or_assign(itemIdList[i], actualItemList[i]);
 		}
 	}
@@ -923,7 +917,7 @@ void ak::aTreeWidgetBase::AddTopLevelItem(
 ) {
 	try {
 		if (_item == nullptr) { throw aException("Is nullptr", "Check aTreeWidgetItem"); }
-		if (_item->id() == ak::invalidID) { throw aException("Is invalid ID", "Check item ID"); }
+		if (_item->id() == ak::invalidUID) { throw aException("Is invalid UID", "Check item UID"); }
 		//if (topLevelItem(_item->text(0)) != nullptr) { throw aException("Item does already exist", "Check for duplicates"); }
 		addTopLevelItem(_item);
 		m_topLevelItems.insert_or_assign(_item->id(), _item);
@@ -953,7 +947,7 @@ ak::aTreeWidgetItem * ak::aTreeWidgetBase::topLevelItem(
 }
 
 ak::aTreeWidgetItem * ak::aTreeWidgetBase::topLevelItem(
-	ak::ID							_id
+	ak::UID							_id
 ) {
 	try {
 		for (auto itm{ m_topLevelItems.begin() }; itm != m_topLevelItems.end(); itm++) {
@@ -961,9 +955,9 @@ ak::aTreeWidgetItem * ak::aTreeWidgetBase::topLevelItem(
 		}
 		return nullptr;
 	}
-	catch (const aException & e) { throw aException(e, "ak::aTreeWidgetBase::topLevelItem(ID)"); }
-	catch (const std::exception & e) { throw aException(e.what(), "ak::aTreeWidgetBase::topLevelItem(ID)"); }
-	catch (...) { throw aException("Unknown error", "ak::aTreeWidgetBase::topLevelItem(ID)"); }
+	catch (const aException & e) { throw aException(e, "ak::aTreeWidgetBase::topLevelItem(UID)"); }
+	catch (const std::exception & e) { throw aException(e.what(), "ak::aTreeWidgetBase::topLevelItem(UID)"); }
+	catch (...) { throw aException("Unknown error", "ak::aTreeWidgetBase::topLevelItem(UID)"); }
 }
 
 std::vector<QString> ak::aTreeWidgetBase::topLevelItemsText(void) {
@@ -980,17 +974,17 @@ void ak::aTreeWidgetBase::Clear(void) {
 }
 
 void ak::aTreeWidgetBase::removeTopLevelItem(
-	ak::ID							_id
+	ak::UID							_id
 ) {
 	m_topLevelItems.erase(_id);
 }
 
 // ####################################################################################################################################
 
-ak::ID ak::aTreeWidgetBase::getItemId(
+ak::UID ak::aTreeWidgetBase::getItemId(
 	QTreeWidgetItem *		_item
 ) {
-	if (_item == nullptr) { return ak::invalidID; }
+	if (_item == nullptr) { return ak::invalidUID; }
 	aTreeWidgetItem * itm = nullptr;
 	itm = dynamic_cast<aTreeWidgetItem *>(_item);
 	assert(itm != nullptr); // Cast failed
@@ -1008,12 +1002,12 @@ QList<ak::aTreeWidgetItem *> ak::aTreeWidgetBase::selectedItemsRef(void) const {
 	return ret;
 }
 
-void ak::aTreeWidgetBase::extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<ID>& _selectedItemIds, QList<ID>& _itemParentIds) const {
+void ak::aTreeWidgetBase::extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<UID>& _selectedItemIds, QList<UID>& _itemParentIds) const {
 	for (auto itm : _selectedItems) _selectedItemIds.push_back(itm->id());
 	for (auto itm : _selectedItems) {
 		aTreeWidgetItem * par = itm->parentItem();
 		if (par) _itemParentIds.push_back(par->id());
-		else _itemParentIds.push_back(invalidID);
+		else _itemParentIds.push_back(invalidUID);
 	}
 	assert(_selectedItems.count() == _selectedItemIds.count() && _selectedItemIds.count() == _itemParentIds.count());
 }
@@ -1025,7 +1019,7 @@ void ak::aTreeWidgetBase::extendedItemSelectionInformation(const QList<aTreeWidg
 // ###########################################################################################################################################
 
 ak::aTreeWidgetItem::aTreeWidgetItem(
-	ak::ID							_newId,
+	ak::UID							_newId,
 	aTreeWidgetItem *						_parent,
 	int								_type
 ) : ak::aObject(otTreeItem), QTreeWidgetItem(_type), m_isVisible(true),
@@ -1033,7 +1027,7 @@ m_id(_newId), m_parent(_parent), m_isEditable(false), m_isLockedForEdit(false) {
 
 ak::aTreeWidgetItem::aTreeWidgetItem(
 	ak::aTreeWidgetBase *			_view,
-	ak::ID							_newId,
+	ak::UID							_newId,
 	aTreeWidgetItem *						_parent,
 	int								_type
 ) : ak::aObject(otTreeItem), QTreeWidgetItem(_view, _type), m_isVisible(true),
@@ -1159,7 +1153,7 @@ void ak::aTreeWidgetItem::setVisible(
 // Getter
 
 ak::aTreeWidgetItem * ak::aTreeWidgetItem::findChild(
-	ak::ID							_id
+	ak::UID							_id
 ) {
 	for (auto itm : m_childs) { if (itm->id() == _id) { return itm; } }
 	return nullptr;
@@ -1172,27 +1166,27 @@ ak::aTreeWidgetItem * ak::aTreeWidgetItem::findChild(
 	return nullptr;
 }
 
-ak::ID ak::aTreeWidgetItem::getItemID(
+ak::UID ak::aTreeWidgetItem::getItemUID(
 	const QStringList &						_itemPath,
 	int										_currentIndex
 ) {
 	try {
 		assert(_currentIndex < _itemPath.count()); // Invalid index provided
 		ak::aTreeWidgetItem * child = findChild(_itemPath.at(_currentIndex));
-		if (child == nullptr) { return ak::invalidID; }
+		if (child == nullptr) { return ak::invalidUID; }
 		if (_currentIndex == _itemPath.count() - 1) { return child->id(); }
-		return child->getItemID(_itemPath, _currentIndex + 1);
+		return child->getItemUID(_itemPath, _currentIndex + 1);
 	}
-	catch (const aException & e) { throw aException(e, "ak::aTreeWidgetItem::getItemID()"); }
-	catch (const std::exception & e) { throw aException(e.what(), "ak::aTreeWidgetItem::getItemID()"); }
-	catch (...) { throw aException("Unknown error", "ak::aTreeWidgetItem::getItemID()"); }
+	catch (const aException & e) { throw aException(e, "ak::aTreeWidgetItem::getItemUID()"); }
+	catch (const std::exception & e) { throw aException(e.what(), "ak::aTreeWidgetItem::getItemUID()"); }
+	catch (...) { throw aException("Unknown error", "ak::aTreeWidgetItem::getItemUID()"); }
 }
 
 void ak::aTreeWidgetItem::eraseChild(
-	ak::ID							_id
+	ak::UID							_id
 ) {
 	std::list<aTreeWidgetItem *>::iterator it1 = m_allChilds.begin();
-	std::list<ak::ID>::iterator it2 = m_allChildsIDs.begin();
+	std::list<ak::UID>::iterator it2 = m_allChildsUIDs.begin();
 	for (auto itm : m_allChilds) {
 		if (itm->id() == _id) { m_allChilds.erase(it1); break; }
 		it1++;
@@ -1202,8 +1196,8 @@ void ak::aTreeWidgetItem::eraseChild(
 		if (itm->id() == _id) { m_childs.erase(it1); break; }
 		it1++;
 	}
-	for (auto itm : m_allChildsIDs) {
-		if (itm == _id) { m_allChildsIDs.erase(it2); break; }
+	for (auto itm : m_allChildsUIDs) {
+		if (itm == _id) { m_allChildsUIDs.erase(it2); break; }
 		it2++;
 	}
 }
@@ -1231,22 +1225,22 @@ const std::list<ak::aTreeWidgetItem *> & ak::aTreeWidgetItem::allChilds(void) {
 	return m_allChilds;
 }
 
-const std::list<ak::ID> & ak::aTreeWidgetItem::allChildsIDs(void) {
-	m_allChildsIDs.clear();
+const std::list<ak::UID> & ak::aTreeWidgetItem::allChildsUIDs(void) {
+	m_allChildsUIDs.clear();
 	for (auto itm : m_childs) {
-		m_allChildsIDs.push_back(itm->id());
-		const std::list<ak::ID> & lst = itm->allChildsIDs();
-		for (auto cpy : lst) { m_allChildsIDs.push_back(cpy); }
+		m_allChildsUIDs.push_back(itm->id());
+		const std::list<ak::UID> & lst = itm->allChildsUIDs();
+		for (auto cpy : lst) { m_allChildsUIDs.push_back(cpy); }
 	}
-	return m_allChildsIDs;
+	return m_allChildsUIDs;
 }
 
 int ak::aTreeWidgetItem::childCount(void) const { return m_childs.size(); }
 
-ak::ID ak::aTreeWidgetItem::id(void) const { return m_id; }
+ak::UID ak::aTreeWidgetItem::id(void) const { return m_id; }
 
-ak::ID ak::aTreeWidgetItem::parentId(void) const {
-	if (m_parent == nullptr) { return ak::invalidID; }
+ak::UID ak::aTreeWidgetItem::parentId(void) const {
+	if (m_parent == nullptr) { return ak::invalidUID; }
 	else { return m_parent->id(); }
 }
 

@@ -564,11 +564,17 @@ Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
 	return nullptr;
 }
 
-void ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree)
+ot::SelectionResultFlags ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin)
 {
-	if (GlobalModel::instance() == nullptr) return;
+	ot::SelectionResultFlags result(ot::SelectionResult::Default);
 
-	GlobalModel::instance()->setSelectedTreeItems(_selectedTreeItems, _selectedModelItems, _selectedVisibleModelItems, _selectionFromTree);
+	if (GlobalModel::instance() == nullptr) {
+		OT_LOG_E("No global model set");
+	}
+	else {
+		result = GlobalModel::instance()->setSelectedTreeItems(_selectedTreeItems, _selectedModelItems, _selectedVisibleModelItems, _selectionOrigin);
+	}
+	return result;
 }
 
 void ViewerAPI::executeAction(unsigned long long buttonID)

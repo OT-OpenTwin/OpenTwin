@@ -66,8 +66,9 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 	}
 }
 
-void SceneNodeMultiVisualisation::setSelected(bool _selection, bool _selectionFromNavigationTree)
-{
+ot::SelectionResultFlags SceneNodeMultiVisualisation::setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) {
+	ot::SelectionResultFlags result = SceneNodeBase::setSelected(_selection, _selectionOrigin);
+
 	if (getModel() != nullptr)
 	{
 		if (!isSelected() && _selection && getModel()->isSingleItemSelected())
@@ -75,17 +76,19 @@ void SceneNodeMultiVisualisation::setSelected(bool _selection, bool _selectionFr
 			const std::list<Visualiser*> visualisers = getVisualiser();
 			for (Visualiser* visualiser : visualisers)
 			{
-				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionFromNavigationTree)
+				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					visualiser->visualise();
+					result |= ot::SelectionResult::NewViewRequested;
 				}
-				else if (visualiser->viewIsCurrentlyOpen() && _selectionFromNavigationTree)
+				else if (visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+					result |= ot::SelectionResult::ActiveViewChanged;
 				}
 			}
 		}
 	}
 
-	SceneNodeBase::setSelected(_selection, _selectionFromNavigationTree);
+	return result;
 }

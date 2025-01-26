@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Flags.h"
+#include "OTCore/CoreTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -15,6 +16,10 @@
 #include <vector>
 
 namespace ot {
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Alignment
 
 	//! \enum Alignment
 	//! \brief Alignment.
@@ -30,6 +35,13 @@ namespace ot {
 		AlignTopLeft
 	};
 
+	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
+	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Orientation
+
 	//! \enum Orientation
 	//! \brief Orientation.
 	enum Orientation {
@@ -37,6 +49,13 @@ namespace ot {
 		Vertical
 	};
 
+	OT_GUI_API_EXPORT std::string toString(Orientation _orientation);
+	OT_GUI_API_EXPORT Orientation stringToOrientation(const std::string& _string);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Font Family
+	
 	//! \enum FontFamily
 	//! \brief Generally available font families.
 	enum FontFamily {
@@ -53,12 +72,26 @@ namespace ot {
 		Verdana
 	};
 
+	OT_GUI_API_EXPORT std::string toString(FontFamily _fontFamily);
+	OT_GUI_API_EXPORT FontFamily stringToFontFamily(const std::string& _string);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Size Policy
+
 	//! \enum SizePolicy
 	//! \brief Size policy for UI elements.
 	enum SizePolicy {
 		Preferred, //! \brief The item size is the ideal size, the item wont shrink but may expand.
 		Dynamic //! \brief The item size will be ignored and the requested size will be used instead (only use for nested items).
 	};
+
+	OT_GUI_API_EXPORT std::string toString(SizePolicy _policy);
+	OT_GUI_API_EXPORT SizePolicy stringToSizePolicy(const std::string& _string);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Connections
 
 	//! \enum ConnectionDirection
 	//! \brief Describes in which direction a connetion from an item is starting.
@@ -72,12 +105,31 @@ namespace ot {
 		ConnectIn //! \brief Connection start inwards relative to the item center.
 	};
 
+	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
+	OT_GUI_API_EXPORT ConnectionDirection stringToConnectionDirection(const std::string& _direction);
+
+	//! @brief Returnse the opposite connection of the one provided
+	OT_GUI_API_EXPORT ConnectionDirection inversedConnectionDirection(ConnectionDirection _direction);
+
+	OT_GUI_API_EXPORT std::list<ConnectionDirection> getAllConnectionDirections(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Gradient
+
 	//! \brief Describes how the painter will behave when painting outsite the gradient area.
 	enum GradientSpread {
 		PadSpread, //! Pad the outside area with the color at the closest stop point.
 		RepeatSpread, //! Repeat the gradient.
 		ReflectSpread //! Reflect the gradient.
 	};
+
+	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
+	OT_GUI_API_EXPORT GradientSpread stringToGradientSpread(const std::string& _spread);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Basic Key
 
 	//! \enum BasicKey
 	enum BasicKey {
@@ -144,6 +196,14 @@ namespace ot {
 		Key_F12
 	};
 
+	OT_GUI_API_EXPORT std::string toString(BasicKey _key);
+
+	OT_GUI_API_EXPORT BasicKey stringToBasicKey(const std::string& _key);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Document Syntax
+
 	//! \brief Supported document syntax.
 	//! Mainly used for syntax highlighting.
 	enum class DocumentSyntax {
@@ -151,73 +211,95 @@ namespace ot {
 		PythonScript
 	};
 
+	OT_GUI_API_EXPORT std::string toString(DocumentSyntax _syntax);
+
+	OT_GUI_API_EXPORT DocumentSyntax stringToDocumentSyntax(const std::string& _syntax);
+
+	OT_GUI_API_EXPORT std::list<std::string> getSupportedDocumentSyntaxStringList(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Lock Type
+
 	//! \brief Describes the object type to lock in the UI.
 	//! \warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
 	enum LockTypeFlag {
-		NoLockFlags         = 0x0000, //! \brief No lock flags are set.
-		LockViewWrite       = 0x0001, //! \brief Lock view write operations.
-		LockViewRead        = 0x0002, //! \brief Lock view read operations.
+		NoLockFlags = 0x0000, //! \brief No lock flags are set.
+		LockViewWrite = 0x0001, //! \brief Lock view write operations.
+		LockViewRead = 0x0002, //! \brief Lock view read operations.
 		//! \brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to modifying the model.
-		LockModelWrite      = 0x0004,
+		LockModelWrite = 0x0004,
 		//! \brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to any model reading access.
-		LockModelRead       = 0x0008,
-		LockProperties      = 0x0010, //! \brief Lock properties.
+		LockModelRead = 0x0008,
+		LockProperties = 0x0010, //! \brief Lock properties.
 		LockNavigationWrite = 0x0020, //! \brief Lock navigation write.
-		LockNavigationAll   = 0x0040, //! \brief Lock navigation.
-		LockAll             = 0x1000 //! \brief Lock all.
+		LockNavigationAll = 0x0040, //! \brief Lock navigation.
+		LockAll = 0x1000 //! \brief Lock all.
 	};
 
 	typedef ot::Flags<LockTypeFlag> LockTypeFlags;
 
-	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags(void);
+	OT_GUI_API_EXPORT std::string toString(LockTypeFlag _type);
 
-	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
-	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
-
-	OT_GUI_API_EXPORT std::string toString(Orientation _orientation);
-	OT_GUI_API_EXPORT Orientation stringToOrientation(const std::string& _string);
-
-	OT_GUI_API_EXPORT std::string toString(FontFamily _fontFamily);
-	OT_GUI_API_EXPORT FontFamily stringToFontFamily(const std::string& _string);
-
-	OT_GUI_API_EXPORT std::string toString(SizePolicy _policy);
-	OT_GUI_API_EXPORT SizePolicy stringToSizePolicy(const std::string& _string);
-
-	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
-	OT_GUI_API_EXPORT ConnectionDirection stringToConnectionDirection(const std::string& _direction);
-
-	//! @brief Returnse the opposite connection of the one provided
-	OT_GUI_API_EXPORT ConnectionDirection inversedConnectionDirection(ConnectionDirection _direction);
-
-	OT_GUI_API_EXPORT std::list<ConnectionDirection> getAllConnectionDirections(void);
-
-	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
-	OT_GUI_API_EXPORT GradientSpread stringToGradientSpread(const std::string& _spread);
-
-	OT_GUI_API_EXPORT BasicKey toBasicKey(const std::string& _key);
-
-	OT_GUI_API_EXPORT std::string toString(BasicKey _key);
-
-	OT_GUI_API_EXPORT DocumentSyntax toDocumentSyntax(const std::string& _syntax);
-
-	OT_GUI_API_EXPORT std::string toString(DocumentSyntax _syntax);
-
-	OT_GUI_API_EXPORT std::list<std::string> getAllSupportedDocumentSyntax(void);
-
-	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::vector<std::string>& _flags);
-
-	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::list<std::string>& _flags);
-
-	OT_GUI_API_EXPORT LockTypeFlag toLockTypeFlag(const std::string& _flag);
-
-	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllSetFlags(const LockTypeFlags& _lockFlags);
+	OT_GUI_API_EXPORT LockTypeFlag stringToLockTypeFlag(const std::string& _flag);
 
 	OT_GUI_API_EXPORT std::list<std::string> toStringList(const LockTypeFlags& _flags);
 
-	OT_GUI_API_EXPORT std::string toString(LockTypeFlag _type);
+	OT_GUI_API_EXPORT LockTypeFlags stringListToLockTypeFlags(const std::list<std::string>& _flags);
+
+	OT_GUI_API_EXPORT LockTypeFlags stringListToLockTypeFlags(const std::vector<std::string>& _flags);
+
+	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllSetFlags(const LockTypeFlags& _lockFlags);
+
+	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Selection Result
+
+	//! @brief Selection origin.
+	enum class SelectionOrigin {
+		User,
+		View,
+		Custom
+	};
+
+	OT_GUI_API_EXPORT std::string toString(SelectionOrigin _flag);
+
+	OT_GUI_API_EXPORT SelectionOrigin stringToSelectionOrigin(const std::string& _flag);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Selection Result
+
+	//! @brief Result flag of a selection changed notification.
+	enum class SelectionResult {
+		Default                   = 0 << 0, //! @brief Default selection handling result.
+		NewViewRequested          = 1 << 0, //! @brief A new view was requested.
+		ActiveViewChanged         = 1 << 1, //! @brief The active view has changed after handling the selection.
+		ActiveViewChangeRequested = 1 << 2, //! @brief A change of the active view was requested/queued.
+
+		NoViewChangeMask = Default
+	};
+
+	//! @brief Result of a selection changed notification.
+	typedef ot::Flags<SelectionResult> SelectionResultFlags;
+
+	OT_GUI_API_EXPORT std::string toString(SelectionResult _flag);
+
+	OT_GUI_API_EXPORT SelectionResult stringToSelectionResult(const std::string& _flag);
+
+	OT_GUI_API_EXPORT std::list<std::string> toStringList(const SelectionResultFlags& _flags);
+
+	OT_GUI_API_EXPORT SelectionResultFlags stringListToSelectionResultFlags(const std::list<std::string>& _flags);
+
+	OT_GUI_API_EXPORT SelectionResultFlags stringListToSelectionResultFlags(const std::vector<std::string>& _flags);
+
+	OT_GUI_API_EXPORT std::list<SelectionResult> getAllSetFlags(const SelectionResultFlags& _lockFlags);
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::SelectionResult)

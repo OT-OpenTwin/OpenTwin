@@ -58,5 +58,5 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	WidgetViewBase::setFromJsonObject(_object);
 	
 	m_text = json::getString(_object, "Text");
-	m_syntax = toDocumentSyntax(json::getString(_object, "Syntax"));
+	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
 }

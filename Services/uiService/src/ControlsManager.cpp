@@ -25,7 +25,7 @@ ControlsManager::~ControlsManager() {
 	for (auto itm : m_creatorMap) { delete itm.second; }
 }
 
-void ControlsManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _controlUid, bool _elementHasEvents) {
+void ControlsManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::UID _controlUid, bool _elementHasEvents) {
 	
 	// Store ui info
 	if (_elementHasEvents) {
@@ -41,14 +41,14 @@ void ControlsManager::uiElementCreated(const ot::BasicServiceInformation& _servi
 	auto creatorList{ m_creatorMap.find(_serviceInfo) };
 	if (creatorList == m_creatorMap.end()) {
 		// Creators first element
-		std::vector<ak::UID> * newVector{ new std::vector<ak::UID> };
+		std::vector<ot::UID> * newVector{ new std::vector<ot::UID> };
 		newVector->push_back(_controlUid);
 		m_creatorMap.insert_or_assign(_serviceInfo, newVector);
 	}
 	else { creatorList->second->push_back(_controlUid); }
 }
 
-bool ControlsManager::destroyUiControl(ak::UID _controlUid) {
+bool ControlsManager::destroyUiControl(ot::UID _controlUid) {
 	// Check if object exists
 	if (!ak::uiAPI::object::exists(_controlUid)) { return false; }
 
@@ -64,7 +64,7 @@ bool ControlsManager::destroyUiControl(ak::UID _controlUid) {
 	return true;
 }
 
-void ControlsManager::destroyUiControls(const std::vector<ak::UID> & _controlUids) {
+void ControlsManager::destroyUiControls(const std::vector<ot::UID> & _controlUids) {
 	bool destroyed = true;
 	while (destroyed)
 	{
@@ -77,7 +77,7 @@ void ControlsManager::destroyUiControls(const std::vector<ak::UID> & _controlUid
 	}
 }
 
-void ControlsManager::uiControlWasDestroyed(ak::UID _controlUid) {
+void ControlsManager::uiControlWasDestroyed(ot::UID _controlUid) {
 	// Clean up the reference list
 	m_uiToCreatorMap.erase(_controlUid);
 
@@ -101,7 +101,7 @@ void ControlsManager::serviceDisconnected(const ot::BasicServiceInformation& _se
 	}
 }
 
-ot::BasicServiceInformation ControlsManager::objectCreator(ak::UID _itemUid) {
+ot::BasicServiceInformation ControlsManager::objectCreator(ot::UID _itemUid) {
 	auto itm{ m_uiToCreatorMap.find(_itemUid) };
 	if (itm == m_uiToCreatorMap.end()) {
 		OT_LOG_E("Creator not found");
@@ -124,7 +124,7 @@ LockManager::~LockManager() {
 	
 }
 
-void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _uid, const ot::LockTypeFlags & _typeFlags) {
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::UID _uid, const ot::LockTypeFlags & _typeFlags) {
 	// Check for duplicate
 	auto oldItm{ m_uiElements.find(_uid) };
 	assert(oldItm == m_uiElements.end());	// Element information already stored
@@ -237,7 +237,7 @@ void LockManager::registerLockable(const ot::BasicServiceInformation& _serviceIn
 	}
 }
 
-void LockManager::uiElementDestroyed(ak::UID _uid) {
+void LockManager::uiElementDestroyed(ot::UID _uid) {
 	
 	// Clean up UI -> lock map
 	auto oldItm{ m_uiElements.find(_uid) };
@@ -433,7 +433,7 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, const 
 	}
 }
 
-void LockManager::disable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element) {
+void LockManager::disable(const ot::BasicServiceInformation& _serviceInfo, ot::UID _element) {
 	auto service = serviceEnabledLevel(_serviceInfo);
 	auto serviceEnabledVal = service->find(_element);
 	if (serviceEnabledVal == service->end()) {
@@ -448,7 +448,7 @@ void LockManager::disable(const ot::BasicServiceInformation& _serviceInfo, ak::U
 	}
 }
 
-void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element, bool _resetCounter) {
+void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ot::UID _element, bool _resetCounter) {
 	auto service = serviceEnabledLevel(_serviceInfo);
 	auto serviceEnabledVal = service->find(_element);
 	if (serviceEnabledVal == service->end()) {
@@ -547,7 +547,7 @@ std::map<ot::LockTypeFlag, int> * LockManager::generateDefaultLockMap(void) cons
 	return newMap;
 }
 
-LockManagerElement * LockManager::uiElement(ak::UID _uid) {
+LockManagerElement * LockManager::uiElement(ot::UID _uid) {
 	auto itm = m_uiElements.find(_uid);
 	if (itm == m_uiElements.end()) {
 		return nullptr;
@@ -567,10 +567,10 @@ std::map<ot::LockTypeFlag, int> * LockManager::serviceLockLevel(const ot::BasicS
 	else { return itm->second; }
 }
 
-std::map<ak::UID, int> * LockManager::serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo) {
+std::map<ot::UID, int> * LockManager::serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo) {
 	auto itm = m_serviceToUiEnabledLevel.find(_serviceInfo);
 	if (itm == m_serviceToUiEnabledLevel.end()) {
-		auto newMap = new std::map<ak::UID, int>;
+		auto newMap = new std::map<ot::UID, int>;
 		m_serviceToUiEnabledLevel.insert_or_assign(_serviceInfo, newMap);
 		return newMap;
 	}
@@ -617,7 +617,7 @@ void ScopedLockManagerLock::setNoUnlock(void) {
 
 // #######################################################################################################################
 
-LockManagerElement::LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags)
+LockManagerElement::LockManagerElement(ot::UID _uid, const ot::LockTypeFlags & _flags)
 	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(_uid), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_text(nullptr), m_view(nullptr), m_lockable(nullptr)
 {}
 

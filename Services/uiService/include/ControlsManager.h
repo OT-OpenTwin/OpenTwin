@@ -38,18 +38,18 @@ public:
 	//! @param _creator The creator of the control (must be unique for elements with events)
 	//! @param _controlUid The UID of the control
 	//! @param _elementHasEvents If false the creator of the element can not be determined further on
-	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _controlUid, bool _elementHasEvents = true);
+	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::UID _controlUid, bool _elementHasEvents = true);
 
 	//! @brief Will destroy an UI control. Return false if failed to destroy (object still has child objects), or the object does not exist
-	bool destroyUiControl(ak::UID _controlUid);
-	void destroyUiControls(const std::vector<ak::UID> & _controlUids);
-	void uiControlWasDestroyed(ak::UID _controlUid);
+	bool destroyUiControl(ot::UID _controlUid);
+	void destroyUiControls(const std::vector<ot::UID> & _controlUids);
+	void uiControlWasDestroyed(ot::UID _controlUid);
 	void serviceDisconnected(const ot::BasicServiceInformation& _serviceInfo);
-	ot::BasicServiceInformation objectCreator(ak::UID);
+	ot::BasicServiceInformation objectCreator(ot::UID);
 
 private:
-	std::map<ot::BasicServiceInformation, std::vector<ak::UID> * >	m_creatorMap;		//! Map containing: Service -> UI UID's
-	std::map<ak::UID, ot::BasicServiceInformation>					m_uiToCreatorMap;	//! Map containing: UI UID -> Service
+	std::map<ot::BasicServiceInformation, std::vector<ot::UID> * >	m_creatorMap;		//! Map containing: Service -> UI UID's
+	std::map<ot::UID, ot::BasicServiceInformation>					m_uiToCreatorMap;	//! Map containing: UI UID -> Service
 
 	ControlsManager(const ControlsManager &) = delete;
 	ControlsManager& operator = (const ControlsManager &) = delete;
@@ -71,7 +71,7 @@ public:
 
 	//! @brief Will create a new entry for this 
 	//! This function will be called from the controls manager automatically if the lock manager was set
-	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _uid, const ot::LockTypeFlags & _typeFlags);
+	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::UID _uid, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::aTreeWidget* _tree, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::PropertyGrid* _propertyGrid, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::GraphicsView* _graphicsView, const ot::LockTypeFlags & _typeFlags);
@@ -81,7 +81,7 @@ public:
 
 	//! @brief Will remove all the stored information about the UI element
 	//! This function will be called from the controls manager automatically if the lock manager was set
-	void uiElementDestroyed(ak::UID _uid);
+	void uiElementDestroyed(ot::UID _uid);
 	void uiElementDestroyed(ak::aTreeWidget* _tree);
 	void uiElementDestroyed(ot::PropertyGrid* _propertyGrid);
 	void uiElementDestroyed(ot::GraphicsView* _graphicsView);
@@ -96,8 +96,8 @@ public:
 	void unlock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type);
 	void unlock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags);
 
-	void disable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element);
-	void enable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element, bool _resetCounter = false);
+	void disable(const ot::BasicServiceInformation& _serviceInfo, ot::UID _element);
+	void enable(const ot::BasicServiceInformation& _serviceInfo, ot::UID _element, bool _resetCounter = false);
 
 	void cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement = true, bool _eraseUiElement = false);
 
@@ -105,9 +105,9 @@ public:
 
 private:
 	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;
-	LockManagerElement * uiElement(ak::UID _uid);
+	LockManagerElement * uiElement(ot::UID _uid);
 	std::map<ot::LockTypeFlag, int> * serviceLockLevel(const ot::BasicServiceInformation& _serviceInfo);
-	std::map<ak::UID, int> * serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo);
+	std::map<ot::UID, int> * serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo);
 	void removeSpeciaElement(LockManagerElement* _element);
 
 	AppBase *														m_owner;
@@ -115,9 +115,9 @@ private:
 
 	std::map<ot::BasicServiceInformation, std::map<ot::LockTypeFlag, int> *>	m_serviceToUiLockLevel;		// Contains a overview of sender to UI elements lock levels
 
-	std::map<ot::BasicServiceInformation, std::map<ak::UID, int> *>	m_serviceToUiEnabledLevel;		// Contains all enbaled levels for every UI element related to a service
+	std::map<ot::BasicServiceInformation, std::map<ot::UID, int> *>	m_serviceToUiEnabledLevel;		// Contains all enbaled levels for every UI element related to a service
 
-	std::map<ak::UID, LockManagerElement *>					m_uiElements;
+	std::map<ot::UID, LockManagerElement *>					m_uiElements;
 
 	LockManager(const LockManager &) = delete;
 	LockManager& operator = (const LockManager &) = delete;
@@ -142,7 +142,7 @@ private:
 
 class LockManagerElement {
 public:
-	LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags);
+	LockManagerElement(ot::UID _uid, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ak::aTreeWidget* _tree, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::PropertyGrid* _prop, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::GraphicsView* _graphics, const ot::LockTypeFlags & _flags);
@@ -171,7 +171,7 @@ private:
 	ot::TextEditor* m_text;
 	ot::WidgetView* m_view;
 	LockableWidget* m_lockable;
-	ak::UID							m_uid;
+	ot::UID							m_uid;
 	ot::LockTypeFlags		m_lockTypes;
 	int								m_disabledCount;
 	int								m_lockCount;

@@ -59,7 +59,7 @@ public:
 	virtual void setWireframe(bool w) override;
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
-	virtual void setSelected(bool selected, bool _selectionFromNavigationTree) override;
+	virtual ot::SelectionResultFlags setSelected(bool selected, ot::SelectionOrigin _selectionOrigin) override;
 
 	void setShowWhenSelected(bool flag) { showWhenSelected = flag; };
 

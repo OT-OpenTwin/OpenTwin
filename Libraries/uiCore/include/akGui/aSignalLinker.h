@@ -138,11 +138,11 @@ namespace ak {
 
 		// ##### Items
 
-		void slotItemChanged(ID);
-		void slotItemDeleted(ID);
-		void slotItemClicked(ID);
-		void slotItemCloseRequested(ID);
-		void slotItemDoubleClicked(ID);
+		void slotItemChanged(UID);
+		void slotItemDeleted(UID);
+		void slotItemClicked(UID);
+		void slotItemCloseRequested(UID);
+		void slotItemDoubleClicked(UID);
 
 		// ##### Table
 

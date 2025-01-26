@@ -315,6 +315,18 @@
     <ClInclude Include="include\OTCore\CopyEntityInformation.h">
       <Filter>include\CopyInformation</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\StateStack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\StateStack.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LocalStateStack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LocalStateStack.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

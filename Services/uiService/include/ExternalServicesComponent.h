@@ -120,7 +120,7 @@ public:
 
 	// Event handling
 
-	virtual void notify(ak::UID _senderId, ak::eventType _event, int _info1, int _info2) override;
+	virtual void notify(ot::UID _senderId, ak::eventType _event, int _info1, int _info2) override;
 
 	void fillPropertyGrid(const std::string& _settings);
 
@@ -385,7 +385,7 @@ private:
 	
 	void removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service);
 
-	ak::UID getServiceUiUid(ServiceDataUi * _service);
+	ot::UID getServiceUiUid(ServiceDataUi * _service);
 
 	ServiceDataUi * getService(ot::serviceID_t _serviceID);
 	ServiceDataUi * getService(const ot::BasicServiceInformation& _serviceInfo);
@@ -406,7 +406,7 @@ private:
 
 	std::string										m_modelServiceURL;
 
-	std::map<std::string, ak::UID>					m_serviceToUidMap;
+	std::map<std::string, ot::UID>					m_serviceToUidMap;
 	std::map<ot::serviceID_t, ServiceDataUi*>	m_serviceIdMap;
 
 	std::vector<ServiceDataUi*>					m_modelViewNotifier;

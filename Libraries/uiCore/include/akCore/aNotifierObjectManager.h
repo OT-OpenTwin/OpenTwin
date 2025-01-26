@@ -38,7 +38,7 @@ namespace ak {
 		// Message IO
 
 		//! @brief Will call the callback function with the provided parameters
-		//! @param _senderId The sender ID the message was send from
+		//! @param _senderId The sender UID the message was send from
 		//! @param _event The event message
 		//! @param _info1 Message addition 1
 		//! @param _info2 Message addition 2

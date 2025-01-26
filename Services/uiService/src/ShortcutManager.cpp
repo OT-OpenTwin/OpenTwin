@@ -184,7 +184,7 @@ Qt::Key KeyboardCommandHandler::keyFromOpenTwin(ot::BasicKey _key) {
 
 // Setter
 
-void KeyboardCommandHandler::attachToEvent(ak::UID _sender, ak::eventType _event, int _info1, int _info2) {
+void KeyboardCommandHandler::attachToEvent(ot::UID _sender, ak::eventType _event, int _info1, int _info2) {
 	m_eventSender = _sender;
 	m_eventType = _event;
 	m_eventInfo1 = _info1;

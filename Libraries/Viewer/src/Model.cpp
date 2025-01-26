@@ -1008,7 +1008,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, false);
+	root->setSelected(false, ot::SelectionOrigin::Custom);
 
 	for (auto child : root->getChildren())
 	{
@@ -1036,8 +1036,9 @@ void Model::setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root)
 	}
 }
 
-void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree)
-{
+ot::SelectionResultFlags Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin) {
+	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+
 	_selectedModelItems.clear();
 
 	// Set the selection flag for all nodes to false
@@ -1053,7 +1054,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 		ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
-		return;
+		return result;
 	}
 
 	singleItemSelected = (_selectedTreeItems.size() == 1);
@@ -1073,7 +1074,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 			isItem3DSelected |= sceneNode->isItem3D();
 
 			assert(sceneNode != nullptr);
-			sceneNode->setSelected(true,_selectionFromTree);
+			result |= sceneNode->setSelected(true, _selectionOrigin);
 			_selectedModelItems.push_back(sceneNode->getModelEntityID());
 
 			if (sceneNode->isVisible()) {
@@ -1099,31 +1100,41 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 
 	if (isItem1DSelected && !isItem3DSelected) {
 		// Ensure that we have the 1D view active
-		ensure1DView();
+		if (ensure1DView()) {
+			result |= ot::SelectionResult::ActiveViewChanged;
+		}
 	}
 
 	if (isItem3DSelected && !isItem1DSelected) {
 		// Ensure that we have the 3D view active
-		ensure3DView();
+		if (ensure3DView()) {
+			result |= ot::SelectionResult::ActiveViewChanged;
+		}
 	}
 
 	// Update the working plane transformation 
 	updateWorkingPlaneTransform();
+
+	return result;
 }
 
-void Model::ensure1DView(void)
-{
-	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions")
-	{
+bool Model::ensure1DView(void) {
+	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions") {
 		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("1D");
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
-void Model::ensure3DView(void)
-{
-	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions")
-	{
+bool Model::ensure3DView(void) {
+	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions") {
 		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("3D");
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 

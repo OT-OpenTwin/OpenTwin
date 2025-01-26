@@ -10,12 +10,9 @@
 // Frontend header
 #include "uiServiceTypes.h"				// Model and View types
 #include "LoginData.h"
+#include "NavigationSelectionManager.h"
 
-// AK header
-#include <akCore/aException.h>
-#include <akCore/globalDataTypes.h>
-#include <akWidgets/aWindow.h>
-
+// OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
@@ -23,6 +20,7 @@
 #include "OTCore/CopyInformation.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -32,6 +30,10 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/MessageBoxHandler.h"
 
+// AK header
+#include <akCore/aException.h>
+#include <akCore/globalDataTypes.h>
+#include <akWidgets/aWindow.h>
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
 
@@ -120,14 +122,14 @@ public:
 
 	// Component functions
 
-	void setUiServiceUID(ak::UID _uid) { m_uid = _uid; };
-	ak::UID getUiServiceUID(void) const { return m_uid; }
+	void setUiServiceUID(ot::UID _uid) { m_uid = _uid; };
+	ot::UID getUiServiceUID(void) const { return m_uid; }
 
-	void setViewerUID(ak::UID _uid) { m_viewerUid = _uid; };
-	ak::UID getViewerUID(void) const { return m_viewerUid; };
+	void setViewerUID(ot::UID _uid) { m_viewerUid = _uid; };
+	ot::UID getViewerUID(void) const { return m_viewerUid; };
 
-	void setModelUID(ak::UID _uid) { m_modelUid = _uid; };
-	ak::UID getModelUID(void) const { return m_modelUid; };
+	void setModelUID(ot::UID _uid) { m_modelUid = _uid; };
+	ot::UID getModelUID(void) const { return m_modelUid; };
 
 	ViewerComponent* getViewerComponent(void) const { return m_viewerComponent; };
 	ExternalServicesComponent* getExternalServicesComponent(void) const { return m_ExternalServicesComponent; };
@@ -164,7 +166,7 @@ public:
 	//! @param _info1 Message addition 1
 	//! @param _info2 Message addition 2
 	//! @throw sim::Exception to forward exceptions coming from the application core class
-	virtual void notify(ak::UID _senderId, ak::eventType _eventType, int _info1, int _info2) override;
+	virtual void notify(ot::UID _senderId, ak::eventType _eventType, int _info1, int _info2) override;
 
 	virtual bool closeEvent(void) override;
 
@@ -234,7 +236,7 @@ public:
 	//! @brief Will return the current site ID
 	int getSiteID(void) const { return m_siteID; }
 
-	ak::UID uiUID(void) const { return m_uid; }
+	ot::UID uiUID(void) const { return m_uid; }
 
 	//! @brief Will set the Relay URLs
 	void setRelayURLs(const std::string &);
@@ -313,23 +315,23 @@ public:
 
 	void clearNavigationTree(void);
 
-	ak::ID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
+	ot::UID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
 
-	void setNavigationTreeItemIcon(ak::ID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
+	void setNavigationTreeItemIcon(ot::UID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
 
-	void setNavigationTreeItemText(ak::ID _itemID, const QString & _itemName);
+	void setNavigationTreeItemText(ot::UID _itemID, const QString & _itemName);
 
-	void setNavigationTreeItemSelected(ak::ID _itemID, bool _isSelected);
+	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
 
-	void setSingleNavigationTreeItemSelected(ak::ID _itemID, bool _isSelected);
+	void setSingleNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
 
-	void expandSingleNavigationTreeItem(ak::ID _itemID, bool _isExpanded);
+	void expandSingleNavigationTreeItem(ot::UID _itemID, bool _isExpanded);
 
-	bool isTreeItemExpanded(ak::ID _itemID);
+	bool isTreeItemExpanded(ot::UID _itemID);
 
-	void toggleNavigationTreeItemSelection(ak::ID _itemID, bool _considerChilds);
+	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
 
-	void removeNavigationTreeItems(const std::vector<ak::ID> & itemIds);
+	void removeNavigationTreeItems(const std::vector<ot::UID> & itemIds);
 
 	void clearNavigationTreeSelection(void);
 	
@@ -339,9 +341,9 @@ public:
 
 	//void fillPropertyGrid(const std::string &settings);
 
-	QString getNavigationTreeItemText(ak::ID _itemID);
+	QString getNavigationTreeItemText(ot::UID _itemID);
 
-	std::vector<int> getSelectedNavigationTreeItems(void);
+	const ot::SelectionInformation& getSelectedNavigationTreeItems(void);
 
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisible1D(bool visible1D) { m_visible1D = visible1D; }
@@ -439,7 +441,7 @@ public:
 
 	// #######################################################################################################################
 
-	void destroyObjects(const std::vector<ak::UID> & _objects);
+	void destroyObjects(const std::vector<ot::UID> & _objects);
 
 	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect);
 
@@ -508,6 +510,8 @@ private Q_SLOTS:
 	void slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column);
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
+	void slotHandleSelectionHasChanged(ot::SelectionResultFlags* _result, ot::SelectionOrigin _eventOrigin);
+
 private:
 	enum class AppState {
 		NoState                = 0x00,
@@ -536,6 +540,10 @@ private:
 
 	void cleanupWidgetViewInfo(ot::WidgetView* _view);
 
+	void setupNewCentralView(ot::WidgetView* _view);
+
+	void runSelectionHandling(ot::SelectionOrigin _eventOrigin);
+
 	AppStateFlags               m_state;
 	ViewHandlingFlags           m_viewHandling;
 
@@ -563,20 +571,22 @@ private:
 
 	ShortcutManager *			m_shortcutManager;
 	
+	ot::NavigationTreeView* m_projectNavigation;
+	ot::NavigationSelectionManager m_navigationManager;
+
 	LoginData m_loginData;
 
 	// Default UI
 
 	ToolBar *					m_ttb;
-	ot::NavigationTreeView* m_projectNavigation;
 	ot::PropertyGridView*  m_propertyGrid;
 	ot::PlainTextEditView* m_output;
 	ot::GraphicsPickerView* m_graphicsPicker;
 	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
-	ak::UID						m_uid;							//! The UID of the wrapper
-	ak::UID						m_mainWindow;
-	ak::UID						m_viewerUid;					//! The UID of the viewer
-	ak::UID						m_modelUid;					//! The UID of the model
+	ot::UID						m_uid;							//! The UID of the wrapper
+	ot::UID						m_mainWindow;
+	ot::UID						m_viewerUid;					//! The UID of the viewer
+	ot::UID						m_modelUid;					//! The UID of the model
 	
 	ot::Label* m_logIntensity;
 

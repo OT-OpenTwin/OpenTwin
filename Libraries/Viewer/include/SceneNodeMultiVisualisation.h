@@ -22,7 +22,8 @@ public:
 
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
-	virtual void setSelected(bool _selection, bool _selectionFromNavigationTree) override;
+	//! \return Returns true if the selection has requested a new view.
+	virtual ot::SelectionResultFlags setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) override;
 
 	void setStorage(const std::string& _projectName) { projectName = _projectName; }
 

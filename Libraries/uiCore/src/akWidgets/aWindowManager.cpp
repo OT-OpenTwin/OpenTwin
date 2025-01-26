@@ -460,7 +460,7 @@ ak::aTtbContainer * ak::aWindowManager::getTabToolBarSubContainer(
 	return nullptr;
 }
 
-QString ak::aWindowManager::getTabToolBarTabText(ak::ID _tabId) {
+QString ak::aWindowManager::getTabToolBarTabText(ak::UID _tabId) {
 	return m_tabToolBar->tabWidget()->tabText(_tabId);
 }
 
@@ -471,17 +471,17 @@ void ak::aWindowManager::addTabToolbarWidget(
 	assert(0); // Not implemented yet
 }
 
-ak::ID ak::aWindowManager::currentTabToolbarTab(void) const { return m_tabToolBar->CurrentTab(); }
+ak::UID ak::aWindowManager::currentTabToolbarTab(void) const { return m_tabToolBar->CurrentTab(); }
 
 int ak::aWindowManager::tabToolbarTabCount(void) const { return m_tabToolBar->TabCount(); }
 
 void ak::aWindowManager::enableTabToolbar(bool flag) const { return m_tabToolBar->setEnabled(flag); }
 
 void ak::aWindowManager::setCurrentTabToolBarTab(
-	ak::ID						_tabID
+	ak::UID						_tabUID
 ) {
-	assert(_tabID >= 0 && _tabID < m_tabToolBar->TabCount());	// Index out of range
-	m_tabToolBar->SetCurrentTab(_tabID);
+	assert(_tabUID >= 0 && _tabUID < m_tabToolBar->TabCount());	// Index out of range
+	m_tabToolBar->SetCurrentTab(_tabUID);
 }
 
 void ak::aWindowManager::setCurrentTabToolBarTab(

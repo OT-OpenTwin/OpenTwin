@@ -178,7 +178,7 @@ void EntityFileText::setSpecializedProperties()
 
 	EntityPropertiesSelection::createProperty("Text Properties",
 		"Syntax Highlight",
-		ot::getAllSupportedDocumentSyntax(),
+		ot::getSupportedDocumentSyntaxStringList(),
 		ot::toString(defaultSyntaxHighlighting),
 		"default",
 		this->getProperties()

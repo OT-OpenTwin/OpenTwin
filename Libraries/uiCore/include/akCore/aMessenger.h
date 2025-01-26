@@ -18,7 +18,7 @@
 #include <mutex>
 
 // AK header
-#include <akCore/globalDataTypes.h>		// UID and ID type
+#include <akCore/globalDataTypes.h>		// UID type
 #include <akCore/akCore.h>				// eventType
 
 namespace ak {

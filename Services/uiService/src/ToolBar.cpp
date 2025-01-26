@@ -110,7 +110,7 @@ ToolBar::ToolBar(AppBase * _owner)
 }
 
 void ToolBar::notify(
-	ak::UID			_sender,
+	ot::UID			_sender,
 	ak::eventType	_event,
 	int				_info1,
 	int				_info2
@@ -139,45 +139,45 @@ tt::Page* ToolBar::getStartPage(void) {
 	return page->getPage();
 }
 
-ak::UID ToolBar::addPage(ak::UID _creator, const QString & _pageName) {
+ot::UID ToolBar::addPage(ot::UID _creator, const QString & _pageName) {
 	return uiAPI::createTabToolBarSubContainer(_creator, m_owner->m_mainWindow, _pageName);
 }
 
-ak::UID ToolBar::addGroup(ak::UID _creator, ak::UID _page, const QString & _groupName) {
+ot::UID ToolBar::addGroup(ot::UID _creator, ot::UID _page, const QString & _groupName) {
 	return uiAPI::createTabToolBarSubContainer(_creator, _page, _groupName);
 }
 
-ak::UID ToolBar::addSubGroup(ak::UID _creator, ak::UID _group, const QString & _subGroupName) {
+ot::UID ToolBar::addSubGroup(ot::UID _creator, ot::UID _group, const QString & _subGroupName) {
 	return uiAPI::createTabToolBarSubContainer(_creator, _group, _subGroupName);
 }
 
-ak::UID ToolBar::addToolButton(ak::UID _creator, ak::UID _container, const QIcon & _icon, const QString & _title) {
-	ak::UID obj = uiAPI::createToolButton(_creator, _title, _icon);
+ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QIcon & _icon, const QString & _title) {
+	ot::UID obj = uiAPI::createToolButton(_creator, _title, _icon);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
-ak::UID ToolBar::addToolButton(ak::UID _creator, ak::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title) {
-	ak::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
+ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title) {
+	ot::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
-ak::UID ToolBar::addToolButton(ak::UID _creator, ak::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title, ak::aNotifier * _notifier) {
-	ak::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
+ot::UID ToolBar::addToolButton(ot::UID _creator, ot::UID _container, const QString & _iconName, const QString & _iconPath, const QString & _title, ak::aNotifier * _notifier) {
+	ot::UID obj = uiAPI::createToolButton(_creator, _title, _iconName, _iconPath);
 	uiAPI::container::addObject(_container, obj);
 	uiAPI::registerUidNotifier(obj, _notifier);
 	return obj;
 }
 
-ak::UID ToolBar::addCheckBox(ak::UID _creator, ak::UID _container, const QString & _text, bool _initialState) {
-	ak::UID obj = uiAPI::createCheckbox(_creator, _text, _initialState);
+ot::UID ToolBar::addCheckBox(ot::UID _creator, ot::UID _container, const QString & _text, bool _initialState) {
+	ot::UID obj = uiAPI::createCheckbox(_creator, _text, _initialState);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }
 
-ak::UID ToolBar::addNiceLineEdit(ak::UID _creator, ak::UID _container, const QString & _title, const QString & _initialState) {
-	ak::UID obj = uiAPI::createNiceLineEdit(_creator, _initialState, _title);
+ot::UID ToolBar::addNiceLineEdit(ot::UID _creator, ot::UID _container, const QString & _title, const QString & _initialState) {
+	ot::UID obj = uiAPI::createNiceLineEdit(_creator, _initialState, _title);
 	uiAPI::container::addObject(_container, obj);
 	return obj;
 }

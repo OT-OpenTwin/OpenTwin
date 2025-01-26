@@ -157,7 +157,8 @@ public:
 	void updateMeshColor(unsigned long long modelEntityID, double colorRGB[3]);
 	void updateObjectFacetsFromDataBase(unsigned long long modelEntityID, unsigned long long entityID, unsigned long long entityVersion);
 
-	void setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree);
+	//! \return Returns true if the selection has requested a new view.
+	ot::SelectionResultFlags setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin);
 	void executeAction(unsigned long long _buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
 	void clearHoverView(void);
@@ -209,8 +210,11 @@ public:
 
 	void freeze3DView(bool flag);
 
-	void ensure1DView(void);
-	void ensure3DView(void);
+	//! @return Return true if a view change was requested.
+	bool ensure1DView(void);
+
+	//! @return Return true if a view change was requested.
+	bool ensure3DView(void);
 
 	bool isSingleItemSelected(void) { return singleItemSelected; }
 

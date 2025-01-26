@@ -191,7 +191,7 @@ namespace ak {
 			const QString &				_text
 		);
 
-		QString getTabToolBarTabText(ak::ID _tabId);
+		QString getTabToolBarTabText(ak::UID _tabId);
 
 		//! @brief Will add the object with the provided uid to the specified parent object
 		//! The object must have been creted by the objectManager used in this tab toolbar manager.
@@ -205,7 +205,7 @@ namespace ak {
 		);
 
 		//! @brief Will return the current selected tab toolbar tab
-		ID currentTabToolbarTab(void) const;
+		UID currentTabToolbarTab(void) const;
 
 		//! @brief Will return the ammount of tabs in the tabToolbar
 		int tabToolbarTabCount(void) const;
@@ -214,9 +214,9 @@ namespace ak {
 		void enableTabToolbar(bool flag) const;
 
 		//! @brief Will set the specified tab toolbar tab as current
-		//! @param _tabID The tab to set as current
+		//! @param _tabUID The tab to set as current
 		void setCurrentTabToolBarTab(
-			ID						_tabID
+			UID						_tabUID
 		);
 
 		void setCurrentTabToolBarTab(

@@ -399,9 +399,9 @@ void SceneNodeGeometry::setEdgeHighlight(unsigned long long faceId, bool h, doub
 	}
 }
 
-void SceneNodeGeometry::setSelected(bool selected, bool _selectionFromNavigationTree)
+ot::SelectionResultFlags SceneNodeGeometry::setSelected(bool selected, ot::SelectionOrigin _selectionOrigin)
 {
-	SceneNodeBase::setSelected(selected, _selectionFromNavigationTree);
+	ot::SelectionResultFlags result = SceneNodeBase::setSelected(selected, _selectionOrigin);
 
 	// Handle visibility state
 	if (showWhenSelected)
@@ -417,6 +417,8 @@ void SceneNodeGeometry::setSelected(bool selected, bool _selectionFromNavigation
 			updateTransparentState(isVisible(), isTransparent(), isWireframe());
 		}
 	}
+
+	return result;
 }
 
 void SceneNodeGeometry::applyParentTransform(void)

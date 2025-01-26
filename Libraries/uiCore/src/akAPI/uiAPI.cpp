@@ -834,15 +834,15 @@ void ak::uiAPI::window::setTabToolbarDoubleClickEnabled(
 	bool											_isEnabled
 ) { object::get<aWindowManager>(_windowUID)->setTabToolbarDoubleClickEnabled(_isEnabled); }
 
-ak::ID ak::uiAPI::window::getCurrentTabToolBarTab(
+ak::UID ak::uiAPI::window::getCurrentTabToolBarTab(
 	UID												_windowUID
 ) { return object::get<aWindowManager>(_windowUID)->currentTabToolbarTab(); }
 
 std::string ak::uiAPI::window::getCurrentToolBarTabText(UID _windowUID) {
 	aWindowManager* manager = object::get<aWindowManager>(_windowUID);
 	if (manager) {
-		ID id = manager->currentTabToolbarTab();
-		if (id != invalidID) {
+		UID id = manager->currentTabToolbarTab();
+		if (id != invalidUID) {
 			return manager->getTabToolBarTabText(id).toStdString();
 		}
 	}
@@ -861,8 +861,8 @@ void ak::uiAPI::window::enableTabToolBar(
 
 void ak::uiAPI::window::setCurrentTabToolBarTab(
 	UID												_windowUID,
-	ID												_tabID
-) { object::get<aWindowManager>(_windowUID)->setCurrentTabToolBarTab(_tabID); }
+	UID												_tabUID
+) { object::get<aWindowManager>(_windowUID)->setCurrentTabToolBarTab(_tabUID); }
 
 void ak::uiAPI::window::setCurrentTabToolBarTab(
 	UID												_windowUID,

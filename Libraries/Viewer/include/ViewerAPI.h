@@ -6,6 +6,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
@@ -49,7 +50,7 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void setTreeStateRecording(ot::UID osgModelID, bool flag);
 
-	__declspec(dllexport) void setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree);
+	__declspec(dllexport) ot::SelectionResultFlags setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin);
 	__declspec(dllexport) void executeAction(unsigned long long buttonID);
 
 	__declspec(dllexport) void setHoverTreeItem(ot::UID hoverItemID);

@@ -83,7 +83,7 @@ ot::UID ViewerComponent::addTreeItem(const std::string &treePath, bool editable,
 {
 	try {
 		try {
-			ak::ID id = AppBase::instance()->addNavigationTreeItem(treePath.c_str(), '/', editable, selectChildren);
+			ot::UID id = AppBase::instance()->addNavigationTreeItem(treePath.c_str(), '/', editable, selectChildren);
 			return id;
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addTreeItem()"); }
@@ -127,7 +127,7 @@ void ViewerComponent::removeTreeItems(std::list<ot::UID> treeItemIDList)
 {
 	try {
 		try {
-			std::vector<ak::ID> items;
+			std::vector<ot::UID> items;
 			for (auto itm : treeItemIDList) { items.push_back(itm); }
 			AppBase::instance()->removeNavigationTreeItems(items);
 		}
@@ -206,7 +206,7 @@ void ViewerComponent::clearTreeSelection(void) {
 }
 
 void ViewerComponent::refreshSelection(void) {
-	this->handleSelectionChanged(true);
+	this->handleSelectionChanged(ot::SelectionOrigin::Custom, AppBase::instance()->getSelectedNavigationTreeItems());
 }
 
 void ViewerComponent::addKeyShortcut(const std::string &keySequence) {
@@ -307,7 +307,7 @@ ViewerUIDtype ViewerComponent::addMenuPage(const std::string &pageName)
 {
 	try {
 		try {
-			ak::UID page = AppBase::instance()->getToolBar()->addPage(AppBase::instance()->getViewerUID(), pageName.c_str());
+			ot::UID page = AppBase::instance()->getToolBar()->addPage(AppBase::instance()->getViewerUID(), pageName.c_str());
 			AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), page, false);
 			return page;
 		}
@@ -323,7 +323,7 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 {
 	try {
 		try {
-			ak::UID group = AppBase::instance()->getToolBar()->addGroup(AppBase::instance()->getViewerUID(), menuPageID, groupName.c_str());
+			ot::UID group = AppBase::instance()->getToolBar()->addGroup(AppBase::instance()->getViewerUID(), menuPageID, groupName.c_str());
 			AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), group, false);
 			return group;
 		}
@@ -336,7 +336,7 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 }
 
 ViewerUIDtype ViewerComponent::addMenuSubGroup(ViewerUIDtype _menuGroupID, const std::string& _subGroupName) {
-	ak::UID subGroup = AppBase::instance()->getToolBar()->addSubGroup(AppBase::instance()->getViewerUID(), _menuGroupID, QString::fromStdString(_subGroupName));
+	ot::UID subGroup = AppBase::instance()->getToolBar()->addSubGroup(AppBase::instance()->getViewerUID(), _menuGroupID, QString::fromStdString(_subGroupName));
 	AppBase::instance()->controlsManager()->uiElementCreated(this->getBasicServiceInformation(), subGroup, false);
 	return subGroup;
 }
@@ -599,7 +599,7 @@ void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 			// Process all delayed actions 
 			if (treeSelectionReceived)
 			{
-				this->handleSelectionChanged(true);
+				this->handleSelectionChanged(ot::SelectionOrigin::Custom, AppBase::instance()->getSelectedNavigationTreeItems());
 			}
 		}
 	}
@@ -610,7 +610,7 @@ void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 // Intern calls
 
 void ViewerComponent::notify(
-	ak::UID									_senderId,
+	ot::UID									_senderId,
 	ak::eventType						_event,
 	int										_info1,
 	int										_info2
@@ -630,24 +630,20 @@ void ViewerComponent::notify(
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
+ot::SelectionResultFlags ViewerComponent::handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectionInformation) {
+	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+
 	OT_TEST_VIEWECOMPONENT_Interval("Selection Changed");
 
 	if (processingGroupCounter > 0)
 	{
 		treeSelectionReceived = true;
-		return;
-	}
-
-	std::vector<int> selection = AppBase::instance()->getSelectedNavigationTreeItems();
-	std::list<ot::UID> selectedTreeItems;
-	for (auto itm : selection) {
-		selectedTreeItems.push_back(itm);
+		return result;
 	}
 
 	// Send the selection changed notification to the viewer component and the model component
-	std::list<ak::UID> selectedModelItems, selectedVisibleModelItems;
-	ViewerAPI::setSelectedTreeItems(selectedTreeItems, selectedModelItems, selectedVisibleModelItems, _selectionFromTree);
+	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;
+	result = ViewerAPI::setSelectedTreeItems(_selectionInformation.getSelectedNavigationItems(), selectedModelItems, selectedVisibleModelItems, _selectionOrigin);
 
 	// Model function
 	ot::UID activeModel = ViewerAPI::getActiveDataModel();
@@ -655,6 +651,8 @@ void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
 	{
 		AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
 	}
+
+	return result;
 }
 
 ViewerUIDtype ViewerComponent::getActiveDataModel() {
@@ -773,7 +771,7 @@ void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::
 }
 
 void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
-		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation
+		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation
 ) {
 	try {
 		ViewerAPI::addNodeFromFacetDataBase(visModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective, modelEntityID, treeIcons,

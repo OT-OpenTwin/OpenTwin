@@ -72,6 +72,8 @@
     <ClInclude Include="include\OTCore\CopyInformationFactory.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
+    <ClInclude Include="include\OTCore\LocalStateStack.h" />
+    <ClInclude Include="include\OTCore\LocalStateStack.hpp" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
@@ -109,6 +111,8 @@
     <ClInclude Include="include\OTCore\Serializable.h" />
     <ClInclude Include="include\OTCore\ServiceBase.h" />
     <ClInclude Include="include\OTCore\Size2D.h" />
+    <ClInclude Include="include\OTCore\StateStack.h" />
+    <ClInclude Include="include\OTCore\StateStack.hpp" />
     <ClInclude Include="include\OTCore\String.h" />
     <ClInclude Include="include\OTCore\String.hpp" />
     <ClInclude Include="include\OTCore\StringToNumericCheck.h" />

@@ -64,13 +64,7 @@ namespace ak {
 	//! @brief The UID datatype used for objects
 	typedef unsigned long long UID;
 
-	//! @brief The ID datatype used for items
-	typedef int	ID;
-
 	//! @brief Represents the invalid UID for an object
 	const UID invalidUID = 0;
-
-	//! @brief Represents the invalid ID for an item
-	const ID invalidID = -1;
 
 }

@@ -78,7 +78,7 @@ void ak::aMessenger::registerUidReceiver(
 			// Create new vector to store the notifier classes
 			std::vector<aNotifier *> * collection = nullptr;
 			collection = new (std::nothrow) std::vector<aNotifier *>();
-			if (collection == nullptr) { throw aException("Memory allocation failed", "Allocate collection at ID does not exist"); }
+			if (collection == nullptr) { throw aException("Memory allocation failed", "Allocate collection at UID does not exist"); }
 			collection->push_back(_notifier);
 			m_uidReceivers.insert_or_assign(_senderId, collection);
 		} else {
@@ -104,7 +104,7 @@ void ak::aMessenger::registerEventTypeReceiver(
 			// Create new vector to store the notifier classes
 			std::vector<aNotifier *> * collection = nullptr;
 			collection = new (std::nothrow) std::vector<aNotifier *>();
-			if (collection == nullptr) { throw aException("Memory allocation failed", "Allocate collection at ID does not exist"); }
+			if (collection == nullptr) { throw aException("Memory allocation failed", "Allocate collection at UID does not exist"); }
 			collection->push_back(_notifier);
 			m_eventReceivers.insert_or_assign(_eventType, collection);
 		}
