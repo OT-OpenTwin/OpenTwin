@@ -1057,10 +1057,10 @@ bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request) {
 	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
 }
 
-bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request, const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs) {
+bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs) {
 	if (!this->isUiConnected()) return false;
 	std::string tmp;
-	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
+	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, _prefetchIDs, tmp);
 }
 
 void Application::flushRequestsToFrontEnd()
