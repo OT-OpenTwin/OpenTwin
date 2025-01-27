@@ -36,16 +36,8 @@ void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _own
 
 	m_selectedEntityIDs.remove(_entityID);
 	m_selectedVisibleEntityIDs.remove(_entityID);
-	
-	auto ownerIt = m_ownersWithSelection.find(_owner);
-	if (ownerIt != m_ownersWithSelection.end())
-	{
-		ownerIt->second.remove(_entityID);
-		if (ownerIt->second.empty())
-		{
-			m_ownersWithSelection.erase(ownerIt->first);
-		}
-	}
+
+	notifyOwners();
 }
 
 const std::list<ot::UID>& SelectionHandler::getSelectedEntityIDs()
