@@ -1659,8 +1659,8 @@ void Viewer::setCursorText(const std::string& text)
 
 		const int textHeight = 15;
 
-		float centerX = mouseCursorX;
-		float centerY = this->height() - mouseCursorY - 1.3 * textHeight;
+		float centerX = mouseCursorX / scaleWidth;
+		float centerY = this->height() - mouseCursorY / scaleHeight - 1.3 * textHeight;
 
 		mouseCursorText = createText(osg::Vec2(centerX, centerY), text, 1.0f * textHeight);
 
