@@ -90,53 +90,62 @@ void VtkDriverGeneric::setProperties(EntityVis2D3D *visEntity)
 	EntityPropertiesBoolean *logscaleProperty = dynamic_cast<EntityPropertiesBoolean*>(visEntity->getProperties().getProperty("Logscale"));
 
 	// Update the visualization -> Create a new visualization data object
-	if (typeProperty->getValue() == "Arrows")
+	if (typeProperty != nullptr)
 	{
-		setVisualizationType(VtkDriverGeneric::ARROWS);
-	}
-	else if (typeProperty->getValue() == "Contour")
-	{
-		setVisualizationType(VtkDriverGeneric::CONTOUR);
-	}
-	else if (typeProperty->getValue() == "Carpet")
-	{
-		setVisualizationType(VtkDriverGeneric::CARPET);
-	}
-	else if (typeProperty->getValue() == "Isolines")
-	{
-		setVisualizationType(VtkDriverGeneric::ISOLINES);
-	}
-	else
-	{
-		assert(0); // Unknown visualization type
-	}
-
-	if (normalProperty->getValue() == "X")
-	{
-		setNormal(1.0, 0.0, 0.0);
-	}
-	else if (normalProperty->getValue() == "Y")
-	{
-		setNormal(0.0, 1.0, 0.0);
-	}
-	else if (normalProperty->getValue() == "Z")
-	{
-		setNormal(0.0, 0.0, 1.0);
-	}
-	else if (normalProperty->getValue() == "Free")
-	{
-		double nx = normalXProperty->getValue();
-		double ny = normalYProperty->getValue();
-		double nz = normalZProperty->getValue();
-
-		setNormal(nx, ny, nz);
-	}
-	else
-	{
-		assert(0); // Unknown normal type
+		if (typeProperty->getValue() == "Arrows")
+		{
+			setVisualizationType(VtkDriverGeneric::ARROWS);
+		}
+		else if (typeProperty->getValue() == "Contour")
+		{
+			setVisualizationType(VtkDriverGeneric::CONTOUR);
+		}
+		else if (typeProperty->getValue() == "Carpet")
+		{
+			setVisualizationType(VtkDriverGeneric::CARPET);
+		}
+		else if (typeProperty->getValue() == "Isolines")
+		{
+			setVisualizationType(VtkDriverGeneric::ISOLINES);
+		}
+		else
+		{
+			assert(0); // Unknown visualization type
+		}
 	}
 
-	setCenter(centerXProperty->getValue(), centerYProperty->getValue(), centerZProperty->getValue());
+	if (normalProperty != nullptr)
+	{
+		if (normalProperty->getValue() == "X")
+		{
+			setNormal(1.0, 0.0, 0.0);
+		}
+		else if (normalProperty->getValue() == "Y")
+		{
+			setNormal(0.0, 1.0, 0.0);
+		}
+		else if (normalProperty->getValue() == "Z")
+		{
+			setNormal(0.0, 0.0, 1.0);
+		}
+		else if (normalProperty->getValue() == "Free")
+		{
+			double nx = normalXProperty->getValue();
+			double ny = normalYProperty->getValue();
+			double nz = normalZProperty->getValue();
+
+			setNormal(nx, ny, nz);
+		}
+		else
+		{
+			assert(0); // Unknown normal type
+		}
+	}
+
+	if (centerXProperty != nullptr && centerYProperty != nullptr && centerZProperty != nullptr)
+	{
+		setCenter(centerXProperty->getValue(), centerYProperty->getValue(), centerZProperty->getValue());
+	}
 }
 
 std::string VtkDriverGeneric::buildSceneNode(DataSourceManagerItem *dataItem)
