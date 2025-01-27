@@ -2997,13 +2997,7 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 
 void AppBase::slotHandleSelectionHasChanged(ot::SelectionResultFlags* _result, ot::SelectionOrigin _eventOrigin) {
 	// If true is returned a new view was requested
-	if (!m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems())) {
-		if (m_lastFocusedCentralView) {
-			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
-		}
-	}
-
-
+	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems()));
 }
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
@@ -3050,9 +3044,13 @@ void AppBase::setupNewCentralView(ot::WidgetView* _view) {
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
-	ot::SelectionResultFlags selectionResult = m_navigationManager.runSelectionHandling(ot::SelectionOrigin::View, m_projectNavigation->getTree()->selectedItems());
+	ot::SelectionResultFlags selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
-	if ((selectionResult | ot::SelectionResult::NoViewChangeMask) == ot::SelectionResult::NoViewChangeMask) {
+	if (selectionResult & ot::SelectionResult::NewViewRequested) {
+		return;
+	}
+
+	if ((selectionResult | ot::SelectionResult::NoViewChangeRequestedMask) == ot::SelectionResult::NoViewChangeRequestedMask) {
 		if (m_lastFocusedCentralView) {
 			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 		}

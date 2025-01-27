@@ -67,7 +67,7 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 }
 
 ot::SelectionResultFlags SceneNodeMultiVisualisation::setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) {
-	ot::SelectionResultFlags result = SceneNodeBase::setSelected(_selection, _selectionOrigin);
+	ot::SelectionResultFlags result(ot::SelectionResult::Default);
 
 	if (getModel() != nullptr)
 	{
@@ -89,6 +89,8 @@ ot::SelectionResultFlags SceneNodeMultiVisualisation::setSelected(bool _selectio
 			}
 		}
 	}
+
+	result |= SceneNodeBase::setSelected(_selection, _selectionOrigin);
 
 	return result;
 }

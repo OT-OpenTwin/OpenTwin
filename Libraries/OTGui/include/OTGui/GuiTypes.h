@@ -281,7 +281,12 @@ namespace ot {
 		ActiveViewChanged         = 1 << 1, //! @brief The active view has changed after handling the selection.
 		ActiveViewChangeRequested = 1 << 2, //! @brief A change of the active view was requested/queued.
 
-		NoViewChangeMask = Default
+		//! @brief The active view has not changed yet but may have been queued.
+		NoCurrentViewChangeMask   = ~ActiveViewChanged,
+
+		//! @brief No view change was requested, but may have already changed.
+		//! @ref SelectionResult::ActiveViewChanged
+		NoViewChangeRequestedMask = ~(NewViewRequested | ActiveViewChangeRequested)
 	};
 
 	//! @brief Result of a selection changed notification.

@@ -199,7 +199,6 @@ void ak::aTreeWidget::setItemSelected(
 	bool							_selected
 ) {
 	auto itm = m_items.find(_itemId);
-	assert(itm != m_items.end()); // Invalid item UID
 	if (itm == m_items.end()) return;
 
 	m_ignoreEvents = true;

@@ -23,11 +23,26 @@ ot::SelectionResultFlags ot::NavigationSelectionManager::runSelectionHandling(Se
 	m_previousSelectionInfo = m_selectionInfo;
 	m_selectionInfo.setSelectedNavigationItems(_newSelection);
 
+	UIDList diffList;
+	for (UID uid : m_selectionInfo.getSelectedNavigationItems()) {
+		bool found = false;
+		for (UID prevUid : m_previousSelectionInfo.getSelectedNavigationItems()) {
+			if (prevUid == uid) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			diffList.push_back(uid);
+		}
+	}
+
 	LocalStateStack<SelectionResultFlags> lclState(m_stateStack, SelectionResult::Default);
 
 	Q_EMIT selectionHasChanged(*lclState, _eventOrigin);
 	
-	m_selectionInfo.setSelectedNavigationItems(_newSelection);
+	m_selectionInfo.addSelectedNavigationItems(std::move(diffList));
 
 	return lclState.getCurrent();
 }
