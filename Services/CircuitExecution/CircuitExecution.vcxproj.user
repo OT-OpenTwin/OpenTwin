@@ -24,4 +24,16 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLR);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <QtLastBackgroundBuild>2025-01-28T16:03:57.8588391Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <QtLastBackgroundBuild>2025-01-28T16:03:58.0308768Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtLastBackgroundBuild>2025-01-28T16:03:58.1379010Z</QtLastBackgroundBuild>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtLastBackgroundBuild>2025-01-28T16:03:58.2469261Z</QtLastBackgroundBuild>
+  </PropertyGroup>
 </Project>

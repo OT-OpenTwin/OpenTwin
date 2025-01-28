@@ -295,6 +295,16 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             if (data.isString()){
 
                 SimulationResults::getInstance()->displayError(data.toString().toStdString());
+            }
+            else {
+                OT_LOG_E("JSON array entry is not a string");
+                return;
+            }  
+        }
+        else if (_actionType.toStdString() == "UnrecoverableError"){
+            if (data.isString()) {
+
+                SimulationResults::getInstance()->displayError(data.toString().toStdString());
 
                 // If we get an error we need to shut down the subservice
                 send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
@@ -302,7 +312,8 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             else {
                 OT_LOG_E("JSON array entry is not a string");
                 return;
-            }  
+            }
+
         }
         else if (_actionType.toStdString() == "Message") {
             if (data.isString()) {
