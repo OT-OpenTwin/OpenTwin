@@ -373,13 +373,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	if (m_subprocessHandler == nullptr) {
 
 		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
-	}
-
-	
-	
-	
-
-	
+	}	
 }
 
 void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {

@@ -33,13 +33,17 @@ QString ConnectionManager::toString(RequestType _type) {
 ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent) {
     m_server = new QLocalServer(this);
     m_socket = nullptr;
-    
+    waitForHealthcheck = false;
+    healthCheckTimer = nullptr;
 }
 
 ConnectionManager::~ConnectionManager()
 {
     delete m_server;
     m_server = nullptr;
+
+    delete healthCheckTimer;
+    healthCheckTimer = nullptr;
 }
 
 void ConnectionManager::startListen(const std::string& _serverName) {
@@ -47,6 +51,7 @@ void ConnectionManager::startListen(const std::string& _serverName) {
    
     connect(m_server, &QLocalServer::newConnection, this, &ConnectionManager::handleConnection);
     m_server->listen(QString::fromStdString(_serverName));
+
     OT_LOG_D("CircuitSimulatorService starting to listen: " + _serverName);
 }
 
@@ -154,7 +159,7 @@ void ConnectionManager::send(std::string messageType, std::string message) {
 
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();
-
+    OT_LOG(data.toStdString(), ot::OUTGOING_MESSAGE_LOG);
     m_socket->write(data);
     m_socket->flush();
 }
@@ -162,7 +167,7 @@ void ConnectionManager::send(std::string messageType, std::string message) {
 
 void ConnectionManager::handleReadyRead() {
     QByteArray rawData = m_socket->readAll();
-
+    OT_LOG(rawData.toStdString(), ot::INBOUND_MESSAGE_LOG);
     if (isMixed(rawData))         {
         QList<QJsonObject> jsonObjects = handleMultipleJsonObjects(rawData);
         for (const QJsonObject& object : jsonObjects) {
@@ -228,6 +233,22 @@ void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::str
     
 }
 
+void ConnectionManager::sendHealthcheck() {
+    if (m_socket->state() == QLocalSocket::ConnectedState) {
+        if (waitForHealthcheck == false) {
+            waitForHealthcheck = true;
+            send("Ping", "Healthcheck");
+        }
+        else {
+            send("Disconnect", "Healthcheck failed");
+        }
+    }
+
+    OT_LOG_E("No connection established, healthcheck failed");
+}
+
+
+
 void ConnectionManager::handleWithJson(const QJsonObject& jsonObject) {
     // Getting message Type
     if (!jsonObject.contains("type")) {
@@ -292,6 +313,13 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             SimulationResults::getInstance()->handleResults(data);
             send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
         }
+        else if (_actionType.toStdString() == "Ping") {
+            send("ResultPing", "Healthcheck");
+
+        }
+        else if (_actionType.toStdString() == "ResultPing") {
+            waitForHealthcheck = false;
+        }
         else {
             if (data.isString()) {
                 SimulationResults::getInstance()->handleUnknownMessageType(data.toString().toStdString());
@@ -320,16 +348,24 @@ void ConnectionManager::handleConnection() {
         delete clientSocket;
         return;
     }
+
+   
     
     m_socket = clientSocket;
     OT_LOG_D("Subprocess connected");
     connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::handleReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
+    QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
+    healthCheckTimer = new QTimer(this);
 
+    healthCheckTimer->setInterval(5000);
+    healthCheckTimer->start();
     //I only send the netlist when the connection is established to prevent sending before connected
     OT_LOG_D("Send netlist");
     m_socket->write(m_netlist);
     m_socket->flush(); 
+
+
 }
 
 

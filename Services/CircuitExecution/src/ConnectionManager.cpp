@@ -7,6 +7,7 @@
 #include "QtCore/qjsondocument.h"
 #include "QtCore/qjsonobject.h"
 #include "QtCore/qjsonarray.h"
+#include "QtCore/qtimer.h"
 
 QString ConnectionManager::toString(RequestType _type) {
 
@@ -27,11 +28,29 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
     m_ngSpice = new NGSpice();
     SimulationResults* simulationResults = SimulationResults::getInstance();
 
-    QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHello);
+    QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHealthCheck);
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
     QObject::connect(m_socket, &QLocalSocket::errorOccurred, this, &ConnectionManager::handleError);
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
     QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::send);
+
+    // Adding healthcheck
+    healthCheckTimer = new QTimer(this);
+    QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
+    healthCheckTimer->setInterval(5000);
+    healthCheckTimer->start();
+}
+
+ConnectionManager::~ConnectionManager() {
+    healthCheckTimer->stop();
+    delete healthCheckTimer;
+    healthCheckTimer = nullptr;
+
+    delete m_ngSpice;
+    m_ngSpice = nullptr;
+
+    delete m_socket;
+    m_socket = nullptr;
 }
 
 
@@ -57,12 +76,16 @@ void ConnectionManager::send(std::string messageType, std::string message) {
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();
 
+    OT_LOG(data.toStdString(),ot::OUTGOING_MESSAGE_LOG);
     m_socket->write(data);
     m_socket->flush();
 }
 
 void ConnectionManager::receiveResponse() {
     QByteArray jsonData = m_socket->readAll();
+    OT_LOG(jsonData.toStdString(), ot::INBOUND_MESSAGE_LOG);
+
+  
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
 
     if (!jsonDoc.isObject()) {
@@ -91,12 +114,7 @@ void ConnectionManager::receiveResponse() {
 
 }
 
-void ConnectionManager::sendHello() {
-    OT_LOG_D("Connected");
-    
-    send(toString(ConnectionManager::RequestType::Message).toStdString(), "Hello CircuitSimulatorService, i am CircuitExecution.");
-  
-}
+
 
 void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
     OT_LOG_E("Error in establishing connection to CircuitSimulatorService: " + m_socket->errorString().toStdString());
@@ -105,7 +123,23 @@ void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
 void ConnectionManager::handleDisconnected() {
     OT_LOG_D("Client disconnected from server");
     SimulationResults::getInstance()->getResultMap().clear();
+    healthCheckTimer->stop();
     exit(0);
+}
+
+void ConnectionManager::sendHealthCheck() {
+    if (m_socket->state() == QLocalSocket::ConnectedState) {
+        if (waitForHealthcheck == false)             {
+            waitForHealthcheck = true;
+            send("Ping", "Healthcheck");
+        }
+        else{
+            handleDisconnected();
+        }
+    } 
+
+    OT_LOG_E("No connection established, healthcheck failed");
+    
 }
 
 void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) {
@@ -124,11 +158,18 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
     }
     else if (_actionType.toStdString() == "Disconnect") {
         handleDisconnected();
-    } else {
+    }
+    else if (_actionType.toStdString() == "Ping") {
+        send("ResultPing", "Healthcheck");
+    }
+    else if (_actionType.toStdString() == "ResultPing") {
+        waitForHealthcheck = false;
+    }
+    else {
+        
         QJsonDocument doc(_data);
-        QByteArray byteArray = doc.toJson(QJsonDocument::Indented);
-        QString message = QString::fromUtf8(byteArray);
-        OT_LOG_D("Normal Message:" + message.toStdString());
+        QString jsonString = doc.toJson(QJsonDocument::Compact);
+        OT_LOG_D("Normal Message:" + jsonString.toStdString());
     }
 }
 

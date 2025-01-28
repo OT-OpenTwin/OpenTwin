@@ -42,6 +42,7 @@ void Application::start(const std::string& _serverName)
 
 Application::Application() {
 	m_connectionManager = nullptr;
+
 }
 
 Application::~Application()

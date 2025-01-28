@@ -4,6 +4,7 @@
 //Qt Header
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
+#include <QtCore/qtimer.h>
 
 class QLocalSocket;
 class QLocalServer;
@@ -41,13 +42,15 @@ private Q_SLOTS:
 	void handleReadyRead();
 	void handleDisconnected();
 	void handleQueueRequest(RequestType _type, std::list<std::string> _data);
+	void sendHealthcheck();
 
 private:
 	
 	QLocalServer* m_server;
 	QLocalSocket* m_socket;
 	QByteArray m_netlist;
-
+	QTimer* healthCheckTimer;
+	bool waitForHealthcheck;
 	void handleWithJson(const QJsonObject& data);
 	void handleMessageType(QString& _actionType, const QJsonValue& _data);
 

@@ -18,5 +18,5 @@ void SimulationResults::addToResultMap(const std::string& key, double value) {
 
 void SimulationResults::triggerCallback(std::string messageType, std::string message) {
     
-    emit callback(messageType, message);
+    Q_EMIT callback(messageType, message);
 }

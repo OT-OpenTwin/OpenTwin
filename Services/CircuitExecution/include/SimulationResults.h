@@ -30,7 +30,7 @@ public:
 
     void triggerCallback(std::string messageType, std::string message);
 
-signals:
+Q_SIGNALS:
     void callback(std::string messageType, std::string message);
 
 private:

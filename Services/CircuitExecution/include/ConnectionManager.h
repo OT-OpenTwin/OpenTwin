@@ -20,7 +20,7 @@ public:
 	
 
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
-	~ConnectionManager() = default;
+	~ConnectionManager();
 
 	void connectToCircuitSimulatorService(const QString& serverName);
 
@@ -28,13 +28,15 @@ public slots:
 	void send(std::string messageType,std::string message);
 private slots:
 	void receiveResponse();
-	void sendHello();
 	void handleError(QLocalSocket::LocalSocketError error);
 	void handleDisconnected();
+	void sendHealthCheck();
 
 private:
 	QLocalSocket* m_socket;
+	QTimer* healthCheckTimer;
 	NGSpice* m_ngSpice;
+	bool waitForHealthcheck;
 	void handleActionType(QString _actionType, QJsonArray _data);
 	void handleRunSimulation( std::list<std::string> _netlist);
 	void sendBackResults(std::map<std::string, std::vector<double>> _results);
