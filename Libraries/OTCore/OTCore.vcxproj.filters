@@ -327,6 +327,9 @@
     <ClInclude Include="include\OTCore\LocalStateStack.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\ReturnMessageProposal.h">
+      <Filter>include\ServiceReturnMessages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
