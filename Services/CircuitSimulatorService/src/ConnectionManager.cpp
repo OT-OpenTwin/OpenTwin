@@ -44,6 +44,8 @@ ConnectionManager::~ConnectionManager()
 
     delete healthCheckTimer;
     healthCheckTimer = nullptr;
+
+
 }
 
 void ConnectionManager::startListen(const std::string& _serverName) {
@@ -312,6 +314,7 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
 
             SimulationResults::getInstance()->handleResults(data);
             send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
+            healthCheckTimer->stop();
         }
         else if (_actionType.toStdString() == "Ping") {
             send("ResultPing", "Healthcheck");
