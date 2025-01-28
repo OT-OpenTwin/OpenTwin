@@ -14,11 +14,20 @@ NGSpice::NGSpice() {
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
-	if (std::string(output).rfind("stdout",0) == 0) {
-		SimulationResults::getInstance()->triggerCallback("Message", std::string(output));
+	std::string callback = std::string(output);
+
+	if (callback.rfind("stdout",0) == 0) {
+		
+		const std::string stdoutPrefix = "stdout";
+		callback.erase(0, stdoutPrefix.size());
+		SimulationResults::getInstance()->triggerCallback("Message", callback);
 	}
-	else if (std::string(output).rfind("stderr",0) == 0) {
-		SimulationResults::getInstance()->triggerCallback("Error", std::string(output));
+	else if (callback.rfind("stderr",0) == 0) {
+		
+		const std::string sterrPrefix = "stderr";
+		callback.erase(0, sterrPrefix.size());
+		SimulationResults::getInstance()->triggerCallback("Error", callback);
+
 	}
 	
 	
