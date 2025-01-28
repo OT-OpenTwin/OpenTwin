@@ -15,8 +15,10 @@
 #include "OTWidgets/Table.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 
 // TabToolbar
 #include <TabToolbar/Page.h>
@@ -37,6 +39,27 @@ enum TableColumn {
 	ColumnCount
 };
 
+ProjectOverviewTableItem::ProjectOverviewTableItem() {
+
+}
+
+bool ProjectOverviewTableItem::operator < (const QTableWidgetItem& _other) const {
+	QString otherTxt(_other.text());
+	const ProjectOverviewTableItem* customItm = dynamic_cast<const ProjectOverviewTableItem*>(&_other);
+	if (customItm) {
+		if (!customItm->getSortHint().isEmpty()) {
+			otherTxt = customItm->getSortHint();
+		}
+	}
+
+	if (m_sortHint.isEmpty()) {
+		return this->text() < otherTxt;
+	}
+	else {
+		return m_sortHint < otherTxt;
+	}
+}
+
 ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
@@ -46,20 +69,21 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_checkBox = new ot::CheckBox;
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
 	
-	m_typeItem = new QTableWidgetItem;
+	m_typeItem = new ProjectOverviewTableItem;
 	m_typeItem->setFlags(m_typeItem->flags() & ~Qt::ItemIsEditable);
 	m_typeItem->setIcon(_projectTypeIcon);
 	m_typeItem->setToolTip(QString::fromStdString(_projectInfo.getProjectType()));
+	m_typeItem->setSortHint(QString::fromStdString(_projectInfo.getProjectType()));
 
-	m_nameItem = new QTableWidgetItem;
+	m_nameItem = new ProjectOverviewTableItem;
 	m_nameItem->setFlags(m_typeItem->flags());
 	m_nameItem->setText(QString::fromStdString(_projectInfo.getProjectName()));
 
-	m_ownerItem = new QTableWidgetItem;
+	m_ownerItem = new ProjectOverviewTableItem;
 	m_ownerItem->setFlags(m_typeItem->flags());
 	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
-	m_groupsItem = new QTableWidgetItem;
+	m_groupsItem = new ProjectOverviewTableItem;;
 	m_groupsItem->setFlags(m_typeItem->flags());
 	if (!_projectInfo.getGroups().empty()) {
 		m_groupsItem->setIcon(ot::IconManager::getIcon("Default/Groups.png"));
@@ -70,15 +94,21 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 		else {
 			tip = "Shared with groups:";
 		}
+
+		std::string newGroupsSortHint;
 		for (const std::string& group : _projectInfo.getGroups()) {
 			tip.append("\n  - " + QString::fromStdString(group));
+			newGroupsSortHint.push_back('\n');
+			newGroupsSortHint.append(group);
 		}
-		m_groupsItem->setToolTip(tip);
+		m_groupsItem->setToolTip(tip);			
+		m_groupsItem->setSortHint(QString::fromStdString(newGroupsSortHint));
 	}
 
-	m_lastAccessTimeItem = new QTableWidgetItem;
+	m_lastAccessTimeItem = new ProjectOverviewTableItem;
 	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
-	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
+	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString());
+	m_lastAccessTimeItem->setSortHint(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
 
 	_table->setCellWidget(row, TableColumn::ColumnCheck, m_checkBox);
 	_table->setItem(row, TableColumn::ColumnType, m_typeItem);
@@ -121,7 +151,7 @@ void ProjectOverviewEntry::slotCheckedChanged(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
-	: m_mode(ViewMode::ViewAll), m_sortMode(SortMode::NameAscending)
+	: m_mode(ViewMode::ViewAll)
 {
 	// Create layouts
 	m_widget = new QWidget;
@@ -160,7 +190,11 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->setHorizontalHeaderLabels({ "", "", "Name", "Owner", "", "Last Modified" });
+	m_table->horizontalHeader()->installEventFilter(this);
+	m_table->setHorizontalHeaderLabels({ "", "Type", "Name", "Owner", "Groups", "Last Modified" });
+	m_table->horizontalHeader()->setSelectionMode(QAbstractItemView::NoSelection);
+	m_table->setSortingEnabled(true);
+	m_table->horizontalHeader()->setSortIndicatorShown(false);
 	m_table->verticalHeader()->setHidden(true);
 
 	glWidget->setMaximumSize(1, 1);
@@ -180,7 +214,8 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	this->connect(m_filter, &ot::LineEdit::textChanged, this, &ProjectOverviewWidget::slotFilterChanged);
 	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &ProjectOverviewWidget::slotProjectDoubleClicked);
 	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &ProjectOverviewWidget::slotUpdateItemSelection);
-	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ProjectOverviewWidget::slotHeaderClicked);
+	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ProjectOverviewWidget::slotTableHeaderItemClicked);
+	this->connect(m_table->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &ProjectOverviewWidget::slotTableHeaderSortingChanged);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotRefreshProjectList);
 	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotToggleViewMode);
@@ -274,6 +309,35 @@ void ProjectOverviewWidget::slotProjectDoubleClicked(int _row, int _column) {
 	}
 }
 
+void ProjectOverviewWidget::slotTableHeaderItemClicked(int _column) {
+	if (_column == TableColumn::ColumnCheck) {
+		bool allChecked = true;
+		for (ProjectOverviewEntry* entry : m_entries) {
+			if (!entry->getIsChecked()) {
+				allChecked = false;
+				ot::SignalBlockWrapper sigBlock(m_table);
+				entry->setIsChecked(true);
+			}
+		}
+
+		if (allChecked) {
+			ot::SignalBlockWrapper sigBlock(m_table);
+			for (ProjectOverviewEntry* entry : m_entries) {
+				entry->setIsChecked(false);
+			}
+		}
+	}
+}
+
+void ProjectOverviewWidget::slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order) {
+	if (_column == TableColumn::ColumnCheck || _column == TableColumn::ColumnGroups) {
+		m_table->horizontalHeader()->setSortIndicatorShown(false);
+	}
+	else {
+		m_table->horizontalHeader()->setSortIndicatorShown(true);
+	}
+}
+
 void ProjectOverviewWidget::slotRefreshProjectList(void) {
 	switch (m_mode) {
 	case ProjectOverviewWidget::ViewMode::ViewAll:
@@ -322,7 +386,6 @@ void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
 	this->updateCountLabel(false);
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
-	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotRefreshAllProjects(void) {
@@ -348,7 +411,6 @@ void ProjectOverviewWidget::slotRefreshAllProjects(void) {
 	this->updateCountLabel(resultExceeded);
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
-	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotToggleViewMode(void) {
@@ -415,33 +477,6 @@ void ProjectOverviewWidget::slotProjectCheckedChanged(void) {
 	this->updateToolButtonsEnabledState();
 }
 
-void ProjectOverviewWidget::slotHeaderClicked(int _index) {
-	if (_index == TableColumn::ColumnName) {
-		if (m_sortMode == NameAscending) {
-			m_sortMode = NameDescending;
-		}
-		else if (m_sortMode == NameDescending) {
-			m_sortMode = NameAscending;
-		}
-		else {
-			m_sortMode = NameAscending;
-		}
-		this->sortTable();
-	}
-	else if (_index == TableColumn::ColumnLastAccess) {
-		if (m_sortMode == LastAccessAscending) {
-			m_sortMode = LastAccessDescending;
-		}
-		else if (m_sortMode == LastAccessDescending) {
-			m_sortMode = LastAccessAscending;
-		}
-		else {
-			m_sortMode = LastAccessAscending;
-		}
-		this->sortTable();
-	}
-}
-
 ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
 	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text);
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
@@ -458,20 +493,37 @@ ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const
 }
 
 void ProjectOverviewWidget::clear(void) {
+	ot::SignalBlockWrapper sigBlock(m_table);
+	int ix = m_table->horizontalHeader()->sortIndicatorSection();
+	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
+
+	bool wasSortingEnabled = m_table->isSortingEnabled();
+	m_table->setSortingEnabled(false);
+
 	for (ProjectOverviewEntry* entry : m_entries) {
 		this->disconnect(entry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
 		delete entry;
 	}
 	m_entries.clear();
-	bool blocked = m_table->signalsBlocked();
-	m_table->blockSignals(true);
 	m_table->setRowCount(0);
-	m_table->blockSignals(blocked);
+
+	if (wasSortingEnabled) {
+		m_table->setSortingEnabled(true);
+		if (ix >= 0) {
+			m_table->horizontalHeader()->setSortIndicator(ix, order);
+			this->slotTableHeaderSortingChanged(ix, order);
+		}
+	}
 }
 
 void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator) {
-	bool blocked = m_table->signalsBlocked();
-	m_table->blockSignals(true);
+	ot::SignalBlockWrapper sigBlock(m_table);
+	
+	int ix = m_table->horizontalHeader()->sortIndicatorSection();
+	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
+
+	bool wasSortingEnabled = m_table->isSortingEnabled();
+	m_table->setSortingEnabled(false);
 
 	QIcon projectTypeIcon = AppBase::instance()->getDefaultProjectTypeIcon();
 	auto iconIt = AppBase::instance()->getProjectTypeDefaultIconNameMap().find(_projectInfo.getProjectType());
@@ -482,8 +534,14 @@ void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, b
 	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);
 	m_entries.push_back(newEntry);
 	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
-	m_table->blockSignals(blocked);
-	this->sortTable();
+
+	if (wasSortingEnabled) {
+		m_table->setSortingEnabled(true);
+		if (ix >= 0) {
+			m_table->horizontalHeader()->setSortIndicator(ix, order);
+			this->slotTableHeaderSortingChanged(ix, order);
+		}
+	}
 }
 
 void ProjectOverviewWidget::updateCountLabel(bool _hasMore) {
@@ -575,24 +633,4 @@ ProjectOverviewEntry* ProjectOverviewWidget::findEntry(const QString& _projectNa
 		}
 	}
 	return nullptr;
-}
-
-void ProjectOverviewWidget::sortTable(void) {
-	switch (m_sortMode) {
-	case ProjectOverviewWidget::NameAscending:
-		m_table->sortByColumn(TableColumn::ColumnName, Qt::AscendingOrder);
-		break;
-	case ProjectOverviewWidget::NameDescending:
-		m_table->sortByColumn(TableColumn::ColumnName, Qt::DescendingOrder);
-		break;
-	case ProjectOverviewWidget::LastAccessAscending:
-		m_table->sortByColumn(TableColumn::ColumnLastAccess, Qt::AscendingOrder);
-		break;
-	case ProjectOverviewWidget::LastAccessDescending:
-		m_table->sortByColumn(TableColumn::ColumnLastAccess, Qt::DescendingOrder);
-		break;
-	default:
-		OT_LOG_E("Unknown sort mode");
-		break;
-	}
 }

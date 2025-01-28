@@ -9,20 +9,19 @@
 #include "ControlsManager.h"
 #include "ProjectInformation.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
 #include <QtGui/qicon.h>
+#include <QtWidgets/qtablewidget.h>
 
 // std header
 #include <map>
 #include <list>
 #include <string>
-
-class QTableWidget;
-class QTableWidgetItem;
 
 namespace tt { class Page; }
 namespace tt { class Group; }
@@ -31,6 +30,19 @@ namespace ot { class Table; }
 namespace ot { class CheckBox; }
 namespace ot { class LineEdit; }
 namespace ot { class ToolButton; }
+
+class ProjectOverviewTableItem : public QTableWidgetItem {
+public:
+	ProjectOverviewTableItem();
+
+	virtual bool operator < (const QTableWidgetItem& _other) const override;
+
+	void setSortHint(const QString& _hint) { m_sortHint = _hint; };
+	const QString& getSortHint(void) const { return m_sortHint; };
+
+private:
+	QString m_sortHint;
+};
 
 class ProjectOverviewEntry : public QObject {
 	Q_OBJECT
@@ -53,11 +65,11 @@ private:
 	QTableWidget* m_table;
 	bool m_ownerIsCreator;
 	ot::CheckBox* m_checkBox;
-	QTableWidgetItem* m_typeItem;
-	QTableWidgetItem* m_nameItem;
-	QTableWidgetItem* m_ownerItem;
-	QTableWidgetItem* m_groupsItem;
-	QTableWidgetItem* m_lastAccessTimeItem;
+	ProjectOverviewTableItem* m_typeItem;
+	ProjectOverviewTableItem* m_nameItem;
+	ProjectOverviewTableItem* m_ownerItem;
+	ProjectOverviewTableItem* m_groupsItem;
+	ProjectOverviewTableItem* m_lastAccessTimeItem;
 
 };
 
@@ -106,7 +118,9 @@ private Q_SLOTS:
 
 	void slotCreateProject(void);
 	void slotProjectDoubleClicked(int _row, int _column);
-	
+	void slotTableHeaderItemClicked(int _column);
+	void slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order);
+
 	void slotRefreshProjectList(void);
 	void slotRefreshRecentProjects(void);
 	void slotRefreshAllProjects(void);
@@ -123,8 +137,6 @@ private Q_SLOTS:
 	void slotFilterChanged(void);
 	void slotProjectCheckedChanged(void);
 
-	void slotHeaderClicked(int _index);
-
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
 	void clear(void);
@@ -134,17 +146,8 @@ private:
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 	bool hasDifferentSelectedOwner(void);
 	ProjectOverviewEntry* findEntry(const QString& _projectName);
-	void sortTable(void);
-
-	enum SortMode {
-		NameAscending,
-		NameDescending,
-		LastAccessAscending,
-		LastAccessDescending
-	};
-
+	
 	ViewMode m_mode;
-	SortMode m_sortMode;
 
 	QWidget* m_widget;
 
