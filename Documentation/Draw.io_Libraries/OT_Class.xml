@@ -35,15 +35,15 @@
     "title": "Title"
   },
   {
-    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"is\" style=\"text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"30\" height=\"20\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
-    "w": 30,
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"is\" style=\"text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"40\" height=\"20\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 40,
     "h": 20,
     "aspect": "fixed",
-    "title": "Is"
+    "title": "is"
   },
   {
-    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"has\" style=\"text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"30\" height=\"20\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
-    "w": 30,
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"has\" style=\"text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"40\" height=\"20\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 40,
     "h": 20,
     "aspect": "fixed",
     "title": "has"
