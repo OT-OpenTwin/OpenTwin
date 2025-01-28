@@ -153,7 +153,7 @@ void ViewerToolBar::setupUIControlsTable(void) {
 	//m_removeItemIDList.push_front(m_tableExportCSVID = FrontendAPI::instance()->addMenuPushButton(m_tableDataID, "Export As CSV", "Export"));
 
 	// Send an initial notification to properly set the state of the new controls
-	this->updateTextEditorEnabledState();
+	this->updateTableEnabledState();
 	FrontendAPI::instance()->setCurrentMenuPage("Table");
 }
 
