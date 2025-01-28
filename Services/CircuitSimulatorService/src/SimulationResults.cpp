@@ -66,7 +66,9 @@ void SimulationResults::displayMessage(std::string _message) {
 
 void SimulationResults::displayError(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
-    this->getInstance()->_uiComponent->displayErrorPrompt(_message);
+    ot::StyledTextBuilder errorMessage;
+    errorMessage << "[" << ot::StyledText::Bold << ot::StyledText::Error << "Error" << ot::StyledText::ClearStyle << "] " << _message;
+    this->getInstance()->_uiComponent->displayStyledMessage(errorMessage);
 }
 
 void SimulationResults::handleResults(const QJsonValue& _result) {
