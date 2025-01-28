@@ -2224,7 +2224,25 @@ void AppBase::slotCopyRequested(ot::CopyInformation* _info) {
 }
 
 void AppBase::slotPasteRequested(ot::CopyInformation* _info) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
 
+	ot::JsonObject infoObj;
+	_info->addToJsonObject(infoObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
+
+	std::string response;
+	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+		OT_LOG_EA("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
+	}
 }
 
 void AppBase::slotTextEditorSaveRequested(void) {

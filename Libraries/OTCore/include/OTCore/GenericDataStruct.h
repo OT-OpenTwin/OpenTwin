@@ -9,8 +9,8 @@ namespace ot
 	{
 	public:
 		GenericDataStruct(const std::string& _typeName = "", uint32_t _numberOfEntries = 0) :m_numberOfEntries(_numberOfEntries), m_typeName(_typeName) {}
-		virtual ~GenericDataStruct() 
-		{
+		virtual ~GenericDataStruct() {
+
 		};
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;

@@ -12,7 +12,6 @@ public:
 	std::string pasteEntitiesAction(ot::JsonDocument& _document);
 
 private:
-	void copyItem(const ot::GraphicsCopyInformation* _copyInformation);
 	void updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _newEntities);
 
 	ot::ActionHandleConnectorManager<BlockHandler> m_connectionManager{ this, &ot::ActionDispatcher::instance() };

@@ -122,7 +122,7 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 
 std::string EntityBase::serialiseAsJSON()
 {
-	auto doc =	serialiseAsMongoDocument();
+	auto doc = serialiseAsMongoDocument();
 	const std::string jsonDoc = bsoncxx::to_json(doc);
 	return jsonDoc;
 }
