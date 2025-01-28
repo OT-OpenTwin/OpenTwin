@@ -162,6 +162,10 @@ void ConnectionManager::send(std::string messageType, std::string message) {
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();
     OT_LOG(data.toStdString(), ot::OUTGOING_MESSAGE_LOG);
+    if (!m_socket)         {
+        OT_LOG_E("CircuitExecution died before");
+        return;
+    }
     m_socket->write(data);
     m_socket->flush();
 }
