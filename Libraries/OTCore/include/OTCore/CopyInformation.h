@@ -18,13 +18,13 @@ namespace ot {
 
 	class OT_CORE_API_EXPORT CopyInformation : public Serializable {
 	public:
-		static std::string getCopyTypeJsonKey(void);
 		static std::string getCopyVersionJsonKey(void);
 		
 		CopyInformation();
+		CopyInformation(const ConstJsonObject& _jsonObject);
 		CopyInformation(const CopyInformation&) = default;
 		CopyInformation(CopyInformation&&) = default;
-		virtual ~CopyInformation() = default;
+		~CopyInformation() = default;
 
 		CopyInformation& operator = (const CopyInformation&) = default;
 		CopyInformation& operator = (CopyInformation&&) = default;
@@ -32,8 +32,7 @@ namespace ot {
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		virtual std::string getCopyType(void) const = 0;
-		virtual int getCopyVersion(void) const = 0;
+		int getCopyVersion(void) const { return 1; };
 
 		void setProjectName(const std::string& _projectName) { m_projectName = _projectName; };
 		const std::string& getProjectName(void) const { return m_projectName; };

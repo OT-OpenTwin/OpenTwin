@@ -122,13 +122,10 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CopyInformation.cpp">
-      <Filter>src\CopyInformation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CopyInformationFactory.cpp">
-      <Filter>src\CopyInformation</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\CopyEntityInformation.cpp">
-      <Filter>src\CopyInformation</Filter>
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -306,15 +303,6 @@
     <ClInclude Include="include\OTCore\OTObject.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\CopyInformation.h">
-      <Filter>include\CopyInformation</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CopyInformationFactory.h">
-      <Filter>include\CopyInformation</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CopyEntityInformation.h">
-      <Filter>include\CopyInformation</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\StateStack.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -329,6 +317,12 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ReturnMessageProposal.h">
       <Filter>include\ServiceReturnMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CopyEntityInformation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CopyInformation.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -373,12 +367,6 @@
     </Filter>
     <Filter Include="src\Geometry">
       <UniqueIdentifier>{5d7cb18f-7ed2-451e-9db2-d3da422a0bca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\CopyInformation">
-      <UniqueIdentifier>{ed75028a-ec17-4bf7-9d59-55d465f9cd65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\CopyInformation">
-      <UniqueIdentifier>{d3542813-741e-452c-a3b8-5dcf9526cea8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

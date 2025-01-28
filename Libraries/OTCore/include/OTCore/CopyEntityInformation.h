@@ -21,6 +21,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT CopyEntityInformation : public Serializable {
 	public:
 		CopyEntityInformation();
+		CopyEntityInformation(const ConstJsonObject& _jsonObject);
 		CopyEntityInformation(UID _uid, const std::string& _name, const std::string& _rawData = std::string());
 		CopyEntityInformation(const CopyEntityInformation&) = default;
 		CopyEntityInformation(CopyEntityInformation&&) = default;

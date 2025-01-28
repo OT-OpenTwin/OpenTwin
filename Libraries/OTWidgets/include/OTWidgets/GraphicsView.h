@@ -9,8 +9,8 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/CopyInformation.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/GraphicsCopyInformation.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -141,9 +141,9 @@ namespace ot {
 
 		//! @brief Is emitted when 
 		//! @param _info 
-		void itemCopyRequested(GraphicsCopyInformation* _info);
+		void itemCopyRequested(CopyInformation& _info);
 
-		void itemPasteRequested(GraphicsCopyInformation* _info);
+		void itemPasteRequested(const CopyInformation& _info);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

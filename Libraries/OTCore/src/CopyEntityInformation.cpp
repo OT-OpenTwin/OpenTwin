@@ -12,6 +12,10 @@ ot::CopyEntityInformation::CopyEntityInformation()
 
 }
 
+ot::CopyEntityInformation::CopyEntityInformation(const ConstJsonObject& _jsonObject) {
+	this->setFromJsonObject(_jsonObject);
+}
+
 ot::CopyEntityInformation::CopyEntityInformation(UID _uid, const std::string& _name, const std::string& _rawData)
 	: m_uid(_uid), m_name(_name), m_rawData(_rawData)
 {

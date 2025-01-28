@@ -5,9 +5,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/CopyInformationFactory.h"
+#include "OTCore/CopyInformation.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTGui/GraphicsCopyInformation.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -362,7 +361,7 @@ bool ot::GraphicsView::requestCopyCurrentSelection(void) {
 		return false;
 	}
 
-	GraphicsCopyInformation copyInfo;
+	CopyInformation copyInfo;
 	copyInfo.setViewOwner(this->getOwner());
 
 	for (GraphicsItem* itm : selection) {
@@ -372,7 +371,7 @@ bool ot::GraphicsView::requestCopyCurrentSelection(void) {
 		}
 	}
 
-	Q_EMIT itemCopyRequested(&copyInfo);
+	Q_EMIT itemCopyRequested(copyInfo);
 
 	return true;
 }
@@ -398,27 +397,25 @@ bool ot::GraphicsView::requestPasteFromClipboard(void) {
 		return false;
 	}
 
-	std::unique_ptr<GraphicsCopyInformation> info(dynamic_cast<GraphicsCopyInformation*>(CopyInformationFactory::create(importDoc.GetConstObject())));
-	if (!info.get()) {
-		return false;
-	}
+	CopyInformation info;
+	info.setFromJsonObject(importDoc.GetConstObject());
 
 	// Ensure same view owner
-	if (info->getViewOwner() != m_owner) {
+	if (info.getViewOwner() != m_owner) {
 		return false;
 	}
 
 	// Create paste info
-	info->setViewName(m_viewName);
+	info.setViewName(m_viewName);
 
 	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
 	if (this->rect().contains(mousePos)) {
 		// If mouse is over the view paste at cursor
 		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
-		info->setScenePos(QtFactory::toPoint2D(mouseScenePos));
+		info.setScenePos(QtFactory::toPoint2D(mouseScenePos));
 	}
 
-	Q_EMIT itemPasteRequested(info.get());
+	Q_EMIT itemPasteRequested(info);
 
 	return true;
 }

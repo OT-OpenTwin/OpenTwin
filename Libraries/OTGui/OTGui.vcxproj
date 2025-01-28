@@ -24,7 +24,6 @@
     <ClInclude Include="include\OTGui\CheckBoxCfg.h" />
     <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
-    <ClInclude Include="include\OTGui\GraphicsCopyInformation.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\MenuCfg.h" />
     <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h" />
@@ -134,7 +133,6 @@
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
-    <ClCompile Include="src\GraphicsCopyInformation.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsInvisibleItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />

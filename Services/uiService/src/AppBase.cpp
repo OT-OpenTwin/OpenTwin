@@ -2190,14 +2190,14 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	}
 }
 
-void AppBase::slotCopyRequested(ot::CopyInformation* _info) {
-	_info->setProjectName(m_currentProjectName);
+void AppBase::slotCopyRequested(ot::CopyInformation& _info) {
+	_info.setProjectName(m_currentProjectName);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject infoObj;
-	_info->addToJsonObject(infoObj, doc.GetAllocator());
+	_info.addToJsonObject(infoObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
 
 	std::string response;
@@ -2223,12 +2223,12 @@ void AppBase::slotCopyRequested(ot::CopyInformation* _info) {
 	clip->setText(QString::fromStdString(rMsg.getWhat()));
 }
 
-void AppBase::slotPasteRequested(ot::CopyInformation* _info) {
+void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject infoObj;
-	_info->addToJsonObject(infoObj, doc.GetAllocator());
+	_info.addToJsonObject(infoObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
 
 	std::string response;

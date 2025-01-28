@@ -15,10 +15,8 @@
 // Open twin header
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTCore/CopyInformationFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
-#include "OTGui/GraphicsCopyInformation.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/ActionTypes.h"

@@ -2,7 +2,7 @@
 #include "BlockHandler.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/Logger.h"
-#include "OTCore/CopyInformationFactory.h"
+#include "OTCore/CopyInformation.h"
 #include "Application.h"
 #include "Model.h"
 #include "EntityBlock.h"
@@ -19,14 +19,14 @@ void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _new
 }
 
 std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document) {
-	ot::CopyInformation* info = ot::CopyInformationFactory::create(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::CopyInformation info = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 
 	//SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
 	//ot::UIDList selectedEntities = selectionHandler.getSelectedEntityIDs();
 	
 	Model* model = Application::instance()->getModel();
 
-	for (ot::CopyEntityInformation& entityInfo : info->getEntities()) {
+	for (ot::CopyEntityInformation& entityInfo : info.getEntities()) {
 		// Find entity
 		EntityBase* entity = model->getEntityByID(entityInfo.getUid());
 
@@ -45,12 +45,12 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 	}
 	
 	ot::JsonDocument responseDocument;
-	info->addToJsonObject(responseDocument, responseDocument.GetAllocator());
+	info.addToJsonObject(responseDocument, responseDocument.GetAllocator());
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDocument.toJson()).toJson();
 }
 
 std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
-	const ot::CopyInformation* info = ot::CopyInformationFactory::create(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	const ot::CopyInformation info(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	// Get class factory
 	Model* model = Application::instance()->getModel();
@@ -63,7 +63,7 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	std::list<EntityCoordinates2D*> blockCoordinateEntities;
 
 	// Deserialize entities
-	for (const ot::CopyEntityInformation& entityInfo : info->getEntities()) {
+	for (const ot::CopyEntityInformation& entityInfo : info.getEntities()) {
 		OTAssert(entityInfo.getRawData().empty(), "Empty entity data stored");
 
 		// Create bson view from json
@@ -103,16 +103,10 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 
 	// Check move distance
 	if (!blockCoordinateEntities.empty()) {
-		const ot::GraphicsCopyInformation* graphicsInfo = dynamic_cast<const ot::GraphicsCopyInformation*>(info);
-		if (!graphicsInfo) {
-			OT_LOG_EA("Block entities found but the paste information is not a graphics copy information");
-			return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
-		}
-
 		// Calculate distance 
 		ot::Point2DD moveAdder(0., 0.);
-		if (graphicsInfo->getScenePosSet()) {
-			moveAdder = graphicsInfo->getScenePos() - graphicsTopLeft;
+		if (info.getScenePosSet()) {
+			moveAdder = info.getScenePos() - graphicsTopLeft;
 		}
 		else {
 			// If no scene pos is provided we move all block by 20
@@ -131,7 +125,7 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	//model->addEntitiesToModel(entityIDsTopo, entityVersionsTopo, topoForceVisible, entityIDsData, entityVersionsData, entityIDsTopo, "Copied block entities", true, false);
 
 	ot::JsonDocument responseDocument;
-	info->addToJsonObject(responseDocument, responseDocument.GetAllocator());
+	info.addToJsonObject(responseDocument, responseDocument.GetAllocator());
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDocument.toJson()).toJson();
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ActionAndFunctionHandler.h"
-#include "OTGui/GraphicsCopyInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
