@@ -14,7 +14,13 @@ NGSpice::NGSpice() {
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
-	SimulationResults::getInstance()->triggerCallback("Message", std::string(output));
+	if (std::string(output).rfind("stdout",0) == 0) {
+		SimulationResults::getInstance()->triggerCallback("Message", std::string(output));
+	}
+	else if (std::string(output).rfind("stderr",0) == 0) {
+		SimulationResults::getInstance()->triggerCallback("Error", std::string(output));
+	}
+	
 	
 	OT_LOG_D(std::string(output));
 	
@@ -32,17 +38,17 @@ int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata) {
 	
 	if (immediate || (exitstatus >= 1 && !quitexit)) {
-		SimulationResults::getInstance()->triggerCallback("Error", "NGSpice fatal error, check Circuit and try again");
+		SimulationResults::getInstance()->triggerCallback("UnrecoverableError", "NGSpice fatal error, check Circuit and try again");
 		
 	}
 	else if (quitexit && immediate) {
-		SimulationResults::getInstance()->triggerCallback("Error", "NGSpice fata error, check Circuit and try again");
+		SimulationResults::getInstance()->triggerCallback("UnrecoverableError", "NGSpice fata error, check Circuit and try again");
 	}
 	else if (exitstatus == 1 && !immediate && quitexit) {
 		SimulationResults::getInstance()->triggerCallback("Message", "Simulation ended normally without error");
 	}
 	else {
-		SimulationResults::getInstance()->triggerCallback("Error", "Unexpected exit condition, restarting ngspice");
+		SimulationResults::getInstance()->triggerCallback("UnrecoverableError", "Unexpected exit condition, restarting ngspice");
 	}
 
 	OT_LOG_E(std::to_string(immediate));
