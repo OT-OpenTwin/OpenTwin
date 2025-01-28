@@ -304,6 +304,22 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::list<SelectionResult> getAllSetFlags(const SelectionResultFlags& _lockFlags);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Sort Order
+
+	enum class SortOrder {
+		Ascending,
+		Descending
+	};
+
+	OT_GUI_API_EXPORT SortOrder oppositeOrder(SortOrder _order);
+
+	OT_GUI_API_EXPORT std::string toString(SortOrder _order);
+
+	OT_GUI_API_EXPORT SortOrder stringToSortOrder(const std::string& _order);
+
+
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag)

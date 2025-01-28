@@ -105,7 +105,11 @@ namespace ot {
 		static ot::TableRange toTableRange(const QTableWidgetSelectionRange& _range);
 		static QTableWidgetSelectionRange toQTableRange(const ot::TableRange& _range);
 
+		static ot::SortOrder toSortOrder(Qt::SortOrder _order);
+		static Qt::SortOrder toQSortOrder(ot::SortOrder _order);
+
 		static QString toQString(QEvent::Type _type);
+
 	private:
 		QtFactory() {};
 		~QtFactory() {};

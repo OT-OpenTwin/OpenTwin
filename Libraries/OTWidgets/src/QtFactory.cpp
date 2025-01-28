@@ -282,6 +282,26 @@ QTableWidgetSelectionRange ot::QtFactory::toQTableRange(const ot::TableRange& _r
     return QTableWidgetSelectionRange(_range.getTopRow(), _range.getLeftColumn(), _range.getBottomRow(), _range.getRightColumn());
 }
 
+ot::SortOrder ot::QtFactory::toSortOrder(Qt::SortOrder _order) {
+    switch (_order) {
+    case Qt::AscendingOrder: return ot::SortOrder::Ascending;
+    case Qt::DescendingOrder: return ot::SortOrder::Descending;
+    default:
+        OT_LOG_E("Unknown qt sort order (" + std::to_string(static_cast<int>(_order)) + ")");
+        return ot::SortOrder::Ascending;
+    }
+}
+
+Qt::SortOrder ot::QtFactory::toQSortOrder(ot::SortOrder _order) {
+    switch (_order) {
+    case ot::SortOrder::Ascending: return Qt::AscendingOrder;
+    case ot::SortOrder::Descending: return Qt::DescendingOrder;
+    default:
+        OT_LOG_E("Unknown sort order (" + std::to_string(static_cast<int>(_order)) + ")");
+        return Qt::AscendingOrder;
+    }
+}
+
 QString ot::QtFactory::toQString(QEvent::Type _type) {
     static const QMap<QEvent::Type, QString> eventTypeMap = {
         { QEvent::None, "None" },

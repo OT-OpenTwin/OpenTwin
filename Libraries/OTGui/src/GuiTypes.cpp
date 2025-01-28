@@ -572,3 +572,26 @@ std::list<ot::SelectionResult> ot::getAllSetFlags(const SelectionResultFlags& _f
 	if (_flags & SelectionResult::ActiveViewChangeRequested) result.push_back(SelectionResult::ActiveViewChangeRequested);
 	return result;
 }
+
+ot::SortOrder ot::oppositeOrder(SortOrder _order) {
+	return (_order == SortOrder::Ascending ? SortOrder::Descending : SortOrder::Ascending);
+}
+
+std::string ot::toString(SortOrder _order) {
+	switch (_order) {
+	case ot::SortOrder::Ascending: return "Ascending";
+	case ot::SortOrder::Descending: return "Descending";
+	default:
+		OT_LOG_E("Unknown sort order (" + std::to_string(static_cast<int>(_order)) + ")");
+		return "Ascending";
+	}
+}
+
+ot::SortOrder ot::stringToSortOrder(const std::string& _order) {
+	if (_order == toString(SortOrder::Ascending)) return SortOrder::Ascending;
+	else if (_order == toString(SortOrder::Descending)) return SortOrder::Descending;
+	else {
+		OT_LOG_E("Unknown sort order \"" + _order + "\"");
+		return SortOrder::Ascending;
+	}
+}
