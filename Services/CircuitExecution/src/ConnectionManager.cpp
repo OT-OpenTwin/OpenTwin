@@ -34,6 +34,8 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
     QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::send);
 
+    waitForHealthcheck = false;
+
     // Adding healthcheck
     healthCheckTimer = new QTimer(this);
     QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
@@ -135,10 +137,11 @@ void ConnectionManager::sendHealthCheck() {
         }
         else{
             handleDisconnected();
+            OT_LOG_E("No connection established, healthcheck failed");
         }
     } 
 
-    OT_LOG_E("No connection established, healthcheck failed");
+    
     
 }
 
