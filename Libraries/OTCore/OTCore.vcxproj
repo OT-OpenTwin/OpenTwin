@@ -63,9 +63,12 @@
     <ClCompile Include="src\VariableToStringConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h" />
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
+    <ClInclude Include="include\OTCore\BasicRAIIWrapper.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
+    <ClInclude Include="include\OTCore\ContainerHelper.hpp" />
     <ClInclude Include="include\OTCore\CopyEntityInformation.h" />
     <ClInclude Include="include\OTCore\CopyInformation.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />

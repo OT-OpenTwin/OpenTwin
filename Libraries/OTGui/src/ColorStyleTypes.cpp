@@ -8,8 +8,7 @@
 #include "OTGui/ColorStyleTypes.h"
 
 std::string ot::toString(ColorStyleName _colorStyleName) {
-	switch (_colorStyleName)
-	{
+	switch (_colorStyleName) {
 	case ot::ColorStyleName::BrightStyle: return "Bright";
 	case ot::ColorStyleName::DarkStyle: return "Dark";
 	case ot::ColorStyleName::BlueStyle: return "Blue";

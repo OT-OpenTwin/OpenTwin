@@ -564,9 +564,9 @@ Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
 	return nullptr;
 }
 
-ot::SelectionResultFlags ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin)
+ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin)
 {
-	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+	ot::SelectionHandlingResult result;
 
 	if (GlobalModel::instance() == nullptr) {
 		OT_LOG_E("No global model set");
@@ -752,11 +752,9 @@ ot::WidgetView* ViewerAPI::getPlotWidget(ot::UID _viewerID) {
 	}
 }
 
-void ViewerAPI::viewerTabChanged(const std::string & _tabTitle, ot::WidgetViewBase::ViewType _type)
-{
-	if (GlobalModel::instance() != nullptr)
-	{
-		GlobalModel::instance()->viewerTabChanged(_tabTitle, _type);
+void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
+	if (GlobalModel::instance() != nullptr) {
+		GlobalModel::instance()->viewerTabChanged(_viewInfo);
 	}
 }
 

@@ -66,8 +66,8 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 	}
 }
 
-ot::SelectionResultFlags SceneNodeMultiVisualisation::setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) {
-	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+ot::SelectionHandlingResult SceneNodeMultiVisualisation::setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) {
+	ot::SelectionHandlingResult result;
 
 	if (getModel() != nullptr)
 	{
@@ -79,12 +79,12 @@ ot::SelectionResultFlags SceneNodeMultiVisualisation::setSelected(bool _selectio
 				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					visualiser->visualise();
-					result |= ot::SelectionResult::NewViewRequested;
+					result |= ot::SelectionHandlingEvent::NewViewRequested;
 				}
 				else if (visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-					result |= ot::SelectionResult::ActiveViewChanged;
+					result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 				}
 			}
 		}

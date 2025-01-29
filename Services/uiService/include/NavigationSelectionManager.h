@@ -24,8 +24,9 @@ namespace ot {
 		NavigationSelectionManager();
 		virtual ~NavigationSelectionManager();
 
-		SelectionResultFlags runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection);
+		SelectionHandlingResult runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection);
 
+		void addSelectedItem(UID _itemId) { m_selectionInfo.addSelectedNavigationItem(_itemId); };
 		void setSelectedItems(const UIDList& _itemIds) { m_selectionInfo.setSelectedNavigationItems(_itemIds); };
 		void setSelectionInformation(const SelectionInformation& _info) { m_selectionInfo = _info; };
 		const SelectionInformation& getSelectionInformation(void) { return m_selectionInfo; };
@@ -33,15 +34,18 @@ namespace ot {
 		const SelectionInformation& getPreviousSelectionInformation(void) { return m_previousSelectionInfo; };
 		const UIDList& getPreviouslySelectedItems(void) const { return m_previousSelectionInfo.getSelectedNavigationItems(); };
 
+		bool isSelectionHandlingRunning(void) const { return m_runCounter > 0; };
+
 	Q_SIGNALS:
-		void selectionHasChanged(SelectionResultFlags* _result, SelectionOrigin _eventOrigin);
+		void selectionHasChanged(SelectionHandlingResult* _result, SelectionOrigin _eventOrigin);
 
 	public Q_SLOTS:
 		void slotViewSelected(void);
 		void slotViewDeselected(void);
 
 	private:
-		StateStack<SelectionResultFlags> m_stateStack;
+		int m_runCounter;
+		StateStack<SelectionHandlingResult> m_stateStack;
 		SelectionInformation m_selectionInfo;
 		SelectionInformation m_previousSelectionInfo;
 	};

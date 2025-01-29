@@ -1036,8 +1036,8 @@ void Model::setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root)
 	}
 }
 
-ot::SelectionResultFlags Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin) {
-	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin) {
+	ot::SelectionHandlingResult result;
 
 	_selectedModelItems.clear();
 
@@ -1101,14 +1101,14 @@ ot::SelectionResultFlags Model::setSelectedTreeItems(const std::list<ot::UID>& _
 	if (isItem1DSelected && !isItem3DSelected) {
 		// Ensure that we have the 1D view active
 		if (ensure1DView()) {
-			result |= ot::SelectionResult::ActiveViewChanged;
+			result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 		}
 	}
 
 	if (isItem3DSelected && !isItem1DSelected) {
 		// Ensure that we have the 3D view active
 		if (ensure3DView()) {
-			result |= ot::SelectionResult::ActiveViewChanged;
+			result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 		}
 	}
 
@@ -1697,6 +1697,43 @@ void Model::removeTableColumn(void) {
 			view->getTable()->removeColumn(ix);
 		}
 		view->getTable()->setContentChanged(true);
+	}
+}
+
+void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
+	ViewerToolBar::instance().removeUIControls();
+
+	m_hasModalMenu = false;
+
+	switch (_viewInfo.getViewType()) {
+	case ot::WidgetViewBase::View3D:
+		ViewerToolBar::instance().setupUIControls3D();
+		break;
+
+	case ot::WidgetViewBase::View1D:
+		ViewerToolBar::instance().setupUIControls1D();
+		break;
+
+	case ot::WidgetViewBase::ViewText:
+		m_hasModalMenu = true;
+		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
+
+		ViewerToolBar::instance().setupUIControlsText();
+
+		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
+		break;
+
+	case ot::WidgetViewBase::ViewTable:
+		m_hasModalMenu = true;
+		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
+
+		ViewerToolBar::instance().setupUIControlsTable();
+
+		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -3263,45 +3300,15 @@ void Model::visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config)
 	update1DPlot(sceneNodesRoot);
 }
 
-void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type)
-{
+void Model::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 	if (m_hasModalMenu) {
 		if (m_currentMenu == FrontendAPI::instance()->getCurrentMenuPage()) {
 			FrontendAPI::instance()->setCurrentMenuPage(m_previousMenu);
 		}
 	}
 
-	ViewerToolBar::instance().removeUIControls();
-
-	m_hasModalMenu = false;
-
-	if (_type == ot::WidgetViewBase::View3D)
-	{
-		ViewerToolBar::instance().setupUIControls3D();
-	}
-	else if(_type == ot::WidgetViewBase::View1D)
-	{
-		ViewerToolBar::instance().setupUIControls1D();
-	}
-	else if (_type == ot::WidgetViewBase::ViewText) {
-		m_hasModalMenu = true;
-		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
-		
-		ViewerToolBar::instance().setupUIControlsText();
-		
-		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
-	}
-	else if (_type == ot::WidgetViewBase::ViewTable) {
-		m_hasModalMenu = true;
-		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
-		
-		ViewerToolBar::instance().setupUIControlsTable();
-
-		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
-	}
-	else
-	{
-		
+	if (_viewInfo.getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		this->viewerTabChangedToCentral(_viewInfo);
 	}
 }
 

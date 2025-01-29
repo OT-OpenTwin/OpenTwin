@@ -1702,7 +1702,7 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _en
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
-	return std::move(ot::listFromMapValues(m_graphicsViews));
+	return std::move(ot::ContainerHelper::listFromMapValues(m_graphicsViews));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -2390,24 +2390,33 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-			const ot::SelectionInformation& sel = _focusedView->getSelectionInformation();
+			const ot::SelectionInformation& viewSelectionInfo = _focusedView->getSelectionInformation();
 
 			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
 
 			m_projectNavigation->getTree()->deselectAllItems(false);
-			for (ot::UID uid : sel.getSelectedNavigationItems()) {
+			for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
 				m_projectNavigation->getTree()->setItemSelected(uid, true);
 			}
 
-			m_viewerComponent->viewerTabChanged(_focusedView->getViewData().getEntityName(), _focusedView->getViewData().getViewType());
+			// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
+			if (m_navigationManager.isSelectionHandlingRunning()) {
+				bool added = false;
+				for (UID id : ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft)) {
+					m_projectNavigation->getTree()->setItemSelected(id, true);
+					added = true;
+				}
+
+				if (added) {
+					m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+				}
+			}
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
 		}
-		else {
-			m_viewerComponent->viewerTabChanged("", ot::WidgetViewBase::CustomView);
-		}
 
+		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 	}
 }
 
@@ -3013,7 +3022,7 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 	
 }
 
-void AppBase::slotHandleSelectionHasChanged(ot::SelectionResultFlags* _result, ot::SelectionOrigin _eventOrigin) {
+void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin) {
 	// If true is returned a new view was requested
 	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems()));
 }
@@ -3037,15 +3046,15 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	if (graphics) {
-		ot::removeFromMapByValue(m_graphicsViews, graphics);
+		ot::ContainerHelper::removeFromMapByValue(m_graphicsViews, graphics);
 		this->lockManager()->uiElementDestroyed(graphics->getGraphicsView());
 	}
 	if (txt) {
-		ot::removeFromMapByValue(m_textEditors, txt);
+		ot::ContainerHelper::removeFromMapByValue(m_textEditors, txt);
 		this->lockManager()->uiElementDestroyed(txt->getTextEditor());
 	}
 	if (table) {
-		ot::removeFromMapByValue(m_tables, table);
+		ot::ContainerHelper::removeFromMapByValue(m_tables, table);
 		this->lockManager()->uiViewDestroyed(table);
 	}
 
@@ -3062,17 +3071,14 @@ void AppBase::setupNewCentralView(ot::WidgetView* _view) {
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
-	ot::SelectionResultFlags selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
+	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
-	if (selectionResult & ot::SelectionResult::NewViewRequested) {
+	if (selectionResult & ot::SelectionHandlingEvent::NewViewRequested) {
 		return;
 	}
-
-	if ((selectionResult | ot::SelectionResult::NoViewChangeRequestedMask) == ot::SelectionResult::NoViewChangeRequestedMask) {
+	else if ((selectionResult | ot::SelectionHandlingEvent::NoViewChangeRequestedMask) == ot::SelectionHandlingEvent::NoViewChangeRequestedMask) {
 		if (m_lastFocusedCentralView) {
 			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 		}
 	}
-
-	//m_lastNavigationSelection.setSelectedNavigationItems(m_projectNavigation->getTree()->selectedItems());
 }

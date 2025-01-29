@@ -275,7 +275,7 @@ namespace ot {
 	// Selection Result
 
 	//! @brief Result flag of a selection changed notification.
-	enum class SelectionResult {
+	enum class SelectionHandlingEvent {
 		Default                   = 0 << 0, //! @brief Default selection handling result.
 		NewViewRequested          = 1 << 0, //! @brief A new view was requested.
 		ActiveViewChanged         = 1 << 1, //! @brief The active view has changed after handling the selection.
@@ -290,19 +290,19 @@ namespace ot {
 	};
 
 	//! @brief Result of a selection changed notification.
-	typedef ot::Flags<SelectionResult> SelectionResultFlags;
+	typedef ot::Flags<SelectionHandlingEvent> SelectionHandlingResult;
 
-	OT_GUI_API_EXPORT std::string toString(SelectionResult _flag);
+	OT_GUI_API_EXPORT std::string toString(SelectionHandlingEvent _flag);
 
-	OT_GUI_API_EXPORT SelectionResult stringToSelectionResult(const std::string& _flag);
+	OT_GUI_API_EXPORT SelectionHandlingEvent stringToSelectionHandlingEvent(const std::string& _flag);
 
-	OT_GUI_API_EXPORT std::list<std::string> toStringList(const SelectionResultFlags& _flags);
+	OT_GUI_API_EXPORT std::list<std::string> toStringList(const SelectionHandlingResult& _flags);
 
-	OT_GUI_API_EXPORT SelectionResultFlags stringListToSelectionResultFlags(const std::list<std::string>& _flags);
+	OT_GUI_API_EXPORT SelectionHandlingResult stringListToSelectionHandlingResult(const std::list<std::string>& _flags);
 
-	OT_GUI_API_EXPORT SelectionResultFlags stringListToSelectionResultFlags(const std::vector<std::string>& _flags);
+	OT_GUI_API_EXPORT SelectionHandlingResult stringListToSelectionHandlingResult(const std::vector<std::string>& _flags);
 
-	OT_GUI_API_EXPORT std::list<SelectionResult> getAllSetFlags(const SelectionResultFlags& _lockFlags);
+	OT_GUI_API_EXPORT std::list<SelectionHandlingEvent> getAllSetEvents(const SelectionHandlingResult& _lockFlags);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -323,4 +323,4 @@ namespace ot {
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::SelectionResult)
+OT_ADD_FLAG_FUNCTIONS(ot::SelectionHandlingEvent)

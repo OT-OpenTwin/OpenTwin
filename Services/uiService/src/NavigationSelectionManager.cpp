@@ -8,9 +8,11 @@
 
 // OpenTwin header
 #include "OTCore/LocalStateStack.h"
+#include "OTCore/ContainerHelper.h"
+#include "OTCore/BasicNumberIncrementWrapper.h"
 
 ot::NavigationSelectionManager::NavigationSelectionManager() 
-	: m_stateStack(ot::SelectionResult::Default)
+	: m_stateStack(SelectionHandlingEvent::Default), m_runCounter(0)
 {
 
 }
@@ -19,40 +21,23 @@ ot::NavigationSelectionManager::~NavigationSelectionManager() {
 
 }
 
-ot::SelectionResultFlags ot::NavigationSelectionManager::runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection) {
+ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection) {
+	BasicNumberIncrementWrapper ct(m_runCounter);
+
 	m_previousSelectionInfo = m_selectionInfo;
 	m_selectionInfo.setSelectedNavigationItems(_newSelection);
 
-	UIDList diffList;
-	for (UID uid : m_selectionInfo.getSelectedNavigationItems()) {
-		bool found = false;
-		for (UID prevUid : m_previousSelectionInfo.getSelectedNavigationItems()) {
-			if (prevUid == uid) {
-				found = true;
-				break;
-			}
-		}
-
-		if (!found) {
-			diffList.push_back(uid);
-		}
-	}
-
-	LocalStateStack<SelectionResultFlags> lclState(m_stateStack, SelectionResult::Default);
+	LocalStateStack<SelectionHandlingResult> lclState(m_stateStack, SelectionHandlingEvent::Default);
 
 	Q_EMIT selectionHasChanged(*lclState, _eventOrigin);
 	
-	m_selectionInfo.addSelectedNavigationItems(std::move(diffList));
-
 	return lclState.getCurrent();
 }
 
 void ot::NavigationSelectionManager::slotViewSelected(void) {
-	m_stateStack->setFlag(SelectionResult::ActiveViewChanged);
-
+	m_stateStack->setFlag(SelectionHandlingEvent::ActiveViewChanged);
 }
 
 void ot::NavigationSelectionManager::slotViewDeselected(void) {
-	m_stateStack->setFlag(SelectionResult::ActiveViewChanged);
-
+	m_stateStack->setFlag(SelectionHandlingEvent::ActiveViewChanged);
 }

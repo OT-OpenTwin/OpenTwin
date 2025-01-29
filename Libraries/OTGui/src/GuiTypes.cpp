@@ -519,57 +519,57 @@ ot::SelectionOrigin ot::stringToSelectionOrigin(const std::string& _flag) {
 
 // Selection Result
 
-std::string ot::toString(SelectionResult _flag) {
+std::string ot::toString(SelectionHandlingEvent _flag) {
 	switch (_flag) {
-	case SelectionResult::Default: return "Default";
-	case SelectionResult::NewViewRequested: return "NewViewRequested";
-	case SelectionResult::ActiveViewChanged: return "ActiveViewChanged";
-	case SelectionResult::ActiveViewChangeRequested: return "ActiveViewChangeRequested";
+	case SelectionHandlingEvent::Default: return "Default";
+	case SelectionHandlingEvent::NewViewRequested: return "NewViewRequested";
+	case SelectionHandlingEvent::ActiveViewChanged: return "ActiveViewChanged";
+	case SelectionHandlingEvent::ActiveViewChangeRequested: return "ActiveViewChangeRequested";
 	default:
 		OT_LOG_E("Unknown selection result (" + std::to_string((int)_flag) + ")");
 		return "Default";
 	}
 }
 
-ot::SelectionResult ot::stringToSelectionResult(const std::string& _flag) {
-	if (_flag == toString(SelectionResult::NewViewRequested)) return SelectionResult::NewViewRequested;
-	if (_flag == toString(SelectionResult::ActiveViewChanged)) return SelectionResult::ActiveViewChanged;
-	if (_flag == toString(SelectionResult::ActiveViewChangeRequested)) return SelectionResult::ActiveViewChangeRequested;
-	else if (_flag != toString(SelectionResult::Default)) {
+ot::SelectionHandlingEvent ot::stringToSelectionHandlingEvent(const std::string& _flag) {
+	if (_flag == toString(SelectionHandlingEvent::NewViewRequested)) return SelectionHandlingEvent::NewViewRequested;
+	if (_flag == toString(SelectionHandlingEvent::ActiveViewChanged)) return SelectionHandlingEvent::ActiveViewChanged;
+	if (_flag == toString(SelectionHandlingEvent::ActiveViewChangeRequested)) return SelectionHandlingEvent::ActiveViewChangeRequested;
+	else if (_flag != toString(SelectionHandlingEvent::Default)) {
 		OT_LOG_E("Unknown selection result \"" + _flag + "\"");
 	}
-	return SelectionResult::Default;
+	return SelectionHandlingEvent::Default;
 }
 
-std::list<std::string> ot::toStringList(const SelectionResultFlags& _flags) {
+std::list<std::string> ot::toStringList(const SelectionHandlingResult& _flags) {
 	std::list<std::string> result;
-	if (_flags & SelectionResult::NewViewRequested) result.push_back(toString(SelectionResult::NewViewRequested));
-	if (_flags & SelectionResult::ActiveViewChanged) result.push_back(toString(SelectionResult::ActiveViewChanged));
-	if (_flags & SelectionResult::ActiveViewChangeRequested) result.push_back(toString(SelectionResult::ActiveViewChangeRequested));
-	return result;
-}
-
-ot::SelectionResultFlags ot::stringListToSelectionResultFlags(const std::list<std::string>& _flags) {
-	SelectionResultFlags result(SelectionResult::Default);
-	for (const std::string& flag : _flags) {
-		result |= stringToSelectionResult(flag);
+	for (SelectionHandlingEvent _event : getAllSetEvents(_flags)) {
+		result.push_back(toString(_event));
 	}
 	return result;
 }
 
-ot::SelectionResultFlags ot::stringListToSelectionResultFlags(const std::vector<std::string>& _flags) {
-	SelectionResultFlags result(SelectionResult::Default);
+ot::SelectionHandlingResult ot::stringListToSelectionHandlingResult(const std::list<std::string>& _flags) {
+	SelectionHandlingResult result;
 	for (const std::string& flag : _flags) {
-		result |= stringToSelectionResult(flag);
+		result |= stringToSelectionHandlingEvent(flag);
 	}
 	return result;
 }
 
-std::list<ot::SelectionResult> ot::getAllSetFlags(const SelectionResultFlags& _flags) {
-	std::list<SelectionResult> result;
-	if (_flags & SelectionResult::NewViewRequested) result.push_back(SelectionResult::NewViewRequested);
-	if (_flags & SelectionResult::ActiveViewChanged) result.push_back(SelectionResult::ActiveViewChanged);
-	if (_flags & SelectionResult::ActiveViewChangeRequested) result.push_back(SelectionResult::ActiveViewChangeRequested);
+ot::SelectionHandlingResult ot::stringListToSelectionHandlingResult(const std::vector<std::string>& _flags) {
+	SelectionHandlingResult result;
+	for (const std::string& flag : _flags) {
+		result |= stringToSelectionHandlingEvent(flag);
+	}
+	return result;
+}
+
+std::list<ot::SelectionHandlingEvent> ot::getAllSetEvents(const SelectionHandlingResult& _flags) {
+	std::list<SelectionHandlingEvent> result;
+	if (_flags & SelectionHandlingEvent::NewViewRequested) result.push_back(SelectionHandlingEvent::NewViewRequested);
+	if (_flags & SelectionHandlingEvent::ActiveViewChanged) result.push_back(SelectionHandlingEvent::ActiveViewChanged);
+	if (_flags & SelectionHandlingEvent::ActiveViewChangeRequested) result.push_back(SelectionHandlingEvent::ActiveViewChangeRequested);
 	return result;
 }
 

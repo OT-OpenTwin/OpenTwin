@@ -324,6 +324,15 @@
     <ClInclude Include="include\OTCore\CopyInformation.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicRAIIWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

@@ -630,8 +630,8 @@ void ViewerComponent::notify(
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-ot::SelectionResultFlags ViewerComponent::handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectionInformation) {
-	ot::SelectionResultFlags result(ot::SelectionResult::Default);
+ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectionInformation) {
+	ot::SelectionHandlingResult result;
 
 	OT_TEST_VIEWECOMPONENT_Interval("Selection Changed");
 
@@ -1040,8 +1040,8 @@ ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getPlotWidget(_viewerID);
 }
 
-void ViewerComponent::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type) {
-	ViewerAPI::viewerTabChanged(_tabTitle, _type);
+void ViewerComponent::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
+	ViewerAPI::viewerTabChanged(_viewInfo);
 }
 
 ViewerUIDtype ViewerComponent::createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,

@@ -54,6 +54,19 @@ void ViewerToolBar::viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _typ
 	}
 }
 
+void ViewerToolBar::setupDefaultControls(void) {
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
+
+	m_removeItemIDList.push_front(m_viewPageID = FrontendAPI::instance()->addMenuPage("View"));
+
+	m_removeItemIDList.push_front(m_visiblityGroupID = FrontendAPI::instance()->addMenuGroup(m_viewPageID, "Visibility"));
+
+	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
+	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
+}
+
 void ViewerToolBar::setupUIControls3D(void) {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;

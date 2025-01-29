@@ -40,6 +40,7 @@ public:
 
 	void viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _type, bool _isModified);
 
+	void setupDefaultControls(void);
 	void setupUIControls3D(void);
 	void setupUIControls1D(void);
 	void setupUIControlsText(void);

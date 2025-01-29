@@ -60,8 +60,8 @@ public:
 	bool isSelected(void) { return selected; };
 
 	//! \return Returns true if the selection has requested a new view.
-	virtual ot::SelectionResultFlags setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin) { selected = _selected; return ot::SelectionResultFlags(ot::SelectionResult::Default); };
-	
+	virtual ot::SelectionHandlingResult setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin) { selected = _selected; return ot::SelectionHandlingResult(); };
+
 	bool isTransparent(void) { return transparent; };
 	virtual void setTransparent(bool t) { transparent = t; };
 

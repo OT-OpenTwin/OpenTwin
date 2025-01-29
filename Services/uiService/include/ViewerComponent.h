@@ -174,7 +174,7 @@ public:
 
 	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
 	
-	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
+	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
 		int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB);
@@ -191,7 +191,7 @@ public:
 	//! \brief Handle navigation tree selection changed event.
 	//! \param _selectionFromTree If true the selection event was emitted from the tree or tree operation.
 	//! \return Returns true if the selection has requested a new view.
-	ot::SelectionResultFlags handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectedItems);
+	ot::SelectionHandlingResult handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectedItems);
 
 	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
 

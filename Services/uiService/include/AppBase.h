@@ -510,7 +510,7 @@ private Q_SLOTS:
 	void slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column);
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
-	void slotHandleSelectionHasChanged(ot::SelectionResultFlags* _result, ot::SelectionOrigin _eventOrigin);
+	void slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin);
 
 private:
 	enum class AppState {
