@@ -16,6 +16,7 @@
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/TableItem.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/SignalBlockWrapper.h"
@@ -39,27 +40,6 @@ enum TableColumn {
 	ColumnCount
 };
 
-ProjectOverviewTableItem::ProjectOverviewTableItem() {
-
-}
-
-bool ProjectOverviewTableItem::operator < (const QTableWidgetItem& _other) const {
-	QString otherTxt(_other.text());
-	const ProjectOverviewTableItem* customItm = dynamic_cast<const ProjectOverviewTableItem*>(&_other);
-	if (customItm) {
-		if (!customItm->getSortHint().isEmpty()) {
-			otherTxt = customItm->getSortHint();
-		}
-	}
-
-	if (m_sortHint.isEmpty()) {
-		return this->text() < otherTxt;
-	}
-	else {
-		return m_sortHint < otherTxt;
-	}
-}
-
 ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
@@ -69,21 +49,21 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_checkBox = new ot::CheckBox;
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
 	
-	m_typeItem = new ProjectOverviewTableItem;
+	m_typeItem = new ot::TableItem;
 	m_typeItem->setFlags(m_typeItem->flags() & ~Qt::ItemIsEditable);
 	m_typeItem->setIcon(_projectTypeIcon);
 	m_typeItem->setToolTip(QString::fromStdString(_projectInfo.getProjectType()));
 	m_typeItem->setSortHint(QString::fromStdString(_projectInfo.getProjectType()));
 
-	m_nameItem = new ProjectOverviewTableItem;
+	m_nameItem = new ot::TableItem;
 	m_nameItem->setFlags(m_typeItem->flags());
 	m_nameItem->setText(QString::fromStdString(_projectInfo.getProjectName()));
 
-	m_ownerItem = new ProjectOverviewTableItem;
+	m_ownerItem = new ot::TableItem;
 	m_ownerItem->setFlags(m_typeItem->flags());
 	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
-	m_groupsItem = new ProjectOverviewTableItem;;
+	m_groupsItem = new ot::TableItem;;
 	m_groupsItem->setFlags(m_typeItem->flags());
 	if (!_projectInfo.getGroups().empty()) {
 		m_groupsItem->setIcon(ot::IconManager::getIcon("Default/Groups.png"));
@@ -105,7 +85,7 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 		m_groupsItem->setSortHint(QString::fromStdString(newGroupsSortHint));
 	}
 
-	m_lastAccessTimeItem = new ProjectOverviewTableItem;
+	m_lastAccessTimeItem = new ot::TableItem;
 	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
 	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString());
 	m_lastAccessTimeItem->setSortHint(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));

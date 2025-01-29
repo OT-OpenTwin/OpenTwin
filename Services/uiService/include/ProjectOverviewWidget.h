@@ -16,12 +16,13 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
 #include <QtGui/qicon.h>
-#include <QtWidgets/qtablewidget.h>
 
 // std header
 #include <map>
 #include <list>
 #include <string>
+
+class QTableWidget;
 
 namespace tt { class Page; }
 namespace tt { class Group; }
@@ -29,20 +30,8 @@ namespace ot { class Label; }
 namespace ot { class Table; }
 namespace ot { class CheckBox; }
 namespace ot { class LineEdit; }
+namespace ot { class TableItem; }
 namespace ot { class ToolButton; }
-
-class ProjectOverviewTableItem : public QTableWidgetItem {
-public:
-	ProjectOverviewTableItem();
-
-	virtual bool operator < (const QTableWidgetItem& _other) const override;
-
-	void setSortHint(const QString& _hint) { m_sortHint = _hint; };
-	const QString& getSortHint(void) const { return m_sortHint; };
-
-private:
-	QString m_sortHint;
-};
 
 class ProjectOverviewEntry : public QObject {
 	Q_OBJECT
@@ -65,11 +54,11 @@ private:
 	QTableWidget* m_table;
 	bool m_ownerIsCreator;
 	ot::CheckBox* m_checkBox;
-	ProjectOverviewTableItem* m_typeItem;
-	ProjectOverviewTableItem* m_nameItem;
-	ProjectOverviewTableItem* m_ownerItem;
-	ProjectOverviewTableItem* m_groupsItem;
-	ProjectOverviewTableItem* m_lastAccessTimeItem;
+	ot::TableItem* m_typeItem;
+	ot::TableItem* m_nameItem;
+	ot::TableItem* m_ownerItem;
+	ot::TableItem* m_groupsItem;
+	ot::TableItem* m_lastAccessTimeItem;
 
 };
 

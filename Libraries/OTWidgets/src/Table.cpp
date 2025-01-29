@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTWidgets/Table.h"
+#include "OTWidgets/TableItem.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableItemDelegate.h"
 #include "OTWidgets/SignalBlockWrapper.h"
@@ -217,6 +218,19 @@ void ot::Table::setSelectedCellsBackground(const QColor& _color) {
 
 void ot::Table::prepareForDataChange(void) {
 	m_stopResizing = true;
+}
+
+ot::TableItem* ot::Table::addItem(int _row, int _column, const QString& _text, const QString& _sortHint) {
+	TableItem* newItem = new TableItem(_text, _sortHint);
+	this->setItem(_row, _column, newItem);
+	return newItem;
+}
+
+ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint) {
+	TableItem* newItem = new TableItem(_text, _sortHint);
+	newItem->setIcon(_icon);
+	this->setItem(_row, _column, newItem);
+	return newItem;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -19,6 +19,8 @@
 
 namespace ot {
 
+	class TableItem;
+
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Table)
@@ -50,6 +52,14 @@ namespace ot {
 		//! This must be called before filling the table since it affects the text edit created by the item delegate.
 		void setMultilineCells(bool _multiline = true) { m_multilineCells = _multiline; };
 		bool getMultilineCells(void) const { return m_multilineCells; };
+
+		//! @brief  Creates a default item and palaces it at the given coordinates.
+		//! @return Default item. The table keeps ownership of the item.
+		TableItem* addItem(int _row, int _column, const QString& _text, const QString& _sortHint = QString());
+
+		//! @brief  Creates a default item and palaces it at the given coordinates.
+		//! @return Default item. The table keeps ownership of the item.
+		TableItem* addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint = QString());
 
 	Q_SIGNALS:
 		void saveRequested(void);

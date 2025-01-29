@@ -460,6 +460,9 @@
     <ClCompile Include="src\SelectionInformation.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\TableItem.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -892,6 +895,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SelectionInformation.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TableItem.h">
+      <Filter>include\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
