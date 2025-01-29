@@ -134,6 +134,9 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		}
 	}
 
+	this->horizontalHeader()->setSortIndicatorClearable(_config.getSortingClearable());
+	this->setSortingEnabled(_config.getSortingEnabled());
+
 	this->setResizeRequired();
 }
 
@@ -186,6 +189,9 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		}
 	}
 	
+	cfg.setSortingClearable(this->horizontalHeader()->isSortIndicatorClearable());
+	cfg.setSortingEnabled(this->isSortingEnabled());
+
 	return cfg;
 }
 

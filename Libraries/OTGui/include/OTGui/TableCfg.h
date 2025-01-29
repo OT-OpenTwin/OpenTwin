@@ -69,12 +69,22 @@ namespace ot {
 		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
+		void setSortingEnabled(bool _enable = true) { m_sortingEnabled = _enable; };
+		bool getSortingEnabled(void) const { return m_sortingEnabled; };
+
+		//! @brief If set the sorting can be cleared when pressing the sort button repeatadly.
+		//! This has no effect if sorting is not enabled.
+		void setSortingClearable(bool _enable = true) { m_sortingClearable = _enable; };
+		bool getSortingClearable(void) const { return m_sortingClearable; };
+
 	private:
 		void initialize(void);
 		void initialize(int _rows, int _columns);
 
 		int m_rows;
 		int m_columns;
+		bool m_sortingEnabled;
+		bool m_sortingClearable;
 
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;
