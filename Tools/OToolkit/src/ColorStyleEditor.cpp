@@ -161,7 +161,20 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	}
 
 	try {
-		this->initializeBrightStyleValues();
+		const std::string& currentGlobalStyleName = ot::GlobalColorStyle::instance().getCurrentStyleName();
+		if (currentGlobalStyleName == ot::toString(ot::ColorStyleName::BlueStyle)) {
+			this->initializeBlueStyleValues();
+		}
+		else if (currentGlobalStyleName == ot::toString(ot::ColorStyleName::DarkStyle)) {
+			this->initializeDarkStyleValues();
+		}
+		else {
+			if (!currentGlobalStyleName.empty() && ot::GlobalColorStyle::instance().getCurrentStyleName() != ot::toString(ot::ColorStyleName::BrightStyle)) {
+				OT_LOG_E("Unknown color style name \"" + currentGlobalStyleName + "\"");
+			}
+			this->initializeBrightStyleValues();
+		}
+
 		this->initializeStyleSheetBase();
 		this->parseStyleSheetBaseFile();
 		this->initializePropertyGrid();
@@ -457,15 +470,19 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpPressed), new PropertyString("/icons/arrow_up_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownPressed), new PropertyString("/icons/arrow_down_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftPressed), new PropertyString("/icons/arrow_left_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightPressed), new PropertyString("/icons/arrow_right_pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));
@@ -631,15 +648,19 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpPressed), new PropertyString("/icons/arrow_up_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownPressed), new PropertyString("/icons/arrow_down_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftPressed), new PropertyString("/icons/arrow_left_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightPressed), new PropertyString("/icons/arrow_right_pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));
@@ -806,15 +827,19 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpPressed), new PropertyString("/icons/arrow_up_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownPressed), new PropertyString("/icons/arrow_down_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftPressed), new PropertyString("/icons/arrow_left_pressed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightPressed), new PropertyString("/icons/arrow_right_pressed.png"));
 
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
 	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));

@@ -76,19 +76,33 @@ private:
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
 	
-	Splitter* root = new Splitter;
-	ot::WidgetView* r = this->createCentralWidgetView(root, "Test");
-	_content.addView(r);
+	{
+		Splitter* root = new Splitter;
+		ot::WidgetView* r = this->createCentralWidgetView(root, "Test Versions");
+		_content.addView(r);
 
-	m_versionGraph = new ot::VersionGraphManager;
-	m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::Iterator);
+		m_versionGraph = new ot::VersionGraphManager;
+		m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::Iterator);
 
-	this->updateVersionConfig(ot::VersionGraphVersionCfg("2.1.3"));
+		this->updateVersionConfig(ot::VersionGraphVersionCfg("2.1.3"));
 
-	root->addWidget(m_versionGraph->getQWidget());
-	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
-	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
-	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
+		root->addWidget(m_versionGraph->getQWidget());
+		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
+		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
+		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
+	}
+	{
+		QTableWidget* table = new QTableWidget(2, 2);
+		ot::WidgetView* r = this->createCentralWidgetView(table, "Test Table");
+		_content.addView(r);
+
+		table->setItem(0, 0, new QTableWidgetItem("Test00"));
+		table->setItem(0, 1, new QTableWidgetItem("Test01"));
+		table->setItem(1, 0, new QTableWidgetItem("Test10"));
+		table->setItem(1, 1, new QTableWidgetItem("Test11"));
+
+		table->setSortingEnabled(true);
+	}
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");

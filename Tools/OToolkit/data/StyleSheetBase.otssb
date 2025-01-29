@@ -1678,8 +1678,8 @@ QHeaderView::section::vertical:disabled {
 QHeaderView::down-arrow {
     /* Those settings (border/width/height/background-color) solve bug */
     /* transparent arrow background and size */
-    background-color: %color:Widget Background%;
-    border: none;
+    background-color: transparent;
+    border: 0px solid transparent;
     height: 12px;
     width: 12px;
     padding-left: 2px;
@@ -1687,14 +1687,34 @@ QHeaderView::down-arrow {
     image: url('%file:Arrow Down Icon%');
 }
 
+QHeaderView::down-arrow:hover:!pressed {
+    image: url('%file:Arrow Down Focus Icon%');
+}
+
+QHeaderView::down-arrow:pressed {
+    image: url('%file:Arrow Down Pressed Icon%');
+}
+
 QHeaderView::up-arrow {
-    background-color: %color:Widget Background%;
-    border: none;
+    background-color: transparent;
+    border: 0px solid transparent;
     height: 12px;
     width: 12px;
     padding-left: 2px;
     padding-right: 2px;
     image: url('%file:Arrow Up Icon%');
+}
+
+QHeaderView::up-arrow:hover:!pressed {
+    image: url('%file:Arrow Up Focus Icon%');
+}
+
+QHeaderView::up-arrow:pressed {
+    image: url('%file:Arrow Up Focus Icon%');
+}
+
+QHeaderView::up-arrow:disabled {
+    image: url('%file:Arrow Up Disabled Icon%');
 }
 
 /* ##################################################################################### */

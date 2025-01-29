@@ -129,15 +129,19 @@ std::string ot::toString(ColorStyleFileEntry _colorStyleFileEntry) {
 	case ot::ColorStyleFileEntry::ArrowUpIcon: return "Arrow Up Icon";
 	case ot::ColorStyleFileEntry::ArrowUpDisabledIcon: return "Arrow Up Disabled Icon";
 	case ot::ColorStyleFileEntry::ArrowUpFocusIcon: return "Arrow Up Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowUpPressed: return "Arrow Up Pressed Icon";
 	case ot::ColorStyleFileEntry::ArrowDownIcon: return "Arrow Down Icon";
 	case ot::ColorStyleFileEntry::ArrowDownDisabledIcon: return "Arrow Down Disabled Icon";
 	case ot::ColorStyleFileEntry::ArrowDownFocusIcon: return "Arrow Down Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowDownPressed: return "Arrow Down Pressed Icon";
 	case ot::ColorStyleFileEntry::ArrowLeftIcon: return "Arrow Left Icon";
 	case ot::ColorStyleFileEntry::ArrowLeftDisabledIcon: return "Arrow Left Disabled Icon";
 	case ot::ColorStyleFileEntry::ArrowLeftFocusIcon: return "Arrow Left Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowLeftPressed: return "Arrow Left Pressed Icon";
 	case ot::ColorStyleFileEntry::ArrowRightIcon: return "Arrow Right Icon";
 	case ot::ColorStyleFileEntry::ArrowRightDisabledIcon: return "Arrow Right Disabled Icon";
 	case ot::ColorStyleFileEntry::ArrowRightFocusIcon: return "Arrow Right Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowRightPressed: return "Arrow Right Pressed Icon";
 
 	case ot::ColorStyleFileEntry::TreeBranchClosedIcon: return "Tree Branch Closed Icon";
 	case ot::ColorStyleFileEntry::TreeBranchClosedFocusIcon: return "Tree Branch Closed Focus Icon";
@@ -212,15 +216,19 @@ ot::ColorStyleFileEntry ot::stringToColorStyleFileEntry(const std::string& _colo
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpIcon)) return ColorStyleFileEntry::ArrowUpIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpDisabledIcon)) return ColorStyleFileEntry::ArrowUpDisabledIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpFocusIcon)) return ColorStyleFileEntry::ArrowUpFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpPressed)) return ColorStyleFileEntry::ArrowUpPressed;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownIcon)) return ColorStyleFileEntry::ArrowDownIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownDisabledIcon)) return ColorStyleFileEntry::ArrowDownDisabledIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownFocusIcon)) return ColorStyleFileEntry::ArrowDownFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownPressed)) return ColorStyleFileEntry::ArrowDownPressed;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftIcon)) return ColorStyleFileEntry::ArrowLeftIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftDisabledIcon)) return ColorStyleFileEntry::ArrowLeftDisabledIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftFocusIcon)) return ColorStyleFileEntry::ArrowLeftFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftPressed)) return ColorStyleFileEntry::ArrowLeftPressed;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightIcon)) return ColorStyleFileEntry::ArrowRightIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightDisabledIcon)) return ColorStyleFileEntry::ArrowRightDisabledIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightFocusIcon)) return ColorStyleFileEntry::ArrowRightFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightPressed)) return ColorStyleFileEntry::ArrowRightPressed;
 
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchClosedIcon)) return ColorStyleFileEntry::TreeBranchClosedIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon)) return ColorStyleFileEntry::TreeBranchClosedFocusIcon;

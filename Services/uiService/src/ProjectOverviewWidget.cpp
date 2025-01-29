@@ -330,12 +330,7 @@ void ProjectOverviewWidget::slotTableHeaderItemClicked(int _column) {
 }
 
 void ProjectOverviewWidget::slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order) {
-	if (_column == TableColumn::ColumnCheck || _column == TableColumn::ColumnGroups) {
-		m_table->horizontalHeader()->setSortIndicatorShown(false);
-	}
-	else {
-		m_table->horizontalHeader()->setSortIndicatorShown(true);
-	}
+	m_table->horizontalHeader()->setSortIndicatorShown(_column != TableColumn::ColumnCheck);
 }
 
 void ProjectOverviewWidget::slotRefreshProjectList(void) {
