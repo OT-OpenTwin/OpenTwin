@@ -34,6 +34,8 @@ namespace ot {
 
 		void updatePosition(bool _forceUpdate = false);
 
+		void setCurrentText(const QString& _text);
+
 	Q_SIGNALS:
 		void popupClosing(void);
 

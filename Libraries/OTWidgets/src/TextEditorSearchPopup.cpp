@@ -98,6 +98,10 @@ void ot::TextEditorSearchPopup::updatePosition(bool _forceUpdate) {
 	this->move(p);
 }
 
+void ot::TextEditorSearchPopup::setCurrentText(const QString& _text) {
+	m_search->setText(_text);
+}
+
 void ot::TextEditorSearchPopup::slotTextChanged(void) {
 	int ix = m_ix;
 	this->slotFindNext();

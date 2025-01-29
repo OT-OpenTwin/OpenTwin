@@ -370,10 +370,21 @@ void ot::TextEditor::slotFindRequested(void) {
 		
 		this->connect(m_searchPopup, &TextEditorSearchPopup::popupClosing, this, &TextEditor::slotFindClosing);
 	}
-	
-	m_searchPopup->setIndex(this->textCursor().position());
+
+	QString selectedText = this->textCursor().selectedText();
+	int ix = this->textCursor().position() - 1;
+	if (ix < 0) {
+		this->textCursor().movePosition(QTextCursor::End);
+		ix = this->textCursor().position();
+	}
+	m_searchPopup->setIndex(ix);
+
 	this->clearFocus();
 	m_searchPopup->focusInput();
+
+	if (!selectedText.isEmpty()) {
+		m_searchPopup->setCurrentText(selectedText);
+	}
 }
 
 void ot::TextEditor::slotFindClosing(void) {
