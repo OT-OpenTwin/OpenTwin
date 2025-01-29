@@ -33,6 +33,7 @@ namespace ot {
 		const UIDList& getSelectedItems(void) const { return m_selectionInfo.getSelectedNavigationItems(); };
 		const SelectionInformation& getPreviousSelectionInformation(void) { return m_previousSelectionInfo; };
 		const UIDList& getPreviouslySelectedItems(void) const { return m_previousSelectionInfo.getSelectedNavigationItems(); };
+		SelectionOrigin getCurrentSelectionOrigin(void) const { return m_selectionOrigin; };
 
 		bool isSelectionHandlingRunning(void) const { return m_runCounter > 0; };
 
@@ -46,6 +47,7 @@ namespace ot {
 	private:
 		int m_runCounter;
 		StateStack<SelectionHandlingResult> m_stateStack;
+		SelectionOrigin m_selectionOrigin;
 		SelectionInformation m_selectionInfo;
 		SelectionInformation m_previousSelectionInfo;
 	};

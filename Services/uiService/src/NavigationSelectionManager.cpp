@@ -12,7 +12,7 @@
 #include "OTCore/BasicNumberIncrementWrapper.h"
 
 ot::NavigationSelectionManager::NavigationSelectionManager() 
-	: m_stateStack(SelectionHandlingEvent::Default), m_runCounter(0)
+	: m_stateStack(SelectionHandlingEvent::Default), m_selectionOrigin(SelectionOrigin::Custom), m_runCounter(0)
 {
 
 }
@@ -24,6 +24,7 @@ ot::NavigationSelectionManager::~NavigationSelectionManager() {
 ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection) {
 	BasicNumberIncrementWrapper ct(m_runCounter);
 
+	m_selectionOrigin = _eventOrigin;
 	m_previousSelectionInfo = m_selectionInfo;
 	m_selectionInfo.setSelectedNavigationItems(_newSelection);
 
@@ -31,6 +32,7 @@ ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling
 
 	Q_EMIT selectionHasChanged(*lclState, _eventOrigin);
 	
+	m_selectionOrigin = _eventOrigin;
 	return lclState.getCurrent();
 }
 

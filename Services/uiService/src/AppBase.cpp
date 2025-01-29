@@ -2400,17 +2400,15 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			}
 
 			// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
-			if (m_navigationManager.isSelectionHandlingRunning()) {
+			if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
 				bool added = false;
 				for (UID id : ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft)) {
 					m_projectNavigation->getTree()->setItemSelected(id, true);
 					added = true;
 				}
-
-				if (added) {
-					m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-				}
 			}
+
+			m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
@@ -2473,16 +2471,15 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 		// Change item selection according to focused view
 		if (itemToSelect) {
 			bool changed = false;
-			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
 
 			// Select
 			if (itemToSelect) {
 				if (!itemToSelect->isSelected()) {
+					ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
 					itemToSelect->setSelected(true);
 					changed = true;
 				}
 			}
-
 			// Notify if needed
 			if (changed) {
 				this->runSelectionHandling(ot::SelectionOrigin::View);
