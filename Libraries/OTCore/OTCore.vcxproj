@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h" />
+    <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h" />
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\BasicRAIIWrapper.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />

@@ -328,10 +328,13 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\BasicRAIIWrapper.h">
-      <Filter>include</Filter>
+      <Filter>include\RAII</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h">
-      <Filter>include</Filter>
+      <Filter>include\RAII</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h">
+      <Filter>include\RAII</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -376,6 +379,9 @@
     </Filter>
     <Filter Include="src\Geometry">
       <UniqueIdentifier>{5d7cb18f-7ed2-451e-9db2-d3da422a0bca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\RAII">
+      <UniqueIdentifier>{14283519-217f-45c0-adab-4c2b019f8a6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
