@@ -1329,3 +1329,113 @@ std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonArray& _
 	std::vector<ot::ConstJsonArray> ret;
 	OT_JSON_getListFromArray(_value, _ix, Array, ret, return ret);
 }
+
+std::string ot::json::toJson(const JsonValue& _obj) {
+	// Create a new JSON document
+	JsonDocument doc;
+	doc.CopyFrom(_obj, doc.GetAllocator());
+
+	// Create string buffer and writer
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+
+	// Return JSON string
+	return std::string(buffer.GetString());
+}
+
+std::string ot::json::toJson(const JsonObject& _obj) {
+	// Create a new JSON document
+	JsonDocument doc;
+
+	// Copy key-value pairs from _obj into the document
+	for (auto it = _obj.MemberBegin(); it != _obj.MemberEnd(); ++it) {
+		// Copy key
+		rapidjson::Value key(it->name, doc.GetAllocator());
+
+		// Deep copy value
+		rapidjson::Value value;
+		value.CopyFrom(it->value, doc.GetAllocator());
+
+		// Add to document
+		doc.AddMember(key, value, doc.GetAllocator());
+	}
+	// Create string buffer and writer
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+
+	// Return JSON string
+	return std::string(buffer.GetString());
+}
+
+std::string ot::json::toJson(const ConstJsonObject& _obj) {
+	// Create a new JSON document
+	JsonDocument doc;
+
+	// Copy key-value pairs from _obj into the document
+	for (auto it = _obj.MemberBegin(); it != _obj.MemberEnd(); ++it) {
+		// Copy key
+		rapidjson::Value key(it->name, doc.GetAllocator());
+
+		// Deep copy value
+		rapidjson::Value value;
+		value.CopyFrom(it->value, doc.GetAllocator());
+
+		// Add to document
+		doc.AddMember(key, value, doc.GetAllocator());
+	}
+	// Create string buffer and writer
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+
+	// Return JSON string
+	return std::string(buffer.GetString());
+}
+
+std::string ot::json::toJson(const JsonArray& _arr) {
+	// Create a new JSON document
+	JsonDocument doc(rapidjson::kArrayType);
+	doc.Reserve(_arr.Size(), doc.GetAllocator());
+
+	// Copy key-value pairs from _obj into the document
+	for (JsonSizeType i = 0; i < _arr.Size(); i++) {
+		// Deep copy value
+		rapidjson::Value value;
+		value.CopyFrom(_arr[i], doc.GetAllocator());
+
+		// Add to document
+		doc.PushBack(value, doc.GetAllocator());
+	}
+	// Create string buffer and writer
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+
+	// Return JSON string
+	return std::string(buffer.GetString());
+}
+
+std::string ot::json::toJson(const ConstJsonArray& _arr) {
+	// Create a new JSON document
+	JsonDocument doc(rapidjson::kArrayType);
+	doc.Reserve(_arr.Size(), doc.GetAllocator());
+
+	// Copy key-value pairs from _obj into the document
+	for (JsonSizeType i = 0; i < _arr.Size(); i++) {
+		// Deep copy value
+		rapidjson::Value value;
+		value.CopyFrom(_arr[i], doc.GetAllocator());
+
+		// Add to document
+		doc.PushBack(value, doc.GetAllocator());
+	}
+	// Create string buffer and writer
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	doc.Accept(writer);
+
+	// Return JSON string
+	return std::string(buffer.GetString());
+}

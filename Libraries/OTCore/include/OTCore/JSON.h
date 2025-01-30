@@ -65,6 +65,7 @@ namespace ot {
 		OT_DECL_NOCOPY(JsonNumber)
 		OT_DECL_NODEFAULT(JsonNumber)
 	public:
+		JsonNumber(int _value) : JsonValue(rapidjson::kNumberType) { this->SetInt64(static_cast<long>(_value)); };
 		JsonNumber(long _value) : JsonValue(rapidjson::kNumberType) { this->SetInt64(_value); };
 		JsonNumber(long long _value) : JsonValue(rapidjson::kNumberType) { this->SetInt64(_value); };
 		JsonNumber(unsigned long _value) : JsonValue(rapidjson::kNumberType) { this->SetUint64(_value); };
@@ -850,5 +851,21 @@ namespace ot {
 		//! Asserts, logs and throws when the provided member does not exist or is invalid type
 		OT_CORE_API_EXPORT std::vector<ConstJsonArray> getArrayVector(const JsonValue& _value, unsigned int _ix);
 		OT_CORE_API_EXPORT std::vector<ConstJsonArray> getArrayVector(const ConstJsonArray& _value, unsigned int _ix);
-	}
+
+		//! @brief Returns the serialized json value.
+		OT_CORE_API_EXPORT std::string toJson(const JsonValue& _obj);
+
+		//! @brief Returns the serialized json object.
+		OT_CORE_API_EXPORT std::string toJson(const JsonObject& _obj);
+
+		//! @brief Returns the serialized json object.
+		OT_CORE_API_EXPORT std::string toJson(const ConstJsonObject& _obj);
+
+		//! @brief Returns the serialized json array.
+		OT_CORE_API_EXPORT std::string toJson(const JsonArray& _arr);
+
+		//! @brief Returns the serialized json array.
+		OT_CORE_API_EXPORT std::string toJson(const ConstJsonArray& _arr);
+
+	} // namespace json
 }
