@@ -4,27 +4,17 @@
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "EntityFileText.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCore/FolderNames.h"
+#include "EntityBinaryData.h"
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
 {
 	m_input = blockEntity->getConnectorInput();
 	m_fileName = blockEntity->getFileName();
-	m_filePath = blockEntity->getFilePath();
 	m_headline = blockEntity->getHeadline();
-	const std::string& selectedFileMode = blockEntity->getSelectedFileMode();
-	if (selectedFileMode == blockEntity->getFileModeAppend())
-	{
-		m_openMode = std::ios_base::app;
-	}
-	else if(selectedFileMode == blockEntity->getFileModeOverride())
-	{
-		m_openMode = std::ios_base::out;
-	}
-	else
-	{
-		assert(0);
-	}
 }
 
 bool BlockHandlerFileWriter::executeSpecialized()
@@ -32,28 +22,8 @@ bool BlockHandlerFileWriter::executeSpecialized()
 	_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
 	PipelineData& incommingPortData	= _dataPerPort[m_input.getConnectorName()];
 	GenericDataList& dataList = incommingPortData.m_data;
-	char lastCharacter = m_filePath[m_filePath.size()-1];
-	if (lastCharacter != '\\' && lastCharacter != '/')
-	{
-		m_filePath = m_filePath + "/";
-	}
-	size_t  pointIndex = m_fileName.find('.');
-	if (pointIndex == std::string::npos)
-	{
-		m_fileName = m_fileName + ".txt";
-	}
 
-	const std::string fullPath = m_filePath + m_fileName;
-	if (m_fileStream.is_open())
-	{
-		m_fileStream.close();
-	}
-	m_fileStream.open(fullPath, m_openMode);
 
-	if (!m_fileStream.is_open())
-	{
-		throw std::exception(std::string("Failed to open file for writing: " + fullPath).c_str());
-	}
 	m_fileStream << m_headline<<"\n";
 
 	for (auto data : dataList)
@@ -104,16 +74,34 @@ bool BlockHandlerFileWriter::executeSpecialized()
 			}
 		}
 	}
-	m_fileStream.close();
+	
+	createFile();
+
 	return true;
 }
 
-BlockHandlerFileWriter::~BlockHandlerFileWriter()
+void BlockHandlerFileWriter::createFile()
 {
-	m_fileStream.close();
+	const std::string fileName = CreateNewUniqueTopologyName(ot::FolderNames::FilesFolder, m_fileName);
+
+	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+	textFile.setName(fileName);
+
+	textFile.setFileProperties("", m_fileName, "txt");
+	
+	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+	const std::string fileContent = m_fileStream.str();
+
+	data.setData(fileContent.c_str(), fileContent.size());
+	data.StoreToDataBase();
+
+	textFile.setData(data.getEntityID(),data.getEntityStorageVersion());
+	textFile.StoreToDataBase();
+
+	_modelComponent->addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");
 }
 
-void BlockHandlerFileWriter::streamVariable(std::ofstream& stream, const ot::Variable& value)
+void BlockHandlerFileWriter::streamVariable(std::stringstream& stream, const ot::Variable& value)
 {
 	if (value.isBool())
 	{

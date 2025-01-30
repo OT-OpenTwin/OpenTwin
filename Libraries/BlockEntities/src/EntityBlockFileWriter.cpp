@@ -14,10 +14,10 @@ EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, Ent
 void EntityBlockFileWriter::createProperties()
 {
 	EntityPropertiesString::createProperty("Headline", "Description", "", "default", getProperties());
-	EntityPropertiesString::createProperty("File Properties", "Path", "", "default", getProperties());
+	//sEntityPropertiesString::createProperty("File Properties", "Path", "", "default", getProperties());
 	EntityPropertiesString::createProperty("File Properties", "File Name", "", "default", getProperties());
 	
-	EntityPropertiesSelection::createProperty("File Properties", "Mode", { m_fileModeAppend, m_fileModeOverride }, m_fileModeAppend,"default",getProperties());
+	//EntityPropertiesSelection::createProperty("File Properties", "Mode", { m_fileModeAppend, m_fileModeOverride }, m_fileModeAppend,"default",getProperties());
 }
 
 const std::string& EntityBlockFileWriter::getHeadline()
@@ -29,14 +29,6 @@ const std::string& EntityBlockFileWriter::getHeadline()
 	return descriptionProperty->getValue();
 }
 
-const std::string& EntityBlockFileWriter::getSelectedFileMode()
-{
-	auto propertyBase = getProperties().getProperty("Mode");
-	assert(propertyBase != nullptr);
-	auto propertySelect = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	assert(propertySelect != nullptr);
-	return propertySelect->getValue();
-}
 
 const std::string& EntityBlockFileWriter::getFileName()
 {
@@ -47,14 +39,6 @@ const std::string& EntityBlockFileWriter::getFileName()
 	return propertyString->getValue();
 }
 
-const std::string& EntityBlockFileWriter::getFilePath()
-{
-	auto propertyBase = getProperties().getProperty("Path");
-	assert(propertyBase != nullptr);
-	auto propertyString = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(propertyString != nullptr);
-	return propertyString->getValue();
-}
 
 ot::GraphicsItemCfg* EntityBlockFileWriter::CreateBlockCfg()
 {

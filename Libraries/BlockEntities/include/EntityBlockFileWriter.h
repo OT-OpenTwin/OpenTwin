@@ -10,9 +10,7 @@ public:
 
 	void createProperties();
 	const std::string& getHeadline();
-	const std::string& getSelectedFileMode();
 	const std::string& getFileName();
-	const std::string& getFilePath();
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	const ot::Connector& getConnectorInput() const { return m_inputConnector; }
 	const std::string& getFileModeAppend() const { return m_fileModeAppend; }
