@@ -350,6 +350,7 @@ private:
 	bool m_hasModalMenu;
 	std::string m_currentMenu;
 	std::string m_previousMenu;
-	ot::WidgetViewBase::ViewType m_currentViewType;
+
+	ot::WidgetViewBase m_currentCentralView;
 };
 

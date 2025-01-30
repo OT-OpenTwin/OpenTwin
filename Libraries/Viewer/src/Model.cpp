@@ -71,7 +71,7 @@ Model::Model() :
 	treeStateRecording(false),
 	currentManipulator(nullptr),
 	m_hasModalMenu(false),
-	m_currentViewType(ot::WidgetViewBase::ViewType::CustomView)
+	m_currentCentralView(ot::WidgetViewBase::CustomView)
 {
 	sceneNodesRoot = new SceneNodeContainer();
 	osgRootNode = sceneNodesRoot->getShapeNode();
@@ -1086,10 +1086,6 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	// Now update the transparent / opaque mode acoording to the selection
 	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
 	
-	// Update the UI state and the view
-	ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
-	refreshAllViews();
-
 	// reset the 1d view, if necessary
 	if (!isItem1DSelected) {
 		clear1DPlot();
@@ -1111,6 +1107,10 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 			result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 		}
 	}
+
+	// Update the UI state and the view
+	ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
+	refreshAllViews();
 
 	// Update the working plane transformation 
 	updateWorkingPlaneTransform();
@@ -1701,6 +1701,11 @@ void Model::removeTableColumn(void) {
 }
 
 void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
+	// If we switch Main->Navigation->Main we don't want the tool bar to change
+	if (_viewInfo.getTitle() == m_currentCentralView.getTitle() && _viewInfo.getViewType() == m_currentCentralView.getViewType()) {
+		return;
+	}
+
 	ViewerToolBar::instance().removeUIControls();
 
 	m_hasModalMenu = false;
@@ -1735,6 +1740,8 @@ void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 	default:
 		break;
 	}
+
+	m_currentCentralView = _viewInfo;
 }
 
 void Model::executeAction(unsigned long long _buttonID) {
