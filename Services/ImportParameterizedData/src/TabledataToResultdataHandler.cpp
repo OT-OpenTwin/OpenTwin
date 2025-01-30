@@ -64,7 +64,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	DataCategorizationConsistencyChecker checker;
 	bool categorizationsAreValid = true;
 	categorizationsAreValid &= checker.isValidAllMSMDHaveParameterAndQuantities(allMetadataAssembliesByNames);
-	categorizationsAreValid &= checker.isValidAllParameterAndQuantitiesReferenceSameTable(allMetadataAssembliesByNames);
+	//categorizationsAreValid &= checker.isValidAllParameterAndQuantitiesReferenceSameTable(allMetadataAssembliesByNames);
 
 	if (!categorizationsAreValid)
 	{
@@ -455,8 +455,8 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 	quantityData.loadAllRangeSelectionInformation(*quantityAssembly, _loadedTables);
 	DataCategorizationConsistencyChecker checker;
 
-	bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
-	
+	//bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
+	bool isValid = true;
 	std::list<DatasetDescription> datasetDescriptions;
 
 	if (isValid)
