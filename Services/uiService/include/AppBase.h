@@ -506,6 +506,8 @@ private Q_SLOTS:
 
 	// Private: Tree slots
 
+	//! @brief Navigation tree item selection has changed.
+	//! @callgraph
 	void slotTreeItemSelectionChanged(void);
 	void slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column);
 	void slotTreeItemFocused(QTreeWidgetItem* _item);

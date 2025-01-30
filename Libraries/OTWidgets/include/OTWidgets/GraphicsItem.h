@@ -145,6 +145,7 @@ namespace ot {
 		//! \brief Handles general item updates.
 		//! The selected state will be forwarded to the GraphicsHighlightItem.
 		//! Position updates will update the connections and call GraphicsItem::graphicsItemEventHandler() with GraphicsItem::ItemMoved
+		//! @callgraph
 		void handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value);
 
 		void handleSetItemGeometry(const QRectF& _geom);
@@ -156,8 +157,9 @@ namespace ot {
 		//! \param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 
-		//! @brief Calculates the draw rect for the item
-		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
+		//! @brief Calculates the draw rect for the item.
+		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size.
+		//! @callgraph
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 		// ###############################################################################################################################################
@@ -170,17 +172,18 @@ namespace ot {
 
 		const GraphicsItem* getRootItem(void) const;
 
-		//! \brief Replaces the current configuration with the configuration prvided.
+		//! \brief Replaces the current configuration with the configuration provided.
 		//! The item takes ownership of the configuration.
 		void setConfiguration(GraphicsItemCfg* _config);
 
 		//! \brief Returns the current configuration.
 		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
 
-		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos
+		//! \brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
 		void setGraphicsItemPos(const QPointF& _pos);
 
-		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos
+		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos(const QPointF&).
+		//! @callgraph
 		void setGraphicsItemPos(const Point2DD& _pos);
 
 		//! \brief Returns the current position set in the configuration.
@@ -315,9 +318,12 @@ namespace ot {
 
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) {};
 
-	private:
-		ConnectionDirection calculateOutwardsConnectionDirection(void) const;
+		//! @brief Returns the cennection direction pointing outwards relative to the parent item.
+		//! If no parent item is set returns ConnectionDirection::ConnectAny.
+		//! @callgraph
+		virtual ConnectionDirection calculateOutwardsConnectionDirection(void) const;
 
+	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.

@@ -9,10 +9,10 @@
 
 std::string ot::UserCredentials::encryptString(std::string data)
 {
-	return ot::encryptString(data);
+	return ot::Encryption::encryptString(data);
 }
 
 std::string ot::UserCredentials::decryptString(std::string data)
 {
-	return ot::decryptString(data);
+	return ot::Encryption::decryptString(data);
 }

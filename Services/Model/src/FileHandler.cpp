@@ -104,7 +104,7 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& 
 		auto content = contents.begin();
 		for (std::string& fileName : fileNames)
 		{
-			std::string fileContent = ot::decryptAndUnzipString(*content, *uncompressedDataLength);
+			std::string fileContent = ot::Encryption::decryptAndUnzipString(*content, *uncompressedDataLength);
 		
 			storeFileInDataBase(fileContent, fileName,_folderName);
 			uncompressedDataLength++;

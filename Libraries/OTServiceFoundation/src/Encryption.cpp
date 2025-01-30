@@ -8,11 +8,11 @@
 #include "OTCore/OTAssert.h"
 #include "OTServiceFoundation/Encryption.h"
 
-#include <zlib.h>
 // Third party header
 #include "base64.h"
+#include <zlib.h>
 
-std::string ot::encryptString(const std::string& _str) {
+std::string ot::Encryption::encryptString(const std::string& _str) {
 	const int dataLength = (int)_str.length();
 	const int encryptedDataLength = (int)(dataLength * 2 + sizeof(int));
 
@@ -44,7 +44,7 @@ std::string ot::encryptString(const std::string& _str) {
 	return base64Encrypted;
 }
 
-std::string ot::decryptString(const std::string& _str) {
+std::string ot::Encryption::decryptString(const std::string& _str) {
 	int decoded_compressed_data_length = Base64decode_len(_str.c_str());
 	char* decoded_compressed_string = new char[decoded_compressed_data_length];
 
@@ -77,8 +77,7 @@ std::string ot::decryptString(const std::string& _str) {
 	return base64_decoded;
 }
 
-OT_SERVICEFOUNDATION_API_EXPORT std::string ot::decryptAndUnzipString(const std::string& _content, uint64_t _uncompressedLength)
-{
+std::string ot::Encryption::decryptAndUnzipString(const std::string& _content, uint64_t _uncompressedLength) {
 	int decoded_compressed_data_length = Base64decode_len(_content.c_str());
 	char* decodedCompressedContent = new char[decoded_compressed_data_length];
 
@@ -100,8 +99,7 @@ OT_SERVICEFOUNDATION_API_EXPORT std::string ot::decryptAndUnzipString(const std:
 	return decodedAndUnzipped;
 }
 
-OT_SERVICEFOUNDATION_API_EXPORT std::string ot::encryptAndZipString(const std::string& _content)
-{
+std::string ot::Encryption::encryptAndZipString(const std::string& _content) {
 	
 	// Compress the file data content
 	uLong compressedSize = compressBound((uLong)_content.size());
