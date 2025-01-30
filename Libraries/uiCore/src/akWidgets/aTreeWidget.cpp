@@ -10,6 +10,10 @@
  *	file 'LICENSE', which is part of this source code package.
  */
 
+// OpenTwin header
+#include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTWidgets/SignalBlockWrapper.h"
+
 // AK header
 #include <akCore/aException.h>
 #include <akCore/aAssert.h>
@@ -252,14 +256,21 @@ void ak::aTreeWidget::toggleItemSelection(
 	selectionChangedEvent(true);
 }
 
-void ak::aTreeWidget::deselectAllItems(
-	bool							_emitEvent
-) {
-	m_ignoreEvents = true;
-	for (auto itm = m_items.begin(); itm != m_items.end(); itm++) { itm->second->setSelected(false); }
-	m_ignoreEvents = false;
-
-	if (_emitEvent) { Q_EMIT selectionChanged(); }
+void ak::aTreeWidget::deselectAllItems(bool _emitEvent) {
+	if (!m_items.empty()) {
+		{
+			ot::SignalBlockWrapper sigBlock(this);
+			m_ignoreEvents = true;
+			for (auto itm = m_items.begin(); itm != m_items.end(); itm++) {
+				itm->second->setSelected(false);
+			}
+			m_ignoreEvents = false;
+		}
+		if (_emitEvent) {
+			Q_EMIT selectionChanged();
+		}
+	}
+	
 }
 
 void ak::aTreeWidget::setEnabled(
@@ -580,26 +591,30 @@ bool ak::aTreeWidget::isSortingEnabled(void) const { return m_tree->isSortingEna
 void ak::aTreeWidget::selectionChangedEvent(
 	bool							_emitEvent
 ) {
-	bool ignoreBackup = m_ignoreEvents;
-	m_ignoreEvents = true;
-	// Get selected items
-	QList<QTreeWidgetItem *> selected = m_tree->selectedItems();
-	// Select childs of selected items
-	for (QTreeWidgetItem * itm : selected) {
-		// Cast item
-		ak::aTreeWidgetItem * i = nullptr;
-		i = dynamic_cast<ak::aTreeWidgetItem *>(itm);
-		assert(i != nullptr); // Cast failed
+	{
+		ot::BasicScopedBoolWrapper lclIgnore(m_ignoreEvents, true);
+		ot::SignalBlockWrapper sigBlock(this);
 
-		if (m_selectAndDeselectChildren && i->getSelectChilds()) {
-			i->setChildsSelected(true);
+		// Get selected items
+		QList<QTreeWidgetItem*> selected = m_tree->selectedItems();
+		// Select childs of selected items
+		for (QTreeWidgetItem* itm : selected) {
+			// Cast item
+			ak::aTreeWidgetItem* i = nullptr;
+			i = dynamic_cast<ak::aTreeWidgetItem*>(itm);
+			assert(i != nullptr); // Cast failed
+
+			if (m_selectAndDeselectChildren && i->getSelectChilds()) {
+				i->setChildsSelected(true);
+			}
+
+			i->ensureTopLevelSelectionVisible();
 		}
-
-		i->ensureTopLevelSelectionVisible();
 	}
-	m_ignoreEvents = ignoreBackup;
 
-	if (_emitEvent) { Q_EMIT selectionChanged(); }
+	if (_emitEvent) {
+		Q_EMIT selectionChanged();
+	}
 }
 
 ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {

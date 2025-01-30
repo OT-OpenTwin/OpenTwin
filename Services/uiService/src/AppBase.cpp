@@ -487,12 +487,12 @@ void AppBase::lockSelectionAndModification(bool flag)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockNavigationWrite);
 
-	if (flag)
-	{
+	if (flag) {
+		OT_LOG_T("Lock request");
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 	}
-	else
-	{
+	else {
+		OT_LOG_T("Unlock request");
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 	}
 
@@ -504,11 +504,13 @@ void AppBase::lockUI(bool flag)
 	ot::LockTypeFlags lockFlags(ot::LockAll);
 
 	if (flag) {
+		OT_LOG_T("Lock ui request");
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
 		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
 	}
-	else{
+	else {
+		OT_LOG_T("Unlock ui request");
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, true);
 	}
@@ -2409,6 +2411,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			}
 
 			m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+			_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;

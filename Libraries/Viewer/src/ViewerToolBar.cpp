@@ -65,6 +65,7 @@ void ViewerToolBar::setupDefaultControls(void) {
 
 	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
+	OT_LOG_T("Show selected set to (de): " + std::to_string(m_showSelectedButtonID));
 }
 
 void ViewerToolBar::setupUIControls3D(void) {
@@ -84,6 +85,7 @@ void ViewerToolBar::setupUIControls3D(void) {
 	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
 	m_removeItemIDList.push_front(m_hideUnselectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Unselected", "HideUnselected"));
+	OT_LOG_T("Show selected set to (3D): " + std::to_string(m_showSelectedButtonID));
 
 	m_removeItemIDList.push_front(m_wireframeButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Wireframe", "Wireframe"));
 	m_removeItemIDList.push_front(m_workingPlaneButtonID = FrontendAPI::instance()->addMenuPushButton(m_styleGroupID, "Working plane", "WorkingPlane"));
@@ -109,6 +111,7 @@ void ViewerToolBar::setupUIControls1D(void) {
 
 	m_removeItemIDList.push_front(m_showSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
 	m_removeItemIDList.push_front(m_hideSelectedButtonID = FrontendAPI::instance()->addMenuPushButton(m_visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
+	OT_LOG_T("Show selected set to (1D): " + std::to_string(m_showSelectedButtonID));
 
 	// Send an initial notification to properly set the state of the new controls
 	this->updateViewEnabledState(ot::UIDList());
@@ -150,7 +153,6 @@ void ViewerToolBar::setupUIControlsTable(void) {
 	m_removeItemIDList.push_front(m_tableSaveID = FrontendAPI::instance()->addMenuPushButton(dataGroupID, "Save", "Save"));
 	FrontendAPI::instance()->setMenuPushButtonToolTip(m_tableSaveID, "Save (Ctrl + S)");
 
-
 	ot::UID rowGroupID = FrontendAPI::instance()->addMenuSubGroup(modifyGroupID, "Row");
 	m_removeItemIDList.push_front(rowGroupID);
 	m_removeItemIDList.push_front(m_tableAddRowBeforeID = FrontendAPI::instance()->addMenuPushButton(rowGroupID, "Add Row Before", "TableInsertRowTop"));
@@ -176,6 +178,10 @@ void ViewerToolBar::removeUIControls(void) {
 	OTAssert(FrontendAPI::instance() != nullptr, "No notifier found");
 	if (FrontendAPI::instance() == nullptr) return;
 
+	if (m_showSelectedButtonID > 0) {
+		OT_LOG_T("Removing: " + std::to_string(m_showSelectedButtonID));
+	}
+
 	FrontendAPI::instance()->removeUIElements(m_removeItemIDList);
 	m_removeItemIDList.clear();
 	this->resetControlsData();
@@ -187,17 +193,26 @@ void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems
 		std::list<unsigned long long> disabled;
 
 		if (_selectedTreeItems.empty()) {
+			if (m_showSelectedButtonID > 0) {
+				OT_LOG_T("Selected button disabled request: " + std::to_string(m_showSelectedButtonID));
+			}
 			disabled.push_back(m_showSelectedButtonID);
 			disabled.push_back(m_hideSelectedButtonID);
 			disabled.push_back(m_hideUnselectedButtonID);
 		}
 		else {
+			if (m_showSelectedButtonID > 0) {
+				OT_LOG_T("Selected button enabled request: " + std::to_string(m_showSelectedButtonID));
+			}
 			enabled.push_back(m_showSelectedButtonID);
 			enabled.push_back(m_hideSelectedButtonID);
 			enabled.push_back(m_hideUnselectedButtonID);
 		}
 
-		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
+		FrontendAPI::instance()->enableDisableControls(enabled, true, disabled);
+	}
+	else {
+		OT_LOG_T("No selection");
 	}
 }
 
@@ -218,7 +233,7 @@ void ViewerToolBar::updateTextEditorSaveEnabledState(void) {
 			disabled.push_back(m_textEditorSaveID);
 		}
 
-		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
+		FrontendAPI::instance()->enableDisableControls(enabled, true, disabled);
 	}
 }
 
@@ -239,7 +254,7 @@ void ViewerToolBar::updateTableSaveEnabledState(void) {
 			disabled.push_back(m_tableSaveID);
 		}
 
-		FrontendAPI::instance()->enableDisableControls(enabled, disabled);
+		FrontendAPI::instance()->enableDisableControls(enabled, true, disabled);
 	}
 }
 
@@ -264,6 +279,8 @@ void ViewerToolBar::resetControlsData(void) {
 	m_textEditorDataID = 0;
 	m_textEditorExportID = 0;
 	m_textEditorSaveID = 0;
+
+	OT_LOG_T("Reset");
 }
 
 ViewerToolBar::ViewerToolBar() {

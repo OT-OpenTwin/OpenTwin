@@ -483,7 +483,7 @@ void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
 	}
 }
 
-void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls)
+void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, bool _resetDisabledCounterForEnabledControls, const ot::UIDList& _disabledControls)
 {
 	try {
 		try {
@@ -492,8 +492,9 @@ void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls,
 
 			ot::BasicServiceInformation bsi = this->getBasicServiceInformation();
 
+			OT_LOG_T("Enabled: " + std::to_string(_enabledControls.size()) + "; Disabled: " + std::to_string(_disabledControls.size()));
 			for (ot::UID objectID : _enabledControls) {
-				lockManager->enable(bsi, objectID);
+				lockManager->enable(bsi, objectID, _resetDisabledCounterForEnabledControls);
 			}
 			for (ot::UID objectID : _disabledControls) {
 				lockManager->disable(bsi, objectID);
@@ -645,11 +646,13 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(ot::Selectio
 	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;
 	result = ViewerAPI::setSelectedTreeItems(_selectionInformation.getSelectedNavigationItems(), selectedModelItems, selectedVisibleModelItems, _selectionOrigin);
 
-	// Model function
-	ot::UID activeModel = ViewerAPI::getActiveDataModel();
-	if (activeModel > 0)
-	{
-		AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
+	// If the model was already notified it means that the selection handling already triggered a notification.
+	if (true || !(result & ot::SelectionHandlingEvent::ModelWasNotified)) {
+		ot::UID activeModel = ViewerAPI::getActiveDataModel();
+		if (activeModel > 0) {
+			result |= ot::SelectionHandlingEvent::ModelWasNotified;
+			AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
+		}
 	}
 
 	return result;

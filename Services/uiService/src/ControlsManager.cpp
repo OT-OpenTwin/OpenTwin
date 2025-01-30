@@ -465,7 +465,7 @@ void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ot::UI
 				}
 			}
 			else {
-				service->insert_or_assign(_element, oldValue -1);
+				service->insert_or_assign(_element, oldValue - 1);
 				LockManagerElement* element = this->uiElement(_element);
 				if (element) {
 					element->enable(1);
@@ -674,6 +674,7 @@ void LockManagerElement::enable(int _value) {
 		}
 		else {
 			if (ak::uiAPI::object::exists(m_uid)) {
+				OT_LOG_T("Enabling: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, true);
 			}
 		}
@@ -703,6 +704,7 @@ void LockManagerElement::disable(int _value) {
 			m_lockable->setWidgetLocked(true);
 		}
 		else {
+			OT_LOG_T("Disabling: " + std::to_string(m_uid));
 			ak::uiAPI::object::setEnabled(m_uid, false);
 		}
 	}
@@ -734,6 +736,7 @@ void LockManagerElement::lock(int _value, ot::LockTypeFlag _lockType) {
 				m_lockable->setWidgetLocked(true);
 			}
 			else {
+				OT_LOG_T("Locking: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, false);
 			}
 		}
@@ -772,6 +775,7 @@ void LockManagerElement::unlock(int _value, ot::LockTypeFlag _lockType) {
 				m_lockable->setWidgetLocked(false);
 			}
 			else {
+				OT_LOG_T("Unlocking: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, true);
 			}
 		}

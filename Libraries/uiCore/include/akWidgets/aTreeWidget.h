@@ -144,12 +144,10 @@ namespace ak {
 		void toggleItemSelection(
 			UID							_itemId
 		);
-
+			
 		//! @brief Will deselect all items
-		//! @param _emitEvent If true a selection changed signal will be emitted
-		void deselectAllItems(
-			bool						_emitEvent
-		);
+		//! @param _emitEvent If true a selection changed signal will be emitted in case the tree had selected items.
+		void deselectAllItems(bool _emitEvent);
 
 		//! @brief Will set the enabled state of this tree
 		void setEnabled(

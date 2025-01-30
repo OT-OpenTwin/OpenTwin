@@ -280,6 +280,7 @@ namespace ot {
 		NewViewRequested          = 1 << 0, //! @brief A new view was requested.
 		ActiveViewChanged         = 1 << 1, //! @brief The active view has changed after handling the selection.
 		ActiveViewChangeRequested = 1 << 2, //! @brief A change of the active view was requested/queued.
+		ModelWasNotified          = 1 << 3, //! @brief Model service received a selection changed notification.
 
 		//! @brief The active view has not changed yet but may have been queued.
 		NoCurrentViewChangeMask   = ~ActiveViewChanged,
