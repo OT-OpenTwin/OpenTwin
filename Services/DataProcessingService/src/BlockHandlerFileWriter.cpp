@@ -8,6 +8,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/FolderNames.h"
 #include "EntityBinaryData.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
@@ -98,7 +99,7 @@ void BlockHandlerFileWriter::createFile()
 	textFile.setData(data.getEntityID(),data.getEntityStorageVersion());
 	textFile.StoreToDataBase();
 
-	_modelComponent->addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");
+	ot::ModelServiceAPI::addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");
 }
 
 void BlockHandlerFileWriter::streamVariable(std::stringstream& stream, const ot::Variable& value)
