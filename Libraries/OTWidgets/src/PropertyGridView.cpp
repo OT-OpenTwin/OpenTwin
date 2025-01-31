@@ -15,7 +15,7 @@ ot::PropertyGridView::PropertyGridView(PropertyGrid* _propertyGrid)
 		m_propertyGrid = new PropertyGrid;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_propertyGrid);
 }
 
 ot::PropertyGridView::~PropertyGridView() {

@@ -9,8 +9,8 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/CopyInformation.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTGui/CopyInformation.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -103,12 +103,6 @@ namespace ot {
 
 		void requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
-		//! @brief Returns true if any item is selected and the itemCopyRequested signal was emitted.
-		bool requestCopyCurrentSelection(void);
-
-		//! @brief Returns true if the paste request succeeded and the itemPasteRequested signal was emitted.
-		bool requestPasteFromClipboard(void);
-
 		void notifyItemMoved(const ot::GraphicsItem* _item);
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
@@ -139,11 +133,9 @@ namespace ot {
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
-		//! @brief Is emitted when 
-		//! @param _info 
-		void itemCopyRequested(CopyInformation& _info);
+		void copyRequested(CopyInformation& _info);
 
-		void itemPasteRequested(const CopyInformation& _info);
+		void pasteRequested(CopyInformation& _info);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

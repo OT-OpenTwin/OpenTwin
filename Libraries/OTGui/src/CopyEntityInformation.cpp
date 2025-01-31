@@ -4,11 +4,10 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/CopyEntityInformation.h"
+#include "OTGui/CopyEntityInformation.h"
 
 ot::CopyEntityInformation::CopyEntityInformation()
-	: m_uid(0)
-{
+	: m_uid(0) {
 
 }
 
@@ -17,8 +16,7 @@ ot::CopyEntityInformation::CopyEntityInformation(const ConstJsonObject& _jsonObj
 }
 
 ot::CopyEntityInformation::CopyEntityInformation(UID _uid, const std::string& _name, const std::string& _rawData)
-	: m_uid(_uid), m_name(_name), m_rawData(_rawData)
-{
+	: m_uid(_uid), m_name(_name), m_rawData(_rawData) {
 
 }
 

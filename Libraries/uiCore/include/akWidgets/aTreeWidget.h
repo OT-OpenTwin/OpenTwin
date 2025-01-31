@@ -12,6 +12,9 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTWidgets/QWidgetInterface.h"
+
  // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
@@ -47,7 +50,7 @@ namespace ak {
 	class aTreeWidgetItem;
 	class aLineEditWidget;
 
-	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget {
+	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget, public ot::QWidgetInterface {
 		Q_OBJECT
 	public:
 		//! @brief Default constructor
@@ -61,6 +64,9 @@ namespace ak {
 
 		//! @brief Will return the widgets widget to display it
 		virtual QWidget * widget(void) override;
+
+		virtual QWidget* getQWidget(void) override;
+		virtual const QWidget* getQWidget(void) const override;
 
 		// ###########################################################################################################################################
 

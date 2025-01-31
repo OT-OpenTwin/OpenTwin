@@ -15,7 +15,7 @@ ot::PlainTextEditView::PlainTextEditView(PlainTextEdit* _textEdit)
 		m_textEdit = new PlainTextEdit;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_textEdit);
 }
 
 ot::PlainTextEditView::~PlainTextEditView() {

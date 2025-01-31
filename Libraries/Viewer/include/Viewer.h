@@ -3,6 +3,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/QWidgetInterface.h"
 
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
@@ -37,13 +38,16 @@ namespace osg		{ class Group; }
 namespace ot        { class Property; }
 namespace ot        { class PlotManagerView; }
 
-class Viewer : public QOpenGLWidget
+class Viewer : public QOpenGLWidget, public ot::QWidgetInterface
 {
 	Q_OBJECT
 public:
 	Viewer() = delete;
 	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	virtual ~Viewer();
+
+	virtual QWidget* getQWidget(void) override { return this; };
+	virtual const QWidget* getQWidget(void) const override { return this; };
 
 	void reset();
 	void refresh(bool _ignoreUpdateSettingsRequest = true);

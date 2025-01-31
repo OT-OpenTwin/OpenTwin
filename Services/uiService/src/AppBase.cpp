@@ -1128,7 +1128,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	
-	m_graphicsPicker->getGraphicsPicker()->pickerWidget()->setVisible(getVisibleBlockPicker());
+	m_graphicsPicker->getGraphicsPicker()->getQWidget()->setVisible(getVisibleBlockPicker());
 
 	// #######################################################################
 
@@ -1673,7 +1673,8 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
-	connect(graphics, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotCopyRequested);
+	connect(graphics, &ot::GraphicsView::copyRequested, this, &AppBase::slotCopyRequested);
+	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
 	connect(graphics, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
@@ -2193,8 +2194,8 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 }
 
 void AppBase::slotCopyRequested(ot::CopyInformation& _info) {
-	_info.setProjectName(m_currentProjectName);
-
+	_info.setOriginProjectName(m_currentProjectName);
+	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
 
@@ -2225,7 +2226,36 @@ void AppBase::slotCopyRequested(ot::CopyInformation& _info) {
 	clip->setText(QString::fromStdString(rMsg.getWhat()));
 }
 
-void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
+void AppBase::slotPasteRequested(ot::CopyInformation& _info) {
+	// Get current copy info from clipboard
+	QClipboard* clip = QApplication::clipboard();
+	if (!clip) {
+		OT_LOG_E("No clipboard found");
+		return;
+	}
+
+	// Get data
+	std::string importString = clip->text().toStdString();
+	if (importString.empty()) {
+		return;
+	}
+
+	ot::JsonDocument importDoc;
+	if (!importDoc.fromJson(importString)) {
+		return;
+	}
+	if (!importDoc.IsObject()) {
+		return;
+	}
+
+	ot::CopyInformation info;
+	info.setFromJsonObject(importDoc.GetConstObject());
+	
+	if (_info.getDestinationScenePosSet()) {
+		info.setDestinationScenePos(_info.getDestinationScenePos());
+	}
+	info.setDestinationViewInfo(_info.getDestinationViewInfo());
+
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
 

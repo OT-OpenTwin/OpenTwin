@@ -27,6 +27,7 @@ namespace ads {
 
 namespace ot {
 
+	class QWidgetInterface;
 	class WidgetViewManager;
 	
 	//! @class WidgetView
@@ -103,6 +104,7 @@ namespace ot {
 	protected:
 
 		//! @brief Call this function as soon as the widget for this view is created to add it to the dock
+		void addWidgetInterfaceToDock(QWidgetInterface* _interface);
 		void addWidgetToDock(QWidget* _widget);
 
 	private:

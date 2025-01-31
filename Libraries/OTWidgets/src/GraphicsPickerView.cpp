@@ -14,7 +14,7 @@ ot::GraphicsPickerView::GraphicsPickerView(GraphicsPicker* _graphicsPicker)
 		m_graphicsPicker = new GraphicsPicker;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_graphicsPicker);
 }
 
 ot::GraphicsPickerView::~GraphicsPickerView() {
@@ -26,5 +26,5 @@ ot::GraphicsPickerView::~GraphicsPickerView() {
 // Base class functions
 
 QWidget* ot::GraphicsPickerView::getViewWidget(void) {
-	return m_graphicsPicker->pickerWidget();
+	return m_graphicsPicker->getQWidget();
 }

@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{c7503f04-c876-4ee1-b8a3-86c009fbdff9}</UniqueIdentifier>
     </Filter>
@@ -393,6 +389,12 @@
     <ClInclude Include="include\OTGui\TableIndexSchemata.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\CopyInformation.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\CopyEntityInformation.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -699,6 +701,12 @@
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\TableIndexSchemata.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CopyInformation.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CopyEntityInformation.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>

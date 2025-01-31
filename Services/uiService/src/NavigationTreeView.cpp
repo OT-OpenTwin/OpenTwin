@@ -14,7 +14,7 @@ ot::NavigationTreeView::NavigationTreeView()
 	: WidgetView(WidgetViewBase::ViewNavigation)
 {
 	m_tree = new ak::aTreeWidget;
-	this->addWidgetToDock(m_tree->widget());
+	this->addWidgetInterfaceToDock(m_tree);
 }
 
 ot::NavigationTreeView::~NavigationTreeView() {

@@ -56,9 +56,11 @@ ot::GraphicsPicker::~GraphicsPicker() {
 
 }
 
-// ##############################################################################################################################
+QWidget* ot::GraphicsPicker::getQWidget(void) {
+	return m_splitter;
+}
 
-QWidget* ot::GraphicsPicker::pickerWidget(void) {
+const QWidget* ot::GraphicsPicker::getQWidget(void) const {
 	return m_splitter;
 }
 
@@ -251,21 +253,21 @@ ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(QWidget* _parentWidget)
 	: QDockWidget(_parentWidget)
 {
 	m_widget = new GraphicsPicker(this->calcWidgetOrientation());
-	setWidget(m_widget->pickerWidget());
+	setWidget(m_widget->getQWidget());
 }
 
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(const QString& _title, QWidget* _parentWidget)
 	: QDockWidget(_title, _parentWidget)
 {
 	m_widget = new GraphicsPicker(this->calcWidgetOrientation());
-	setWidget(m_widget->pickerWidget());
+	setWidget(m_widget->getQWidget());
 }
 
 ot::GraphicsPickerDockWidget::GraphicsPickerDockWidget(GraphicsPicker* _customPickerWidget, const QString& _title, QWidget* _parentWidget)
 	: QDockWidget(_title, _parentWidget), m_widget(_customPickerWidget)
 {
 	OTAssert(m_widget, "No block picker widget provided");
-	setWidget(m_widget->pickerWidget());
+	setWidget(m_widget->getQWidget());
 }
 
 ot::GraphicsPickerDockWidget::~GraphicsPickerDockWidget() {

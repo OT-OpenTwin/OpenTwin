@@ -9,7 +9,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <string>
@@ -18,7 +18,7 @@
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT CopyEntityInformation : public Serializable {
+	class OT_GUI_API_EXPORT CopyEntityInformation : public Serializable {
 	public:
 		CopyEntityInformation();
 		CopyEntityInformation(const ConstJsonObject& _jsonObject);
@@ -38,7 +38,7 @@ namespace ot {
 
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
-		
+
 		void setRawData(const std::string& _data) { m_rawData = _data; };
 		const std::string& getRawData(void) const { return m_rawData; };
 

@@ -13,7 +13,7 @@ ot::ViewerView::ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWid
 	: WidgetView(WidgetViewBase::View3D)
 {
 	m_viewer = new Viewer(_modelID, _viewerID, _scaleWidth, _scaleHeight, _backgroundR, _backgroundG, _backgroundB, _overlayTextR, _overlayTextG, _overlayTextB);
-	this->addWidgetToDock(m_viewer);
+	this->addWidgetInterfaceToDock(m_viewer);
 }
 
 ot::ViewerView::~ViewerView() {

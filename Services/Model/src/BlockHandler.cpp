@@ -2,7 +2,7 @@
 #include "BlockHandler.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/Logger.h"
-#include "OTCore/CopyInformation.h"
+#include "OTGui/CopyInformation.h"
 #include "Application.h"
 #include "Model.h"
 #include "EntityBlock.h"
@@ -21,14 +21,19 @@ void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _new
 std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document) {
 	ot::CopyInformation info = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 
-	//SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
-	//ot::UIDList selectedEntities = selectionHandler.getSelectedEntityIDs();
+	if (!info.getEntities().empty()) {
+		OT_LOG_E("Provided copy information already contains entities. This is unexpected here and the existing information will be replaced");
+		info.clearEntities();
+	}
+
+	SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
+	ot::UIDList selectedEntities = selectionHandler.getSelectedEntityIDs();
 	
 	Model* model = Application::instance()->getModel();
 
-	for (ot::CopyEntityInformation& entityInfo : info.getEntities()) {
+	for (ot::UID uid : selectedEntities) {
 		// Find entity
-		EntityBase* entity = model->getEntityByID(entityInfo.getUid());
+		EntityBase* entity = model->getEntityByID(uid);
 
 		if (entity) {
 			// Serialize entity
@@ -36,10 +41,14 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 			// #########################################################################################################################################
 
 			// !!!!!    Here the serializeAsJSON would include the coordinate entity ID of a block but we need the coordinate serialized aswell   !!!!!
+			ot::CopyEntityInformation entityInfo;
+			entityInfo.setName(entity->getName());
+			entityInfo.setUid(entity->getEntityID());
 			entityInfo.setRawData(entity->serialiseAsJSON());
+			info.addEntity(entityInfo);
 		}
 		else {
-			OT_LOG_E("Failed to load entity (" + std::to_string(entityInfo.getUid()) + ")");
+			OT_LOG_E("Failed to load entity from uid (" + std::to_string(uid) + ")");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
 		}
 	}
@@ -105,8 +114,8 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	if (!blockCoordinateEntities.empty()) {
 		// Calculate distance 
 		ot::Point2DD moveAdder(0., 0.);
-		if (info.getScenePosSet()) {
-			moveAdder = info.getScenePos() - graphicsTopLeft;
+		if (info.getDestinationScenePosSet()) {
+			moveAdder = info.getDestinationScenePos() - graphicsTopLeft;
 		}
 		else {
 			// If no scene pos is provided we move all block by 20

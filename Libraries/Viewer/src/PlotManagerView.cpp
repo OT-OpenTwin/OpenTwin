@@ -14,7 +14,7 @@ ot::PlotManagerView::PlotManagerView()
 {
 	m_plotManager = new PlotManager;
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_plotManager);
 }
 
 ot::PlotManagerView::~PlotManagerView() {

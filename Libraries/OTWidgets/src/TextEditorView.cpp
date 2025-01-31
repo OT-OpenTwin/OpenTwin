@@ -14,7 +14,7 @@ ot::TextEditorView::TextEditorView(TextEditor* _textEditor)
 		m_textEditor = new TextEditor;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_textEditor);
 	this->connect(m_textEditor, &TextEditor::modificationChanged, this, &TextEditorView::slotModifiedChanged);
 	this->connect(m_textEditor, &TextEditor::saveRequested, this, &TextEditorView::slotSaveRequested);
 }

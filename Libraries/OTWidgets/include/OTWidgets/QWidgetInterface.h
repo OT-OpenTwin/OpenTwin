@@ -15,9 +15,11 @@
 
 namespace ot {
 
+	class WidgetView;
+
 	class OT_WIDGETS_API_EXPORTONLY QWidgetInterface {
 	public:
-		QWidgetInterface() {};
+		QWidgetInterface() : m_parentView(nullptr) {};
 		virtual ~QWidgetInterface() {};
 
 		//! @brief Returns a pointer to the root widget of this object
@@ -27,10 +29,14 @@ namespace ot {
 		void setOTWidgetFlags(const WidgetFlags& _flags);
 		const WidgetFlags& otWidgetFlags(void) const { return m_widgetFlags; };
 
+		void setParentWidgetView(WidgetView* _view) { m_parentView = _view; };
+		WidgetView* getParentWidgetView(void) const { return m_parentView; };
+
 	protected:
 		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};
 
 	private:
 		WidgetFlags m_widgetFlags;
+		WidgetView* m_parentView;
 	};
 }

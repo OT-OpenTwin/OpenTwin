@@ -87,6 +87,14 @@ ak::aTreeWidget::~aTreeWidget() {
 
 QWidget * ak::aTreeWidget::widget(void) { return m_widget; }
 
+QWidget* ak::aTreeWidget::getQWidget(void) {
+	return m_widget;
+}
+
+const QWidget* ak::aTreeWidget::getQWidget(void) const {
+	return m_widget;
+}
+
 // ###########################################################################################################################
 
 // Data manipulation

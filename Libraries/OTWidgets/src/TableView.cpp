@@ -14,7 +14,7 @@ ot::TableView::TableView(Table* _table)
 		m_table = new Table;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_table);
 	this->connect(m_table, &Table::modifiedChanged, this, &TableView::slotModifiedChanged);
 }
 

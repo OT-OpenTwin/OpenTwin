@@ -15,7 +15,7 @@ ot::VersionGraphManagerView::VersionGraphManagerView(VersionGraphManager* _versi
 		m_versionGraphManager = new VersionGraphManager;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_versionGraphManager);
 }
 
 ot::VersionGraphManagerView::~VersionGraphManagerView() {}

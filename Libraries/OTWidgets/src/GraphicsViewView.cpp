@@ -14,7 +14,7 @@ ot::GraphicsViewView::GraphicsViewView(GraphicsView* _graphicsView)
 		m_graphicsView = new GraphicsView;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_graphicsView);
 }
 
 ot::GraphicsViewView::~GraphicsViewView() {

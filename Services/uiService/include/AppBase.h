@@ -17,7 +17,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
-#include "OTCore/CopyInformation.h"
+#include "OTGui/CopyInformation.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
@@ -460,7 +460,7 @@ public Q_SLOTS:
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 
 	void slotCopyRequested(ot::CopyInformation& _info);
-	void slotPasteRequested(const ot::CopyInformation& _info);
+	void slotPasteRequested(ot::CopyInformation& _info);
 
 	void slotTextEditorSaveRequested(void);
 	void slotTableSaveRequested(void);

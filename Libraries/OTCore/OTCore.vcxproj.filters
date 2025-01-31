@@ -121,12 +121,6 @@
     <ClCompile Include="src\OTObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\CopyInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CopyEntityInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -317,12 +311,6 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ReturnMessageProposal.h">
       <Filter>include\ServiceReturnMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CopyEntityInformation.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CopyInformation.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ContainerHelper.hpp">
       <Filter>include</Filter>

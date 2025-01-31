@@ -5,9 +5,9 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/CopyInformation.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -355,71 +355,6 @@ void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid
 	Q_EMIT connectionToConnectionRequested(_fromItemUid, _fromItemConnector, _toConnectionUid, _newControlPoint);
 }
 
-bool ot::GraphicsView::requestCopyCurrentSelection(void) {
-	std::list<GraphicsItem*> selection = this->getSelectedGraphicsItems();
-	if (selection.empty()) {
-		return false;
-	}
-
-	CopyInformation copyInfo;
-	copyInfo.setViewOwner(this->getOwner());
-
-	for (GraphicsItem* itm : selection) {
-		// Copy top level items only
-		if (!itm->getParentGraphicsItem()) {
-			copyInfo.addEntity(itm->getGraphicsItemUid(), itm->getGraphicsItemName());
-		}
-	}
-
-	Q_EMIT itemCopyRequested(copyInfo);
-
-	return true;
-}
-
-bool ot::GraphicsView::requestPasteFromClipboard(void) {
-	QClipboard* clip = QApplication::clipboard();
-	if (!clip) {
-		OT_LOG_E("No clipboard found");
-		return false;
-	}
-
-	// Get data
-	std::string importString = clip->text().toStdString();
-	if (importString.empty()) {
-		return false;
-	}
-
-	JsonDocument importDoc;
-	if (!importDoc.fromJson(importString)) {
-		return false;
-	}
-	if (!importDoc.IsObject()) {
-		return false;
-	}
-
-	CopyInformation info;
-	info.setFromJsonObject(importDoc.GetConstObject());
-
-	// Ensure same view owner
-	if (info.getViewOwner() != m_owner) {
-		return false;
-	}
-
-	// Create paste info
-	info.setViewName(m_viewName);
-
-	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
-	if (this->rect().contains(mousePos)) {
-		// If mouse is over the view paste at cursor
-		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
-		info.setScenePos(QtFactory::toPoint2D(mouseScenePos));
-	}
-
-	Q_EMIT itemPasteRequested(info);
-
-	return true;
-}
-
 void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
@@ -721,11 +656,28 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 }
 
 void ot::GraphicsView::slotCopy(void) {
-	this->requestCopyCurrentSelection();
+	CopyInformation info;
+	if (this->getParentWidgetView()) {
+		info.setOriginViewInfo(this->getParentWidgetView()->getViewData());
+	}
+	Q_EMIT copyRequested(info);
 }
 
 void ot::GraphicsView::slotPaste(void) {
-	this->requestPasteFromClipboard();
+	CopyInformation info;
+
+	if (this->getParentWidgetView()) {
+		info.setDestinationViewInfo(this->getParentWidgetView()->getViewData());
+	}
+
+	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
+	if (this->rect().contains(mousePos)) {
+		// If mouse is over the view paste at cursor
+		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
+		info.setDestinationScenePos(QtFactory::toPoint2D(mouseScenePos));
+	}
+
+	Q_EMIT pasteRequested(info);
 }
 
 void ot::GraphicsView::beginItemMove(void) {

@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/WidgetViewManager.h"
 
 // ADS header
@@ -94,6 +95,11 @@ bool ot::WidgetView::isCurrentViewTab(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
+
+void ot::WidgetView::addWidgetInterfaceToDock(QWidgetInterface* _interface) {
+	_interface->setParentWidgetView(this);
+	this->addWidgetToDock(_interface->getQWidget());
+}
 
 void ot::WidgetView::addWidgetToDock(QWidget* _widget) {
 	m_dockWidget->setWidget(_widget);

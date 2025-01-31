@@ -14,7 +14,7 @@ ot::PlotView::PlotView(Plot* _plot)
 		m_plot = new Plot;
 	}
 
-	this->addWidgetToDock(this->getViewWidget());
+	this->addWidgetInterfaceToDock(m_plot);
 }
 
 ot::PlotView::~PlotView() {
