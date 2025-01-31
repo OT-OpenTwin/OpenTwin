@@ -36,8 +36,8 @@ void ot::CopyInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 
 	JsonObject posObj;
 	m_destinationScenePos.addToJsonObject(posObj, _allocator);
-	_object.AddMember("DestScenePos", posObj, _allocator);
-	_object.AddMember("DestScenePosSet", m_destinationScenePosSet, _allocator);
+	_object.AddMember("DestionationScenePos", posObj, _allocator);
+	_object.AddMember("DestionationScenePosSet", m_destinationScenePosSet, _allocator);
 
 	JsonArray entities;
 	for (const CopyEntityInformation& entity : m_entities) {
@@ -54,8 +54,8 @@ void ot::CopyInformation::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	m_originViewInfo.setFromJsonObject(json::getObject(_object, "OriginView"));
 	m_destinationViewInfo.setFromJsonObject(json::getObject(_object, "DestinationView"));
 
-	m_destinationScenePosSet = json::getBool(_object, "ScenePosSet");
-	m_destinationScenePos.setFromJsonObject(json::getObject(_object, "ScenePos"));
+	m_destinationScenePosSet = json::getBool(_object, "DestionationScenePosSet");
+	m_destinationScenePos.setFromJsonObject(json::getObject(_object, "DestionationScenePos"));
 
 	m_entities.clear();
 	for (const ConstJsonObject& entityObj : json::getObjectList(_object, "Entities")) {
