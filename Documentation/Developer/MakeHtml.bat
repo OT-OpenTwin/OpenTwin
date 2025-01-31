@@ -19,4 +19,3 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 CALL "%OPENTWIN_DEV_ROOT%\Documentation\Developer\make.bat" html
 
 :PAUSE_END
-pause

@@ -1,6 +1,7 @@
 # Build directories
 /**/html
 /**/latex
+/**/codedochtml
 
 # Error output log
 /**/ErrorLog.txt

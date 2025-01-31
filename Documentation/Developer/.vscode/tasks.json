@@ -4,8 +4,11 @@
         {
             "label": "OpenTwin Build Sphinx Documentation",
             "type": "shell",
-            "command": "${env:OPENTWIN_DEV_ROOT}\\Documentation\\Developer\\MakeButIgnoreStatic.bat silent",
-            "args": [],
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "& { if (Test-Path .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml) { Remove-Item -Force -ErrorAction Ignore .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml.bckp; Rename-Item -Force .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml code_doc_index.xhtml.bckp }; & \"${env:OPENTWIN_DEV_ROOT}\\Documentation\\Developer\\MakeHTML.bat\"; if (Test-Path .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml.bckp) { Remove-Item -Force -ErrorAction Ignore .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml; Rename-Item -Force .\\_build\\html\\_static\\codedochtml\\code_doc_index.xhtml.bckp code_doc_index.xhtml } }"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true

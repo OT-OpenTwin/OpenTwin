@@ -18,17 +18,16 @@ Action Handling
 ***************
 
 The action handling is performed by the OTCommunication api.
-For more information about the api read the `dispatch documentation <../_static/code/d6/dc1/classot_1_1_action_dispatcher.html>`_ and `connector documentation <../_static/code/db/d97/classot_1_1_action_handle_connector.html>`_ 
 
 .. image:: images/default_action_handler.png
     :scale: 50%
 
-The following sequence diagram displays the default setup sequence when following the default :ref:`action handler syntax <document_the_code>`.
+The following sequence diagram displays the default setup sequence when following the default :ref:`action handler syntax <action_handler_example>`.
 
 .. image:: images/default_action_handler_sequence.png
     :scale: 50%
 
-.. _document_the_code::
+.. _action_handler_example::
 
 Default Action Handling Example
 ===============================
