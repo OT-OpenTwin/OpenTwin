@@ -1739,7 +1739,6 @@ void ExternalServicesComponent::lockGui(void)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockModelRead);
 
-	OT_LOG_T("Lock GUI requested");
 	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
@@ -1750,7 +1749,6 @@ void ExternalServicesComponent::unlockGui(void)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockModelRead);
 
-	OT_LOG_T("Unlock GUI request");
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
@@ -2014,7 +2012,6 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 
 	ot::LockTypeFlags lockFlags(ot::LockAll);
 	
-	OT_LOG_T("Compound lock");
 	ScopedLockManagerLock uiLock(m_lockManager, AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
@@ -2834,8 +2831,6 @@ std::string ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDoc
 
 	ServiceDataUi* service = getService(serviceId);
 	
-	OT_LOG_T("Handling set controls enabled");
-
 	for (auto controlName : enabled)
 	{
 		//NOTE, add functionallity to uiServiceAPI
@@ -3433,8 +3428,6 @@ std::string ExternalServicesComponent::handleCreateRubberband(ot::JsonDocument& 
 }
 
 std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
-	OT_LOG_T("Handling lock");
-
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->lock(getService(serviceId)->getBasicServiceInformation(), flags);
@@ -3443,8 +3436,6 @@ std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 }
 
 std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document) {
-	OT_LOG_T("Handling unlock");
-
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypeFlags flags = ot::stringListToLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	m_lockManager->unlock(getService(serviceId)->getBasicServiceInformation(), flags);

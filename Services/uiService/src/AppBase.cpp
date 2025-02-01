@@ -488,11 +488,9 @@ void AppBase::lockSelectionAndModification(bool flag)
 	lockFlags.setFlag(ot::LockNavigationWrite);
 
 	if (flag) {
-		OT_LOG_T("Lock request");
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 	}
 	else {
-		OT_LOG_T("Unlock request");
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 	}
 
@@ -504,13 +502,11 @@ void AppBase::lockUI(bool flag)
 	ot::LockTypeFlags lockFlags(ot::LockAll);
 
 	if (flag) {
-		OT_LOG_T("Lock ui request");
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
 		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
 	}
 	else {
-		OT_LOG_T("Unlock ui request");
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, true);
 	}

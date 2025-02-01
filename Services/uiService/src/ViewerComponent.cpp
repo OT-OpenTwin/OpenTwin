@@ -492,7 +492,6 @@ void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls,
 
 			ot::BasicServiceInformation bsi = this->getBasicServiceInformation();
 
-			OT_LOG_T("Enabled: " + std::to_string(_enabledControls.size()) + "; Disabled: " + std::to_string(_disabledControls.size()));
 			for (ot::UID objectID : _enabledControls) {
 				lockManager->enable(bsi, objectID, _resetDisabledCounterForEnabledControls);
 			}
