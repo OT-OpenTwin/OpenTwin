@@ -77,6 +77,6 @@ ECHO Build Doxygen Documentation
 ECHO ====================================================================
 CALL "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\Generate.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\DoxygenDocumentation_buildLog.txt" 2>&1
 
-RENAME "%OPENTWIN_DEV_ROOT%\Documentation\Developer\build\html\_static\codedochtml\index.xhtml" "code_doc_index.xhtml"
+RENAME "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_build\html\_static\codedochtml\index.xhtml" "code_doc_index.xhtml"
 
 :END
