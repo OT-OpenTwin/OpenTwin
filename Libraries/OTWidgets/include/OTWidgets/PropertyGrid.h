@@ -53,6 +53,7 @@ namespace ot {
 		PropertyGridGroup* findGroup(const std::list<std::string>& _groupPath) const;
 		PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
 		PropertyGridItem* findItem(const std::list<std::string>& _groupPath, const std::string& _itemName) const;
+		std::list<PropertyGridItem*> getAllItems(void) const;
 
 		void clear(void);
 
@@ -71,6 +72,8 @@ namespace ot {
 
 	private:
 		PropertyGridGroup* findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const;
+		void findAllChildItems(QTreeWidgetItem* _parentTreeItem, std::list<PropertyGridItem*>& _items) const;
+
 
 		PropertyGridTree* m_tree;
 	};

@@ -95,6 +95,12 @@ ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::list<std::string>& _
 	else return nullptr;
 }
 
+std::list<ot::PropertyGridItem*> ot::PropertyGrid::getAllItems(void) const {
+	std::list<ot::PropertyGridItem*> result;
+	this->findAllChildItems(m_tree->invisibleRootItem(), result);
+	return result;
+}
+
 void ot::PropertyGrid::clear(void) {
 	this->blockSignals(true);
 	m_tree->blockSignals(true);
@@ -159,10 +165,25 @@ ot::PropertyGridGroup* ot::PropertyGrid::findGroup(QTreeWidgetItem* _parentTreeI
 			if (g->getName() == _groupPath.front()) {
 				std::list<std::string> newPath = _groupPath;
 				newPath.pop_front();
-				if (newPath.empty()) return g;
-				else return this->findGroup(g, newPath);
+				if (newPath.empty()) {
+					return g;
+				}
+				else {
+					return this->findGroup(g, newPath);
+				}
 			}
 		}
 	}
 	return nullptr;
+}
+
+void ot::PropertyGrid::findAllChildItems(QTreeWidgetItem* _parentTreeItem, std::list<PropertyGridItem*>& _items) const {
+	for (int c = 0; c < _parentTreeItem->childCount(); c++) {
+		PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(_parentTreeItem->child(c));
+		if (itm) {
+			_items.push_back(itm);
+		}
+
+		this->findAllChildItems(itm, _items);
+	}
 }

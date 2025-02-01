@@ -9,6 +9,7 @@
 
 // std header
 #include <set>
+#include <algorithm>
 
 template <typename K, typename V>
 std::list<K> ot::ContainerHelper::listFromMapKeys(const std::map<K, V>& _map) {
