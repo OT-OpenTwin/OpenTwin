@@ -1,36 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Color.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dllmain.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Queue.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ServiceBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\String.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TextEncoding.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EncodingGuesser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Variable.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
@@ -49,14 +19,8 @@
     <ClCompile Include="src\OwnerService.cpp">
       <Filter>src\Owner</Filter>
     </ClCompile>
-    <ClCompile Include="src\BasicServiceInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\ReturnMessage.cpp">
       <Filter>src\ServiceReturnMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JSON.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ReturnValues.cpp">
       <Filter>src\ServiceReturnMessages</Filter>
@@ -85,9 +49,6 @@
     <ClCompile Include="src\VariableToStringConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
-    <ClCompile Include="src\ThisService.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Point2D.cpp">
       <Filter>src\Geometry</Filter>
     </ClCompile>
@@ -100,26 +61,65 @@
     <ClCompile Include="src\VariableListToStringListConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
-    <ClCompile Include="src\Math.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="src\BasicEntityInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicServiceInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Color.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EncodingGuesser.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSON.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\LogModeManager.cpp">
-      <Filter>src</Filter>
+      <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\UIDNamePair.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\StringToNumericCheck.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BasicEntityInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RuntimeTests.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="src\Math.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\OTObject.cpp">
-      <Filter>src</Filter>
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Queue.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RuntimeTests.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServiceBase.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\String.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringToNumericCheck.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEncoding.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ThisService.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UIDNamePair.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,60 +153,6 @@
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\BasicServiceInformation.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Color.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CoreAPIExport.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\CoreTypes.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Flags.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\FolderNames.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Logger.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ObjectManagerTemplate.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\OTAssert.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\OTClassHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Queue.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Serializable.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ServiceBase.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\String.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\TemplateTypeName.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\TemplateTypeName.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\TypeNames.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\JSON.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\ReturnMessage.h">
       <Filter>include\ServiceReturnMessages</Filter>
     </ClInclude>
@@ -237,15 +183,6 @@
     <ClInclude Include="include\OTCore\VariableToStringConverter.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\ThisService.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\FactoryTemplate.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\FactoryTemplate.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\Size2D.h">
       <Filter>include\Geometry</Filter>
     </ClInclude>
@@ -261,59 +198,14 @@
     <ClInclude Include="include\OTCore\VariableListToStringListConverter.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\DefensiveProgramming.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Math.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\LogModeManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\ComplexNumbers.h">
       <Filter>include\VariableType</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\UIDNamePair.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\StringToNumericCheck.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\BasicEntityInformation.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ContainerHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\RuntimeTests.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\String.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\GlobalTestingFlags.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\OTObject.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\StateStack.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\StateStack.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\LocalStateStack.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\LocalStateStack.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\ReturnMessageProposal.h">
       <Filter>include\ServiceReturnMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ContainerHelper.hpp">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\BasicRAIIWrapper.h">
       <Filter>include\RAII</Filter>
@@ -323,6 +215,114 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h">
       <Filter>include\RAII</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicEntityInformation.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\BasicServiceInformation.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Color.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CoreAPIExport.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\CoreTypes.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\DefensiveProgramming.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FactoryTemplate.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FactoryTemplate.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Flags.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FolderNames.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\GlobalTestingFlags.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSON.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LocalStateStack.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LocalStateStack.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Logger.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LogModeManager.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Math.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ObjectManagerTemplate.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTAssert.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTClassHelper.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTObject.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Queue.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\RuntimeTests.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Serializable.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ServiceBase.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\StateStack.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\StateStack.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\String.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\String.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TemplateTypeName.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TemplateTypeName.hpp">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ThisService.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\TypeNames.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\UIDNamePair.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -370,6 +370,12 @@
     </Filter>
     <Filter Include="include\RAII">
       <UniqueIdentifier>{14283519-217f-45c0-adab-4c2b019f8a6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\General">
+      <UniqueIdentifier>{923d97b7-0812-4164-9166-db1b20d234c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\General">
+      <UniqueIdentifier>{c87a6f4f-09c3-4d4c-bf19-6ecc580dbabe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
