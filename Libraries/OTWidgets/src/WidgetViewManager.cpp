@@ -9,6 +9,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/WidgetViewDockComponentsFactory.h"
 
 // ADS header
 #include <ads/DockManager.h>
@@ -42,6 +43,8 @@ void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 		m_dockManager->setStyleSheet("");
 	}
 
+	ads::CDockComponentsFactory::setFactory(new WidgetViewDockComponentsFactory(m_dockManager));
+	
 	// Initialize custom icons
 	ads::CIconProvider& iconProvider = m_dockManager->iconProvider();
 
@@ -473,7 +476,7 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState)
+	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState), m_dockComponentsFactory(nullptr)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;

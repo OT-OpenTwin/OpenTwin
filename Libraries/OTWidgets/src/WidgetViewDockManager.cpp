@@ -6,16 +6,19 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/WidgetViewDockManager.h"
+#include "OTWidgets/WidgetViewDockComponentsFactory.h"
 
 // Qt ADS header
 #include <ads/DockAreaWidget.h>
 
-ot::WidgetViewDockManager::WidgetViewDockManager() {
+ot::WidgetViewDockManager::WidgetViewDockManager() : m_componentsFactory(nullptr) {
 
 }
 
 ot::WidgetViewDockManager::~WidgetViewDockManager() {
-
+	if (m_componentsFactory) {
+		ads::CDockComponentsFactory::resetDefaultFactory();
+	}
 }
 
 void ot::WidgetViewDockManager::addView(WidgetView* _view, ads::CDockAreaWidget* _areaWidget, const WidgetView::InsertFlags& _insertFlags) {

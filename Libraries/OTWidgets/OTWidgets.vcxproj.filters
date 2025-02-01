@@ -463,6 +463,12 @@
     <ClCompile Include="src\TableItem.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetViewDockComponentsFactory.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewTab.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -898,6 +904,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TableItem.h">
       <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewTab.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
