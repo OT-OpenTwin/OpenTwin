@@ -404,7 +404,7 @@ void ot::TextEditor::slotDuplicateLine(void) {
 	this->insertPlainText("\n" + txt);
 }
 
-void ot::TextEditor::slotCurrentColorStyleChanged(const ot::ColorStyle& _style) {
+void ot::TextEditor::slotCurrentColorStyleChanged(void) {
 	this->slotHighlightCurrentLine();
 }
 

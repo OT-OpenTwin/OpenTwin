@@ -908,9 +908,6 @@
     <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewTab.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1083,6 +1080,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TableTextEdit.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\WidgetViewTab.h">
+      <Filter>include\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -61,7 +61,7 @@ namespace ot {
 
 	Q_SIGNALS:
 		void currentStyleAboutToChange(void);
-		void currentStyleChanged(const ColorStyle& _style);
+		void currentStyleChanged(void);
 
 	private:
 		GlobalColorStyle();

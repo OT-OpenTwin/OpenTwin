@@ -142,7 +142,7 @@ void ot::TreeWidget::slotColorStyleAboutToChange(void) {
 	}
 }
 
-void ot::TreeWidget::slotColorStyleChanged(const ColorStyle& _style) {
+void ot::TreeWidget::slotColorStyleChanged(void) {
 	int i = 0;
 	for (int w : m_columnWidths) {
 		this->setColumnWidth(i++, w);

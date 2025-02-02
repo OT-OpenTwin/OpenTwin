@@ -34,7 +34,7 @@ ot::PropertyGridItem::PropertyGridItem()
 	titleLayout->addWidget(m_titleLabel, 1);
 	titleLayout->addWidget(m_deleteLabel);
 
-	this->slotGlobalStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
+	this->slotGlobalStyleChanged();
 
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridItem::slotGlobalStyleChanged);
 	this->connect(m_deleteLabel, &Label::mousePressed, this, &PropertyGridItem::slotDeleteRequested);
@@ -125,7 +125,7 @@ void ot::PropertyGridItem::slotDeleteRequested(void) {
 	if (signalProperty) delete signalProperty;
 }
 
-void ot::PropertyGridItem::slotGlobalStyleChanged(const ColorStyle& _style) {
+void ot::PropertyGridItem::slotGlobalStyleChanged(void) {
 	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(ColorStyleFileEntry::PropertyItemDeleteIcon);
 	QIcon ico(pth);
 	m_deleteLabel->setPixmap(ico.pixmap(16, 16));

@@ -9,7 +9,6 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyBase.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -65,7 +64,7 @@ namespace ot {
 	private Q_SLOTS:
 		void slotValueChanged(void);
 		void slotDeleteRequested(void);
-		void slotGlobalStyleChanged(const ColorStyle& _style);
+		void slotGlobalStyleChanged(void);
 		
 	private:
 		void clear(void);

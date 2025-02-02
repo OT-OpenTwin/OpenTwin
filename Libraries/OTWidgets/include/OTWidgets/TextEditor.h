@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTGui/TextEditorCfg.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/PlainTextEdit.h"
 
 // Qt header
@@ -113,7 +112,7 @@ namespace ot {
 		void slotFindRequested(void);
 		void slotFindClosing(void);
 		void slotDuplicateLine(void);
-		void slotCurrentColorStyleChanged(const ot::ColorStyle& _style);
+		void slotCurrentColorStyleChanged(void);
 		void slotSelectionChanged(void);
 
 	private:

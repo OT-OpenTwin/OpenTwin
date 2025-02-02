@@ -2,7 +2,6 @@
 
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 #include <QMainWindow>
@@ -120,7 +119,7 @@ public:
 	bool getFreezeWorkingPlane() { return freezeWorkingPlane; }
 
 private Q_SLOTS:
-	void slotColorStyleChanged(const ot::ColorStyle& _style);
+	void slotColorStyleChanged(void);
 	void slotUpdateViewerSettings(void);
 
 protected:

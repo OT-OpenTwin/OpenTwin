@@ -208,7 +208,7 @@
     <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h" />
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
-    <ClInclude Include="include\OTWidgets\WidgetViewTab.h" />
+    <QtMoc Include="include\OTWidgets\WidgetViewTab.h" />
     <QtMoc Include="include\OTWidgets\DelayedCallHandler.h" />
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />

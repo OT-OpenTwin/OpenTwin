@@ -465,10 +465,8 @@ void AppBase::slotFinalizeInit(void) {
 	}
 }
 
-void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
+void AppBase::slotColorStyleChanged(void) {
 	this->updateTransparentColorStyleValue();
-	//this->hide();
-	//QMetaObject::invokeMethod(this, &AppBase::show, Qt::QueuedConnection);
 }
 
 AppBase::AppBase(QApplication* _app) 

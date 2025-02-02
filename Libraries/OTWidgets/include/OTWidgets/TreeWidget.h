@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/TreeWidgetItemInfo.h"
@@ -90,7 +89,7 @@ namespace ot {
 
 	private Q_SLOTS:
 		void slotColorStyleAboutToChange(void);
-		void slotColorStyleChanged(const ColorStyle& _style);
+		void slotColorStyleChanged(void);
 
 	private:
 		std::list<int> m_columnWidths;

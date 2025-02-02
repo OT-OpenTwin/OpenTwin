@@ -43,7 +43,7 @@ ot::PropertyGridGroup::PropertyGridGroup()
 	titleLayout->setContentsMargins(0, 0, 0, 0);
 
 	this->setFlags(this->flags() & (~Qt::ItemIsSelectable));
-	this->slotColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
+	this->slotColorStyleChanged();
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
@@ -210,17 +210,18 @@ void ot::PropertyGridGroup::updateStateIcon(void) {
 	this->updateStateIcon(GlobalColorStyle::instance().getCurrentStyle());
 }
 
-void ot::PropertyGridGroup::slotColorStyleChanged(const ColorStyle& _style) {
-	this->setBackground(1, _style.getValue(ColorStyleValueEntry::TitleBackground).brush());
-	this->setForeground(1, _style.getValue(ColorStyleValueEntry::TitleForeground).brush());
+void ot::PropertyGridGroup::slotColorStyleChanged(void) {
+	const ColorStyle& gStyle = GlobalColorStyle::instance().getCurrentStyle();
+	this->setBackground(1, gStyle.getValue(ColorStyleValueEntry::TitleBackground).brush());
+	this->setForeground(1, gStyle.getValue(ColorStyleValueEntry::TitleForeground).brush());
 
-	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + _style.getValue(ColorStyleValueEntry::TitleBackground).qss() +
-		"; color: " + _style.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }" +
-		"#PropertyGridGroupTitleLabel { background-color: " + _style.getValue(ColorStyleValueEntry::TitleBackground).qss() +
-		"; color: " + _style.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }";
+	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).qss() +
+		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }" +
+		"#PropertyGridGroupTitleLabel { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).qss() +
+		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }";
 
 	m_titleLayoutW->setStyleSheet(sheet);
-	this->updateStateIcon(_style);
+	this->updateStateIcon(gStyle);
 }
 
 void ot::PropertyGridGroup::slotItemInputValueChanged(const ot::Property* const _property) {

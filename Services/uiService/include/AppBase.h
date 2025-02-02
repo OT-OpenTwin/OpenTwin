@@ -26,7 +26,6 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/MessageBoxHandler.h"
 
@@ -478,7 +477,7 @@ private Q_SLOTS:
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
-	void slotColorStyleChanged(const ot::ColorStyle& _style);
+	void slotColorStyleChanged(void);
 
 	void slotShowOutputContextMenu(QPoint _pos);
 

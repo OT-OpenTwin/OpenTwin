@@ -82,7 +82,7 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName, bool _
 		m_app->setStyleSheet(it->second.styleSheet());
 	}
 	OT_LOG_D("Current color style changed \"" + m_currentStyle + "\"");
-	Q_EMIT currentStyleChanged(it->second);
+	Q_EMIT currentStyleChanged();
 	return true;
 }
 

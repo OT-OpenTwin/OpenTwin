@@ -11,7 +11,6 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/ColorStyle.h"
 
 // Qt header
 #include <QtCore/qthread.h>
@@ -104,7 +103,7 @@ private Q_SLOTS:
 	void slotInitializeTools(void);
 	void slotRecenter(void);
 	void slotFinalizeInit(void);
-	void slotColorStyleChanged(const ot::ColorStyle& _style);
+	void slotColorStyleChanged(void);
 
 private:
 	AppBase(QApplication* _app = (QApplication*)nullptr);

@@ -7,7 +7,6 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -24,7 +23,7 @@ namespace ot {
 		virtual ~Splitter();
 
 	private Q_SLOTS:
-		void slotGlobalColorStyleChanged(const ColorStyle& _style);
+		void slotGlobalColorStyleChanged(void);
 	};
 
 }

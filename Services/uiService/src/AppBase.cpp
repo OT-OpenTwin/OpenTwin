@@ -2532,13 +2532,15 @@ void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
 	}
 }
 
-void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
+void AppBase::slotColorStyleChanged(void) {
 	if (m_state & AppState::RestoringSettingsState) return;
 	if (!(m_state & AppState::LoggedInState)) return;
 
 	UserManagement uM(m_loginData);
 
-	uM.storeSetting(STATE_NAME_COLORSTYLE, _style.colorStyleName());
+	const ot::ColorStyle& gStyle = ot::GlobalColorStyle::instance().getCurrentStyle();
+
+	uM.storeSetting(STATE_NAME_COLORSTYLE, gStyle.colorStyleName());
 }
 
 void AppBase::slotShowOutputContextMenu(QPoint _pos) {

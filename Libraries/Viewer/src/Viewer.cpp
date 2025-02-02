@@ -247,7 +247,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &Viewer::slotColorStyleChanged);
 }
 
-void Viewer::slotColorStyleChanged(const ot::ColorStyle& _style) 
+void Viewer::slotColorStyleChanged(void) 
 {
 	setClearColorAutomatic();
 	refresh();

@@ -7,7 +7,6 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -36,7 +35,7 @@ namespace ot {
 		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
 
 	private Q_SLOTS:
-		void slotGlobalStyleChanged(const ColorStyle& _style);
+		void slotGlobalStyleChanged(void);
 
 	private:
 		bool m_maintainAspectRatio;

@@ -62,7 +62,7 @@ namespace ot {
 		void itemDeleteRequested(const ot::Property* const _property);
 
 	private Q_SLOTS:
-		void slotColorStyleChanged(const ColorStyle& _style);
+		void slotColorStyleChanged(void);
 		void slotItemInputValueChanged(const ot::Property* const _property);
 		void slotItemDeleteRequested(const ot::Property* const _property);
 
