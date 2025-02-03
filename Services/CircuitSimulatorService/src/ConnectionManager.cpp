@@ -240,6 +240,9 @@ void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::str
 }
 
 void ConnectionManager::sendHealthcheck() {
+    if (m_socket == nullptr)         {
+        return;
+    }
     if (m_socket->state() == QLocalSocket::ConnectedState) {
         if (waitForHealthcheck == false) {
             waitForHealthcheck = true;
