@@ -53,22 +53,28 @@ void ParametricResult1DManager::extractData(Result1DManager& result1DManager)
 	//First, we assemble all new metadata in a new series metadata entity
 	
 	// Now we process the different types of data entries
-	const std::vector<std::string> categories{ "1D Results/Balance", "1D Results/Energy", "1D Results/Port signals", "1D Results/Power","1D Results/Reference Impedance" };
+	//const std::vector<std::string> categories{ "1D Results/Balance", "1D Results/Energy", "1D Results/Port signals", "1D Results/Power","1D Results/Reference Impedance" };
 
 	for (int runID : runIDList)
 	{
 		RunIDContainer* runIDContainer = result1DManager.getContainer(runID);
 		assert(runIDContainer != nullptr);
 
-		for (const std::string& category : categories)
+		for (const std::string& category : runIDContainer->getListOfCategories())
 		{
-			std::list<DatasetDescription>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer,runID);
-			m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(curveDescriptions));
-		}
-		DatasetDescription sparameterDescriptions;
-		if (extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer, runID, sparameterDescriptions))
-		{
-			m_allDataDescriptions.push_back(std::move(sparameterDescriptions));
+			if (category == "1D Results/S-Parameters")
+			{
+				DatasetDescription sparameterDescriptions;
+				if (extractDataDescriptionSParameter(category, runIDContainer, runID, sparameterDescriptions))
+				{
+					m_allDataDescriptions.push_back(std::move(sparameterDescriptions));
+				}
+			}
+			else
+			{
+				std::list<DatasetDescription>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer, runID);
+				m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(curveDescriptions));
+			}
 		}
 	}
 }
@@ -90,7 +96,14 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	//Now we store all data points in the result collection
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
-		resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
+		try
+		{
+			resultCollectionExtender.processDataPoints(&dataDescription, seriesMetadataIndex);
+		}
+		catch (std::exception e)
+		{
+			OT_LOG_E("Unable to import data: " + dataDescription.getQuantityDescription()->getName() + " (" + e.what() + ")");
+		}
 	}
 }
 
@@ -121,76 +134,79 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 		//Now we create the individual curve descriptions
 		for (auto& curve : categoryResults)
 		{
-			DatasetDescription newCurveDescription;
-			
-			newCurveDescription.addParameterDescriptions(allParameterDescriptions);
-
-			Result1DData* curveData = curve.second;
-			
-			std::string quantityUnit, quantityName;
-			//parseAxisLabel(curveData->getYLabel(), quantityName, quantityUnit);
-			//quantityName= quantityName;
-
-			std::string prefix = curve.first.substr(_category.size() + 1);
-			quantityUnit = "";
-			quantityName = prefix;
-			QuantityDescription* quantityDescription = nullptr;
-			//quantityDescription->setName(prefix);
-
-			const bool hasRealValues = !curveData->getYreValues().empty();
-			const bool hasImValue = !curveData->getYimValues().empty();
-			ValueFormatSetter valueFormatSetter;
-			
-			//Values are either complex or real ? Plain imaginary values?
-			if (hasImValue && hasRealValues)
+			if (!curve.second->getXValues().empty())   // Some 1D Results data have no x values assigned. We cannot deal with such data here
 			{
-				auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
-				valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+				DatasetDescription newCurveDescription;
 
-				quantityDescriptionComplex->reserveSizeRealValues(curveData->getYreValues().size());
-				for (auto realValue : curveData->getYreValues())
-				{
-					quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
-				}
+				newCurveDescription.addParameterDescriptions(allParameterDescriptions);
 
-				quantityDescriptionComplex->reserveSizeImagValues(curveData->getYimValues().size());
-				for (auto imValue : curveData->getYimValues())
-				{
-					quantityDescriptionComplex->addValueImag(ot::Variable(imValue));
-				}
-				
-				quantityDescription = quantityDescriptionComplex.release();
-			}
-			else
-			{
-				auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
-				if (hasImValue)
-				{
-					valueFormatSetter.setValueFormatImaginaryOnly(*quantityDescriptionCurve, quantityUnit);
+				Result1DData* curveData = curve.second;
 
-					quantityDescriptionCurve->reserveDatapointSize(curveData->getYimValues().size());
+				std::string quantityUnit, quantityName;
+				//parseAxisLabel(curveData->getYLabel(), quantityName, quantityUnit);
+				//quantityName= quantityName;
+
+				//std::string prefix = curve.first.substr(_category.size() + 1);
+				quantityUnit = "";
+				quantityName = curve.first;
+				QuantityDescription* quantityDescription = nullptr;
+				//quantityDescription->setName(prefix);
+
+				const bool hasRealValues = !curveData->getYreValues().empty();
+				const bool hasImValue = !curveData->getYimValues().empty();
+				ValueFormatSetter valueFormatSetter;
+
+				//Values are either complex or real ? Plain imaginary values?
+				if (hasImValue && hasRealValues)
+				{
+					auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+					valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+
+					quantityDescriptionComplex->reserveSizeRealValues(curveData->getYreValues().size());
+					for (auto realValue : curveData->getYreValues())
+					{
+						quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
+					}
+
+					quantityDescriptionComplex->reserveSizeImagValues(curveData->getYimValues().size());
 					for (auto imValue : curveData->getYimValues())
 					{
-						quantityDescriptionCurve->addDatapoint(ot::Variable(imValue));
+						quantityDescriptionComplex->addValueImag(ot::Variable(imValue));
 					}
+
+					quantityDescription = quantityDescriptionComplex.release();
 				}
 				else
 				{
-					valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
-
-					quantityDescriptionCurve->reserveDatapointSize(curveData->getYreValues().size());
-					for (auto reValue : curveData->getYreValues())
+					auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+					if (hasImValue)
 					{
-						quantityDescriptionCurve->addDatapoint(ot::Variable(reValue));
+						valueFormatSetter.setValueFormatImaginaryOnly(*quantityDescriptionCurve, quantityUnit);
+
+						quantityDescriptionCurve->reserveDatapointSize(curveData->getYimValues().size());
+						for (auto imValue : curveData->getYimValues())
+						{
+							quantityDescriptionCurve->addDatapoint(ot::Variable(imValue));
+						}
 					}
+					else
+					{
+						valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
+
+						quantityDescriptionCurve->reserveDatapointSize(curveData->getYreValues().size());
+						for (auto reValue : curveData->getYreValues())
+						{
+							quantityDescriptionCurve->addDatapoint(ot::Variable(reValue));
+						}
+					}
+					quantityDescription = quantityDescriptionCurve.release();
 				}
-				quantityDescription = quantityDescriptionCurve.release();
+
+				quantityDescription->setName(quantityName);
+				assert(quantityDescription != nullptr);
+				newCurveDescription.setQuantityDescription(quantityDescription);
+				allCurveDescriptions.push_back(std::move(newCurveDescription));
 			}
-			
-			quantityDescription->setName(quantityName);
-			assert(quantityDescription != nullptr);
-			newCurveDescription.setQuantityDescription(quantityDescription);
-			allCurveDescriptions.push_back(std::move(newCurveDescription));
 		}
 	}
 	return allCurveDescriptions;
@@ -216,8 +232,8 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 		//Dangerous? Do all curves guaranteed have the same number of frequency points ? Are real values always existing ?
 		size_t numberOfFrequencyPoints = sParameterValues[0]->getYreValues().size();
 		quantityDescription->initiateZeroFilledValueMatrices(numberOfFrequencyPoints);
-		
-		quantityDescription->setName("S-Parameter");
+
+		quantityDescription->setName("1D Results/S-Parameters");
 		ValueFormatSetter valueFormatSetter;
 		valueFormatSetter.setValueFormatRealImaginary(*quantityDescription, quantityUnit);
 

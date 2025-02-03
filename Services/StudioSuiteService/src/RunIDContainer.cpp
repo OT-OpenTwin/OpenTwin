@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <algorithm>
+#include <set>
 
 RunIDContainer::RunIDContainer()
 {
@@ -58,7 +59,16 @@ int RunIDContainer::readData(size_t &bufferIndex, char *dataBuffer, size_t dataB
 			resultData->setData(data);
 		}
 
-		fileNameToData[fileName] = resultData;
+		if (resultData->getXValues().empty()) 
+		{
+			// We skip all data which is not x/y type of data, e.g. data contains only one point value
+			delete resultData;
+			resultData = nullptr;
+		}
+		else
+		{
+			fileNameToData[fileName] = resultData;
+		}
 	}
 
 	return (int) runId;
@@ -151,6 +161,29 @@ void RunIDContainer::readLine(std::stringstream& dataContent, std::string& line)
 		}
 	}
 }
+
+std::list<std::string> RunIDContainer::getListOfCategories()
+{
+	std::set<std::string> categorySet;
+
+	for (auto file : fileNameToData)
+	{
+		// extract category from file name
+		size_t pos = file.first.find_last_of('/');
+		std::string category = (pos != std::string::npos) ? file.first.substr(0, pos) : file.first;
+
+		if (category.substr(0, 11) == "1D Results/")
+		{
+			categorySet.emplace(category);
+		}
+	}
+
+	// convert the map to a list
+	std::list<std::string> categories(categorySet.begin(), categorySet.end());
+
+	return categories;
+}
+
 
 std::map<std::string, Result1DData*> RunIDContainer::getResultsForCategory(const std::string& category)
 {
