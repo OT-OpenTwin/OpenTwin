@@ -1,7 +1,6 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "Document/DocumentAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataParameter.h"
 #include "AdvancedQueryBuilder.h"
@@ -22,22 +21,34 @@ private:
 	{
 		std::string m_connectorName;
 		std::string m_projectionName;
-		PipelineData m_outputData;
+		PipelineData m_pipelineData;
 	};
 	
 	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
 	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 	std::list< BsonViewOrValue> m_comparisons;
-	
-	std::list< QueryDescription> m_queryDescriptions;
-
 	BsonViewOrValue m_query;
 	BsonViewOrValue m_projection;
+	const int m_documentLimit = 0;
 
+	std::list< QueryDescription> m_queryDescriptions;
+	std::map<std::string, ot::Variable> m_fixedParameter;
+
+
+
+	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
+	const MetadataSeries* addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity);
+	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
+	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
+	
 	void buildRangeQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter);
 	void buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains);
-	void setValueFromString(std::unique_ptr<ot::Variable>& _value, const std::string& _valueString, const std::string& _valueType) const;
-	ot::Variable setValueFromString(const std::string& _valueString, const std::string& _valueType) const;
+	
 	void addComparision(const ValueComparisionDefinition& _definition);
-	void addParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
+	void addParameterQueryDescription(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
+
+	void extractQuantity(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument);
+	void addNotFixedParameter(PipelineDataDocument& _document, ot::ConstJsonObject& _databaseDocument, const MetadataSeries* _series, const MetadataCampaign* _campaign);
+	void extractParameter(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument);
+	
 };

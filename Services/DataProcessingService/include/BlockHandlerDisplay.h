@@ -1,6 +1,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockDisplay.h"
+#include "OTCore/GenericDataStruct.h"
 
 class BlockHandlerDisplay : public BlockHandler
 {
@@ -9,8 +10,6 @@ public:
 	virtual bool executeSpecialized() override;
 
 private:
-	ot::Connector _input;
-	std::string _description;
-
-
+	ot::Connector m_input;
+	std::string m_description;
 };

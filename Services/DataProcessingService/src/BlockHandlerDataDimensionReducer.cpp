@@ -1,5 +1,5 @@
 #include "BlockHandlerDataDimensionReducer.h"
-#include "OTCore/GenericDataStructVector.h"
+#include "OTCore/GenericDataStructSingle.h"
 
 
 BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* blockEntity, const HandlerMap& handlerMap)
@@ -15,13 +15,15 @@ bool BlockHandlerDataDimensionReducer::executeSpecialized()
 {
 	_uiComponent->displayMessage("Executing Data Dimension Reduction Block: " + _blockName);
 	PipelineData& incommingPortData = _dataPerPort[m_inputConnectorName];
-	auto& genericDataBlocks = incommingPortData.m_data;
-
-	std::shared_ptr<ot::GenericDataStructVector> filteredData (new ot::GenericDataStructVector(static_cast<uint32_t>(genericDataBlocks.size())));
-	uint32_t count(0);
-	for (const auto& genericData : genericDataBlocks)
+	PipelineDataDocumentList& pipelineDataDocuments = incommingPortData.m_data;
+	if (incommingPortData.m_quantity == nullptr)
 	{
-		auto matrixData = dynamic_cast<ot::GenericDataStructMatrix*>(genericData.get());
+		throw std::exception("Only quantities are possibly stored as matrix.");
+	}
+	PipelineDataDocumentList filteredDocumentList;
+	for (const auto& pipelineDocument : pipelineDataDocuments)
+	{
+		auto matrixData = dynamic_cast<ot::GenericDataStructMatrix*>(pipelineDocument.m_quantity.get());
 		if (matrixData == nullptr)
 		{
 			throw std::exception((_errorMessageBase + m_blockTypeName + " requires a matrix as input.").c_str());
@@ -29,13 +31,17 @@ bool BlockHandlerDataDimensionReducer::executeSpecialized()
 		
 		const ot::Variable& value = matrixData->getValue(m_matrixEntry);
 		
-		filteredData->setValue(count, value);
-		count++;
+		std::shared_ptr<ot::GenericDataStructSingle> filteredData (new ot::GenericDataStructSingle());
+		filteredData->setValue(value);
+		PipelineDataDocument filteredDocument;
+		filteredDocument.m_quantity = filteredData;
+		filteredDocument.m_parameter = pipelineDocument.m_parameter;
+		filteredDocumentList.push_back(filteredDocument);
 	}
 
 	PipelineData outputData;
 	incommingPortData.copyMetaDataReferences(outputData);
-	outputData.m_data = { filteredData };
+	outputData.m_data = std::move(filteredDocumentList);
 
 	_dataPerPort[m_outputConnectorName] = outputData;
 	return true;

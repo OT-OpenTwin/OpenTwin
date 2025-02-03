@@ -208,6 +208,7 @@
     <ClCompile Include="src\PipelineData.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
+    <ClCompile Include="src\StringConverter.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\GraphHandler.cpp" />
   </ItemGroup>
@@ -222,6 +223,8 @@
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BlockHandlerStorage.h" />
+    <ClInclude Include="include\DataDocument.h" />
+    <ClInclude Include="include\ExplicitStringValueConverter.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
@@ -230,6 +233,7 @@
     <ClInclude Include="include\PipelineData.h" />
     <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
+    <ClInclude Include="include\StringConverter.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\GraphHandler.h" />
   </ItemGroup>

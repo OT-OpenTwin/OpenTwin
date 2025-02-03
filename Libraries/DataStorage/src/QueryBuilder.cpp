@@ -119,19 +119,19 @@ namespace DataStorageAPI
 		return docBuilder.extract();
 	}
 	
-	BsonViewOrValue QueryBuilder::GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId)
+	BsonViewOrValue QueryBuilder::GenerateSelectQuery(std::vector<std::string> _columnNames, bool _incudeId, const bool _includeFields)
 	{
 		auto builder = bsoncxx::builder::basic::document{};
-		if (columnNames.size() == 0)
+		if (_columnNames.size() == 0)
 			return builder.extract();
 
-		if (!incudeId) {
+		if (!_incudeId) {
 			builder.append(kvp("_id", 0));
 		}
 
-		for (auto& columnName : columnNames)
+		for (auto& columnName : _columnNames)
 		{
-			builder.append(kvp(columnName, 1));
+			builder.append(kvp(columnName, _includeFields));
 		}
 
 		return builder.extract();

@@ -49,12 +49,12 @@ bool BlockHandlerPython::executeSpecialized()
         {
             const std::string portName = dataPortEntry.first;
             PipelineData& incommingPortData  = dataPortEntry.second;
-            const GenericDataList& portData = incommingPortData.m_data;
+            const PipelineDataDocumentList& portData = incommingPortData.m_data;
             
             std::list<ot::GenericDataStruct*> portDataPtr;
             for (auto portDataEntry : portData)
             {
-                portDataPtr.push_back(portDataEntry.get());
+                portDataPtr.push_back(portDataEntry.m_quantity.get());
             }
 
             _pythonServiceInterface->AddPortData(portName, portDataPtr);
@@ -75,10 +75,12 @@ bool BlockHandlerPython::executeSpecialized()
                 else
                 {
                     auto& returnValueList = valuesPointer->second;
-                    GenericDataList returnValuesListSPtr;
+                    PipelineDataDocumentList returnValuesListSPtr;
                     for (auto returnValue : returnValueList)
                     {
-                        returnValuesListSPtr.push_back(std::shared_ptr<ot::GenericDataStruct>(returnValue));
+                        PipelineDataDocument document;
+                        document.m_quantity = std::shared_ptr<ot::GenericDataStruct>(returnValue);
+                        returnValuesListSPtr.push_back(document);
                     }
                     PipelineData outputData;
                     outputData.m_data = std::move(returnValuesListSPtr);

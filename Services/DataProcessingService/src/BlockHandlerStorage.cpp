@@ -88,85 +88,38 @@ std::list<std::shared_ptr<ParameterDescription>> BlockHandlerStorage::createAllP
 	{
 		
 		MetadataParameter newParameter = extractParameter(connector);
-		
 		const std::string parameterName = connector.getConnectorName();
+
 		auto portData = _dataPerPort.find(parameterName);
 		assert(portData != _dataPerPort.end()); //Should have been checked before
 		const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
 		const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName);
-		const std::string portLabel = connector.getConnectorTitle();
-
-		//Now we assign the parameter values and check if the characteristics are matching.
-		const std::string errorMessageInvalidNumberOfEntries = "The parameter port " + portLabel + " has been selected as constant through the dataset, but the port received more than one value, which is inconsistent.";
-		const std::string errorMessageNoValuesReceived = "The parameter port " + portLabel + " has not received any values.";
-		const std::string errorMessageInvalidFormat= "The parameter port " + portLabel + " received a matrix of data, which is not supported. Only single values or lists of values are allowed.";
+		const std::string portLabel = connector.getConnectorTitle();		
 		
+		auto& pipelineDocumentList = portData->second.m_data;
 		
-		auto& pipelineData = portData->second.m_data;
-		auto firstDataEntry = *pipelineData.begin();
-		
-		if (pipelineData.size() == 0)
+		if (pipelineDocumentList.size() == 0)
 		{
+			const std::string errorMessageNoValuesReceived = "The parameter port " + portLabel + " has not received any values.";
 			throw std::exception(errorMessageNoValuesReceived.c_str());
 		}
-
-		ot::GenericDataStructSingle* singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(firstDataEntry.get());
-		if (singleEntry != nullptr)
+		
+		for (auto& pipelineDocument : pipelineDocumentList)
 		{
-			newParameter.typeName = singleEntry->getValue().getTypeName();
-			if (pipelineData.size() > 1 && selectedProperties.m_propertyConstParameter)
+			if (pipelineDocument.m_parameter.size()> 1)
 			{
-				throw std::exception(errorMessageInvalidNumberOfEntries.c_str());
+				throw std::exception(("The parameter port " + portLabel + " has a dimension that is not supported.").c_str());
 			}
 			else
 			{
-				for (auto dataEntry : pipelineData)
-				{
-					singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.get());
-					assert(singleEntry != nullptr);
-					const ot::Variable& value =	singleEntry->getValue();
-					assert(value.getTypeName() == newParameter.typeName);
-					newParameter.values.push_back(value);
-				}
-			}
-		}
-
-		ot::GenericDataStructVector* vectorEntry = dynamic_cast<ot::GenericDataStructVector*>(firstDataEntry.get());
-		if (vectorEntry != nullptr)
-		{
-			if (vectorEntry->getNumberOfEntries() == 0)
-			{
-				throw std::exception(errorMessageNoValuesReceived.c_str());
-			}
-			newParameter.typeName =	vectorEntry->getValue(0).getTypeName();
-
-			if ((pipelineData.size() > 1 && vectorEntry->getNumberOfEntries() > 1)) //Essentially a matrix of entries
-			{
-				throw std::exception(errorMessageInvalidFormat.c_str());
-			}
-			else if ((pipelineData.size() > 1 || vectorEntry->getNumberOfEntries() > 1) && selectedProperties.m_propertyConstParameter) //More then one entry + const parameter property
-			{
-				throw std::exception(errorMessageInvalidNumberOfEntries.c_str());
-			}
-			else
-			{
-				for (auto dataEntry : pipelineData)
-				{
-					vectorEntry = dynamic_cast<ot::GenericDataStructVector*>(dataEntry.get());
-					std::vector<ot::Variable> values =	vectorEntry->getValues();
-					assert(values.begin()->getTypeName() == newParameter.typeName);
-					newParameter.values.insert(newParameter.values.end(), values.begin(), values.end());
-				}
+				const ot::Variable& value = pipelineDocument.m_parameter.begin()->second;
+				newParameter.values.push_back(value);
 			}
 		}
 		
-		ot::GenericDataStructMatrix* matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(firstDataEntry.get());
-		if (matrixEntry != nullptr)
-		{
-			throw std::exception(errorMessageInvalidFormat.c_str());
-		}
 		allParameter.push_back(std::make_shared< ParameterDescription>(newParameter, selectedProperties.m_propertyConstParameter));
 	}
+	
 	return allParameter;
 }
 
@@ -176,7 +129,7 @@ MetadataParameter BlockHandlerStorage::extractParameter(const ot::Connector& _co
 	auto portData = _dataPerPort.find(parameterName);
 	assert(portData != _dataPerPort.end()); //Should have been checked before
 	const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
-	const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName);
+	const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName); //Parameter settings that are set in the properties
 
 	MetadataParameter newParameter;
 	if (metadataParameterFromPort != nullptr)
@@ -248,8 +201,8 @@ QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::C
 	const std::string errorMessageNoValuesReceived = "The quantity port " + portLabel + " has not received any values.";
 
 	auto& pipelineData = portData->second.m_data;
-	auto firstDataEntry = *pipelineData.begin();
-
+	auto firstDataEntry = pipelineData.begin()->m_quantity;
+	assert(firstDataEntry != nullptr);
 	if (pipelineData.size() == 0)
 	{
 		throw std::exception(errorMessageNoValuesReceived.c_str());
@@ -263,7 +216,7 @@ QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::C
 		auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
 		for (auto dataEntry : pipelineData)
 		{
-			singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.get());
+			singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.m_quantity.get());
 			ot::Variable value = singleEntry->getValue();
 			quantityDescriptionCurve->addDatapoint(std::move(value));
 		}
@@ -310,7 +263,7 @@ QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::C
 		auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>(matrixDimension, pipelineData.size()));
 		for (auto dataEntry : pipelineData)
 		{
-			matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.get());
+			matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.m_quantity.get());
 			quantityDescriptionMatrix->addToValues(*matrixEntry);
 			quantityDescription = quantityDescriptionMatrix.release();
 		}

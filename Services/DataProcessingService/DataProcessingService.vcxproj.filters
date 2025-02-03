@@ -21,6 +21,15 @@
     <Filter Include="Source Files\BlockFunctionality">
       <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PipelineData">
+      <UniqueIdentifier>{d388b899-dbd2-4edd-94c1-f1a12f58bb82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Pipeline Data">
+      <UniqueIdentifier>{dccbd867-ba01-446c-9131-6841110758b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{b35061e5-9426-4e30-b521-e6b66a278c3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -80,11 +89,14 @@
     <ClCompile Include="src\BlockHandlerStorage.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
-    <ClCompile Include="src\PipelineData.cpp">
-      <Filter>Source Files\BlockFunctionality</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockHandlerPython.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PipelineData.cpp">
+      <Filter>Source Files\PipelineData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringConverter.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,7 +158,16 @@
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\PipelineData.h">
-      <Filter>Header Files\BlockFunctionality</Filter>
+      <Filter>Header Files\Pipeline Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataDocument.h">
+      <Filter>Header Files\Pipeline Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExplicitStringValueConverter.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringConverter.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ namespace DataStorageAPI
 		BsonViewOrValue GenerateFilterQuery(const std::string& fieldName, BsonViewOrValue&& queryEntry);
 		BsonViewOrValue BuildBsonArray(const std::string& fieldName, std::list<BsonViewOrValue>&& variables);
 		
-		BsonViewOrValue GenerateSelectQuery(std::vector<std::string> columnNames, bool incudeId);
+		BsonViewOrValue GenerateSelectQuery(std::vector<std::string> _columnNames, bool _incudeId, const bool _includeFields = true);
 
 		BsonViewOrValue AppendElementToQuery(BsonView existingQuery, std::map<std::string, BsonValueType> newKvps);
 	};

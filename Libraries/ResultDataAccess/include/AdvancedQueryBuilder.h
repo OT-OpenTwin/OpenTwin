@@ -10,7 +10,7 @@ public:
 	static const std::list<std::string>& getComparators() { return m_comparators; }
 	static std::string getAnyOfComparator() { return m_anyOfComparator; }
 	static std::string getNoneOfComparator() { return m_noneOfComparator; }
-
+	
 	BsonViewOrValue CreateComparison(const std::string& comparator, const ot::Variable& variable);
 
 	/// <summary>
