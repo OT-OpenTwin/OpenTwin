@@ -469,6 +469,9 @@
     <ClCompile Include="src\WidgetViewTab.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\DirectoryBrowser.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1083,6 +1086,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\WidgetViewTab.h">
       <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\DirectoryBrowser.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

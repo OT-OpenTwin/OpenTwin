@@ -55,6 +55,16 @@
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\DoubleSpinBox.cpp" />
     <ClCompile Include="src\EventNotifier.cpp" />
+    <ClCompile Include="src\DirectoryBrowser.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="src\FilePathEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GraphicsArcItem.cpp" />
@@ -211,6 +221,7 @@
     <QtMoc Include="include\OTWidgets\WidgetViewTab.h" />
     <QtMoc Include="include\OTWidgets\DelayedCallHandler.h" />
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
+    <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />

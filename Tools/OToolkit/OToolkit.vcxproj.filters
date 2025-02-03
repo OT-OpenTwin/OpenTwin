@@ -231,6 +231,9 @@
     <ClCompile Include="src\ExternalLibraryManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\SVGBrowser.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -389,6 +392,9 @@
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
     <QtMoc Include="include\WidgetTest.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\SVGBrowser.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>

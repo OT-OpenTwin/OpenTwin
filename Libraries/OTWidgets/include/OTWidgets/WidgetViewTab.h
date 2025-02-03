@@ -14,9 +14,11 @@
 
 namespace ot {
 
+	class ToolButton;
 	class WidgetViewDockManager;
 
 	class OT_WIDGETS_API_EXPORT WidgetViewTab : public ads::CDockWidgetTab {
+		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewTab)
 		OT_DECL_NODEFAULT(WidgetViewTab)
 	public:
@@ -24,8 +26,9 @@ namespace ot {
 		virtual ~WidgetViewTab();
 
 	private:
-		WidgetViewDockManager* m_dockManager;
-
+		ToolButton* m_pinButton;
+		ToolButton* m_lockButton;
+		
 	};
 
 }

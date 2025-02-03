@@ -55,6 +55,7 @@
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
+    <ClCompile Include="src\SVGBrowser.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
     <ClCompile Include="src\ToolBarManager.cpp" />
     <ClCompile Include="src\ToolManager.cpp" />
@@ -94,6 +95,7 @@
     <QtMoc Include="include\LoggingFilterView.h" />
     <QtMoc Include="include\LogModeSetter.h" />
     <QtMoc Include="include\QuickLogExport.h" />
+    <QtMoc Include="include\SVGBrowser.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

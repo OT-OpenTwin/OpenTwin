@@ -13,6 +13,7 @@
 #include "MenuManager.h"
 #include "ImageEditor.h"
 #include "StatusManager.h"
+#include "SVGBrowser.h"
 #include "ToolViewManager.h"
 #include "SettingsManager.h"
 #include "ColorStyleEditor.h"
@@ -412,6 +413,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new ImageEditor);
 	m_toolManager->addTool(new GraphicsItemDesigner);
 	m_toolManager->addTool(new NetworkTools);
+	m_toolManager->addTool(new SVGBrowser);
 
 	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
 	if (!arr.isEmpty()) {
