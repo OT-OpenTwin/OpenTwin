@@ -399,7 +399,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 
 	//The quantity shall only be stored if the quantity was not stored for this series yet.
 	quantityUpForStorageByName = m_quantitiesUpForStorageByName.find(quantityName);
-	if (quantityUpForStorageByName != m_quantitiesUpForStorageByName.end())
+	if (quantityUpForStorageByName == m_quantitiesUpForStorageByName.end())
 	{
 		m_logger.log("Quantity " + newQuantity.quantityName + " is stored as new quantity.");
 		m_quantitiesUpForStorageByName[newQuantity.quantityName].push_back(&newQuantity);
