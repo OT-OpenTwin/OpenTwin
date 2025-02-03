@@ -7,43 +7,94 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/DirectoryBrowser.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtCore/qdir.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qtreeview.h>
+#include <QtWidgets/qfilesystemmodel.h>
 
 ot::DirectoryBrowser::DirectoryBrowser() {
-	m_rootWidget = new QWidget;
-	QVBoxLayout* rootLayout = new QVBoxLayout(m_rootWidget);
-	QHBoxLayout* searchLayout = new QHBoxLayout;
-	searchLayout->setContentsMargins(QMargins(0, 2, 0, 2));
+	// Create layouts
+	QVBoxLayout* rootLay = new QVBoxLayout(this);
 
-	searchLayout->addWidget(new Label("Root:"));
-	searchLayout->addWidget(m_search = new LineEdit);
-	rootLayout->addLayout(searchLayout);
+	QHBoxLayout* searchLay = new QHBoxLayout;
+	searchLay->setContentsMargins(0, 0, 0, 0);
+	searchLay->addWidget(new Label("Find"));
+	searchLay->addWidget(m_rootEdit = new LineEdit(QDir::rootPath()));
 
-	m_tree = new TreeWidgetFilter;
-	rootLayout->addWidget(m_tree->getQWidget());
-	TreeWidget* tree = m_tree->getTreeWidget();
-	OTAssertNullptr(tree);
-	tree->setHeaderHidden(true);
-	tree->setSelectionMode(QAbstractItemView::SingleSelection);
+	rootLay->addLayout(searchLay);
 
-	m_search->setText(QDir::rootPath());
+	// Create Qt file system model
+	m_model = new QFileSystemModel(this);
+	m_model->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+	m_model->setRootPath("");
+	m_model->setOption(QFileSystemModel::DontResolveSymlinks);
+	m_model->setOption(QFileSystemModel::DontUseCustomDirectoryIcons);
 
-	QTreeWidgetItem* m_rootIItem = new QTreeWidgetItem;
-	m_rootIItem->setText(0, m_search->text());
+	// Create tree view to display file system model
+	m_treeView = new QTreeView(this);
+	m_treeView->setModel(m_model);
+	m_treeView->setAnimated(false);
+	m_treeView->setIndentation(20);
+	m_treeView->setSortingEnabled(true);
+	this->slotRootChanged();
+	
+	for (int i = 1; i <= 3; i++) {
+		m_treeView->setColumnHidden(i, true);
+	}
+	
+	rootLay->addWidget(m_treeView);
 
-	this->connect(m_search, &LineEdit::editingFinished, this, &DirectoryBrowser::slotSearchChanged);
-	this->connect(tree, &TreeWidget::itemSelectionChanged, this, &DirectoryBrowser::slotSelectionChanged);
+	// Connect signals
+	this->connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DirectoryBrowser::slotSelectionChanged);
 }
 
 ot::DirectoryBrowser::~DirectoryBrowser() {
 
 }
+
+void ot::DirectoryBrowser::slotRootChanged(void) {
+	QModelIndex rootIx = m_treeView->rootIndex();
+
+	if (m_rootEdit->text().isEmpty()) {
+		SignalBlockWrapper sigBlock(m_rootEdit);
+		m_rootEdit->setText(this->getItemText(rootIx));
+	}
+
+	QModelIndex ix = m_model->index(m_rootEdit->text());
+	if (!ix.isValid()) {
+		ix = m_treeView->rootIndex();
+		if (ix.isValid()) {
+			SignalBlockWrapper sigBlock(m_rootEdit);
+			m_rootEdit->setText(this->getItemText(ix));
+		}
+		else {
+			OT_LOG_E("Failed to find model index");
+		}
+	}
+	m_treeView->setRootIndex(ix);
+}
+
+void ot::DirectoryBrowser::slotSelectionChanged(void) {
+	QModelIndex currentIndex = m_treeView->selectionModel()->currentIndex();
+	if (!currentIndex.isValid()) {
+		return;
+	}
+
+	QString path = m_model->filePath(currentIndex);
+	Q_EMIT currentPathChanged(path);
+}
+
+QString ot::DirectoryBrowser::getItemText(const QModelIndex& _ix) {
+	OTAssert(_ix.isValid(), "Invalid index");
+	QMap<int, QVariant> itemData = m_model->itemData(_ix);
+	return itemData.value(0, QString()).toString();
+}
+
+/*
 
 void ot::DirectoryBrowser::goTo(const QString& _path) {
 	QString path = _path;
@@ -54,7 +105,7 @@ void ot::DirectoryBrowser::goTo(const QString& _path) {
 
 void ot::DirectoryBrowser::goTo(const QStringList& _path) {
 	QStringList tmp = _path;
-	QTreeWidgetItem* itm = this->buildPath(m_tree->getTreeWidget()->invisibleRootItem(), tmp);
+	QTreeWidgetItem* itm = this->buildPath(m_rootItem, tmp);
 	tmp.clear();
 	this->getItemPath(itm, tmp);
 	if (tmp != _path) {
@@ -104,7 +155,7 @@ QTreeWidgetItem* ot::DirectoryBrowser::findItemFromPath(const QString& _tidyPath
 		return nullptr;
 	}
 
-	return this->findItemFromPath(m_tree->getTreeWidget()->invisibleRootItem(), lst, _returnSubset);
+	return this->findItemFromPath(m_rootItem, lst, _returnSubset);
 }
 
 QTreeWidgetItem* ot::DirectoryBrowser::findItemFromPath(const QStringList& _tidyPath, bool _returnSubset) {
@@ -113,7 +164,7 @@ QTreeWidgetItem* ot::DirectoryBrowser::findItemFromPath(const QStringList& _tidy
 		return nullptr;
 	}
 
-	return this->findItemFromPath(m_tree->getTreeWidget()->invisibleRootItem(), lst, _returnSubset);
+	return this->findItemFromPath(m_rootItem, lst, _returnSubset);
 }
 
 QTreeWidgetItem* ot::DirectoryBrowser::findItemFromPath(QTreeWidgetItem* _parentItem, QStringList& _tidyPath, bool _returnSubset) {
@@ -143,11 +194,57 @@ QTreeWidgetItem* ot::DirectoryBrowser::findItemFromPath(QTreeWidgetItem* _parent
 	return nullptr;
 }
 
+void ot::DirectoryBrowser::updateRoot(const QString& _newRootPath) {
+	QStringList lastPath;
+	auto sel = m_tree->getTreeWidget()->selectedItems();
+	if (!sel.isEmpty()) {
+		this->getItemPath(sel.front(), lastPath);
+	}
+
+	QDir dir(_newRootPath);
+	if (!dir.exists()) {
+		return;
+	}
+
+	m_rootItem->setText(0, dir.dirName());
+	QStringList newChildItems = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	for (const QString& newChild : newChildItems) {
+		bool found = false;
+		for (int i = 0; i < m_rootItem->childCount(); i++) {
+			if (m_rootItem->child(i)->text(0) == newChild) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			m_rootItem->addChild(new QTreeWidgetItem(QStringList({ newChild })));
+		}
+	}
+}
+
 QTreeWidgetItem* ot::DirectoryBrowser::buildPath(QTreeWidgetItem* _parentItem, QStringList& _tidyPath) {
 	if (_tidyPath.isEmpty()) {
 		return nullptr;
 	}
-	
+
+	// Rescan directory
+	QDir parentDir(this->getItemPathString(_parentItem));
+	QStringList newChildItems = parentDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	for (const QString& newChild : newChildItems) {
+		bool found = false;
+		for (int i = 0; i < _parentItem->childCount(); i++) {
+			if (_parentItem->child(i)->text(0) == newChild) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			_parentItem->addChild(new QTreeWidgetItem(QStringList({ newChild })));
+		}
+	}
+
 	// Check if first item in path exists
 	for (int i = 0; i < _parentItem->childCount(); i++) {
 		// Find existing child
@@ -183,11 +280,14 @@ QTreeWidgetItem* ot::DirectoryBrowser::buildPath(QTreeWidgetItem* _parentItem, Q
 }
 
 void ot::DirectoryBrowser::getItemPath(QTreeWidgetItem* _childItem, QStringList& _resultPath) {
-	if (!_childItem || _childItem == m_tree->getTreeWidget()->invisibleRootItem()) {
+	if (!_childItem) {
 		return;
 	}
 	_resultPath.push_front(_childItem->text(0));
-	this->getItemPath(_childItem->parent(), _resultPath);
+
+	if (_childItem != m_rootItem) {
+		this->getItemPath(_childItem->parent(), _resultPath);
+	}
 }
 
 QString ot::DirectoryBrowser::getItemPathString(QTreeWidgetItem* _itm) {
@@ -203,3 +303,4 @@ QString ot::DirectoryBrowser::getItemPathString(QTreeWidgetItem* _itm) {
 		return result + "/" + _itm->text(0);
 	}
 }
+*/

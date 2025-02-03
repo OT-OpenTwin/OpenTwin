@@ -7,6 +7,7 @@
 #include "SVGBrowser.h"
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/DirectoryBrowser.h"
 
 using namespace ot;
@@ -24,6 +25,8 @@ bool SVGBrowser::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	_content.addView(this->createSideWidgetView(newBrowser->getQWidget(), "SVG Browser"));
 
+	this->connect(newBrowser, &DirectoryBrowser::currentPathChanged, this, &SVGBrowser::slotPathChanged);
+
 	return true;
 }
 
@@ -34,4 +37,8 @@ void SVGBrowser::restoreToolSettings(QSettings& _settings) {
 bool SVGBrowser::prepareToolShutdown(QSettings& _settings) {
 
 	return false;
+}
+
+void SVGBrowser::slotPathChanged(const QString& _path) {
+	OT_LOG_D(_path.toStdString());
 }
