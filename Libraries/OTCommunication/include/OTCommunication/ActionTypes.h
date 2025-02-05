@@ -584,6 +584,7 @@
 #define OT_ACTION_PARAM_MESH_NODE_ID "Mesh.Node.ID"
 #define OT_ACTION_PARAM_MESH_NODE_VERSION "Mesh.Node.Version"
 
+#define OT_ACTION_PARAM_VIEW1D_Setup "View1D.Setup"
 #define OT_ACTION_PARAM_VIEW1D_Title "View1D.Title"
 #define OT_ACTION_PARAM_VIEW1D_PlotType "View1D.PlotType"
 #define OT_ACTION_PARAM_VIEW1D_PlotQuantity "View1D.PlotQuantity"

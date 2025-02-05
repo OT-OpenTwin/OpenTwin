@@ -988,8 +988,8 @@ std::string Application::handleShowTable(ot::JsonDocument& _document)
 {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
-	
-	auto entityIDByName	= m_model->getEntityNameToIDMap().find(tableName);
+	std::map<std::string,ot::UID> entityMap = m_model->getEntityNameToIDMap();
+	auto entityIDByName	= entityMap.find(tableName);
 	if (entityIDByName != m_model->getEntityNameToIDMap().end())
 	{
 		ot::UID tableID = entityIDByName->second;

@@ -33,6 +33,8 @@
     <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
+    <ClInclude Include="include\IVisualisationCurve.h" />
+    <ClInclude Include="include\IVisualisationPlot1D.h" />
     <ClInclude Include="include\IVisualisationTable.h" />
     <ClInclude Include="include\IVisualisationText.h" />
     <ClInclude Include="include\EntityMetadataSeries.h" />

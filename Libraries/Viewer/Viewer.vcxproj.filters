@@ -151,6 +151,12 @@
     <ClCompile Include="src\GlobalModel.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\CurveVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -311,6 +317,12 @@
     </ClInclude>
     <ClInclude Include="include\GlobalFontPath.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurveVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotVisualiser.h">
+      <Filter>include\Visualiser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

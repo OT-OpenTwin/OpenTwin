@@ -4,6 +4,8 @@
 #include "Model.h"
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
+#include "IVisualisationPlot1D.h"
+#include "IVisualisationCurve.h"
 
 #include "OTCore/RuntimeTests.h"
 
@@ -30,8 +32,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	if (_visualisationType == OT_ACTION_CMD_UI_TABLE_Setup)
 	{
-		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize table");
 
+		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize table");
 		IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
 		assert(tableEntity != nullptr);
 		if (tableEntity != nullptr && tableEntity->visualiseTable())
@@ -71,6 +73,47 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
 			std::string response;
 			Application::instance()->queuedRequestToFrontend(document);
+		}
+	}
+	else if (_visualisationType == OT_ACTION_PARAM_VIEW1D_Setup)
+	{
+		IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
+		assert(plotEntity != nullptr);
+		if (plotEntity != nullptr && plotEntity->visualisePlot())
+		{
+			ot::JsonDocument document;
+			info.addToJsonObject(document, document.GetAllocator());
+			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+			//document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
+
+			const ot::Plot1DCfg tableCfg = plotEntity->getPlot();
+			ot::JsonObject cfgObj;
+			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
+
+			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+			std::string response;
+			Application::instance()->queuedRequestToFrontend(document);
+		}
+	}
+	else if (_visualisationType == OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot)
+	{
+		IVisualisationCurve* curveEntity = dynamic_cast<IVisualisationCurve*>(baseEntity);
+		assert(curveEntity != nullptr);
+		if (curveEntity != nullptr && curveEntity->visualiseCurve())
+		{
+			ot::JsonDocument document;
+			info.addToJsonObject(document, document.GetAllocator());
+			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+	
+			/*const ot::Plot1DCfg tableCfg = curveEntity->getCurve();
+			ot::JsonObject cfgObj;
+			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
+
+			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+			std::string response;
+			Application::instance()->queuedRequestToFrontend(document);*/
 		}
 	}
 	else

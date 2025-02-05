@@ -397,6 +397,12 @@
     <ClInclude Include="include\EntityAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\IVisualisationPlot1D.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IVisualisationCurve.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">

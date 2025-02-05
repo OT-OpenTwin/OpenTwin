@@ -27,6 +27,7 @@
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
+    <ClCompile Include="src\CurveVisualiser.cpp" />
     <ClCompile Include="src\EntityHandler.cpp" />
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
@@ -48,6 +49,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\PlotManager.cpp" />
     <ClCompile Include="src\PlotManagerView.cpp" />
+    <ClCompile Include="src\PlotVisualiser.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
     <ClCompile Include="src\SceneNodeCartesianMesh.cpp" />
@@ -95,6 +97,7 @@
     <ClInclude Include="include\AxisCross.h" />
     <ClInclude Include="include\CappingEffect.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />
+    <ClInclude Include="include\CurveVisualiser.h" />
     <ClInclude Include="include\EntityHandler.h" />
     <ClInclude Include="include\Factory.h" />
     <ClInclude Include="include\FrontendAPI.h" />
@@ -105,6 +108,7 @@
     <ClInclude Include="include\HandlerIntersector.h" />
     <ClInclude Include="include\HandleWheel.h" />
     <ClInclude Include="include\PlotManagerView.h" />
+    <ClInclude Include="include\PlotVisualiser.h" />
     <ClInclude Include="include\ViewChangedStates.h" />
     <ClInclude Include="include\ViewerToolBar.h" />
     <ClInclude Include="include\Visualiser.h" />
