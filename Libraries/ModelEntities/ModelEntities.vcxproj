@@ -31,6 +31,7 @@
     <ClInclude Include="include\EntityAPI.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityInformation.h" />
+    <ClInclude Include="include\EntityResult1DPlot_New.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\IVisualisationCurve.h" />
@@ -129,6 +130,7 @@
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalarSurface.h" />
     <ClInclude Include="include\PropertyBundleVisUnstructuredVector.h" />
     <ClInclude Include="include\PropertyBundleVis2D3D.h" />
+    <ClInclude Include="include\PropertyHelper.h" />
     <ClInclude Include="include\ScalingProperties.h" />
     <ClInclude Include="include\SerializeWithBSON.h" />
     <ClInclude Include="include\TemplateDefaultManager.h" />
@@ -176,6 +178,7 @@
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
+    <ClCompile Include="src\EntityResult1DPlot_New.cpp" />
     <ClCompile Include="src\EntityResultText.cpp" />
     <ClCompile Include="src\EntityResultTextData.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
@@ -225,6 +228,7 @@
     <ClCompile Include="src\PropertyBundleVisUnstructuredScalar.cpp" />
     <ClCompile Include="src\PropertyBundleVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\PropertyBundleVisUnstructuredVector.cpp" />
+    <ClCompile Include="src\PropertyHelper.cpp" />
     <ClCompile Include="src\TemplateDefaultManager.cpp" />
     <ClCompile Include="src\OldTreeIcon.cpp" />
     <ClCompile Include="src\VariableToBSONConverter.cpp" />

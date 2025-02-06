@@ -17,9 +17,11 @@ namespace ot
 
 		void addTextVisualisation();
 		void addTableVisualisation();
+		void addPlot1DVisualisation();
 
 		bool visualiseAsText();
 		bool visualiseAsTable();
+		bool visualiseAsPlot1D();
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
@@ -28,5 +30,6 @@ namespace ot
 		std::list<uint32_t> m_visualisations;
 		const uint32_t m_visualisationAsText = 0;
 		const uint32_t m_visualisationAsTable = 1;
+		const uint32_t m_visualisationAsPlot1D = 2;
 	};
 }
