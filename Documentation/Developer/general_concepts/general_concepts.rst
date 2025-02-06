@@ -10,6 +10,7 @@ See here for more details:
    opentwin_layers
    service_information
    user_interface
+   Model_Entities
    datamodel
    messaging
    json
