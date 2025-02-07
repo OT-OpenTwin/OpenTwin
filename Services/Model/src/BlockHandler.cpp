@@ -20,13 +20,20 @@ void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _new
 	{
 		newEntity->setEntityID(model->createEntityUID());
 		
-		const std::string name = newEntity->getName();
-		const std::string folderName = name.substr(name.find_last_of("/") + 1);
+		const std::string fullName = newEntity->getName();
+		const std::string folderName = fullName.substr(0,fullName.find_last_of("/"));
+
+		const std::string name = fullName.substr(fullName.find_last_of("/") + 1,fullName.size());
 		std::list<std::string> folderContent = model->getListOfFolderItems(folderName,false);
 		folderContent.insert(folderContent.end(), newEntityNames.begin(), newEntityNames.end()); //Names from the other new entities are not known to the model yet
 		const std::string newName =	CreateNewUniqueTopologyName(folderContent, folderName, name);
 		newEntityNames.push_back(newName);
 		newEntity->setName(newName);
+		
+		//Important! These are set later when the entity is added to the state. If they are set here, it causes issues when the object is destroyed.
+		newEntity->setObserver(nullptr);
+		newEntity->setParent(nullptr);
+
 	}
 }
 
@@ -97,76 +104,46 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	ClassFactoryModel& classFactory = model->getClassFactory();
 	std::map<ot::UID, EntityBase*> entityMap;
 
-	// Setup info for graphics paste
-	/*ot::Point2DD graphicsTopLeft(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
-	std::list<EntityCoordinates2D*> blockCoordinateEntities;*/
 
 	std::list<std::unique_ptr<EntityBase>> newEntities;
 	// Deserialize entities
 	for (const ot::CopyEntityInformation& entityInfo : info.getEntities()) {
-		OTAssert(entityInfo.getRawData().empty(), "Empty entity data stored");
+		if (!entityInfo.getRawData().empty())
+		{
 
-		// Create bson view from json
-		std::string_view serialisedEntityJSONView(entityInfo.getRawData());
-		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
-		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+			// Create bson view from json
+			std::string_view serialisedEntityJSONView(entityInfo.getRawData());
+			auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+			auto serialisedEntityBSONView = serialisedEntityBSON.view();
 
-		std::string entityType = serialisedEntityBSON["SchemaType"].get_utf8().value.data();
-		OTAssert(entityType.empty(), "Empty entity type");
-
-		std::unique_ptr<EntityBase>entity(classFactory.CreateEntity(entityType));
-
-		// ########################################################################################################################
-		entity->restoreFromDataBase(nullptr, model, model->getStateManager(), serialisedEntityBSONView, entityMap);
-		newEntities.push_back(std::move(entity));
-		//EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity.get());
-		//
-		//if (blockEntity != nullptr) {
-		//	// ########################################################################################################################
-
-		//	// !!!!!   note that curently the coordinate entity id of the copy origin is stored   !!!!!
-		//	ot::UID coordinateEntityId = blockEntity->getCoordinateEntityID();
-		//	EntityCoordinates2D* coordinateEntity = dynamic_cast<EntityCoordinates2D*>(model->getEntityByID(coordinateEntityId));
-		//	if (!coordinateEntity) {
-		//		OT_LOG_E("Block entity has an invalid coordinate entity");
-		//		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();;
-		//	}
-
-		//	blockCoordinateEntities.push_back(coordinateEntity);
-		//	OTAssert(coordinateEntity->getCoordinates().x() != std::numeric_limits<double>::max(), "Invalid x coordinate value stored");
-		//	OTAssert(coordinateEntity->getCoordinates().y() != std::numeric_limits<double>::max(), "Invalid y coordinate value stored");
-		//	graphicsTopLeft.moveTop(coordinateEntity->getCoordinates().y()).moveLeft(coordinateEntity->getCoordinates().x());
-		//}
+			std::string entityType = serialisedEntityBSON["SchemaType"].get_utf8().value.data();
+				
+			std::unique_ptr<EntityBase>entity(classFactory.CreateEntity(entityType));
+			if (entity != nullptr)
+			{
+				// ########################################################################################################################
+				try
+				{
+					entity->restoreFromDataBase(nullptr, model, model->getStateManager(), serialisedEntityBSONView, entityMap);
+					newEntities.push_back(std::move(entity));
+				}
+				catch (std::exception& e)
+				{
+					OT_LOG_E("Failed to build entity from paste information. " + std::string(e.what()));
+				}
+			}
+			else
+			{
+				OT_LOG_E("Failed to create entity from paste information.");
+			}
+		}
+		else
+		{
+			OT_LOG_E("Tried to paste an entity without data.");
+		}
 	}
 
 	updateIdentifier(newEntities);
-
-	//// Check move distance
-	//if (!blockCoordinateEntities.empty()) {
-	//	// Calculate distance 
-	//	ot::Point2DD moveAdder(0., 0.);
-	//	if (info.getDestinationScenePosSet()) {
-	//		moveAdder = info.getDestinationScenePos() - graphicsTopLeft;
-	//	}
-	//	else {
-	//		// If no scene pos is provided we move all block by 20
-	//		moveAdder.set(20., 20.);
-	//	}
-
-	//	// Adjust coordinates
-	//	for (EntityCoordinates2D* coord : blockCoordinateEntities) {
-	//		// Update coordinate
-	//		coord->setCoordinates(coord->getCoordinates() + moveAdder);
-
-	//		//coord->StoreToDataBase();
-	//	}
-	//}
-
-	//model->addEntitiesToModel(entityIDsTopo, entityVersionsTopo, topoForceVisible, entityIDsData, entityVersionsData, entityIDsTopo, "Copied block entities", true, false);
-
-	/*ot::JsonDocument responseDocument;
-	info.addToJsonObject(responseDocument, responseDocument.GetAllocator());
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDocument.toJson()).toJson();*/
+	storeEntities(newEntities);
 	return ot::ReturnMessage().toJson();
 }
