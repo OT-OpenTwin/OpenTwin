@@ -1,5 +1,4 @@
-//! @file Outline.h
-//! 
+//! @file PenCfg.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -13,7 +12,7 @@
 
 namespace ot {
 
-	class OutlineF;
+	class PenFCfg;
 
 	//! @brief Line style.
 	enum LineStyle {
@@ -49,42 +48,42 @@ namespace ot {
 	OT_GUI_API_EXPORT std::string toString(LineJoinStyle _join);
 	OT_GUI_API_EXPORT LineJoinStyle stringToJoinStyle(const std::string& _join);
 
-	//! @class Outline
-	//! @brief The Outline class is used to describe how a outline should look like.
-	class OT_GUI_API_EXPORT Outline : public ot::Serializable {
+	//! @class PenCfg
+	//! @brief The PenCfg is used to configure a line pen that will be used in the frontend.
+	class OT_GUI_API_EXPORT PenCfg : public ot::Serializable {
 	public:
 		//! @brief Default constructor.
 		//! Creates a black fill painter.
-		Outline();
+		PenCfg();
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		Outline(const Color& _color);
+		PenCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
-		//! @param _painter Initial painter (if 0, default painter will be set [/ref Outline() "See default constructor"]).
-		Outline(Painter2D* _painter);
+		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenCfg() "See default constructor"]).
+		PenCfg(Painter2D* _painter);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		Outline(int _width, const Color& _color);
+		PenCfg(int _width, const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width 
-		//! @param _painter Initial painter (if 0, default painter will be set [/ref Outline() "See default constructor"]).
-		Outline(int _width, Painter2D* _painter);
+		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenCfg() "See default constructor"]).
+		PenCfg(int _width, Painter2D* _painter);
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		Outline(const Outline& _other);
+		PenCfg(const PenCfg& _other);
 
 		//! @brief Destructor.
-		~Outline();
+		~PenCfg();
 
 		//! @brief Assignment operator.
 		//! @param _other The other style.
-		Outline& operator = (const Outline& _other);
+		PenCfg& operator = (const PenCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -101,7 +100,7 @@ namespace ot {
 		void setColor(const Color& _color);
 
 		//! @brief Set the painter.
-		//! The outline takes ownership of the painter.
+		//! The pen takes ownership of the painter.
 		//! @param _painter The painter to set.
 		void setPainter(Painter2D* _painter);
 
@@ -140,7 +139,7 @@ namespace ot {
 		//! @brief Line join style.
 		constexpr inline LineJoinStyle joinStyle(void) const { return m_join; };
 
-		OutlineF toOutlineF(void) const;
+		PenFCfg toPenFCfg(void) const;
 
 	private:
 		Painter2D* m_painter; //! @brief Painter.
@@ -156,42 +155,42 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//! @class OutlineF
-	//! @brief The OutlineF class is used to describe how a outline should look like.
-	class OT_GUI_API_EXPORT OutlineF : public ot::Serializable {
+	//! @class PenFCfg
+	//! @brief The PenCfg is used to configure a line pen that will be used in the frontend.
+	class OT_GUI_API_EXPORT PenFCfg : public ot::Serializable {
 	public:
 		//! @brief Default constructor.
 		//! Creates a black fill painter.
-		OutlineF();
+		PenFCfg();
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		OutlineF(const Color& _color);
+		PenFCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
-		//! @param _painter Initial painter (if 0, default painter will be set [/ref OutlineF() "See default constructor"]).
-		OutlineF(Painter2D* _painter);
+		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenFCfg() "See default constructor"]).
+		PenFCfg(Painter2D* _painter);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		OutlineF(double _width, const Color& _color);
+		PenFCfg(double _width, const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width 
-		//! @param _painter Initial painter (if 0, default painter will be set [/ref OutlineF() "See default constructor"]).
-		OutlineF(double _width, Painter2D* _painter);
+		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenFCfg() "See default constructor"]).
+		PenFCfg(double _width, Painter2D* _painter);
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		OutlineF(const OutlineF& _other);
+		PenFCfg(const PenFCfg& _other);
 
 		//! @brief Destructor.
-		~OutlineF();
+		~PenFCfg();
 
 		//! @brief Assignment operator.
 		//! @param _other The other style.
-		OutlineF& operator = (const OutlineF& _other);
+		PenFCfg& operator = (const PenFCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -208,7 +207,7 @@ namespace ot {
 		void setColor(const Color& _color);
 
 		//! @brief Set the painter.
-		//! The outline takes ownership of the painter.
+		//! The pen takes ownership of the painter.
 		//! @param _painter The painter to set.
 		void setPainter(Painter2D* _painter);
 
@@ -247,7 +246,7 @@ namespace ot {
 		//! @brief Line join style.
 		constexpr inline LineJoinStyle joinStyle(void) const { return m_join; };
 
-		Outline toOutline(void) const;
+		PenCfg toPenCfg(void) const;
 
 	private:
 		Painter2D* m_painter; //! @brief Painter.

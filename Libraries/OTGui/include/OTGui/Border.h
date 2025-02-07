@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
@@ -19,9 +19,10 @@ namespace ot {
 	class OT_GUI_API_EXPORT Border : public ot::Serializable {
 	public:
 		Border() {};
+		Border(const PenCfg& _pen);
 		Border(const ot::Color& _color, int _width);
 		Border(const ot::Color& _color, int _leftWidth, int _topWidth, int _rightWidth, int _bottomWidth);
-		Border(const Outline& _left, const Outline& _top, const Outline& _right, const Outline& _bottom);
+		Border(const PenCfg& _left, const PenCfg& _top, const PenCfg& _right, const PenCfg& _bottom);
 		Border(const Border& _other);
 		virtual ~Border();
 
@@ -46,23 +47,23 @@ namespace ot {
 		void setWidth(int _width);
 
 		//! @brief Set the top border.
-		inline void setTop(const Outline& _s) { m_top = _s; };
-		inline const Outline& top(void) const { return m_top; };
+		inline void setTop(const PenCfg& _s) { m_top = _s; };
+		inline const PenCfg& top(void) const { return m_top; };
 
-		inline void setLeft(const Outline& _s) { m_left = _s; };
-		inline const Outline& left(void) const { return m_left; };
+		inline void setLeft(const PenCfg& _s) { m_left = _s; };
+		inline const PenCfg& left(void) const { return m_left; };
 
-		inline void setRight(const Outline& _s) { m_right = _s; };
-		inline const Outline& right(void) const { return m_right; };
+		inline void setRight(const PenCfg& _s) { m_right = _s; };
+		inline const PenCfg& right(void) const { return m_right; };
 
-		inline void setBottom(const Outline& _s) { m_bottom = _s; };
-		inline const Outline& bottom(void) const { return m_bottom; };
+		inline void setBottom(const PenCfg& _s) { m_bottom = _s; };
+		inline const PenCfg& bottom(void) const { return m_bottom; };
 
 	private:
-		Outline m_top;
-		Outline m_left;
-		Outline m_right;
-		Outline m_bottom;
+		PenCfg m_top;
+		PenCfg m_left;
+		PenCfg m_right;
+		PenCfg m_bottom;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -80,7 +81,7 @@ namespace ot {
 		BorderF() {};
 		BorderF(const ot::Color& _color, double _width);
 		BorderF(const ot::Color& _color, double _leftWidth, double _topWidth, double _rightWidth, double _bottomWidth);
-		BorderF(const OutlineF& _left, const OutlineF& _top, const OutlineF& _right, const OutlineF& _bottom);
+		BorderF(const PenFCfg& _left, const PenFCfg& _top, const PenFCfg& _right, const PenFCfg& _bottom);
 		BorderF(const BorderF& _other);
 		virtual ~BorderF();
 
@@ -105,23 +106,23 @@ namespace ot {
 		void setWidth(double _width);
 
 		//! @brief Set the top border.
-		inline void setTop(const OutlineF& _s) { m_top = _s; };
-		inline const OutlineF& top(void) const { return m_top; };
+		inline void setTop(const PenFCfg& _s) { m_top = _s; };
+		inline const PenFCfg& top(void) const { return m_top; };
 
-		inline void setLeft(const OutlineF& _s) { m_left = _s; };
-		inline const OutlineF& left(void) const { return m_left; };
+		inline void setLeft(const PenFCfg& _s) { m_left = _s; };
+		inline const PenFCfg& left(void) const { return m_left; };
 
-		inline void setRight(const OutlineF& _s) { m_right = _s; };
-		inline const OutlineF& right(void) const { return m_right; };
+		inline void setRight(const PenFCfg& _s) { m_right = _s; };
+		inline const PenFCfg& right(void) const { return m_right; };
 
-		inline void setBottom(const OutlineF& _s) { m_bottom = _s; };
-		inline const OutlineF& bottom(void) const { return m_bottom; };
+		inline void setBottom(const PenFCfg& _s) { m_bottom = _s; };
+		inline const PenFCfg& bottom(void) const { return m_bottom; };
 
 	private:
-		OutlineF m_top;
-		OutlineF m_left;
-		OutlineF m_right;
-		OutlineF m_bottom;
+		PenFCfg m_top;
+		PenFCfg m_left;
+		PenFCfg m_right;
+		PenFCfg m_bottom;
 	};
 
 }

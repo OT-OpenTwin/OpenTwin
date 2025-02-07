@@ -19,7 +19,7 @@ EntityBlockConnection::~EntityBlockConnection()
 ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 {
 	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
-	ot::OutlineF outlineCfg;
+	ot::PenFCfg outlineCfg;
 
 	EntityPropertiesGuiPainter* painterProperty = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
 	outlineCfg.setPainter(painterProperty->getValue()->createCopy());

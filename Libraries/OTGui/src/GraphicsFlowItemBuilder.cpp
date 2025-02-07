@@ -145,7 +145,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
 	itm->setSize(ot::Size2DD(10., 10.));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
+	itm->setOutline(ot::PenFCfg(1., this->createSecondaryPainter()));
 
 	return itm;
 }
@@ -154,7 +154,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
 	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
+	itm->setOutline(ot::PenFCfg(1., this->createSecondaryPainter()));
 
 	return itm;
 }
@@ -164,7 +164,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsT
 	itm->setBackgroundPainer(this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
+	itm->setOutline(ot::PenFCfg(1., this->createSecondaryPainter()));
 
 	return itm;
 }
@@ -200,7 +200,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
-	bor->setOutline(ot::OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+	bor->setOutline(ot::PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(ot::Dynamic);
@@ -222,7 +222,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
-	tBor->setOutline(OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+	tBor->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));

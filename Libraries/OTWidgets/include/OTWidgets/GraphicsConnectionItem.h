@@ -80,8 +80,8 @@ namespace ot {
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter(void) const { return m_config.getLinePainter(); };
 
-		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
-		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
+		void setLineStyle(const PenFCfg& _style) { m_config.setLineStyle(_style); this->update(); };
+		const PenFCfg& getLineStyle(void) const { return m_config.getLineStyle(); };
 
 		void setHandleState(bool _handlesState);
 		bool getHandleState(void) const;

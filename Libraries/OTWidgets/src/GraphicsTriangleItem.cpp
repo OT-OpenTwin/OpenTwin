@@ -243,12 +243,12 @@ const ot::Painter2D* ot::GraphicsTriangleItem::getBackgroundPainter(void) const 
 	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getBackgroundPainter();
 }
 
-void ot::GraphicsTriangleItem::setOutline(const OutlineF& _outline) {
+void ot::GraphicsTriangleItem::setOutline(const PenFCfg& _outline) {
 	this->getItemConfiguration<GraphicsTriangleItemCfg>()->setOutline(_outline);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsTriangleItem::getOutline(void) const {
+const ot::PenFCfg& ot::GraphicsTriangleItem::getOutline(void) const {
 	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getOutline();
 }
 

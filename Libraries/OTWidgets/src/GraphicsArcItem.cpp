@@ -109,12 +109,12 @@ double ot::GraphicsArcItem::getSpanAngle(void) const {
 	return this->getItemConfiguration<GraphicsArcItemCfg>()->getSpanAngle();
 }
 
-void ot::GraphicsArcItem::setLineStyle(const OutlineF& _style) {
+void ot::GraphicsArcItem::setLineStyle(const PenFCfg& _style) {
 	this->getItemConfiguration<GraphicsArcItemCfg>()->setLineStyle(_style);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsArcItem::getLineStyle(void) const {
+const ot::PenFCfg& ot::GraphicsArcItem::getLineStyle(void) const {
 	const GraphicsArcItemCfg* cfg = this->getItemConfiguration<GraphicsArcItemCfg>();
 	return cfg->getLineStyle();
 }

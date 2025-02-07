@@ -77,7 +77,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	textFont.setSize(8);
 	m_labelItem->setFont(textFont);
 
-	OutlineF borderOutline(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
+	PenFCfg borderOutline(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
 	if (m_config.getName() == _activeVersion) {
 		borderOutline.setStyle(ot::DotLine);
 		border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));

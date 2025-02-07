@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -85,8 +85,8 @@ namespace ot {
 		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.painter(); };
 
 		void setLineStyle(LineStyle _style) { m_lineStyle.setStyle(_style); };
-		void setLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
-		const OutlineF& getLineStyle(void) const { return m_lineStyle; };
+		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
+		const PenFCfg& getLineStyle(void) const { return m_lineStyle; };
 
 		std::string createConnectionKey(void) const;
 		std::string createConnectionKeyReverse(void) const;
@@ -104,7 +104,7 @@ namespace ot {
 		ot::UID m_uid;
 
 		ConnectionShape m_lineShape;
-		OutlineF m_lineStyle;
+		PenFCfg m_lineStyle;
 
 		bool m_handlesState;
 	};

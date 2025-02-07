@@ -7,7 +7,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
@@ -58,8 +58,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTriangleItem); };
 
-		void setOutline(const ot::OutlineF& _outline) { m_outline = _outline; };
-		const OutlineF& getOutline(void) const { return m_outline; };
+		void setOutline(const ot::PenFCfg& _outline) { m_outline = _outline; };
+		const PenFCfg& getOutline(void) const { return m_outline; };
 
 		void setBackgroundPainer(ot::Painter2D* _painter);
 		const ot::Painter2D* getBackgroundPainter(void) const { return m_backgroundPainter; };
@@ -74,7 +74,7 @@ namespace ot {
 		TriangleDirection getTriangleDirection(void) const { return m_direction; };
 
 	private:
-		ot::OutlineF m_outline;
+		ot::PenFCfg m_outline;
 		ot::Size2DD m_size;
 		ot::Painter2D* m_backgroundPainter;
 		TriangleDirection m_direction;

@@ -18,7 +18,7 @@
 static WrappedItemFactoryRegistrar<WrappedArcItem> arcRegistrar(OT_FactoryKey_GraphicsArcItem);
 
 WrappedArcItem::WrappedArcItem() {
-	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));
+	this->setLineStyle(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));
 }
 
 WrappedArcItem::~WrappedArcItem() {
@@ -174,7 +174,7 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle = this->getLineStyle();
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
@@ -185,7 +185,7 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle = this->getLineStyle();
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}

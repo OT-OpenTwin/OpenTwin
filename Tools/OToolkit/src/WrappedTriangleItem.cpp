@@ -17,7 +17,7 @@
 static WrappedItemFactoryRegistrar<WrappedTriangleItem> circleRegistrar(OT_FactoryKey_GraphicsTriangleItem);
 
 WrappedTriangleItem::WrappedTriangleItem() {
-	this->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 }
 
@@ -38,7 +38,7 @@ ot::TreeWidgetItemInfo WrappedTriangleItem::createNavigationInformation(void) {
 }
 
 void WrappedTriangleItem::makeItemTransparent(void) {
-	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
+	this->setOutline(ot::PenFCfg(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
 }
 
@@ -170,7 +170,7 @@ void WrappedTriangleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle = this->getOutline();
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setOutline(lineStyle);
 	}
@@ -181,7 +181,7 @@ void WrappedTriangleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle = this->getOutline();
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setOutline(lineStyle);
 	}

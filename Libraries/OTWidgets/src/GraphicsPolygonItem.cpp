@@ -138,12 +138,12 @@ const ot::Painter2D* ot::GraphicsPolygonItem::getBackgroundPainter(void) const {
 	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getBackgroundPainter();
 }
 
-void ot::GraphicsPolygonItem::setOutline(const OutlineF& _outline) {
+void ot::GraphicsPolygonItem::setOutline(const PenFCfg& _outline) {
 	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setOutline(_outline);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsPolygonItem::getOutline(void) const {
+const ot::PenFCfg& ot::GraphicsPolygonItem::getOutline(void) const {
 	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getOutline();
 }
 

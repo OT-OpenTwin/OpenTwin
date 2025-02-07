@@ -110,12 +110,12 @@ const ot::Painter2D* ot::GraphicsRectangularItem::getBackgroundPainter(void) con
 	return this->getItemConfiguration<GraphicsRectangularItemCfg>()->getBackgroundPainter();
 }
 
-void ot::GraphicsRectangularItem::setOutline(const OutlineF& _outline) {
+void ot::GraphicsRectangularItem::setOutline(const PenFCfg& _outline) {
 	this->getItemConfiguration<GraphicsRectangularItemCfg>()->setOutline(_outline);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsRectangularItem::getOutline(void) const {
+const ot::PenFCfg& ot::GraphicsRectangularItem::getOutline(void) const {
 	return this->getItemConfiguration<GraphicsRectangularItemCfg>()->getOutline();
 }
 

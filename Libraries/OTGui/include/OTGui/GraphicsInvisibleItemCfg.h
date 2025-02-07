@@ -7,7 +7,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #define OT_FactoryKey_GraphicsInvisibleItem "OT_GIInvis"

@@ -10,7 +10,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/Serializable.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -65,7 +65,7 @@ namespace ot {
 
 		Grid();
 		Grid(double _defaultGridLineWidth, const GridFlags& _flags, GridSnapMode _snapMode);
-		Grid(const Point2D& _gridStep, const Point2D& _gridWideEvery, const OutlineF& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode);
+		Grid(const Point2D& _gridStep, const Point2D& _gridWideEvery, const PenFCfg& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode);
 		Grid(const Grid& _other);
 		virtual ~Grid();
 
@@ -165,8 +165,8 @@ namespace ot {
 
 		void setGridLineColor(int _r, int _g, int _b, int _a = 255) { this->setGridLineColor(Color(_r, _g, _b, _a)); };
 		void setGridLineColor(const Color& _color) { m_lineStyle.setColor(_color); };
-		void setGridLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
-		const OutlineF& getGridLineStyle(void) const { return m_lineStyle; };
+		void setGridLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
+		const PenFCfg& getGridLineStyle(void) const { return m_lineStyle; };
 
 		//! \brief Returns true if at least one type of grid should be drawn according to the current flags.
 		bool isGridLinesValid(void) const { return (m_flags | Grid::NoGridLineMask) != NoGridLineMask; };
@@ -179,7 +179,7 @@ namespace ot {
 		Point2D m_gridStep;
 		Point2D m_gridWideEvery;
 		GridSnapMode m_snapMode;
-		OutlineF m_lineStyle;
+		PenFCfg m_lineStyle;
 	};
 }
 OT_ADD_FLAG_FUNCTIONS(ot::Grid::GridFlag)

@@ -73,8 +73,8 @@ namespace ot {
 		void setGridSnapMode(Grid::GridSnapMode _mode) { m_grid.setGridSnapMode(_mode); };
 		Grid::GridSnapMode getGridSnapMode(void) const { return m_grid.getGridSnapMode(); };
 
-		void setGridLineStyle(const OutlineF& _outline) { m_grid.setGridLineStyle(_outline); };
-		const OutlineF& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
+		void setGridLineStyle(const PenFCfg& _outline) { m_grid.setGridLineStyle(_outline); };
+		const PenFCfg& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
 		
 		void setMultiselectionEnabled(bool _enabled) { m_multiselectionEnabled = _enabled; };
 		bool getMultiselectionEnabled(void) const { return m_multiselectionEnabled; };

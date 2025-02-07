@@ -94,11 +94,11 @@ const ot::Painter2D* ot::GraphicsShapeItem::getBackgroundPainter(void) const {
 	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getBackgroundPainter();
 }
 
-void ot::GraphicsShapeItem::setOutline(const OutlineF& _outline) {
+void ot::GraphicsShapeItem::setOutline(const PenFCfg& _outline) {
 	this->getItemConfiguration<GraphicsShapeItemCfg>()->setOutline(_outline);
 }
 
-const ot::OutlineF& ot::GraphicsShapeItem::getOutline(void) const {
+const ot::PenFCfg& ot::GraphicsShapeItem::getOutline(void) const {
 	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getOutline();
 }
 

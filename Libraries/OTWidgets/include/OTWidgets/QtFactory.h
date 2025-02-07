@@ -12,8 +12,8 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Font.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/Path2D.h"
-#include "OTGui/Outline.h"
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Transform.h"
@@ -82,8 +82,8 @@ namespace ot {
 		static QFont toQFont(const Font& _f);
 		static Font toFont(const QFont& _font);
 
-		static QPen toQPen(const Outline& _outline);
-		static QPen toQPen(const OutlineF& _outline);
+		static QPen toQPen(const PenCfg& _outline);
+		static QPen toQPen(const PenFCfg& _outline);
 
 		static Qt::Alignment toQAlignment(Alignment _alignment);
 

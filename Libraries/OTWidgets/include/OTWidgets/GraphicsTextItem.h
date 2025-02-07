@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header

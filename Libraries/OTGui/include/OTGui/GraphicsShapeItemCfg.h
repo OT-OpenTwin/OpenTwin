@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/Path2D.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
@@ -72,10 +72,10 @@ namespace ot {
 
 		//! @brief Set the outline.
 		//! @param _outline Outline to set.
-		void setOutline(const OutlineF& _outline) { m_outline = _outline; };
+		void setOutline(const PenFCfg& _outline) { m_outline = _outline; };
 
 		//! @brief Outlin.
-		const OutlineF& getOutline(void) const { return m_outline; };
+		const PenFCfg& getOutline(void) const { return m_outline; };
 
 		//! @brief Set the outline painter.
 		//! The item takes ownership of the painter.
@@ -101,7 +101,7 @@ namespace ot {
 	private:
 		Path2DF m_path; //! @brief Outline path.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
-		OutlineF m_outline;
+		PenFCfg m_outline;
 		bool m_fillShape;
 	};
 

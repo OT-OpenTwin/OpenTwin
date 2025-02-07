@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 namespace ot {
@@ -50,8 +50,8 @@ namespace ot {
 		void setBackgroundPainter(Painter2D* _painter);
 		const Painter2D* getBackgroundPainter(void) const;
 
-		void setOutline(const OutlineF& _outline);
-		const OutlineF& getOutline(void) const;
+		void setOutline(const PenFCfg& _outline);
+		const PenFCfg& getOutline(void) const;
 
 		void setFillPolygon(bool _fill);
 		bool getFillPolygon(void) const;

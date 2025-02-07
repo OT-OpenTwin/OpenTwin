@@ -59,8 +59,8 @@ namespace ot {
 		void setBackgroundPainter(ot::Painter2D* _painter);
 		const ot::Painter2D* getBackgroundPainter(void) const;
 
-		void setOutline(const OutlineF& _outline);
-		const OutlineF& getOutline(void) const;
+		void setOutline(const PenFCfg& _outline);
+		const PenFCfg& getOutline(void) const;
 
 		void setTriangleShape(ot::GraphicsTriangleItemCfg::TriangleShape _shape);
 		ot::GraphicsTriangleItemCfg::TriangleShape getTriangleShape(void) const;

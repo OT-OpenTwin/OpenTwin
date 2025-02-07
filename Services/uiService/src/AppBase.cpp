@@ -1688,7 +1688,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	graphics->setSceneMargins(QMarginsF(200., 200., 200., 200.));
 	graphics->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::AutoScaleGrid);
 	graphics->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
-	ot::OutlineF newOutline;
+	ot::PenFCfg newOutline;
 	newOutline.setWidth(.8);
 	newOutline.setCap(ot::RoundCap);
 	newOutline.setStyle(ot::DotLine);
@@ -2061,7 +2061,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
-	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
+	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
 	pckg.addConnection(connectionConfig);
 
 	ot::JsonObject pckgObj;
@@ -2108,7 +2108,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsView()->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
-	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	connectionConfig.setLineStyle(ot::PenFCfg(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	pckg.addConnection(connectionConfig);
 
 	ot::JsonObject pckgObj;

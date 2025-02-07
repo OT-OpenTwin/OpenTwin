@@ -120,11 +120,11 @@ const ot::Painter2D* ot::GraphicsEllipseItem::getBackgroundPainter(void) const {
 	return this->getItemConfiguration<GraphicsEllipseItemCfg>()->getBackgroundPainter();
 }
 
-void ot::GraphicsEllipseItem::setOutline(const OutlineF& _outline) {
+void ot::GraphicsEllipseItem::setOutline(const PenFCfg& _outline) {
 	this->getItemConfiguration<GraphicsEllipseItemCfg>()->setOutline(_outline);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsEllipseItem::getOutline(void) const {
+const ot::PenFCfg& ot::GraphicsEllipseItem::getOutline(void) const {
 	return this->getItemConfiguration<GraphicsEllipseItemCfg>()->getOutline();
 }

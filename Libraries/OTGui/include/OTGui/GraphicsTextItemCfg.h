@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #define OT_FactoryKey_GraphicsTextItem "OT_GIText"
@@ -51,8 +51,8 @@ namespace ot {
 
 		void setTextLineWidth(double _width) { m_textStyle.setWidth(_width); };
 
-		void setTextStyle(const OutlineF& _style) { m_textStyle = _style; };
-		const OutlineF& getTextStyle(void) const { return m_textStyle; };
+		void setTextStyle(const PenFCfg& _style) { m_textStyle = _style; };
+		const PenFCfg& getTextStyle(void) const { return m_textStyle; };
 
 		//! \brief Sets the text is reference mode.
 		//! \see getTextIsReference
@@ -65,7 +65,7 @@ namespace ot {
 	private:
 		std::string m_text;
 		ot::Font    m_textFont;
-		OutlineF	m_textStyle;
+		PenFCfg	m_textStyle;
 		bool m_textIsReference;
 
 		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;

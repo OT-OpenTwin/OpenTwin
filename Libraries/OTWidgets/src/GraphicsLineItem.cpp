@@ -115,12 +115,12 @@ QLineF ot::GraphicsLineItem::getLine(void) const {
 	return QLineF(QtFactory::toQPoint(cfg->getFrom()), QtFactory::toQPoint(cfg->getTo()));
 }
 
-void ot::GraphicsLineItem::setLineStyle(const OutlineF& _style) {	
+void ot::GraphicsLineItem::setLineStyle(const PenFCfg& _style) {	
 	this->getItemConfiguration<GraphicsLineItemCfg>()->setLineStyle(_style);
 	this->update();
 }
 
-const ot::OutlineF& ot::GraphicsLineItem::getLineStyle(void) const {
+const ot::PenFCfg& ot::GraphicsLineItem::getLineStyle(void) const {
 	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
 	return cfg->getLineStyle();
 }

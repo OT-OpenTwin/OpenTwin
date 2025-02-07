@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
@@ -56,8 +56,8 @@ namespace ot {
 		void setBackgroundPainter(ot::Painter2D* _painter);
 		const ot::Painter2D* getBackgroundPainter(void) const;
 
-		void setOutline(const OutlineF& _outline);
-		const OutlineF& getOutline(void) const;
+		void setOutline(const PenFCfg& _outline);
+		const PenFCfg& getOutline(void) const;
 	};
 
 }

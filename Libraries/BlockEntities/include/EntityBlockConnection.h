@@ -25,7 +25,7 @@ private:
 	std::string _navigationOldTreeIconName = "";
 	std::string _navigationOldTreeIconNameHidden = "";
 	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
-	ot::OutlineF m_lineStyle;
+	ot::PenFCfg m_lineStyle;
 
 	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;

@@ -6,7 +6,11 @@
 // OpenTwin header
 #include "OTGui/Border.h"
 
-ot::Border::Border(const ot::Color& _color, int _width) 
+ot::Border::Border(const PenCfg& _pen)
+	: m_top(_pen), m_left(_pen), m_right(_pen), m_bottom(_pen)
+{}
+
+ot::Border::Border(const ot::Color& _color, int _width)
 	: m_top(_width, _color), m_left(_width, _color), m_right(_width, _color), m_bottom(_width, _color)
 {}
 
@@ -14,7 +18,7 @@ ot::Border::Border(const ot::Color& _color, int _leftWidth, int _topWidth, int _
 	: m_top(_topWidth, _color), m_left(_leftWidth, _color), m_right(_rightWidth, _color), m_bottom(_bottomWidth, _color) 
 {}
 
-ot::Border::Border(const Outline& _left, const Outline& _top, const Outline& _right, const Outline& _bottom)
+ot::Border::Border(const PenCfg& _left, const PenCfg& _top, const PenCfg& _right, const PenCfg& _bottom)
 	: m_top(_top), m_left(_left), m_right(_right), m_bottom(_bottom)
 {}
 
@@ -83,7 +87,7 @@ ot::BorderF::BorderF(const ot::Color& _color, double _leftWidth, double _topWidt
 	: m_top(_topWidth, _color), m_left(_leftWidth, _color), m_right(_rightWidth, _color), m_bottom(_bottomWidth, _color)
 {}
 
-ot::BorderF::BorderF(const OutlineF& _left, const OutlineF& _top, const OutlineF& _right, const OutlineF& _bottom)
+ot::BorderF::BorderF(const PenFCfg& _left, const PenFCfg& _top, const PenFCfg& _right, const PenFCfg& _bottom)
 	: m_top(_top), m_left(_left), m_right(_right), m_bottom(_bottom)
 {}
 

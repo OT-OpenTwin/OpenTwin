@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTCore/Rect.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #define OT_FactoryKey_GraphicsArcItem "OT_GIArc"
@@ -70,14 +70,14 @@ namespace ot {
 		//! @brief Background painter.
 		const Painter2D* getPainter(void) const { return m_lineStyle.painter(); };
 
-		void setLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
-		const OutlineF& getLineStyle(void) const { return m_lineStyle; };
+		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
+		const PenFCfg& getLineStyle(void) const { return m_lineStyle; };
 
 	private:
 		RectD m_rect;
 		double m_startAngle;
 		double m_spanAngle;
-		OutlineF m_lineStyle; //! \brief Line style.
+		PenFCfg m_lineStyle; //! \brief Line style.
 	};
 
 }

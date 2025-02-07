@@ -14,7 +14,7 @@
 #include "OTWidgets/GraphicsScene.h"
 
 WrappedSquareItem::WrappedSquareItem() {
-	this->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	this->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 }
 
@@ -35,7 +35,7 @@ ot::TreeWidgetItemInfo WrappedSquareItem::createNavigationInformation(void) {
 }
 
 void WrappedSquareItem::makeItemTransparent(void) {
-	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
+	this->setOutline(ot::PenFCfg(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
 }
 
@@ -117,7 +117,7 @@ void WrappedSquareItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle = this->getOutline();
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setOutline(lineStyle);
 	}
@@ -128,7 +128,7 @@ void WrappedSquareItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle = this->getOutline();
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setOutline(lineStyle);
 	}

@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/Rect.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 namespace ot {
@@ -51,8 +51,8 @@ namespace ot {
 		void setSpanAngle(double _angle);
 		double getSpanAngle(void) const;
 
-		void setLineStyle(const OutlineF& _style);
-		const OutlineF& getLineStyle(void) const;
+		void setLineStyle(const PenFCfg& _style);
+		const PenFCfg& getLineStyle(void) const;
 	};
 
 

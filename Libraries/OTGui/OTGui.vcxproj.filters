@@ -200,7 +200,7 @@
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\Outline.h">
+    <ClInclude Include="include\OTGui\PenCfg.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\Painter2DFactory.h">
@@ -520,7 +520,7 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Outline.cpp">
+    <ClCompile Include="src\PenCfg.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\Painter2DFactory.cpp">

@@ -18,7 +18,7 @@
 static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(OT_FactoryKey_GraphicsLineItem);
 
 WrappedLineItem::WrappedLineItem() {
-	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));
+	this->setLineStyle(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));
 }
 
 WrappedLineItem::~WrappedLineItem() {
@@ -147,7 +147,7 @@ void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle = this->getLineStyle();
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
@@ -158,7 +158,7 @@ void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::OutlineF lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle = this->getLineStyle();
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}

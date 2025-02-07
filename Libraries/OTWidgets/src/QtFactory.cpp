@@ -38,12 +38,12 @@ ot::Font ot::QtFactory::toFont(const QFont& _font) {
     return font;
 }
 
-QPen ot::QtFactory::toQPen(const Outline& _outline) {
+QPen ot::QtFactory::toQPen(const PenCfg& _outline) {
     if (_outline.width() <= 0) return QPen(Qt::NoPen);
     else return QPen(toQBrush(_outline.painter()), (qreal)_outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
 }
 
-QPen ot::QtFactory::toQPen(const OutlineF& _outline) {
+QPen ot::QtFactory::toQPen(const PenFCfg& _outline) {
     if (_outline.width() <= 0.) return QPen(Qt::NoPen);
     else return QPen(toQBrush(_outline.painter()), _outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
 }

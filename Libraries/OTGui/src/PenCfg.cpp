@@ -1,12 +1,11 @@
-//! @file Outline.cpp
-//! 
+//! @file PenCfg.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
 
@@ -90,19 +89,19 @@ ot::LineJoinStyle ot::stringToJoinStyle(const std::string& _join) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::Outline::Outline()
+ot::PenCfg::PenCfg()
 	: m_width(1), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(Black);
 }
 
-ot::Outline::Outline(const Color& _color)
+ot::PenCfg::PenCfg(const Color& _color)
 	: m_width(1), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(_color);
 }
 
-ot::Outline::Outline(Painter2D* _painter)
+ot::PenCfg::PenCfg(Painter2D* _painter)
 	: m_width(1), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
@@ -111,13 +110,13 @@ ot::Outline::Outline(Painter2D* _painter)
 	}
 }
 
-ot::Outline::Outline(int _width, const Color& _color)
+ot::PenCfg::PenCfg(int _width, const Color& _color)
 	: m_width(_width), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(_color);
 }
 
-ot::Outline::Outline(int _width, Painter2D* _painter)
+ot::PenCfg::PenCfg(int _width, Painter2D* _painter)
 	: m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
@@ -126,18 +125,18 @@ ot::Outline::Outline(int _width, Painter2D* _painter)
 	}
 }
 
-ot::Outline::Outline(const Outline& _other)
+ot::PenCfg::PenCfg(const PenCfg& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
 	this->setPainter(_other.m_painter->createCopy());
 }
 
-ot::Outline::~Outline() {
+ot::PenCfg::~PenCfg() {
 	if (m_painter) delete m_painter;
 	m_painter = nullptr;
 }
 
-ot::Outline& ot::Outline::operator = (const Outline& _other) {
+ot::PenCfg& ot::PenCfg::operator = (const PenCfg& _other) {
 	if (this == &_other) return *this;
 	m_width = _other.m_width;
 	m_style = _other.m_style;
@@ -149,7 +148,7 @@ ot::Outline& ot::Outline::operator = (const Outline& _other) {
 	return *this;
 }
 
-void ot::Outline::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+void ot::PenCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Width", m_width, _allocator);
 	_object.AddMember("Style", JsonString(toString(m_style), _allocator), _allocator);
 	_object.AddMember("Cap", JsonString(toString(m_cap), _allocator), _allocator);
@@ -160,7 +159,7 @@ void ot::Outline::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _al
 	_object.AddMember("Painter", painterObj, _allocator);
 }
 
-void ot::Outline::setFromJsonObject(const ot::ConstJsonObject& _object) {
+void ot::PenCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_width = json::getInt(_object, "Width");
 	m_style = stringToLineStyle(json::getString(_object, "Style"));
 	m_cap = stringToCapStyle(json::getString(_object, "Cap"));
@@ -173,11 +172,11 @@ void ot::Outline::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
-void ot::Outline::setColor(const Color& _color) {
+void ot::PenCfg::setColor(const Color& _color) {
 	this->setPainter(new FillPainter2D(_color));
 }
 
-void ot::Outline::setPainter(Painter2D* _painter) {
+void ot::PenCfg::setPainter(Painter2D* _painter) {
 	if (m_painter == _painter) return;
 	if (!_painter) {
 		OT_LOG_W("Nullptr provided. Ignoring");
@@ -188,18 +187,18 @@ void ot::Outline::setPainter(Painter2D* _painter) {
 	m_painter = _painter;
 }
 
-ot::Painter2D* ot::Outline::takePainter(void) {
+ot::Painter2D* ot::PenCfg::takePainter(void) {
 	Painter2D* ret = m_painter;
 	m_painter = new FillPainter2D(Black);
 	return ret;
 }
 
-ot::OutlineF ot::Outline::toOutlineF(void) const {
+ot::PenFCfg ot::PenCfg::toPenFCfg(void) const {
 	if (m_painter) {
-		return OutlineF((double)m_width, m_painter->createCopy());
+		return PenFCfg((double)m_width, m_painter->createCopy());
 	}
 	else {
-		return OutlineF((double)m_width, Color());
+		return PenFCfg((double)m_width, Color());
 	}
 }
 
@@ -209,19 +208,19 @@ ot::OutlineF ot::Outline::toOutlineF(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::OutlineF::OutlineF()
+ot::PenFCfg::PenFCfg()
 	: m_width(1.), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(Black);
 }
 
-ot::OutlineF::OutlineF(const Color& _color)
+ot::PenFCfg::PenFCfg(const Color& _color)
 	: m_width(1.), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(_color);
 }
 
-ot::OutlineF::OutlineF(Painter2D* _painter)
+ot::PenFCfg::PenFCfg(Painter2D* _painter)
 	: m_width(1.), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
@@ -230,13 +229,13 @@ ot::OutlineF::OutlineF(Painter2D* _painter)
 	}
 }
 
-ot::OutlineF::OutlineF(double _width, const Color& _color)
+ot::PenFCfg::PenFCfg(double _width, const Color& _color)
 	: m_width(_width), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	m_painter = new FillPainter2D(_color);
 }
 
-ot::OutlineF::OutlineF(double _width, Painter2D* _painter)
+ot::PenFCfg::PenFCfg(double _width, Painter2D* _painter)
 	: m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
@@ -245,18 +244,18 @@ ot::OutlineF::OutlineF(double _width, Painter2D* _painter)
 	}
 }
 
-ot::OutlineF::OutlineF(const OutlineF& _other)
+ot::PenFCfg::PenFCfg(const PenFCfg& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
 	this->setPainter(_other.m_painter->createCopy());
 }
 
-ot::OutlineF::~OutlineF() {
+ot::PenFCfg::~PenFCfg() {
 	if (m_painter) delete m_painter;
 	m_painter = nullptr;
 }
 
-ot::OutlineF& ot::OutlineF::operator = (const OutlineF& _other) {
+ot::PenFCfg& ot::PenFCfg::operator = (const PenFCfg& _other) {
 	if (this == &_other) return *this;
 	m_width = _other.m_width;
 	m_style = _other.m_style;
@@ -268,7 +267,7 @@ ot::OutlineF& ot::OutlineF::operator = (const OutlineF& _other) {
 	return *this;
 }
 
-void ot::OutlineF::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+void ot::PenFCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Width", m_width, _allocator);
 	_object.AddMember("Style", JsonString(toString(m_style), _allocator), _allocator);
 	_object.AddMember("Cap", JsonString(toString(m_cap), _allocator), _allocator);
@@ -279,7 +278,7 @@ void ot::OutlineF::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 	_object.AddMember("Painter", painterObj, _allocator);
 }
 
-void ot::OutlineF::setFromJsonObject(const ot::ConstJsonObject& _object) {
+void ot::PenFCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_width = json::getDouble(_object, "Width");
 	m_style = stringToLineStyle(json::getString(_object, "Style"));
 	m_cap = stringToCapStyle(json::getString(_object, "Cap"));
@@ -292,11 +291,11 @@ void ot::OutlineF::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
-void ot::OutlineF::setColor(const Color& _color) {
+void ot::PenFCfg::setColor(const Color& _color) {
 	this->setPainter(new FillPainter2D(_color));
 }
 
-void ot::OutlineF::setPainter(Painter2D* _painter) {
+void ot::PenFCfg::setPainter(Painter2D* _painter) {
 	if (m_painter == _painter) return;
 	if (!_painter) {
 		OT_LOG_W("Nullptr provided. Ignoring");
@@ -307,17 +306,17 @@ void ot::OutlineF::setPainter(Painter2D* _painter) {
 	m_painter = _painter;
 }
 
-ot::Painter2D* ot::OutlineF::takePainter(void) {
+ot::Painter2D* ot::PenFCfg::takePainter(void) {
 	Painter2D* ret = m_painter;
 	m_painter = new FillPainter2D(Black);
 	return ret;
 }
 
-ot::Outline ot::OutlineF::toOutline(void) const {
+ot::PenCfg ot::PenFCfg::toPenCfg(void) const {
 	if (m_painter) {
-		return Outline((int)m_width, m_painter->createCopy());
+		return PenCfg((int)m_width, m_painter->createCopy());
 	}
 	else {
-		return Outline((int)m_width, Color());
+		return PenCfg((int)m_width, Color());
 	}
 }

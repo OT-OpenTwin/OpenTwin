@@ -441,7 +441,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
 	connection1->setName("Left3");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
-	connection1->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
+	connection1->setOutline(ot::PenFCfg(1., ot::Color(ot::Black)));
 	connection1->setBackgroundPainer(painter1);
 	connection1->setAlignment(ot::AlignCenter);
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
@@ -450,7 +450,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
 	connection2->setName("Right3");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
-	connection2->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
+	connection2->setOutline(ot::PenFCfg(1., ot::Color(ot::Black)));
 	connection2->setBackgroundPainer(painter2);
 	connection2->setAlignment(ot::AlignCenter);
 	connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));

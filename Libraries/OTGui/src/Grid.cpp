@@ -97,7 +97,7 @@ ot::Grid::Grid(double _defaultGridLineWidth, const GridFlags& _flags, GridSnapMo
 	: m_flags(_flags), m_gridStep(10, 10), m_gridWideEvery(10, 10), m_snapMode(_snapMode)
 {}
 
-ot::Grid::Grid(const Point2D& _gridStep, const Point2D& _gridWideEvery, const OutlineF& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode)
+ot::Grid::Grid(const Point2D& _gridStep, const Point2D& _gridWideEvery, const PenFCfg& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode)
 	: m_flags(_flags), m_gridStep(_gridStep), m_gridWideEvery(_gridWideEvery), m_snapMode(_snapMode), m_lineStyle(_gridLineStyle)
 {}
 

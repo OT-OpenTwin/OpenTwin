@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
+#include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
@@ -52,8 +52,8 @@ namespace ot {
 		const Point2DD& getTo(void) const;
 		QLineF getLine(void) const;
 
-		void setLineStyle(const OutlineF& _style);
-		const OutlineF& getLineStyle(void) const;
+		void setLineStyle(const PenFCfg& _style);
+		const PenFCfg& getLineStyle(void) const;
 	};
 
 

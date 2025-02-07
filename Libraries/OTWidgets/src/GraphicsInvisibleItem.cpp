@@ -63,12 +63,12 @@ void ot::GraphicsInvisibleItem::paintCustomItem(QPainter* _painter, const QStyle
 
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
-			OutlineF selectedOutline(1., GraphicsItem::createSelectionBorderPainter());
+			PenFCfg selectedOutline(1., GraphicsItem::createSelectionBorderPainter());
 			_painter->setPen(QtFactory::toQPen(selectedOutline));
 			_painter->drawEllipse(br);
 		}
 		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
-			OutlineF hoverOutline(1., GraphicsItem::createHoverBorderPainter());
+			PenFCfg hoverOutline(1., GraphicsItem::createHoverBorderPainter());
 			_painter->setPen(QtFactory::toQPen(hoverOutline));
 			_painter->drawEllipse(br);
 		}
