@@ -19,7 +19,7 @@ public:
 
 	virtual std::string getClassName(void) { return "EntityCompressedVector"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
 
 	void setTolerance(double tol);

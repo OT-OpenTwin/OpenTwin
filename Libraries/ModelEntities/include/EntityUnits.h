@@ -11,7 +11,7 @@ public:
 	EntityUnits(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	
 	virtual void createProperties(void);
 	virtual bool updateFromProperties(void) override;

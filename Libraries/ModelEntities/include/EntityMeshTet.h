@@ -42,7 +42,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityMeshTet"; };
 	virtual void addVisualizationNodes(void) override;
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
 	bool getMeshValid(void) { return meshValid; }

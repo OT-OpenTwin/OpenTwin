@@ -27,9 +27,9 @@ public:
 	void setVersion(EntityVersion version) { m_entityVersion = version; };
 	void setEntityType(tEntityType type) { m_entityType = type; };
 
-	EntityID getParentEntityID(void) { return m_parentEntityID; };
-	EntityVersion getEntityVersion(void) { return m_entityVersion; };
-	tEntityType getEntityType(void) { return m_entityType; };
+	EntityID getParentEntityID(void) const { return m_parentEntityID; };
+	EntityVersion getEntityVersion(void) const { return m_entityVersion; };
+	tEntityType getEntityType(void) const { return m_entityType; };
 
 private:
 	EntityVersion m_entityVersion;

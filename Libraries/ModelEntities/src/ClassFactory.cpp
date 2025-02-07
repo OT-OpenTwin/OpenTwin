@@ -60,7 +60,7 @@
 #include "EntityResultUnstructuredMeshData.h"
 #include "EntitySolverCircuitSimulator.h"
 #include "EntityResult1DPlot_New.h"
-
+#include "EntityResult1DCurve_New.h"
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredVectorVolume.h"
@@ -344,6 +344,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityResult1DPlot_New")
 	{
 		return new EntityResult1DPlot_New(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityResult1DCurve_New")
+	{
+		return new EntityResult1DCurve_New(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

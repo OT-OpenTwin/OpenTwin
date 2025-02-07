@@ -109,7 +109,7 @@ public:
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds);
 
 	enum entityType {TOPOLOGY, DATA};
-	virtual entityType getEntityType(void) = 0;
+	virtual entityType getEntityType(void) const = 0;
 
 	void setOwningService(const std::string &owner) { m_owningService = owner; };
 	const std::string &getOwningService(void) { return m_owningService; };

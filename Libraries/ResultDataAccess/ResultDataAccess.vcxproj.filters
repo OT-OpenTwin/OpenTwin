@@ -122,6 +122,9 @@
     <ClInclude Include="include\ResultImportLoggerEntry.h">
       <Filter>include\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="include\PlotBuilder.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -176,6 +179,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ResultImportLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotBuilder.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

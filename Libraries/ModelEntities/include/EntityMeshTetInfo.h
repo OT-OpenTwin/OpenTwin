@@ -16,7 +16,7 @@ public:
 
 	virtual std::string getClassName(void) { return "EntityMeshTetInfo"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 
 	void addGeneralData(ot::UID dataID, ot::UID dataVersion) { generalData.push_back(std::pair<ot::UID, ot::UID>(dataID, dataVersion)); };
 	void addFacesData(ot::UID dataID, ot::UID dataVersion) { facesData.push_back(std::pair<ot::UID, ot::UID>(dataID, dataVersion)); };

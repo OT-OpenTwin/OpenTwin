@@ -6,7 +6,7 @@ class __declspec(dllexport) EntityBlockFileWriter : public EntityBlock
 public:
 	EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockFileWriter"; };
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	void createProperties();
 	const std::string& getHeadline();

@@ -11,7 +11,7 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntitySignalType"; };
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };

@@ -42,7 +42,7 @@ public:
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) override;
 
-	virtual entityType getEntityType(void) override;
+	virtual entityType getEntityType(void) const override;
 
 	void setCreateVisualizationItem(bool flag);
 	bool getCreateVisualizationItem(void) { return createVisualizationItem; }

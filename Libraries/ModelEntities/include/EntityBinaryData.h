@@ -17,7 +17,7 @@ public:
 
 	virtual std::string getClassName(void) { return "EntityBinaryData"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
 
 	void setData(const char *dat, size_t length);

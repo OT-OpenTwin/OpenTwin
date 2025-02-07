@@ -22,10 +22,13 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelAPIManager.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />
+    <ClCompile Include="src\ModelStateInformationHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTModelAPI\ModelAPIManager.h" />
     <ClInclude Include="include\OTModelAPI\ModelServiceAPI.h" />
+    <ClInclude Include="include\OTModelAPI\ModelStateInformationHelper.h" />
+    <ClInclude Include="include\OTModelAPI\NewModelStateInformation.h" />
     <ClInclude Include="include\OTModelAPI\OTModelAPIExport.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

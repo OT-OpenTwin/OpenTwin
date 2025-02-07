@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\AdvancedQueryBuilder.h" />
+    <ClInclude Include="include\PlotBuilder.h" />
     <ClInclude Include="include\ResultImportLoggerEntry.h" />
     <ClInclude Include="include\ResultImportLoggerVerbosity.h" />
     <ClInclude Include="include\ParameterDescription.h" />
@@ -54,6 +55,7 @@
     <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
     <ClCompile Include="src\DatasetDescription.cpp" />
     <ClCompile Include="src\DatasetOverviewVisualiser.cpp" />
+    <ClCompile Include="src\PlotBuilder.cpp" />
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\QuantityContainerSerialiser.cpp" />
     <ClCompile Include="src\QuantityDescription.cpp" />

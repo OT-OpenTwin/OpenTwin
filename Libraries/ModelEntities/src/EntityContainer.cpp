@@ -256,7 +256,7 @@ void EntityContainer::addPrefetchingRequirementsForTopology(std::list<ot::UID> &
 	}
 }
 
-EntityContainer::entityType EntityContainer::getEntityType(void) 
+EntityContainer::entityType EntityContainer::getEntityType(void) const
 {
 	if (createVisualizationItem)
 	{

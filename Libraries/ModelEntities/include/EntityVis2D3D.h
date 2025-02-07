@@ -17,7 +17,7 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntityVis2D3D"; } ;
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };

@@ -161,6 +161,17 @@ void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDL
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
+void ot::ModelServiceAPI::addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation, bool saveModel)
+{
+	addEntitiesToModel(_newModelStateInfos.m_topologyEntityIDs,
+		_newModelStateInfos.m_topologyEntityVersions,
+		_newModelStateInfos.m_forceVisible,
+		_newModelStateInfos.m_dataEntityIDs,
+		_newModelStateInfos.m_dataEntityVersions,
+		_newModelStateInfos.m_dataEntityParentIDs,
+		_changeComment, askForBranchCreation, saveModel);
+}
+
 void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName,
 	std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList,
 	const std::string& _changeComment) {

@@ -63,7 +63,7 @@ public:
 	long long getMeshDataTetsStorageId(void) { return meshDataTetsStorageId; };
 	long long getMeshDataTetedgesStorageId(void) { return meshDataTetEdgesStorageId; };
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
 	BoundingBox &getBoundingBox(void) { return boundingBox; }

@@ -5,7 +5,7 @@ class __declspec(dllexport) EntityBlockPlot1D : public EntityBlock
 public:
 	EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockPlot1D"; };
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	virtual bool updateFromProperties() override;
 
 	void createProperties();

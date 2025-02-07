@@ -40,7 +40,7 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntityMeshCartesianItem"; };
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	BoundingBox &getBoundingBox(void) { return boundingBox; }
 

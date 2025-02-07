@@ -23,7 +23,7 @@ public:
 
 	virtual std::string getClassName(void) { return "EntityMeshCartesianFaceList"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
 
 private:

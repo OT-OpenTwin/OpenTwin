@@ -71,7 +71,7 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 	for (ot::UID uid : selectedEntities) {
 		// Find entity
 		EntityBase* entity = model->getEntityByID(uid);
-
+		EntityBase* base = entity->clone(); //besser die serialisierung zurückgeben.
 		if (entity) {
 			// Serialize entity
 
@@ -126,6 +126,8 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 				{
 					entity->restoreFromDataBase(nullptr, model, model->getStateManager(), serialisedEntityBSONView, entityMap);
 					newEntities.push_back(std::move(entity));
+					//Positions anpassung
+					//Selektion der neuen Entities.
 				}
 				catch (std::exception& e)
 				{

@@ -27,7 +27,7 @@ public:
 
 	virtual std::string getClassName(void) override { return "EntityFacetData"; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
 	virtual int getSchemaVersion(void) override { return 1; };

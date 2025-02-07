@@ -21,7 +21,7 @@ public:
 	
 	virtual std::string getClassName(void) { return "EntityResult3DData"; };
 	
-	virtual entityType getEntityType(void) override { return DATA;};
+	virtual entityType getEntityType(void) const override { return DATA;};
 
 	/**
 	 * @brief  .

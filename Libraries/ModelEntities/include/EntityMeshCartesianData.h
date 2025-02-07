@@ -32,7 +32,7 @@ public:
 
 	virtual std::string getClassName(void) { return "EntityMeshCartesianData"; }
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	virtual void removeChild(EntityBase *child) override;
 

@@ -11,7 +11,7 @@ public:
 	EntityTableSelectedRanges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	virtual std::string getClassName(void) { return "EntityTableSelectedRanges"; };
-	virtual entityType getEntityType() override { return TOPOLOGY; }
+	virtual entityType getEntityType() const override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;
 	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType);

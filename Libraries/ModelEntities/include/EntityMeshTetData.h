@@ -55,7 +55,7 @@ public:
 	EntityMeshTetNodes *getMeshNodes(void) { return meshNodes; };
 	EntityMeshTetFaceData *getMeshFaces(void) { return meshFaces; };
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	virtual void removeChild(EntityBase *child) override;
 

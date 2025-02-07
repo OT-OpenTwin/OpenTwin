@@ -24,6 +24,9 @@
     <ClCompile Include="src\ModelServiceAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ModelStateInformationHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTModelAPI\OTModelAPIExport.h">
@@ -33,6 +36,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTModelAPI\ModelServiceAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTModelAPI\NewModelStateInformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTModelAPI\ModelStateInformationHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

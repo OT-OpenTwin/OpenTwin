@@ -128,6 +128,19 @@ void PropertyHelper::setStringPropertyValue(const std::string& _value, EntityBas
 	stringProperty->setValue(_value);
 }
 
+void PropertyHelper::setSelectionPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesSelection* selectionProperty = getSelectionProperty(_base, _name, _groupName);
+	const std::vector<std::string> options = selectionProperty->getOptions();
+	bool valueIsNoOption = std::find(options.begin(), options.end(), _value) == options.end();
+	if (valueIsNoOption)
+	{
+		throw std::exception("Tried to set a value that is not an option in the selection entity.");
+	}
+
+	selectionProperty->setValue(_value);
+}
+
 void PropertyHelper::setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesBoolean* booleanProeprty = getBoolProperty(_base, _name, _groupName);

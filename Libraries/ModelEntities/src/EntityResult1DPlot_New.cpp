@@ -28,7 +28,7 @@ void EntityResult1DPlot_New::addVisualizationNodes(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
 	ot::VisualisationTypes visTypes;
-	visTypes.addTextVisualisation();
+	visTypes.addPlot1DVisualisation();
 
 	visTypes.addToJsonObject(doc, doc.GetAllocator());
 	treeIcons.addToJsonDoc(doc);
@@ -142,8 +142,9 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
 	const std::string title = PropertyHelper::getStringPropertyValue(this, "Title");
-	const std::string plotType = PropertyHelper::getStringPropertyValue(this, "Plot type");
-	const std::string xAxisQuantity = PropertyHelper::getStringPropertyValue(this, "Plot type");
+	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type");
+	const std::string plotQuantity = PropertyHelper::getSelectionPropertyValue(this, "Plot quantity");
+
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
 	
@@ -165,7 +166,7 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
-	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(xAxisQuantity));
+	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));
 
 	config.setGridColor(ot::Color(gridColorR, gridColorG, gridColorB));
 	config.setGridVisible(gridVisible);
@@ -199,6 +200,27 @@ void EntityResult1DPlot_New::readSpecificDataFromDataBase(bsoncxx::document::vie
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 	
 	resetModified();
+}
+
+void EntityResult1DPlot_New::setPlot(const ot::Plot1DCfg& _config)
+{
+	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
+	PropertyHelper::setStringPropertyValue(_config.getTitle(), this, "Title");
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::plotTypeToString(_config.getPlotType()), this, "Plot type");
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::axisQuantityToString(_config.getAxisQuantity()), this, "Plot quantity");
+	
+	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
+	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
+
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale X");
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale X");
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "X min");
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "X max");
+
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale Y");
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale Y");
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Y min");
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Y max");
 }
 
 

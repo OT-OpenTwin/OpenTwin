@@ -26,7 +26,7 @@ public:
 
 	void addMeshFaceStorageIds(EntityMeshTetInfo *meshInfo);
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
 
 	std::map<int, EntityMeshTetFace*> getAllFaces(void) { return meshFaces; }

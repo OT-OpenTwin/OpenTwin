@@ -21,7 +21,7 @@ public:
 
 	virtual std::string getClassName(void) { return className; };
 
-	virtual entityType getEntityType(void) override { return DATA; };
+	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
 
 	void setNumberOfColumns(uint64_t cols);

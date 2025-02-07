@@ -45,7 +45,7 @@ public:
 	void addPrefetchingRequirementsForBrep(std::list<ot::UID> &prefetchIds);
 	void addPrefetchingRequirementsForFacets(std::list<ot::UID> &prefetchIds);
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
 	long long getBrepPrefetchID(void);

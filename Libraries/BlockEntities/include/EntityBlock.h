@@ -23,7 +23,7 @@ public:
 	virtual ~EntityBlock();
 
 	virtual std::string getClassName(void) override { return "EntityBlock"; };
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual void addVisualizationNodes(void) override;
 

@@ -17,7 +17,7 @@ public:
 	
 	virtual std::string getClassName(void) { return "EntityResultUnstructuredMesh"; };
 	
-	virtual entityType getEntityType(void) override { return DATA;};
+	virtual entityType getEntityType(void) const override { return DATA;};
 
 	void GetPointCoordData(size_t& numberPoints, double *&x, double*& y, double*& z, ClassFactoryHandler* factory);
 	void GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactoryHandler* factory);

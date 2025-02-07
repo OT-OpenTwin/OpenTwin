@@ -35,7 +35,7 @@ public:
 
 	void addVisualizationItem(bool isHidden);
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void)const  override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
 	EntityAnnotationData *getAnnotationData(void) { EnsureAnnotationDataIsLoaded(); return annotationData; }

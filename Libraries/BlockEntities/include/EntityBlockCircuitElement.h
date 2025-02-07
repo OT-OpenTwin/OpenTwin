@@ -5,7 +5,7 @@ class __declspec(dllexport) EntityBlockCircuitElement : public EntityBlock
 public:
 	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitElement"; };
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties() = 0;
 	
 	

@@ -11,7 +11,7 @@
 #include "OTModelAPI/OTModelAPIExport.h"
 #include "EntityBase.h"
 #include "EntityInformation.h"
-
+#include "NewModelStateInformation.h"
 // std header
 #include <string>
 #include <list>
@@ -36,6 +36,7 @@ namespace ot {
 		// Entity management
 		static void addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
+		static void addEntitiesToModel(NewModelStateInformation& _newModelStateInfos, const std::string& _changeComment, bool askForBranchCreation = true, bool saveModel = true);
 		static void addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName, std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList, const std::string& _changeComment);
 		static void deleteEntitiesFromModel(std::list<std::string>& _entityNameList, bool _saveModel = true);
 		static void getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo);

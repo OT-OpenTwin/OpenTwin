@@ -21,7 +21,7 @@ public:
 	EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	virtual std::string getClassName(void) override { return "EntityBlockStorage"; };
-	virtual entityType getEntityType(void) override { return TOPOLOGY; }
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	void createProperties();
 	virtual bool updateFromProperties() override;
 

@@ -409,6 +409,9 @@
     <ClInclude Include="include\PropertyHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityResult1DCurve_New.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -691,6 +694,9 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResult1DCurve_New.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

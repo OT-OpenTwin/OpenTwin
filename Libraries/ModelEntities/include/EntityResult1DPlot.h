@@ -25,7 +25,7 @@ public:
 
 	void addVisualizationItem(bool isHidden);
 
-	virtual entityType getEntityType(void) override { return TOPOLOGY; };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	void createProperties(void);
 

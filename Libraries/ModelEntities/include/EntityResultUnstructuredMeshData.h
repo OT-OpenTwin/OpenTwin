@@ -18,7 +18,7 @@ public:
 	
 	virtual std::string getClassName(void) { return "EntityResultUnstructuredMeshData"; };
 	
-	virtual entityType getEntityType(void) override { return DATA;};
+	virtual entityType getEntityType(void) const override { return DATA;};
 
 	long long getNumberOfPoints(void) { return _numberPoints; };
 	long long getNumberOfCells(void) { return _numberCells; };
