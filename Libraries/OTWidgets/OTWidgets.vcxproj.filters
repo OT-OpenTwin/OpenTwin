@@ -472,6 +472,12 @@
     <ClCompile Include="src\DirectoryBrowser.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\SVGWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SVGWidgetGrid.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -911,6 +917,9 @@
     <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\SVGWidgetGrid.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1088,6 +1097,9 @@
       <Filter>include\WidgetView</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\SVGWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

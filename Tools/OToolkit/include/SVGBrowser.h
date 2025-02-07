@@ -14,6 +14,8 @@
 // Qt header
 #include <QtCore/qstring.h>
 
+namespace ot { class SVGWidgetGrid; }
+
 class SVGBrowser : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
@@ -42,7 +44,7 @@ private Q_SLOTS:
 	void slotPathChanged(const QString& _path);
 
 private:
-	
+	ot::SVGWidgetGrid* m_grid;
 
 };
 

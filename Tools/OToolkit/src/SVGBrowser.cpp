@@ -8,11 +8,12 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/SVGWidgetGrid.h"
 #include "OTWidgets/DirectoryBrowser.h"
 
 using namespace ot;
 
-SVGBrowser::SVGBrowser() {
+SVGBrowser::SVGBrowser() : m_grid(nullptr) {
 
 }
 
@@ -21,6 +22,9 @@ SVGBrowser::~SVGBrowser() {
 }
 
 bool SVGBrowser::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
+	m_grid = new SVGWidgetGrid;
+	_content.addView(this->createCentralWidgetView(m_grid->getQWidget(), "SVG View"));
+
 	DirectoryBrowser* newBrowser = new DirectoryBrowser;
 
 	_content.addView(this->createSideWidgetView(newBrowser->getQWidget(), "SVG Browser"));
@@ -41,4 +45,5 @@ bool SVGBrowser::prepareToolShutdown(QSettings& _settings) {
 
 void SVGBrowser::slotPathChanged(const QString& _path) {
 	OT_LOG_D(_path.toStdString());
+	m_grid->fillFromPath(_path);
 }
