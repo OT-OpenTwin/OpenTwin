@@ -305,7 +305,30 @@ std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _d
 	return buildInfo;
 }
 
+std::string GlobalSessionService::handlePrepareFrontendInstaller(ot::JsonDocument& _doc)
+{
+	m_frontendInstallerFileContent.clear();
+	
+	loadFrontendInstallerFile();
+
+	return std::to_string(m_frontendInstallerFileContent.size()+1);
+}
+
 std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _doc)
+{
+	if (m_frontendInstallerFileContent.empty())
+	{
+		loadFrontendInstallerFile();
+	}
+
+	std::string tmp = m_frontendInstallerFileContent;
+
+	m_frontendInstallerFileContent.clear();
+
+	return tmp;
+}
+
+void GlobalSessionService::loadFrontendInstallerFile()
 {
 	std::string installerPath;
 
@@ -332,10 +355,7 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 		installerPath = dev_root + "\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
 	}
 
-	std::string fileContent;
-	readFileContent(installerPath, fileContent);
-
-	return fileContent;
+	readFileContent(installerPath, m_frontendInstallerFileContent);
 }
 
 void GlobalSessionService::readFileContent(const std::string& fileName, std::string& fileContent)

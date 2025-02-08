@@ -7,6 +7,7 @@
 #include "AppBase.h"
 #include "LogInDialog.h"
 #include "LogInGSSEditDialog.h"
+#include "DownloadFile.h"
 
 // OpenTwin header
 #include "OTWidgets/Label.h"
@@ -18,7 +19,6 @@
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
-#include "OTCommunication/DownloadFile.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/SystemInformation.h"
 #include "OTSystem/Application.h"
@@ -528,24 +528,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		if (msgBox.exec() == QMessageBox::Yes)
 		{
 			// We try to update the frontend installation
-
-			std::string tempFolder;
-			std::string fileName = "Install_OpenTwin_Frontend.exe";
-			std::string error;
-
-			if (ot::DownloadFile::downloadFrontendInstaller(m_loginData.getGss().getConnectionUrl().toStdString(), fileName, tempFolder, error))
-			{
-				std::string applicationPath = tempFolder + "\\" + fileName;
-				std::string commandLine = "\"" + applicationPath + "\" /S";
-				OT_PROCESS_HANDLE processHandle;
-				ot::app::runApplication(applicationPath, commandLine, processHandle, false);
-				exit(0);
-			}
-			else
-			{
-				// Error in downloading the installer
-				QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok | QMessageBox::Cancel);
-			}
+			QMetaObject::invokeMethod(AppBase::instance(), "downloadInstaller", Qt::QueuedConnection, Q_ARG(QString, m_loginData.getGss().getConnectionUrl()));
 
 			m_loginData.clear();
 			this->setControlsEnabled(true);

@@ -25,7 +25,6 @@
     <ClCompile Include="src\ActionHandleConnector.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\DownloadFile.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
     <ClCompile Include="src\Msg.cpp" />
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
@@ -43,7 +42,6 @@
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />
-    <ClInclude Include="include\OTCommunication\DownloadFile.h" />
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h" />

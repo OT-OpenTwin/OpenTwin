@@ -135,6 +135,9 @@
     <ClCompile Include="src\NavigationSelectionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DownloadFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -180,6 +183,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ProjectInformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DownloadFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

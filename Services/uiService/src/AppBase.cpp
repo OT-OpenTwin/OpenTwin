@@ -23,6 +23,7 @@
 #include "CopyProjectDialog.h"
 #include "RenameProjectDialog.h"
 #include "ManageOwner.h"
+#include "DownloadFile.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -89,6 +90,8 @@
 #include "OTCommunication/ServiceLogNotifier.h"
 
 #include "akWidgets/aTreeWidget.h"
+
+#include "OTSystem/Application.h"
 
 // ADS header
 #include <ads/DockManager.h>
@@ -184,7 +187,8 @@ AppBase::AppBase() :
 	m_ttb(nullptr),
 	m_logIntensity(nullptr),
 	m_lastFocusedCentralView(nullptr),
-	m_defaultView(nullptr)
+	m_defaultView(nullptr),
+	m_loginDialog(nullptr)
 {
 	m_currentStateWindow.viewShown = false;
 
@@ -253,11 +257,14 @@ bool AppBase::initialize() {
 
 bool AppBase::logIn(void) {
 	LogInDialog loginDia;
+	m_loginDialog = &loginDia;
 	loginDia.showNormal();
 	if (loginDia.showDialog() != ot::Dialog::Ok) {
+		m_loginDialog = nullptr;
 		return false;
 	}
-	
+	m_loginDialog = nullptr;
+
 	OTAssert(loginDia.getLoginData().isValid(), "Invalid login data...");
 
 	m_loginData = loginDia.getLoginData();
@@ -515,6 +522,33 @@ void AppBase::lockUI(bool flag)
 void AppBase::refreshWelcomeScreen(void)
 {
 	m_welcomeScreen->refreshProjectList();
+}
+
+void AppBase::downloadInstaller(QString gssUrl)
+{
+	std::string tempFolder;
+	std::string fileName = "Install_OpenTwin_Frontend.exe";
+	std::string error;
+	
+	if (downloadFrontendInstaller(gssUrl.toStdString(), fileName, tempFolder, error, m_loginDialog))
+	{
+		QMessageBox msgBox(QMessageBox::Information, "Update Download Successful", 
+			"The update has been downloaded successfully and will be installed after pressing the OK button.\n\n"
+			"Please wait until the login screen will be re-opened.", QMessageBox::Ok);
+		msgBox.exec();
+
+		std::string applicationPath = tempFolder + "\\" + fileName;
+		std::string commandLine = "\"" + applicationPath + "\" /S";
+		OT_PROCESS_HANDLE processHandle;
+		ot::app::runApplication(applicationPath, commandLine, processHandle, false);
+		exit(0);
+	}
+	else
+	{
+		// Error in downloading the installer
+		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok | QMessageBox::Cancel);
+		msgBox.exec();
+	}
 }
 
 void AppBase::exportProjectWorker(std::string selectedProjectName, std::string exportFileName)

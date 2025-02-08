@@ -31,6 +31,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\DownloadFile.cpp" />
     <ClCompile Include="src\LoginData.cpp" />
     <ClCompile Include="src\LogInDialog.cpp" />
     <ClCompile Include="src\LogInGSSEditDialog.cpp" />
@@ -60,6 +61,7 @@
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <QtMoc Include="include\NavigationSelectionManager.h" />
+    <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="include\CopyProjectDialog.h" />

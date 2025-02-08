@@ -56,6 +56,7 @@ class ExternalServicesComponent;
 class ProjectManagement;
 class ShortcutManager;
 class OldWelcomeScreen;
+class LogInDialog;
 
 // Forward declaration
 class ToolBar;
@@ -289,6 +290,7 @@ public Q_SLOTS:
 	void lockUI(bool flag);
 	void refreshWelcomeScreen(void);
 	void lockSelectionAndModification(bool flag);
+	void downloadInstaller(QString gssUrl);
 
 	//! @brief Will turn on or off the progress bar visibility and set the progress message
 	void setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous);
@@ -575,6 +577,7 @@ private:
 	ot::NavigationTreeView* m_projectNavigation;
 	ot::NavigationSelectionManager m_navigationManager;
 
+	LogInDialog* m_loginDialog;
 	LoginData m_loginData;
 
 	// Default UI

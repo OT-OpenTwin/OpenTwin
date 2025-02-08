@@ -29,16 +29,13 @@
     <ClCompile Include="src\ActionDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ActionHandleConnectorBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ActionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DownloadFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionDispatcherBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionHandleConnector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,19 +61,28 @@
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionHandleConnectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandleConnector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\DownloadFile.h">
+    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
+    <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

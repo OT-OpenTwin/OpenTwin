@@ -7,14 +7,13 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
-#include "OTCommunication/DownloadFile.h"			// Corresponding header
+#include "DownloadFile.h"			// Corresponding header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
 #include "base64.h"
 
-// Curl header
-#include "curl/curl.h"
+#include "qprogressdialog.h"
 
 #include <thread>
 #include <chrono>
@@ -23,22 +22,77 @@
 #include <iostream>
 #include <fstream>
 
+#include <windows.h>
+
+void downloadFrontendInstallerWorker(std::string _gssUrl, int _timeout, std::string *response, std::atomic<int> *success)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFrontendInstaller, doc.GetAllocator()), doc.GetAllocator());
+
+	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), *response, _timeout, false, false))
+	{
+		*success = 0;
+	}
+
+	*success = 1;
+}
+
 bool downloadFrontendInstaller(
 		const std::string&	_gssUrl,
 		const std::string&	_fileName,
 		std::string &		_tempFolder,
 		std::string &		_error,
-		int					_timeout) 
+		QWidget*			_parent,
+		int					_timeout)
 {
-	std::string response;
-	response.reserve(200e6);
-
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFrontendInstaller, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PrepareFrontendInstaller, doc.GetAllocator()), doc.GetAllocator());
+	std::string response;
+
+	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, _timeout))
+	{
+		_error = "Unable to get frontend installer size";
+		OT_LOG_E(_error);
+		return false;
+	}
+	
+	size_t installerSize = 0;
+
+	OT_ACTION_IF_RESPONSE_ERROR(response) 
+	{
+		installerSize = 140000000;
+	}
+	else
+	{
+		installerSize = atoll(response.c_str());
+	}
+
+	response.clear();
+	response.reserve(installerSize);
+
+	std::atomic<int> success = -1;
 
 	OT_LOG("Downloading frontend installer from " + _gssUrl, ot::OUTGOING_MESSAGE_LOG);
 
-	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, _timeout, false, false))
+	QProgressDialog progress("Download update package...", QString(), 0, 100);
+	progress.setWindowTitle("Updating Frontend");
+	progress.setMinimumWidth(300);
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setValue(0);
+
+	std::thread workerThread(downloadFrontendInstallerWorker, _gssUrl, _timeout, &response, &success);
+
+	while (success == -1)
+	{
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(20ms);
+		int percent = (int) (100.0 * response.size() / installerSize);
+		progress.setValue(percent);
+	}
+
+	workerThread.join();
+
+	if (success == 0)
 	{
 		_error = "Unable to download frontend installer";
 		OT_LOG_E(_error);

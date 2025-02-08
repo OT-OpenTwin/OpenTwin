@@ -63,6 +63,7 @@ private:
 	OT_HANDLER(handleGetProjectTemplatesList, GlobalSessionService, OT_ACTION_CMD_GetListOfProjectTemplates, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetBuildInformation, GlobalSessionService, OT_ACTION_CMD_GetBuildInformation, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetFrontendInstaller, GlobalSessionService, OT_ACTION_CMD_GetFrontendInstaller, ot::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handlePrepareFrontendInstaller, GlobalSessionService, OT_ACTION_CMD_PrepareFrontendInstaller, ot::ALL_MESSAGE_TYPES)
 
 	OT_HANDLER(handleGetSystemInformation, GlobalSessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterSessionService, GlobalSessionService, OT_ACTION_CMD_RegisterNewSessionService, ot::SECURE_MESSAGE_TYPES)
@@ -91,6 +92,7 @@ private:
 
 	void setHealthCheckRunning(bool _isRunning) { m_healthCheckRunning = _isRunning; };
 	void readFileContent(const std::string& fileName, std::string& fileContent);
+	void loadFrontendInstallerFile();
 
 	std::string m_url;
 	std::string m_databaseUrl;
@@ -106,6 +108,7 @@ private:
 	ot::SystemInformation						m_SystemLoadInformation;
 
 	ot::LogModeManager m_logModeManager;
+	std::string m_frontendInstallerFileContent;
 
 	GlobalSessionService(GlobalSessionService&) = delete;
 	GlobalSessionService& operator = (GlobalSessionService&) = delete;
