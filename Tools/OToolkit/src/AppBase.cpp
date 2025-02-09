@@ -35,6 +35,7 @@
 #include "OTCommunication/actionTypes.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PlainTextEdit.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/PlainTextEditView.h"

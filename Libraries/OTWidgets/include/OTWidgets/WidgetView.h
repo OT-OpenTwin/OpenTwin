@@ -21,12 +21,9 @@
 class QWidget;
 class QAction;
 
-namespace ads {
-	class CDockWidget;
-}
-
 namespace ot {
 
+	class WidgetViewDock;
 	class QWidgetInterface;
 	class WidgetViewManager;
 	
@@ -71,7 +68,7 @@ namespace ot {
 		const WidgetViewBase& getViewData(void) const { return m_data; };
 
 		//! @brief Returns the dock widget that belongs to this widget view.
-		ads::CDockWidget* getViewDockWidget(void) const { return m_dockWidget; };
+		WidgetViewDock* getViewDockWidget(void) const { return m_dockWidget; };
 
 		//! @brief Returns the dock widget toggle visibility action.
 		//! Returns 0 if no widget view is set
@@ -99,6 +96,7 @@ namespace ot {
 		const SelectionInformation& getSelectionInformation(void) const { return m_selectionInfo; };
 
 	Q_SIGNALS:
+		void closeRequested(void);
 		void viewDataModifiedChanged(void);
 
 	protected:
@@ -107,10 +105,15 @@ namespace ot {
 		void addWidgetInterfaceToDock(QWidgetInterface* _interface);
 		void addWidgetToDock(QWidget* _widget);
 
+	private Q_SLOTS:
+		void slotCloseRequested(void);
+		void slotToggleVisible(void);
+		void slotLockedChanged(bool _isLocked);
+
 	private:
 		friend class WidgetViewManager;
 
-		ads::CDockWidget* m_dockWidget; //! @brief Dock widget for this widget view
+		WidgetViewDock* m_dockWidget; //! @brief Dock widget for this widget view
 
 		WidgetViewBase m_data;
 		bool m_isDeletedByManager; //! @brief If false the widget will deregister from the manager upon deleting

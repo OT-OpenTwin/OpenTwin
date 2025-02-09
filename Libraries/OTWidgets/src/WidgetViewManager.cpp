@@ -8,6 +8,7 @@
 #include "OTCore/String.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetViewDockComponentsFactory.h"
 
@@ -418,7 +419,7 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 		return;
 	}
 
-	WidgetView* view = this->getViewFromDockWidget(dynamic_cast<ads::CDockWidget*>(sender()));
+	WidgetView* view = dynamic_cast<WidgetView*>(sender());
 	if (!view) {
 		OT_LOG_E("View not found");
 		return;
@@ -570,10 +571,8 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	m_dockManager->addView(_view, area, _insertFlags);
 	m_state &= (~InsertViewState);
 
-	// Add view toggle (if view is closeable)
-	if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
-		m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
-	}
+	// Add view toggle (only visible if dock is closeable)
+	m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
 	
 	// Store information
 	lst->push_back(nameTypeEntry);
@@ -596,7 +595,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 
 	// Connect signals
-	this->connect(_view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
 	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
 	if (_view->getViewDockWidget()->tabWidget()) {
 		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);

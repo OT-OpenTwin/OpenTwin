@@ -211,6 +211,7 @@
     <ClCompile Include="src\VersionGraphManagerView.cpp" />
     <ClCompile Include="src\Widget.cpp" />
     <ClCompile Include="src\WidgetView.cpp" />
+    <ClCompile Include="src\WidgetViewDock.cpp" />
     <ClCompile Include="src\WidgetViewDockComponentsFactory.cpp" />
     <ClCompile Include="src\WidgetViewDockManager.cpp" />
     <ClCompile Include="src\WidgetViewManager.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="include\OTWidgets\TabToolBarPage.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarSubGroup.h" />
     <ClInclude Include="include\OTWidgets\Widget.h" />
+    <QtMoc Include="include\OTWidgets\WidgetViewDock.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h" />
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />

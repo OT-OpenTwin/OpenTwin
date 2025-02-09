@@ -481,6 +481,9 @@
     <ClCompile Include="src\PlotDatasetData.cpp">
       <Filter>src\Plot\Base</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetViewDock.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1107,6 +1110,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\SVGWidget.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\WidgetViewDock.h">
+      <Filter>include\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -64,6 +64,7 @@
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridView.h"
@@ -94,7 +95,6 @@
 #include "OTSystem/Application.h"
 
 // ADS header
-#include <ads/DockManager.h>
 #include <ads/DockAreaWidget.h>
 
 // Qt header

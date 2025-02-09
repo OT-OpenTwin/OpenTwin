@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/WidgetViewManager.h"
 
@@ -26,9 +27,10 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType)
 	: m_isPermanent(false), m_isDeletedByManager(false),
 	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
 {
-	m_dockWidget = new ads::CDockWidget("");
-	m_dockWidget->setFeature(ads::CDockWidget::CustomCloseHandling, true);
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+	m_dockWidget = new WidgetViewDock;
+
+	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
+	this->connect(m_dockWidget, &WidgetViewDock::dockLockedChanged, this, &WidgetView::slotLockedChanged);
 }
 
 ot::WidgetView::~WidgetView() {
@@ -60,11 +62,14 @@ void ot::WidgetView::setViewWidgetFocus(void) {
 
 void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
-
+	
 	m_dockWidget->setObjectName(QString::fromStdString(WidgetView::createStoredViewName(m_data)));
+
 	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.getTitle()));
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
+	m_dockWidget->toggleViewAction()->setVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
+
+	m_dockWidget->setCloseButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
+	m_dockWidget->setLockButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
 }
@@ -103,4 +108,16 @@ void ot::WidgetView::addWidgetInterfaceToDock(QWidgetInterface* _interface) {
 
 void ot::WidgetView::addWidgetToDock(QWidget* _widget) {
 	m_dockWidget->setWidget(_widget);
+}
+
+void ot::WidgetView::slotCloseRequested(void) {
+	Q_EMIT closeRequested();
+}
+
+void ot::WidgetView::slotToggleVisible(void) {
+	m_dockWidget->toggleView(!m_dockWidget->isVisible());
+}
+
+void ot::WidgetView::slotLockedChanged(bool _isLocked) {
+
 }

@@ -12,10 +12,11 @@
 // Qt ADS header
 #include <ads/DockWidgetTab.h>
 
+namespace ads { class CDockWidget; }
+
 namespace ot {
 
 	class ToolButton;
-	class WidgetViewDockManager;
 
 	class OT_WIDGETS_API_EXPORT WidgetViewTab : public ads::CDockWidgetTab {
 		Q_OBJECT
@@ -25,8 +26,24 @@ namespace ot {
 		WidgetViewTab(ads::CDockWidget* _dockWidget);
 		virtual ~WidgetViewTab();
 
+		void setLocked(bool _locked) { m_isLocked = _locked; };
+		bool isLocked(void) const { return m_isLocked; };
+
+		void setCloseButtonVisible(bool _vis);
+		void setLockButtonVisible(bool _vis);
+
+	Q_SIGNALS:
+		void closeRequested(void);
+		void lockedChanged(bool _isLocked);
+
+	private Q_SLOTS:
+		void slotClose(void);
+		void slotToggleLocked(void);
+
 	private:
-		ToolButton* m_pinButton;
+		bool m_isLocked;
+
+		ToolButton* m_closeButton;
 		ToolButton* m_lockButton;
 		
 	};
