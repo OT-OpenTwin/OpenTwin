@@ -22,16 +22,19 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget* _dockWidget)
 	}
 
 	m_pinButton = new ToolButton;
-	m_pinButton->setObjectName("OT_ViewTabPinButton");
-
 	m_lockButton = new ToolButton;
+	/*
+	m_pinButton->setObjectName("OT_ViewTabPinButton");
+	m_pinButton->setHidden(true);
+
 	m_lockButton->setObjectName("OT_ViewTabLockButton");
+	m_lockButton->setHidden(true);
 
 	int ix = std::max(layout->count(), layout->count() - 2);
 	layout->insertWidget(ix++, m_pinButton, Qt::AlignVCenter);
 	layout->insertSpacing(ix++, qRound(1.5 * layout->contentsMargins().left() / 2.0));
 	layout->insertWidget(ix++, m_lockButton, Qt::AlignVCenter);
-	layout->insertSpacing(ix++, qRound(1.5 * layout->contentsMargins().left() / 2.0));
+	layout->insertSpacing(ix++, qRound(1.5 * layout->contentsMargins().left() / 2.0));*/
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
