@@ -3726,10 +3726,10 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 
 	ot::ConstJsonObjectList entities = ot::json::getObjectList(_document, OT_ACTION_PARAM_List);
 	for (const ot::ConstJsonObject& entity : entities) {
-		ot::Plot1DCurveInfoCfg curve;
+		ot::Plot1DCurveCfg curve;
 		curve.setFromJsonObject(entity);
 
-		ViewerAPI::visualizationResult1DPropertiesChanged(visualizationUID, curve.getId(), curve.getVersion());
+		ViewerAPI::visualizationResult1DPropertiesChanged(visualizationUID, curve.getEntityID(), curve.getEntityVersion());
 	}
 
 	return "";

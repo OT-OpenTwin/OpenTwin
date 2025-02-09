@@ -439,6 +439,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
@@ -632,6 +634,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
@@ -827,6 +831,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 

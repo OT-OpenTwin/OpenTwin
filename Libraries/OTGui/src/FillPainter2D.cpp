@@ -13,6 +13,8 @@ ot::FillPainter2D::FillPainter2D() {}
 
 ot::FillPainter2D::FillPainter2D(ot::DefaultColor _color) : m_color(_color) {}
 
+ot::FillPainter2D::FillPainter2D(int _r, int _g, int _b, int _a) : m_color(_r, _g, _b, _a) {}
+
 ot::FillPainter2D::FillPainter2D(const ot::Color& _color) : m_color(_color) {}
 
 ot::FillPainter2D::~FillPainter2D() {}

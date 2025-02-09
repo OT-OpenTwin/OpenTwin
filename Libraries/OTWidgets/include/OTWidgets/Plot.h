@@ -59,12 +59,7 @@ namespace ot {
 
 		void setPlotType(Plot1DCfg::PlotType _type);
 
-		PlotDataset* addDataset(
-			const QString& _title,
-			double* _dataX,
-			double* _dataY,
-			long					_dataSize
-		);
+		PlotDataset* addDataset(const Plot1DCurveCfg& _config, double* _dataX, double* _dataY, int _dataSize);
 
 		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
 		const Plot1DCfg& getConfig(void) const { return m_config; };
@@ -119,7 +114,7 @@ namespace ot {
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
 
 	protected:
-		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveInfoCfg>& _curvesToImport) {};
+		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport) {};
 
 		std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) { return m_cache; };
 		const std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) const { return m_cache; };
@@ -136,12 +131,10 @@ namespace ot {
 		CartesianPlot* m_cartesianPlot;
 		PolarPlot* m_polarPlot;
 
-		Plot1DCfg::PlotType			m_currentPlotType;
+		Plot1DCfg::PlotType m_currentPlotType;
 
-		bool							m_isError;
-
-		unsigned long					m_currentDatasetId;
-
+		bool m_isError;
+		
 		std::map<UID, std::pair<UID, PlotDataset*>> m_cache;
 
 	};

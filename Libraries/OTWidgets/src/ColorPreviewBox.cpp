@@ -48,6 +48,6 @@ void ot::ColorPreviewBox::paintEvent(QPaintEvent* _event) {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	
 	QRect r2(r1.topLeft() + QPoint(1, 1), r1.bottomRight() - QPoint(1, 1));
-	painter.fillRect(r1, cs.getValue(ColorStyleValueEntry::Border).brush());
+	painter.fillRect(r1, cs.getValue(ColorStyleValueEntry::Border).toBrush());
 	painter.fillRect(r2, m_color);
 }

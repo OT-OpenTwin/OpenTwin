@@ -478,6 +478,9 @@
     <ClCompile Include="src\SVGWidgetGrid.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlotDatasetData.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -919,6 +922,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SVGWidgetGrid.h">
       <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotDatasetData.h">
+      <Filter>include\Plot\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

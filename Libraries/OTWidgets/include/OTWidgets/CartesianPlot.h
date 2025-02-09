@@ -50,7 +50,7 @@ namespace ot {
 
 		virtual Plot1DCfg::PlotType getPlotType(void) const override { return Plot1DCfg::Cartesian; };
 
-		QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointID);
+		QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointIx);
 
 	private:
 		CartesianPlotZoomer* m_plotZoomer;

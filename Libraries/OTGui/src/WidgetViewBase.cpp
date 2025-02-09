@@ -123,11 +123,11 @@ ot::WidgetViewBase::WidgetViewBase(ViewType _type, ViewFlags _flags)
 {}
 
 ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewType _type, ViewFlags _flags)
-	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
+	: BasicEntityInformation(_entityName, 0, 0), m_title(_title), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
 {}
 
 ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewType _type, ViewFlags _flags)
-	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(_dockLocation), m_flags(_flags), m_type(_type)
+	: BasicEntityInformation(_entityName, 0, 0), m_title(_title), m_dockLocation(_dockLocation), m_flags(_flags), m_type(_type)
 {}
 
 ot::WidgetViewBase::WidgetViewBase(const WidgetViewBase& _other) {

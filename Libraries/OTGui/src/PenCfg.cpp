@@ -89,38 +89,22 @@ ot::LineJoinStyle ot::stringToJoinStyle(const std::string& _join) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::PenCfg::PenCfg()
-	: m_width(1), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(Black);
-}
+ot::PenCfg::PenCfg() : PenCfg(1, nullptr) {};
 
-ot::PenCfg::PenCfg(const Color& _color)
-	: m_width(1), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(_color);
-}
+ot::PenCfg::PenCfg(DefaultColor _color) : PenCfg(1, new FillPainter2D(Color(_color))) {};
 
-ot::PenCfg::PenCfg(Painter2D* _painter)
-	: m_width(1), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	if (!m_painter) {
-		OT_LOG_W("Nullptr provided for painter. Defaulting");
-		m_painter = new FillPainter2D(Black);
-	}
-}
+ot::PenCfg::PenCfg(const Color& _color) : PenCfg(1, new FillPainter2D(_color)) {};
 
-ot::PenCfg::PenCfg(int _width, const Color& _color)
-	: m_width(_width), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(_color);
-}
+ot::PenCfg::PenCfg(Painter2D* _painter) : PenCfg(1, _painter) {};
+
+ot::PenCfg::PenCfg(int _width, DefaultColor _color) : PenCfg(_width, new FillPainter2D(Color(_color))) {};
+
+ot::PenCfg::PenCfg(int _width, const Color& _color) : PenCfg(_width, new FillPainter2D(_color)) {};
 
 ot::PenCfg::PenCfg(int _width, Painter2D* _painter)
 	: m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
-		OT_LOG_W("Nullptr provided for painter. Defaulting");
 		m_painter = new FillPainter2D(Black);
 	}
 }
@@ -208,38 +192,22 @@ ot::PenFCfg ot::PenCfg::toPenFCfg(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::PenFCfg::PenFCfg()
-	: m_width(1.), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(Black);
-}
+ot::PenFCfg::PenFCfg() : PenFCfg(1., nullptr) {}
 
-ot::PenFCfg::PenFCfg(const Color& _color)
-	: m_width(1.), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(_color);
-}
+ot::PenFCfg::PenFCfg(DefaultColor _color) : PenFCfg(1., new FillPainter2D(Color(_color))) {}
 
-ot::PenFCfg::PenFCfg(Painter2D* _painter)
-	: m_width(1.), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
+ot::PenFCfg::PenFCfg(const Color& _color) : PenFCfg(1., new FillPainter2D(_color)) {}
+
+ot::PenFCfg::PenFCfg(Painter2D* _painter) : PenFCfg(1., _painter) {}
+
+ot::PenFCfg::PenFCfg(double _width, DefaultColor _color) : PenFCfg(_width, new FillPainter2D(Color(_color))) {}
+
+ot::PenFCfg::PenFCfg(double _width, const Color& _color) : PenFCfg(_width, new FillPainter2D(_color)) {}
+
+ot::PenFCfg::PenFCfg(double _width, Painter2D* _painter) : 
+	m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
 {
 	if (!m_painter) {
-		OT_LOG_W("Nullptr provided for painter. Defaulting");
-		m_painter = new FillPainter2D(Black);
-	}
-}
-
-ot::PenFCfg::PenFCfg(double _width, const Color& _color)
-	: m_width(_width), m_painter(nullptr), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	m_painter = new FillPainter2D(_color);
-}
-
-ot::PenFCfg::PenFCfg(double _width, Painter2D* _painter)
-	: m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
-{
-	if (!m_painter) {
-		OT_LOG_W("Nullptr provided for painter. Defaulting");
 		m_painter = new FillPainter2D(Black);
 	}
 }

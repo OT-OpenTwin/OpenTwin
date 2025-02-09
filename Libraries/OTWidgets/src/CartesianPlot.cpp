@@ -94,7 +94,7 @@ void ot::CartesianPlot::updateGrid(void) {
 
 // Getter
 
-QwtPlotCurve * ot::CartesianPlot::findNearestCurve(const QPoint & _pos, int & _pointID) {
+QwtPlotCurve * ot::CartesianPlot::findNearestCurve(const QPoint & _pos, int& _pointIx) {
 	double dist{ std::numeric_limits<double>::max() };
 
 	QwtPlotCurve * curve = nullptr;
@@ -112,7 +112,7 @@ QwtPlotCurve * ot::CartesianPlot::findNearestCurve(const QPoint & _pos, int & _p
 			{
 				curve = c;
 				dist = d;
-				_pointID = idx;
+				_pointIx = idx;
 			}
 		}
 	}

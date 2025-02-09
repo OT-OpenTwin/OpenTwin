@@ -3207,26 +3207,26 @@ void Model::addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
 	curveOldTreeIcons.visibleIcon = "Result1DVisible";
 	curveOldTreeIcons.hiddenIcon = "Result1DHidden";
 
-	std::list<ot::Plot1DCurveInfoCfg> curves = plotNode->getCurves();
-	plotNode->setCurves(std::list<ot::Plot1DCurveInfoCfg>());
+	std::list<ot::Plot1DCurveCfg> curves = plotNode->getCurves();
+	plotNode->setCurves(std::list<ot::Plot1DCurveCfg>());
 
-	for (ot::Plot1DCurveInfoCfg& curveInfo : curves) {
-		curveInfo.setName(_config.getName() + "/" + curveInfo.getName());
+	for (ot::Plot1DCurveCfg& curveInfo : curves) {
+		curveInfo.setEntityName(_config.getName() + "/" + curveInfo.getEntityName());
 		plotNode->addCurve(curveInfo);
 		addVisualizationResult1DNode(curveInfo, curveOldTreeIcons, _config.getHidden());
 	}
 }
 
-void Model::addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInfo, const OldTreeIcon& _treeIcons, bool _isHidden) {
+void Model::addVisualizationResult1DNode(const ot::Plot1DCurveCfg& _curveInfo, const OldTreeIcon& _treeIcons, bool _isHidden) {
 	SceneNodePlot1DCurve* curveNode = new SceneNodePlot1DCurve;
 
-	curveNode->setName(_curveInfo.getName());
-	curveNode->setModelEntityID(_curveInfo.getId());
-	curveNode->setModelEntityVersion(_curveInfo.getVersion());
+	curveNode->setName(_curveInfo.getEntityName());
+	curveNode->setModelEntityID(_curveInfo.getEntityID());
+	curveNode->setModelEntityVersion(_curveInfo.getEntityVersion());
 	curveNode->setOldTreeIcons(_treeIcons);
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(_curveInfo.getName());
+	SceneNodeBase *parentNode = getParentNode(_curveInfo.getEntityName());
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	// Now add the current node as child to the parent
@@ -3236,15 +3236,15 @@ void Model::addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInf
 	addSceneNodesToTree(curveNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[_curveInfo.getName()] = curveNode;
+	m_nameToSceneNodesMap[_curveInfo.getEntityName()] = curveNode;
 	treeItemToSceneNodesMap[curveNode->getTreeItemID()] = curveNode;
-	modelItemToSceneNodesMap[_curveInfo.getId()] = curveNode;
+	modelItemToSceneNodesMap[_curveInfo.getEntityID()] = curveNode;
 		
 	if (_isHidden) {
 		this->setItemVisibleState(curveNode, false);
 	}
 
-	modelItemToSceneNodesMap[_curveInfo.getId()] = curveNode;
+	modelItemToSceneNodesMap[_curveInfo.getEntityID()] = curveNode;
 		
 	if (_isHidden)
 	{
@@ -3591,7 +3591,7 @@ void Model::add1DPlotItems(SceneNodeBase* _root, bool& _isFirstCurve, SceneNodeP
 
 			if (_isFirstCurve) {
 				_config = plot->getConfig();
-				_config.setCurves(std::list<ot::Plot1DCurveInfoCfg>());
+				_config.setCurves(std::list<ot::Plot1DCurveCfg>());
 				_commonPlot = plot;
 				_isFirstCurve = false;
 			}
@@ -3606,14 +3606,14 @@ void Model::add1DPlotItems(SceneNodeBase* _root, bool& _isFirstCurve, SceneNodeP
 				}
 			}
 
-			ot::Plot1DCurveInfoCfg curveInfo;
-			curveInfo.setId(curve->getModelEntityID());
-			curveInfo.setVersion(curve->getModelEntityVersion());
-			curveInfo.setTreeId(curve->getTreeItemID());
+			ot::Plot1DCurveCfg curveInfo;
+			curveInfo.setEntityID(curve->getModelEntityID());
+			curveInfo.setEntityVersion(curve->getModelEntityVersion());
+			curveInfo.setNavigationId(curve->getTreeItemID());
 
 			std::string parentName = curve->getParent()->getName();
 			std::string curveName = curve->getName().substr(parentName.length() + 1);
-			curveInfo.setName(curveName);
+			curveInfo.setTitle(curveName);
 
 			_config.addCurve(curveInfo);
 		}
@@ -3640,15 +3640,15 @@ void Model::addCompatibleDimmedPlotItems(SceneNodeBase* _root, ot::Plot1DDataBas
 			}
 
 			if (_config == plot->getConfig()) {
-				ot::Plot1DCurveInfoCfg curveInfo;
-				curveInfo.setId(curve->getModelEntityID());
-				curveInfo.setVersion(curve->getModelEntityVersion());
-				curveInfo.setTreeId(curve->getTreeItemID());
+				ot::Plot1DCurveCfg curveInfo;
+				curveInfo.setEntityID(curve->getModelEntityID());
+				curveInfo.setEntityVersion(curve->getModelEntityVersion());
+				curveInfo.setNavigationId(curve->getTreeItemID());
 				curveInfo.setDimmed(true);
 
 				std::string parentName = curve->getParent()->getName();
 				std::string curveName = curve->getName().substr(parentName.length() + 1);
-				curveInfo.setName(curveName);
+				curveInfo.setEntityName(curveName);
 
 				_config.addCurve(curveInfo);
 			}

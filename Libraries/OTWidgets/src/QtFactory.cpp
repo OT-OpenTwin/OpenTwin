@@ -136,7 +136,7 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 			return QBrush();
 		}
 		else {
-			return cs.getValue(painter->getReferenceKey()).brush();
+			return cs.getValue(painter->getReferenceKey()).toBrush();
 		}
 	}
     else if (_painter->getFactoryKey() == OT_FactoryKey_CheckerboardPainter2D) {

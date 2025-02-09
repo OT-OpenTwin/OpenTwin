@@ -396,6 +396,8 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::PythonFunction: return "Python Function";
 	case ot::ColorStyleValueEntry::PythonComment: return "Python Comment";
 
+	case ot::ColorStyleValueEntry::PlotCurveDimmed: return "Plot Curve Dimmed";
+
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
@@ -469,6 +471,8 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonString)) return ColorStyleValueEntry::PythonString;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonFunction)) return ColorStyleValueEntry::PythonFunction;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonComment)) return ColorStyleValueEntry::PythonComment;
+
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveDimmed)) return ColorStyleValueEntry::PlotCurveDimmed;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {

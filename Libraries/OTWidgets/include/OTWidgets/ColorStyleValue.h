@@ -52,9 +52,9 @@ namespace ot {
 		void setEntryKey(ColorStyleValueEntry _key) { m_entryKey = _key; };
 		ColorStyleValueEntry getEntryKey(void) const { return m_entryKey; };
 
-		QString qss(void) const;
-		QColor color(void) const;
-		QBrush brush(void) const;
+		QString toQss(void) const;
+		QColor toColor(void) const;
+		QBrush toBrush(void) const;
 
 		//! @brief Set the painter which will also set the brush
 		//! The object takes ownership

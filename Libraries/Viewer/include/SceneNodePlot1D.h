@@ -35,11 +35,11 @@ public:
 	void setModel(Model* _model) { m_model = _model; };
 	Model *getModel(void) { return m_model; };
 
-	void addCurve(const ot::Plot1DCurveInfoCfg& _curve);
-	void setCurves(const std::list<ot::Plot1DCurveInfoCfg>& _curves);
-	const std::list<ot::Plot1DCurveInfoCfg>& getCurves(void) const;
+	void addCurve(const ot::Plot1DCurveCfg& _curve);
+	void setCurves(const std::list<ot::Plot1DCurveCfg>& _curves);
+	const std::list<ot::Plot1DCurveCfg>& getCurves(void) const;
 	size_t getNumberOfCurves(void) const;
-	const ot::Plot1DCurveInfoCfg& getCurveInfo(size_t _index) const;
+	const ot::Plot1DCurveCfg& getCurveInfo(size_t _index) const;
 
 	bool updateCurveEntityVersion(ot::UID _curveEntityID, ot::UID _curveVersion);
 

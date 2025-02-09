@@ -221,6 +221,8 @@ namespace ot {
 		PythonFunction,
 		PythonComment,
 
+		PlotCurveDimmed,
+
 		ErrorForeground,
 
 		//! \brief Used to determine the last entry.

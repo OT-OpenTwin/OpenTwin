@@ -22,12 +22,12 @@ ot::PlotManager::~PlotManager() {
 }
 
 
-void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveInfoCfg>& _entitiesToImport) {
+void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _entitiesToImport) {
 	if (_entitiesToImport.empty()) return;
 
 	std::list<std::pair<UID, UID>> prefetchCurves;
-	for (const Plot1DCurveInfoCfg& item : _entitiesToImport) {
-		prefetchCurves.push_back(std::pair<UID, UID>(item.getId(), item.getVersion()));
+	for (const Plot1DCurveCfg& curveCfg : _entitiesToImport) {
+		prefetchCurves.push_back(std::pair<UID, UID>(curveCfg.getEntityID(), curveCfg.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchCurves);
@@ -35,12 +35,9 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 	std::list<std::pair<UID, UID>> prefetchCurveData;
 	std::list< PlotDataset*> curves;
 
-	for (auto item : _entitiesToImport) {
-		UID entityID = item.getId();
-		UID entityVersion = item.getVersion();
-
+	for (const Plot1DCurveCfg& curveCfg : _entitiesToImport) {
 		EntityHandler handler;
-		EntityBase* baseEntity = handler.readEntityFromEntityIDandVersion(entityID, entityVersion);
+		EntityBase* baseEntity = handler.readEntityFromEntityIDandVersion(curveCfg.getEntityID(), curveCfg.getEntityVersion());
 		std::unique_ptr<EntityResult1DCurve> curve(dynamic_cast<EntityResult1DCurve*>(baseEntity));
 
 		// Read the curve data item
@@ -48,36 +45,22 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 		UID curveDataStorageVersion = curve->getCurveDataStorageVersion();
 		baseEntity = handler.readEntityFromEntityIDandVersion(curveDataStorageId, curveDataStorageVersion);
 		std::unique_ptr<EntityResult1DCurveData> curveData(dynamic_cast<EntityResult1DCurveData*>(baseEntity));
-		std::string curveLabel = item.getName();
+		
+		Plot1DCurveCfg cfg = curveCfg;
 
-		ot::Color colour = curve->getColor();
+		cfg.setTitle(curve->getName());
 
-		std::string xAxisLabel = curve->getAxisLabelX();
-		std::string yAxisLabel = curve->getAxisLabelY();
+		cfg.setLinePenColor(curve->getColor());
+		
+		cfg.setXAxisUnit(curve->getUnitX());
+		cfg.setYAxisUnit(curve->getUnitY());
 
-		std::string xAxisUnit = curve->getUnitX();
-		std::string yAxisUnit = curve->getUnitY();
+		cfg.setXAxisTitle(curve->getAxisLabelX() + " [" + curve->getUnitX() + "]");
+		cfg.setYAxisTitle(curve->getAxisLabelY() + " [" + curve->getUnitY() + "]");
 
-		std::string axisTitleX = xAxisLabel + " [" + xAxisUnit + "]";
-		std::string axisTitleY = yAxisLabel + " [" + yAxisUnit + "]";
-
-		PlotDataset* newDataset = addDataset(curveLabel.c_str(), nullptr, nullptr, 0);
-
-		newDataset->setEntityID(entityID);
-		newDataset->setEntityVersion(entityVersion);
-		newDataset->setCurveEntityID(curveDataStorageId);
-		newDataset->setCurveEntityVersion(curveDataStorageVersion);
-		newDataset->setTreeItemID(item.getTreeId());
-		newDataset->setDimmed(item.getDimmed(), false);
-
-		newDataset->setCurvePointsVisible(false, false);
-
-		newDataset->setCurveColor(QColor(colour.r(), colour.g(), colour.b()), false);
-		newDataset->setCurveTitle(curveLabel.c_str());
-		newDataset->setAxisTitleX(axisTitleX);
-		newDataset->setAxisTitleY(axisTitleY);
-
-		newDataset->updateVisualization();
+		PlotDataset* newDataset = addDataset(cfg, nullptr, nullptr, 0);
+		newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
+		newDataset->updateCurveVisualization();
 
 		// Check whether we already have the curve data
 
@@ -89,10 +72,10 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 			PlotDataset* oldDataset = it->second.second;
 
 			if (oldDataset != nullptr) {
-				if (oldDataset->getCurveEntityID() == newDataset->getCurveEntityID()
-					&& oldDataset->getCurveEntityVersion() == newDataset->getCurveEntityVersion()) {
+				if (oldDataset->getStorageEntityInfo().getEntityID() == newDataset->getStorageEntityInfo().getEntityID()
+					&& oldDataset->getStorageEntityInfo().getEntityVersion() == newDataset->getStorageEntityInfo().getEntityVersion()) {
+					
 					// The curve data in the previous data set is the same as the one in the new data set
-
 					double* x = nullptr, * y = nullptr;
 					long n;
 
@@ -124,8 +107,8 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 	for (PlotDataset* item : curves) {
 		// Here we get the storage data of the underlying curve data
-		UID entityID = item->getCurveEntityID();
-		UID entityVersion = item->getCurveEntityVersion();
+		UID entityID = item->getStorageEntityInfo().getEntityID();
+		UID entityVersion = item->getStorageEntityInfo().getEntityVersion();
 
 		auto doc = bsoncxx::builder::basic::document{};
 

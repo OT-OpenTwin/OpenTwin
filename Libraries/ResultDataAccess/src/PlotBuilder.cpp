@@ -10,23 +10,23 @@ PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string&
 	:m_extender(_extender), m_owner(_owner)
 {}
 
-void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveInfoCfg& _config)
+void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config)
 {
-	const std::string labelY = _config.getLabelY();
+	const std::string labelY = _config.getYAxisTitle();
 	assert(labelY ==_dataSetDescription.getQuantityDescription()->getName());
 
 	auto parameters = _dataSetDescription.getParameters();
 	assert(parameters.size() == 1);
 	std::shared_ptr<ParameterDescription> xAxis = *parameters.begin();
 	
-	const std::string labelX = _config.getLabelX();
+	const std::string labelX = _config.getXAxisTitle();
 	assert(labelY ==xAxis->getMetadataParameter().parameterName);
 
 	storeCurve(std::move(_dataSetDescription), _config);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
-	curveEntity.setName(_config.getName());
+	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 	curveEntity.setCurve(_config);
 	curveEntity.StoreToDataBase();
@@ -40,7 +40,7 @@ void PlotBuilder::buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot", _saveModelState);
 }
 
-void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveInfoCfg& _config)
+void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config)
 { 
 	//std::list<DatasetDescription> datasets{ std::move(_dataSetDescription) };
 	//ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _config.getName(), {});

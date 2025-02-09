@@ -27,7 +27,7 @@
 #include <memory>
 
 ot::Plot::Plot()
-	: m_currentDatasetId(0), m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
+	: m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget;
 	m_centralLayout = new QVBoxLayout(m_centralWidget);
@@ -87,13 +87,8 @@ void ot::Plot::setPlotType(Plot1DCfg::PlotType _type) {
 	}
 }
 
-ot::PlotDataset * ot::Plot::addDataset(
-	const QString &			_title,
-	double *				_dataX,
-	double *				_dataY,
-	long					_dataSize
-) {
-	return new PlotDataset(this, ++m_currentDatasetId, _title, _dataX, _dataY, _dataSize);
+ot::PlotDataset * ot::Plot::addDataset(const Plot1DCurveCfg& _config, double * _dataX, double * _dataY, int _dataSize) {
+	return new PlotDataset(this, _config, PlotDatasetData(_dataX, nullptr, _dataY, nullptr, nullptr, _dataSize));
 }
 
 void ot::Plot::setFromDataBaseConfig(const Plot1DDataBaseCfg& _config) {
@@ -103,17 +98,17 @@ void ot::Plot::setFromDataBaseConfig(const Plot1DDataBaseCfg& _config) {
 	m_config = _config;
 
 	// Check cache
-	std::list<Plot1DCurveInfoCfg> entitiesToImport;
-	for (const Plot1DCurveInfoCfg& curveInfo : _config.getCurves()) {
+	std::list<Plot1DCurveCfg> entitiesToImport;
+	for (const Plot1DCurveCfg& curveInfo : _config.getCurves()) {
 		// Check for entity ID
-		auto itm = m_cache.find(curveInfo.getId());
+		auto itm = m_cache.find(curveInfo.getEntityID());
 		if (itm != m_cache.end()) {
 			// Check if the entity Versions match
-			if (itm->second.first != curveInfo.getVersion()) {
+			if (itm->second.first != curveInfo.getEntityVersion()) {
 				entitiesToImport.push_back(curveInfo);
 			}
 			else {
-				itm->second.second->setTreeItemID(curveInfo.getTreeId());  // We need to update the tree id, since this might have changed due to undo / redo or open project
+				itm->second.second->setNavigationId(curveInfo.getNavigationId());  // We need to update the tree id, since this might have changed due to undo / redo or open project
 				itm->second.second->setDimmed(curveInfo.getDimmed(), true);
 				itm->second.second->attach();
 			}
@@ -251,7 +246,7 @@ void ot::Plot::datasetSelectionChanged(PlotDataset * _selectedDataset) {
 		}
 	}
 	else {
-		Q_EMIT setItemSelectedRequest(_selectedDataset->getTreeItemID(), ctrlPressed);
+		Q_EMIT setItemSelectedRequest(_selectedDataset->getNavigationId(), ctrlPressed);
 	}
 }
 
@@ -304,7 +299,7 @@ bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVer
 	}
 	else {
 		it->second.first = _newEntityVersion;
-		it->second.second->setCurveEntityVersion(_newEntityVersion);
+		it->second.second->setEntityVersion(_newEntityVersion);
 		return true;
 	}
 }
@@ -332,12 +327,12 @@ void ot::Plot::applyConfig(void) {
 	std::string axisTitleY;
 
 	if (!m_cache.empty()) {
-		axisTitleX = m_cache.begin()->second.second->getAxisTitleX();
-		axisTitleY = m_cache.begin()->second.second->getAxisTitleY();
+		axisTitleX = m_cache.begin()->second.second->getConfig().getXAxisTitle();
+		axisTitleY = m_cache.begin()->second.second->getConfig().getYAxisTitle();
 
 		for (const auto& itm : m_cache) {
-			if (axisTitleX != m_cache.begin()->second.second->getAxisTitleX()) compatible = false;
-			if (axisTitleY != m_cache.begin()->second.second->getAxisTitleY()) compatible = false;
+			if (axisTitleX != m_cache.begin()->second.second->getConfig().getXAxisTitle()) compatible = false;
+			if (axisTitleY != m_cache.begin()->second.second->getConfig().getYAxisTitle()) compatible = false;
 			if (!compatible) break;
 		}
 	}

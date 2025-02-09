@@ -64,15 +64,15 @@ bool SceneNodePlot1D::updateCurveEntityVersion(ot::UID _curveEntityID, ot::UID _
 	return m_config.updateCurveVersion(_curveEntityID, _curveVersion) && this->isAnyChildSelectedAndVisible(this);
 }
 
-void SceneNodePlot1D::addCurve(const ot::Plot1DCurveInfoCfg& _curve) {
+void SceneNodePlot1D::addCurve(const ot::Plot1DCurveCfg& _curve) {
 	m_config.addCurve(_curve);
 }
 
-void SceneNodePlot1D::setCurves(const std::list<ot::Plot1DCurveInfoCfg>& _curves) {
+void SceneNodePlot1D::setCurves(const std::list<ot::Plot1DCurveCfg>& _curves) {
 	m_config.setCurves(_curves);
 }
 
-const std::list<ot::Plot1DCurveInfoCfg>& SceneNodePlot1D::getCurves(void) const {
+const std::list<ot::Plot1DCurveCfg>& SceneNodePlot1D::getCurves(void) const {
 	return m_config.getCurves();
 }
 
@@ -80,9 +80,9 @@ size_t SceneNodePlot1D::getNumberOfCurves(void) const {
 	return m_config.getCurves().size();
 }
 
-const ot::Plot1DCurveInfoCfg& SceneNodePlot1D::getCurveInfo(size_t _index) const {
+const ot::Plot1DCurveCfg& SceneNodePlot1D::getCurveInfo(size_t _index) const {
 	size_t ix = 0;
-	for (const ot::Plot1DCurveInfoCfg& curve : m_config.getCurves()) {
+	for (const ot::Plot1DCurveCfg& curve : m_config.getCurves()) {
 		if (_index == ix++) {
 			return curve;
 		}

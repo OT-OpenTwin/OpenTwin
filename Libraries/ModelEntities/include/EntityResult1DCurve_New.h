@@ -24,6 +24,6 @@ public:
 
 	// Inherited via IVisualisationCurve
 	bool visualiseCurve() override { return true; };
-	ot::Plot1DCurveInfoCfg getCurve() override;
-	void setCurve(const ot::Plot1DCurveInfoCfg& _curve) override;
+	ot::Plot1DCurveCfg getCurve() override;
+	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 };

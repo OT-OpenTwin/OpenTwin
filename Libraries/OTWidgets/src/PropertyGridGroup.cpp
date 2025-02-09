@@ -212,13 +212,13 @@ void ot::PropertyGridGroup::updateStateIcon(void) {
 
 void ot::PropertyGridGroup::slotColorStyleChanged(void) {
 	const ColorStyle& gStyle = GlobalColorStyle::instance().getCurrentStyle();
-	this->setBackground(1, gStyle.getValue(ColorStyleValueEntry::TitleBackground).brush());
-	this->setForeground(1, gStyle.getValue(ColorStyleValueEntry::TitleForeground).brush());
+	this->setBackground(1, gStyle.getValue(ColorStyleValueEntry::TitleBackground).toBrush());
+	this->setForeground(1, gStyle.getValue(ColorStyleValueEntry::TitleForeground).toBrush());
 
-	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).qss() +
-		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }" +
-		"#PropertyGridGroupTitleLabel { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).qss() +
-		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }";
+	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).toQss() +
+		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).toQss() + "; }" +
+		"#PropertyGridGroupTitleLabel { background-color: " + gStyle.getValue(ColorStyleValueEntry::TitleBackground).toQss() +
+		"; color: " + gStyle.getValue(ColorStyleValueEntry::TitleForeground).toQss() + "; }";
 
 	m_titleLayoutW->setStyleSheet(sheet);
 	this->updateStateIcon(gStyle);

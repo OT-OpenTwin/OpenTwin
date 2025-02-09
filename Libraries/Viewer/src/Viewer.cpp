@@ -443,12 +443,12 @@ void Viewer::setClearColorAutomatic(void)
 		ot::ColorStyleValue backColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue(ot::ColorStyleValueEntry::WindowBackground);
 		ot::ColorStyleValue frontColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue(ot::ColorStyleValueEntry::WindowForeground);
 
-		viewColorAutoBackgroundR = backColor.color().red();
-		viewColorAutoBackgroundG = backColor.color().green();
-		viewColorAutoBackgroundB = backColor.color().blue();
+		viewColorAutoBackgroundR = backColor.toColor().red();
+		viewColorAutoBackgroundG = backColor.toColor().green();
+		viewColorAutoBackgroundB = backColor.toColor().blue();
 
 		setClearColor(viewColorAutoBackgroundR, viewColorAutoBackgroundG, viewColorAutoBackgroundB, 
-			          frontColor.color().red(), frontColor.color().green(), frontColor.color().blue());
+			          frontColor.toColor().red(), frontColor.toColor().green(), frontColor.toColor().blue());
 	}
 	else
 	{

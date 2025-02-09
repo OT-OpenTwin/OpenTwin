@@ -1,6 +1,7 @@
 #include "EntityResult1DCurve_New.h"
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTGui/Painter2D.h"
 #include "OTGui/VisualisationTypes.h"
 
 EntityResult1DCurve_New::EntityResult1DCurve_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
@@ -51,9 +52,9 @@ void EntityResult1DCurve_New::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-ot::Plot1DCurveInfoCfg EntityResult1DCurve_New::getCurve()
+ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 {
-	ot::Plot1DCurveInfoCfg curveCfg;
+	ot::Plot1DCurveCfg curveCfg;
 
 	const ot::Color colour = PropertyHelper::getColourPropertyValue(this, "Color");
 
@@ -63,22 +64,22 @@ ot::Plot1DCurveInfoCfg EntityResult1DCurve_New::getCurve()
 	const std::string yAxisLabel =PropertyHelper::getStringPropertyValue(this, "Y axis label");
 	const std::string yAxisUnit =PropertyHelper::getStringPropertyValue(this, "Y axis unit");
 	
-	curveCfg.setColour(colour);
-	curveCfg.setLabelX(xAxisLabel);
-	curveCfg.setUnitX(xAxisUnit);
+	curveCfg.setLinePenColor(colour);
+	curveCfg.setXAxisTitle(xAxisLabel);
+	curveCfg.setXAxisUnit(xAxisUnit);
 
-	curveCfg.setLabelY(yAxisLabel);
-	curveCfg.setUnitY(yAxisUnit);
+	curveCfg.setYAxisTitle(yAxisLabel);
+	curveCfg.setYAxisUnit(yAxisUnit);
 	return curveCfg;
 }
 
-void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveInfoCfg& _curve)
+void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 {
-	PropertyHelper::setColourPropertyValue(_curve.getColour(), this, "Color");
+	PropertyHelper::setColourPropertyValue(_curve.getLinePen().painter()->getDefaultColor(), this, "Color");
 
-	PropertyHelper::setStringPropertyValue(_curve.getLabelX(), this, "X axis label");
-	PropertyHelper::setStringPropertyValue(_curve.getUnitX(), this, "X axis unit");
+	PropertyHelper::setStringPropertyValue(_curve.getXAxisTitle(), this, "X axis label");
+	PropertyHelper::setStringPropertyValue(_curve.getXAxisUnit(), this, "X axis unit");
 
-	PropertyHelper::setStringPropertyValue(_curve.getLabelY(), this, "Y axis label");
-	PropertyHelper::setStringPropertyValue(_curve.getUnitY(), this, "Y axis unit");
+	PropertyHelper::setStringPropertyValue(_curve.getYAxisTitle(), this, "Y axis label");
+	PropertyHelper::setStringPropertyValue(_curve.getYAxisUnit(), this, "Y axis unit");
 }

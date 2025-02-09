@@ -83,7 +83,7 @@
     <ClInclude Include="include\OTGui\Path2D.h" />
     <ClInclude Include="include\OTGui\Plot1DAxisCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DCfg.h" />
-    <ClInclude Include="include\OTGui\Plot1DCurveInfoCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DCurveCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h" />
     <ClInclude Include="include\OTGui\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTGui\Property.h" />
@@ -191,7 +191,7 @@
     <ClCompile Include="src\Path2D.cpp" />
     <ClCompile Include="src\Plot1DAxisCfg.cpp" />
     <ClCompile Include="src\Plot1DCfg.cpp" />
-    <ClCompile Include="src\Plot1DCurveInfoCfg.cpp" />
+    <ClCompile Include="src\Plot1DCurveCfg.cpp" />
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
     <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Property.cpp" />

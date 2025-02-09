@@ -6,7 +6,7 @@
 #include "DataBase.h"
 #include "OldTreeIcon.h"
 
-#include "OTGui/Plot1DCurveInfoCfg.h"
+#include "OTGui/Plot1DCurveCfg.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -178,9 +178,9 @@ bool EntityResult1DCurve::updateFromProperties(void)
 
 	ot::JsonArray entities;
 	ot::JsonObject curveObj;
-	ot::Plot1DCurveInfoCfg curve;
-	curve.setId(this->getEntityID());
-	curve.setVersion(this->getEntityStorageVersion());
+	ot::Plot1DCurveCfg curve;
+	curve.setEntityID(this->getEntityID());
+	curve.setEntityVersion(this->getEntityStorageVersion());
 	curve.addToJsonObject(curveObj, doc.GetAllocator());
 	entities.PushBack(curveObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_List, entities, doc.GetAllocator());

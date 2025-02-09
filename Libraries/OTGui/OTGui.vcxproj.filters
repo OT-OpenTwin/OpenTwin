@@ -320,7 +320,7 @@
     <ClInclude Include="include\OTGui\Plot1DCfg.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\Plot1DCurveInfoCfg.h">
+    <ClInclude Include="include\OTGui\Plot1DCurveCfg.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\Plot1DAxisCfg.h">
@@ -637,7 +637,7 @@
     <ClCompile Include="src\Plot1DAxisCfg.cpp">
       <Filter>Source Files\Plot</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plot1DCurveInfoCfg.cpp">
+    <ClCompile Include="src\Plot1DCurveCfg.cpp">
       <Filter>Source Files\Plot</Filter>
     </ClCompile>
     <ClCompile Include="src\Plot1DCfg.cpp">

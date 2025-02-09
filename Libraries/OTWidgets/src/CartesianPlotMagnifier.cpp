@@ -145,8 +145,8 @@ void ot::CartesianPlotMagnifier::rescale(double _factor) {
 }
 
 void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
-	int itemId;
-	QwtPlotCurve* curve = m_plot->findNearestCurve(_pos, itemId);
+	int itemIx;
+	QwtPlotCurve* curve = m_plot->findNearestCurve(_pos, itemIx);
 
 	if (curve != nullptr) {
 		// Find dataset
@@ -156,7 +156,7 @@ void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
 		OTAssertNullptr(dataset);
 
 		double x, y;
-		if (!dataset->getDataAt(itemId, x, y)) {
+		if (!dataset->getDataAt(itemIx, x, y)) {
 			return;
 		}
 

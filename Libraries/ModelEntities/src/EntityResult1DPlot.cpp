@@ -91,10 +91,10 @@ void EntityResult1DPlot::addVisualizationItem(bool isHidden)
 	this->addBasicsToConfig(config);
 	
 	for (ot::UIDNamePair& curveInfo : m_curves) {
-		ot::Plot1DCurveInfoCfg curve;
-		curve.setId(curveInfo.getUid());
-		curve.setName(curveInfo.getName());
-		curve.setVersion(getCurrentEntityVersion(curveInfo.getUid()));
+		ot::Plot1DCurveCfg curve;
+		curve.setEntityID(curveInfo.getUid());
+		curve.setEntityName(curveInfo.getName());
+		curve.setEntityVersion(getCurrentEntityVersion(curveInfo.getUid()));
 		config.addCurve(curve);
 	}
 

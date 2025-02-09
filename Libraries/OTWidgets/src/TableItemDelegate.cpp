@@ -43,12 +43,12 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
     if (item) {
         // Check current item state
         if (opt.state & QStyle::State_MouseOver) { // Hover
-            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetHoverBackground).brush());
-            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetHoverForeground).brush());
+            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetHoverBackground).toBrush());
+            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetHoverForeground).toBrush());
         }
         else if (opt.state & QStyle::State_Selected) { // Selected
-            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetSelectionBackground).brush());
-            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetSelectionForeground).brush());
+            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetSelectionBackground).toBrush());
+            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetSelectionForeground).toBrush());
         }
         else if (item->background().color().isValid()) { // Item has valid color set
             _painter->fillRect(opt.rect, item->background());

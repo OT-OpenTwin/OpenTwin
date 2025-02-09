@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/Plot1DCfg.h"
-#include "OTGui/Plot1DCurveInfoCfg.h"
+#include "OTGui/Plot1DCurveCfg.h"
 
 namespace ot {
 
@@ -35,16 +35,17 @@ namespace ot {
 
 		// Setter / Getter
 
-		void addCurve(const Plot1DCurveInfoCfg& _curve);
-		void setCurves(const std::list<Plot1DCurveInfoCfg>& _curves) { m_curves = _curves; };
-		const std::list<Plot1DCurveInfoCfg>& getCurves(void) const { return m_curves; };
+		void addCurve(const Plot1DCurveCfg& _curve);
+		void addCurve(Plot1DCurveCfg&& _curve);
+		void setCurves(const std::list<Plot1DCurveCfg>& _curves) { m_curves = _curves; };
+		const std::list<Plot1DCurveCfg>& getCurves(void) const { return m_curves; };
 
 		//! \brief Updates the curve version.
 		//! Returns true if the version has been changed.
 		bool updateCurveVersion(ot::UID _curveEntityUID, ot::UID _newCurveEntityVersion);
 
 	private:
-		std::list<Plot1DCurveInfoCfg> m_curves;
+		std::list<Plot1DCurveCfg> m_curves;
 	};
 
 }

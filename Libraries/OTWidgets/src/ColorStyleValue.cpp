@@ -63,19 +63,19 @@ void ot::ColorStyleValue::setFromJsonObject(const ot::ConstJsonObject& _object) 
 
 // Setter/Getter
 
-QString ot::ColorStyleValue::qss(void) const {
+QString ot::ColorStyleValue::toQss(void) const {
 	OTAssertNullptr(m_painter);
 	if (m_painter) return QString::fromStdString(m_painter->generateQss());
 	else return "";
 }
 
-QColor ot::ColorStyleValue::color(void) const {
+QColor ot::ColorStyleValue::toColor(void) const {
 	OTAssertNullptr(m_painter);
 	if (m_painter) return QtFactory::toQColor(m_painter->getDefaultColor());
 	else return QColor();
 }
 
-QBrush ot::ColorStyleValue::brush(void) const {
+QBrush ot::ColorStyleValue::toBrush(void) const {
 	return QtFactory::toQBrush(m_painter);
 }
 

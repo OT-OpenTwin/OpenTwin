@@ -140,9 +140,9 @@ int ot::TextEditor::lineNumberAreaWidth(void) const {
 void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	QPainter painter(m_lineNumberArea);
-	QBrush backBrush = cs.getValue(ColorStyleValueEntry::TitleBackground).brush();
-	QBrush frontBrush = cs.getValue(ColorStyleValueEntry::TitleForeground).brush();
-	QBrush borderBrush = cs.getValue(ColorStyleValueEntry::Border).brush();
+	QBrush backBrush = cs.getValue(ColorStyleValueEntry::TitleBackground).toBrush();
+	QBrush frontBrush = cs.getValue(ColorStyleValueEntry::TitleForeground).toBrush();
+	QBrush borderBrush = cs.getValue(ColorStyleValueEntry::Border).toBrush();
 	painter.fillRect(_event->rect(), backBrush);
 	painter.setPen(QPen(borderBrush, 1.));
 	painter.drawLine(_event->rect().x() + _event->rect().width() - 1, _event->rect().y(),
@@ -419,7 +419,7 @@ void ot::TextEditor::getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _
 
 		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
-		selection.format.setProperty(QTextFormat::OutlinePen, QPen(cs.getValue(ColorStyleValueEntry::TextEditorLineBorder).brush(), 1.));
+		selection.format.setProperty(QTextFormat::OutlinePen, QPen(cs.getValue(ColorStyleValueEntry::TextEditorLineBorder).toBrush(), 1.));
 		selection.format.setProperty(QTextFormat::CssFloat, QVariant());
 		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
 		selection.cursor = textCursor();
@@ -440,7 +440,7 @@ void ot::TextEditor::addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _
 
 		this->blockSignals(true);
 		int cursorPos = cursor.position();
-		QBrush hb = GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::TextEditorHighlightBackground).brush();
+		QBrush hb = GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::TextEditorHighlightBackground).toBrush();
 
 		// Highlight the selected text
 		QRegularExpression regex(selectedText, QRegularExpression::PatternOption::CaseInsensitiveOption);

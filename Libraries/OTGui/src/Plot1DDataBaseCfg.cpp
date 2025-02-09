@@ -37,7 +37,7 @@ void ot::Plot1DDataBaseCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllo
 	Plot1DCfg::addToJsonObject(_object, _allocator);
 
 	JsonArray curvesArray;
-	for (const Plot1DCurveInfoCfg& curve : m_curves) {
+	for (const Plot1DCurveCfg& curve : m_curves) {
 		JsonObject curveObject;
 		curve.addToJsonObject(curveObject, _allocator);
 		curvesArray.PushBack(curveObject, _allocator);
@@ -51,7 +51,7 @@ void ot::Plot1DDataBaseCfg::setFromJsonObject(const ot::ConstJsonObject& _object
 
 	ConstJsonObjectList curvesArray = json::getObjectList(_object, "Curves");
 	for (const ConstJsonObject& curveObject : curvesArray) {
-		Plot1DCurveInfoCfg newCurve;
+		Plot1DCurveCfg newCurve;
 		newCurve.setFromJsonObject(curveObject);
 		m_curves.push_back(newCurve);
 	}
@@ -61,15 +61,19 @@ void ot::Plot1DDataBaseCfg::setFromJsonObject(const ot::ConstJsonObject& _object
 
 // Setter / Getter
 
-void ot::Plot1DDataBaseCfg::addCurve(const Plot1DCurveInfoCfg& _curve) {
+void ot::Plot1DDataBaseCfg::addCurve(const Plot1DCurveCfg& _curve) {
 	m_curves.push_back(_curve);
+}
+
+void ot::Plot1DDataBaseCfg::addCurve(Plot1DCurveCfg&& _curve) {
+	m_curves.push_back(std::move(_curve));
 }
 
 bool ot::Plot1DDataBaseCfg::updateCurveVersion(ot::UID _curveEntityUID, ot::UID _newCurveEntityVersion) {
 	bool changed = false;
-	for (Plot1DCurveInfoCfg& curve : m_curves) {
-		if (curve.getId() == _curveEntityUID && curve.getVersion() != _newCurveEntityVersion) {
-			curve.setVersion(_newCurveEntityVersion);
+	for (Plot1DCurveCfg& curve : m_curves) {
+		if (curve.getEntityID() == _curveEntityUID && curve.getEntityVersion() != _newCurveEntityVersion) {
+			curve.setEntityID(_newCurveEntityVersion);
 			changed = true;
 		}
 	}

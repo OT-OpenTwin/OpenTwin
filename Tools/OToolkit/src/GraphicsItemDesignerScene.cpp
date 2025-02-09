@@ -126,8 +126,8 @@ void GraphicsItemDesignerScene::drawBackground(QPainter* _painter, const QRectF&
 	}
 
 	const ot::ColorStyle& cs = ot::GlobalColorStyle::instance().getCurrentStyle();
-	_painter->fillRect(_rect, cs.getValue(ot::ColorStyleValueEntry::WidgetDisabledBackground).brush());
-	_painter->fillRect(_rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)), cs.getValue(ot::ColorStyleValueEntry::WidgetBackground).brush());
+	_painter->fillRect(_rect, cs.getValue(ot::ColorStyleValueEntry::WidgetDisabledBackground).toBrush());
+	_painter->fillRect(_rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)), cs.getValue(ot::ColorStyleValueEntry::WidgetBackground).toBrush());
 
 	this->drawGrid(_painter, _rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)));
 }

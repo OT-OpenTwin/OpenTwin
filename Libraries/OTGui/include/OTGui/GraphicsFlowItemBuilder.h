@@ -7,11 +7,12 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Color.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Margins.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsTriangleItemCfg.h"
-#include "OTGui/Margins.h"
 
 namespace ot {
 

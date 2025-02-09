@@ -142,7 +142,7 @@ public:
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
 	void addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config);
-	void addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInfo, const OldTreeIcon& _treeIcons, bool _isHidden);
+	void addVisualizationResult1DNode(const ot::Plot1DCurveCfg& _curveInfo, const OldTreeIcon& _treeIcons, bool _isHidden);
 	
 	void visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _version);
 	void visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config);

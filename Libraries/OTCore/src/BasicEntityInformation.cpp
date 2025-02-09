@@ -11,8 +11,8 @@ ot::BasicEntityInformation::BasicEntityInformation()
 {
 }
 
-ot::BasicEntityInformation::BasicEntityInformation(const std::string& _entityName) 
-	: m_entityName(_entityName), m_entityId(0), m_entityVersion(0)
+ot::BasicEntityInformation::BasicEntityInformation(UID _entityId, UID _entityVersion)
+	: m_entityId(_entityId), m_entityVersion(_entityVersion)
 {
 }
 

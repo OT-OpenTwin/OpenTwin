@@ -19,7 +19,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT BasicEntityInformation : public Serializable {
 	public:
 		BasicEntityInformation();
-		BasicEntityInformation(const std::string& _entityName);
+		BasicEntityInformation(UID _entityId, UID _entityVersion);
 		BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion);
 		BasicEntityInformation(const BasicEntityInformation& _other);
 		virtual ~BasicEntityInformation();

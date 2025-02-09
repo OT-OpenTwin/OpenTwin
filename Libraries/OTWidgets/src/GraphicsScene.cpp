@@ -399,7 +399,7 @@ void ot::GraphicsScene::drawGrid(QPainter* _painter, const QRectF& _rect) {
 	QPen pen = QtFactory::toQPen(m_grid.getGridLineStyle());
 	qreal scaledLineWidth = this->calculateScaledGridLineWidth(_painter, pen.widthF());
 
-	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::Border).brush());
+	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::Border).toBrush());
 	pen.setWidthF(scaledLineWidth);
 	
 	if (!normalLines.isEmpty()) {
@@ -415,7 +415,7 @@ void ot::GraphicsScene::drawGrid(QPainter* _painter, const QRectF& _rect) {
 	
 	if (!centerLines.isEmpty()) {
 		pen.setWidthF(scaledLineWidth * 3.);
-		pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::WidgetHoverBackground).brush());
+		pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::WidgetHoverBackground).toBrush());
 		_painter->setPen(pen);
 		_painter->drawLines(centerLines);
 	}

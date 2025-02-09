@@ -6,13 +6,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
-#include "OTGui/Painter2D.h"
+#include "OTCore/Color.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 
 	class PenFCfg;
+	class Painter2D;
 
 	//! @brief Line style.
 	enum LineStyle {
@@ -58,11 +58,20 @@ namespace ot {
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
+		PenCfg(DefaultColor _color);
+
+		//! @brief Assignment constructor.
+		//! @param _color Initial color.
 		PenCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenCfg() "See default constructor"]).
 		PenCfg(Painter2D* _painter);
+
+		//! @brief Assignment constructor.
+		//! @param _width Line width.
+		//! @param _color Initial color.
+		PenCfg(int _width, DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
@@ -105,7 +114,7 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 
 		//! @brief Painter.
-		constexpr inline const Painter2D* painter(void) const { return m_painter; };
+		inline const Painter2D* painter(void) const { return m_painter; };
 
 		//! @brief Replaces the current painter with a default painter and returns the old painter.
 		//! The caller takes ownership of the painter.
@@ -113,31 +122,31 @@ namespace ot {
 
 		//! @brief Set the line width.
 		//! @param _w Width to set.
-		constexpr inline void setWidth(int _w) { m_width = _w; };
+		inline void setWidth(int _w) { m_width = _w; };
 
 		//! @brief Line width.
-		constexpr inline int width(void) const { return m_width; };
+		inline int width(void) const { return m_width; };
 
 		//! @brief Set the line style.
 		//! @param _style Style to set.
-		constexpr inline void setStyle(LineStyle _style) { m_style = _style; };
+		inline void setStyle(LineStyle _style) { m_style = _style; };
 
 		//! @brief Line style.
-		constexpr inline LineStyle style(void) const { return m_style; };
+		inline LineStyle style(void) const { return m_style; };
 
 		//! @brief Set the line cap style.
 		//! @param _cap Cap style to set.
-		constexpr inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
+		inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
 
 		//! @brief Cap style.
-		constexpr inline LineCapStyle cap(void) const { return m_cap; };
+		inline LineCapStyle cap(void) const { return m_cap; };
 
 		//! @brief Set the line join style.
 		//! @param _style Join style to set.
-		constexpr inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
+		inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
 
 		//! @brief Line join style.
-		constexpr inline LineJoinStyle joinStyle(void) const { return m_join; };
+		inline LineJoinStyle joinStyle(void) const { return m_join; };
 
 		PenFCfg toPenFCfg(void) const;
 
@@ -165,11 +174,20 @@ namespace ot {
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
+		PenFCfg(DefaultColor _color);
+
+		//! @brief Assignment constructor.
+		//! @param _color Initial color.
 		PenFCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenFCfg() "See default constructor"]).
 		PenFCfg(Painter2D* _painter);
+
+		//! @brief Assignment constructor.
+		//! @param _width Line width.
+		//! @param _color Initial color.
+		PenFCfg(double _width, DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
@@ -212,7 +230,7 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 
 		//! @brief Painter.
-		constexpr inline const Painter2D* painter(void) const { return m_painter; };
+		inline const Painter2D* painter(void) const { return m_painter; };
 
 		//! @brief Replaces the current painter with a default painter and returns the old painter.
 		//! The caller takes ownership of the painter.
@@ -220,31 +238,31 @@ namespace ot {
 
 		//! @brief Set the line width.
 		//! @param _w Width to set.
-		constexpr inline void setWidth(double _w) { m_width = _w; };
+		inline void setWidth(double _w) { m_width = _w; };
 
 		//! @brief Line width.
-		constexpr inline double width(void) const { return m_width; };
+		inline double width(void) const { return m_width; };
 
 		//! @brief Set the line style.
 		//! @param _style Style to set.
-		constexpr inline void setStyle(LineStyle _style) { m_style = _style; };
+		inline void setStyle(LineStyle _style) { m_style = _style; };
 
 		//! @brief Line style.
-		constexpr inline LineStyle style(void) const { return m_style; };
+		inline LineStyle style(void) const { return m_style; };
 
 		//! @brief Set the line cap style.
 		//! @param _cap Cap style to set.
-		constexpr inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
+		inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
 
 		//! @brief Cap style.
-		constexpr inline LineCapStyle cap(void) const { return m_cap; };
+		inline LineCapStyle cap(void) const { return m_cap; };
 
 		//! @brief Set the line join style.
 		//! @param _style Join style to set.
-		constexpr inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
+		inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
 
 		//! @brief Line join style.
-		constexpr inline LineJoinStyle joinStyle(void) const { return m_join; };
+		inline LineJoinStyle joinStyle(void) const { return m_join; };
 
 		PenCfg toPenCfg(void) const;
 

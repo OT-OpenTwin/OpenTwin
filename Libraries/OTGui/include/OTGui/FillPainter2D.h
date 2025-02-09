@@ -17,6 +17,7 @@ namespace ot {
 	public:
 		FillPainter2D();
 		FillPainter2D(ot::DefaultColor _color);
+		FillPainter2D(int _r, int _g, int _b, int _a = 255);
 		FillPainter2D(const ot::Color& _color);
 		virtual ~FillPainter2D();
 
