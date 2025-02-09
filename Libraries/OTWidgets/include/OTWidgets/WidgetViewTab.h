@@ -33,8 +33,8 @@ namespace ot {
 		void setLockButtonVisible(bool _vis);
 
 	Q_SIGNALS:
-		void closeRequested(void);
-		void lockedChanged(bool _isLocked);
+		void viewCloseRequested(void);
+		void viewLockedChanged(bool _isLocked);
 
 	private Q_SLOTS:
 		void slotClose(void);

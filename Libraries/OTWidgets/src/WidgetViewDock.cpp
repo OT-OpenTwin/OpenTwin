@@ -11,8 +11,8 @@
 ot::WidgetViewDock::WidgetViewDock() : ads::CDockWidget(QString()) {
 	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (actualTab) {
-		this->connect(actualTab, &WidgetViewTab::closeRequested, this, &WidgetViewDock::slotCloseRequested);
-		this->connect(actualTab, &WidgetViewTab::lockedChanged, this, &WidgetViewDock::slotLockedChanged);
+		this->connect(actualTab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
+		this->connect(actualTab, &WidgetViewTab::viewLockedChanged, this, &WidgetViewDock::slotLockedChanged);
 	}
 	else {
 		OT_LOG_E("Unexpected tab");

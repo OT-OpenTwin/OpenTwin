@@ -77,10 +77,10 @@ void ot::WidgetViewTab::setLockButtonVisible(bool _vis) {
 }
 
 void ot::WidgetViewTab::slotClose(void) {
-	Q_EMIT closeRequested();
+	Q_EMIT viewCloseRequested();
 }
 
 void ot::WidgetViewTab::slotToggleLocked(void) {
 	m_isLocked = !m_isLocked;
-	Q_EMIT lockedChanged(m_isLocked);
+	Q_EMIT viewLockedChanged(m_isLocked);
 }

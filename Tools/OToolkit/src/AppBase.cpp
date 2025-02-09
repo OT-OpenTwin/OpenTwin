@@ -479,10 +479,6 @@ AppBase::AppBase(QApplication* _app)
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	// Initialize dock manager
-	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideFeatureEnabled);
-	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideButtonTogglesArea);
-	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideShowOnMouseOver);
-	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::DockAreaHasAutoHideButton);
 	ot::WidgetViewManager::instance().initialize();
 
 	// Create output
