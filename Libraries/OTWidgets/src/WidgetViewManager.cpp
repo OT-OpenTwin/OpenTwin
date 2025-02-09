@@ -35,10 +35,18 @@ void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 	m_dockManager = _dockManager;
 
 	if (!m_dockManager) {
-		ads::CDockManager::setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
-		ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
-		ads::CDockManager::setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, true);
-		ads::CDockManager::setConfigFlag(ads::CDockManager::MiddleMouseButtonClosesTab, true);
+		using namespace ads;
+		
+		CDockManager::setConfigFlags(
+			CDockManager::AllTabsHaveCloseButton | 
+			CDockManager::MiddleMouseButtonClosesTab | 
+			CDockManager::MiddleMouseButtonClosesTab |
+			CDockManager::FloatingContainerHasWidgetTitle |
+			CDockManager::DisableTabTextEliding |
+			CDockManager::FocusHighlighting |
+			CDockManager::XmlCompressionEnabled
+		);
+
 		m_dockManager = new WidgetViewDockManager;
 		m_dockManager->setStyleSheet("");
 	}
