@@ -56,7 +56,7 @@ jobs:
         set DEVENV_ROOT_2022=%DEVENV_PATH%
         set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
         set QtMsBuild=%cd%\OpenTwin\QtMsBuild
-        echo "Starting BuildAll.bat..."
+        echo "Starting  BuildAll.bat..."
         call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
 
     - name: Upload build log Debug artifact
