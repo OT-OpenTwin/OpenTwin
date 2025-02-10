@@ -9,6 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Plot1DAxisCfg.h"
+#include "OTGui/WidgetViewBase.h"
 #include "OTGui/NavigationTreeItemIcon.h"
 
 // std header
@@ -16,7 +17,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Plot1DCfg : public Serializable {
+	class OT_GUI_API_EXPORT Plot1DCfg : public WidgetViewBase {
 	public:
 		enum PlotType {
 			Cartesian,
@@ -61,15 +62,6 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
-
-		void setUid(UID _uid) { m_uid = _uid; };
-		UID getUid(void) const { return m_uid; };
-
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
-
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle(void) const { return m_title; };
 
 		void setProjectName(const std::string& _projectName) { m_projectName = _projectName; };
 		const std::string& getProjectName(void) const { return m_projectName; };
@@ -129,10 +121,6 @@ namespace ot {
 		bool getYAxisIsAutoScale(void) const { return m_yAxis.getIsAutoScale(); };
 
 	private:
-		UID m_uid;
-		
-		std::string m_name;
-		std::string m_title;
 		std::string m_projectName;
 		PlotType m_type;
 		AxisQuantity m_axisQuantity;

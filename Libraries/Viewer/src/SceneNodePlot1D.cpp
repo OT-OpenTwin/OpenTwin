@@ -91,8 +91,8 @@ const ot::Plot1DCurveCfg& SceneNodePlot1D::getCurveInfo(size_t _index) const {
 }
 
 void SceneNodePlot1D::applyConfigInfo(void) {
-	this->setName(m_config.getName());
-	this->setModelEntityID(m_config.getUid());
+	this->setName(m_config.getEntityName());
+	this->setModelEntityID(m_config.getEntityID());
 	OldTreeIcon icons;
 	icons.size = 32;
 	icons.visibleIcon = m_config.getOldTreeIcons().getVisibleIcon();

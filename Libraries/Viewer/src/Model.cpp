@@ -3177,9 +3177,9 @@ void Model::addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
 	plotNode->setDataBaseConfig(_config);
 	
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(_config.getName());
+	SceneNodeBase *parentNode = getParentNode(_config.getEntityName());
 	if (!parentNode) {
-		OT_LOG_EAS("Parent node \"" + _config.getName() + "\" not found");
+		OT_LOG_EAS("Parent node \"" + _config.getEntityName() + "\" not found");
 		return;
 	}
 	
@@ -3190,9 +3190,9 @@ void Model::addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
 	addSceneNodesToTree(plotNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[_config.getName()] = plotNode;
+	m_nameToSceneNodesMap[_config.getEntityName()] = plotNode;
 	treeItemToSceneNodesMap[plotNode->getTreeItemID()] = plotNode;
-	modelItemToSceneNodesMap[_config.getUid()] = plotNode;
+	modelItemToSceneNodesMap[_config.getEntityID()] = plotNode;
 
 	plotNode->setModel(this);
 
@@ -3211,7 +3211,7 @@ void Model::addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
 	plotNode->setCurves(std::list<ot::Plot1DCurveCfg>());
 
 	for (ot::Plot1DCurveCfg& curveInfo : curves) {
-		curveInfo.setEntityName(_config.getName() + "/" + curveInfo.getEntityName());
+		curveInfo.setEntityName(_config.getEntityName() + "/" + curveInfo.getEntityName());
 		plotNode->addCurve(curveInfo);
 		addVisualizationResult1DNode(curveInfo, curveOldTreeIcons, _config.getHidden());
 	}
@@ -3295,7 +3295,7 @@ bool Model::updateCurveEntityVersion(SceneNodeBase * _root, ot::UID _entityID, o
 
 void Model::visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config)
 {
-	SceneNodePlot1D* plotNode = dynamic_cast<SceneNodePlot1D*>(modelItemToSceneNodesMap[_config.getUid()]);
+	SceneNodePlot1D* plotNode = dynamic_cast<SceneNodePlot1D*>(modelItemToSceneNodesMap[_config.getEntityID()]);
 	
 	if (!plotNode) {
 		OT_LOG_EAS("Plot node not found");

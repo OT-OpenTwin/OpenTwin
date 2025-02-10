@@ -195,8 +195,8 @@ void EntityResult1DPlot::addBasicsToConfig(ot::Plot1DCfg& _config)
 	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
 	this->getGridColor(gridColorR, gridColorG, gridColorB);
 
-	_config.setName(this->getName());
-	_config.setUid(this->getEntityID());
+	_config.setEntityName(this->getName());
+	_config.setEntityID(this->getEntityID());
 	_config.setTitle(this->getTitle());
 	_config.setProjectName(DataBase::GetDataBase()->getProjectName());
 	_config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));

@@ -10,7 +10,7 @@
 #include "PlotManagerView.h"
 
 ot::PlotManagerView::PlotManagerView()
-	: WidgetView(WidgetViewBase::ViewVersion)
+	: WidgetView(WidgetViewBase::View1D)
 {
 	m_plotManager = new PlotManager;
 

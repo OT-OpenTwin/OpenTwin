@@ -72,7 +72,7 @@ void PlotBuilder::createPlot(const ot::Plot1DCfg& _plotCfg)
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 
 	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
-	plotEntity.setName(_plotCfg.getName());
+	plotEntity.setName(_plotCfg.getEntityName());
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();

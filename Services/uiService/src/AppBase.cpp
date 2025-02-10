@@ -34,6 +34,7 @@
 
 // OpenTwin header
 #include "DataBase.h"
+#include "PlotManagerView.h"
 
 #include "OTCore/Flags.h"
 #include "OTCore/Logger.h"
@@ -872,7 +873,7 @@ void AppBase::createUi(void) {
 
 			ot::Label* defaultLabel = new ot::Label;
 			m_defaultView = new ot::BasicWidgetView(defaultLabel);
-			m_defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
+			m_defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::CustomView, ot::WidgetViewBase::ViewIsCentral));
 			m_defaultView->setViewIsPermanent(true);
 			m_defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
@@ -1876,6 +1877,56 @@ void AppBase::closeTable(const std::string& _entityName) {
 
 	this->cleanupWidgetViewInfo(view);
 	ot::WidgetViewManager::instance().closeView(view);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Plot
+
+ot::PlotManagerView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
+	ot::PlotManagerView* newPlot = this->findPlot(_config.getEntityName());
+	if (newPlot != nullptr) {
+		OT_LOG_D("Plot already exists { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		return newPlot;
+	}
+
+	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::View1D)) {
+		OT_LOG_EAS("Plot managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		return nullptr;
+	}
+
+	newPlot = new ot::PlotManagerView;
+	newPlot->setViewData(_config);
+	this->setupNewCentralView(newPlot);
+
+	this->lockManager()->uiViewCreated(_serviceInfo, newPlot, ot::LockAll | ot::LockModelWrite);
+
+	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newPlot, _viewInsertFlags);
+
+	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
+	return newPlot;
+}
+
+ot::PlotManagerView* AppBase::findPlot(const std::string& _entityName) {
+	auto it = m_plots.find(_entityName);
+	if (it == m_plots.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second;
+	}
+}
+
+ot::PlotManagerView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
+	ot::PlotManagerView* v = this->findPlot(_config.getEntityName());
+	if (v) {
+		return v;
+	}
+
+	OT_LOG_D("Plot does not exist. Creating new plot. { \"Plot.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewPlot(_config, _serviceInfo, _viewInsertFlags);
 }
 
 // ######################################################################################################################

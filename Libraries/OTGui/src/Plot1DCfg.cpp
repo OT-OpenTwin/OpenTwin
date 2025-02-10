@@ -55,48 +55,46 @@ ot::Plot1DCfg::AxisQuantity ot::Plot1DCfg::stringToAxisQuantity(const std::strin
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::Plot1DCfg::Plot1DCfg() 
-	: m_uid(0), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
+ot::Plot1DCfg::Plot1DCfg() : 
+	WidgetViewBase(WidgetViewBase::View1D), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
 	m_gridVisible(false), m_gridWidth(1.), m_isHidden(false), m_legendVisible(false)
 {}
 
-ot::Plot1DCfg::Plot1DCfg(const Plot1DCfg& _other) {
+ot::Plot1DCfg::Plot1DCfg(const Plot1DCfg& _other)
+	: WidgetViewBase(WidgetViewBase::View1D)
+{
 	*this = _other;
 }
 
 ot::Plot1DCfg::~Plot1DCfg() {}
 
 ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
-	if (this == &_other) return *this;
+	WidgetViewBase::operator=(_other);
 
-	m_uid = _other.m_uid;
-	
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	m_projectName = _other.m_projectName;
-	m_type = _other.m_type;
-	m_axisQuantity = _other.m_axisQuantity;
+	if (this != &_other) {
+		m_projectName = _other.m_projectName;
+		m_type = _other.m_type;
+		m_axisQuantity = _other.m_axisQuantity;
 
-	m_gridVisible = _other.m_gridVisible;
-	m_gridColor = _other.m_gridColor;
-	m_gridWidth = _other.m_gridWidth;
+		m_gridVisible = _other.m_gridVisible;
+		m_gridColor = _other.m_gridColor;
+		m_gridWidth = _other.m_gridWidth;
 
-	m_isHidden = _other.m_isHidden;
-	m_legendVisible = _other.m_legendVisible;
+		m_isHidden = _other.m_isHidden;
+		m_legendVisible = _other.m_legendVisible;
 
-	m_treeIcons = _other.m_treeIcons;
+		m_treeIcons = _other.m_treeIcons;
 
-	m_xAxis = _other.m_xAxis;
-	m_yAxis = _other.m_yAxis;
+		m_xAxis = _other.m_xAxis;
+		m_yAxis = _other.m_yAxis;
+	}
 
 	return *this;
 }
 
 void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("UID", m_uid, _allocator);
+	WidgetViewBase::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
-	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("ProjectName", JsonString(m_projectName, _allocator), _allocator);
 	_object.AddMember("Type", JsonString(this->plotTypeToString(m_type), _allocator), _allocator);
 	_object.AddMember("AxisQuantity", JsonString(this->axisQuantityToString(m_axisQuantity), _allocator), _allocator);
@@ -124,10 +122,8 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	m_uid = json::getUInt64(_object, "UID");
+	WidgetViewBase::setFromJsonObject(_object);
 
-	m_name = json::getString(_object, "Name");
-	m_title = json::getString(_object, "Title");
 	m_projectName = json::getString(_object, "ProjectName");
 	m_type = this->stringToPlotType(json::getString(_object, "Type"));
 	m_axisQuantity = this->stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
@@ -146,10 +142,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 }
 
 bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
-	return (m_uid == _other.m_uid) &&
-
-		(m_name == _other.m_name) &&
-		(m_title == _other.m_title) &&
+	return (WidgetViewBase::operator==(_other)) &&
 		(m_projectName == _other.m_projectName) &&
 		(m_type == _other.m_type) &&
 		(m_axisQuantity == _other.m_axisQuantity) &&
@@ -168,5 +161,5 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 }
 
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
-	return !(*this == _other);
+	return !Plot1DCfg::operator==(_other);
 }

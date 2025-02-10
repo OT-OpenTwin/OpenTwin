@@ -21,6 +21,7 @@
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/Plot1DCfg.h"
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -71,6 +72,7 @@ namespace ot { class GraphicsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class TextEditorView; }
 namespace ot { class GraphicsItemCfg; }
+namespace ot { class PlotManagerView; }
 namespace ot { class GraphicsViewView; }
 namespace ot { class PropertyGridView; }
 namespace ot { class PropertyGridItem; }
@@ -423,6 +425,16 @@ public:
 
 	void closeTable(const std::string& _name);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Plot
+
+	ot::PlotManagerView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+
+	ot::PlotManagerView* findPlot(const std::string& _entityName);
+
+	ot::PlotManagerView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+
 	// ######################################################################################################################
 
 	// Prompt
@@ -608,6 +620,7 @@ private:
 	std::map<std::string, ot::GraphicsViewView*> m_graphicsViews;
 	std::map<std::string, ot::TextEditorView*> m_textEditors;
 	std::map<std::string, ot::TableView*> m_tables;
+	std::map<std::string, ot::PlotManagerView*> m_plots;
 	
 	QIcon m_defaultProjectTypeIcon;
 	std::map<std::string, std::string> m_projectTypeDefaultIconNameMap;

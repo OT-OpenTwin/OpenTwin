@@ -159,8 +159,8 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Y max");
 
 	ot::Plot1DCfg config;
-	config.setName(getName());
-	config.setUid(getEntityID());
+	config.setEntityName(getName());
+	config.setEntityID(getEntityID());
 	config.setTitle(title);
 	config.setProjectName(DataBase::GetDataBase()->getProjectName());
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
