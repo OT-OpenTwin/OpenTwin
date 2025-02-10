@@ -99,6 +99,9 @@ namespace ot {
 
 		WidgetViewBase& operator = (const WidgetViewBase& _other);
 
+		bool operator == (const WidgetViewBase& _other) const;
+		bool operator != (const WidgetViewBase& _other) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions

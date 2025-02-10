@@ -26,6 +26,9 @@ namespace ot {
 
 		BasicEntityInformation& operator = (const BasicEntityInformation& _other);
 
+		bool operator == (const BasicEntityInformation& _other) const;
+		bool operator != (const BasicEntityInformation& _other) const;
+
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
 		//! \param _allocator Allocator.

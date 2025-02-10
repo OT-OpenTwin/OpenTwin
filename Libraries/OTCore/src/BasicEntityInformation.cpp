@@ -38,6 +38,16 @@ ot::BasicEntityInformation& ot::BasicEntityInformation::operator=(const BasicEnt
 	return *this;
 }
 
+bool ot::BasicEntityInformation::operator==(const BasicEntityInformation& _other) const {
+	return (m_entityId == _other.m_entityId) &&
+		(m_entityName == _other.m_entityName) &&
+		(m_entityVersion == _other.m_entityVersion);
+}
+
+bool ot::BasicEntityInformation::operator!=(const BasicEntityInformation& _other) const {
+	return !BasicEntityInformation::operator==(_other);
+}
+
 void ot::BasicEntityInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("EntityName", JsonString(m_entityName, _allocator), _allocator);
 	_object.AddMember("EntityID", m_entityId, _allocator);

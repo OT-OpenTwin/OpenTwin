@@ -150,6 +150,18 @@ ot::WidgetViewBase& ot::WidgetViewBase::operator = (const WidgetViewBase& _other
 	return *this;
 }
 
+bool ot::WidgetViewBase::operator==(const WidgetViewBase& _other) const {
+	return (BasicEntityInformation::operator==(_other)) &&
+		(m_title == _other.m_title) &&
+		(m_flags == _other.m_flags) &&
+		(m_dockLocation == _other.m_dockLocation) &&
+		(m_type == _other.m_type);
+}
+
+bool ot::WidgetViewBase::operator!=(const WidgetViewBase& _other) const {
+	return !WidgetViewBase::operator==(_other);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions
@@ -157,18 +169,18 @@ ot::WidgetViewBase& ot::WidgetViewBase::operator = (const WidgetViewBase& _other
 void ot::WidgetViewBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	BasicEntityInformation::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
-	_object.AddMember("Type", JsonString(this->toString(m_type), _allocator), _allocator);
-	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
+	_object.AddMember("ViewTitle", JsonString(m_title, _allocator), _allocator);
+	_object.AddMember("ViewType", JsonString(this->toString(m_type), _allocator), _allocator);
+	_object.AddMember("ViewFlags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
 	_object.AddMember("DockLocation", JsonString(this->toString(m_dockLocation), _allocator), _allocator);
 }
 
 void ot::WidgetViewBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	BasicEntityInformation::setFromJsonObject(_object);
 
-	m_title = json::getString(_object, "Title");
-	m_type = this->stringToViewType(json::getString(_object, "Type"));
-	m_flags = this->stringListToViewFlags(json::getStringList(_object, "Flags"));
+	m_title = json::getString(_object, "ViewTitle");
+	m_type = this->stringToViewType(json::getString(_object, "ViewType"));
+	m_flags = this->stringListToViewFlags(json::getStringList(_object, "ViewFlags"));
 	m_dockLocation = this->stringToDockLocation(json::getString(_object, "DockLocation"));
 }
 
