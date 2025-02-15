@@ -72,6 +72,9 @@
 	Var lds_entry
 	Var admin_entry
 	Var download_entry
+	
+	# Certificate VARIABLES
+	Var certs_path_content
 
 	#Database (MongoDB) variables
 	Var DirHandleMainInstall
@@ -134,6 +137,74 @@
 	!define MONGODB_INST_MSI_PATH "$INSTDIR\Upgrader\MongoDB_Installer" ;The relative position is used by the Upgrader.exe in the MongoDB_Executable folder
 	!define MONGODB_INST_SERVER_PATH "$INSTDIR\Upgrader\MongoDB_Server"
 	!define LOG_PATH "$INSTDIR\BuildInformation"
+	
+#=================================================================
+#						MACROS
+#=================================================================
+!define StrStr "!insertmacro StrStr"
+ 
+!macro StrStr ResultVar String SubString
+  Push `${String}`
+  Push `${SubString}`
+  Call StrStr
+  Pop `${ResultVar}`
+!macroend
+ 
+Function StrStr
+/*After this point:
+  ------------------------------------------
+  $R0 = SubString (input)
+  $R1 = String (input)
+  $R2 = SubStringLen (temp)
+  $R3 = StrLen (temp)
+  $R4 = StartCharPos (temp)
+  $R5 = TempStr (temp)*/
+ 
+  ;Get input from user
+  Exch $R0
+  Exch
+  Exch $R1
+  Push $R2
+  Push $R3
+  Push $R4
+  Push $R5
+ 
+  ;Get "String" and "SubString" length
+  StrLen $R2 $R0
+  StrLen $R3 $R1
+  ;Start "StartCharPos" counter
+  StrCpy $R4 0
+ 
+  ;Loop until "SubString" is found or "String" reaches its end
+  loop:
+    ;Remove everything before and after the searched part ("TempStr")
+    StrCpy $R5 $R1 $R2 $R4
+ 
+    ;Compare "TempStr" with "SubString"
+    StrCmp $R5 $R0 done
+    ;If not "SubString", this could be "String"'s end
+    IntCmp $R4 $R3 done 0 done
+    ;If not, continue the loop
+    IntOp $R4 $R4 + 1
+    Goto loop
+  done:
+ 
+/*After this point:
+  ------------------------------------------
+  $R0 = ResultVar (output)*/
+ 
+  ;Remove part before "SubString" on "String" (if there has one)
+  StrCpy $R0 $R1 `` $R4
+ 
+  ;Return output to user
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Pop $R1
+  Exch $R0
+FunctionEnd
+
 #=================================================================
 #						END OF DEFINES
 #=================================================================
@@ -389,6 +460,10 @@ Function PublicIPCertificate
 	${NSD_CreateBrowseButton} 350 68 65u 15u "Browse..."
 		Pop $BrowseButton
 	${NSD_OnClick} $BrowseButton SelectCertDirectory
+	
+	${If} $PublicCertPageChecker <> 0
+		${NSD_SetText} $DirHandleCert $certs_path_content
+	${EndIf}
 
 	nsDialogs::Show
 	SkipPublicIPCertPage:
@@ -407,6 +482,8 @@ FunctionEnd
 	Function OnPublicCertficateLeave
 
 		StrCpy $PublicCertPageChecker 1 
+		
+		${NSD_GetText} $DirHandleCert $certs_path_content
 
 		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$PUBLIC_CERT_PATH"
 		
@@ -1004,20 +1081,63 @@ Function .onInit
 	StrCpy "$ROOTDIR" "$WINDIR" 2
 	
 	StrCpy $UPGRADER_MONGODB_SERVICE_NAME "MongoDB" ; Default value
+	
+	# now read the defaults from potentially set environment variables (from a previous installation)
+	ReadRegStr $public_ip_field_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS"
+		
+	${If} $public_ip_field_content != ""
+		${If} $public_ip_field_content == "127.0.0.1"
+			StrCpy $localhost_radio_btn_state ${BST_CHECKED}
+		${Else}
+			StrCpy $RadioButtonPublic_state ${BST_CHECKED}
+		${EndIf}
+	${EndIf}
+	
+	ReadRegStr $MongoDBCustomPortField_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
+
+	${StrStr} $0 $MongoDBCustomPortField_content ":"
+	StrCpy $MongoDBCustomPortField_content $0 "" 1
+	
+	ReadRegStr $auth_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
+	ReadRegStr $gss_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
+	ReadRegStr $lss_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
+	ReadRegStr $gds_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
+	ReadRegStr $lds_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
+	ReadRegStr $admin_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT"
+	ReadRegStr $download_port_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT"
+	
+	${If} $MongoDBCustomPortField_content != ""
+	${AndIf} $auth_port_content != ""
+	${AndIf} $gss_port_content != ""
+	${AndIf} $lss_port_content != ""
+	${AndIf} $gds_port_content != ""
+	${AndIf} $lds_port_content != ""
+	${AndIf} $admin_port_content != ""
+	${AndIf} $download_port_content != ""
+	    StrCpy $PortReturnChecker 1
+		${If} $MongoDBCustomPortField_content != "27017"
+		${OrIf} $auth_port_content != "8092"
+		${OrIf} $gss_port_content != "8091"
+		${OrIf} $lss_port_content != "8093"
+		${OrIf} $gds_port_content != "9094"
+		${OrIf} $lds_port_content != "9095"
+		${OrIf} $admin_port_content != "8000"
+		${OrIf} $download_port_content != "80"
+			StrCpy $customPortValuesRadioBtnState ${BST_CHECKED}
+		${Else}
+			StrCpy $standardPortValuesRadioBtnState ${BST_CHECKED}
+		${EndIf}
+	${EndIf}
+	
+	ReadRegStr $certs_path_content HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH"
+	
+	${If} $MongoDBCustomPortField_content != ""
+	    StrCpy $PublicCertPageChecker 1
+	${EndIf}
+
 FunctionEnd
 
 Section Uninstall
-#Delete ALL env variables set by the installer
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT"
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH"	
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS"
 	
 	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 #===============================================================================================================================	
