@@ -42,6 +42,7 @@ Set DEVELOPER_NSI="!OPENTWIN_DEV_ROOT!\Scripts\Installer\nsis\install_opentwin_D
 Set THIRDPARTY_UNZIP_PATH="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools"
 Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zip.001"
 Set PLUGIN_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\dev\EnVar_plugin.zip"
+Set NSISLOG_ZIPFILE="%OPENTWIN_THIRDPARTY_ROOT%\Installer_Tools\ThirdParty\dev\nsis-3.10-log.zip"
 
 SET HELPER_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\helper"
 Set UPGRADER_PATH="!OPENTWIN_DEV_ROOT!\Tools\MongoDBUpgrader"
@@ -74,7 +75,11 @@ echo +++ COMPILE TIME +++
 REM	echo Extracting EnVar plugin for NSIS using 7-Zip...
 REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 
-	
+	ECHO NSIS found: %NSIS_REG_VALUE%
+
+	echo Extracting special build of NSIS including logging...
+	"!SEVENZIP_REG_DATA!\7z.exe" x "%NSISLOG_ZIPFILE%" -o"%NSIS_REG_VALUE%" -y -aoa
+
 	echo Copying Installation helpers...
 	RMDIR /S /Q "!HELPER_PATH!"
 	mkdir !HELPER_PATH!

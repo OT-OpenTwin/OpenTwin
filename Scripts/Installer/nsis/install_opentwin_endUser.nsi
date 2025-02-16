@@ -205,6 +205,57 @@ Function StrStr
   Exch $R0
 FunctionEnd
 
+
+!define /IfNDef LVM_GETITEMCOUNT 0x1004
+!define /IfNDef LVM_GETITEMTEXTA 0x102D
+!define /IfNDef LVM_GETITEMTEXTW 0x1073
+!if "${NSIS_CHAR_SIZE}" > 1
+!define /IfNDef LVM_GETITEMTEXT ${LVM_GETITEMTEXTW}
+!else
+!define /IfNDef LVM_GETITEMTEXT ${LVM_GETITEMTEXTA}
+!endif
+ 
+Function DumpLog
+  Exch $5
+  Push $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+  Push $6
+  FindWindow $0 "#32770" "" $HWNDPARENT
+  GetDlgItem $0 $0 1016
+  StrCmp $0 0 exit
+  FileOpen $5 $5 "w"
+  StrCmp $5 "" exit
+    SendMessage $0 ${LVM_GETITEMCOUNT} 0 0 $6
+    System::Call '*(&t${NSIS_MAX_STRLEN})p.r3'
+    StrCpy $2 0
+    System::Call "*(i, i, i, i, i, p, i, i, i) p  (0, 0, 0, 0, 0, r3, ${NSIS_MAX_STRLEN}) .r1"
+    loop: StrCmp $2 $6 done
+      System::Call "User32::SendMessage(p, i, p, p) p ($0, ${LVM_GETITEMTEXT}, $2, r1)"
+      System::Call "*$3(&t${NSIS_MAX_STRLEN} .r4)"
+      !ifdef DumpLog_As_UTF16LE
+      FileWriteUTF16LE ${DumpLog_As_UTF16LE} $5 "$4$\r$\n"
+      !else
+      FileWrite $5 "$4$\r$\n" ; Unicode will be translated to ANSI!
+      !endif
+      IntOp $2 $2 + 1
+      Goto loop
+    done:
+      FileClose $5
+      System::Free $1
+      System::Free $3
+  exit:
+    Pop $6
+    Pop $4
+    Pop $3
+    Pop $2
+    Pop $1
+    Pop $0
+    Pop $5
+FunctionEnd
+
 #=================================================================
 #						END OF DEFINES
 #=================================================================
@@ -338,6 +389,7 @@ FunctionEnd
 ########################################################################
 
 Function NetworkModePage
+
 	StrCpy $PublicIpSet 0
 	!insertmacro MUI_HEADER_TEXT "OpenTwin Server Settings" "Select your desired network configuration for OpenTwin. Select between a local runtime via your localhost adress or a remote server setup via a public IP adress"		
 		nsDialogs::Create 1018
@@ -863,7 +915,7 @@ FunctionEnd
 	!insertmacro MUI_PAGE_INSTFILES
 	; Finish page
 	#!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenTwin_local.bat"
-
+	
 	!define MUI_TEXT_FINISH_INFO_TEXT "Installation complete. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
 
 	!insertmacro MUI_PAGE_FINISH
@@ -883,6 +935,10 @@ ShowInstDetails hide
 ShowUnInstDetails hide
 
 Section "-Extract Installer Tools (Required)" SEC01
+
+	LogSet on
+	LogText "Extract Installer Tools"
+
 	SectionIn RO ;read only section
 	SetOutPath "$INSTDIR\Tools\ThirdParty"
 	DetailPrint "Extracting toolchain..."
@@ -904,6 +960,9 @@ Section "-Extract Installer Tools (Required)" SEC01
 SectionEnd
 
 Section "OpenTwin Main Files (Required)" SEC02
+
+	LogText "OpenTwin Main Files"
+
 	SectionIn RO ;read only section
 	SetOutPath "$INSTDIR"
 	SetOverwrite ifnewer
@@ -934,6 +993,12 @@ Section "OpenTwin Main Files (Required)" SEC02
 	CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
 	CreateShortCut "$DESKTOP\OpenTwin.lnk" "$INSTDIR\OpenTwin_local.bat" "" ${OPENTWIN_APP_ICON}
 	!insertmacro MUI_STARTMENU_WRITE_END
+	
+	LogText "Dumping Detailed Information"
+
+	StrCpy $0 "$INSTDIR\install.log"
+	Push $0
+	Call DumpLog
 SectionEnd
 
 ####### Checking if a MongoDB upgrade or a first installation is required ######
@@ -945,6 +1010,8 @@ SectionEnd
 !include MongoFirstInstallSetup.nsh
 
 Section "-Post MongoInstall"
+	LogText "Post MongoInstall"
+
 	;MessageBox MB_OK "Deleting Mongo Files"
 	DetailPrint "Removing MongoDB executables ..."
 	
@@ -1045,6 +1112,7 @@ FunctionEnd
 
 #.onInit function to initialize any values that need initializing at the beginning of the script
 Function .onInit
+		
 	#from front end installer
 	!insertmacro EnsureAdminRights
 		
@@ -1072,7 +1140,7 @@ Function .onInit
 		${EndIf}
 
 	${EndIf}
-
+	
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
