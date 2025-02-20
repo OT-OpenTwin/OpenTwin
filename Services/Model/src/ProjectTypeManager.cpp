@@ -34,6 +34,10 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypeLTSpice();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_PYRIT)
+	{
+		initializeProjectTypePyrit();
+	}
 	else
 	{
 		// This is an unknown project type which defaults to development
@@ -129,6 +133,24 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 	_datasetRMD = getDatasetRootName() + "/Information";
 }
 
+void ProjectTypeManager::initializeProjectTypePyrit(void)
+{
+	_hasGeometryRoot = true;
+	_hasMaterialRoot = true;
+	_hasMeshRoot = true;
+	_hasSolverRoot = true;
+	_hasScriptsRoot = false;
+	_hasUnitRoot = true;
+	_hasDataCategorizationRoot = false;
+	_hasRMDCategorization = false;
+	_hasRMDCategorizationPreview = false;
+	_hasDatasetRoot = false;
+	_hasDatasetRMD = false;
+
+	_has3DView = true;
+	_has1DView = true;
+	_hasBlockPicker = false;
+}
 std::string ProjectTypeManager::getViews(void)
 {
 	ot::JsonDocument newDoc;

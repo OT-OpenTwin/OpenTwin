@@ -277,6 +277,24 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	{
 		using namespace ot;
+		ProjectTemplateInformation defaultPyrit;
+		defaultPyrit.setName(OT_ACTION_PARAM_SESSIONTYPE_PYRIT);
+		defaultPyrit.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_PYRIT);
+		defaultPyrit.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "Pyrit Project" << StyledText::Text <<
+			"Create, import, export and modify 3D geometries. Run simulations using the Pyrit solver.";
+
+		defaultPyrit.setDescription(description);
+
+		ot::JsonObject objPyrit;
+		defaultPyrit.addToJsonObject(objPyrit, result.GetAllocator());
+		result.PushBack(objPyrit, result.GetAllocator());
+	}
+
+	{
+		using namespace ot;
 		ProjectTemplateInformation defaultDevelopment;
 		defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
 		defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);

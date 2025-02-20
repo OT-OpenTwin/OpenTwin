@@ -32,6 +32,7 @@ private:
 	void initializeProjectTypeDataPipeline(void);
 	void initializeProjectTypeStudioSuite(void);
 	void initializeProjectTypeLTSpice(void);
+	void initializeProjectTypePyrit(void);
 
 	bool _hasGeometryRoot				= true;
 	bool _hasMaterialRoot				= true;

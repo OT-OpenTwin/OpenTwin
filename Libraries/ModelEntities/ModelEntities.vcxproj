@@ -35,6 +35,7 @@
     <ClInclude Include="include\EntityResult1DPlot_New.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
+    <ClInclude Include="include\EntitySolverPyrit.h" />
     <ClInclude Include="include\IVisualisationCurve.h" />
     <ClInclude Include="include\IVisualisationPlot1D.h" />
     <ClInclude Include="include\IVisualisationTable.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
     <ClCompile Include="src\EntitySolverCircuitSimulator.cpp" />
     <ClCompile Include="src\EntitySolverElmerFEM.cpp" />
+    <ClCompile Include="src\EntitySolverPyrit.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarVolume.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredVectorVolume.cpp" />

@@ -323,6 +323,11 @@ ECHO ===============================================================
 CALL "%OT_LTSPICE_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Service: PyritService
+ECHO ===============================================================
+CALL "%OT_PYRIT_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Service: PythonExecutionService
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2

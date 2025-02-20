@@ -70,6 +70,7 @@ SET OT_BLOCKEDITORSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\BlockEditorService
 SET OT_DATA_PROCESSING_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\DataProcessingService
 SET OT_CIRCUIT_SIMULATOR_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService
 SET	OT_CIRCUIT_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitExecution
+SET OT_PYRIT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PyritService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths

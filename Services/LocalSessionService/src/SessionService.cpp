@@ -100,6 +100,17 @@ SessionService::SessionService()
 	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
 	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LTSPICE, OT_INFO_SERVICE_TYPE_LTSPICE));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, LTSpiceSessionServices);
+
+	//
+	// Pyrit services list (this contains all services relevant for Pyrit integration)
+	//
+	std::vector<ot::ServiceBase>* PyritSessionServices = new std::vector<ot::ServiceBase>;
+	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
+	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
+	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
+	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_PYRIT, PyritSessionServices);
 }
 
 bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {
