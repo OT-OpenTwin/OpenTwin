@@ -144,6 +144,8 @@ Section "Program files (Required)"
   File /r ..\..\Deployment_Frontend\*.*
   
   nsExec::Exec 'CMD /C certutil -f -addstore -user root "$InstDir\Certificates\ca.pem"'	
+  
+  ExecShell "" "$InstDir\OpenTwin.exe" "-c" SW_HIDE ; Check the graphics card and activate software rendering, if necessary
 
   IfSilent "" +2 ; If the installer is silent then we run the executable in a last step
   ExecShell "" "$InstDir\OpenTwin.exe"

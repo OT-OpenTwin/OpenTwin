@@ -29,6 +29,7 @@
 #include <QtGui/qoffscreensurface.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
+#include <QtCore/qcommandlineparser.h>
 
 // C++ header
 #include <exception>
@@ -61,7 +62,7 @@ void initializeAppBase(void) {
 	app->getExternalServicesComponent()->setRelayServiceIsRequired();
 }
 
-bool initializeOpenGL(void) {
+bool initializeOpenGL(bool checkGraphics) {
 	// Check for a sufficient OpenGL version
 	QOffscreenSurface surf;
 	surf.create();
@@ -76,11 +77,42 @@ bool initializeOpenGL(void) {
 	{
 		std::string errorString = "The system supports OpenGL version " + version + " only.\n"
 			"At least OpenGL version 2.0.0 is required.\n\n"
-			"You may use software rendering by renaming the file opengl32sw.dll to opengl32.dll in the installation directory.";
+			"As a fallback solution, slower software rendering will now be activated.\n\n"
+			"Please restart the application for the changes to take effect.";
+
+		std::string installPath = QCoreApplication::applicationDirPath().toLocal8Bit().constData();
+		std::string sourceFile  = installPath + "/opengl32sw.dll";
+		std::string destFile    = installPath + "/opengl32.dll";
+
+		if (!std::filesystem::exists(sourceFile)) 
+		{
+			std::string dev_root = qgetenv("OPENTWIN_DEV_ROOT").constData();
+
+			if (dev_root.empty())
+			{
+				errorString = "The system supports OpenGL version " + version + " only.\n"
+						   	  "At least OpenGL version 2.0.0 is required.";
+			}
+			else
+			{
+				sourceFile = dev_root + "/Deployment/opengl32sw.dll";
+				destFile = dev_root + "/Deployment/opengl32.dll";
+
+				std::filesystem::copy_file(sourceFile, destFile);
+			}
+		}
+		else
+		{
+			std::filesystem::copy_file(sourceFile, destFile);
+		}
 
 		//OT_LOG_E(errorString);  This does not worl if OpenGL is not properly initialized due to the HTML styling
-		QMessageBox msgBox(QMessageBox::Critical, "OpenGL error", QString::fromStdString(errorString), QMessageBox::Ok);
-		msgBox.exec();
+
+		if (!checkGraphics)
+		{
+			QMessageBox msgBox(QMessageBox::Critical, "OpenGL error", QString::fromStdString(errorString), QMessageBox::Ok);
+			msgBox.exec();
+		}
 		return false;
 	}
 	else {
@@ -177,11 +209,23 @@ int main(int _argc, char *_argv[])
 		initializeLogging();
 
 		QApplication* app = initializeQt(_argc, _argv);
-		
+
+		QCommandLineParser parser;
+		QCommandLineOption checkGraphicsOption("c");
+		parser.addOption(checkGraphicsOption);
+
+		parser.process(*app);
+		bool checkGraphics = parser.isSet(checkGraphicsOption);
+
 		initializeAppBase();
 
-		if (!initializeOpenGL()) {
+		if (!initializeOpenGL(checkGraphics)) {
 			return -1;
+		}
+
+		if (checkGraphics)
+		{
+			return 0;
 		}
 
 		if (!initializeAssets()) {

@@ -985,8 +985,10 @@ Section "OpenTwin Main Files (Required)" SEC02
 	DetailPrint "Installing VC Redistributable..."
 	# The 32bit version is required for Apache
 	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x86.exe" /silent'					
-	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64.exe" /silent'					
+	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64.exe" /silent'		
 
+	ExecWait '"$INSTDIR\uiFrontend.exe" -c' ; Check the graphics card and activate software rendering, if necessary
+	
 	; Shortcuts
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 	CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
