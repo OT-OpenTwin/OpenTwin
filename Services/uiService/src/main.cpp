@@ -165,7 +165,7 @@ bool initializeAssets(void) {
 	}
 
 	// Check if at least one graphics item directory was found
-	if (stylePathCounter == 0) {
+	if (graphicsPathCounter == 0) {
 		OT_LOG_EA("No graphics item path found");
 		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application", QMessageBox::Ok);
 		msgBox.exec();
