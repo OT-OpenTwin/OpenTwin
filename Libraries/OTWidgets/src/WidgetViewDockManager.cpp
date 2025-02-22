@@ -18,6 +18,7 @@ ot::WidgetViewDockManager::WidgetViewDockManager() : m_componentsFactory(nullptr
 
 ot::WidgetViewDockManager::~WidgetViewDockManager() {
 	if (m_componentsFactory) {
+		m_componentsFactory->forgetDockManager();
 		ads::CDockComponentsFactory::resetDefaultFactory();
 	}
 }
