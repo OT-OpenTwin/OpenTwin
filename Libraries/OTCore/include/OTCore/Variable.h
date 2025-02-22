@@ -22,6 +22,11 @@ namespace ot
 	class OT_CORE_API_EXPORT StringWrapper
 	{
 	public:
+		StringWrapper(const char* ptr) {
+			size_t length = strlen(ptr) + 1;
+			_ptr = new char[length];
+			strcpy_s(_ptr, length, ptr);
+		}
 		StringWrapper(const std::string& val)
 		{
 			_ptr = new char[val.size() + 1] {};
@@ -45,6 +50,17 @@ namespace ot
 			_ptr = new char[length];
 			memmove_s(_ptr, length, other._ptr, length);
 			other._ptr = nullptr;
+		}
+		StringWrapper& operator=(const char* ptr) {
+			if (_ptr != nullptr) {
+				delete[] _ptr;
+				_ptr = nullptr;
+			}
+
+			size_t length = strlen(ptr) + 1;
+			_ptr = new char[length];
+			strcpy_s(_ptr, length, ptr);
+			return *this;
 		}
 		StringWrapper& operator=(const StringWrapper& other)
 		{
