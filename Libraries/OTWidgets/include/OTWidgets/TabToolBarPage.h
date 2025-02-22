@@ -37,6 +37,8 @@ namespace ot {
 		TabToolBar* getParentTabToolBar(void) { return m_parentTabToolBar; };
 		const TabToolBar* getParentTabToolBar(void) const { return m_parentTabToolBar; };
 
+		tt::Page* getPage(void) const { return m_page; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Element creation

@@ -28,6 +28,8 @@ namespace ot {
 		TabToolBarGroup* getParentTabToolBarGroup(void) { return m_parentGroup; };
 		const TabToolBarGroup* getParentTabToolBarGroup(void) const { return m_parentGroup; };
 
+		tt::SubGroup* getSubGroup(void) const { return m_subGroup; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Child management

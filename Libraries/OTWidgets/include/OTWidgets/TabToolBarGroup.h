@@ -35,6 +35,8 @@ namespace ot {
 		TabToolBarPage* getParentTabToolBarPage(void) { return m_parentPage; };
 		const TabToolBarPage* getParentTabToolBarPage(void) const { return m_parentPage; };
 
+		tt::Group* getGroup(void) const { return m_group; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Child management
