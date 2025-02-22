@@ -10,16 +10,19 @@
 
 // Qt header
 #include <QtCore/qstring.h>
+#include <QtGui/qicon.h>
 
 // std header
 #include <list>
 #include <string>
 
+class QMenu;
 namespace tt { class TabToolbar; }
 
 namespace ot {
 
 	class MainWindow;
+	class ToolButton;
 	class TabToolBarPage;
 	class TabToolBarGroup;
 	class TabToolBarSubGroup;
@@ -27,6 +30,8 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TabToolBar : public AbstractToolBar {
 		OT_DECL_NOCOPY(TabToolBar)
 	public:
+		static ToolButton* createButton(const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+
 		TabToolBar(MainWindow* _window = (MainWindow*)nullptr);
 		virtual ~TabToolBar();
 

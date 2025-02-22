@@ -392,7 +392,7 @@
       <Filter>src\Plot\Polar</Filter>
     </ClCompile>
     <ClCompile Include="src\TableItemDelegate.cpp">
-      <Filter>src\StyledDelegates</Filter>
+      <Filter>src\Delegates</Filter>
     </ClCompile>
     <ClCompile Include="src\StyledTextConverter.cpp">
       <Filter>src\General</Filter>
@@ -484,6 +484,9 @@
     <ClCompile Include="src\WidgetViewDock.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\TabToolBarButtonProxyStyle.cpp">
+      <Filter>src\Delegates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -570,12 +573,6 @@
     <Filter Include="src\Plot\Polar">
       <UniqueIdentifier>{a9a34595-f45c-40e4-9afa-881e031858ae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\StyledDelegates">
-      <UniqueIdentifier>{85780b8c-6fa1-4fc2-bb29-5bb08b6a2575}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\StyledDelegates">
-      <UniqueIdentifier>{666d82f1-aafe-4aeb-bdc5-d1e54fbe0966}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\ContextMenu">
       <UniqueIdentifier>{797f8cc2-4b48-41b0-ab84-d7705601f14d}</UniqueIdentifier>
     </Filter>
@@ -593,6 +590,12 @@
     </Filter>
     <Filter Include="src\ToolBar">
       <UniqueIdentifier>{6dc99e89-1351-4258-a4d9-8f3e315ccee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Delegates">
+      <UniqueIdentifier>{666d82f1-aafe-4aeb-bdc5-d1e54fbe0966}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Delegates">
+      <UniqueIdentifier>{85780b8c-6fa1-4fc2-bb29-5bb08b6a2575}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -849,7 +852,7 @@
       <Filter>include\Plot\Polar</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TableItemDelegate.h">
-      <Filter>include\StyledDelegates</Filter>
+      <Filter>include\Delegates</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\StyledTextConverter.h">
       <Filter>include\General</Filter>
@@ -928,6 +931,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h">
       <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBarButtonProxyStyle.h">
+      <Filter>include\Delegates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

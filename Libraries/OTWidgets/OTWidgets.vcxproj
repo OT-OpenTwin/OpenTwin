@@ -105,6 +105,7 @@
     <ClCompile Include="src\SVGWidgetGrid.cpp" />
     <ClCompile Include="src\TableItem.cpp" />
     <ClCompile Include="src\TableTextEdit.cpp" />
+    <ClCompile Include="src\TabToolBarButtonProxyStyle.cpp" />
     <ClCompile Include="src\WidgetManager.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\ImagePainterManager.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="include\OTWidgets\TabToolBarGroup.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarPage.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarSubGroup.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBarButtonProxyStyle.h" />
     <ClInclude Include="include\OTWidgets\Widget.h" />
     <QtMoc Include="include\OTWidgets\WidgetViewDock.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h" />

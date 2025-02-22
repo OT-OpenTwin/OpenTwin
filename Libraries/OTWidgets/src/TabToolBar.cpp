@@ -6,12 +6,32 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/MainWindow.h"
+#include "OTWidgets/ToolButton.h"
 #include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/TabToolBarPage.h"
+#include "OTWidgets/TabToolBarButtonProxyStyle.h"
 
 // TabToolBar header
 #include <TabToolbar/Page.h>
 #include <TabToolbar/TabToolbar.h>
+
+// Qt header
+#include <QtWidgets/qstyle.h>
+#include <QtWidgets/qapplication.h>
+
+ot::ToolButton* ot::TabToolBar::createButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
+	ToolButton* btn = new ot::ToolButton(_icon, _text);
+
+	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
+
+	btn->setAutoRaise(true);
+	btn->setIconSize(QSize(iconSize, iconSize));
+	btn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+	btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+	btn->setStyle(new ot::TabToolBarButtonProxyStyle());
+
+	return btn;
+}
 
 ot::TabToolBar::TabToolBar(MainWindow* _window)
 	: m_toolBar(nullptr)
