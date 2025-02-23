@@ -42,7 +42,7 @@ void initializeLogging(void) {
 	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
 }
 
-QApplication* initializeQt(int _argc, char* _argv[]) {
+QApplication* initializeQt(int &_argc, char* _argv[]) {
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
