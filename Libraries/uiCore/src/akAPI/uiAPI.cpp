@@ -70,8 +70,7 @@ ak::uiAPI::apiManager::apiManager()
 	m_appIsRunning(false),
 	m_defaultSurfaceFormat(nullptr),
 	m_fileUidManager(nullptr),
-	m_app(nullptr),
-	m_settings(nullptr)
+	m_app(nullptr)
 {
 	aSingletonAllowedMessages::instance();
 	m_fileUidManager = new aUidManager();
@@ -92,10 +91,6 @@ ak::uiAPI::apiManager::~apiManager() {
 	if (m_uidManager != nullptr) {
 		delete m_uidManager; m_uidManager = nullptr;
 	}
-
-	if (m_settings != nullptr) {
-		delete m_settings; m_settings = nullptr;
-	}
 }
 
 void ak::uiAPI::apiManager::ini(
@@ -109,8 +104,7 @@ void ak::uiAPI::apiManager::ini(
 	
 	m_companyName = _organizationName;
 	m_applicationName = _applicationName;
-	m_settings = new QSettings(_organizationName, _applicationName);
-
+	
 	// messenger
 	m_messenger = new aMessenger;
 	
@@ -1036,94 +1030,6 @@ QMovie * ak::uiAPI::getMovie(
 	const QString&											_name
 ) {
 	return ot::IconManager::getMovie("Animations/" + _name + ".gif").get();
-}
-
-// ###############################################################################################################################################
-
-// settings
-
-QString ak::uiAPI::settings::getString(
-	const QString &			_settingsName,
-	const QString &			_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toString();
-}
-
-int ak::uiAPI::settings::getInt(
-	const QString &			_settingsName,
-	int						_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toInt();
-}
-
-double ak::uiAPI::settings::getDouble(
-	const QString &			_settingsName,
-	double					_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toDouble();
-}
-
-float ak::uiAPI::settings::getFloat(
-	const QString &			_settingsName,
-	float					_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toFloat();
-}
-
-bool ak::uiAPI::settings::getBool(
-	const QString &			_settingsName,
-	bool					_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toBool();
-}
-
-QByteArray ak::uiAPI::settings::getByteArray(
-	const QString &			_settingsName,
-	const QByteArray &		_defaultValue
-) {
-	return m_apiManager.settings()->value(_settingsName, _defaultValue).toByteArray();
-}
-
-void ak::uiAPI::settings::setString(
-	const QString &			_settingsName,
-	const QString &			_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
-}
-
-void ak::uiAPI::settings::setInt(
-	const QString &			_settingsName,
-	int						_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
-}
-
-void ak::uiAPI::settings::setDouble(
-	const QString &			_settingsName,
-	double					_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
-}
-
-void ak::uiAPI::settings::setFloat(
-	const QString &			_settingsName,
-	float					_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
-}
-
-void ak::uiAPI::settings::setBool(
-	const QString &			_settingsName,
-	bool					_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
-}
-
-void ak::uiAPI::settings::setByteArray(
-	const QString &			_settingsName,
-	const QByteArray &		_value
-) {
-	m_apiManager.settings()->setValue(_settingsName, _value);
 }
 
 // ###############################################################################################################################################

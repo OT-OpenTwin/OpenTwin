@@ -82,8 +82,6 @@ namespace ak {
 
 			QScreen* screen() { return m_screen; }
 
-			QSettings * settings(void) const { return m_settings; }
-
 		protected:
 			QApplication*				m_app;							//! The core application
 			bool						m_appIsRunning;				//! True if the core application is already running
@@ -92,8 +90,7 @@ namespace ak {
 
 			QString						m_companyName;
 			QString						m_applicationName;
-			QSettings *					m_settings;
-
+			
 			bool						m_isInitialized;				//! If true, then the API was initialized
 
 			aUidManager *				m_fileUidManager;				//! The UID manager used for files in this API
@@ -1106,73 +1103,6 @@ namespace ak {
 		UICORE_API_EXPORT QMovie * getMovie(
 			const QString&											_name
 		);
-
-		// ###############################################################################################################################################
-
-		// Settings
-
-		namespace settings {
-
-			UICORE_API_EXPORT QString getString(
-				const QString &			_settingsName,
-				const QString &			_defaultValue = QString("")
-			);
-
-			UICORE_API_EXPORT int getInt(
-				const QString &			_settingsName,
-				int						_defaultValue = 0
-			);
-
-			UICORE_API_EXPORT double getDouble(
-				const QString &			_settingsName,
-				double					_defaultValue = 0.0
-			);
-
-			UICORE_API_EXPORT float getFloat(
-				const QString &			_settingsName,
-				float					_defaultValue = 0.0
-			);
-
-			UICORE_API_EXPORT bool getBool(
-				const QString &			_settingsName,
-				bool					_defaultValue = 0.0
-			);
-
-			UICORE_API_EXPORT QByteArray getByteArray(
-				const QString &			_settingsName,
-				const QByteArray &		_defaultValue = QByteArray()
-			);
-
-			UICORE_API_EXPORT void setString(
-				const QString &			_settingsName,
-				const QString &			_value
-			);
-
-			UICORE_API_EXPORT void setInt(
-				const QString &			_settingsName,
-				int						_value
-			);
-
-			UICORE_API_EXPORT void setDouble(
-				const QString &			_settingsName,
-				double					_value
-			);
-
-			UICORE_API_EXPORT void setFloat(
-				const QString &			_settingsName,
-				float					_value
-			);
-
-			UICORE_API_EXPORT void setBool(
-				const QString &			_settingsName,
-				bool					_value
-			);
-
-			UICORE_API_EXPORT void setByteArray(
-				const QString &			_settingsName,
-				const QByteArray &		_value
-			);
-		}
 
 		// ###############################################################################################################################################
 
