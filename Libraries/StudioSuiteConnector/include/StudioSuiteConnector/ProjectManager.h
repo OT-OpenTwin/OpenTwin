@@ -52,6 +52,7 @@ private:
     void                       writeVersionFile(const std::string& baseProjectName, const std::string &projectName, const std::string& newVersion, const std::string& cacheFolderName);
     void                       sendUnitsInformation(const std::string& projectRoot);
     void                       sendMaterialInformation(const std::string& projectRoot);
+    void                       sendParameterInformation(const std::string& projectRoot);
     void                       sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager& infoFileManager);
     void                       readFileContent(const std::string& fileName, std::string& content);
     std::map<std::string, int> determineAllShapes(std::stringstream fileContent);

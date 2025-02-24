@@ -32,6 +32,7 @@
 #include "EntityGeometry.h"
 #include "EntityFile.h"
 #include "EntityBinaryData.h"
+#include "EntityParameter.h"
 
 #include "InfoFileManager.h"
 #include "Result1DManager.h"
@@ -105,6 +106,12 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	{
 		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 		changeMaterials(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_PARAMETERS)
+	{
+		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		changeParameters(content);
 		return "";
 	}
 	else if (_action == OT_ACTION_CMD_UI_SS_SHAPEINFO)
@@ -689,6 +696,119 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	delete material; material = nullptr;
 
 	return true;
+}
+
+void Application::changeParameters(const std::string& content)
+{
+	std::stringstream buffer(content);
+
+	ot::UIDList currentParameters = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("Parameters", "EntityParameter", true);
+	std::list<ot::EntityInformation> currentParameterInfo;
+	ot::ModelServiceAPI::getEntityInformation(currentParameters, currentParameterInfo);
+	std::map<std::string, bool> parameterProcessed;
+
+	processParameterBuffer(buffer, parameterProcessed);
+
+	// Now we need to check if an existing parameter was not processed, which means that it no longer exists.
+	// In this case, we need to delete the parameter
+
+	std::list<std::string> obsoleteParameters;
+
+	for (auto parameter : currentParameterInfo)
+	{
+		if (parameterProcessed.count(parameter.getEntityName()) == 0)
+		{
+			obsoleteParameters.push_back(parameter.getEntityName());
+		}
+	}
+
+	if (!obsoleteParameters.empty())
+	{
+		ot::ModelServiceAPI::deleteEntitiesFromModel(obsoleteParameters, false);
+	}
+}
+
+void Application::processParameterBuffer(std::stringstream& buffer, std::map<std::string, bool>& parameterProcessed)
+{
+	std::string line;
+	std::getline(buffer, line);
+
+	int numberOfParameters = atoi(line.c_str());
+
+	bool changed = false;
+
+	for (int index = 0; index < numberOfParameters; index++)
+	{
+		std::string parameterName;
+		std::getline(buffer, parameterName);
+
+		std::string parameterValue;
+		std::getline(buffer, parameterValue);
+
+		std::string parameterDescription;
+		std::getline(buffer, parameterDescription);
+
+		// Try loading the parameter
+		EntityParameter* parameter = nullptr;
+
+		ot::EntityInformation entityInformation;
+		if (ot::ModelServiceAPI::getEntityInformation("Parameters/" + parameterName, entityInformation))
+		{
+			parameter = dynamic_cast<EntityParameter*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+		}
+
+		if (parameter == nullptr)
+		{
+			// We have a new parameter to create
+			parameter = new EntityParameter(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+			parameter->setName("Parameters/" + parameterName);
+			parameter->createProperties();
+
+			EntityPropertiesString* stringValue = dynamic_cast<EntityPropertiesString*>(parameter->getProperties().getProperty("Value"));
+			EntityPropertiesDouble* doubleValue = dynamic_cast<EntityPropertiesDouble*>(parameter->getProperties().getProperty("#Value"));
+			EntityPropertiesString* description = dynamic_cast<EntityPropertiesString*>(parameter->getProperties().getProperty("Description"));
+
+			stringValue->setValue(parameterValue);
+			doubleValue->setValue(atof(parameterValue.c_str()));
+			description->setValue(parameterDescription);
+
+			changed = true;
+		}
+		else
+		{
+			// We need to modify an existing parameter
+			EntityPropertiesString* stringValue = dynamic_cast<EntityPropertiesString*>(parameter->getProperties().getProperty("Value"));
+			EntityPropertiesDouble* doubleValue = dynamic_cast<EntityPropertiesDouble*>(parameter->getProperties().getProperty("#Value"));
+			EntityPropertiesString* description = dynamic_cast<EntityPropertiesString*>(parameter->getProperties().getProperty("Description"));
+
+			if (stringValue->getValue() != parameterValue)
+			{
+				stringValue->setValue(parameterValue);
+				doubleValue->setValue(atof(parameterValue.c_str()));
+
+				changed = true;
+			}
+
+			if (description->getValue() != parameterDescription)
+			{
+				description->setValue(parameterDescription);
+
+				changed = true;
+			}
+
+			parameterProcessed[parameter->getName()] = true;
+		}
+
+		// If a change is necessary, store the new entity
+		if (changed)
+		{
+			parameter->getProperties().setAllPropertiesReadOnly();
+			parameter->StoreToDataBase();
+			modelComponent()->addNewTopologyEntity(parameter->getEntityID(), parameter->getEntityStorageVersion(), false);
+		}
+
+		delete parameter; parameter = nullptr;
+	}
 }
 
 void Application::readDoubleTriple(const std::string& line, double& a, double& b, double& c)

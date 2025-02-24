@@ -121,10 +121,12 @@ public:
 	void EnsureVisualizationModelIDKnown(void);
 
 	void changeUnits(const std::string &content);
-	void changeMaterials(const std::string &content);
+	void changeMaterials(const std::string& content);
+	void changeParameters(const std::string& content);
 	void shapeInformation(const std::string &content);
 	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
-	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed);
+	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool>& materialProcessed);
+	void processParameterBuffer(std::stringstream& buffer, std::map<std::string, bool>& parameterProcessed);
 	void readDoubleTriple(const std::string& line, double& a, double& b, double& c);
 	void shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash);
 	void result1D(bool appendData, std::string &data, size_t uncompressedDataLength);
