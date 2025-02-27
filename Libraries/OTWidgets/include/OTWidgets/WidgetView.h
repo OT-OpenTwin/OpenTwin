@@ -88,6 +88,10 @@ namespace ot {
 		//! @brief Returns the widget view title that is currently displayed
 		QString getCurrentViewTitle(void) const;
 
+		void openView(void);
+
+		void closeView(void);
+
 		void setAsCurrentViewTab(void);
 
 		bool isCurrentViewTab(void) const;

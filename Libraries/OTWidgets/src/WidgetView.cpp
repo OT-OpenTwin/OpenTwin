@@ -89,6 +89,14 @@ QString ot::WidgetView::getCurrentViewTitle(void) const {
 	return m_dockWidget->windowTitle();
 }
 
+void ot::WidgetView::openView(void) {
+	m_dockWidget->openView();
+}
+
+void ot::WidgetView::closeView(void) {
+	m_dockWidget->closeView();
+}
+
 void ot::WidgetView::setAsCurrentViewTab(void) {
 	m_dockWidget->setAsCurrentTab();
 }

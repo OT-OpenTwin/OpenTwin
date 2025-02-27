@@ -24,6 +24,14 @@ ot::WidgetViewDock::WidgetViewDock() : ads::CDockWidget(QString()) {
 	this->connect(this, &ads::CDockWidget::closeRequested, this, &WidgetViewDock::slotCloseRequested);
 }
 
+void ot::WidgetViewDock::openView(void) {
+	this->toggleView(true);
+}
+
+void ot::WidgetViewDock::closeView(void) {
+	this->toggleView(false);
+}
+
 void ot::WidgetViewDock::setCloseButtonVisible(bool _vis) {
 	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (actualTab) {

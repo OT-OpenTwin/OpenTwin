@@ -487,6 +487,9 @@
     <ClCompile Include="src\TabToolBarButtonProxyStyle.cpp">
       <Filter>src\Delegates</Filter>
     </ClCompile>
+    <ClCompile Include="src\TreeItemViewLink.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1119,6 +1122,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\SVGWidgetGrid.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TreeItemViewLink.h">
+      <Filter>include\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

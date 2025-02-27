@@ -20,6 +20,9 @@ namespace ot {
 	public:
 		WidgetViewDock();
 
+		void openView(void);
+		void closeView(void);
+
 		void setCloseButtonVisible(bool _vis);
 		void setLockButtonVisible(bool _vis);
 
