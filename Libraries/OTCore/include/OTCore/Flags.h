@@ -231,11 +231,15 @@ namespace ot {
 	public:
 		//! \brief Default constructor.
 		//! Initializes the data with 0.
-		inline Flags() : m_data{ static_cast<T>(0) } {};
+		inline Flags() : Flags(0) {};
 
 		//! \brief Assignment constructor.
 		//! \param _initialData Initial data.
-		inline Flags(T _initialData) : m_data{ _initialData } {}
+		inline Flags(T _initialData) : m_data{ _initialData } {};
+
+		//! \brief Assignment constructor.
+		//! \param _initialData Initial data.
+		explicit inline Flags(FlagCastType _initialData) : m_data{ static_cast<T>(_initialData) } {};
 
 		//! \brief Copy constructor.
 		//! \param _other Other flags.
