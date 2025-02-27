@@ -65,6 +65,7 @@ namespace ot {
 
 		Grid();
 		Grid(double _defaultGridLineWidth, const GridFlags& _flags, GridSnapMode _snapMode);
+		Grid(int _gridStep, int _gridWideEvery, const PenFCfg& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode);
 		Grid(const Point2D& _gridStep, const Point2D& _gridWideEvery, const PenFCfg& _gridLineStyle, const GridFlags& _flags, GridSnapMode _snapMode);
 		Grid(const Grid& _other);
 		virtual ~Grid();
