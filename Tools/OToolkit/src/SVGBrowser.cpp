@@ -29,6 +29,14 @@ bool SVGBrowser::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	_content.addView(this->createSideWidgetView(newBrowser->getQWidget(), "SVG Browser"));
 
+	QMenu* sizeMenu = _rootMenu->addMenu("Icon Size");
+	this->connect(sizeMenu->addAction("16"), &QAction::triggered, [=]() { m_grid->setItemSize(16); });
+	this->connect(sizeMenu->addAction("22"), &QAction::triggered, [=]() { m_grid->setItemSize(22); });
+	this->connect(sizeMenu->addAction("32"), &QAction::triggered, [=]() { m_grid->setItemSize(32); });
+	this->connect(sizeMenu->addAction("48"), &QAction::triggered, [=]() { m_grid->setItemSize(48); });
+	this->connect(sizeMenu->addAction("64"), &QAction::triggered, [=]() { m_grid->setItemSize(64); });
+	this->connect(sizeMenu->addAction("128"), &QAction::triggered, [=]() { m_grid->setItemSize(128); });
+
 	this->connect(newBrowser, &DirectoryBrowser::currentPathChanged, this, &SVGBrowser::slotPathChanged);
 
 	return true;
@@ -47,3 +55,4 @@ void SVGBrowser::slotPathChanged(const QString& _path) {
 	OT_LOG_D(_path.toStdString());
 	m_grid->fillFromPath(_path);
 }
+
