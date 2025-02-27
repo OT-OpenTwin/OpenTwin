@@ -15,12 +15,8 @@
 #include <QtWidgets/qscrollarea.h>
 
 ot::SVGWidgetGrid::SVGWidgetGrid()
-	: m_itemSize(22, 22), m_rebuildTimer(this)
+	: m_itemSize(22, 22), m_delayedLoadTimer(this)
 {
-	m_rebuildInfo.widgetIx = 0;
-	m_rebuildInfo.col = 0;
-	m_rebuildInfo.row = 0;
-
 	QWidget* rootW = new QWidget;
 	rootW->setSizePolicy(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::MinimumExpanding);
 	QHBoxLayout* hWrap = new QHBoxLayout(rootW);
@@ -37,12 +33,16 @@ ot::SVGWidgetGrid::SVGWidgetGrid()
 
 	m_layout->setContentsMargins(1, 1, 1, 1);
 
-	m_rebuildTimer.setInterval(0);
-	m_rebuildTimer.setSingleShot(true);
-	this->connect(&m_rebuildTimer, &QTimer::timeout, this, &SVGWidgetGrid::slotRebuildGridStep);
+	m_loadData.ix = 0;
+	
+	m_delayedLoadTimer.setInterval(0);
+	m_delayedLoadTimer.setSingleShot(true);
+	this->connect(&m_delayedLoadTimer, &QTimer::timeout, this, &SVGWidgetGrid::slotLoadNext);
 }
 
 void ot::SVGWidgetGrid::fillFromPath(const QString& _rootPath) {
+	m_delayedLoadTimer.stop();
+
 	QDir dir(_rootPath);
 	if (!dir.exists()) {
 		OT_LOG_E("Directory \"" + _rootPath.toStdString() + "\" does not exist");
@@ -52,14 +52,15 @@ void ot::SVGWidgetGrid::fillFromPath(const QString& _rootPath) {
 	this->clear();
 
 	QStringList paths = dir.entryList(QStringList({ "*.svg" }), QDir::Files);
+	
 	m_widgets.reserve(paths.size());
-	m_rebuildInfo.filePaths.reserve(m_widgets.size());
+	m_loadData.paths.reserve(m_widgets.size());
+
 	for (QString path : paths) {
-		m_rebuildInfo.filePaths.push_back(_rootPath + "/" + path);
+		m_loadData.paths.push_back(_rootPath + "/" + path);
 
 		// Add empty widget to current widgets, it will be imported during the rebuild
 		m_widgets.push_back(new SVGWidget);
-		m_widgets.back()->setFixedSize(m_itemSize);
 	}
 
 	this->rebuildGrid(this->size());
@@ -74,8 +75,7 @@ void ot::SVGWidgetGrid::clear(void) {
 		}
 	}
 	m_widgets.clear();
-	m_rebuildInfo.filePaths.clear();
-	this->resetRebuildInfo();
+	m_loadData.paths.clear();
 }
 
 void ot::SVGWidgetGrid::setItemSize(const QSize& _size) {
@@ -87,48 +87,29 @@ void ot::SVGWidgetGrid::resizeEvent(QResizeEvent* _event) {
 	this->rebuildGrid(_event->size());
 }
 
-void ot::SVGWidgetGrid::slotRebuildGridStep(void) {
-	if (m_rebuildInfo.widgetIx >= m_widgets.size()) {
-		return;
-	}
+void ot::SVGWidgetGrid::slotLoadNext(void) {
+	size_t ix = m_loadData.ix;
+	if (ix < m_loadData.paths.size()) {
+		m_loadData.ix++;
 
-	bool loaded = false;
+		if (m_loadData.paths[ix].isEmpty()) {
+			this->slotLoadNext();
+		}
+		else {
+			m_widgets[ix]->loadFromFile(m_loadData.paths[ix]);
+			m_loadData.paths[ix].clear();
 
-	// Check if the widget must be reloaded
-	if (!m_rebuildInfo.filePaths[m_rebuildInfo.widgetIx].isEmpty()) {
-		m_widgets[m_rebuildInfo.widgetIx]->loadFromFile(m_rebuildInfo.filePaths[m_rebuildInfo.widgetIx]);
-		m_rebuildInfo.filePaths[m_rebuildInfo.widgetIx].clear();
-		loaded = true;
-	}
-	
-	// Add widget
-	m_widgets[m_rebuildInfo.widgetIx]->getQWidget()->setFixedSize(m_itemSize);
-	m_layout->addWidget(m_widgets[m_rebuildInfo.widgetIx]->getQWidget(), m_rebuildInfo.row, m_rebuildInfo.col);
-	m_widgets[m_rebuildInfo.widgetIx]->getQWidget()->setHidden(false);
-
-	m_rebuildInfo.widgetIx++;
-	m_rebuildInfo.col++;
-
-	// Check column bounds
-	if (m_rebuildInfo.col >= m_rebuildInfo.cols) {
-		m_rebuildInfo.row++;
-		m_rebuildInfo.col = 0;
-	}
-
-	if (loaded) {
-		m_rebuildTimer.start();
-	}
-	else {
-		this->slotRebuildGridStep();
+			m_delayedLoadTimer.start();
+		}
 	}
 }
 
 void ot::SVGWidgetGrid::rebuildGrid(const QSize& _newSize) {
 	// Stop rebuild step timer
-	m_rebuildTimer.stop();
+	m_delayedLoadTimer.stop();
 
 	// Ensure there is data
-	OTAssert(m_widgets.size() == m_rebuildInfo.filePaths.size(), "Data size mismatch");
+	OTAssert(m_widgets.size() == m_loadData.paths.size(), "Data size mismatch");
 	if (m_widgets.empty()) {
 		return;
 	}
@@ -138,26 +119,26 @@ void ot::SVGWidgetGrid::rebuildGrid(const QSize& _newSize) {
 	QSize boundSize = m_itemSize + QSize(marg.left() + marg.right(), marg.top() + marg.bottom());
 	int cols = std::max(1, _newSize.width() / ((boundSize.width() + (2 * (marg.left() + marg.right())))));
 
-	if (cols != m_rebuildInfo.cols) {
-		// Remove all widgets from layout
-		for (SVGWidget* w : m_widgets) {
-			if (w) {
-				w->getQWidget()->setHidden(true);
-				m_layout->removeWidget(w->getQWidget());
-			}
+	int r = 0;
+	int c = 0;
+	for (SVGWidget* w : m_widgets) {
+		w->getQWidget()->setHidden(true);
+		m_layout->removeWidget(w->getQWidget());
+
+		w->getQWidget()->setFixedSize(m_itemSize);
+
+		m_layout->addWidget(w->getQWidget(), r, c);
+		w->getQWidget()->setHidden(false);
+
+		c++;
+
+		// Check column bounds
+		if (c >= cols) {
+			r++;
+			c = 0;
 		}
-
-		this->resetRebuildInfo();
-
-		m_rebuildInfo.cols = cols;
 	}
 
-	this->slotRebuildGridStep();
-}
-
-void ot::SVGWidgetGrid::resetRebuildInfo(void) {
-	m_rebuildInfo.widgetIx = 0;
-	m_rebuildInfo.row = 0;
-	m_rebuildInfo.col = 0;
-	m_rebuildInfo.cols = 0;
+	m_loadData.ix = 0;
+	m_delayedLoadTimer.start();
 }

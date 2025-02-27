@@ -44,27 +44,23 @@ namespace ot {
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
 	private Q_SLOTS:
-		void slotRebuildGridStep(void);
+		void slotLoadNext(void);
 
 	private:
 		void rebuildGrid(const QSize& _newSize);
-		void resetRebuildInfo(void);
 		
 		QGridLayout* m_layout;
 
 		QSize m_itemSize;
 
-		QTimer m_rebuildTimer;
+		QTimer m_delayedLoadTimer;
 		
-		struct RebuildInfo {
-			size_t widgetIx;
-			int row;
-			int col;
-			int cols;
-			std::vector<QString> filePaths;
+		struct LoadData {
+			size_t ix;
+			std::vector<QString> paths;
 		};
 
-		RebuildInfo m_rebuildInfo;
+		LoadData m_loadData;
 
 		std::vector<SVGWidget*> m_widgets;
 	};
