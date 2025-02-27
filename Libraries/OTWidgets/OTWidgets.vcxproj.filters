@@ -926,9 +926,6 @@
     <ClInclude Include="include\OTWidgets\WidgetViewDockComponentsFactory.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\SVGWidgetGrid.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h">
       <Filter>include\Plot\Base</Filter>
     </ClInclude>
@@ -1119,6 +1116,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\WidgetViewDock.h">
       <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\SVGWidgetGrid.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

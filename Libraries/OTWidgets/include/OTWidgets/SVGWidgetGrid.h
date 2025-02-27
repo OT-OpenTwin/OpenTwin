@@ -11,7 +11,11 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtWidgets/qscrollarea.h>
+
+// std header
+#include <vector>
 
 class QGridLayout;
 
@@ -20,6 +24,7 @@ namespace ot {
 	class SVGWidget;
 
 	class OT_WIDGETS_API_EXPORT SVGWidgetGrid : public QScrollArea, public QWidgetInterface {
+		Q_OBJECT
 	public:
 		SVGWidgetGrid();
 
@@ -31,17 +36,37 @@ namespace ot {
 
 		virtual const QWidget* getQWidget(void) const override { return this; };
 
+		void setItemSize(int _widthAndHeight) { this->setItemSize(QSize(_widthAndHeight, _widthAndHeight)); };
+		void setItemSize(int _width, int _height) { this->setItemSize(QSize(_width, _height)); };
+		void setItemSize(const QSize& _size);
+
 	protected:
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
+	private Q_SLOTS:
+		void slotRebuildGridStep(void);
+
 	private:
 		void rebuildGrid(const QSize& _newSize);
-
+		void resetRebuildInfo(void);
+		
 		QGridLayout* m_layout;
 
 		QSize m_itemSize;
-	};
 
-	std::list<SVGWidget*> m_widgets;
+		QTimer m_rebuildTimer;
+		
+		struct RebuildInfo {
+			size_t widgetIx;
+			int row;
+			int col;
+			int cols;
+			std::vector<QString> filePaths;
+		};
+
+		RebuildInfo m_rebuildInfo;
+
+		std::vector<SVGWidget*> m_widgets;
+	};
 
 }

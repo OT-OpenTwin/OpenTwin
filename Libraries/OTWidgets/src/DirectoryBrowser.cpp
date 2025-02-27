@@ -23,14 +23,14 @@ ot::DirectoryBrowser::DirectoryBrowser() {
 	QHBoxLayout* searchLay = new QHBoxLayout;
 	searchLay->setContentsMargins(0, 0, 0, 0);
 	searchLay->addWidget(new Label("Find"));
-	searchLay->addWidget(m_rootEdit = new LineEdit(QDir::rootPath()));
+	searchLay->addWidget(m_rootEdit = new LineEdit);
 
 	rootLay->addLayout(searchLay);
 
 	// Create Qt file system model
 	m_model = new QFileSystemModel(this);
 	m_model->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
-	m_model->setRootPath("");
+	m_model->setRootPath(QDir::rootPath());
 	m_model->setOption(QFileSystemModel::DontResolveSymlinks);
 	m_model->setOption(QFileSystemModel::DontUseCustomDirectoryIcons);
 
@@ -40,15 +40,17 @@ ot::DirectoryBrowser::DirectoryBrowser() {
 	m_treeView->setAnimated(false);
 	m_treeView->setIndentation(20);
 	m_treeView->setSortingEnabled(true);
-	this->slotRootChanged();
 	
 	for (int i = 1; i <= 3; i++) {
 		m_treeView->setColumnHidden(i, true);
 	}
 	
+	m_rootIx = m_treeView->rootIndex();
+
 	rootLay->addWidget(m_treeView);
 
 	// Connect signals
+	this->connect(m_rootEdit, &LineEdit::editingFinished, this, &DirectoryBrowser::slotRootChanged);
 	this->connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &DirectoryBrowser::slotSelectionChanged);
 }
 
@@ -57,25 +59,30 @@ ot::DirectoryBrowser::~DirectoryBrowser() {
 }
 
 void ot::DirectoryBrowser::slotRootChanged(void) {
-	QModelIndex rootIx = m_treeView->rootIndex();
+	QString txt = m_rootEdit->text();
+	
+	QModelIndex newRoot = m_rootIx;
 
-	if (m_rootEdit->text().isEmpty()) {
-		SignalBlockWrapper sigBlock(m_rootEdit);
-		m_rootEdit->setText(this->getItemText(rootIx));
+	if (!txt.isEmpty()) {
+		QStringList lst = txt.replace('\\', '/').split('/');
+
+		QString path;
+		for (int i = 0; i < lst.count(); i++) {
+			if (i > 0) {
+				path.append('/');
+			}
+			path.append(lst[i]);
+
+			QModelIndex ix = m_model->index(path);
+			if (ix.isValid()) {
+				m_treeView->expand(ix);
+				newRoot = ix;
+			}
+		}
 	}
 
-	QModelIndex ix = m_model->index(m_rootEdit->text());
-	if (!ix.isValid()) {
-		ix = m_treeView->rootIndex();
-		if (ix.isValid()) {
-			SignalBlockWrapper sigBlock(m_rootEdit);
-			m_rootEdit->setText(this->getItemText(ix));
-		}
-		else {
-			OT_LOG_E("Failed to find model index");
-		}
-	}
-	m_treeView->setRootIndex(ix);
+	m_treeView->setCurrentIndex(newRoot);
+	this->slotSelectionChanged();
 }
 
 void ot::DirectoryBrowser::slotSelectionChanged(void) {

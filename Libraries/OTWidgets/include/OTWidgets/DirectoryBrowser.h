@@ -11,6 +11,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qabstractitemmodel.h>
 #include <QtWidgets/qwidget.h>
 
 class QTreeView;
@@ -44,6 +45,7 @@ namespace ot {
 		LineEdit* m_rootEdit;
 		QTreeView* m_treeView;
 		QFileSystemModel* m_model;
+		QModelIndex m_rootIx;
 	};
 
 }

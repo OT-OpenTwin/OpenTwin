@@ -236,7 +236,7 @@
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
     <QtMoc Include="include\OTWidgets\TableTextEdit.h" />
     <QtMoc Include="include\OTWidgets\SVGWidget.h" />
-    <ClInclude Include="include\OTWidgets\SVGWidgetGrid.h" />
+    <QtMoc Include="include\OTWidgets\SVGWidgetGrid.h" />
     <ClInclude Include="include\OTWidgets\TableItem.h" />
     <ClInclude Include="include\OTWidgets\TabToolBar.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarGroup.h" />

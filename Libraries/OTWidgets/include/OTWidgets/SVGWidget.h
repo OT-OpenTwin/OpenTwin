@@ -11,21 +11,32 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
-#include <QtSvgWidgets/qsvgwidget.h>
+#include <QtCore/qobject.h>
+
+class QSvgWidget;
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT SVGWidget : public QSvgWidget, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT SVGWidget : public QObject, public QWidgetInterface {
 		Q_OBJECT
 	public:
-		SVGWidget(const QString& _imagePath, QWidget* parent = (QWidget*)nullptr);
+		SVGWidget(QWidget* _parent = (QWidget*)nullptr) : SVGWidget(QByteArray(), _parent) {};
+		SVGWidget(const QByteArray& _svgData, QWidget* _parent = (QWidget*)nullptr);
 
-		virtual QWidget* getQWidget(void) override { return this; };
+		virtual QWidget* getQWidget(void) override;
+		virtual const QWidget* getQWidget(void) const override;
 
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		void setSvgData(const QByteArray& _data);
+		const QByteArray& getSvgData(void) const { return m_data; };
+
+		void setFixedSize(int _width, int _height) { this->setFixedSize(QSize(_width, _height)); };
+		void setFixedSize(const QSize& _size);
+
+		void loadFromFile(const QString& _filePath);
 
 	private:
-
+		QSvgWidget* m_widget;
+		QByteArray m_data;
 	};
 
 }
