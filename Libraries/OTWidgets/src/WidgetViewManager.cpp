@@ -268,11 +268,13 @@ void ot::WidgetViewManager::setCurrentViewFromTitle(const std::string& _viewTitl
 	}
 }
 
-std::string ot::WidgetViewManager::saveState(int _version) const {
+std::string ot::WidgetViewManager::saveState(int _version) {
 	OTAssertNullptr(m_dockManager);
 
 	QByteArray tmp = m_dockManager->saveState(_version);
-	if (tmp.isEmpty()) return std::string();
+	if (tmp.isEmpty()) {
+		return std::string();
+	}
 
 	std::string ret;
 	ret.reserve((tmp.size() * 3) - 1);
@@ -282,6 +284,11 @@ std::string ot::WidgetViewManager::saveState(int _version) const {
 		ret.append(std::to_string((int)c));
 	}
 
+	if (m_initialState.empty()) {
+		m_initialState = ret;
+		m_initialStateVersion = _version;
+	}
+
 	return ret;
 }
 
@@ -289,6 +296,12 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	OTAssertNullptr(m_dockManager);
 
 	if (_state.empty()) return false;
+
+	// Save the current state as the initial state if no initial state found yet.
+	if (m_initialState.empty()) {
+		this->saveState(_version);
+	}
+
 	QByteArray tmp;
 
 	size_t ix = _state.find(';');
@@ -312,6 +325,15 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	this->slotUpdateViewVisibility();
 	
 	return result;
+}
+
+void ot::WidgetViewManager::applyInitialState(void) {
+	if (m_initialState.empty()) {
+		OT_LOG_D("Initial state is empty.");
+	}
+	else {
+		this->restoreState(m_initialState, m_initialStateVersion);
+	}	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -484,8 +506,9 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
 
 // Private
 
-ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState), m_dockComponentsFactory(nullptr)
+ot::WidgetViewManager::WidgetViewManager() :
+	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState), 
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;

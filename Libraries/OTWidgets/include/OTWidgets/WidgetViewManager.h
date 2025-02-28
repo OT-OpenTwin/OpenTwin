@@ -144,12 +144,16 @@ namespace ot {
 
 		//! @brief Saves the current state that can be restored later.
 		//! @param _version State version (see restoreState).
-		std::string saveState(int _version = 0) const;
+		std::string saveState(int _version = 0);
 
 		//! @brief Restores the state.
 		//! @param _state State to restore.
 		//! @param _version State version. If the versions mismatch the restore state will cancel and return false.
 		bool restoreState(std::string _state, int _version = 0);
+
+		//! @brief Restore the stored initial state.
+		//! An initial state is save the first time a state is saved or restored.
+		void applyInitialState(void);
 
 		void setConfigFlag(ManagerConfigFlag _flag, bool _active = true) { m_config.setFlag(_flag, _active); };
 		void setConfigFlags(const ManagerConfigFlags& _flags) { m_config = _flags; };
@@ -247,6 +251,8 @@ namespace ot {
 		
 		ManagerStateFlags m_state;
 		ManagerConfigFlags m_config;
+		std::string m_initialState;
+		int m_initialStateVersion;
 
 		FocusInfo        m_focusInfo;
 		
