@@ -73,6 +73,7 @@ namespace ot {
 
 		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
+		const GraphicsScene* getGraphicsScene(void) const { return m_scene; };
 		
 		GraphicsItem* getItem(const ot::UID& _itemUid);
 		GraphicsConnectionItem* getConnection(const ot::UID& _connectionUid);

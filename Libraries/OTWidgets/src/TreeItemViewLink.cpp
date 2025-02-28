@@ -6,8 +6,9 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/WidgetView.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/TreeItemViewLink.h"
+#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetViewManager.h"
 
 // Qt header
@@ -24,13 +25,14 @@ ot::TreeItemViewLink::TreeItemViewLink(QTreeWidgetItem* _treeItem, WidgetView* _
 }
 
 ot::TreeItemViewLink::~TreeItemViewLink() {
+
 }
 
 void ot::TreeItemViewLink::slotTreeSelectionChanged() {
-	if (m_treeItem->isSelected() && (m_flags & LinkFlag::OpenOnSelect)) {
+	if (m_treeItem->isSelected() && (m_flags & LinkFlag::OpenOnSelect) && !m_view->getViewDockWidget()->isVisible()) {
 		m_view->openView();
 	}
-	else if (m_treeItem->isSelected() && (m_flags & LinkFlag::CloseOnDeselect)) {
+	else if (!m_treeItem->isSelected() && (m_flags & LinkFlag::CloseOnDeselect) && m_view->getViewDockWidget()->isVisible()) {
 		m_view->closeView();
 	}
 }

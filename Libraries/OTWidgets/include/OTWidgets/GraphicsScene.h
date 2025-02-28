@@ -56,6 +56,7 @@ namespace ot {
 		// Setter / Getter
 
 		void setGrid(const Grid& _grid) { m_grid = _grid; };
+		Grid& getGrid(void) { return m_grid; };
 		const Grid& getGrid(void) const { return m_grid; };
 
 		void setGridStep(int _step) { m_grid.setGridStep(_step); };
