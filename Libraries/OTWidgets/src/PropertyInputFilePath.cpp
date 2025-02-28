@@ -7,12 +7,12 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyFilePath.h"
 #include "OTWidgets/LineEdit.h"
-#include "OTWidgets/PushButton.h"
+#include "OTWidgets/FilePathEdit.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/PropertyInputFilePath.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
 // Qt header
-#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputFilePath> propertyInputFilePathRegistrar(ot::PropertyFilePath::propertyTypeString());
@@ -20,22 +20,13 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputFilePath> propertyInpu
 ot::PropertyInputFilePath::PropertyInputFilePath()
 	: m_mode(PropertyFilePath::ReadFile)
 {
-	m_root = new QWidget;
-	QHBoxLayout* rLay = new QHBoxLayout(m_root);
-
-	m_edit = new LineEdit;
+	m_path = new FilePathEdit(FilePathEdit::OpenFileMode);
 	
-	rLay->addWidget(m_edit, 1);
-
-	m_find = new PushButton("Search");
-	rLay->addWidget(m_find);
-
-	this->connect(m_edit, &QLineEdit::editingFinished, this, &PropertyInputFilePath::slotChanged);
-	this->connect(m_find, &QPushButton::clicked, this, &PropertyInputFilePath::slotFind);
+	this->connect(m_path, &FilePathEdit::fileChanged, this, qOverload<>(& PropertyInputFilePath::slotValueChanged));
 }
 
 ot::PropertyInputFilePath::~PropertyInputFilePath() {
-	delete m_edit;
+	delete m_path;
 }
 
 void ot::PropertyInputFilePath::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {
@@ -47,39 +38,18 @@ QVariant ot::PropertyInputFilePath::getCurrentValue(void) const {
 }
 
 QWidget* ot::PropertyInputFilePath::getQWidget(void) {
-	return m_root;
+	return m_path->getQWidget();
 }
 
 const QWidget* ot::PropertyInputFilePath::getQWidget(void) const {
-	return m_root;
-}
-
-void ot::PropertyInputFilePath::slotFind(void) {
-	QString pth;
-	if (m_mode == PropertyFilePath::ReadFile) {
-		pth = QFileDialog::getOpenFileName(m_edit, QString::fromStdString(this->data().getPropertyTitle()), m_edit->text(), m_filter);
-	} else {
-		pth = QFileDialog::getSaveFileName(m_edit, QString::fromStdString(this->data().getPropertyTitle()), m_edit->text(), m_filter);
-	}
-	if (!pth.isEmpty() && m_edit->text() != pth) {
-		m_text = pth;
-		m_edit->setText(pth);
-		this->slotValueChanged();
-	}
-}
-
-void ot::PropertyInputFilePath::slotChanged(void) {
-	if (m_edit->text() != m_text) {
-		m_text = m_edit->text();
-		this->slotValueChanged();
-	}
+	return m_path->getQWidget();
 }
 
 ot::Property* ot::PropertyInputFilePath::createPropertyConfiguration(void) const {
 	ot::PropertyFilePath* newProperty = new ot::PropertyFilePath(this->data());
 
 	newProperty->setBrowseMode(m_mode);
-	newProperty->setPath(m_edit->text().toStdString()); 
+	newProperty->setPath(m_path->getFilePath().toStdString());
 
 	return newProperty;
 }
@@ -92,38 +62,35 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 		return false;
 	}
 
-	m_edit->blockSignals(true);
+	SignalBlockWrapper sigBlock(m_path);
 
 	m_mode = actualProperty->getBrowseMode();
 
-	m_edit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
+	m_path->getLineEdit()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
-		m_edit->setText("...");
+		m_path->setFilePath("...");
 	}
 	else {
-		m_edit->setText(m_text);
+		m_path->setFilePath(m_text);
 	}
 
 	for (PropertyFilePath::FilterInfo info : actualProperty->getFilters()) {
 		if (!m_filter.isEmpty()) m_filter.append(";;");
 		m_filter.append(QString::fromStdString(info.text) + " (" + QString::fromStdString(info.extension) + ")");
 	}
-	m_edit->setReadOnly(!(this->data().getPropertyFlags() & Property::IsReadOnly));
-	m_find->setEnabled(this->data().getPropertyFlags() & Property::IsReadOnly);
-
-	m_edit->blockSignals(false);
+	m_path->getLineEdit()->setReadOnly(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
 	return true;
 }
 
 void ot::PropertyInputFilePath::focusPropertyInput(void) {
-	m_edit->setFocus();
+	m_path->getLineEdit()->setFocus();
 }
 
 void ot::PropertyInputFilePath::setCurrentFile(const QString& _file) {
-	m_edit->setText(_file);
+	m_path->setFilePath(_file);
 }
 
 QString ot::PropertyInputFilePath::currentFile(void) const {
-	return m_edit->text();
+	return m_path->getFilePath();
 }

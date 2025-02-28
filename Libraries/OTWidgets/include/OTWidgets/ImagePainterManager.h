@@ -13,11 +13,13 @@
 #include <string>
 #include <qvariant.h>
 
+class QPainter;
+
 namespace ot {
 
 	class ImagePainter;
 
-	class ImagePainterManager {
+	class OT_WIDGETS_API_EXPORT ImagePainterManager {
 	public:
 		static ImagePainterManager& instance(void);
 

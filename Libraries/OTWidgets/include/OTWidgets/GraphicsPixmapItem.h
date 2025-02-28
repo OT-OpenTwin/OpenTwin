@@ -14,7 +14,7 @@
 namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsPixmapItem : public CustomGraphicsItem {
 	public:
-		GraphicsPixmapItem();
+		GraphicsPixmapItem(const std::string& _imagePath = std::string());
 		virtual ~GraphicsPixmapItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -28,6 +28,8 @@ namespace ot {
 		// Base class functions: ot::CustomGraphicsItem
 
 		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
+
+		void setImagePath(const std::string& _imagePath);
 
 	protected:
 

@@ -11,8 +11,7 @@
 
 namespace ot {
 
-	class LineEdit;
-	class PushButton;
+	class FilePathEdit;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputFilePath : public PropertyInput {
 		Q_OBJECT
@@ -32,15 +31,9 @@ namespace ot {
 		void setCurrentFile(const QString& _file);
 		QString currentFile(void) const;
 
-	private Q_SLOTS:
-		void slotFind(void);
-		void slotChanged(void);
-
 	private:
 		PropertyFilePath::BrowseMode m_mode;
-		QWidget* m_root;
-		LineEdit* m_edit;
-		PushButton* m_find;
+		FilePathEdit* m_path;
 		QString m_filter;
 		QString m_text;
 	};

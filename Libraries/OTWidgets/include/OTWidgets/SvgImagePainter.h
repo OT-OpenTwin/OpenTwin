@@ -12,7 +12,7 @@ class QSvgRenderer;
 
 namespace ot {
 
-	class SvgImagePainter : public ImagePainter {
+	class OT_WIDGETS_API_EXPORT SvgImagePainter : public ImagePainter {
 		OT_DECL_NODEFAULT(SvgImagePainter)
 		OT_DECL_NOCOPY(SvgImagePainter)
 	public:

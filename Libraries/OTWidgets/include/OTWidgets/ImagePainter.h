@@ -17,7 +17,7 @@ class QPainter;
 
 namespace ot {
 
-	class ImagePainter {
+	class OT_WIDGETS_API_EXPORT ImagePainter {
 		OT_DECL_NOCOPY(ImagePainter)
 	public:
 		ImagePainter() {};

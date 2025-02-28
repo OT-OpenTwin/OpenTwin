@@ -17,8 +17,8 @@
 
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPixmapItem> pixmItemRegistrar(OT_FactoryKey_GraphicsImageItem);
 
-ot::GraphicsPixmapItem::GraphicsPixmapItem()
-	: ot::CustomGraphicsItem(new GraphicsImageItemCfg)
+ot::GraphicsPixmapItem::GraphicsPixmapItem(const std::string& _imagePath)
+	: ot::CustomGraphicsItem(new GraphicsImageItemCfg(_imagePath))
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -65,6 +65,16 @@ QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
 	ImagePainter* painter = ImagePainterManager::instance().getPainter(config->imagePath());
 	if (painter) return painter->getDefaultImageSize();
 	else return QSizeF();
+}
+
+void ot::GraphicsPixmapItem::setImagePath(const std::string& _imagePath) {
+	GraphicsImageItemCfg* config = dynamic_cast<GraphicsImageItemCfg*>(this->getConfiguration());
+	if (!config) {
+		OT_LOG_EA("Config not set");
+		return;
+	}
+
+	config->setImagePath(_imagePath);
 }
 
 void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {

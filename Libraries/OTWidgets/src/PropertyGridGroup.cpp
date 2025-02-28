@@ -89,7 +89,7 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(bool _includeChild
 
 		std::list<PropertyGroup*> g;
 		for (const PropertyGridGroup* i : this->childGroups()) {
-			g.push_back(i->createConfiguration(true));
+			g.push_back(i->createConfiguration(_includeChildAndProperties));
 		}
 
 		newGroup->setChildGroups(g);
@@ -154,7 +154,7 @@ void ot::PropertyGridGroup::addChildGroup(PropertyGridGroup* _group) {
 }
 
 ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const {
-	for (int i = 0; this->childCount(); i++) {
+	for (int i = 0; i < this->childCount(); i++) {
 		PropertyGridItem* p = dynamic_cast<PropertyGridItem*>(this->child(i));
 		if (p) {
 			if (p->getPropertyData().getPropertyName() == _propertyName) return p;
@@ -181,7 +181,7 @@ std::list<ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(void) co
 }
 
 ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& _name, bool _searchChildGroups) const {
-	for (int i = 0; this->childCount(); i++) {
+	for (int i = 0; i < this->childCount(); i++) {
 		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
 		if (g) {
 			if (g->getName() == _name) return g;
@@ -196,7 +196,7 @@ ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& 
 std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const {
 	std::list<ot::PropertyGridGroup*> ret;
 
-	for (int i = 0; this->childCount(); i++) {
+	for (int i = 0; i < this->childCount(); i++) {
 		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(this->child(i));
 		if (g) {
 			ret.push_back(g);

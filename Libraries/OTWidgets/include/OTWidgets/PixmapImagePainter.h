@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class PixmapImagePainter : public ImagePainter {
+	class OT_WIDGETS_API_EXPORT PixmapImagePainter : public ImagePainter {
 		OT_DECL_NODEFAULT(PixmapImagePainter)
 		OT_DECL_NOCOPY(PixmapImagePainter)
 	public:

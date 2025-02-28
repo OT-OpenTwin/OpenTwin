@@ -47,6 +47,9 @@ namespace ot {
 		TreeWidget* getTreeWidget(void) const;
 
 		void setupGridFromConfig(const PropertyGridCfg& _config);
+		
+		PropertyGridCfg createGridConfig(void) const;
+
 		void addGroup(PropertyGridGroup* _group);
 
 		PropertyGridGroup* findGroup(const std::string& _groupName) const;

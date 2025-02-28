@@ -63,6 +63,22 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->blockSignals(false);
 }
 
+ot::PropertyGridCfg ot::PropertyGrid::createGridConfig(void) const {
+	PropertyGridCfg cfg;
+
+	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
+		const PropertyGridGroup* group = dynamic_cast<PropertyGridGroup*>(m_tree->topLevelItem(i));
+		if (!group) {
+			OT_LOG_E("Unknown top level item");
+			continue;
+		}
+
+		cfg.addRootGroup(group->createConfiguration(true));
+	}
+
+	return cfg;
+}
+
 void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 	if (_group->getName().empty()) {
 		OT_LOG_W("Group name is empty. Group wont be findable trough find group");
