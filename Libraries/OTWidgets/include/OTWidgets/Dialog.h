@@ -62,6 +62,7 @@ namespace ot {
 		void setDialogFlags(DialogCfg::DialogFlags _flags) { m_flags = _flags; };
 		DialogCfg::DialogFlags dialogFlags(void) const { return m_flags; };
 
+		void setDialogResult(DialogResult _result) { m_result = _result; };
 		DialogResult dialogResult(void) const { return m_result; };
 
 		void setDialogName(const std::string& _name) { m_dialogName = _name; };
