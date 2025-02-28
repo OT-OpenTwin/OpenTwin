@@ -120,3 +120,11 @@ void ot::Dialog::closeEvent(QCloseEvent* _event) {
 		_event->accept();
 	}
 }
+
+bool ot::Dialog::mayCloseDialogWindow(void) {
+	bool continueClose = true;
+	
+	Q_EMIT closingDialog(continueClose);
+
+	return continueClose;
+}

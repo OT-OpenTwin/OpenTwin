@@ -41,7 +41,7 @@ public:
 	const LoginData& getLoginData(void) const { return m_loginData; };
 
 protected:
-	virtual bool mayCloseDialogWindow(void) const override;
+	virtual bool mayCloseDialogWindow(void) override;
 
 private:
 	enum class LogInStateFlag {

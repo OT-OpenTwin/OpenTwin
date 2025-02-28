@@ -85,7 +85,7 @@ void ConnectToLoggerDialog::queueRecenterRequest(void) {
 	QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotRecenter, Qt::QueuedConnection);
 }
 
-bool ConnectToLoggerDialog::mayCloseDialogWindow(void) const {
+bool ConnectToLoggerDialog::mayCloseDialogWindow(void) {
 	return !m_workerRunning;
 }
 

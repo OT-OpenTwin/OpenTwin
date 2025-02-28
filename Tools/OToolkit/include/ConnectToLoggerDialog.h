@@ -36,7 +36,7 @@ public:
 	void queueRecenterRequest(void);
 
 protected:
-	virtual bool mayCloseDialogWindow(void) const override;
+	virtual bool mayCloseDialogWindow(void) override;
 
 private Q_SLOTS:
 	void slotCancel(void);

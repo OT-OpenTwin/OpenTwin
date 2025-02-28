@@ -211,9 +211,8 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_exitButton->setEnabled(_enabled);
 }
 
-bool LogInDialog::mayCloseDialogWindow(void) const {
+bool LogInDialog::mayCloseDialogWindow(void) {
 	return !(m_state & LogInStateFlag::WorkerRunning);
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

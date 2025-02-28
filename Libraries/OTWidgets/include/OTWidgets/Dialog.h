@@ -69,6 +69,12 @@ namespace ot {
 
 		const DialogStateFlags& getDialogState(void) const { return m_state; };
 
+	Q_SIGNALS:
+		//! @brief Is emitted just before closing the dialog window.
+		//! Continue close is set to true by default.
+		//! Set to false if the dialog window should remain open otherwise keep unchanged.
+		void closingDialog(bool& _continueClose);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Public slots
@@ -92,7 +98,9 @@ namespace ot {
 		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
 		virtual void closeEvent(QCloseEvent* _event) override;
 
-		virtual bool mayCloseDialogWindow(void) const { return true; };
+		//! @brief Is called before closing the dialog.
+		//! By default if will emit the closingDialog signal and if continue close was set to false the close will cancel.
+		virtual bool mayCloseDialogWindow(void);
 
 	private:
 		DialogStateFlags m_state;
