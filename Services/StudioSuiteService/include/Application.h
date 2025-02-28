@@ -123,6 +123,7 @@ public:
 	void changeUnits(const std::string &content);
 	void changeMaterials(const std::string& content);
 	void changeParameters(const std::string& content);
+	void changeHistory(const std::string& content);
 	void shapeInformation(const std::string &content);
 	void processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed);
 	bool processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool>& materialProcessed);

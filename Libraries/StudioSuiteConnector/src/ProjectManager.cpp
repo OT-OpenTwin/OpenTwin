@@ -290,6 +290,9 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Send the parameter information
 		sendParameterInformation(baseProjectName);
 
+		// Send the history information
+		sendHistoryInformation(baseProjectName);
+
 		// Send the shapes information and triangulations (progress range 70-80)
 		sendShapeInformationAndTriangulation(baseProjectName, infoFileManager);
 
@@ -892,6 +895,19 @@ void ProjectManager::sendParameterInformation(const std::string& projectRoot)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_PARAMETERS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	ServiceConnector::getInstance().sendExecuteRequest(doc);
+}
+
+void ProjectManager::sendHistoryInformation(const std::string& projectRoot)
+{
+	std::string fileContent;
+	readFileContent(projectRoot + "/Model/3D/Model.mod", fileContent);
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_HISTORY, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
 
 	// Send the message to the service

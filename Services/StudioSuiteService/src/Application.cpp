@@ -33,6 +33,8 @@
 #include "EntityFile.h"
 #include "EntityBinaryData.h"
 #include "EntityParameter.h"
+#include "EntityFileText.h"
+#include "EntityBinaryData.h"
 
 #include "InfoFileManager.h"
 #include "Result1DManager.h"
@@ -112,6 +114,12 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	{
 		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 		changeParameters(content);
+		return "";
+	}
+	else if (_action == OT_ACTION_CMD_UI_SS_HISTORY)
+	{
+		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+		changeHistory(content);
 		return "";
 	}
 	else if (_action == OT_ACTION_CMD_UI_SS_SHAPEINFO)
@@ -726,6 +734,45 @@ void Application::changeParameters(const std::string& content)
 	{
 		ot::ModelServiceAPI::deleteEntitiesFromModel(obsoleteParameters, false);
 	}
+}
+
+void Application::changeHistory(const std::string& content)
+{
+	EntityFileText* history = nullptr;
+
+	{
+		std::shared_ptr<EntityBinaryData> data = nullptr;
+
+		ot::EntityInformation currentHistoryInfo;
+		if (ot::ModelServiceAPI::getEntityInformation("History", currentHistoryInfo))
+		{
+			// A history already exists
+			history = dynamic_cast<EntityFileText*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentHistoryInfo.getEntityID(), currentHistoryInfo.getEntityVersion(), getClassFactory()));
+
+			data = history->getData();
+		}
+		else
+		{
+			// A new history item needs to be created
+			history = new EntityFileText(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, &getClassFactory(), getServiceName());
+			history->setName("History");
+
+			data = std::make_shared<EntityBinaryData>(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+		}
+
+		data->setData(content.data(), content.size());
+		data->StoreToDataBase();
+
+		history->setData(data->getEntityID(), data->getEntityStorageVersion());
+		history->getProperties().setAllPropertiesReadOnly();
+		history->setEditable(false);
+		history->StoreToDataBase();
+
+		modelComponent()->addNewDataEntity(data->getEntityID(), data->getEntityStorageVersion(), history->getEntityID());
+		modelComponent()->addNewTopologyEntity(history->getEntityID(), history->getEntityStorageVersion(), false);
+	}
+
+	delete history; history = nullptr;
 }
 
 void Application::processParameterBuffer(std::stringstream& buffer, std::map<std::string, bool>& parameterProcessed)

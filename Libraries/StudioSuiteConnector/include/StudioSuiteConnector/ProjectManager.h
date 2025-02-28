@@ -53,6 +53,7 @@ private:
     void                       sendUnitsInformation(const std::string& projectRoot);
     void                       sendMaterialInformation(const std::string& projectRoot);
     void                       sendParameterInformation(const std::string& projectRoot);
+    void                       sendHistoryInformation(const std::string& projectRoot);
     void                       sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager& infoFileManager);
     void                       readFileContent(const std::string& fileName, std::string& content);
     std::map<std::string, int> determineAllShapes(std::stringstream fileContent);
