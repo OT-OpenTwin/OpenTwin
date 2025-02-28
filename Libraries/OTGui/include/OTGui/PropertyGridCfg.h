@@ -11,6 +11,9 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 
+// std header
+#include <list>
+
 #pragma warning(disable:4251)
 
 namespace ot {
@@ -22,9 +25,11 @@ namespace ot {
 	public:
 		PropertyGridCfg();
 		PropertyGridCfg(const PropertyGridCfg& _other);
+		PropertyGridCfg(PropertyGridCfg&& _other) noexcept;
 		virtual ~PropertyGridCfg();
 
 		PropertyGridCfg& operator = (const PropertyGridCfg& _other);
+		PropertyGridCfg& operator = (PropertyGridCfg&& _other) noexcept;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -43,8 +48,11 @@ namespace ot {
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
+		std::list<PropertyGroup*>& getRootGroups(void) { return m_rootGroups; };
 		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_rootGroups; };
-		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
+
+		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false);
+		const PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
 		//! \brief Returns all properties of all groups and nested groups.

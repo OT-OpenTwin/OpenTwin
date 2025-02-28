@@ -17,18 +17,31 @@ ot::PropertyGridCfg::PropertyGridCfg(const PropertyGridCfg& _other) {
 	*this = _other;
 }
 
+ot::PropertyGridCfg::PropertyGridCfg(PropertyGridCfg&& _other) noexcept : Serializable(_other), m_rootGroups(std::move(_other.m_rootGroups)) {
+	_other.m_rootGroups.clear();
+}
+
 ot::PropertyGridCfg::~PropertyGridCfg() {
 	this->clear();
 }
 
 ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _other) {
-	if (this == &_other) return *this;
+	if (this != &_other) {
+		this->clear();
 
-	this->clear();
+		for (const PropertyGroup* g : _other.getRootGroups()) {
+			PropertyGroup* ng = new PropertyGroup(*g);
+			this->addRootGroup(ng);
+		}
+	}
 
-	for (const PropertyGroup* g : _other.getRootGroups()) {
-		PropertyGroup* ng = new PropertyGroup(*g);
-		this->addRootGroup(ng);
+	return *this;
+}
+
+ot::PropertyGridCfg& ot::PropertyGridCfg::operator=(PropertyGridCfg&& _other) noexcept {
+	if (this != &_other) {
+		m_rootGroups = std::move(_other.m_rootGroups);
+
 	}
 
 	return *this;
@@ -88,7 +101,7 @@ void ot::PropertyGridCfg::addRootGroup(PropertyGroup* _group) {
 	m_rootGroups.push_back(_group);
 }
 
-ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) const {
+ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) {
 	for (PropertyGroup* g : m_rootGroups) {
 		if (g->getName() == _name) return g;
 		if (_searchChildGroups) {
@@ -96,6 +109,24 @@ ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool
 			if (c) return c;
 		}
 	}
+	return nullptr;
+}
+
+const ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) const {
+	for (const PropertyGroup* g : m_rootGroups) {
+		if (g->getName() == _name) {
+			return g;
+		}
+
+		if (_searchChildGroups) {
+			const PropertyGroup* c = g->findGroup(_name);
+
+			if (c) {
+				return c;
+			}
+		}
+	}
+
 	return nullptr;
 }
 
