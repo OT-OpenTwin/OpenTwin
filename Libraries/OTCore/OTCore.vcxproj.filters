@@ -324,6 +324,12 @@
     <ClInclude Include="include\OTCore\UIDNamePair.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\LinearVector2D.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Vector2D.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -346,9 +352,6 @@
     </Filter>
     <Filter Include="src\Owner">
       <UniqueIdentifier>{535507a4-a4fb-42be-9614-b9301bf40ec8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\DataObjects">
-      <UniqueIdentifier>{db4094f0-bb18-4f12-93e8-f802607f293a}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\ServiceReturnMessages">
       <UniqueIdentifier>{bb4b9512-777d-46dc-a8e7-3f34845e584b}</UniqueIdentifier>
