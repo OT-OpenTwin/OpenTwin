@@ -17,7 +17,12 @@ namespace ot {
 	class OT_CORE_API_EXPORTONLY Serializable {
 	public:
 		Serializable() {};
+		Serializable(const Serializable&) = default;
+		Serializable(Serializable&&) noexcept = default;
 		virtual ~Serializable() {};
+
+		Serializable& operator = (const Serializable&) = default;
+		Serializable& operator = (Serializable&&) noexcept = default;
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
