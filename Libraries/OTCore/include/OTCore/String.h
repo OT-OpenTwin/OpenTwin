@@ -19,7 +19,6 @@ namespace ot {
 		OT_DECL_NOCOPY(String)
 		OT_DECL_NODEFAULT(String)
 	public:
-
 		//! @brief Changes the provided string to the lower case.
 		static std::string toLower(const std::string& _string);
 
@@ -63,6 +62,34 @@ namespace ot {
 		//! \brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 		static std::wstring replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
+
+		//! @brief Adds a prefix to the provided string.
+		//! The prefix will "fill" the string to match the specified minimum length.
+		//! @param _string String to modify.
+		//! @param _minLength Minimum string length. Longer strings will remain unchanged.
+		//! @param _fillChar Character to use to fill in the prefix.
+		static void filledPrefix(std::string& _string, size_t _minLength, char _fillChar);
+		
+		//! @brief Create a string with a filled prefix.
+		//! The prefix will "fill" the string to match the specified minimum length.
+		//! @param _string String that will be copied and returned with the filled prefix.
+		//! @param _minLength Minimum string length. Longer strings will remain unchanged.
+		//! @param _fillChar Character to use to fill in the prefix.
+		static std::string fillPrefix(const std::string& _string, size_t _minLength, char _fillChar);
+
+		//! @brief Adds a suffix to the provided string.
+		//! The suffix will "fill" the string to match the specified minimum length.
+		//! @param _string String to modify.
+		//! @param _minLength Minimum string length. Longer strings will remain unchanged.
+		//! @param _fillChar Character to use to fill in the suffix.
+		static void filledSuffix(std::string& _string, size_t _minLength, char _fillChar);
+		
+		//! @brief Create a string with a filled suffix.
+		//! The suffix will "fill" the string to match the specified minimum length.
+		//! @param _string String that will be copied and returned with the filled suffix.
+		//! @param _minLength Minimum string length. Longer strings will remain unchanged.
+		//! @param _fillChar Character to use to fill in the suffix.
+		static std::string fillSuffix(const std::string& _string, size_t _minLength, char _fillChar);
 
 		//! \brief Creates a C-String copy of the provided C++ String
 		static char* getCStringCopy(const std::string& _str);

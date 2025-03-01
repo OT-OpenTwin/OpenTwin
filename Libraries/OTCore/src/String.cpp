@@ -334,6 +334,48 @@ std::wstring ot::String::replace(const std::wstring& _str, const std::wstring& _
 	return result;
 }
 
+void ot::String::filledPrefix(std::string& _string, size_t _minLength, char _fillChar) {
+	const size_t strLen = _string.length();
+	size_t preLen = std::max(strLen, _minLength) - strLen;
+
+	if (preLen > 0) {
+		std::string pre;
+		pre.reserve(preLen);
+		for (size_t i = 0; i < preLen; i++) {
+			pre.push_back(_fillChar);
+		}
+		
+		_string = pre + _string;
+	}
+}
+
+std::string ot::String::fillPrefix(const std::string& _string, size_t _minLength, char _fillChar) {
+	std::string result(_string);
+	String::filledPrefix(result, _minLength, _fillChar);
+	return result;
+}
+
+void ot::String::filledSuffix(std::string& _string, size_t _minLength, char _fillChar) {
+	const size_t strLen = _string.length();
+	size_t sufLen = std::max(strLen, _minLength) - strLen;
+
+	if (sufLen > 0) {
+		std::string suf;
+		suf.reserve(sufLen);
+		for (size_t i = 0; i < sufLen; i++) {
+			suf.push_back(_fillChar);
+		}
+
+		_string.append(suf);
+	}
+}
+
+std::string ot::String::fillSuffix(const std::string& _string, size_t _minLength, char _fillChar) {
+	std::string result(_string);
+	String::filledSuffix(result, _minLength, _fillChar);
+	return result;
+}
+
 char* ot::String::getCStringCopy(const std::string& _str) {
 	size_t len = _str.length() + 1;
 	char* retval = new char[len];
