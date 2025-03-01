@@ -156,11 +156,13 @@ namespace ot {
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
 		//! \param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
+		qreal calculateShortestDistanceToPoint(double _x, double _y) { return this->calculateShortestDistanceToPoint(QPointF(_x, _y)); };
 
 		//! @brief Calculates the draw rect for the item.
 		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size.
 		//! @callgraph
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
+		QRectF calculatePaintArea(double _innerWidth, double _innerHeight) { return this->calculatePaintArea(QSize(_innerWidth, _innerHeight)); };
 
 		// ###############################################################################################################################################
 
@@ -184,6 +186,7 @@ namespace ot {
 
 		//! \brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
 		void setGraphicsItemPos(const QPointF& _pos);
+		void setGraphicsItemPos(double _x, double _y) { this->setGraphicsItemPos(QPointF(_x, _y)); };
 
 		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos(const QPointF&).
 		//! @callgraph
@@ -220,6 +223,8 @@ namespace ot {
 		void setGraphicsItemToolTip(const std::string& _toolTip);
 		const std::string& getGraphicsItemToolTip(void) const;
 
+		void setAdditionalTriggerDistance(double _left, double _top, double _right, double _bottom) { this->setAdditionalTriggerDistance(MarginsD(_left, _top, _right, _bottom)); };
+		void setAdditionalTriggerDistance(double _distance) { this->setAdditionalTriggerDistance(MarginsD(_distance, _distance, _distance, _distance)); };
 		void setAdditionalTriggerDistance(const ot::MarginsD& _distance);
 		const ot::MarginsD& getAdditionalTriggerDistance(void) const;
 		
@@ -240,6 +245,8 @@ namespace ot {
 		void setGraphicsItemAlignment(ot::Alignment _align);
 		ot::Alignment getGraphicsItemAlignment(void) const;
 
+		void setGraphicsItemMargins(double _left, double _top, double _right, double _bottom) { this->setGraphicsItemMargins(MarginsD(_left, _top, _right, _bottom)); };
+		void setGraphicsItemMargins(double _margins) { this->setGraphicsItemMargins(MarginsD(_margins, _margins, _margins, _margins)); };
 		void setGraphicsItemMargins(const ot::MarginsD& _margins);
 		const ot::MarginsD& getGraphicsItemMargins(void) const;
 

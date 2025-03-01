@@ -66,6 +66,23 @@ void ot::ImagePainterManager::importFromFile(const std::string& _fileSubPath) {
 	}
 }
 
+ot::ImagePainter* ot::ImagePainterManager::removeImagePainter(const std::string& _key, bool _destroyInstance) {
+	ImagePainter* ptr = nullptr;
+
+	auto it = m_painter.find(_key);
+	if (it != m_painter.end()) {
+		ptr = it->second;
+		if (ptr && _destroyInstance) {
+			delete ptr;
+			ptr = nullptr;
+		}
+
+		m_painter.erase(it);
+	}
+
+	return ptr;
+}
+
 void ot::ImagePainterManager::clear(void) {
 	for (const auto& it : m_painter) {
 		delete it.second;
