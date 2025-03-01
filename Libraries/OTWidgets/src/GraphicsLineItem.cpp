@@ -44,6 +44,13 @@ bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return true;
 }
 
+QMarginsF ot::GraphicsLineItem::getOutlineMargins(void) const {
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	OTAssertNullptr(cfg);
+	double margs = cfg->getLineStyle().width() / 2.;
+	return QMarginsF(margs, margs, margs, margs);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions: ot::CustomGraphicsItem

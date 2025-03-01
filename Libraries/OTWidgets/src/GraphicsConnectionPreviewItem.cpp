@@ -13,8 +13,9 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-ot::GraphicsConnectionPreviewItem::GraphicsConnectionPreviewItem()
-	: m_shape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny)
+ot::GraphicsConnectionPreviewItem::GraphicsConnectionPreviewItem() :
+	m_shape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), 
+	m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny), c_lineWidth(2.)
 {
 
 }
@@ -27,26 +28,36 @@ ot::GraphicsConnectionPreviewItem::~GraphicsConnectionPreviewItem() {
 
 
 QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
+	QRectF result;
+	
+	double marg = c_lineWidth / 2.;
+	QMarginsF margs(marg, marg, marg, marg);
+
 	switch (m_shape)
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
-		return QRectF(QPointF(std::min(m_origin.x(), m_dest.x()), std::min(m_origin.y(), m_dest.y())), QPointF(std::max(m_origin.x(), m_dest.x()), std::max(m_origin.y(), m_dest.y()))).marginsAdded(QMarginsF(1., 1., 1., 1.));
+		result = QRectF(
+			QPointF(std::min(m_origin.x(), m_dest.x()), std::min(m_origin.y(), m_dest.y())), 
+			QPointF(std::max(m_origin.x(), m_dest.x()), std::max(m_origin.y(), m_dest.y()))
+		).marginsAdded(margs);
 	}
 	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
 		QPointF c1;
 		QPointF c2;
 		this->calculateSmoothLinePoints(c1, c2);
-		return QRectF(QPointF(std::min({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::min({ m_origin.y(), c1.y(), c2.y(), m_dest.y() })),
-			QPointF(std::max({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::max({ m_origin.y(), c1.y(), c2.y(), m_dest.y() }))).marginsAdded(QMarginsF(1., 1., 1., 1.));
+		result = QRectF(
+			QPointF(std::min({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::min({ m_origin.y(), c1.y(), c2.y(), m_dest.y() })),
+			QPointF(std::max({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::max({ m_origin.y(), c1.y(), c2.y(), m_dest.y() }))
+		).marginsAdded(margs);
 	}
 	break;
 	default:
 		OT_LOG_EA("Unknown connection style");
 	}
 
-	return m_lastRect.marginsAdded(QMarginsF(1., 1., 1., 1.));
+	return result;
 }
 
 void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

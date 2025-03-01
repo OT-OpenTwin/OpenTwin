@@ -43,6 +43,13 @@ bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return true;
 }
 
+QMarginsF ot::GraphicsPolygonItem::getOutlineMargins(void) const {
+	const GraphicsPolygonItemCfg* cfg = this->getItemConfiguration<GraphicsPolygonItemCfg>();
+	OTAssertNullptr(cfg);
+	double margs = cfg->getOutlineWidth() / 2.;
+	return QMarginsF(margs, margs, margs, margs);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions: ot::CustomGraphicsItem

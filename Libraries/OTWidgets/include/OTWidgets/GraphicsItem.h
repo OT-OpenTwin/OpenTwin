@@ -121,6 +121,8 @@ namespace ot {
 		//! Container items must override this method to forward the call to their child items.
 		virtual void finalizeGraphicsItem(void) {};
 
+		virtual QMarginsF getOutlineMargins(void) const;
+
 		// ###############################################################################################################################################
 
 		// Event handler

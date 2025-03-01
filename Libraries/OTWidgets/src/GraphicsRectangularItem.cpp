@@ -43,6 +43,13 @@ bool ot::GraphicsRectangularItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return true;
 }
 
+QMarginsF ot::GraphicsRectangularItem::getOutlineMargins(void) const {
+	const GraphicsRectangularItemCfg* cfg = this->getItemConfiguration<GraphicsRectangularItemCfg>();
+	OTAssertNullptr(cfg);
+	double margs = cfg->getOutline().width() / 2.;
+	return QMarginsF(margs, margs, margs, margs);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions: ot::CustomGraphicsItem

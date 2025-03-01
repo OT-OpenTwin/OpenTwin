@@ -26,6 +26,8 @@ namespace ot {
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
+		virtual QMarginsF getOutlineMargins(void) const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: ot::CustomGraphicsItem

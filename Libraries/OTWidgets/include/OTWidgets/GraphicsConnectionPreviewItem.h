@@ -54,12 +54,12 @@ namespace ot {
 		void calculateSmoothLinePoints(QPointF& _control1, QPointF& _control2) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 
+		const double c_lineWidth;
+
 		QPointF m_origin;
 		ot::ConnectionDirection m_originDir;
 		QPointF m_dest;
 		ot::ConnectionDirection m_destDir;
-
-		QRectF m_lastRect;
 
 		ot::GraphicsConnectionCfg::ConnectionShape m_shape;
 	};

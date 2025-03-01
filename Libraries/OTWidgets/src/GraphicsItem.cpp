@@ -146,6 +146,10 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 
 // Event handler
 
+QMarginsF ot::GraphicsItem::getOutlineMargins(void) const {
+	return QMarginsF(0., 0., 0., 0.);
+}
+
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
@@ -253,13 +257,13 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 		return QRectF(
 			_rect.topLeft(),
 			this->applyGraphicsItemMargins(this->getGraphicsItemMinimumSize().expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
-		);
+		).marginsAdded(this->getOutlineMargins());
 	}
 	else {
 		return QRectF(
 			_rect.topLeft(),
 			this->applyGraphicsItemMargins(_rect.size().expandedTo(this->getGraphicsItemMinimumSize()).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
-		);
+		).marginsAdded(this->getOutlineMargins());
 	}
 	
 }

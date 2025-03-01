@@ -49,7 +49,9 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 
 	QPainterPath path;
 	this->calculatePainterPath(path);
-	return path.boundingRect().marginsAdded(QMarginsF(m_config.getLineStyle().width(), m_config.getLineStyle().width(), m_config.getLineStyle().width(), m_config.getLineStyle().width()));
+	double margs = m_config.getLineWidth() / 2.;
+	return path.boundingRect().marginsAdded(
+		QMarginsF(margs, margs, margs, margs));
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
