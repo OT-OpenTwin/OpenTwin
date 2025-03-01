@@ -15,30 +15,82 @@ namespace ot {
 
 	//! @class LinearVector2D
 	//! @brief A 2D container implemented as a linear vector.
-	//! @tparam T Type of elements stored in the container.
-	//! @details This class provides a dynamically resizable 2D array stored in a single linear vector.
+	//! The LinearVector2D provides a dynamically resizable 2D array stored in a single linear vector.
 	//! It allows efficient access and modification of elements and supports row and column operations.
+	//! 
+	//! When comparing to a Vector2D the linear vector is more efficient when the data dimensions are known and do not need to be changed.
+	//! @tparam T Type of elements stored in the container.
 	template <class T> class LinearVector2D {
 	public:
+
+		// Constructor
+
 		//! @brief Default constructor.
-		LinearVector2D() : m_rows(0), m_cols(0) {};
+		LinearVector2D();
 
 		//! @brief Constructs a 2D vector with given dimensions.
 		//! @param _cols Number of columns.
 		//! @param _rows Number of rows.
-		LinearVector2D(size_t _cols, size_t _rows) : LinearVector2D() { this->resize(_cols, _rows); };
+		LinearVector2D(size_t _cols, size_t _rows);
 
 		//! @brief Constructs a 2D vector with given dimensions and default value.
 		//! @param _cols Number of columns.
 		//! @param _rows Number of rows.
 		//! @param _default Default value for all elements.
-		LinearVector2D(size_t _cols, size_t _rows, const T& _default) : LinearVector2D() { this->resize(_cols, _rows, _default); };
+		LinearVector2D(size_t _cols, size_t _rows, const T& _default);
 
-		LinearVector2D(const LinearVector2D&) = default;
-		LinearVector2D(LinearVector2D&&) = default;
-		LinearVector2D& operator = (const LinearVector2D&) = default;
-		LinearVector2D& operator = (LinearVector2D&&) = default;
-		virtual ~LinearVector2D() = default;
+		//! @brief Constructs a 2D vector from the provided other vector by copying the data.
+		//! @param _other Other vector.
+		LinearVector2D(const LinearVector2D& _other);
+
+		//! @brief Constructs a 2D vector from the provided other vector by moving the data.
+		//! @param _other Other vector.
+		LinearVector2D(LinearVector2D&& _other) noexcept;
+
+		//! @brief Destructor.
+		virtual ~LinearVector2D() {};
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Operator
+
+		//! @brief Assignment operator.
+		//! Clears the current data structure and copies the data from the provided vector.
+		//! @param _other Other vector.
+		//! @return Returns reference to this vector.
+		LinearVector2D& operator = (const LinearVector2D& _other);
+
+		//! @brief Move-Assignment operator.
+		//! Clears the current data structure by replacing (moving) the data the provided vector.
+		//! The provided vector will remain in an undefined state, call clear to ensure a true clear state after the move.
+		//! @param _other Other vector.
+		//! @return Returns reference to this vector.
+		LinearVector2D& operator = (LinearVector2D&& _other) noexcept;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Iterator
+
+		using iterator = typename std::vector<T>::iterator;
+		using const_iterator = typename std::vector<T>::const_iterator;
+		using value_type = T;
+
+		iterator begin() { return m_data.begin(); };
+		iterator end() { return m_data.end(); };
+		const_iterator begin() const { return m_data.begin(); };
+		const_iterator end() const { return m_data.end(); };
+		const_iterator cbegin() const { return m_data.cbegin(); };
+		const_iterator cend() const { return m_data.cend(); };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Data handling
+
+		//! @brief Current column count.
+		size_t getColumnCount(void) const { return m_cols; };
+
+		//! @brief Current row count.
+		size_t getRowCount(void) const { return m_rows; };
 
 		//! @brief Removes all the data and sets the dimensions back to 0, 0.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
@@ -138,14 +190,20 @@ namespace ot {
 		//! @param _col Column data.
 		void pushColumnBack(std::vector<T>&& _col);
 
-		//! @brief Retrieves a const reference to the internal data.
-		//! @return Const reference to the data vector.
-		const std::vector<T>& getData(void) const { return m_data; };
+		//! @brief Replaces the current data.
+		//! Complexity: O(1) data is moved.
+		//! @param _rows New row count.
+		//! @param _cols New column count.
+		//! @param _data New data.
+		void setData(size_t _rows, size_t _cols, std::vector<T>&& _data);
 
-	protected:
 		//! @brief Retrieves a reference to the internal data.
 		//! @return Reference to the data vector.
 		std::vector<T>& getData(void) { return m_data; };
+
+		//! @brief Retrieves a const reference to the internal data.
+		//! @return Const reference to the data vector.
+		const std::vector<T>& getData(void) const { return m_data; };
 
 	private:
 		size_t m_rows; //! @brief Number of rows.
@@ -155,15 +213,82 @@ namespace ot {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor
+
+template<class T>
+ot::LinearVector2D<T>::LinearVector2D()
+	: m_rows(0), m_cols(0) 
+{}
+
+template<class T>
+ot::LinearVector2D<T>::LinearVector2D(size_t _cols, size_t _rows) :
+	LinearVector2D() 
+{ 
+	this->resize(_cols, _rows); 
+}
+
+template<class T>
+ot::LinearVector2D<T>::LinearVector2D(size_t _cols, size_t _rows, const T& _default) :
+	LinearVector2D()
+{
+	this->resize(_cols, _rows, _default);
+}
+
+template<class T>
+ot::LinearVector2D<T>::LinearVector2D(const LinearVector2D& _other) :
+	m_rows(_other.m_rows), m_cols(_other.m_cols), m_data(_other.m_data)
+{}
+
+template<class T>
+ot::LinearVector2D<T>::LinearVector2D(LinearVector2D&& _other) noexcept :
+	m_rows(std::move(_other.m_rows)), std::move(m_cols(_other.m_cols)), std::move(m_data(_other.m_data))
+{}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Operator
+
+template<class T>
+ot::LinearVector2D<T>& ot::LinearVector2D<T>::operator=(const LinearVector2D& _other) {
+	if (this != &_other) {
+		m_rows = _other.m_rows;
+		m_cols = _other.m_cols;
+		m_data = _other.m_data;
+	}
+
+	return *this;
+}
+
+template<class T>
+ot::LinearVector2D<T>& ot::LinearVector2D<T>::operator=(LinearVector2D&& _other) noexcept {
+	if (this != &_other) {
+		m_rows = std::move(_other.m_rows);
+		m_cols = std::move(_other.m_cols);
+		m_data = std::move(_other.m_data);
+	}
+
+	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data handling
+
 template<typename T>
-inline void ot::LinearVector2D<T>::clear(void) {
+void ot::LinearVector2D<T>::clear(void) {
 	m_rows = 0;
 	m_cols = 0;
 	m_data.clear();
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::resize(size_t _cols, size_t _rows, const T& _default) {
+void ot::LinearVector2D<T>::resize(size_t _cols, size_t _rows, const T& _default) {
 	std::vector<T> tmp = std::move(m_data);
 	m_data.clear();
 
@@ -294,4 +419,11 @@ inline void ot::LinearVector2D<T>::pushColumnBack(std::vector<T>&& _col) {
 		m_data.insert(m_data.begin() + (r + 1) * m_cols + r, std::move(_col[r]));
 	}
 	m_cols++;
+}
+
+template<class T>
+inline void ot::LinearVector2D<T>::setData(size_t _rows, size_t _cols, std::vector<T>&& _data) {
+	m_rows = _rows;
+	m_cols = _cols;
+	m_data = std::move(_data);
 }

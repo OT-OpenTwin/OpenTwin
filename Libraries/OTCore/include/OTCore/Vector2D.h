@@ -14,30 +14,61 @@
 namespace ot {
 
 	//! @class Vector2D
-	//! @brief A 2D vector container for generic types.
-	//! @tparam T The type of elements stored in the 2D vector.
+	//! @brief A 2D container implemented as a nested vector container for generic types.
+	//! The Vector2D provides a dynamically resizable 2D array where
+	//! the data is stored in a vector of columns and each column vector contains the actual entries.
+	//! @tparam T The type of elements stored in the container.
 	template <typename T>
 	class Vector2D {
 	public:
+
+		// Constructor
+
 		//! @brief Default constructor.
-		Vector2D() : m_rows(0), m_cols(0) {};
+		Vector2D();
 
 		//! @brief Constructs a 2D vector with given dimensions, initialized to 0.
 		//! @param _cols Number of columns.
 		//! @param _rows Number of rows.
-		Vector2D(size_t _cols, size_t _rows) : Vector2D() { this->resize(_cols, _rows); };
+		Vector2D(size_t _cols, size_t _rows);
 
 		//! @brief Constructs a 2D vector with given dimensions and default value.
 		//! @param _cols Number of columns.
 		//! @param _rows Number of rows.
 		//! @param _default Default value for initialization.
-		Vector2D(size_t _cols, size_t _rows, const T& _default) : Vector2D() { this->resize(_cols, _rows, _default); };
+		Vector2D(size_t _cols, size_t _rows, const T& _default);
 
-		Vector2D(const Vector2D&) = default;
-		Vector2D(Vector2D&&) = default;
-		Vector2D& operator = (const Vector2D&) = default;
-		Vector2D& operator = (Vector2D&&) = default;
-		virtual ~Vector2D() = default;
+		//! @brief Constructs a 2D vector from the provided other vector by copying the data.
+		//! @param _other Other vector.
+		Vector2D(const Vector2D& _other);
+
+		//! @brief Constructs a 2D vector from the provided other vector by moving the data.
+		//! @param _other Other vector.
+		Vector2D(Vector2D&& _other);
+
+		//! @brief Destructor.
+		virtual ~Vector2D() {};
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Operator
+
+		Vector2D& operator = (const Vector2D&);
+		Vector2D& operator = (Vector2D&&);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Data handling
+		
+		//! @brief Current column count.
+		size_t getColumnCount(void) const { return m_cols; };
+
+		//! @brief Current row count.
+		size_t getRowCount(void) const { return m_rows; };
+
+		//! @brief Removes all the data and sets the dimensions back to 0, 0.
+		//! Complexity: O(r * c) where r = _rows, c = _cols.
+		void clear(void);
 
 		//! @brief Resizes the vector to the given dimensions.
 		//! Complexity: O(r * c) where r = _rows and c = _cols.
@@ -133,14 +164,20 @@ namespace ot {
 		//! @param _col Column data to insert.
 		void pushColumnBack(std::vector<T>&& _col);
 
-		//! @brief Retrieves the entire data structure.
-		//! @return Constant reference to the stored data.
-		const std::vector<std::vector<T>>& getData(void) const { return m_data; };
+		//! @brief Replaces the current data.
+		//! Complexity: O(1) data is moved.
+		//! @param _rows New row count.
+		//! @param _cols New column count.
+		//! @param _data New data.
+		void setData(size_t _rows, size_t _cols, std::vector<std::vector<T>>&& _data);
 
-	protected:
 		//! @brief Retrieves the modifiable data structure.
 		//! @return Reference to the stored data.
 		std::vector<std::vector<T>>& getData(void) { return m_data; };
+
+		//! @brief Retrieves the entire data structure.
+		//! @return Constant reference to the stored data.
+		const std::vector<std::vector<T>>& getData(void) const { return m_data; };
 
 	private:
 		size_t m_rows; //! @brief Number of rows.
@@ -150,13 +187,91 @@ namespace ot {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor
+
 template<typename T>
-inline void ot::Vector2D<T>::resize(size_t _cols, size_t _rows) {
+ot::Vector2D<T>::Vector2D() : 
+	m_rows(0), m_cols(0)
+{}
+
+template<typename T>
+ot::Vector2D<T>::Vector2D(size_t _cols, size_t _rows) :
+	Vector2D() 
+{
+	this->resize(_cols, _rows);
+}
+
+template<typename T>
+ot::Vector2D<T>::Vector2D(size_t _cols, size_t _rows, const T& _default) :
+	Vector2D()
+{
+	this->resize(_cols, _rows, _default); 
+}
+
+template<typename T>
+ot::Vector2D<T>::Vector2D(const Vector2D& _other) :
+	m_rows(_other.m_rows), m_cols(_other.m_cols), m_data(_other.m_data)
+{
+
+}
+
+template<typename T>
+ot::Vector2D<T>::Vector2D(Vector2D&& _other) :
+	m_rows(std::move(_other.m_rows)), std::move(m_cols(_other.m_cols)), std::move(m_data(_other.m_data))
+{
+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Operator
+
+template<class T>
+ot::Vector2D<T>& ot::Vector2D<T>::operator=(const Vector2D& _other) {
+	if (this != &_other) {
+		m_rows = _other.m_rows;
+		m_cols = _other.m_cols;
+		m_data = _other.m_data;
+	}
+
+	return *this;
+}
+
+template<class T>
+ot::Vector2D<T>& ot::Vector2D<T>::operator=(Vector2D&& _other) noexcept {
+	if (this != &_other) {
+		m_rows = std::move(_other.m_rows);
+		m_cols = std::move(_other.m_cols);
+		m_data = std::move(_other.m_data);
+	}
+
+	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data handling
+
+template<typename T>
+void ot::Vector2D<T>::clear(void) {
+	m_rows = 0;
+	m_cols = 0;
+	m_data.clear();
+}
+
+template<typename T>
+void ot::Vector2D<T>::resize(size_t _cols, size_t _rows) {
 	this->resize(_cols, _rows, static_cast<const T>(0));
 }
 
 template<typename T>
-inline void ot::Vector2D<T>::resize(size_t _cols, size_t _rows, const T& _default) {
+void ot::Vector2D<T>::resize(size_t _cols, size_t _rows, const T& _default) {
 	std::vector<std::vector<T>> tmp = std::move(m_data);
 	m_data.clear();
 
@@ -294,5 +409,12 @@ inline void ot::Vector2D<T>::pushColumnBack(std::vector<T>&& _col) {
 		m_data[i].push_back(std::move(_col[i]));
 	}
 	m_cols++;
+}
+
+template<typename T>
+inline void ot::Vector2D<T>::setData(size_t _rows, size_t _cols, std::vector<std::vector<T>>&& _data) {
+	m_rows = _rows;
+	m_cols = _cols;
+	m_data = std::move(_data);
 }
 
