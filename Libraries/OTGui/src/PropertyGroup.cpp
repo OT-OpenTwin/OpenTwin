@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyFactory.h"
@@ -234,6 +235,13 @@ ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path
 		}
 	}
 	return nullptr;
+}
+
+ot::Property* ot::PropertyGroup::findPropertyByPath(const std::string& _path, char _pathDelimiter) const {
+	OTAssert(!_path.empty(), "Empty path provided");
+	std::list<std::string> pth = String::split(_path, _pathDelimiter, true);
+	OTAssert(!pth.empty(), "Path split failed");
+	return this->findPropertyByPath(pth);
 }
 
 void ot::PropertyGroup::setChildGroups(const std::list<PropertyGroup*>& _groups) {

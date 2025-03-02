@@ -99,6 +99,7 @@ namespace ot {
 		//! The path contains the group names from root to the item.
 		//! The last path entry must be the property name.
 		Property* findPropertyByPath(std::list<std::string> _path) const;
+		Property* findPropertyByPath(const std::string& _path, char _pathDelimiter = '/') const;
 
 		//! @brief Set the child groups.
 		//! This group takes ownership of the groups.

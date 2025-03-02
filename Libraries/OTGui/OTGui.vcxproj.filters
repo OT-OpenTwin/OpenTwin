@@ -395,6 +395,9 @@
     <ClInclude Include="include\OTGui\CopyEntityInformation.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManager.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -708,6 +711,9 @@
     </ClCompile>
     <ClCompile Include="src\CopyEntityInformation.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManager.cpp">
+      <Filter>Source Files\Properties</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

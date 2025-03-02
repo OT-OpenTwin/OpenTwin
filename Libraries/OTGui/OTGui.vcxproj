@@ -100,6 +100,7 @@
     <ClInclude Include="include\OTGui\PropertyGridCfg.h" />
     <ClInclude Include="include\OTGui\PropertyGroup.h" />
     <ClInclude Include="include\OTGui\PropertyInt.h" />
+    <ClInclude Include="include\OTGui\PropertyManager.h" />
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="src\PropertyGridCfg.cpp" />
     <ClCompile Include="src\PropertyGroup.cpp" />
     <ClCompile Include="src\PropertyInt.cpp" />
+    <ClCompile Include="src\PropertyManager.cpp" />
     <ClCompile Include="src\PropertyPainter2D.cpp" />
     <ClCompile Include="src\PropertyString.cpp" />
     <ClCompile Include="src\PropertyStringList.cpp" />

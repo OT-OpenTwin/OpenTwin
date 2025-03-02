@@ -100,7 +100,7 @@ namespace ot {
 
 		QTreeWidgetItem* addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
 		void destroyRecursive(QTreeWidgetItem* _item);
-
+		
 	};
 
 }
