@@ -10,6 +10,8 @@
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/PropertyFilePath.h"
 
 // std header
 #include <map>
@@ -26,8 +28,10 @@ namespace ot {
 	class PropertyColor;
 	class PropertyDouble;
 	class PropertyString;
+	class PropertyDirectory;
 	class PropertyPainter2D;
 	class PropertyStringList;
+	class PropertyManagerNotifier;
 
 	//! @brief Manages various property types and serialization.
 	//! The PropertyManager provides functions to set, get, and manage different property types.
@@ -83,6 +87,11 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter
+
+		//! @brief Adds the property to the specified group.
+		//! @param _groupName Name of group to add property to.
+		//! @param _property Property to add.
+		void addProperty(const std::string& _groupName, Property* _property);
 
 		//! @brief Sets boolean property.
 		//! @param _groupName The property group name.
@@ -168,9 +177,32 @@ namespace ot {
 		//! @return Pointer to the created property.
 		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
 
+		//! @brief Sets file path property.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @param _path The path to set.
+		//! @param _browseMode Browse mode used for file dialog.
+		//! @param _flags Property flags used when visualizing the property.
+		//! @return Pointer to the created property.
+		PropertyFilePath* setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path, PropertyFilePath::BrowseMode _browseMode = PropertyFilePath::ReadFile, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+
+		//! @brief Sets directory path property.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @param _path The path to set.
+		//! @param _flags Property flags used when visualizing the property.
+		//! @return Pointer to the created property.
+		PropertyDirectory* setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter
+
+		//! @brief Finds a property by group and name.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return Pointer to the found Property, or nullptr if not found.
+		Property* findProperty(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Retrieves boolean property value.
 		//! @param _groupName The property group name.
@@ -194,19 +226,31 @@ namespace ot {
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return The boolean value.
-		std::string getString(const std::string& _groupName, const std::string& _valueName) const;
+		const std::string& getString(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Retrieves color property value.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return The color value.
-		Color getColor(const std::string& _groupName, const std::string& _valueName) const;
+		const Color& getColor(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Retrieves Painter2D property value.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return The Painter2D value.
 		const Painter2D* getPainter2D(const std::string& _groupName, const std::string& _valueName) const;
+
+		//! @brief Retrieves file path property value.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return The file path.
+		const std::string& getFilePath(const std::string& _groupName, const std::string& _valueName) const;
+
+		//! @brief Retrieves Direcotry property value.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return The Directory path.
+		const std::string& getDirectory(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Finds a property by group and name.
 		//! The found property will be casted to the specified type.
@@ -226,8 +270,12 @@ namespace ot {
 		//! @brief Removes all groups and properties.
 		void clear(void);
 
+		void addNotifier(PropertyManagerNotifier* _notifier);
+		PropertyManagerNotifier* removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject);
+
 	private:
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
+		std::list<PropertyManagerNotifier*> m_notifier;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -243,16 +291,17 @@ namespace ot {
 		//! @return Pointer to the found or created PropertyGroup.
 		PropertyGroup* findOrCreateGroup(const std::string& _group);
 
-		//! @brief Finds a property by group and name.
-		//! @param _groupName The property group name.
-		//! @param _valueName The property value name.
-		//! @return Pointer to the found Property, or nullptr if not found.
-		Property* findProperty(const std::string& _groupName, const std::string& _valueName) const;
-
 		//! @brief Stores a property within a specified group.
 		//! @param _groupName The group to store the property in.
 		//! @param _property Pointer to the property to store.
 		//! @return Pointer to the stored property.
 		Property* storeProperty(const std::string& _groupName, Property* _property);
+
+		void notifyPropertyCreated(Property* _property);
+
+		void notifyPropertyDestroyed(Property* _property);
+
+		void notifyPropertyChanged(const Property* _property);
+
 	};
 }

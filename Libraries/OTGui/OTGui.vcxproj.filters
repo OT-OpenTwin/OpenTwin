@@ -398,6 +398,12 @@
     <ClInclude Include="include\OTGui\PropertyManager.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\ManagedPropertyObject.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerNotifier.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -713,6 +719,12 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyManager.cpp">
+      <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ManagedPropertyObject.cpp">
+      <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManagerNotifier.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
   </ItemGroup>
