@@ -270,12 +270,19 @@ namespace ot {
 		//! @brief Removes all groups and properties.
 		void clear(void);
 
+		//! @brief Register property manager notifier.
+		//! @param _notifier Notifier to add.
 		void addNotifier(PropertyManagerNotifier* _notifier);
+
+		//! @brief Remove given notifier from this manager.
+		//! @param _notifier Notifier to remove.
+		//! @param _destroyObject Will destroy the passed notifier no matter if it exists or not.
+		//! @return The removed notifier or nullptr if not found or destroyed.
 		PropertyManagerNotifier* removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject);
 
 	private:
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
-		std::list<PropertyManagerNotifier*> m_notifier;
+		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -297,10 +304,16 @@ namespace ot {
 		//! @return Pointer to the stored property.
 		Property* storeProperty(const std::string& _groupName, Property* _property);
 
+		//! @brief Notify all registered notifiers about the creation of the property.
+		//! @param _property Newly created property.
 		void notifyPropertyCreated(Property* _property);
 
+		//! @brief Notify all registered notifiers about the deletion of the property.
+		//! @param _property Property that will be destroyed after this call.
 		void notifyPropertyDestroyed(Property* _property);
 
+		//! @brief Notify all registed notifiers about the value change of the property.
+		//! @param _property Changed property.
 		void notifyPropertyChanged(const Property* _property);
 
 	};

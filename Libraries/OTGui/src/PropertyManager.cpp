@@ -357,16 +357,26 @@ void ot::PropertyManager::addNotifier(PropertyManagerNotifier* _notifier) {
 }
 
 ot::PropertyManagerNotifier* ot::PropertyManager::removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject) {
-	PropertyManagerNotifier* noti = nullptr;
+	PropertyManagerNotifier* noti = _notifier;
 
-	auto it = std::find(m_notifier.begin(), m_notifier.end(), _notifier);
-	if (it != m_notifier.end()) {
-		noti = *it;
-		if (_destroyObject && noti) {
-			delete noti;
-			noti = nullptr;
-		}
+	// Find notifier in list
+	auto it = std::find(m_notifier.begin(), m_notifier.end(), noti);
+
+	// Check if in list
+	if (it == m_notifier.end()) {
+		noti = nullptr;
 	}
+	else {
+		// Remove from list
+		m_notifier.erase(it);
+	}
+
+	// Destroy object if needed
+	if (_destroyObject && _notifier) {
+		noti = nullptr;
+		delete _notifier;
+	}
+
 	return noti;
 }
 
