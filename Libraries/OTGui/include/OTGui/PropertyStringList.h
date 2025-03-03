@@ -31,6 +31,8 @@ namespace ot {
 		static std::string propertyTypeString(void) { return "StringList"; };
 		virtual std::string getPropertyType(void) const override { return PropertyStringList::propertyTypeString(); };
 
+		virtual void setValueFromOther(const Property* _other) override;
+
 		virtual Property* createCopy(void) const override;
 
 		void setList(const std::list<std::string>& _values) { m_list = _values; };

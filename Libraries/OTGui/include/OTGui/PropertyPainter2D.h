@@ -43,6 +43,8 @@ namespace ot {
 		static std::string propertyTypeString(void) { return "Painter2D"; };
 		virtual std::string getPropertyType(void) const override { return PropertyPainter2D::propertyTypeString(); };
 
+		virtual void setValueFromOther(const Property* _other) override;
+
 		virtual Property* createCopy(void) const override;
 
 		//! @brief Set the painter for this property.

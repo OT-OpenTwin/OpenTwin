@@ -26,6 +26,8 @@ namespace ot {
 		static std::string propertyTypeString(void) { return "Directory"; };
 		virtual std::string getPropertyType(void) const override { return PropertyDirectory::propertyTypeString(); };
 
+		virtual void setValueFromOther(const Property* _other) override;
+
 		virtual Property* createCopy(void) const override;
 
 		void setPath(const std::string& _path) { m_path = _path; };

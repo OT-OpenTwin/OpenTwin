@@ -35,6 +35,13 @@ ot::PropertyInt::PropertyInt(const std::string& _name, int _value, int _min, int
 	: Property(_name, _flags), m_value(_value), m_min(_min), m_max(_max)
 {}
 
+void ot::PropertyInt::setValueFromOther(const Property* _other) {
+	const PropertyInt* other = dynamic_cast<const PropertyInt*>(_other);
+	m_value = other->m_value;
+	m_min = other->m_min;
+	m_max = other->m_max;
+}
+
 ot::Property* ot::PropertyInt::createCopy(void) const {
 	return new PropertyInt(this);
 }

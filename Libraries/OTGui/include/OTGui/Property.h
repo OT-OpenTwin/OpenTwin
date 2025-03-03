@@ -32,6 +32,10 @@ namespace ot {
 
 		virtual std::string getPropertyType(void) const = 0;
 
+		//! @brief Set the property values from the other property.
+		//! @param _other Other property.
+		virtual void setValueFromOther(const Property* _other) = 0;
+
 		//! \brief Creates a copy of this property.
 		virtual Property* createCopy(void) const = 0;
 

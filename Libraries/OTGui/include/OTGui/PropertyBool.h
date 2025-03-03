@@ -23,6 +23,8 @@ namespace ot {
 		static std::string propertyTypeString(void) { return "Bool"; };
 		virtual std::string getPropertyType(void) const override { return PropertyBool::propertyTypeString(); };
 
+		virtual void setValueFromOther(const Property* _other) override;
+
 		virtual Property* createCopy(void) const override;
 
 		void setValue(bool _value) { m_value = _value; };

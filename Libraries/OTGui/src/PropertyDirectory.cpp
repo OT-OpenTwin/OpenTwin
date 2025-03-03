@@ -19,6 +19,11 @@ ot::PropertyDirectory::PropertyDirectory(const PropertyBase& _base)
 	: Property(_base)
 {}
 
+void ot::PropertyDirectory::setValueFromOther(const Property* _other) {
+	const PropertyDirectory* other = dynamic_cast<const PropertyDirectory*>(_other);
+	m_path = other->m_path;
+}
+
 ot::Property* ot::PropertyDirectory::createCopy(void) const {
 	return new PropertyDirectory(this);
 }

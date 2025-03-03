@@ -51,6 +51,12 @@ ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::
 	}
 }
 
+void ot::PropertyStringList::setValueFromOther(const Property* _other) {
+	const PropertyStringList* other = dynamic_cast<const PropertyStringList*>(_other);
+	m_current = other->m_current;
+	m_list = other->m_list;
+}
+
 ot::Property* ot::PropertyStringList::createCopy(void) const {
 	return new PropertyStringList(this);
 }

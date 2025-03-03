@@ -64,6 +64,11 @@ ot::PropertyPainter2D::~PropertyPainter2D() {
 	m_painter = nullptr;
 }
 
+void ot::PropertyPainter2D::setValueFromOther(const Property* _other) {
+	const PropertyPainter2D* other = dynamic_cast<const PropertyPainter2D*>(_other);
+	this->setPainter(other->getPainter()->createCopy());
+}
+
 ot::Property* ot::PropertyPainter2D::createCopy(void) const {
 	return new PropertyPainter2D(this);
 }
