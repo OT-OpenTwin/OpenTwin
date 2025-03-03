@@ -6,6 +6,7 @@
 #include "OTCommunication/Msg.h"
 
 #include <thread>
+#include <chrono>
 
 GlobalDirectoryService::GlobalDirectoryService(SessionService * _sessionService)
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService),

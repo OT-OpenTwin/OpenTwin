@@ -1,12 +1,15 @@
-#include "StartupDispatcher.h"
+// Service header
 #include "Application.h"
+#include "StartupDispatcher.h"
 #include "LocalDirectoryService.h"
 
+// OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 
+// std header
 #include <thread>
-#include <iostream>
+#include <chrono>
 
 StartupDispatcher::StartupDispatcher(void) : m_isStopping(false),
 	m_workerThread(nullptr)

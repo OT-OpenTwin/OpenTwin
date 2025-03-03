@@ -10,9 +10,9 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
-// C++ header
-#include <iostream>
+// std header
 #include <thread>
+#include <chrono>
 
 ServiceManager::ServiceManager()
 	: m_isShuttingDown(false), m_threadServiceStarter(nullptr), m_threadServiceInitializer(nullptr), m_threadHealthCheck(nullptr),
