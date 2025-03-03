@@ -18,4 +18,5 @@ See here for more details:
    session_management
    service_api_structure
    entity_copy_request
+   managed_properties
    
