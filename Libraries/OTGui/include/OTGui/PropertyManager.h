@@ -86,6 +86,19 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Event handling
+
+		//! @brief Will be called whenever a property has been changed.
+		//! @param _property Property that has been changed.
+		virtual void propertyChanged(const Property* _property);
+
+		//! @brief Will be called before a property will be read.
+		//! @param _propertyGroupName Name of the group where the property should be located at.
+		//! @param _propertyName Name of the property. The name should be unique inside a group.
+		virtual void propertyRead(const std::string& _propertyGroupName, const std::string& _propertyName);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		// Setter
 
 		//! @brief Adds the property to the specified group.
@@ -280,13 +293,17 @@ namespace ot {
 		//! @return The removed notifier or nullptr if not found or destroyed.
 		PropertyManagerNotifier* removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject);
 
-	private:
-		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
-		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Private
+		// Protected
+
+	protected:
+
+		//! @brief Stores a property within a specified group.
+		//! @param _groupName The group to store the property in.
+		//! @param _property Pointer to the property to store.
+		//! @return Pointer to the stored property.
+		virtual Property* storeProperty(const std::string& _groupName, Property* _property);
 
 		//! @brief Find an existing group by name.
 		//! @param _group The group name.
@@ -297,12 +314,6 @@ namespace ot {
 		//! @param _group The group name.
 		//! @return Pointer to the found or created PropertyGroup.
 		PropertyGroup* findOrCreateGroup(const std::string& _group);
-
-		//! @brief Stores a property within a specified group.
-		//! @param _groupName The group to store the property in.
-		//! @param _property Pointer to the property to store.
-		//! @return Pointer to the stored property.
-		Property* storeProperty(const std::string& _groupName, Property* _property);
 
 		//! @brief Notify all registered notifiers about the creation of the property.
 		//! @param _property Newly created property.
@@ -315,6 +326,10 @@ namespace ot {
 		//! @brief Notify all registed notifiers about the value change of the property.
 		//! @param _property Changed property.
 		void notifyPropertyChanged(const Property* _property);
+
+	private:
+		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
+		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
 
 	};
 }

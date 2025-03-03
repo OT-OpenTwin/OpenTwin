@@ -87,6 +87,18 @@ void ot::PropertyManager::setFromJsonObject(const ot::ConstJsonObject& _object) 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Event handling
+
+void ot::PropertyManager::propertyChanged(const Property* _property) {
+	OTAssertNullptr(_property);
+}
+
+void ot::PropertyManager::propertyRead(const std::string& _propertyGroupName, const std::string& _propertyName) {
+	
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Setter
 
 void ot::PropertyManager::addProperty(const std::string& _groupName, Property* _property) {
@@ -402,7 +414,7 @@ ot::PropertyGroup* ot::PropertyManager::findOrCreateGroup(const std::string& _gr
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private
+// Protected
 
 ot::Property* ot::PropertyManager::storeProperty(const std::string& _groupName, Property* _property) {
 	ot::PropertyGroup* grp = this->findOrCreateGroup(_groupName);
@@ -410,7 +422,7 @@ ot::Property* ot::PropertyManager::storeProperty(const std::string& _groupName, 
 	OTAssert(grp->findPropertyByPath(_property->getPropertyName()) == nullptr, "Property with the given name already exists");
 
 	grp->addProperty(_property);
-	
+
 	this->notifyPropertyCreated(_property);
 
 	return _property;

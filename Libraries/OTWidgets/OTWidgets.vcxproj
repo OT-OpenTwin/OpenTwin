@@ -98,8 +98,12 @@
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
+    <ClCompile Include="src\ManagedPropertyLink.cpp" />
+    <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
+    <ClCompile Include="src\WidgetPropertyManager.cpp" />
     <ClCompile Include="src\PlotDatasetData.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
+    <ClCompile Include="src\PropertyManagerGridLink.cpp" />
     <ClCompile Include="src\SelectionInformation.cpp" />
     <ClCompile Include="src\SVGWidget.cpp" />
     <ClCompile Include="src\SVGWidgetGrid.cpp" />
@@ -231,7 +235,11 @@
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
+    <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
+    <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h" />
+    <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h" />
+    <QtMoc Include="include\OTWidgets\PropertyManagerGridLink.h" />
     <ClInclude Include="include\OTWidgets\SelectionInformation.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />

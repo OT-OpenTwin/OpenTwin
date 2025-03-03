@@ -404,6 +404,12 @@
     <ClInclude Include="include\OTGui\PropertyManagerNotifier.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\ManagedPropertyRegistrar.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\ManagedPropertyObjectBase.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">

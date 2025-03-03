@@ -490,6 +490,18 @@
     <ClCompile Include="src\TreeItemViewLink.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetPropertyManager.cpp">
+      <Filter>src\PropertyLink</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManagerGridLink.cpp">
+      <Filter>src\PropertyLink</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ManagedPropertyLink.cpp">
+      <Filter>src\PropertyLink</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ManagedWidgetPropertyObject.cpp">
+      <Filter>src\PropertyLink</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -599,6 +611,12 @@
     </Filter>
     <Filter Include="include\Delegates">
       <UniqueIdentifier>{85780b8c-6fa1-4fc2-bb29-5bb08b6a2575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PropertyLink">
+      <UniqueIdentifier>{814beebd-7e98-497d-91f7-c953dee7cf87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\PropertyLink">
+      <UniqueIdentifier>{a0da90b9-c9a0-439e-8ff9-058154e0488e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -935,6 +953,12 @@
     <ClInclude Include="include\OTWidgets\TabToolBarButtonProxyStyle.h">
       <Filter>include\Delegates</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h">
+      <Filter>include\PropertyLink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h">
+      <Filter>include\PropertyLink</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1125,6 +1149,12 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\TreeItemViewLink.h">
       <Filter>include\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyManagerGridLink.h">
+      <Filter>include\PropertyLink</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h">
+      <Filter>include\PropertyLink</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
