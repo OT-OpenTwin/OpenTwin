@@ -38,8 +38,8 @@ namespace ot {
 		void useCustomToolTip(bool _use = true);
 		bool isUseCustomToolTip(void) const { return m_useCustomToolTip; };
 
-		void useAlpha(bool _use = true);
-		bool isUseAlpha(void) const { return m_useAlpha; };
+		void setEditAlpha(bool _use = true);
+		bool getEditAlpha(void) const { return m_editAlpha; };
 
 		void replaceButtonText(const QString& _text);
 
@@ -59,7 +59,7 @@ namespace ot {
 		void ini(const QColor& _color);
 
 		bool m_useCustomToolTip;
-		bool m_useAlpha;
+		bool m_editAlpha;
 		ColorPreviewBox* m_view;
 		PushButton* m_btn;
 	};

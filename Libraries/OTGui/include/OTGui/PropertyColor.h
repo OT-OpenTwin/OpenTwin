@@ -31,6 +31,9 @@ namespace ot {
 		void setValue(const ot::Color& _value) { m_value = _value; };
 		const ot::Color& getValue(void) const { return m_value; };
 
+		void setIncludeAlpha(bool _include = true) { m_includeAlpha = _include; };
+		bool getIncludeAlpha(void) const { return m_includeAlpha; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added

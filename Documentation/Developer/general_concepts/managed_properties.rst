@@ -35,7 +35,7 @@ Tree Entity Name Example
 
 The following :ref:`example <tree_entit_name_example_code>` will demonstrate how to create a string property and synchronize it with a tree item.
 
-Convenience macros provided in the `OTGui/ManagedPropertyRegistrarBase.h file<../_static/codedochtml/classot_1_1_managed_property_registrar_base.xhtml>`_ will be used in this :ref:`example <tree_entit_name_example_code>`.
+Convenience macros provided in the `OTGui/ManagedPropertyRegistrarBase.h file <../_static/codedochtml/classot_1_1_managed_property_registrar_base.xhtml>`_ will be used in this :ref:`example <tree_entit_name_example_code>`.
 
 The ``OT_PROPERTY_STRING_CALL`` macro from the `Managed Property Registrar Base <../_static/codedochtml/classot_1_1_managed_property_registrar_base.xhtml>`_ is used the generate the property.
 A setter and getter method in the following syntax will be gerated:

@@ -35,6 +35,8 @@ namespace ot {
 		Color getOTColor(void) const;
 		QColor getColor(void) const;
 
+		ColorPickButton* getColorPickButton(void) const { return m_colorBtn; };
+
 	private:
 		ColorPickButton* m_colorBtn;
 	};

@@ -63,6 +63,8 @@ bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configurati
 	m_colorBtn->blockSignals(true);
 
 	m_colorBtn->setColor(actualProperty->getValue());
+	m_colorBtn->setEditAlpha(actualProperty->getIncludeAlpha());
+
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_colorBtn->replaceButtonText("...");
 	}
