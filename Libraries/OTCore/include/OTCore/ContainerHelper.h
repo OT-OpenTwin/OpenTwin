@@ -40,11 +40,20 @@ namespace ot {
 		//! @param _value 
 		template <class K, class V> void removeFromMapByValue(std::map<K, V>& _map, const V& _value);
 
+		//! @brief Returns true if the provided map stores an entry with the given value.
+		//! @tparam K Map key type.
+		//! @tparam V Map value type.
+		//! @param _map 
+		//! @param _value 
+		template <class K, class V> bool hasValue(const std::map<K, V>& _map, const V& _value);
+
 		template <typename T> std::vector<T> vectorFromList(const std::list<T>& _list);
 		template <typename T> std::list<T> listFromVector(const std::vector<T>& _vector);
 
 		template <typename T> std::list<T> createDiff(const std::list<T>& _left, const std::list<T>& _right, DiffMode _diffMode);
 		template <typename T> std::vector<T> createDiff(const std::vector<T>& _left, const std::vector<T>& _right, DiffMode _diffMode);
+
+
 	};	
 }
 

@@ -45,6 +45,16 @@ void ot::ContainerHelper::removeFromMapByValue(std::map<K, V>& _map, const V& _v
 	}
 }
 
+template<class K, class V>
+bool ot::ContainerHelper::hasValue(const std::map<K, V>& _map, const V& _value) {
+	for (const auto& it = _map.begin(); it != _map.end(); it++) {
+		if (it->second == _value) {
+			return true;
+		}
+	}
+	return false;
+}
+
 template <typename T>
 std::vector<T> ot::ContainerHelper::vectorFromList(const std::list<T>& _list) {
 	std::vector<T> result;
