@@ -62,6 +62,10 @@ ot::Property* ot::Property::createCopyWithParents(void) const {
 	return newProperty;
 }
 
+void ot::Property::setValueFromOther(const Property* _other) {
+	
+}
+
 ot::PropertyGroup* ot::Property::getRootGroup(void) const {
 	if (m_parentGroup) return m_parentGroup->getRootGroup();
 	else return nullptr;

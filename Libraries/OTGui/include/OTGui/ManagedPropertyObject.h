@@ -9,6 +9,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/PropertyManagerNotifier.h"
 
 namespace ot {
 
@@ -17,7 +18,7 @@ namespace ot {
 	//! @class ManagedPropertyObject
 	//! @brief The ManagedPropertyObject class is a basic wrapper for the use of the PropertyManager.
 	//! A PropertyManager instance is accessable trough a regular and a const getter methods.
-	class OT_GUI_API_EXPORT ManagedPropertyObject {
+	class OT_GUI_API_EXPORT ManagedPropertyObject : public PropertyManagerNotifier {
 		OT_DECL_NOCOPY(ManagedPropertyObject)
 	public:
 		//! @brief Constructor.

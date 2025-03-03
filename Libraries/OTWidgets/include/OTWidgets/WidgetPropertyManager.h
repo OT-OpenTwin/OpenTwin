@@ -19,8 +19,7 @@ namespace ot {
 
 	class ManagedPropertyLink;
 	class ManagedWidgetPropertyObject;
-	class PropertyManagerGridConnector;
-
+	
 	//! @class WidgetPropertyManager
 	//! @brief The WidgetPropertyManager class is an extended PropertyManager wrapper.
 	//! It allows to use frontend component links to the properties enabling build in property handling.

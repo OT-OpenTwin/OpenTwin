@@ -30,6 +30,8 @@ namespace ot {
 		//! @return Reference to this object.
 		ManagedWidgetPropertyObject& operator = (ManagedWidgetPropertyObject&& _other) noexcept;
 
+		virtual void propertyValueHasChanged(const ot::Property* _property) {};
+
 	};
 
 }

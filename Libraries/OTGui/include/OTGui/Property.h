@@ -32,10 +32,6 @@ namespace ot {
 
 		virtual std::string getPropertyType(void) const = 0;
 
-		//! @brief Set the property values from the other property.
-		//! @param _other Other property.
-		virtual void setValueFromOther(const Property* _other) = 0;
-
 		//! \brief Creates a copy of this property.
 		virtual Property* createCopy(void) const = 0;
 
@@ -60,6 +56,11 @@ namespace ot {
 		//!        +--> <This Property>
 		//! </pre>
 		Property* createCopyWithParents(void) const;
+
+		//! @brief Set the property values from the other property.
+		//! The base date won't be changed (base class method does nothing).
+		//! @param _other Other property.
+		virtual void setValueFromOther(const Property* _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference

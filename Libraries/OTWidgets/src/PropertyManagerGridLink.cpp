@@ -22,10 +22,10 @@ ot::PropertyManagerGridLink::~PropertyManagerGridLink() {
 	this->forgetPropertyGrid();
 }
 
-void ot::PropertyManagerGridLink::visualizeProperty(QWidgetInterface* _widget) {
-	if (!m_grid || m_grid != _widget) {
-		return;
-	}
+void ot::PropertyManagerGridLink::visualizeAtGrid(PropertyGrid* _grid) {
+	OTAssertNullptr(_grid);
+	this->forgetPropertyGrid();
+	m_grid = _grid;
 
 	WidgetPropertyManager* manager = this->getWidgetPropertyManager();
 	OTAssertNullptr(manager);
@@ -46,14 +46,28 @@ void ot::PropertyManagerGridLink::forgetPropertyGrid(void) {
 }
 
 void ot::PropertyManagerGridLink::slotPropertyChanged(const Property* const _property) {
-	const PropertyGroup* grp = _property->getParentGroup();
-	OTAssertNullptr(grp);
-	
+	// Ensure property should be modified
+	if (_property->getPropertyFlags() & (PropertyBase::IsReadOnly | PropertyBase::IsProtected | PropertyBase::IsHidden)) {
+		OT_LOG_W("Property should not have changed");
+		if (m_grid) {
+			this->visualizeAtGrid(m_grid);
+		}
+		return;
+	}
+
+	// Get manager
 	WidgetPropertyManager* manager = this->getWidgetPropertyManager();
 	OTAssertNullptr(manager);
 
+	// Get group
+	const PropertyGroup* grp = _property->getParentGroup();
+	OTAssertNullptr(grp);
+	
+	// Get property
 	Property* prop = manager->findProperty(grp->getName(), _property->getPropertyName());
 	OTAssertNullptr(prop);
+
+	// Update value
 	prop->setValueFromOther(_property);
 }
 

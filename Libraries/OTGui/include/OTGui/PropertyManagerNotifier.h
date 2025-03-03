@@ -23,9 +23,9 @@ namespace ot {
 		PropertyManagerNotifier& operator = (const PropertyManagerNotifier& _other);
 		PropertyManagerNotifier& operator = (PropertyManagerNotifier&& _other) noexcept;
 
-		virtual void propertyCreated(ot::Property* _property);
-		virtual void propertyDestroyed(ot::Property* _property);
-		virtual void propertyChanged(const ot::Property* _property);
+		virtual void propertyWasCreated(ot::Property* _property) {};
+		virtual void propertyWasDestroyed(ot::Property* _property) {};
+		virtual void propertyHasChanged(const ot::Property* _property) {};
 
 	private:
 		friend class PropertyManager;

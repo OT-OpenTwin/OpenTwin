@@ -431,20 +431,20 @@ ot::Property* ot::PropertyManager::storeProperty(const std::string& _groupName, 
 void ot::PropertyManager::notifyPropertyCreated(Property* _property) {
 	OTAssertNullptr(_property);
 	for (PropertyManagerNotifier* n : m_notifier) {
-		n->propertyCreated(_property);
+		n->propertyWasCreated(_property);
 	}
 }
 
 void ot::PropertyManager::notifyPropertyDestroyed(Property* _property) {
 	OTAssertNullptr(_property);
 	for (PropertyManagerNotifier* n : m_notifier) {
-		n->propertyDestroyed(_property);
+		n->propertyWasDestroyed(_property);
 	}
 }
 
 void ot::PropertyManager::notifyPropertyChanged(const Property* _property) {
 	OTAssertNullptr(_property);
 	for (PropertyManagerNotifier* n : m_notifier) {
-		n->propertyChanged(_property);
+		n->propertyHasChanged(_property);
 	}
 }

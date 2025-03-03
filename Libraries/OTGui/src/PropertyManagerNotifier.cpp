@@ -58,12 +58,3 @@ ot::PropertyManagerNotifier& ot::PropertyManagerNotifier::operator=(PropertyMana
 
 	return *this;
 }
-
-void ot::PropertyManagerNotifier::propertyCreated(ot::Property* _property) {
-}
-
-void ot::PropertyManagerNotifier::propertyDestroyed(ot::Property* _property) {
-}
-
-void ot::PropertyManagerNotifier::propertyChanged(const ot::Property* _property) {
-}

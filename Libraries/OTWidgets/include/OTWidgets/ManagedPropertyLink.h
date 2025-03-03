@@ -21,11 +21,10 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ManagedPropertyLink)
 		OT_DECL_NOMOVE(ManagedPropertyLink)
+		OT_DECL_NODEFAULT(ManagedPropertyLink)
 	public:
-		ManagedPropertyLink(WidgetPropertyManager* _manager = (WidgetPropertyManager*)nullptr);
+		ManagedPropertyLink(WidgetPropertyManager* _manager);
 		virtual ~ManagedPropertyLink();
-
-		virtual void visualizeProperty(QWidgetInterface* _widget) {};
 
 		void setWidgetPropertyManager(WidgetPropertyManager* _manager) { m_manager = _manager; };
 		WidgetPropertyManager* getWidgetPropertyManager(void) { return m_manager; };

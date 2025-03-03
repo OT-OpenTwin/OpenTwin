@@ -20,11 +20,12 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyManagerGridLink)
 		OT_DECL_NOMOVE(PropertyManagerGridLink)
+		OT_DECL_NODEFAULT(PropertyManagerGridLink)
 	public:
-		PropertyManagerGridLink(WidgetPropertyManager* _manager = (WidgetPropertyManager*)nullptr);
+		PropertyManagerGridLink(WidgetPropertyManager* _manager);
 		virtual ~PropertyManagerGridLink();
 
-		virtual void visualizeProperty(QWidgetInterface* _widget) override;
+		void visualizeAtGrid(PropertyGrid* _grid);
 
 		void forgetPropertyGrid(void);
 
