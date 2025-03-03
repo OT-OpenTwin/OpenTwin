@@ -35,8 +35,8 @@ namespace ot {
 		std::list<const Property*> getChangedProperties(void) const { return m_changedProperties; };
 
 	Q_SIGNALS:
-		void propertyChanged(const std::string& _owner, const Property* const _property);
-		void propertyDeleteRequested(const std::string& _owner, const Property* const _property);
+		void propertyChanged(const std::string& _owner, const Property* _property);
+		void propertyDeleteRequested(const std::string& _owner, const Property* _property);
 
 	public:
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -53,7 +53,7 @@ namespace ot {
 		//! \see ot::PropertyGroup::mergeWith()
 		bool getReplaceExistingPropertiesOnMerge(void) const { return m_propertyReplaceOnMerge; };
 
-		const PropertyDialog* const getDialog(void) const { return m_dialog; };
+		const PropertyDialog* getDialog(void) const { return m_dialog; };
 
 		void setDialogTitle(const QString& _title);
 		const QString getDialogTitle(void) const { return m_dialogTitle; };

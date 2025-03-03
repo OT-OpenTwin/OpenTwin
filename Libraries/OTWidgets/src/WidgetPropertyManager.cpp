@@ -31,6 +31,14 @@ ot::WidgetPropertyManager& ot::WidgetPropertyManager::operator=(WidgetPropertyMa
 	return *this;
 }
 
+void ot::WidgetPropertyManager::propertyChanged(const Property* _property) {
+	PropertyManager::propertyChanged(_property);
+}
+
+void ot::WidgetPropertyManager::readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) {
+	PropertyManager::readingProperty(_propertyGroupName, _propertyName);
+}
+
 void ot::WidgetPropertyManager::addPropertyLink(ManagedPropertyLink* _link) {
 	OTAssertNullptr(_link);
 	OTAssert(std::find(m_links.begin(), m_links.end(), _link) == m_links.end(), "Link already registered");

@@ -30,8 +30,8 @@ namespace ot {
 		void forgetPropertyGrid(void);
 
 	private Q_SLOTS:
-		void slotPropertyChanged(const Property* const _property);
-		void slotPropertyDeleteRequested(const Property* const _property);
+		void slotPropertyChanged(const Property* _property);
+		void slotPropertyDeleteRequested(const Property* _property);
 
 	private:
 		PropertyGrid* m_grid;

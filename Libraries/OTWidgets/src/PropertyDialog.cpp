@@ -204,14 +204,14 @@ void ot::PropertyDialog::slotTreeSelectionChanged(void) {
 	m_grid->setupGridFromConfig(it->second.getGridConfig());
 }
 
-void ot::PropertyDialog::slotPropertyChanged(const Property* const _property) {
+void ot::PropertyDialog::slotPropertyChanged(const Property* _property) {
 	// Store a copy if the signal is not used and the properties need to be accessed all at once after the dialog was confirmed.
 	m_changedProperties.push_back(_property->createCopyWithParents());
 
 	Q_EMIT propertyChanged(_property);
 }
 
-void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* const _property) {
+void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* _property) {
 	Q_EMIT propertyDeleteRequested(_property);
 }
 

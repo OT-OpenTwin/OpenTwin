@@ -32,6 +32,8 @@ namespace ot {
 	class PropertyPainter2D;
 	class PropertyStringList;
 	class PropertyManagerNotifier;
+	class PropertyManagerReadCallbackNotifier;
+	class PropertyManagerWriteCallbackNotifierBase;
 
 	//! @brief Manages various property types and serialization.
 	//! The PropertyManager provides functions to set, get, and manage different property types.
@@ -95,16 +97,28 @@ namespace ot {
 		//! @brief Will be called before a property will be read.
 		//! @param _propertyGroupName Name of the group where the property should be located at.
 		//! @param _propertyName Name of the property. The name should be unique inside a group.
-		virtual void propertyRead(const std::string& _propertyGroupName, const std::string& _propertyName);
+		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter
 
 		//! @brief Adds the property to the specified group.
+		//! The property should not exist, an existing one will be replaced.
 		//! @param _groupName Name of group to add property to.
 		//! @param _property Property to add.
-		void addProperty(const std::string& _groupName, Property* _property);
+		ot::Property* addProperty(const std::string& _groupName, Property* _property);
+
+		//! @brief Updates an existing property or creates a new one.
+		//! @param _groupName Name of group to add property to.
+		//! @param _property Property to update.
+		void updateProperty(const std::string& _groupName, Property* _property);
+
+		//! @brief Updates an existing property or creates a new one.
+		//! @param _groupName Name of group to add property to.
+		//! @param _property Property to update.
+		//! @param _deleteProvidedProperty If true the provided _property will be destroyed.
+		void updateProperty(const std::string& _groupName, const Property* _property, bool _deleteProvidedProperty);
 
 		//! @brief Sets boolean property.
 		//! @param _groupName The property group name.
@@ -293,6 +307,14 @@ namespace ot {
 		//! @return The removed notifier or nullptr if not found or destroyed.
 		PropertyManagerNotifier* removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject);
 
+		void addReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
+
+		void removeReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
+
+		void addWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
+
+		void removeWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected
@@ -330,6 +352,8 @@ namespace ot {
 	private:
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
 		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
+		std::map<std::string, PropertyManagerReadCallbackNotifier*> m_readNotifier;
+		std::map<std::string, PropertyManagerWriteCallbackNotifierBase*> m_writeNotifier;
 
 	};
 }

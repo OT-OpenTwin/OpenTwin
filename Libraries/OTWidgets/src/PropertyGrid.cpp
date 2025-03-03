@@ -151,11 +151,11 @@ void ot::PropertyGrid::focusProperty(const std::list<std::string>& _groupPath, c
 	prop->getInput()->focusPropertyInput();
 }
 
-void ot::PropertyGrid::slotPropertyChanged(const Property* const _property) {
+void ot::PropertyGrid::slotPropertyChanged(const Property* _property) {
 	Q_EMIT propertyChanged(_property);
 }
 
-void ot::PropertyGrid::slotPropertyDeleteRequested(const Property* const _property) {
+void ot::PropertyGrid::slotPropertyDeleteRequested(const Property* _property) {
 	Q_EMIT propertyDeleteRequested(_property);
 }
 

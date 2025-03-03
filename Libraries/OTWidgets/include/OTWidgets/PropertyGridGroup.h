@@ -58,13 +58,13 @@ namespace ot {
 		void updateStateIcon(void);
 
 	Q_SIGNALS:
-		void itemInputValueChanged(const ot::Property* const _property);
-		void itemDeleteRequested(const ot::Property* const _property);
+		void itemInputValueChanged(const ot::Property* _property);
+		void itemDeleteRequested(const ot::Property* _property);
 
 	private Q_SLOTS:
 		void slotColorStyleChanged(void);
-		void slotItemInputValueChanged(const ot::Property* const _property);
-		void slotItemDeleteRequested(const ot::Property* const _property);
+		void slotItemInputValueChanged(const ot::Property* _property);
+		void slotItemDeleteRequested(const ot::Property* _property);
 
 	private:
 		void updateStateIcon(const ColorStyle& _style);

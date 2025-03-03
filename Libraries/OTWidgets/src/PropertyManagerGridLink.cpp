@@ -45,7 +45,7 @@ void ot::PropertyManagerGridLink::forgetPropertyGrid(void) {
 	}
 }
 
-void ot::PropertyManagerGridLink::slotPropertyChanged(const Property* const _property) {
+void ot::PropertyManagerGridLink::slotPropertyChanged(const Property* _property) {
 	// Ensure property should be modified
 	if (_property->getPropertyFlags() & (PropertyBase::IsReadOnly | PropertyBase::IsProtected | PropertyBase::IsHidden)) {
 		OT_LOG_W("Property should not have changed");
@@ -63,14 +63,10 @@ void ot::PropertyManagerGridLink::slotPropertyChanged(const Property* const _pro
 	const PropertyGroup* grp = _property->getParentGroup();
 	OTAssertNullptr(grp);
 	
-	// Get property
-	Property* prop = manager->findProperty(grp->getName(), _property->getPropertyName());
-	OTAssertNullptr(prop);
-
-	// Update value
-	prop->setValueFromOther(_property);
+	// Update property
+	manager->updateProperty(grp->getName(), _property, false);
 }
 
-void ot::PropertyManagerGridLink::slotPropertyDeleteRequested(const Property* const _property) {
+void ot::PropertyManagerGridLink::slotPropertyDeleteRequested(const Property* _property) {
 	OT_LOG_EA("Removeable entities are not supported yet");
 }

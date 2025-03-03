@@ -21,6 +21,9 @@ namespace ot {
 	class OT_GUI_API_EXPORT ManagedPropertyObject : public PropertyManagerNotifier {
 		OT_DECL_NOCOPY(ManagedPropertyObject)
 	public:
+		//! @brief Return the default name of the general property group.
+		static std::string getDefaultGeneralGroupName(void);
+
 		//! @brief Constructor.
 		//! @param _propertyManager Property manager to use. May be null.
 		ManagedPropertyObject(PropertyManager* _propertyManager = (PropertyManager*)nullptr);

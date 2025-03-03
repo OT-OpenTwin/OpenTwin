@@ -64,12 +64,12 @@ namespace ot {
 		void focusProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	Q_SIGNALS:
-		void propertyChanged(const Property* const _property);
-		void propertyDeleteRequested(const Property* const _property);
+		void propertyChanged(const Property* _property);
+		void propertyDeleteRequested(const Property* _property);
 
 	private Q_SLOTS:
-		void slotPropertyChanged(const Property* const _property);
-		void slotPropertyDeleteRequested(const Property* const _property);
+		void slotPropertyChanged(const Property* _property);
+		void slotPropertyDeleteRequested(const Property* _property);
 		void slotItemCollapsed(QTreeWidgetItem* _item);
 		void slotItemExpanded(QTreeWidgetItem* _item);
 

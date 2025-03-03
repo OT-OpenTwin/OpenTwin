@@ -49,12 +49,12 @@ namespace ot {
 
 		//! @brief Will be called whenever a property has been changed.
 		//! @param _property Property that has been changed.
-		virtual void propertyChanged(const Property* _property) override {};
+		virtual void propertyChanged(const Property* _property) override;
 
 		//! @brief Will be called before a property will be read.
 		//! @param _propertyGroupName Name of the group where the property should be located at.
 		//! @param _propertyName Name of the property. The name should be unique inside a group.
-		virtual void propertyRead(const std::string& _propertyGroupName, const std::string& _propertyName) override {};
+		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

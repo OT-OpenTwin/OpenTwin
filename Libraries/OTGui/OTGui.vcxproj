@@ -90,6 +90,7 @@
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h" />
     <ClInclude Include="include\OTGui\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTGui\Property.h" />
+    <ClInclude Include="include\OTGui\PropertyManagerReadCallbackNotifier.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
     <ClInclude Include="include\OTGui\PropertyColor.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="include\OTGui\PropertyInt.h" />
     <ClInclude Include="include\OTGui\PropertyManager.h" />
     <ClInclude Include="include\OTGui\PropertyManagerNotifier.h" />
+    <ClInclude Include="include\OTGui\PropertyManagerWriteCallbackNotifier.h" />
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
@@ -201,6 +203,7 @@
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
     <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Property.cpp" />
+    <ClCompile Include="src\PropertyManagerReadCallbackNotifier.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
     <ClCompile Include="src\PropertyColor.cpp" />

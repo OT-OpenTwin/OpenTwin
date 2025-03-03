@@ -224,11 +224,11 @@ void ot::PropertyGridGroup::slotColorStyleChanged(void) {
 	this->updateStateIcon(gStyle);
 }
 
-void ot::PropertyGridGroup::slotItemInputValueChanged(const ot::Property* const _property) {
+void ot::PropertyGridGroup::slotItemInputValueChanged(const ot::Property* _property) {
 	Q_EMIT itemInputValueChanged(_property);
 }
 
-void ot::PropertyGridGroup::slotItemDeleteRequested(const ot::Property* const _property) {
+void ot::PropertyGridGroup::slotItemDeleteRequested(const ot::Property* _property) {
 	Q_EMIT itemDeleteRequested(_property);
 }
 

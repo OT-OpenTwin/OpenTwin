@@ -181,10 +181,10 @@ namespace ot {
 		void setConfiguration(GraphicsItemCfg* _config);
 
 		//! \brief Returns the current configuration.
-		GraphicsItemCfg* const getConfiguration(void) { return m_config; };
+		GraphicsItemCfg* getConfiguration(void) { return m_config; };
 
 		//! \brief Returns the current configuration.
-		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
+		const GraphicsItemCfg* getConfiguration(void) const { return m_config; };
 
 		//! \brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
 		void setGraphicsItemPos(const QPointF& _pos);

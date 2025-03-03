@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"
@@ -19,6 +20,8 @@
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyManagerNotifier.h"
+#include "OTGui/PropertyManagerReadCallbackNotifier.h"
+#include "OTGui/PropertyManagerWriteCallbackNotifier.h"
 
 ot::PropertyManager::PropertyManager() {}
 
@@ -90,22 +93,62 @@ void ot::PropertyManager::setFromJsonObject(const ot::ConstJsonObject& _object) 
 // Event handling
 
 void ot::PropertyManager::propertyChanged(const Property* _property) {
-	OTAssertNullptr(_property);
+	const auto it = m_writeNotifier.find(_property->getPropertyPath());
+	if (it != m_writeNotifier.end()) {
+		it->second->call(_property);
+	}
 }
 
-void ot::PropertyManager::propertyRead(const std::string& _propertyGroupName, const std::string& _propertyName) {
-	
+void ot::PropertyManager::readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) {
+	const auto it = m_readNotifier.find(_propertyGroupName + "/" + _propertyName);
+	if (it != m_readNotifier.end()) {
+		it->second->call(_propertyGroupName, _propertyName);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter
 
-void ot::PropertyManager::addProperty(const std::string& _groupName, Property* _property) {
+ot::Property* ot::PropertyManager::addProperty(const std::string& _groupName, Property* _property) {
 	OTAssertNullptr(_property);
 	OTAssert(this->findProperty(_groupName, _property->getPropertyName()) == nullptr, "Property already exists");
 
-	this->storeProperty(_groupName, _property);
+	return this->storeProperty(_groupName, _property);
+}
+
+void ot::PropertyManager::updateProperty(const std::string& _groupName, Property* _property) {
+	OTAssertNullptr(_property);
+
+	Property* prop = this->findProperty(_groupName, _property->getPropertyName());
+	if (prop) {
+		prop->setValueFromOther(_property);
+
+		delete _property;
+	}
+	else {
+		prop = this->addProperty(_groupName, _property);
+	}
+
+	this->propertyChanged(prop);
+}
+
+void ot::PropertyManager::updateProperty(const std::string& _groupName, const Property* _property, bool _deleteProvidedProperty) {
+	OTAssertNullptr(_property);
+
+	Property* prop = this->findProperty(_groupName, _property->getPropertyName());
+	if (prop) {
+		prop->setValueFromOther(_property);
+	}
+	else {
+		prop = this->addProperty(_groupName, _property->createCopy());
+	}
+
+	if (_deleteProvidedProperty) {
+		delete _property;
+	}
+
+	this->propertyChanged(prop);
 }
 
 ot::PropertyBool* ot::PropertyManager::setBool(const std::string& _groupName, const std::string& _valueName, bool _value, const Property::PropertyFlags& _flags) {
@@ -390,6 +433,28 @@ ot::PropertyManagerNotifier* ot::PropertyManager::removeNotifier(PropertyManager
 	}
 
 	return noti;
+}
+
+void ot::PropertyManager::addReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier) {
+	OTAssertNullptr(_notifier);
+	OTAssert(m_readNotifier.find(_notifier->getPropertyPath()) == m_readNotifier.end(), "Notifier for given name already stored");
+	m_readNotifier.insert_or_assign(_notifier->getPropertyPath(), _notifier);
+}
+
+void ot::PropertyManager::removeReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier) {
+	OTAssertNullptr(_notifier);
+	m_readNotifier.erase(_notifier->getPropertyPath());
+}
+
+void ot::PropertyManager::addWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier) {
+	OTAssertNullptr(_notifier);
+	OTAssert(m_writeNotifier.find(_notifier->getPropertyPath()) == m_writeNotifier.end(), "Notifier for given name already stored");
+	m_writeNotifier.insert_or_assign(_notifier->getPropertyPath(), _notifier);
+}
+
+void ot::PropertyManager::removeWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier) {
+	OTAssertNullptr(_notifier);
+	m_writeNotifier.erase(_notifier->getPropertyPath());
 }
 
 ot::PropertyGroup* ot::PropertyManager::findGroup(const std::string& _group) const {

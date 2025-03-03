@@ -58,8 +58,8 @@ namespace ot {
 		std::string getPropertyType(void) const;
 
 	Q_SIGNALS:
-		void inputValueChanged(const ot::Property* const _property);
-		void deleteRequested(const ot::Property* const _property);
+		void inputValueChanged(const ot::Property* _property);
+		void deleteRequested(const ot::Property* _property);
 
 	private Q_SLOTS:
 		void slotValueChanged(void);

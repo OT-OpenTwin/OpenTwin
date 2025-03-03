@@ -410,6 +410,12 @@
     <ClInclude Include="include\OTGui\ManagedPropertyObjectBase.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerReadCallbackNotifier.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerWriteCallbackNotifier.h">
+      <Filter>Header Files\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -731,6 +737,9 @@
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyManagerNotifier.cpp">
+      <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManagerReadCallbackNotifier.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
   </ItemGroup>

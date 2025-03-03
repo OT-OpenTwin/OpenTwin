@@ -40,7 +40,7 @@ namespace ot {
 		//! Existing data will be removed.
 		void setupFromConfiguration(const PropertyDialogCfg& _config);
 
-		const PropertyGrid* const getPropertyGrid(void) const { return m_grid; };
+		const PropertyGrid* getPropertyGrid(void) const { return m_grid; };
 
 		const std::list<const Property*>& getChangedProperties(void) const { return m_changedProperties; };
 

@@ -7,6 +7,10 @@
 #include "OTGui/PropertyManager.h"
 #include "OTGui/ManagedPropertyObject.h"
 
+std::string ot::ManagedPropertyObject::getDefaultGeneralGroupName(void) {
+	return std::string("General");
+}
+
 ot::ManagedPropertyObject::ManagedPropertyObject(PropertyManager* _propertyManager) :
 	m_manager(_propertyManager)
 {
