@@ -11,11 +11,12 @@
 
 namespace ot {
 
+	//! @class ManagedWidgetPropertyObject
+	//! @brief The ManagedWidgetPropertyObject is used as a base class for visualizable property objects.
 	class OT_WIDGETS_API_EXPORT ManagedWidgetPropertyObject : public ManagedPropertyObject {
 		OT_DECL_NOCOPY(ManagedWidgetPropertyObject)
 	public:
 		//! @brief Constructor.
-		//! @param _propertyManager Property manager to use. If null a new WidgetPropertyManager will be created.
 		ManagedWidgetPropertyObject();
 
 		//! @brief Move constructor.

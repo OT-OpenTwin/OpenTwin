@@ -54,7 +54,7 @@ namespace ot {
 		//! @brief Will be called before a property will be read.
 		//! @param _propertyGroupName Name of the group where the property should be located at.
 		//! @param _propertyName Name of the property. The name should be unique inside a group.
-		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) override;
+		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

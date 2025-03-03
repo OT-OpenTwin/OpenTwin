@@ -16,6 +16,10 @@ namespace ot {
 	class Property;
 	class PropertyGrid;
 	
+	//! @class PropertyManagerGridLink
+	//! @brief The PropertyManagerGridLink is a link between properties of a PropertyManager and a PropertyGrid.
+	//! @ref PropertyGrid
+	//! @ref WidgetPropertyManager
 	class OT_WIDGETS_API_EXPORT PropertyManagerGridLink : public ManagedPropertyLink {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyManagerGridLink)

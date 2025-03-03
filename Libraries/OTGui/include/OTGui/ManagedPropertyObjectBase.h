@@ -83,22 +83,14 @@
 #define OT_ADD_PROPERTY_SETTER(___scope, ___propertyType, ___propertyObjectName, ___propertyName, ___propertyGroup, ___setterType, ___propertySetter, ___setterCompletedCallback, ...) \
 	private: \
 		friend class ot::PropertyManagerWriteCallbackNotifier<ot::Property##___propertyType>; \
-		ot::PropertyManagerWriteCallbackNotifier<ot::Property##___propertyType> notify##___propertyObjectName##WriteWrapper { [=]() -> ot::PropertyManager* { return this->getPropertyManager(); }, ___propertyGroup + std::string("/") + ___propertyName, std::optional<ot::PropertyManagerWriteCallbackNotifier<ot::Property##___propertyType>::CallbackType>(___setterCompletedCallback) }; \
-	___scope: \
-		void notify##___propertyObjectName##WasModified(const ot::Property##___propertyType* _property) { \
-			auto manager = this->getPropertyManager(); \
-			OTAssertNullptr(manager); \
-			___setterCompletedCallback(_property); \
-			manager->propertyChanged(_property); \
-		} \
+		ot::PropertyManagerWriteCallbackNotifier<ot::Property##___propertyType> notify##___propertyObjectName##WriteWrapper { \
+			[=]() -> ot::PropertyManager* { return this->getPropertyManager(); }, \
+			___propertyGroup + std::string("/") + ___propertyName, \
+			std::optional<ot::PropertyManagerWriteCallbackNotifier<ot::Property##___propertyType>::CallbackType>(___setterCompletedCallback) \
+		}; \
 	___scope: \
 		void set##___propertyObjectName(___setterType _value) { \
-			auto manager = this->getPropertyManager(); \
-			OTAssertNullptr(manager); \
-			const ot::Property##___propertyType* result = static_cast<const ot::Property##___propertyType*>( \
-				manager->##___propertySetter(___propertyGroup, ___propertyName, _value) \
-			); \
-			this->notify##___propertyObjectName##WasModified(result); \
+			this->getPropertyManager()->##___propertySetter(___propertyGroup, ___propertyName, _value); \
 		}
 
 //! @def OT_ADD_PROPERTY_GETTER
@@ -122,21 +114,14 @@
 #define OT_ADD_PROPERTY_GETTER(___scope, ___propertyType, ___propertyObjectName, ___propertyName, ___propertyGroup, ___getterType, ___propertyGetter, ___getterConstDecl, ___getterStartedCallback, ...) \
 	private: \
 		friend class ot::PropertyManagerReadCallbackNotifier; \
-		ot::PropertyManagerReadCallbackNotifier notify##___propertyObjectName##ReadWrapper { [=]() -> ot::PropertyManager* { return this->getPropertyManager(); }, ___propertyGroup + std::string("/") + ___propertyName, std::optional<ot::PropertyManagerReadCallbackNotifier::CallbackType>(___getterStartedCallback) }; \
-	___scope: \
-		void notify##___propertyObjectName##IsAboutToBeRead(const std::string& _groupName, const std::string& _propertyName) ___getterConstDecl { \
-			___getterConstDecl auto manager = this->getPropertyManager(); \
-			OTAssertNullptr(manager); \
-			 \
-			manager->readingProperty(_groupName, _propertyName); \
-		} \
+		ot::PropertyManagerReadCallbackNotifier notify##___propertyObjectName##ReadWrapper { \
+			[=]() -> ot::PropertyManager* { return this->getPropertyManager(); }, \
+			___propertyGroup + std::string("/") + ___propertyName, \
+			std::optional<ot::PropertyManagerReadCallbackNotifier::CallbackType>(___getterStartedCallback) \
+		}; \
 	___scope: \
 		___getterType get##___propertyObjectName(void) ___getterConstDecl { \
-			auto manager = this->getPropertyManager(); \
-			OTAssertNullptr(manager); \
-			manager->readingProperty(___propertyGroup, ___propertyName); \
-			notify##___propertyObjectName##IsAboutToBeRead(___propertyGroup, ___propertyName); \
-			return manager->##___propertyGetter(___propertyGroup, ___propertyName); \
+			return this->getPropertyManager()->##___propertyGetter(___propertyGroup, ___propertyName); \
 		}
 
 //! @def OT_ADD_PROPERTY_SETTERGETTER

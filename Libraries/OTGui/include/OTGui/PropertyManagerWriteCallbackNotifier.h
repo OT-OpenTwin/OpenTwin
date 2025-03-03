@@ -18,12 +18,16 @@ namespace ot {
 
 	class Property;
 
+	//! @class PropertyManagerWriteCallbackNotifierBase
+	//! @brief Base class to receive and forward a write callback for property to the set callback method.
+	//! @ref PropertyManager
 	class PropertyManagerWriteCallbackNotifierBase {
 	public:
 		PropertyManagerWriteCallbackNotifierBase(const std::string& _propertyPath) :
 			m_propertyPath(_propertyPath)
 		{}
 
+		//! @brief Interface to call the callback method.
 		virtual void call(const ot::Property* _property) = 0;
 
 		const std::string& getPropertyPath(void) const { return m_propertyPath; };
@@ -32,8 +36,10 @@ namespace ot {
 		std::string m_propertyPath;
 	};
 
-	template <class T>
-	class PropertyManagerWriteCallbackNotifier : public PropertyManagerWriteCallbackNotifierBase {
+	//! @class PropertyManagerWriteCallbackNotifier
+	//! @brief Base class to receive and forward a write callback for property to the set callback method.
+	//! @tparam T Actual property type used to cast property.
+	template <class T> class PropertyManagerWriteCallbackNotifier : public PropertyManagerWriteCallbackNotifierBase {
 		OT_DECL_NODEFAULT(PropertyManagerWriteCallbackNotifier)
 	public:
 		using ManagerGetType = std::function<PropertyManager* (void)>;

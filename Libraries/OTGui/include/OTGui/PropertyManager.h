@@ -97,7 +97,7 @@ namespace ot {
 		//! @brief Will be called before a property will be read.
 		//! @param _propertyGroupName Name of the group where the property should be located at.
 		//! @param _propertyName Name of the property. The name should be unique inside a group.
-		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName);
+		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -136,16 +136,6 @@ namespace ot {
 		//! @return Pointer to the created property.
 		PropertyInt* setInt(const std::string& _groupName, const std::string& _valueName, int _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
 		
-		//! @brief Sets integer property.
-		//! @param _groupName The property group name.
-		//! @param _valueName The property value name.
-		//! @param _value The value to set.
-		//! @param _min The min value to set.
-		//! @param _max The max value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyInt* setInt(const std::string& _groupName, const std::string& _valueName, int _value, int _min, int _max, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
-
 		//! @brief Sets double property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
@@ -153,16 +143,6 @@ namespace ot {
 		//! @param _flags Property flags used when visualizing the property.
 		//! @return Pointer to the created property.
 		PropertyDouble* setDouble(const std::string& _groupName, const std::string& _valueName, double _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
-
-		//! @brief Sets double property.
-		//! @param _groupName The property group name.
-		//! @param _valueName The property value name.
-		//! @param _value The value to set.
-		//! @param _min The min value to set.
-		//! @param _max The max value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyDouble* setDouble(const std::string& _groupName, const std::string& _valueName, double _value, double _min, double _max, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
 
 		//! @brief Sets string property.
 		//! @param _groupName The property group name.
@@ -307,12 +287,28 @@ namespace ot {
 		//! @return The removed notifier or nullptr if not found or destroyed.
 		PropertyManagerNotifier* removeNotifier(PropertyManagerNotifier* _notifier, bool _destroyObject);
 
+		//! @brief Add read callback notifier.
+		//! The read callback notifier will receive read callbacks for
+		//! the property under the currently set property path.
+		//! The callback method is called before the property read operation starts.
+		//! @param _notifier Notifier to add.
+		//! @ref PropertyManagerReadCallbackNotifier
 		void addReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
 
 		void removeReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
 
+		//! @brief Add write callback notifier.
+		//! The write callback notifier will receive write callbacks for
+		//! the property under the currently set property path.
+		//! The callback method is called after the property write operation finishes
+		//! and before the 
+		//! @param _notifier Notifier to add.
+		//! @ref PropertyManagerWriteCallbackNotifierBase
 		void addWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
 
+		//! @brief Remove write callback notifier.
+		//! @param _notifier Notifier to remove.
+		//! @ref PropertyManagerWriteCallbackNotifierBase
 		void removeWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -336,18 +332,6 @@ namespace ot {
 		//! @param _group The group name.
 		//! @return Pointer to the found or created PropertyGroup.
 		PropertyGroup* findOrCreateGroup(const std::string& _group);
-
-		//! @brief Notify all registered notifiers about the creation of the property.
-		//! @param _property Newly created property.
-		void notifyPropertyCreated(Property* _property);
-
-		//! @brief Notify all registered notifiers about the deletion of the property.
-		//! @param _property Property that will be destroyed after this call.
-		void notifyPropertyDestroyed(Property* _property);
-
-		//! @brief Notify all registed notifiers about the value change of the property.
-		//! @param _property Changed property.
-		void notifyPropertyChanged(const Property* _property);
 
 	private:
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.

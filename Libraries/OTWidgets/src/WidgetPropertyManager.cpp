@@ -35,7 +35,7 @@ void ot::WidgetPropertyManager::propertyChanged(const Property* _property) {
 	PropertyManager::propertyChanged(_property);
 }
 
-void ot::WidgetPropertyManager::readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) {
+void ot::WidgetPropertyManager::readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) const {
 	PropertyManager::readingProperty(_propertyGroupName, _propertyName);
 }
 

@@ -15,7 +15,10 @@
 #include <functional>
 
 namespace ot {
-
+	
+	//! @class PropertyManagerReadCallbackNotifier
+	//! @brief Receives and forwards a read callback for property to the set callback method.
+	//! @ref PropertyManager
 	class OT_GUI_API_EXPORT PropertyManagerReadCallbackNotifier {
 		OT_DECL_NODEFAULT(PropertyManagerReadCallbackNotifier)
 	public:

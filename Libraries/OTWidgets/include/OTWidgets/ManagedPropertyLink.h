@@ -17,6 +17,9 @@ namespace ot {
 	class QWidgetInterface;
 	class WidgetPropertyManager;
 
+	//! @class ManagedPropertyLink
+	//! @brief The ManagedPropertyLink is a base class to link widget components to managed properties.
+	//! @ref PropertyManager
 	class OT_WIDGETS_API_EXPORT ManagedPropertyLink : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ManagedPropertyLink)
@@ -26,7 +29,6 @@ namespace ot {
 		ManagedPropertyLink(WidgetPropertyManager* _manager);
 		virtual ~ManagedPropertyLink();
 
-		void setWidgetPropertyManager(WidgetPropertyManager* _manager) { m_manager = _manager; };
 		WidgetPropertyManager* getWidgetPropertyManager(void) { return m_manager; };
 		const WidgetPropertyManager* getWidgetPropertyManager(void) const { return m_manager; };
 
