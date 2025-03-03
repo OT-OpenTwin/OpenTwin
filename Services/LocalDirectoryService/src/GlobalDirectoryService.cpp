@@ -1,13 +1,16 @@
-#include "GlobalDirectoryService.h"
+// Service header
 #include "Application.h"
+#include "GlobalDirectoryService.h"
 
-#include "OTCore/Logger.h"
+// OpenTwin header
 #include "OTSystem/OperatingSystem.h"
+#include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
-#include <iostream>
+// std header
 #include <thread>
+#include <chrono>
 
 GlobalDirectoryService::GlobalDirectoryService(void)
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService, "", ot::invalidServiceID, "0"),

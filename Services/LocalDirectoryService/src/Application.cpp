@@ -11,7 +11,7 @@
 #include "Configuration.h"
 #include "ExitCodes.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
@@ -20,6 +20,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
+// std header
 #include <thread>
 #include <iostream>
 #include <cstdlib>
