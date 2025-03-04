@@ -536,6 +536,7 @@ FunctionEnd
 		StrCpy $PublicCertPageChecker 1 
 		
 		${NSD_GetText} $DirHandleCert $certs_path_content
+		${NSD_GetText} $DirHandleCert $PUBLIC_CERT_PATH
 
 		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$PUBLIC_CERT_PATH"
 		
