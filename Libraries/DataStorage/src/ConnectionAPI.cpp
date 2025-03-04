@@ -150,18 +150,18 @@ namespace DataStorageAPI
 		//if (!mongoURL.empty()) return mongoURL;  Deactivate caching, since the connection needs to be checked with different accounts.
 
 		// Get the path of the certificate key file. First choice: The explicitly defined path.
-		char* explicitCertPath = ot::os::getEnvironmentVariable("OPEN_TWIN_CERT_KEY");
+		char* explicitCertPath = ot::OperatingSystem::getEnvironmentVariable("OPEN_TWIN_CERT_KEY");
 		std::string certKeyPath;
 		if (explicitCertPath == nullptr)
 		{
 			// Second choice, check the file relative to the local executable 
-			certKeyPath = ot::os::getExecutablePath();
+			certKeyPath = ot::OperatingSystem::getExecutablePath();
 			certKeyPath += "\\Certificates\\certificateKeyFile.pem";
 
 			if (!std::filesystem::exists(certKeyPath))
 			{
 				// Last choice, the path depending on OPENTWIN_DEV_ROOT (for development machines when debugging the application)
-				char* devRootPath = ot::os::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
+				char* devRootPath = ot::OperatingSystem::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
 				if (devRootPath == nullptr)
 				{
 					throw std::exception("No CertificateKeyFile found.");

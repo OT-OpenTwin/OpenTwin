@@ -8,6 +8,8 @@
 #include <list>
 #include <limits>
 
+#define OT_NOTHING 
+
 namespace ot {
 
 	//! @brief ID type used to identify a service (16 bit unsigned integer).

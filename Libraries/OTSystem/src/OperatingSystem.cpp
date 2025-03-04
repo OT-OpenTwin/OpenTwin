@@ -1,28 +1,36 @@
-//! \file OperatingSystem.cpp
-//! \author Alexander Kuester (alexk95)
-//! \date April 2023
+//! @file OperatingSystem.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date April 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// OpenTwin header
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
 
+// std header
 #include <codecvt>
 
 #if defined(OT_OS_WINDOWS)
+// Windows header
 #include <Windows.h>
 #include <TCHAR.h>
 #include <pdh.h>
+
 #elif defined(OT_OS_UNIX)
+// Unix header header
 #include <unistd.h>
 #include <cstdlib>
+
 #elif defined(OT_OS_LINUX)
+// Linux header header
 #include <sys/types.h>
 #include <sys/sysinfo.h>
 #include <cstdlib>
+
 #endif
 
 
-unsigned long long ot::os::getTotalPhysicalMemory(void) {
+unsigned long long ot::OperatingSystem::getTotalPhysicalMemory(void) {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -41,7 +49,7 @@ unsigned long long ot::os::getTotalPhysicalMemory(void) {
 #endif
 }
 
-unsigned long long ot::os::getAvailablePhysicalMemory(void) {
+unsigned long long ot::OperatingSystem::getAvailablePhysicalMemory(void) {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -59,7 +67,7 @@ unsigned long long ot::os::getAvailablePhysicalMemory(void) {
 #endif
 }
 
-unsigned long long ot::os::getTotalVirtualMemory(void) {
+unsigned long long ot::OperatingSystem::getTotalVirtualMemory(void) {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -78,7 +86,7 @@ unsigned long long ot::os::getTotalVirtualMemory(void) {
 #endif
 }
 
-unsigned long long ot::os::getAvailableVirtualMemory(void) {
+unsigned long long ot::OperatingSystem::getAvailableVirtualMemory(void) {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -97,7 +105,7 @@ unsigned long long ot::os::getAvailableVirtualMemory(void) {
 #endif
 }
 
-char * ot::os::getEnvironmentVariable(const char * _variableName) {
+char * ot::OperatingSystem::getEnvironmentVariable(const char * _variableName) {
 #if defined(OT_OS_WINDOWS)
 	char * ret = nullptr;
 	size_t ct = 0;
@@ -110,9 +118,17 @@ char * ot::os::getEnvironmentVariable(const char * _variableName) {
 #endif
 }
 
+std::string ot::OperatingSystem::getEnvironmentVariableString(const char* _variableName) {
+	std::string result;
+	char* var = OperatingSystem::getEnvironmentVariable(_variableName);
+	result = var;
+	if (var) {
+		free(var);
+	}
+	return result;
+}
 
-OT_SYS_API_EXPORT std::string ot::os::getExecutablePath()
-{
+std::string ot::OperatingSystem::getExecutablePath(void) {
 #if defined(OT_OS_WINDOWS)
 	TCHAR buffer[MAX_PATH] = { 0 };
 	GetModuleFileName(NULL, buffer, MAX_PATH);

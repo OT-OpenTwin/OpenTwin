@@ -111,12 +111,12 @@ void PythonWrapper::AddToSysPath(const std::string& newPathComponent) {
 std::string PythonWrapper::DeterminePythonRootDirectory() {
 #ifdef _RELEASEDEBUG
 	std::string envName = "OT_PYTHON_ROOT";
-	const char*  pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
+	const char*  pythonRoot = ot::OperatingSystem::getEnvironmentVariable(envName.c_str());
 	assert(pythonRoot != nullptr);
 	return std::string(pythonRoot);
 #else
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
+	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
 
 	if (devEnvRoot != nullptr)
 	{
@@ -139,7 +139,7 @@ std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
 	//If we are in debug, we are a developer. And we want the path to the deployment folder.
 	
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
+	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
 	assert(devEnvRoot != nullptr);
 	
 	path = std::string(devEnvRoot) + "\\Deployment\\Python";
@@ -156,7 +156,7 @@ std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
 void PythonWrapper::addOptionalUserPythonSitePackageDirectory()
 {
 	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
-	const char* pythonSitePackagePath = ot::os::getEnvironmentVariable(envName.c_str());
+	const char* pythonSitePackagePath = ot::OperatingSystem::getEnvironmentVariable(envName.c_str());
 
 	if (pythonSitePackagePath != nullptr)
 	{

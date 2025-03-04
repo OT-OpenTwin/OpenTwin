@@ -1,3 +1,7 @@
+
+// OpenTwin header
+#include "OTSystem/SystemProcess.h"
+
 // std header
 #include <iostream>
 #include <string>
@@ -5,8 +9,6 @@
 #include <filesystem>
 #include <list>
 #include <cassert>
-
-#include "OTSystem/Application.h"
 
 bool lineStartsWith(const std::string& line, const std::string& pattern)
 {

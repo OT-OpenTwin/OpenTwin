@@ -59,8 +59,27 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	return TRUE;
 }
 
+class A {
+public:
+	virtual int foo(void) const { return 1; };
+};
+
+class B : public A {
+public:
+	int foo(void) const override { return 2; };
+};
+
+class C : public B {
+public:
+	int foo(void) const override { return 3; };
+};
+
 void mainApplicationThread()
 {
+
+	B b;
+	int x = b.foo();
+
 	try {
 		// Initialize seed
 		srand(time(0));

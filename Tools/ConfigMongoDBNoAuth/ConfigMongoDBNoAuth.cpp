@@ -1,3 +1,8 @@
+
+// OpenTwin header
+#include "OTSystem/SystemProcess.h"
+#include "OTServiceFoundation/UserCredentials.h"
+
 // std header
 #include <iostream>
 #include <string>
@@ -5,9 +10,6 @@
 #include <filesystem>
 #include <list>
 #include <cassert>
-
-#include "OTSystem/Application.h"
-#include "OTServiceFoundation/UserCredentials.h"
 
 void ensureFolderExist(const std::string& path)
 {

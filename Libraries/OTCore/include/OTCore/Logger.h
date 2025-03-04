@@ -12,6 +12,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreAPIExport.h"
+#include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/CoreTypes.h"
@@ -472,11 +473,17 @@ namespace ot {
 		OT_DECL_NODEFAULT(LogNotifierFileWriter)
 		OT_DECL_NOCOPY(LogNotifierFileWriter)
 	public:
-		LogNotifierFileWriter(const std::string& _serviceName);
+		static std::string generateFileName(const std::string& _serviceName);
+
+		LogNotifierFileWriter(const std::string& _filePath);
 		virtual ~LogNotifierFileWriter();
 
 		//! @brief Called when the a log message was created.
 		virtual void log(const LogMessage& _message) override;
+
+		void flushAndCloseStream(void);
+
+		void closeStream(void);
 
 	private:
 		std::ofstream* m_stream;

@@ -7,7 +7,8 @@
 #pragma once
 
 // OpenTwin header
-#include <OTSystem/ArchitectureInfo.h>
+#include "OTSystem/ArchitectureInfo.h"
+#include "OTCore/OTClassHelper.h"
 
 // std header
 #include <type_traits>

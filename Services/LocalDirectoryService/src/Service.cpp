@@ -6,7 +6,7 @@
 // Open Twin core types header
 #include "OTCore/otAssert.h"
 #include "OTCore/Logger.h"
-#include "OTSystem/Application.h"
+#include "OTSystem/SystemProcess.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
@@ -45,7 +45,7 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	_object.AddMember("WebsocketPort", m_websocketPort, _allocator);
 }
 
-ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
+ot::SystemProcess::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
 	OT_LOG_D("Starting service (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; Session.ID = \"" + 
 		_sessionInformation.id() + "\"; LSS.Url = \"" + _sessionInformation.sessionServiceURL() + "\")");
 
@@ -77,10 +77,10 @@ ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, c
 	
 	OT_LOG_D("Starting \"" + launcherName + "\" with command line \"" + commandLine + "\"");
 
-	return ot::app::runApplication(launcherName, commandLine, m_processHandle, false, 0);
+	return ot::SystemProcess::runApplication(launcherName, commandLine, m_processHandle, false, 0);
 #else
 	otAssert(0, "Not implemented");
-	return ot::app::GeneralError;
+	return ot::SystemProcess::GeneralError;
 #endif
 }
 

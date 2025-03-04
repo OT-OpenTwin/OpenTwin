@@ -10,6 +10,8 @@
 #include "DownloadFile.h"
 
 // OpenTwin header
+#include "OTSystem/SystemProcess.h"
+#include "OTSystem/SystemInformation.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
@@ -20,8 +22,6 @@
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTSystem/SystemInformation.h"
-#include "OTSystem/Application.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>

@@ -41,11 +41,11 @@ ImageEditorToolBar::ImageEditorToolBar() {
 	Label* fromLabel = new Label("From:");
 	m_fromColor = new ColorPickButton(QColor(0, 0, 0));
 	m_fromColor->setMinimumWidth(100);
-	m_fromColor->useAlpha(true);
+	m_fromColor->setEditAlpha(true);
 
 	Label* toLabel = new Label("To:");
 	m_toColor = new ColorPickButton(QColor(0, 0, 0));
-	m_toColor->useAlpha(true);
+	m_toColor->setEditAlpha(true);
 
 	Label* toleranceLabel = new Label("Tolerance:");
 	m_tolerance = new SpinBox;

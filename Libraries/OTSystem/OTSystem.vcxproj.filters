@@ -18,7 +18,7 @@
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\SystemProcess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Network.cpp">
@@ -38,7 +38,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTSystem\Application.h">
+    <ClInclude Include="include\OTSystem\SystemProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTSystem\ArchitectureInfo.h">

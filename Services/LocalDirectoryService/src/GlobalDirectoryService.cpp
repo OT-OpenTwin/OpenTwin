@@ -118,8 +118,8 @@ void GlobalDirectoryService::healthCheck(void) {
 }
 
 void GlobalDirectoryService::addSystemValues(ot::JsonDocument& _jsonDocument) {
-	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory, ot::JsonString(std::to_string(ot::os::getAvailablePhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
-	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory, ot::JsonString(std::to_string(ot::os::getAvailableVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
-	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory, ot::JsonString(std::to_string(ot::os::getTotalPhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
-	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory, ot::JsonString(std::to_string(ot::os::getTotalVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory, ot::JsonString(std::to_string(ot::OperatingSystem::getAvailablePhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory, ot::JsonString(std::to_string(ot::OperatingSystem::getAvailableVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory, ot::JsonString(std::to_string(ot::OperatingSystem::getTotalPhysicalMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
+	_jsonDocument.AddMember(OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory, ot::JsonString(std::to_string(ot::OperatingSystem::getTotalVirtualMemory()), _jsonDocument.GetAllocator()), _jsonDocument.GetAllocator());
 }

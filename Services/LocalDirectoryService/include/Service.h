@@ -8,7 +8,7 @@
 #include <map>
 #include <thread>
 
-#include "OTSystem/Application.h"
+#include "OTSystem/SystemProcess.h"
 #include "OTSystem/Network.h"
 
 class ServiceManager;
@@ -24,7 +24,7 @@ public:
 	//! @param _object The JSON object to add the contents to
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
-	ot::app::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
+	ot::SystemProcess::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
 	bool shutdown(void);
 
 	bool checkAlive(void);

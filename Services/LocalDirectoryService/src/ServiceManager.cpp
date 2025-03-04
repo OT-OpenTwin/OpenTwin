@@ -148,14 +148,14 @@ bool ServiceManager::requestStartService(const SessionInformation& _sessionInfor
 bool ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
 	m_mutexRequestedServices.lock();
 
-	ot::app::RunResult result = ot::app::GeneralError;
+	ot::SystemProcess::RunResult result = ot::SystemProcess::GeneralError;
 	Service * newService = new Service(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService));
 
-	while (result != ot::app::OK) {
+	while (result != ot::SystemProcess::OK) {
 		// Attempt to start service
 		result = newService->run(_sessionInformation, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
 
-		if (result == ot::app::OK) {
+		if (result == ot::SystemProcess::OK) {
 			// The relay could be started, now ensure its alive
 			ot::JsonDocument checkCommandDoc;
 			checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
@@ -502,8 +502,8 @@ void ServiceManager::workerServiceStarter(void) {
 			Service * newService = new Service(this, info.service);
 			
 			// Attempt to start service
-			ot::app::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
-			if (result != ot::app::OK) {
+			ot::SystemProcess::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
+			if (result != ot::SystemProcess::OK) {
 				// Clean up port numbers
 				ot::PortManager::instance().setPortNotInUse(newService->port());
 				ot::PortManager::instance().setPortNotInUse(newService->websocketPort());

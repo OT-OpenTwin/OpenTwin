@@ -36,6 +36,8 @@
 #include "DataBase.h"
 #include "PlotManagerView.h"
 
+#include "OTSystem/SystemProcess.h"
+
 #include "OTCore/Flags.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
@@ -92,8 +94,6 @@
 #include "OTCommunication/ServiceLogNotifier.h"
 
 #include "akWidgets/aTreeWidget.h"
-
-#include "OTSystem/Application.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>
@@ -543,7 +543,7 @@ void AppBase::downloadInstaller(QString gssUrl)
 		std::string applicationPath = tempFolder + "\\" + fileName;
 		std::string commandLine = "\"" + applicationPath + "\" /S";
 		OT_PROCESS_HANDLE processHandle;
-		ot::app::runApplication(applicationPath, commandLine, processHandle, false);
+		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle, false);
 		exit(0);
 	}
 	else

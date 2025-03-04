@@ -4,7 +4,7 @@
 #include "SubprocessManager.h"
 
 // OpenTwin header
-#include "OTSystem/Application.h"
+#include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 
@@ -47,8 +47,8 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 	std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
 
 	// Run sub
-	ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
-	if (result != ot::app::OK) {
+	ot::SystemProcess::RunResult result = ot::SystemProcess::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
+	if (result != ot::SystemProcess::OK) {
 		m_clientHandle = nullptr;
 		OT_LOG_E("Failed to start subprocess");
 		return false;
@@ -63,7 +63,7 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 
 std::string SubprocessHandler::findSubprocessPath(void) const {
 #ifdef _DEBUG
-	const char* otRootFolder = ot::os::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
+	const char* otRootFolder = ot::OperatingSystem::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
 	if (otRootFolder) {
 		std::string result = std::string(otRootFolder) + "\\Deployment\\";
 		delete[] otRootFolder;
@@ -112,7 +112,7 @@ void SubprocessHandler::healthCheckWorker(void) {
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
-			if (!ot::app::isApplicationRunning(m_clientHandle)) {
+			if (!ot::SystemProcess::isApplicationRunning(m_clientHandle)) {
 				m_performHealthCheck = false;
 				
 				CloseHandle(m_clientHandle);

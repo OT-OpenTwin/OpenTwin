@@ -121,6 +121,9 @@
     <ClCompile Include="src\UIDNamePair.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\OTEnvInfo.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -328,6 +331,9 @@
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\Vector2D.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTEnvInfo.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,11 +3,10 @@
 #include "ExitCodes.h"
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 #include "OTCore/otAssert.h"
-#include "OTCommunication/actionTypes.h"
-#include "OTSystem/Application.h"
-#include "OTSystem/OperatingSystem.h"
+#include "OTCommunication/ActionTypes.h"
 
 // C++ header
 #include <iostream>
@@ -143,7 +142,7 @@ int Configuration::importFromEnvironment(void) {
 	m_supportedServices.clear();
 
 	// Read configuration from env
-	const char * configurationEnv = ot::os::getEnvironmentVariable(LDS_CFG_ENV);
+	const char * configurationEnv = ot::OperatingSystem::getEnvironmentVariable(LDS_CFG_ENV);
 	if (configurationEnv == nullptr) return LDS_EXIT_CfgNoEnv;
 
 	ot::JsonDocument configurationDoc;

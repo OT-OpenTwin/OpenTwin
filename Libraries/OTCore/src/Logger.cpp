@@ -229,7 +229,7 @@ void ot::LogNotifierStdCout::log(const LogMessage& _message) {
 
 // ######################################################################################################################################################
 
-ot::LogNotifierFileWriter::LogNotifierFileWriter(const std::string& _serviceName) {
+std::string ot::LogNotifierFileWriter::generateFileName(const std::string& _serviceName) {
 	std::string baseName = _serviceName + "_log";
 	std::string extension = ".txt";
 	std::string fileName;
@@ -244,12 +244,18 @@ ot::LogNotifierFileWriter::LogNotifierFileWriter(const std::string& _serviceName
 		counter++;
 	} while (std::filesystem::exists(fileName));
 
-	m_stream = new std::ofstream(fileName);
+	return fileName;
+}
+
+ot::LogNotifierFileWriter::LogNotifierFileWriter(const std::string& _filePath) {
+	OTAssert(!_filePath.empty(), "File path is empty");
+
+	m_stream = new std::ofstream(_filePath);
 	if (!m_stream->is_open()) {
 		delete m_stream;
 		m_stream = nullptr;
 
-		OT_LOG_EAS("Unable to create file \"" + fileName  + "\"");
+		OT_LOG_EAS("Unable to create file \"" + _filePath + "\"");
 	}
 }
 
@@ -264,6 +270,21 @@ ot::LogNotifierFileWriter::~LogNotifierFileWriter() {
 void ot::LogNotifierFileWriter::log(const LogMessage& _message) {
 	if (m_stream) {
 		*m_stream << _message << std::endl;
+	}
+}
+
+void ot::LogNotifierFileWriter::flushAndCloseStream(void) {
+	if (m_stream) {
+		m_stream->flush();
+		this->closeStream();
+	}
+}
+
+void ot::LogNotifierFileWriter::closeStream(void) {
+	if (m_stream) {
+		m_stream->close();
+		delete m_stream;
+		m_stream = nullptr;
 	}
 }
 

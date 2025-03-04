@@ -30,7 +30,7 @@ SubprocessHandler::~SubprocessHandler() {
 std::string SubprocessHandler::FindSubprocessPath()
 {
 #ifdef _DEBUG
-	const std::string otRootFolder = ot::os::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
+	const std::string otRootFolder = ot::OperatingSystem::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
 	assert(otRootFolder != "");
 	return otRootFolder + "\\Deployment\\";
 

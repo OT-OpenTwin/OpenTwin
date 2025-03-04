@@ -16,7 +16,7 @@ namespace ot {
 	class Point2DD;
 
 	//! @class Point2D
-	//! @brief 2D Point with integer values
+	//! @brief 2D Point with integer values.
 	class OT_CORE_API_EXPORT Point2D : public ot::Serializable {
 	public:
 		Point2D() : m_x(0), m_y(0) {};
