@@ -6,6 +6,7 @@
 
 #include "QtCore/qcoreapplication.h"
 #include "QtCore/qtimer.h"
+#include "QtCore/qdatetime.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
 
@@ -51,7 +52,10 @@ void SubprocessHandler::InitiateProcess()
 }
 
 void SubprocessHandler::RunSubprocess()
-{
+{	
+	QDateTime startTime = QDateTime::currentDateTime();
+	OT_LOG_D("Start time of Subservice: " + startTime.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString());
+
 	try
 	{
 		const bool startSuccessfull = startSubprocess();
