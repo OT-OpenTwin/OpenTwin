@@ -19,6 +19,15 @@ namespace ot {
 		OT_DECL_NOCOPY(String)
 		OT_DECL_NODEFAULT(String)
 	public:
+		
+		//! @brief Use the default convert method to convert the wstring to a string.
+		//! @param _string String to convert.
+		static std::string toString(const std::wstring& _string);
+
+		//! @brief Use the default convert method to convert the string to a wstring.
+		//! @param _string String to convert.
+		static std::wstring toWString(const std::string& _string);
+		
 		//! @brief Changes the provided string to the lower case.
 		static std::string toLower(const std::string& _string);
 
@@ -91,6 +100,28 @@ namespace ot {
 		//! @param _fillChar Character to use to fill in the suffix.
 		static std::string fillSuffix(const std::string& _string, size_t _minLength, char _fillChar);
 
+		//! @brief Remove not allowed prefix characters.
+		//! @param _string String to trim.
+		//! @param _characterBlacklist List of not allowed characters. Not allowed characters will be removed first until a non blacklisted character is found.
+		//! @param _characterWhitelist List of allowed characters. Allowed characters will be ensuref after the blacklist is completed until the first allowed character is found.
+		//! @return Trimmed string.
+		static std::string removePrefix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist = std::string());
+
+		//! @brief Remove not allowed suffix characters.
+		//! @param _string String to trim.
+		//! @param _characterBlacklist List of not allowed characters. Not allowed characters will be removed first until a non blacklisted character is found.
+		//! @param _characterWhitelist List of allowed characters. Allowed characters will be ensuref after the blacklist is completed until the first allowed character is found.
+		//! @return Trimmed string.
+		static std::string removeSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist = std::string());
+
+		//! @brief Remove not allowed prefix and suffix characters.
+		//! Will call removePrefix and then removeSuffix with the arguments provided.
+		//! @param _string String to trim from both sides.
+		//! @param _characterBlacklist List of not allowed characters. Not allowed characters will be removed first until a non blacklisted character is found.
+		//! @param _characterWhitelist List of allowed characters. Allowed characters will be ensuref after the blacklist is completed until the first allowed character is found.
+		//! @return Trimmed string.
+		static std::string removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist = std::string());
+
 		//! \brief Creates a C-String copy of the provided C++ String
 		static char* getCStringCopy(const std::string& _str);
 
@@ -112,6 +143,7 @@ namespace ot {
 		//! \param _fill Fill character.
 		//! \param _length Output string length.
 		template <class T> static inline std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
+
 	};
 }
 

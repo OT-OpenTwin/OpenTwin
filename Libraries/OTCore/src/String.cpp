@@ -9,7 +9,41 @@
 
 // std header
 #include <map>
+#include <locale>
 #include <algorithm>
+
+#ifdef OT_OS_WINDOWS
+#include <Windows.h>
+#undef min
+#undef max
+#endif
+
+
+std::string ot::String::toString(const std::wstring& _string) {
+	if (_string.empty()) return {};
+
+	// Get required buffer size
+	int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	if (sizeNeeded <= 0) return {};
+
+	// Convert to UTF-8
+	std::string result(sizeNeeded - 1, '\0'); // Remove null terminator
+	WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded, nullptr, nullptr);
+	return result;
+}
+
+std::wstring ot::String::toWString(const std::string& _string) {
+	if (_string.empty()) return {};
+
+	// Get required buffer size
+	int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0);
+	if (sizeNeeded <= 0) return {};
+
+	// Convert to wide string
+	std::wstring result(sizeNeeded - 1, L'\0'); // Remove null terminator
+	MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded);
+	return result;
+}
 
 std::string ot::String::toLower(const std::string& _string)
 {
@@ -374,6 +408,105 @@ std::string ot::String::fillSuffix(const std::string& _string, size_t _minLength
 	std::string result(_string);
 	String::filledSuffix(result, _minLength, _fillChar);
 	return result;
+}
+
+std::string ot::String::removePrefix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+	size_t ix = 0;
+	const size_t len = _string.length();
+	bool hasError = true;
+
+	// Remove blacklist
+	while (hasError && ix < len) {
+		hasError = false;
+		for (char c : _characterBlacklist) {
+			if (c == _string[ix]) {
+				hasError = true;
+				ix++;
+				break;
+			}
+		}
+	}
+
+	// Move to first whitelisted character
+	hasError = true;
+	if (!_characterWhitelist.empty()) {
+		while (hasError && ix < len) {
+			for (char c : _characterWhitelist) {
+				if (c == _string[ix]) {
+					hasError = false;
+					break;
+				}
+			}
+			if (hasError) {
+				ix++;
+			}
+		}
+	}
+
+	// Return trimmed string
+	if (ix < len) {
+		return std::string(_string.substr(ix));
+	}
+	else {
+		return std::string();
+	}
+}
+
+std::string ot::String::removeSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+	const size_t len = _string.length();
+	
+	if (len == 0) {
+		return std::string();
+	}
+
+	size_t ix = len - 1;
+	bool hasError = true;
+
+	// Remove blacklist
+	while (hasError) {
+		hasError = false;
+		for (char c : _characterBlacklist) {
+			if (c == _string[ix]) {
+				hasError = true;
+
+				if (ix == 0) {
+					// String is fully blacklisted
+					return std::string();
+				}
+				else {
+					ix--;
+					break;
+				}
+			}
+		}
+	}
+
+	// Move to first whitelisted character
+	hasError = true;
+	if (!_characterWhitelist.empty()) {
+		while (hasError) {
+			for (char c : _characterWhitelist) {
+				if (c == _string[ix]) {
+					hasError = false;
+					break;
+				}
+			}
+			if (hasError) {
+				if (ix == 0) {
+					// String has no whitelisted character
+					return std::string();
+				}
+				ix--;
+			}
+		}
+	}
+
+	// Return trimmed string
+	return std::string(_string.substr(0, ix + 1));
+}
+
+std::string ot::String::removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+	return String::removeSuffix(String::removePrefix(_string, _characterBlacklist, _characterWhitelist), _characterBlacklist, _characterWhitelist);
 }
 
 char* ot::String::getCStringCopy(const std::string& _str) {
