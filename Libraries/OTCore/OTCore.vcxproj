@@ -52,6 +52,7 @@
     <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringToVariableConverter.cpp" />
+    <ClCompile Include="src\SystemServiceConfigInfo.cpp" />
     <ClCompile Include="src\TextEncoding.cpp" />
     <ClCompile Include="src\ThisService.cpp" />
     <ClCompile Include="src\UIDNamePair.cpp" />
@@ -78,6 +79,7 @@
     <ClInclude Include="include\OTCore\Math.h" />
     <ClInclude Include="include\OTCore\OTEnvInfo.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
+    <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h" />
     <ClInclude Include="include\OTCore\ReturnMessageProposal.h" />
     <ClInclude Include="include\OTCore\RuntimeTests.h" />
     <ClInclude Include="include\OTCore\Rect.h" />

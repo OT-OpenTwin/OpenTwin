@@ -124,6 +124,9 @@
     <ClCompile Include="src\OTEnvInfo.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\SystemServiceConfigInfo.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -334,6 +337,9 @@
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\OTEnvInfo.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
