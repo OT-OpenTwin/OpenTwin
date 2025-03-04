@@ -60,7 +60,7 @@ namespace ot {
 
 template <class T>
 ot::PropertyWriteCallbackNotifier<T>::PropertyWriteCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyName, std::optional<CallbackType> _method) :
-	PropertyWriteCallbackNotifier(_propertyName), m_method(_method)
+	PropertyWriteCallbackNotifierBase(_propertyName), m_method(_method)
 {
 	m_manager = _getManager();
 	OTAssertNullptr(m_manager);

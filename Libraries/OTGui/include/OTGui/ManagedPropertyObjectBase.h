@@ -680,41 +680,41 @@
 		}
 
 #define OT_PROPERTY_POINT2D(___propertyObjectName, ___propertyGroup, ___propertyName, ___x, ___y) \
-	OT_PROPERTY_INT(___propertyObjectName##_X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
-	OT_PROPERTY_INT(___propertyObjectName##_Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
+	OT_PROPERTY_INT(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
+	OT_PROPERTY_INT(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2D, Int, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
 #define OT_PROPERTY_POINT2D_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___x, ___y) \
-	OT_PROPERTY_INT_CALL(___propertyObjectName##_X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
-	OT_PROPERTY_INT_CALL(___propertyObjectName##_Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
+	OT_PROPERTY_INT_CALL(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
+	OT_PROPERTY_INT_CALL(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2D, Int, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
 #define OT_PROPERTY_POINT2DD(___propertyObjectName, ___propertyGroup, ___propertyName, ___x, ___y) \
-	OT_PROPERTY_DOUBLE(___propertyObjectName##_X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
-	OT_PROPERTY_DOUBLE(___propertyObjectName##_Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
+	OT_PROPERTY_DOUBLE(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
+	OT_PROPERTY_DOUBLE(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2DD, Double, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
 #define OT_PROPERTY_POINT2DD_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___x, ___y) \
-	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##_X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
-	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##_Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
+	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
+	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2DD, Double, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
 #define OT_PROPERTY_SIZE2D(___propertyObjectName, ___propertyGroup, ___propertyName, ___width, ___height) \
-	OT_PROPERTY_INT(___propertyObjectName##_Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
-	OT_PROPERTY_INT(___propertyObjectName##_Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
+	OT_PROPERTY_INT(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
+	OT_PROPERTY_INT(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2D, Int, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
 #define OT_PROPERTY_SIZE2D_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___width, ___height) \
-	OT_PROPERTY_INT_CALL(___propertyObjectName##_Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
-	OT_PROPERTY_INT_CALL(___propertyObjectName##_Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \
+	OT_PROPERTY_INT_CALL(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
+	OT_PROPERTY_INT_CALL(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2D, Int, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
 #define OT_PROPERTY_SIZE2DD(___propertyObjectName, ___propertyGroup, ___propertyName, ___width, ___height) \
-	OT_PROPERTY_DOUBLE(___propertyObjectName##_Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
-	OT_PROPERTY_DOUBLE(___propertyObjectName##_Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
+	OT_PROPERTY_DOUBLE(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
+	OT_PROPERTY_DOUBLE(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2DD, Double, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
 #define OT_PROPERTY_SIZE2DD_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___width, ___height) \
-	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##_Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
-	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##_Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \
+	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
+	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2DD, Double, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
