@@ -73,7 +73,7 @@ extern "C" {
 	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownURL, const char * _globalDirectoryServiceURL, const char * _unused2) {
 		std::string loggerServiceURL(_loggerServiceURL);
 
-#ifdef _DEBUG
+#ifdef _DEBUG || OT_RELEASE_DEBUG
 		std::cout << "Local Directory Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, true);
 #else

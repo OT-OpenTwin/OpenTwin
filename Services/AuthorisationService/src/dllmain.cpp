@@ -87,11 +87,11 @@ extern "C"{
 	{
 		std::string loggerServiceURL(_loggerServiceURL);
 
-#ifdef _DEBUG
-		std::cout << "Authorization Service" << std::endl;
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, true);
+#ifdef _DEBUG || OT_RELEASE_DEBUG
+	std::cout << "Authorization Service" << std::endl;
+	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, true);
 #else
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, false);
+	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, false);
 #endif
 		return ServiceBase::GetInstance().initialize(_ownIP, _databaseIP, _databasePWD);
 	}

@@ -39,7 +39,11 @@ void initializeLogging(void) {
 	QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");
 
 	// Initialize logging
-	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
+	#ifdef OT_RELEASE_DEBUG
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), true);
+	#else
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
+	#endif
 }
 
 QApplication* initializeQt(int &_argc, char* _argv[]) {

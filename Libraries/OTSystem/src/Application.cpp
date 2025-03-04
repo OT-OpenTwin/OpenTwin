@@ -70,7 +70,11 @@ ot::app::RunResult ot::app::runApplication(const std::wstring& _applicationPath,
 	info.cb = sizeof(info);
 	info.lpTitle = cl;
 	info.dwFlags = STARTF_USESHOWWINDOW;
-	info.wShowWindow = SW_HIDE;
+	#ifdef OT_RELEASE_DEBUG
+		info.wShowWindow = SW_SHOW;
+	#else
+		info.wShowWindow = SW_HIDE;
+	#endif
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
 	RunResult result = app::GeneralError;

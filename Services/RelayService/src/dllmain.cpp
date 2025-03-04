@@ -123,7 +123,7 @@ extern "C"
 		try {
 			std::string logUrl = qgetenv("OPEN_TWIN_LOGGING_URL").toStdString();
 
-#ifdef _DEBUG
+#ifdef _DEBUG || OT_RELEASE_DEBUG
 			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, true);
 #else
 			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, false);

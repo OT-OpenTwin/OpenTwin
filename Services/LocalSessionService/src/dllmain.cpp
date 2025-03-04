@@ -55,7 +55,7 @@ extern "C"
 		std::string loggerServiceURL(_loggerServiceURL);
 
 		// Initialize logging
-#ifdef _DEBUG
+#ifdef _DEBUG || OT_RELEASE_DEBUG
 		std::cout << "Local Session Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_SessionService, loggerServiceURL, true);
 #else

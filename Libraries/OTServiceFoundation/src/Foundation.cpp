@@ -89,7 +89,7 @@ int ot::foundation::init(
 ) {
 	try {
 		// Setup logger
-#ifdef _DEBUG
+#ifdef _DEBUG || OT_RELEASE_DEBUG
 		if (_application) ot::ServiceLogNotifier::initialize(_application->getServiceName(), "", true);
 		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
 #else

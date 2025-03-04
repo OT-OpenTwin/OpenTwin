@@ -70,6 +70,9 @@ void mainApplicationThread()
 		QApplication application(argc, nullptr);
 
 		// Initialize OpenTwin API
+		#ifdef OT_RELEASE_DEBUG
+			ot::LogDispatcher::initialize("Toolkit", true);
+		#endif 
 		ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
 
 		// Set global text size
