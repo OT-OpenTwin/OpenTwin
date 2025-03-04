@@ -231,12 +231,6 @@
     <ClInclude Include="include\OTCore\Color.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\ContainerHelper.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ContainerHelper.hpp">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\CoreAPIExport.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -330,17 +324,35 @@
     <ClInclude Include="include\OTCore\UIDNamePair.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\LinearVector2D.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Vector2D.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\OTEnvInfo.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Vector2D.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LinearVector2D.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.hpp">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Matrix2.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Matrix2.hpp">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Matrix2Factory.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Matrix2Factory.hpp">
+      <Filter>include\Container</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -391,6 +403,9 @@
     </Filter>
     <Filter Include="src\General">
       <UniqueIdentifier>{c87a6f4f-09c3-4d4c-bf19-6ecc580dbabe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Container">
+      <UniqueIdentifier>{393d2c82-5ac9-4960-be66-6a6719f40cdd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

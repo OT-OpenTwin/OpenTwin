@@ -69,20 +69,8 @@
     <ClInclude Include="include\OTServiceFoundation\IDManager.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\Matrix.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\Matrix.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\MatrixFactory.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\MatrixFactory.hpp">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\MenuButtonDescription.h">
       <Filter>include</Filter>

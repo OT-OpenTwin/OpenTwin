@@ -77,6 +77,10 @@
     <ClInclude Include="include\OTCore\LocalStateStack.hpp" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
+    <ClInclude Include="include\OTCore\Matrix2.h" />
+    <ClInclude Include="include\OTCore\Matrix2.hpp" />
+    <ClInclude Include="include\OTCore\Matrix2Factory.h" />
+    <ClInclude Include="include\OTCore\Matrix2Factory.hpp" />
     <ClInclude Include="include\OTCore\OTEnvInfo.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h" />

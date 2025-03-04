@@ -220,10 +220,6 @@
     <ClInclude Include="include\OTServiceFoundation\Foundation.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationAPIExport.h" />
     <ClInclude Include="include\OTServiceFoundation\IDManager.h" />
-    <ClInclude Include="include\OTServiceFoundation\Matrix.h" />
-    <ClInclude Include="include\OTServiceFoundation\Matrix.hpp" />
-    <ClInclude Include="include\OTServiceFoundation\MatrixFactory.h" />
-    <ClInclude Include="include\OTServiceFoundation\MatrixFactory.hpp" />
     <ClInclude Include="include\OTServiceFoundation\MenuButtonDescription.h" />
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
