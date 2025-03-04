@@ -128,3 +128,13 @@ void ot::Plot1DCurveCfg::setPointsFillPainter(Painter2D* _painter) {
 
 	m_pointsFillPainter = _painter;
 }
+
+void ot::Plot1DCurveCfg::setQueryInformation(QueryInformation _queryInformation)
+{
+	m_queryInformation = _queryInformation;
+}
+
+const ot::QueryInformation& ot::Plot1DCurveCfg::getQueryInformation() const
+{
+	return m_queryInformation;
+}

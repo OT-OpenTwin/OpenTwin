@@ -1,6 +1,7 @@
 #pragma once
 #include "EntityBase.h"
 #include "IVisualisationCurve.h"
+#include "OTGui/QueryInformation.h"
 
 class __declspec(dllexport) EntityResult1DCurve_New : public EntityBase, public IVisualisationCurve
 {
@@ -21,9 +22,14 @@ public:
 
 	void createProperties(void);
 
-
 	// Inherited via IVisualisationCurve
 	bool visualiseCurve() override { return true; };
 	ot::Plot1DCurveCfg getCurve() override;
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
+
+private:
+	ot::QueryInformation m_queryInformation;
+	
+	virtual void AddStorageData(bsoncxx::builder::basic::document& storage);
+	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

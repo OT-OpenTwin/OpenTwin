@@ -416,6 +416,9 @@
     <ClInclude Include="include\OTGui\PropertyManagerWriteCallbackNotifier.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\QueryInformation.h">
+      <Filter>Header Files\Plot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -741,6 +744,9 @@
     </ClCompile>
     <ClCompile Include="src\PropertyManagerReadCallbackNotifier.cpp">
       <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QueryInformation.cpp">
+      <Filter>Source Files\Plot</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

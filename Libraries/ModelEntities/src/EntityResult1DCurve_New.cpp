@@ -70,6 +70,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 
 	curveCfg.setYAxisTitle(yAxisLabel);
 	curveCfg.setYAxisUnit(yAxisUnit);
+
+	curveCfg.setQueryInformation(m_queryInformation);
 	return curveCfg;
 }
 
@@ -82,4 +84,23 @@ void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisTitle(), this, "Y axis label");
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisUnit(), this, "Y axis unit");
+
+	m_queryInformation = _curve.getQueryInformation();
+}
+
+void EntityResult1DCurve_New::AddStorageData(bsoncxx::builder::basic::document& storage)
+{
+	EntityBase::AddStorageData(storage);
+
+	storage.append(
+		bsoncxx::builder::basic::kvp("Query", m_queryInformation.m_query),
+		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.m_projection));
+}
+
+void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+{
+	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
+	m_queryInformation.m_query = doc_view["Query"].get_string();
+	m_queryInformation.m_projection = doc_view["Projection"].get_string();
+
 }

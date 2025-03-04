@@ -127,7 +127,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
 	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
-	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
+	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "icon");
+	//_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
@@ -209,6 +210,67 @@ void Application::modelSelectionChanged(void)
 
 // ##################################################################################################################################
 
+#include "ResultCollectionExtender.h"
+#include "PlotBuilder.h"
+#include "DatasetDescription.h"
+#include "QuantityDescriptionCurve.h"
+
+void testPlot()
+{
+	const std::string collName = Application::instance()->getCollectionName();
+
+	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	PlotBuilder builder(extender, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+
+	DatasetDescription description;
+	MetadataParameter parameter;
+	parameter.parameterName = "SomeParameter";
+	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.unit = "[kOlf]";
+	QuantityDescriptionCurve quantDesc;
+	quantDesc.setName("SomeQuantity");
+	quantDesc.addValueDescription("", ot::TypeNames::getInt32TypeName(), "[Olf]");
+	
+	for (int i = 0; i <= 50; i++)
+	{
+		quantDesc.addDatapoint(ot::Variable(i));
+		parameter.values.push_back(ot::Variable(i));
+	}
+	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+	
+	description.setQuantityDescription(&quantDesc);
+	description.addParameterDescription(parameterDesc);
+	
+	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
+	curveCfg.setXAxisTitle("SomeParameter");
+	curveCfg.setYAxisTitle("SomeQuantity");
+	curveCfg.setEntityName("Test/A_Curve");
+
+	builder.addCurve(std::move(description), curveCfg);
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName("Test/A_plot");
+	plotCfg.setTitle("Some title");
+	plotCfg.setGridColor(ot::Color(ot::DefaultColor::Black));
+	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
+	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
+
+	plotCfg.setGridVisible(true);
+	plotCfg.setLegendVisible(false);
+	plotCfg.setXAxisIsLogScale(false);
+	plotCfg.setXAxisIsAutoScale(true);
+	plotCfg.setYAxisIsLogScale(false);
+	plotCfg.setYAxisIsAutoScale(true);
+	plotCfg.setXAxisMin(0);
+	plotCfg.setXAxisMax(50);
+	plotCfg.setYAxisMin(0);
+	plotCfg.setYAxisMax(50);
+
+	builder.buildPlot(plotCfg);
+
+}
+
+
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
 {
 	std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
@@ -234,10 +296,12 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+
+				testPlot();
+				/*m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
 				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
-				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
+				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);*/
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{

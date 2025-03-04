@@ -10,6 +10,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/PenCfg.h"
+#include "OTGui/QueryInformation.h"
 
 // std header
 #include <string>
@@ -86,6 +87,9 @@ namespace ot {
 		void setPointsFillPainter(Painter2D* _painter);
 		const Painter2D* getPointsFillPainter(void) const { return m_pointsFillPainter; };
 
+		void setQueryInformation(QueryInformation _queryInformation);
+		const QueryInformation& getQueryInformation() const;
+
 	private:
 		UID m_navigationId;
 
@@ -105,6 +109,7 @@ namespace ot {
 		int m_pointsSize;
 		PenFCfg m_pointsOulinePen;
 		Painter2D* m_pointsFillPainter;
+		QueryInformation m_queryInformation;
 	};
 
 }

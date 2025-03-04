@@ -5,6 +5,7 @@
 #include "OTModelAPI/ModelStateInformationHelper.h"
 #include "MetadataSeries.h"
 #include "AdvancedQueryBuilder.h"
+#include "OTGui/QueryInformation.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string& _owner)
 	:m_extender(_extender), m_owner(_owner)
@@ -20,7 +21,7 @@ void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DC
 	std::shared_ptr<ParameterDescription> xAxis = *parameters.begin();
 	
 	const std::string labelX = _config.getXAxisTitle();
-	assert(labelY ==xAxis->getMetadataParameter().parameterName);
+	assert(labelX ==xAxis->getMetadataParameter().parameterName);
 
 	storeCurve(std::move(_dataSetDescription), _config);
 
@@ -42,15 +43,16 @@ void PlotBuilder::buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 
 void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config)
 { 
-	//std::list<DatasetDescription> datasets{ std::move(_dataSetDescription) };
-	//ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _config.getName(), {});
-	//m_extender.processDataPoints(&(*datasets.begin()), seriesID);
-	//
-	//const std::string query = createQuery(seriesID);
-	//_config.setQuery(query);
-
-	//const std::string projection = createProjection();
-	//_config.setProjection(projection);
+	std::list<DatasetDescription> datasets;
+	datasets.push_back(std::move(_dataSetDescription));
+	ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _config.getEntityName(), {});
+	m_extender.processDataPoints(&(*datasets.begin()), seriesID);
+	
+	ot::QueryInformation queryInformation;
+	//queryInformation.m_query= createQuery(seriesID);
+	queryInformation.m_projection = createProjection();
+	
+	_config.setQueryInformation(queryInformation);
 }
 
 const std::string PlotBuilder::createQuery(ot::UID _seriesID)

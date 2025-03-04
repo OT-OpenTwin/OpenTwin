@@ -7,7 +7,7 @@
 #include "OTModelAPI/NewModelStateInformation.h"
 #include "ResultCollectionExtender.h"
 
-class PlotBuilder
+class __declspec(dllexport) PlotBuilder
 {
 public:
 	PlotBuilder(ResultCollectionExtender& _extender, const std::string& _owner);
