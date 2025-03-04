@@ -1,4 +1,4 @@
-//! @file LinearVector2D.h
+//! @file MatrixVectorizedXAlign.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,49 +6,51 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Matrix.h"
 #include "OTCore/OTAssert.h"
 
 // std header
 #include <vector>
 
+#define OT_MATRIX_GET_INDEX_XALIGN(___dimensions, ___index) (___index.y * ___dimensions.x) + ___index.x
+
 namespace ot {
 
-	//! @class LinearVector2D
-	//! @brief A 2D container implemented as a linear vector.
-	//! The LinearVector2D provides a dynamically resizable 2D array stored in a single linear vector.
+	//! @class MatrixVectorizedXAlign
+	//! @brief A matrix container implemented as a linear vector.
+	//! The MatrixVectorizedXAlign provides a dynamically resizable matrix stored in a single linear vector.
 	//! It allows efficient access and modification of elements and supports row and column operations.
 	//! 
-	//! When comparing to a Vector2D the linear vector is more efficient when the data dimensions are known and do not need to be changed.
+	//! The data is X aligned so the X values are stored next to each other in the memory.
+	//! Therefore row-wise operations are faster than column.wise operations.
 	//! @tparam T Type of elements stored in the container.
-	template <class T> class LinearVector2D {
+	template <typename T> class MatrixVectorizedXAlign : public Matrix<T> {
 	public:
 
 		// Constructor
 
 		//! @brief Default constructor.
-		LinearVector2D();
+		MatrixVectorizedXAlign();
 
 		//! @brief Constructs a 2D vector with given dimensions.
-		//! @param _cols Number of columns.
-		//! @param _rows Number of rows.
-		LinearVector2D(size_t _cols, size_t _rows);
+		//! @param _dimensions New dimensions.
+		MatrixVectorizedXAlign(const MatrixIndex& _dimensions);
 
 		//! @brief Constructs a 2D vector with given dimensions and default value.
-		//! @param _cols Number of columns.
-		//! @param _rows Number of rows.
+		//! @param _dimensions New dimensions.
 		//! @param _default Default value for all elements.
-		LinearVector2D(size_t _cols, size_t _rows, const T& _default);
+		MatrixVectorizedXAlign(const MatrixIndex& _dimensions, const T& _default);
 
 		//! @brief Constructs a 2D vector from the provided other vector by copying the data.
 		//! @param _other Other vector.
-		LinearVector2D(const LinearVector2D& _other);
+		MatrixVectorizedXAlign(const MatrixVectorizedXAlign& _other);
 
 		//! @brief Constructs a 2D vector from the provided other vector by moving the data.
 		//! @param _other Other vector.
-		LinearVector2D(LinearVector2D&& _other) noexcept;
+		MatrixVectorizedXAlign(MatrixVectorizedXAlign&& _other) noexcept;
 
 		//! @brief Destructor.
-		virtual ~LinearVector2D() {};
+		virtual ~MatrixVectorizedXAlign() {};
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -58,14 +60,14 @@ namespace ot {
 		//! Clears the current data structure and copies the data from the provided vector.
 		//! @param _other Other vector.
 		//! @return Returns reference to this vector.
-		LinearVector2D& operator = (const LinearVector2D& _other);
+		MatrixVectorizedXAlign& operator = (const MatrixVectorizedXAlign& _other);
 
 		//! @brief Move-Assignment operator.
 		//! Clears the current data structure by replacing (moving) the data the provided vector.
 		//! The provided vector will remain in an undefined state, call clear to ensure a true clear state after the move.
 		//! @param _other Other vector.
 		//! @return Returns reference to this vector.
-		LinearVector2D& operator = (LinearVector2D&& _other) noexcept;
+		MatrixVectorizedXAlign& operator = (MatrixVectorizedXAlign&& _other) noexcept;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,10 +89,10 @@ namespace ot {
 		// Data handling
 
 		//! @brief Current column count.
-		size_t getColumnCount(void) const { return m_cols; };
+		size_t getColumnCount(void) const { return m_size.x; };
 
 		//! @brief Current row count.
-		size_t getRowCount(void) const { return m_rows; };
+		size_t getRowCount(void) const { return m_size.y; };
 
 		//! @brief Removes all the data and sets the dimensions back to 0, 0.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
@@ -98,37 +100,51 @@ namespace ot {
 
 		//! @brief Resizes the 2D vector.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
-		//! @param _cols New number of columns.
-		//! @param _rows New number of rows.
-		void resize(size_t _cols, size_t _rows) { this->resize(_cols, _rows, static_cast<const T>(0)); };
+		//! @param _x New column count.
+		//! @param _y New row count.
+		void resize(MatrixIndex::ValueType _x, MatrixIndex::ValueType _y) { this->resize(MatrixIndex(_x, _y), static_cast<const T>(0)); };
+
+		//! @brief Resizes the 2D vector.
+		//! Complexity: O(r * c) where r = _rows, c = _cols.
+		//! @param _dimensions New dimensions.
+		void resize(const MatrixIndex& _dimensions) { this->resize(_dimensions, static_cast<const T>(0)); };
 
 		//! @brief Resizes the 2D vector with a default value.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
-		//! @param _cols New number of columns.
-		//! @param _rows New number of rows.
+		//! @param _x New column count.
+		//! @param _y New row count.
 		//! @param _default Default value for new elements.
-		void resize(size_t _cols, size_t _rows, const T& _default);
+		void resize(MatrixIndex::ValueType _x, MatrixIndex::ValueType _y, const T& _default) { this->resize(MatrixIndex(_x, _y), _default); };
+
+		//! @brief Resizes the 2D vector with a default value.
+		//! Complexity: O(r * c) where r = _rows, c = _cols.
+		//! @param _dimensions New dimensions.
+		//! @param _default Default value for new elements.
+		void resize(const MatrixIndex& _dimensions, const T& _default);
 
 		//! @brief Sets the value of a specific element.
 		//! Complexity: O(1).
-		//! @param _col Column index.
-		//! @param _row Row index.
+		//! @param _dimensions Data index.
 		//! @param _data Value to set.
-		void setData(size_t _col, size_t _row, const T& _data);
+		void setData(const MatrixIndex& _index, const T& _data) override;
+
+		//! @brief Sets the value of a specific element.
+		//! Complexity: O(1).
+		//! @param _dimensions Data index.
+		//! @param _data Value to set.
+		void setData(const MatrixIndex& _index, T&& _data) override;
 
 		//! @brief Retrieves a reference to a specific element.
 		//! Complexity: O(1).
-		//! @param _col Column index.
-		//! @param _row Row index.
+		//! @param _dimensions Data index.
 		//! @return Reference to the requested element.
-		T& getData(size_t _col, size_t _row);
+		T& getData(const MatrixIndex& _index) override;
 
 		//! @brief Retrieves a const reference to a specific element.
 		//! Complexity: O(1).
-		//! @param _col Column index.
-		//! @param _row Row index.
+		//! @param _dimensions Data index.
 		//! @return Const reference to the requested element.
-		const T& getData(size_t _col, size_t _row) const;
+		const T& getData(const MatrixIndex& _index) const override;
 
 		//! @brief Inserts a row at the front.
 		//! Complexity: O(c) where c = number of columns.
@@ -192,10 +208,9 @@ namespace ot {
 
 		//! @brief Replaces the current data.
 		//! Complexity: O(1) data is moved.
-		//! @param _rows New row count.
-		//! @param _cols New column count.
+		//! @param _dimensions New dimensions.
 		//! @param _data New data.
-		void setData(size_t _rows, size_t _cols, std::vector<T>&& _data);
+		void setData(const MatrixIndex& _dimensions, std::vector<T>&& _data);
 
 		//! @brief Retrieves a reference to the internal data.
 		//! @return Reference to the data vector.
@@ -206,9 +221,8 @@ namespace ot {
 		const std::vector<T>& getData(void) const { return m_data; };
 
 	private:
-		size_t m_rows; //! @brief Number of rows.
-		size_t m_cols; //! @brief Number of columns.
-		std::vector<T> m_data; //! @brief Linear vector storage.
+		MatrixIndex m_size; //! @brief Dimensions.
+		std::vector<T> m_data; //! @brief Y aligned linear vector storage.
 	};
 
 }
@@ -221,55 +235,53 @@ namespace ot {
 
 // Constructor
 
-template<class T>
-ot::LinearVector2D<T>::LinearVector2D()
-	: m_rows(0), m_cols(0) 
+template<typename T>
+ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign()
+	: m_size(0, 0)
 {}
 
-template<class T>
-ot::LinearVector2D<T>::LinearVector2D(size_t _cols, size_t _rows) :
-	LinearVector2D() 
+template<typename T>
+ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(const MatrixIndex& _dimensions) :
+	MatrixVectorizedXAlign() 
 { 
-	this->resize(_cols, _rows); 
+	this->resize(_dimensions);
 }
 
-template<class T>
-ot::LinearVector2D<T>::LinearVector2D(size_t _cols, size_t _rows, const T& _default) :
-	LinearVector2D()
+template<typename T>
+ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(const MatrixIndex& _dimensions, const T& _default) :
+	MatrixVectorizedXAlign()
 {
-	this->resize(_cols, _rows, _default);
+	this->resize(_dimensions, _default);
 }
 
-template<class T>
-ot::LinearVector2D<T>::LinearVector2D(const LinearVector2D& _other) :
-	m_rows(_other.m_rows), m_cols(_other.m_cols), m_data(_other.m_data)
+template<typename T>
+ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(const MatrixVectorizedXAlign& _other) :
+	m_size(_other.m_size), m_data(_other.m_data)
 {}
 
-template<class T>
-ot::LinearVector2D<T>::LinearVector2D(LinearVector2D&& _other) noexcept :
-	m_rows(std::move(_other.m_rows)), std::move(m_cols(_other.m_cols)), std::move(m_data(_other.m_data))
+template<typename T>
+ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(MatrixVectorizedXAlign&& _other) noexcept :
+	m_size(std::move(_other.m_size)), std::move(m_data(_other.m_data))
 {}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Operator
 
-template<class T>
-ot::LinearVector2D<T>& ot::LinearVector2D<T>::operator=(const LinearVector2D& _other) {
+template<typename T>
+ot::MatrixVectorizedXAlign<T>& ot::MatrixVectorizedXAlign<T>::operator=(const MatrixVectorizedXAlign& _other) {
 	if (this != &_other) {
-		m_rows = _other.m_rows;
-		m_cols = _other.m_cols;
+		m_size = _other.m_size;
 		m_data = _other.m_data;
 	}
 
 	return *this;
 }
 
-template<class T>
-ot::LinearVector2D<T>& ot::LinearVector2D<T>::operator=(LinearVector2D&& _other) noexcept {
+template<typename T>
+ot::MatrixVectorizedXAlign<T>& ot::MatrixVectorizedXAlign<T>::operator=(MatrixVectorizedXAlign&& _other) noexcept {
 	if (this != &_other) {
-		m_rows = std::move(_other.m_rows);
-		m_cols = std::move(_other.m_cols);
+		m_size = std::move(_other.m_size);
 		m_data = std::move(_other.m_data);
 	}
 
@@ -281,24 +293,23 @@ ot::LinearVector2D<T>& ot::LinearVector2D<T>::operator=(LinearVector2D&& _other)
 // Data handling
 
 template<typename T>
-void ot::LinearVector2D<T>::clear(void) {
-	m_rows = 0;
-	m_cols = 0;
+void ot::MatrixVectorizedXAlign<T>::clear(void) {
+	m_size.x = 0;
+	m_size.y = 0;
 	m_data.clear();
 }
 
 template<typename T>
-void ot::LinearVector2D<T>::resize(size_t _cols, size_t _rows, const T& _default) {
+void ot::MatrixVectorizedXAlign<T>::resize(const MatrixIndex& _dimensions, const T& _default) {
 	std::vector<T> tmp = std::move(m_data);
+	
 	m_data.clear();
+	m_data.reserve(_dimensions.x * _dimensions.y);
 
-	size_t newSize = _cols * _rows;
-	m_data.reserve(newSize);
-
-	for (size_t newR = 0; newR < _rows; newR++) {
-		for (size_t newC = 0; newC < _cols; newC++) {
-			if (newR < m_rows && newC < m_cols) {
-				size_t oldIx = (newR * m_cols) + newC;
+	for (size_t y = 0; y < _dimensions.y; y++) {
+		for (size_t x = 0; x < _dimensions.x; x++) {
+			if (y < m_size.y && x < _dimensions.x) {
+				size_t oldIx = (y * _dimensions.x) + x;
 				m_data.push_back(std::move(tmp[oldIx]));
 			}
 			else {
@@ -307,123 +318,131 @@ void ot::LinearVector2D<T>::resize(size_t _cols, size_t _rows, const T& _default
 		}
 	}
 
-	m_cols = _cols;
-	m_rows = _rows;
+	m_size = _dimensions;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::setData(size_t _col, size_t _row, const T& _data) {
-	OTAssert(((_row * m_cols) + _col) < m_data.size(), "Index out of range");
-	m_data[(_row * m_cols) + _col] = _data;
+inline void ot::MatrixVectorizedXAlign<T>::setData(const MatrixIndex& _index, const T& _data) {
+	OTAssert(_index.x < m_size.x, "Column index out of range");
+	OTAssert(_index.y < m_size.y, "Row index out of range");
+	m_data[OT_MATRIX_GET_INDEX_XALIGN(m_size, _index)] = _data;
 }
 
 template<typename T>
-inline T& ot::LinearVector2D<T>::getData(size_t _col, size_t _row) {
-	OTAssert(((_row * m_cols) + _col) < m_data.size(), "Index out of range");
-	return m_data[(_row * m_cols) + _col];
+inline void ot::MatrixVectorizedXAlign<T>::setData(const MatrixIndex& _index, T&& _data) {
+	OTAssert(_index.x < m_size.x, "Column index out of range");
+	OTAssert(_index.y < m_size.y, "Row index out of range");
+	m_data[OT_MATRIX_GET_INDEX_XALIGN(m_size, _index)] = std::move(_data);
 }
 
 template<typename T>
-inline const T& ot::LinearVector2D<T>::getData(size_t _col, size_t _row) const {
-	OTAssert(((_row * m_cols) + _col) < m_data.size(), "Index out of range");
-	return m_data[(_row * m_cols) + _col];
+inline T& ot::MatrixVectorizedXAlign<T>::getData(const MatrixIndex& _index) {
+	OTAssert(_index.x < m_size.x, "Column index out of range");
+	OTAssert(_index.y < m_size.y, "Row index out of range");
+	return m_data[OT_MATRIX_GET_INDEX_XALIGN(m_size, _index)];
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowFront(const T& _defaultValue) {
-	m_data.insert(m_data.begin(), m_cols, _defaultValue);
-	m_rows++;
+inline const T& ot::MatrixVectorizedXAlign<T>::getData(const MatrixIndex& _index) const {
+	OTAssert(_index.x < m_size.x, "Column index out of range");
+	OTAssert(_index.y < m_size.y, "Row index out of range");
+	return m_data[OT_MATRIX_GET_INDEX_XALIGN(m_size, _index)];
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowFront(const std::vector<T>& _row) {
-	OTAssert(_row.size() == m_cols, "Row size mismatch");
+inline void ot::MatrixVectorizedXAlign<T>::pushRowFront(const T& _defaultValue) {
+	m_data.insert(m_data.begin(), m_size.x, _defaultValue);
+	m_size.y++;
+}
+
+template<typename T>
+inline void ot::MatrixVectorizedXAlign<T>::pushRowFront(const std::vector<T>& _row) {
+	OTAssert(_row.size() == m_size.x, "Row size mismatch");
 	m_data.insert(m_data.begin(), _row.begin(), _row.end());
-	m_rows++;
+	m_size.y++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowFront(std::vector<T>&& _row) {
-	OTAssert(_row.size() == m_cols, "Row size mismatch");
+inline void ot::MatrixVectorizedXAlign<T>::pushRowFront(std::vector<T>&& _row) {
+	OTAssert(_row.size() == m_size.x, "Row size mismatch");
 	m_data.insert(m_data.begin(), std::make_move_iterator(_row.begin()), std::make_move_iterator(_row.end()));
-	m_rows++;
+	m_size.y++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowBack(const T& _defaultValue) {
-	m_data.insert(m_data.end(), m_cols, _defaultValue);
-	m_rows++;
+inline void ot::MatrixVectorizedXAlign<T>::pushRowBack(const T& _defaultValue) {
+	m_data.insert(m_data.end(), m_size.x, _defaultValue);
+	m_size.y++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowBack(const std::vector<T>& _row) {
-	OTAssert(_row.size() == m_cols, "Row size mismatch");
+inline void ot::MatrixVectorizedXAlign<T>::pushRowBack(const std::vector<T>& _row) {
+	OTAssert(_row.size() == m_size.x, "Row size mismatch");
 	m_data.insert(m_data.end(), _row.begin(), _row.end());
-	m_rows++;
+	m_size.y++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushRowBack(std::vector<T>&& _row) {
-	OTAssert(_row.size() == m_cols, "Row size mismatch");
+inline void ot::MatrixVectorizedXAlign<T>::pushRowBack(std::vector<T>&& _row) {
+	OTAssert(_row.size() == m_size.x, "Row size mismatch");
 	m_data.insert(m_data.end(), std::make_move_iterator(_row.begin()), std::make_move_iterator(_row.end()));
-	m_rows++;
+	m_size.y++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnFront(const T& _defaultValue) {
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + r * (m_cols + 1), _defaultValue);
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnFront(const T& _defaultValue) {
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + r * (m_size.x + 1), _defaultValue);
 	}
-	m_cols++;
+	m_size.x++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnFront(const std::vector<T>& _col) {
-	OTAssert(_col.size() == m_rows, "Column size mismatch");
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + r * (m_cols + 1), _col[r]);
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnFront(const std::vector<T>& _col) {
+	OTAssert(_col.size() == m_size.y, "Column size mismatch");
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + r * (m_size.x + 1), _col[r]);
 	}
-	m_cols++;
+	m_size.x++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnFront(std::vector<T>&& _col) {
-	OTAssert(_col.size() == m_rows, "Column size mismatch");
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + r * (m_cols + 1), std::move(_col[r]));
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnFront(std::vector<T>&& _col) {
+	OTAssert(_col.size() == m_size.y, "Column size mismatch");
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + r * (m_size.x + 1), std::move(_col[r]));
 	}
-	m_cols++;
+	m_size.x++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnBack(const T& _defaultValue) {
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + (r + 1) * m_cols + r, _defaultValue);
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnBack(const T& _defaultValue) {
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + (r + 1) * m_size.x + r, _defaultValue);
 	}
-	m_cols++;
+	m_size.x++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnBack(const std::vector<T>& _col) {
-	OTAssert(_col.size() == m_rows, "Column size mismatch");
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + (r + 1) * m_cols + r, _col[r]);
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnBack(const std::vector<T>& _col) {
+	OTAssert(_col.size() == m_size.y, "Column size mismatch");
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + (r + 1) * m_size.x + r, _col[r]);
 	}
-	m_cols++;
+	m_size.x++;
 }
 
 template<typename T>
-inline void ot::LinearVector2D<T>::pushColumnBack(std::vector<T>&& _col) {
-	OTAssert(_col.size() == m_rows, "Column size mismatch");
-	for (size_t r = 0; r < m_rows; ++r) {
-		m_data.insert(m_data.begin() + (r + 1) * m_cols + r, std::move(_col[r]));
+inline void ot::MatrixVectorizedXAlign<T>::pushColumnBack(std::vector<T>&& _col) {
+	OTAssert(_col.size() == m_size.y, "Column size mismatch");
+	for (size_t r = 0; r < m_size.y; ++r) {
+		m_data.insert(m_data.begin() + (r + 1) * m_size.x + r, std::move(_col[r]));
 	}
-	m_cols++;
+	m_size.x++;
 }
 
-template<class T>
-inline void ot::LinearVector2D<T>::setData(size_t _rows, size_t _cols, std::vector<T>&& _data) {
-	m_rows = _rows;
-	m_cols = _cols;
+template<typename T>
+inline void ot::MatrixVectorizedXAlign<T>::setData(const MatrixIndex& _dimensions, std::vector<T>&& _data) {
+	m_size = _dimensions;
 	m_data = std::move(_data);
 }

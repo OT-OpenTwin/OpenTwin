@@ -330,10 +330,10 @@
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\Vector2D.h">
+    <ClInclude Include="include\OTCore\MatrixNested.h">
       <Filter>include\Container</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\LinearVector2D.h">
+    <ClInclude Include="include\OTCore\MatrixVectorizedXAlign.h">
       <Filter>include\Container</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ContainerHelper.h">
@@ -352,6 +352,9 @@
       <Filter>include\Container</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\Matrix2Factory.hpp">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Matrix.h">
       <Filter>include\Container</Filter>
     </ClInclude>
   </ItemGroup>
