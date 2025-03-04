@@ -89,6 +89,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitSimulatorService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitExecution.exe" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll" 2>NUL
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTSystemInformationTool.dll" 2>NUL
 
 ECHO Delete color styles
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles\*.otcsf" 2>NUL
@@ -173,6 +174,7 @@ REM ====================================================================
 ECHO Copy Tools
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\x64\Release\OToolkitAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool\x64\Release\OTSystemInformationTool.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 REM ====================================================================
 REM  Copy Color Styles

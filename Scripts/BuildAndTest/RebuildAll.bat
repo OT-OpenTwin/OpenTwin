@@ -377,6 +377,11 @@ ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Executable: System Information Tool
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Executable: Password encryption tool
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption\build.bat" %1 %2
