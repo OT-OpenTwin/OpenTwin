@@ -1,37 +1,39 @@
 //! @file Serializable.h
-//! 
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-// OT header
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/CoreAPIExport.h"
 
 namespace ot {
 
-	//! \class Serializable.
-	//! \brief The Serializable class is the default interface of serializable objects.
+	//! @class Serializable
+	//! @brief The Serializable class is the default interface of serializable objects.
+	//! It provides the default virtual addToJsonObject and setFromJsonObject methods.
 	class OT_CORE_API_EXPORTONLY Serializable {
 	public:
 		Serializable() {};
-		Serializable(const Serializable&) = default;
-		Serializable(Serializable&&) noexcept = default;
+		Serializable(const Serializable&) {};
+		Serializable(Serializable&&) noexcept {};
 		virtual ~Serializable() {};
 
-		Serializable& operator = (const Serializable&) = default;
-		Serializable& operator = (Serializable&&) noexcept = default;
+		Serializable& operator = (const Serializable&) { return *this; };
+		Serializable& operator = (Serializable&&) noexcept { return *this; };
 
-		//! \brief Add the object contents to the provided JSON object.
-		//! \param _object Json object reference to write the data to.
-		//! \param _allocator Allocator.
+		//! @brief Serialize the object data into the provided object by using the provided allocator.
+		//! @param _object Json object value reference to write the data to.
+		//! @param _allocator Allocator to use when writing data.
+		//! @ref Serializable::addToJsonObject
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const = 0;
 
-		//! \brief Set the object contents from the provided JSON object.
-		//! \param _object The JSON object containing the information.
-		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
+		//! @brief Set the data by deserializing the object.
+		//! Set the object contents from the provided JSON object.
+		//! @param _object The JSON object containing the information.
+		//! @ref Serializable::setFromJsonObject
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) = 0;
 	};
 }
