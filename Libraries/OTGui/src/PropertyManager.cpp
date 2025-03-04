@@ -20,10 +20,14 @@
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyManagerNotifier.h"
-#include "OTGui/PropertyManagerReadCallbackNotifier.h"
-#include "OTGui/PropertyManagerWriteCallbackNotifier.h"
+#include "OTGui/PropertyReadCallbackNotifier.h"
+#include "OTGui/PropertyWriteCallbackNotifier.h"
 
 ot::PropertyManager::PropertyManager() {}
+
+ot::PropertyManager::PropertyManager(const ConstJsonObject& _jsonObject) {
+	this->setFromJsonObject(_jsonObject);
+}
 
 ot::PropertyManager::PropertyManager(const PropertyManager& _other) {
 	for (const auto& it : _other.m_groups) {
@@ -116,9 +120,15 @@ void ot::PropertyManager::readingProperty(const std::string& _propertyGroupName,
 
 ot::Property* ot::PropertyManager::addProperty(const std::string& _groupName, Property* _property) {
 	OTAssertNullptr(_property);
-	OTAssert(this->findProperty(_groupName, _property->getPropertyName()) == nullptr, "Property already exists");
-
-	return this->storeProperty(_groupName, _property);
+	Property* prop = this->findProperty(_groupName, _property->getPropertyName());
+	
+	// Adding a property will not update its values
+	// This avoids conflicts on multiinitialization
+	if (!prop) {
+		prop = this->storeProperty(_groupName, _property);
+	}
+	
+	return prop;
 }
 
 void ot::PropertyManager::updateProperty(const std::string& _groupName, Property* _property) {
@@ -135,6 +145,10 @@ void ot::PropertyManager::updateProperty(const std::string& _groupName, Property
 	}
 
 	this->propertyChanged(prop);
+}
+
+void ot::PropertyManager::mergeWith(const PropertyManager& _other, PropertyMergeMode _mergeMode) {
+	
 }
 
 void ot::PropertyManager::updateProperty(const std::string& _groupName, const Property* _property, bool _deleteProvidedProperty) {
@@ -155,7 +169,7 @@ void ot::PropertyManager::updateProperty(const std::string& _groupName, const Pr
 	this->propertyChanged(prop);
 }
 
-ot::PropertyBool* ot::PropertyManager::setBool(const std::string& _groupName, const std::string& _valueName, bool _value, const Property::PropertyFlags& _flags) {
+ot::PropertyBool* ot::PropertyManager::setBool(const std::string& _groupName, const std::string& _valueName, bool _value) {
 	PropertyBool* prop = dynamic_cast<PropertyBool*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -168,7 +182,7 @@ ot::PropertyBool* ot::PropertyManager::setBool(const std::string& _groupName, co
 	return prop;
 }
 
-ot::PropertyInt* ot::PropertyManager::setInt(const std::string& _groupName, const std::string& _valueName, int _value, const Property::PropertyFlags& _flags) {
+ot::PropertyInt* ot::PropertyManager::setInt(const std::string& _groupName, const std::string& _valueName, int _value) {
 	PropertyInt* prop = dynamic_cast<PropertyInt*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -181,7 +195,7 @@ ot::PropertyInt* ot::PropertyManager::setInt(const std::string& _groupName, cons
 	return prop;
 }
 
-ot::PropertyDouble* ot::PropertyManager::setDouble(const std::string& _groupName, const std::string& _valueName, double _value, const Property::PropertyFlags& _flags) {
+ot::PropertyDouble* ot::PropertyManager::setDouble(const std::string& _groupName, const std::string& _valueName, double _value) {
 	PropertyDouble* prop = dynamic_cast<PropertyDouble*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -194,7 +208,7 @@ ot::PropertyDouble* ot::PropertyManager::setDouble(const std::string& _groupName
 	return prop;
 }
 
-ot::PropertyString* ot::PropertyManager::setString(const std::string& _groupName, const std::string& _valueName, const std::string& _value, const Property::PropertyFlags& _flags) {
+ot::PropertyString* ot::PropertyManager::setString(const std::string& _groupName, const std::string& _valueName, const std::string& _value) {
 	PropertyString* prop = dynamic_cast<PropertyString*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -207,7 +221,7 @@ ot::PropertyString* ot::PropertyManager::setString(const std::string& _groupName
 	return prop;
 }
 
-ot::PropertyStringList* ot::PropertyManager::setStringList(const std::string& _groupName, const std::string& _valueName, const std::string& _value, const std::list<std::string>& _possibleValues, const Property::PropertyFlags& _flags) {
+ot::PropertyStringList* ot::PropertyManager::setStringList(const std::string& _groupName, const std::string& _valueName, const std::string& _value) {
 	PropertyStringList* prop = dynamic_cast<PropertyStringList*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -220,7 +234,7 @@ ot::PropertyStringList* ot::PropertyManager::setStringList(const std::string& _g
 	return prop;
 }
 
-ot::PropertyColor* ot::PropertyManager::setColor(const std::string& _groupName, const std::string& _valueName, const Color& _value, const Property::PropertyFlags& _flags) {
+ot::PropertyColor* ot::PropertyManager::setColor(const std::string& _groupName, const std::string& _valueName, const Color& _value) {
 	PropertyColor* prop = dynamic_cast<PropertyColor*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -233,7 +247,7 @@ ot::PropertyColor* ot::PropertyManager::setColor(const std::string& _groupName, 
 	return prop;
 }
 
-ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _groupName, const std::string& _valueName, Painter2D* _painter, const Property::PropertyFlags& _flags) {
+ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _groupName, const std::string& _valueName, Painter2D* _painter) {
 	PropertyPainter2D* prop = dynamic_cast<PropertyPainter2D*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -246,12 +260,12 @@ ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _gro
 	return prop;
 }
 
-ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter, const Property::PropertyFlags& _flags) {
+ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter) {
 	OTAssertNullptr(_painter);
 	return this->setPainter2D(_groupName, _valueName, static_cast<Painter2D*>(_painter->createCopy()));
 }
 
-ot::PropertyFilePath* ot::PropertyManager::setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path, PropertyFilePath::BrowseMode _browseMode, const Property::PropertyFlags& _flags) {
+ot::PropertyFilePath* ot::PropertyManager::setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path) {
 	PropertyFilePath* prop = dynamic_cast<PropertyFilePath*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -264,7 +278,7 @@ ot::PropertyFilePath* ot::PropertyManager::setFilePath(const std::string& _group
 	return prop;
 }
 
-ot::PropertyDirectory* ot::PropertyManager::setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path, const Property::PropertyFlags& _flags) {
+ot::PropertyDirectory* ot::PropertyManager::setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path) {
 	PropertyDirectory* prop = dynamic_cast<PropertyDirectory*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
@@ -411,26 +425,40 @@ ot::PropertyManagerNotifier* ot::PropertyManager::removeNotifier(PropertyManager
 	return noti;
 }
 
-void ot::PropertyManager::addReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier) {
+void ot::PropertyManager::addReadCallbackNotifier(PropertyReadCallbackNotifier* _notifier) {
 	OTAssertNullptr(_notifier);
 	OTAssert(m_readNotifier.find(_notifier->getPropertyPath()) == m_readNotifier.end(), "Notifier for given name already stored");
 	m_readNotifier.insert_or_assign(_notifier->getPropertyPath(), _notifier);
 }
 
-void ot::PropertyManager::removeReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier) {
+void ot::PropertyManager::removeReadCallbackNotifier(PropertyReadCallbackNotifier* _notifier) {
 	OTAssertNullptr(_notifier);
 	m_readNotifier.erase(_notifier->getPropertyPath());
 }
 
-void ot::PropertyManager::addWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier) {
+void ot::PropertyManager::addWriteCallbackNotifier(PropertyWriteCallbackNotifierBase* _notifier) {
 	OTAssertNullptr(_notifier);
 	OTAssert(m_writeNotifier.find(_notifier->getPropertyPath()) == m_writeNotifier.end(), "Notifier for given name already stored");
 	m_writeNotifier.insert_or_assign(_notifier->getPropertyPath(), _notifier);
 }
 
-void ot::PropertyManager::removeWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier) {
+void ot::PropertyManager::removeWriteCallbackNotifier(PropertyWriteCallbackNotifierBase* _notifier) {
 	OTAssertNullptr(_notifier);
 	m_writeNotifier.erase(_notifier->getPropertyPath());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+ot::Property* ot::PropertyManager::storeProperty(const std::string& _groupName, Property* _property) {
+	ot::PropertyGroup* grp = this->findOrCreateGroup(_groupName);
+	OTAssertNullptr(grp);
+	OTAssert(grp->findPropertyByPath(_property->getPropertyName()) == nullptr, "Property with the given name already exists");
+
+	grp->addProperty(_property);
+
+	return _property;
 }
 
 ot::PropertyGroup* ot::PropertyManager::findGroup(const std::string& _group) const {
@@ -451,18 +479,4 @@ ot::PropertyGroup* ot::PropertyManager::findOrCreateGroup(const std::string& _gr
 	}
 
 	return grp;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Protected
-
-ot::Property* ot::PropertyManager::storeProperty(const std::string& _groupName, Property* _property) {
-	ot::PropertyGroup* grp = this->findOrCreateGroup(_groupName);
-	OTAssertNullptr(grp);
-	OTAssert(grp->findPropertyByPath(_property->getPropertyName()) == nullptr, "Property with the given name already exists");
-
-	grp->addProperty(_property);
-
-	return _property;
 }

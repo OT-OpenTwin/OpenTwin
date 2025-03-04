@@ -26,10 +26,12 @@
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
     <ClInclude Include="include\OTGui\CopyEntityInformation.h" />
     <ClInclude Include="include\OTGui\CopyInformation.h" />
+    <ClInclude Include="include\OTGui\DefaultPropertyValues.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObjectBase.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyRegistrar.h" />
+    <ClInclude Include="include\OTGui\ManagedSpecialPropertyRegistrar.h" />
     <ClInclude Include="include\OTGui\MenuCfg.h" />
     <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h" />
     <ClInclude Include="include\OTGui\MenuEntryCfg.h" />
@@ -90,7 +92,8 @@
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h" />
     <ClInclude Include="include\OTGui\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTGui\Property.h" />
-    <ClInclude Include="include\OTGui\PropertyManagerReadCallbackNotifier.h" />
+    <ClInclude Include="include\OTGui\PropertyManagerIterator.h" />
+    <ClInclude Include="include\OTGui\PropertyReadCallbackNotifier.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
     <ClInclude Include="include\OTGui\PropertyColor.h" />
@@ -106,7 +109,7 @@
     <ClInclude Include="include\OTGui\PropertyInt.h" />
     <ClInclude Include="include\OTGui\PropertyManager.h" />
     <ClInclude Include="include\OTGui\PropertyManagerNotifier.h" />
-    <ClInclude Include="include\OTGui\PropertyManagerWriteCallbackNotifier.h" />
+    <ClInclude Include="include\OTGui\PropertyWriteCallbackNotifier.h" />
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
@@ -142,6 +145,7 @@
     <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\CopyEntityInformation.cpp" />
     <ClCompile Include="src\CopyInformation.cpp" />
+    <ClCompile Include="src\DefaultPropertyValues.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
@@ -204,7 +208,7 @@
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
     <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Property.cpp" />
-    <ClCompile Include="src\PropertyManagerReadCallbackNotifier.cpp" />
+    <ClCompile Include="src\PropertyReadCallbackNotifier.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
     <ClCompile Include="src\PropertyColor.cpp" />

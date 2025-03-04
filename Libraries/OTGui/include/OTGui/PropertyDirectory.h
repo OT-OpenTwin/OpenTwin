@@ -16,6 +16,9 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyDirectory : public Property {
 		OT_DECL_NOCOPY(PropertyDirectory)
 	public:
+		typedef std::string DirectoryValueType;
+		using PropertyValueType = DirectoryValueType;
+
 		PropertyDirectory(const PropertyDirectory* _other);
 		PropertyDirectory(const PropertyBase& _base);
 		PropertyDirectory(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};

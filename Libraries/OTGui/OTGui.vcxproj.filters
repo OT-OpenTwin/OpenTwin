@@ -75,6 +75,12 @@
     <Filter Include="Source Files\Menu">
       <UniqueIdentifier>{6f95c957-b0b3-494c-9426-da44f848fe78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ManagedProperties">
+      <UniqueIdentifier>{99dffc06-c33f-47a2-819c-e09f0a3f7d45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ManagedProperties">
+      <UniqueIdentifier>{1779e56e-4a15-4482-afc2-44e3841eb269}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -395,26 +401,35 @@
     <ClInclude Include="include\OTGui\CopyEntityInformation.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyManager.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyManagerNotifier.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\ManagedPropertyRegistrar.h">
-      <Filter>Header Files\Properties</Filter>
+      <Filter>Header Files\ManagedProperties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\ManagedPropertyObjectBase.h">
-      <Filter>Header Files\Properties</Filter>
+      <Filter>Header Files\ManagedProperties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyManagerReadCallbackNotifier.h">
-      <Filter>Header Files\Properties</Filter>
+    <ClInclude Include="include\OTGui\ManagedPropertyRegistrar.h">
+      <Filter>Header Files\ManagedProperties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyManagerWriteCallbackNotifier.h">
-      <Filter>Header Files\Properties</Filter>
+    <ClInclude Include="include\OTGui\PropertyReadCallbackNotifier.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManager.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerNotifier.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyWriteCallbackNotifier.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\ManagedSpecialPropertyRegistrar.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\DefaultPropertyValues.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerIterator.h">
+      <Filter>Header Files\ManagedProperties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\QueryInformation.h">
       <Filter>Header Files\Plot</Filter>
@@ -733,17 +748,20 @@
     <ClCompile Include="src\CopyEntityInformation.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyManager.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\ManagedPropertyObject.cpp">
-      <Filter>Source Files\Properties</Filter>
+      <Filter>Source Files\ManagedProperties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManager.cpp">
+      <Filter>Source Files\ManagedProperties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyManagerNotifier.cpp">
-      <Filter>Source Files\Properties</Filter>
+      <Filter>Source Files\ManagedProperties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyManagerReadCallbackNotifier.cpp">
-      <Filter>Source Files\Properties</Filter>
+    <ClCompile Include="src\PropertyReadCallbackNotifier.cpp">
+      <Filter>Source Files\ManagedProperties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DefaultPropertyValues.cpp">
+      <Filter>Source Files\ManagedProperties</Filter>
     </ClCompile>
     <ClCompile Include="src\QueryInformation.cpp">
       <Filter>Source Files\Plot</Filter>

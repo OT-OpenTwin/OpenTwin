@@ -37,7 +37,7 @@ namespace ot {
 
 }
 
-template <class T> ot::ManagedPropertyRegistrar<T>::ManagedPropertyRegistrar(ManagedPropertyObject* _object, const std::string& _groupName, ot::Property* _property) {
+template <class T> ot::ManagedPropertyRegistrar<T>::ManagedPropertyRegistrar(ot::ManagedPropertyObject* _object, const std::string& _groupName, ot::Property* _property) {
 	OTAssertNullptr(_object);
 	OTAssertNullptr(dynamic_cast<T*>(_property));
 	OTAssertNullptr(_object->getPropertyManager());

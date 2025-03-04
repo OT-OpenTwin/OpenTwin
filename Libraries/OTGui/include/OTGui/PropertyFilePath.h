@@ -16,6 +16,9 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyFilePath : public Property {
 		OT_DECL_NOCOPY(PropertyFilePath)
 	public:
+		typedef std::string FilePathValueType;
+		using PropertyValueType = FilePathValueType;
+
 		enum BrowseMode {
 			ReadFile = 0,
 			WriteFile = 1

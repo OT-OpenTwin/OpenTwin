@@ -1,4 +1,4 @@
-//! @file PropertyManagerReadCallbackNotifier.cpp
+//! @file PropertyReadCallbackNotifier.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,9 +6,9 @@
 // OT header
 #include "OTCore/OTAssert.h"
 #include "OTGui/PropertyManager.h"
-#include "OTGui/PropertyManagerReadCallbackNotifier.h"
+#include "OTGui/PropertyReadCallbackNotifier.h"
 
-ot::PropertyManagerReadCallbackNotifier::PropertyManagerReadCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyPath, std::optional<CallbackType> _method) :
+ot::PropertyReadCallbackNotifier::PropertyReadCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyPath, std::optional<CallbackType> _method) :
 	m_method(_method), m_propertyPath(_propertyPath)
 {
 	m_manager = _getManager();
@@ -16,13 +16,13 @@ ot::PropertyManagerReadCallbackNotifier::PropertyManagerReadCallbackNotifier(Man
 	m_manager->addReadCallbackNotifier(this);
 }
 
-ot::PropertyManagerReadCallbackNotifier::~PropertyManagerReadCallbackNotifier() {
+ot::PropertyReadCallbackNotifier::~PropertyReadCallbackNotifier() {
 	if (m_manager) {
 		m_manager->removeReadCallbackNotifier(this);
 	}
 }
 
-void ot::PropertyManagerReadCallbackNotifier::call(const std::string& _propertyGroupName, const std::string& _propertyName) {
+void ot::PropertyReadCallbackNotifier::call(const std::string& _propertyGroupName, const std::string& _propertyName) {
 	if (m_method.has_value()) {
 		m_method.value()(_propertyGroupName, _propertyName);
 	}

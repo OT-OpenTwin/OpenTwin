@@ -1,4 +1,4 @@
-//! @file PropertyManagerReadCallbackNotifier.h
+//! @file PropertyReadCallbackNotifier.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -16,17 +16,17 @@
 
 namespace ot {
 	
-	//! @class PropertyManagerReadCallbackNotifier
+	//! @class PropertyReadCallbackNotifier
 	//! @brief Receives and forwards a read callback for property to the set callback method.
 	//! @ref PropertyManager
-	class OT_GUI_API_EXPORT PropertyManagerReadCallbackNotifier {
-		OT_DECL_NODEFAULT(PropertyManagerReadCallbackNotifier)
+	class OT_GUI_API_EXPORT PropertyReadCallbackNotifier {
+		OT_DECL_NODEFAULT(PropertyReadCallbackNotifier)
 	public:
 		using ManagerGetType = std::function<PropertyManager*(void)>;
 		using CallbackType = std::function<void(const std::string&, const std::string&)>;
 
-		PropertyManagerReadCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyPath, std::optional<CallbackType> _method);
-		virtual ~PropertyManagerReadCallbackNotifier();
+		PropertyReadCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyPath, std::optional<CallbackType> _method);
+		virtual ~PropertyReadCallbackNotifier();
 
 		void call(const std::string& _propertyGroupName, const std::string& _propertyName);
 

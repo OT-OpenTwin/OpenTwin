@@ -13,6 +13,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyInt : public Property {
 		OT_DECL_NOCOPY(PropertyInt)
 	public:
+		using PropertyValueType = int;
+
 		PropertyInt(const PropertyInt* _other);
 		PropertyInt(const PropertyBase& _base);
 		PropertyInt(PropertyFlags _flags = PropertyFlags(NoFlags));

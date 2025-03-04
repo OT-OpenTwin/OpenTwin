@@ -21,6 +21,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT Property : public PropertyBase {
 		OT_DECL_NOCOPY(Property)
 	public:
+		using PropertyValueType = void;
+
 		Property(const Property* _other);
 		Property(const PropertyBase& _base);
 		Property(PropertyFlags _flags = PropertyFlags(NoFlags));

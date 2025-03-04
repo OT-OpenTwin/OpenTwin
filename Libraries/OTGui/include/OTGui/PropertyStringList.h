@@ -18,6 +18,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyStringList : public Property {
 		OT_DECL_NOCOPY(PropertyStringList)
 	public:
+		using PropertyValueType = std::list<std::string>;
+
 		PropertyStringList(const PropertyStringList* _other);
 		PropertyStringList(const PropertyBase& _base);
 		PropertyStringList(PropertyFlags _flags = PropertyFlags(NoFlags));

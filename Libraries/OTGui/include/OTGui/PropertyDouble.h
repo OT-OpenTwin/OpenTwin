@@ -13,6 +13,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyDouble : public Property {
 		OT_DECL_NOCOPY(PropertyDouble)
 	public:
+		using PropertyValueType = double;
+
 		PropertyDouble(const PropertyDouble* _other);
 		PropertyDouble(const PropertyBase& _base);
 		PropertyDouble(PropertyFlags _flags = PropertyFlags(NoFlags));

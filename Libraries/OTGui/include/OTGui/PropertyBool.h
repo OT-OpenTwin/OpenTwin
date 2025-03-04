@@ -13,6 +13,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyBool : public Property {
 		OT_DECL_NOCOPY(PropertyBool)
 	public:
+		using PropertyValueType = bool;
+
 		PropertyBool(const PropertyBool* _other);
 		PropertyBool(const PropertyBase& _base);
 		PropertyBool(PropertyFlags _flags = PropertyFlags(NoFlags));

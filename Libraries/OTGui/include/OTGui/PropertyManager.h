@@ -6,7 +6,11 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Rect.h"
 #include "OTCore/Color.h"
+#include "OTCore/Size2D.h"
+#include "OTCore/Point2D.h"
+#include "OTCore/Point3D.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
@@ -32,20 +36,30 @@ namespace ot {
 	class PropertyPainter2D;
 	class PropertyStringList;
 	class PropertyManagerNotifier;
-	class PropertyManagerReadCallbackNotifier;
-	class PropertyManagerWriteCallbackNotifierBase;
+	class PropertyReadCallbackNotifier;
+	class PropertyWriteCallbackNotifierBase;
 
 	//! @brief Manages various property types and serialization.
 	//! The PropertyManager provides functions to set, get, and manage different property types.
 	//! It also supports serialization to and from JSON objects.
 	class OT_GUI_API_EXPORT PropertyManager : public Serializable {
 	public:
+		//! @brief Merge mode used when merging with other property manager.
+		enum PropertyMergeMode {
+			MergeValuesOnly, //! @brief Merge the property values only.
+			MergeValuesAndNew, //! @brief Merge the property values and add not existing properties.
+			MergeFully, //! @brief Merge property values, property settings and add all missing properties.
+		};
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Constructor
 
 		//! @brief Default constructor.
 		PropertyManager();
+
+		//! @brief Deserialize constructor.
+		PropertyManager(const ConstJsonObject& _jsonObject);
 
 		//! @brief Copy constructor.
 		//! @param _other The PropertyManager to copy from.
@@ -114,6 +128,11 @@ namespace ot {
 		//! @param _property Property to update.
 		void updateProperty(const std::string& _groupName, Property* _property);
 
+		//! @brief Merge the properties with the other manager.
+		//! @param _other Other property manager to copy values and properties from.
+		//! @param _mergeMode Mode to use when merging.
+		void mergeWith(const PropertyManager& _other, PropertyMergeMode _mergeMode = PropertyMergeMode::MergeValuesOnly);
+
 		//! @brief Updates an existing property or creates a new one.
 		//! @param _groupName Name of group to add property to.
 		//! @param _property Property to update.
@@ -124,82 +143,71 @@ namespace ot {
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _value The boolean value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyBool* setBool(const std::string& _groupName, const std::string& _valueName, bool _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyBool* setBool(const std::string& _groupName, const std::string& _valueName, bool _value);
 
 		//! @brief Sets integer property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyInt* setInt(const std::string& _groupName, const std::string& _valueName, int _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyInt* setInt(const std::string& _groupName, const std::string& _valueName, int _value);
 		
 		//! @brief Sets double property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyDouble* setDouble(const std::string& _groupName, const std::string& _valueName, double _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyDouble* setDouble(const std::string& _groupName, const std::string& _valueName, double _value);
 
 		//! @brief Sets string property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyString* setString(const std::string& _groupName, const std::string& _valueName, const std::string& _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyString* setString(const std::string& _groupName, const std::string& _valueName, const std::string& _value);
 
 		//! @brief Sets string property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyStringList* setStringList(const std::string& _groupName, const std::string& _valueName, const std::string& _value, const std::list<std::string>& _possibleValues, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyStringList* setStringList(const std::string& _groupName, const std::string& _valueName, const std::string& _value);
 
 		//! @brief Sets color property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
-		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyColor* setColor(const std::string& _groupName, const std::string& _valueName, const Color& _value, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @param _value The color to set.
+		//! @return Pointer to the set property.
+		PropertyColor* setColor(const std::string& _groupName, const std::string& _valueName, const Color& _value);
 
 		//! @brief Sets painter property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
-		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, Painter2D* _painter, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @param _painter The painter to set.
+		//! @return Pointer to the set property.
+		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, Painter2D* _painter);
 
 		//! @brief Sets painter property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
-		//! @param _value The value to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @param _painter The painter to create copy from.
+		//! @return Pointer to the set property.
+		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter);
 
 		//! @brief Sets file path property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _path The path to set.
-		//! @param _browseMode Browse mode used for file dialog.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyFilePath* setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path, PropertyFilePath::BrowseMode _browseMode = PropertyFilePath::ReadFile, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyFilePath* setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path);
 
 		//! @brief Sets directory path property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _path The path to set.
-		//! @param _flags Property flags used when visualizing the property.
-		//! @return Pointer to the created property.
-		PropertyDirectory* setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path, const Property::PropertyFlags& _flags = Property::PropertyFlag::NoFlags);
+		//! @return Pointer to the set property.
+		PropertyDirectory* setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -292,10 +300,10 @@ namespace ot {
 		//! the property under the currently set property path.
 		//! The callback method is called before the property read operation starts.
 		//! @param _notifier Notifier to add.
-		//! @ref PropertyManagerReadCallbackNotifier
-		void addReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
+		//! @ref PropertyReadCallbackNotifier
+		void addReadCallbackNotifier(PropertyReadCallbackNotifier* _notifier);
 
-		void removeReadCallbackNotifier(PropertyManagerReadCallbackNotifier* _notifier);
+		void removeReadCallbackNotifier(PropertyReadCallbackNotifier* _notifier);
 
 		//! @brief Add write callback notifier.
 		//! The write callback notifier will receive write callbacks for
@@ -303,13 +311,13 @@ namespace ot {
 		//! The callback method is called after the property write operation finishes
 		//! and before the 
 		//! @param _notifier Notifier to add.
-		//! @ref PropertyManagerWriteCallbackNotifierBase
-		void addWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
+		//! @ref PropertyWriteCallbackNotifierBase
+		void addWriteCallbackNotifier(PropertyWriteCallbackNotifierBase* _notifier);
 
 		//! @brief Remove write callback notifier.
 		//! @param _notifier Notifier to remove.
-		//! @ref PropertyManagerWriteCallbackNotifierBase
-		void removeWriteCallbackNotifier(PropertyManagerWriteCallbackNotifierBase* _notifier);
+		//! @ref PropertyWriteCallbackNotifierBase
+		void removeWriteCallbackNotifier(PropertyWriteCallbackNotifierBase* _notifier);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -336,8 +344,7 @@ namespace ot {
 	private:
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
 		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
-		std::map<std::string, PropertyManagerReadCallbackNotifier*> m_readNotifier;
-		std::map<std::string, PropertyManagerWriteCallbackNotifierBase*> m_writeNotifier;
-
+		std::map<std::string, PropertyReadCallbackNotifier*> m_readNotifier;
+		std::map<std::string, PropertyWriteCallbackNotifierBase*> m_writeNotifier;
 	};
 }

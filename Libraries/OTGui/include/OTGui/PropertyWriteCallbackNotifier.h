@@ -1,4 +1,4 @@
-//! @file PropertyManagerWriteCallbackNotifier.h
+//! @file PropertyWriteCallbackNotifier.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -18,12 +18,12 @@ namespace ot {
 
 	class Property;
 
-	//! @class PropertyManagerWriteCallbackNotifierBase
+	//! @class PropertyWriteCallbackNotifierBase
 	//! @brief Base class to receive and forward a write callback for property to the set callback method.
 	//! @ref PropertyManager
-	class PropertyManagerWriteCallbackNotifierBase {
+	class PropertyWriteCallbackNotifierBase {
 	public:
-		PropertyManagerWriteCallbackNotifierBase(const std::string& _propertyPath) :
+		PropertyWriteCallbackNotifierBase(const std::string& _propertyPath) :
 			m_propertyPath(_propertyPath)
 		{}
 
@@ -36,17 +36,17 @@ namespace ot {
 		std::string m_propertyPath;
 	};
 
-	//! @class PropertyManagerWriteCallbackNotifier
+	//! @class PropertyWriteCallbackNotifier
 	//! @brief Base class to receive and forward a write callback for property to the set callback method.
 	//! @tparam T Actual property type used to cast property.
-	template <class T> class PropertyManagerWriteCallbackNotifier : public PropertyManagerWriteCallbackNotifierBase {
-		OT_DECL_NODEFAULT(PropertyManagerWriteCallbackNotifier)
+	template <class T> class PropertyWriteCallbackNotifier : public PropertyWriteCallbackNotifierBase {
+		OT_DECL_NODEFAULT(PropertyWriteCallbackNotifier)
 	public:
 		using ManagerGetType = std::function<PropertyManager* (void)>;
 		using CallbackType = std::function<void(const T*)>;
 
-		PropertyManagerWriteCallbackNotifier(ManagerGetType _getManager, const std::string& m_propertyPath, std::optional<CallbackType> _method);
-		virtual ~PropertyManagerWriteCallbackNotifier();
+		PropertyWriteCallbackNotifier(ManagerGetType _getManager, const std::string& m_propertyPath, std::optional<CallbackType> _method);
+		virtual ~PropertyWriteCallbackNotifier();
 
 		virtual void call(const ot::Property* _property) override;
 		void callType(const T* _property);
@@ -59,8 +59,8 @@ namespace ot {
 }
 
 template <class T>
-ot::PropertyManagerWriteCallbackNotifier<T>::PropertyManagerWriteCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyName, std::optional<CallbackType> _method) :
-	PropertyManagerWriteCallbackNotifierBase(_propertyName), m_method(_method)
+ot::PropertyWriteCallbackNotifier<T>::PropertyWriteCallbackNotifier(ManagerGetType _getManager, const std::string& _propertyName, std::optional<CallbackType> _method) :
+	PropertyWriteCallbackNotifier(_propertyName), m_method(_method)
 {
 	m_manager = _getManager();
 	OTAssertNullptr(m_manager);
@@ -68,21 +68,21 @@ ot::PropertyManagerWriteCallbackNotifier<T>::PropertyManagerWriteCallbackNotifie
 }
 
 template <class T>
-ot::PropertyManagerWriteCallbackNotifier<T>::~PropertyManagerWriteCallbackNotifier() {
+ot::PropertyWriteCallbackNotifier<T>::~PropertyWriteCallbackNotifier() {
 	if (m_manager) {
 		m_manager->removeWriteCallbackNotifier(this);
 	}
 }
 
 template<class T>
-void ot::PropertyManagerWriteCallbackNotifier<T>::call(const ot::Property* _property) {
+void ot::PropertyWriteCallbackNotifier<T>::call(const ot::Property* _property) {
 	const T* prop = static_cast<const T*>(_property);
 	OTAssertNullptr(prop);
 	this->callType(prop);
 }
 
 template <class T>
-void ot::PropertyManagerWriteCallbackNotifier<T>::callType(const T* _property) {
+void ot::PropertyWriteCallbackNotifier<T>::callType(const T* _property) {
 	if (m_method.has_value()) {
 		m_method.value()(_property);
 	}

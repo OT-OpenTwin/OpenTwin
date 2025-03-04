@@ -14,6 +14,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT PropertyColor : public Property {
 		OT_DECL_NOCOPY(PropertyColor)
 	public:
+		using PropertyValueType = Color;
+
 		PropertyColor(const PropertyColor* _other);
 		PropertyColor(const PropertyBase& _base);
 		PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags));
