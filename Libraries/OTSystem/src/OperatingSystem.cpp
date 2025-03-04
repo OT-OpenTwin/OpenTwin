@@ -121,8 +121,8 @@ char * ot::OperatingSystem::getEnvironmentVariable(const char * _variableName) {
 std::string ot::OperatingSystem::getEnvironmentVariableString(const char* _variableName) {
 	std::string result;
 	char* var = OperatingSystem::getEnvironmentVariable(_variableName);
-	result = var;
 	if (var) {
+		result.append(var);
 		free(var);
 	}
 	return result;
