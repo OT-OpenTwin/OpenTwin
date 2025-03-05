@@ -45,7 +45,7 @@ namespace ot {
 		//! @brief Merge mode used when merging with other property manager.
 		enum MergeFlag {
 			NoMerge = 0 << 0, //! @brief No merge flags.
-			MergeValues = 0 << 0, //! @brief Merge values.
+			MergeValues = 1 << 0, //! @brief Merge values.
 			MergeConfig = 1 << 1, //! @brief Merge configuration (e.g. Flags, Name, ...).
 			AddMissing = 1 << 2, //! @brief Add missing entries.
 
