@@ -2,6 +2,8 @@
 #include <string>
 #include "OTCore/Serializable.h"
 
+#pragma warning(disable:4251)
+
 namespace ot
 {
 	struct __declspec(dllexport) QueryInformation : public ot::Serializable
