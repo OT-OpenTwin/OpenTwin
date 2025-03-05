@@ -47,8 +47,8 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 	std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
 
 	// Run sub
-	ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
-	if (result != ot::app::OK) {
+	ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle);
+	if (result.isOk()) {
 		m_clientHandle = nullptr;
 		OT_LOG_E("Failed to start subprocess");
 		return false;

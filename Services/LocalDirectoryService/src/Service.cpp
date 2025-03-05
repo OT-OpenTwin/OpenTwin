@@ -77,7 +77,7 @@ ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, c
 	
 	OT_LOG_D("Starting \"" + launcherName + "\" with command line \"" + commandLine + "\"");
 
-	return ot::app::runApplication(launcherName, commandLine, m_processHandle, false, 0);
+	return ot::app::runApplication(launcherName, commandLine, m_processHandle);
 #else
 	otAssert(0, "Not implemented");
 	return ot::app::GeneralError;

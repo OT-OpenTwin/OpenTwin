@@ -148,15 +148,16 @@ bool ServiceManager::requestStartService(const SessionInformation& _sessionInfor
 bool ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
 	m_mutexRequestedServices.lock();
 
-	ot::app::RunResult result = ot::app::GeneralError;
+	ot::app::RunResult result;
 	Service * newService = new Service(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService));
 
-	while (result != ot::app::OK) {
+	do{
 		// Attempt to start service
 		result = newService->run(_sessionInformation, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
 
-		if (result == ot::app::OK) {
+		if (result.isOk()) {
 			// The relay could be started, now ensure its alive
+			OT_LOG_D("Relay started successfully. Now checking if allive.");
 			ot::JsonDocument checkCommandDoc;
 			checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 			std::string checkCommandString = checkCommandDoc.toJson();
@@ -191,9 +192,11 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 				// Service start failed
 				delete newService;
 
-				OT_LOG_E("Service start failed");
+				OT_LOG_E("Relay Service allive check failed.");
 				return false;
 			}
+			
+			OT_LOG_D("Varified that relay service is allive.");
 
 			_relayServiceURL = newService->url();
 			_websocketUrl = newService->websocketUrl();
@@ -207,10 +210,10 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 			// Service start failed
 			delete newService;
 
-			OT_LOG_E("Service start failed");
+			OT_LOG_E("Service start failed with return value: " + std::to_string(result.m_value) + " and message: " + result.m_message);
 			return false;
 		}
-	}
+	} while (!result.isOk() );
 
 	// Store information
 	m_mutexRequestedServices.unlock();
@@ -503,7 +506,9 @@ void ServiceManager::workerServiceStarter(void) {
 			
 			// Attempt to start service
 			ot::app::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
-			if (result != ot::app::OK) {
+			if (!result.isOk()) {
+				OT_LOG_E("Service start failed with error code: " + std::to_string(result.m_value) + " and error message: " + result.m_message);
+				
 				// Clean up port numbers
 				ot::PortManager::instance().setPortNotInUse(newService->port());
 				ot::PortManager::instance().setPortNotInUse(newService->websocketPort());

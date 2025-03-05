@@ -11,13 +11,15 @@ void setPermissions(const std::string& path)
 	std::string commandLine = exeName + " \"" + path + "\" /grant NETWORKSERVICE:(OI)(CI)F /T";
 
 	HANDLE processHandle = OT_INVALID_PROCESS_HANDLE;
-	if (ot::app::runApplication(exeName, commandLine, processHandle, true) == ot::app::RunResult::OK)
+	ot::app::RunResult result =	ot::app::runApplication(exeName, commandLine, processHandle);
+	if (result.isOk())
 	{
 		std::cout << "Successfully set permissions for NETWORK SERVICE on " << path << std::endl;
 	}
 	else
 	{
 		std::cout << "Failed to set permissions for " << path << std::endl;
+		std::cout << "Error code: " << result.m_value << " error message: " << result.m_message<< std::endl;
 	}
 }
 

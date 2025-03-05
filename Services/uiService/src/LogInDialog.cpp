@@ -538,7 +538,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 				std::string applicationPath = tempFolder + "\\" + fileName;
 				std::string commandLine = "\"" + applicationPath + "\" /S";
 				OT_PROCESS_HANDLE processHandle;
-				ot::app::runApplication(applicationPath, commandLine, processHandle, false);
+				ot::app::runApplication(applicationPath, commandLine, processHandle);
 				exit(0);
 			}
 			else
