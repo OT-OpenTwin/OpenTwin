@@ -352,9 +352,9 @@ ot::PropertyGridCfg Application::createSettings(void) const {
 void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	ApplicationSettings * settings = ApplicationSettings::instance();
 
-	ot::PropertyColor* geomColor = dynamic_cast<ot::PropertyColor*>(_dataset.findPropertyByPath("Geometry/Default Geometry Color"));
-	ot::PropertyStringList* geomNamingMode = dynamic_cast<ot::PropertyStringList*>(_dataset.findPropertyByPath("Geometry/Geometry Naming Mode"));
-	ot::PropertyString* geomCustomName = dynamic_cast<ot::PropertyString*>(_dataset.findPropertyByPath("Geometry/New Geometry Name"));
+	const ot::PropertyColor* geomColor = dynamic_cast<const ot::PropertyColor*>(_dataset.findPropertyByPath("Geometry/Default Geometry Color"));
+	const ot::PropertyStringList* geomNamingMode = dynamic_cast<const ot::PropertyStringList*>(_dataset.findPropertyByPath("Geometry/Geometry Naming Mode"));
+	const ot::PropertyString* geomCustomName = dynamic_cast<const ot::PropertyString*>(_dataset.findPropertyByPath("Geometry/New Geometry Name"));
 	
 	if (geomColor) { settings->geometryDefaultColor = geomColor->getValue(); } else { OTAssert(0, "Item not found"); }
 	if (geomNamingMode) { settings->geometryNamingMode = geomNamingMode->getCurrent(); } else { OTAssert(0, "Item not found"); }

@@ -532,7 +532,7 @@ void ViewerComponent::updateSettings(const ot::PropertyGridCfg& _config)
 void ViewerComponent::loadSettings(ot::PropertyGridCfg& _config)
 {
 	ot::PropertyGridCfg oldConfig = AppBase::instance()->getSettingsFromDataBase(VIEWER_SETTINGS_NAME);
-	_config.mergeWith(oldConfig, true);
+	_config.mergeWith(oldConfig, ot::PropertyBase::MergeValues | ot::PropertyBase::AddMissing);
 }
 
 void ViewerComponent::saveSettings(const ot::PropertyGridCfg& _config)

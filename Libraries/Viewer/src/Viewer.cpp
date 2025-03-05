@@ -1154,35 +1154,35 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 
 	using namespace ot;
 
-	ot::PropertyStringList * workingPlaneStyle = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Working Plane/Grid Style"));
-	ot::PropertyInt * workingPlaneDefaultSize = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Default Size"));
-	ot::PropertyBool * workingPlaneAutoSize = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Size"));
-	ot::PropertyInt * workingPlaneSize = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Size"));
-	ot::PropertyColor * workingPlanePlaneColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Plane Color"));
-	ot::PropertyColor * workingPlaneGridColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Grid Color"));
-	ot::PropertyBool * workingPlaneGridAutoResolution = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Grid Resolution"));
-	ot::PropertyDouble * workingPlaneGridResolution = dynamic_cast<ot::PropertyDouble *>(_dataset.findPropertyByPath("Working Plane/Grid Resolution"));
-	ot::PropertyInt * workingPlaneGridHighlightStep = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Highlight Grid Line"));
-	ot::PropertyInt * workingPlaneGridLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Grid Line Width"));
-	ot::PropertyInt * workingPlaneGridWideLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Wide Grid Line Width"));
+	const ot::PropertyStringList * workingPlaneStyle = dynamic_cast<const ot::PropertyStringList *>(_dataset.findPropertyByPath("Working Plane/Grid Style"));
+	const ot::PropertyInt * workingPlaneDefaultSize = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Default Size"));
+	const ot::PropertyBool * workingPlaneAutoSize = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Size"));
+	const ot::PropertyInt * workingPlaneSize = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Size"));
+	const ot::PropertyColor * workingPlanePlaneColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Plane Color"));
+	const ot::PropertyColor * workingPlaneGridColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Grid Color"));
+	const ot::PropertyBool * workingPlaneGridAutoResolution = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Grid Resolution"));
+	const ot::PropertyDouble * workingPlaneGridResolution = dynamic_cast<const ot::PropertyDouble *>(_dataset.findPropertyByPath("Working Plane/Grid Resolution"));
+	const ot::PropertyInt * workingPlaneGridHighlightStep = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Highlight Grid Line"));
+	const ot::PropertyInt * workingPlaneGridLineWidth = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Grid Line Width"));
+	const ot::PropertyInt * workingPlaneGridWideLineWidth = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Wide Grid Line Width"));
 
-	ot::PropertyColor *axisCrossColorX = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color X-Axis"));
-	ot::PropertyColor *axisCrossColorY = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Y-Axis"));
-	ot::PropertyColor *axisCrossColorZ = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Z-Axis"));
-	ot::PropertyColor *axisCrossColorCenter = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Center Point Color"));
-	ot::PropertyInt *axisCrossCenterCrossLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Axis Cross/Line Width"));
-	ot::PropertyBool *axisCrossDashedLineVisible = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Negative Visible"));
-	ot::PropertyBool *axisCrossCenterCrossAlswaysAtFront = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Keep At Front"));
+	const ot::PropertyColor *axisCrossColorX = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color X-Axis"));
+	const ot::PropertyColor *axisCrossColorY = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Y-Axis"));
+	const ot::PropertyColor *axisCrossColorZ = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Z-Axis"));
+	const ot::PropertyColor *axisCrossColorCenter = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Center Point Color"));
+	const ot::PropertyInt *axisCrossCenterCrossLineWidth = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Axis Cross/Line Width"));
+	const ot::PropertyBool *axisCrossDashedLineVisible = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Negative Visible"));
+	const ot::PropertyBool *axisCrossCenterCrossAlswaysAtFront = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Keep At Front"));
 
-	ot::PropertyColor *geometryHighlightColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/Highlight Color"));
-	ot::PropertyStringList *geometryEdgeColorMode = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Edge Color Mode"));
-	ot::PropertyStringList *geometryLightSourceDistance = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Light Source Distance"));
-	ot::PropertyBool *geometryViewBackgroundColorAutomatic = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Geometry/Automatic View Background Color"));
-	ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
-	ot::PropertyColor *geometryViewForegroundColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Foreground Color"));
+	const ot::PropertyColor *geometryHighlightColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/Highlight Color"));
+	const ot::PropertyStringList *geometryEdgeColorMode = dynamic_cast<const ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Edge Color Mode"));
+	const ot::PropertyStringList *geometryLightSourceDistance = dynamic_cast<const ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Light Source Distance"));
+	const ot::PropertyBool *geometryViewBackgroundColorAutomatic = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Geometry/Automatic View Background Color"));
+	const ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
+	const ot::PropertyColor *geometryViewForegroundColor = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Foreground Color"));
 
-	ot::PropertyBool *useDisplayLists = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Display Lists"));
-	ot::PropertyBool *useVertexBuffers = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Vertex Buffer"));
+	const ot::PropertyBool *useDisplayLists = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Display Lists"));
+	const ot::PropertyBool *useVertexBuffers = dynamic_cast<const ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Vertex Buffer"));
 
 	if (workingPlaneStyle) { settings->workingPlaneStyle = workingPlaneStyle->getCurrent(); } 
 	if (workingPlaneDefaultSize) { settings->workingPlaneDefaultSize = workingPlaneDefaultSize->getValue(); } 

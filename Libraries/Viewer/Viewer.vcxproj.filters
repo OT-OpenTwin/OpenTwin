@@ -151,10 +151,10 @@
     <ClCompile Include="src\GlobalModel.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\CurveVisualiser.cpp">
+    <ClCompile Include="src\PlotVisualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotVisualiser.cpp">
+    <ClCompile Include="src\CurveVisualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
   </ItemGroup>

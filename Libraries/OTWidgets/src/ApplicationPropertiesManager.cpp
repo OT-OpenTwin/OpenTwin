@@ -61,7 +61,7 @@ void ot::ApplicationPropertiesManager::clear(void) {
 
 void ot::ApplicationPropertiesManager::add(const std::string& _owner, const PropertyGridCfg& _config) {
 	PropertyGridCfg oldConfig = this->findData(_owner);
-	oldConfig.mergeWith(_config, m_propertyReplaceOnMerge);
+	oldConfig.mergeWith(_config, (m_propertyReplaceOnMerge ? PropertyBase::FullMerge : PropertyBase::AddMissing | PropertyBase::MergeValues));
 	m_data.insert_or_assign(_owner, oldConfig);
 
 	// If the dialog is visible we need to update the properties displayed there.

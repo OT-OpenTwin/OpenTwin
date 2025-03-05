@@ -455,7 +455,7 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString(), DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_application->m_DBuserCollection);
 
 	if (!oldConfig.isEmpty()) {
-		_config.mergeWith(oldConfig, true);
+		_config.mergeWith(oldConfig, ot::PropertyBase::FullMerge);
 	}
 
 	m_application->settingsSynchronized(_config);

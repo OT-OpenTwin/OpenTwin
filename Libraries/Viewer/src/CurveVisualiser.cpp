@@ -5,14 +5,12 @@
 #include "FrontendAPI.h"
 #include "SceneNodeBase.h"
 
-CurveVisualiser::CurveVisualiser(SceneNodeBase* _sceneNode)
-	:Visualiser(_sceneNode, ot::WidgetViewBase::View1D)
-{
+CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
+	:Visualiser(_sceneNode, ot::WidgetViewBase::View1D) {
 
 }
 
-void CurveVisualiser::visualise(bool _setFocus)
-{
+void CurveVisualiser::visualise(bool _setFocus) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, doc.GetAllocator());
@@ -57,7 +55,7 @@ void CurveVisualiser::visualise(bool _setFocus)
 
 	//ot::Plot plot;
 	//plot.setConfig(curveConfig); 
-	
-	
-	
+
+
+
 }
