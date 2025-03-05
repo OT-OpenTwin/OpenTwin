@@ -51,10 +51,18 @@ ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::
 	}
 }
 
-void ot::PropertyStringList::setValueFromOther(const Property* _other) {
+void ot::PropertyStringList::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
 	const PropertyStringList* other = dynamic_cast<const PropertyStringList*>(_other);
-	m_current = other->m_current;
-	m_list = other->m_list;
+	OTAssertNullptr(other);
+
+	if (_mergeMode & PropertyBase::MergeValues) {	
+		m_current = other->m_current;
+	}
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		m_list = other->m_list;
+	}
 }
 
 ot::Property* ot::PropertyStringList::createCopy(void) const {

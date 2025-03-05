@@ -31,11 +31,19 @@ ot::PropertyString::PropertyString(const std::string& _name, const std::string& 
 	: Property(_name, _flags), m_value(_value), m_maxLength(0)
 {}
 
-void ot::PropertyString::setValueFromOther(const Property* _other) {
+void ot::PropertyString::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
 	const PropertyString* other = dynamic_cast<const PropertyString*>(_other);
-	m_value = other->m_value;
-	m_placeholderText = other->m_placeholderText;
-	m_maxLength = other->m_maxLength;
+	OTAssertNullptr(other);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		m_value = other->m_value;
+	}
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		m_placeholderText = other->m_placeholderText;
+		m_maxLength = other->m_maxLength;
+	}
 }
 
 ot::Property* ot::PropertyString::createCopy(void) const {

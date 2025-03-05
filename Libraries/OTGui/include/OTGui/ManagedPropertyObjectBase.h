@@ -339,7 +339,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with false.
-//!			OT_PROPERTY_BOOL(MyProperty, false);
+//!			OT_PROPERTY_BOOL(MyProperty, "General", "My Property", false);
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -356,7 +356,7 @@
 //!			// The created property will be initialized with false.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_BOOL_CALL(MyProperty, (void), [=](const ot::PropertyBool* _property){
+//!			OT_PROPERTY_BOOL_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyBool* _property){
 //!				this->myPropertyHasChanged(_property->getValue());
 //!			}, false);
 //! 
@@ -378,7 +378,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with 0.
-//!			OT_PROPERTY_INT(MyProperty, 0);
+//!			OT_PROPERTY_INT(MyProperty, "General", "My Property", 0);
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -396,7 +396,7 @@
 //!			// The created property will be initialized with 0.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_INT_CALL(MyProperty, (void), [=](const ot::PropertyInt* _property){
+//!			OT_PROPERTY_INT_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyInt* _property){
 //!				this->myPropertyHasChanged(_property->getValue());
 //!			}, 0);
 //! 
@@ -417,7 +417,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with 0.
-//!			OT_PROPERTY_DOUBLE(MyProperty, 0.0);
+//!			OT_PROPERTY_DOUBLE(MyProperty, "General", "My Property", 0.0);
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -435,7 +435,7 @@
 //!			// The created property will be initialized with 0.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_DOUBLE_CALL(MyProperty, (void), [=](const ot::PropertyDouble* _property){
+//!			OT_PROPERTY_DOUBLE_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyDouble* _property){
 //!				this->myPropertyHasChanged(_property->getValue());
 //!			}, 0.0);
 //! 
@@ -456,7 +456,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with an empty string.
-//!			OT_PROPERTY_STRING(MyProperty, "");
+//!			OT_PROPERTY_STRING(MyProperty, "General", "My Property", "");
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -474,7 +474,7 @@
 //!			// The created property will be initialized with false.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_STRING_CALL(MyProperty, (void), [=](const ot::PropertyString* _property){
+//!			OT_PROPERTY_STRING_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyString* _property){
 //!				this->myPropertyHasChanged(_property->getValue());
 //!			}, false);
 //! 
@@ -495,7 +495,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with the color red.
-//!			OT_PROPERTY_COLOR(MyProperty, ot::Color(ot::Red));
+//!			OT_PROPERTY_COLOR(MyProperty, "General", "My Property", ot::Color(ot::Red));
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -513,7 +513,7 @@
 //!			// The created property will be initialized with the color red.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_COLOR_CALL(MyProperty, (void), [=](const ot::PropertyColor* _property){
+//!			OT_PROPERTY_COLOR_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyColor* _property){
 //!				this->myPropertyHasChanged(_property->getValue());
 //!			}, ot::Color(ot::Red));
 //! 
@@ -534,7 +534,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with a black fill painter.
-//!			OT_PROPERTY_PAINTER2D(MyProperty, new ot::FillPainter(ot::Black));
+//!			OT_PROPERTY_PAINTER2D(MyProperty, "General", "My Property", new ot::FillPainter(ot::Black));
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -552,7 +552,7 @@
 //!			// The created property will be initialized with a black fill painter.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_PAINTER2D_CALL(MyProperty, (void), [=](const ot::PropertyPainter2D* _property) {
+//!			OT_PROPERTY_PAINTER2D_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyPainter2D* _property) {
 //!				this->myPropertyHasChanged(_property->getPainter());
 //!			}, new ot::FillPainter(ot::Black));
 //! 
@@ -573,7 +573,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with an empty string.
-//!			OT_PROPERTY_FILEPATH(MyProperty, "");
+//!			OT_PROPERTY_FILEPATH(MyProperty, "General", "My Property", "");
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -591,7 +591,7 @@
 //!			// The created property will be initialized with an empty string.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_FILEPATH_CALL(MyProperty, (void), [=](const ot::PropertyFilePath* _property){
+//!			OT_PROPERTY_FILEPATH_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyFilePath* _property){
 //!				this->myPropertyHasChanged(_property->getPath());
 //!			}, false);
 //! 
@@ -612,7 +612,7 @@
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with an empty string.
-//!			OT_PROPERTY_DIRECTORYPATH(MyProperty, "");
+//!			OT_PROPERTY_DIRECTORYPATH(MyProperty, "General", "My Property", "");
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
@@ -630,7 +630,7 @@
 //!			// The created property will be initialized with an empty string.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_PROPERTY_DIRECTORYPATH_CALL(MyProperty, (void), [=](const ot::PropertyDirectory* _property){
+//!			OT_PROPERTY_DIRECTORYPATH_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyDirectory* _property){
 //!				this->myPropertyHasChanged(_property->getPath());
 //!			}, "");
 //! 
@@ -651,7 +651,8 @@
 
 // Convenience properties
 
-
+//! @def OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
+//! @brief Add setter and getter methods for an object that is based on two basic properties
 #define OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ___valueType, ___propertyBaseTypeName, ___propertyObjectName_1, ___propertyGetter_1, ___propertyObjectName_2, ___propertyGetter_2) \
 	public: \
 		void set##___propertyObjectName(const ___valueType& _value) { \
@@ -679,41 +680,241 @@
 			); \
 		}
 
+//! @def OT_PROPERTY_POINT2D
+//! @brief Declare a Point2D property.
+//! Creates two integer properties.
+//! Will register the properties at the objects PropertyManager.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with 0.
+//!			OT_PROPERTY_POINT2D(MyProperty, "General", "My Property", 0, 0);
+//!		};
+//! 
+//! The generated object names for the base type will get the ("X"; "Y") suffix.
+//! The generated property names for the base type will get the (" X"; " Y") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_INT
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_POINT2D(___propertyObjectName, ___propertyGroup, ___propertyName, ___x, ___y) \
 	OT_PROPERTY_INT(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
 	OT_PROPERTY_INT(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2D, Int, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
+//! @def OT_PROPERTY_POINT2D_CALL
+//! @brief Declare a Point2D property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Lambdas for getter and setter method can be provided.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with the color red.
+//!			// The getter will remain default.
+//!			// The setter will call the virtual method myPropertyHasChanged.
+//!			OT_PROPERTY_POINT2D_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyInt* _property){
+//!				// Since the Point2D is not a base type for properties 
+//!				// the macro will create different base properties.
+//!				if (_property->getPropertyName() == "My Property X") {
+//!					this->myWidthPropertyHasChanged(_property->getValue());
+//!				}
+//!				else {
+//!					this->myHeightPropertyHasChanged(_property->getValue());
+//!				}
+//!			}, 0, 0);
+//! 
+//!		protected:
+//!			virtual void myXPropertyHasChanged(int _newValue) {};
+//!			virtual void myYPropertyHasChanged(int _newValue) {};
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_DOUBLE_CALL
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_POINT2D_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___x, ___y) \
 	OT_PROPERTY_INT_CALL(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
 	OT_PROPERTY_INT_CALL(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2D, Int, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
+//! @def OT_PROPERTY_POINT2D
+//! @brief Declare a Point2D property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with 0.
+//!			OT_PROPERTY_POINT2D(MyProperty, "General", "My Property", 0, 0);
+//!		};
+//! 
+//! The generated object names for the base type will get the ("X"; "Y") suffix.
+//! The generated property names for the base type will get the (" X"; " Y") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_DOUBLE
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_POINT2DD(___propertyObjectName, ___propertyGroup, ___propertyName, ___x, ___y) \
 	OT_PROPERTY_DOUBLE(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___x) \
 	OT_PROPERTY_DOUBLE(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2DD, Double, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
+//! @def OT_PROPERTY_POINT2DD_CALL
+//! @brief Declare a Point2DD property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Lambdas for getter and setter method can be provided.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with the color red.
+//!			// The getter will remain default.
+//!			// The setter will call the virtual method myPropertyHasChanged.
+//!			OT_PROPERTY_POINT2DD_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyDouble* _property){
+//!				// Since the Point2DD is not a base type for properties 
+//!				// the macro will create different base properties.
+//!				if (_property->getPropertyName() == "My Property X") {
+//!					this->myWidthPropertyHasChanged(_property->getValue());
+//!				}
+//!				else {
+//!					this->myHeightPropertyHasChanged(_property->getValue());
+//!				}
+//!			}, 0.0, 0.0);
+//! 
+//!		protected:
+//!			virtual void myXPropertyHasChanged(double _newValue) {};
+//!			virtual void myYPropertyHasChanged(double _newValue) {};
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_DOUBLE_CALL
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_POINT2DD_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___x, ___y) \
 	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##X, ___propertyGroup, ___propertyName + std::string(" X"), ___setterCompletedCallback, ___getterStartedCallback, ___x) \
 	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Y, ___propertyGroup, ___propertyName + std::string(" Y"), ___setterCompletedCallback, ___getterStartedCallback, ___y) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Point2DD, Double, ___propertyName + std::string(" X"), x, ___propertyName + std::string(" Y"), y)
 
+//! @def OT_PROPERTY_SIZE2D
+//! @brief Declare a Size2D property.
+//! Creates two integer properties.
+//! Will register the properties at the objects PropertyManager.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with 0.
+//!			OT_PROPERTY_SIZE2D(MyProperty, "General", "My Property", 0, 0);
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_INT
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_SIZE2D(___propertyObjectName, ___propertyGroup, ___propertyName, ___width, ___height) \
 	OT_PROPERTY_INT(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
 	OT_PROPERTY_INT(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2D, Int, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
+//! @def OT_PROPERTY_SIZE2D_CALL
+//! @brief Declare a Size2D property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Lambdas for getter and setter method can be provided.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with the color red.
+//!			// The getter will remain default.
+//!			// The setter will call the virtual method myPropertyHasChanged.
+//!			OT_PROPERTY_SIZE2D_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyInt* _property){
+//!				// Since the Size2D is not a base type for properties 
+//!				// the macro will create different base properties.
+//!				if (_property->getPropertyName() == "My Property Width") {
+//!					this->myWidthPropertyHasChanged(_property->getValue());
+//!				}
+//!				else {
+//!					this->myHeightPropertyHasChanged(_property->getValue());
+//!				}
+//!			}, 0, 0);
+//! 
+//!		protected:
+//!			virtual void myWidthPropertyHasChanged(int _newValue) {};
+//!			virtual void myHeightPropertyHasChanged(int _newValue) {};
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_INT_CALL
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_SIZE2D_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___width, ___height) \
 	OT_PROPERTY_INT_CALL(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
 	OT_PROPERTY_INT_CALL(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2D, Int, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
+//! @def OT_PROPERTY_SIZE2DD
+//! @brief Declare a Size2DD property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with 0.
+//!			OT_PROPERTY_SIZE2DD(MyProperty, "General", "My Property", 0.0, 0.0);
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_DOUBLE
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_SIZE2DD(___propertyObjectName, ___propertyGroup, ___propertyName, ___width, ___height) \
 	OT_PROPERTY_DOUBLE(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___width) \
 	OT_PROPERTY_DOUBLE(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___height) \
 	OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2(___propertyObjectName, ___propertyGroup, ot::Size2DD, Double, ___propertyName + std::string(" Width"), width, ___propertyName + std::string(" Height"), height)
 
+//! @def OT_PROPERTY_SIZE2DD
+//! @brief Declare a Size2DD property.
+//! Creates two double properties.
+//! Will register the properties at the objects PropertyManager.
+//! Lambdas for getter and setter method can be provided.
+//! Use in the following way: <br>
+//! 
+//!		class MyClass : public ManagedPropertyObject {
+//!			// This will add the getMyProperty and setMyPropertyMethods.
+//!			// The created property will be initialized with the color red.
+//!			// The getter will remain default.
+//!			// The setter will call the virtual method myPropertyHasChanged.
+//!			OT_PROPERTY_SIZE2DD_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyDouble* _property){
+//!				// Since the Size2DD is not a base type for properties 
+//!				// the macro will create different base properties.
+//!				if (_property->getPropertyName() == "My Property Width") {
+//!					this->myWidthPropertyHasChanged(_property->getValue());
+//!				}
+//!				else {
+//!					this->myHeightPropertyHasChanged(_property->getValue());
+//!				}
+//!			}, 0.0, 0.0);
+//! 
+//!		protected:
+//!			virtual void myWidthPropertyHasChanged(double _newValue) {};
+//!			virtual void myHeightPropertyHasChanged(double _newValue) {};
+//!		};
+//! 
+//! The generated object names for the base type will get the ("Width"; "Name") suffix.
+//! The generated property names for the base type will get the (" Width"; " Name") suffix.
+//! @note The object using this macro must inherit from ManagedPropertyObject.
+//! @ref OT_PROPERTY_DOUBLE_CALL
+//! @ref OT_ADD_BASIC_COMBO_PROPERTY_SETTERGETTER_2
 #define OT_PROPERTY_SIZE2DD_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ___width, ___height) \
 	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Width, ___propertyGroup, ___propertyName + std::string(" Width"), ___setterCompletedCallback, ___getterStartedCallback, ___width) \
 	OT_PROPERTY_DOUBLE_CALL(___propertyObjectName##Height, ___propertyGroup, ___propertyName + std::string(" Height"), ___setterCompletedCallback, ___getterStartedCallback, ___height) \

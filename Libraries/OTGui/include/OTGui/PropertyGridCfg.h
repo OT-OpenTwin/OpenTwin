@@ -9,7 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/PropertyBase.h"
 
 // std header
 #include <list>
@@ -41,10 +41,10 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		//! \brief Adds the contents of the other configuration to this configuration.
-		//! \param _other Other configuration to merge into this.
-		//! \param _replaceExistingProperties If enabled existing properties will be replaced with their corresponding property in the other group. Note that the property type may change if the other group contains a different property type.
-		void mergeWith(const PropertyGridCfg& _other, bool _replaceExistingProperties);
+		//! @brief Adds the contents of the other configuration to this configuration.
+		//! @param _other Other configuration to merge into this.
+		//! @param _mergeMode Merge mode to use.
+		void mergeWith(const PropertyGridCfg& _other, const PropertyBase::MergeMode& _mergeMode);
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
@@ -55,18 +55,27 @@ namespace ot {
 		const PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
-		//! \brief Returns all properties of all groups and nested groups.
+		//! @brief Returns all properties of all groups and nested groups.
 		std::list<Property*> getAllProperties(void) const;
 		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
 
-		//! \brief Returns the property at the given path.
-		//! \see Property* findPropertyByPath(const std::list<std::string>& _path)
-		Property* findPropertyByPath(const std::string& _path, char _delimiter = '/') const;
+		//! @brief Returns the property at the given path.
+		//! @ref Property* findPropertyByPath(const std::list<std::string>& _path)
+		Property* findPropertyByPath(const std::string& _path, char _delimiter = '/');
 
-		//! \brief Returns the property at the given path.
+		//! @brief Returns the property at the given path.
+		//! @ref Property* findPropertyByPath(const std::list<std::string>& _path)
+		const Property* findPropertyByPath(const std::string& _path, char _delimiter = '/') const;
+
+		//! @brief Returns the property at the given path.
 		//! The path contains the group names from root to the item.
 		//! The last path entry must be the property name.
-		Property* findPropertyByPath(std::list<std::string> _path) const;
+		Property* findPropertyByPath(std::list<std::string> _path);
+
+		//! @brief Returns the property at the given path.
+		//! The path contains the group names from root to the item.
+		//! The last path entry must be the property name.
+		const Property* findPropertyByPath(std::list<std::string> _path) const;
 
 		//! \brief Returns false if at least one property exists in any of the groups and its child groups.
 		bool isEmpty(void) const;

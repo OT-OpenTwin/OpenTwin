@@ -35,11 +35,19 @@ void ot::PropertyFilePath::addFilter(const FilterInfo& _info) {
 	m_filters.push_back(_info);
 }
 
-void ot::PropertyFilePath::setValueFromOther(const Property* _other) {
+void ot::PropertyFilePath::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
 	const PropertyFilePath* other = dynamic_cast<const PropertyFilePath*>(_other);
-	m_path = other->m_path;
-	m_browseMode = other->m_browseMode;
-	m_filters = other->m_filters;
+	OTAssertNullptr(other);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		m_path = other->m_path;
+	}
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		m_browseMode = other->m_browseMode;
+		m_filters = other->m_filters;
+	}
 }
 
 ot::Property* ot::PropertyFilePath::createCopy(void) const {

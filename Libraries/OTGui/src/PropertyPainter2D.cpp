@@ -64,9 +64,14 @@ ot::PropertyPainter2D::~PropertyPainter2D() {
 	m_painter = nullptr;
 }
 
-void ot::PropertyPainter2D::setValueFromOther(const Property* _other) {
-	const PropertyPainter2D* other = dynamic_cast<const PropertyPainter2D*>(_other);
-	this->setPainter(other->getPainter()->createCopy());
+void ot::PropertyPainter2D::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		const PropertyPainter2D* other = dynamic_cast<const PropertyPainter2D*>(_other);
+		OTAssertNullptr(other);
+		this->setPainter(other->getPainter()->createCopy());
+	}
 }
 
 ot::Property* ot::PropertyPainter2D::createCopy(void) const {

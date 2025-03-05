@@ -20,6 +20,7 @@
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyManagerNotifier.h"
+#include "OTGui/PropertyManagerIterator.h"
 #include "OTGui/PropertyReadCallbackNotifier.h"
 #include "OTGui/PropertyWriteCallbackNotifier.h"
 
@@ -136,7 +137,7 @@ void ot::PropertyManager::updateProperty(const std::string& _groupName, Property
 
 	Property* prop = this->findProperty(_groupName, _property->getPropertyName());
 	if (prop) {
-		prop->setValueFromOther(_property);
+		prop->mergeWith(_property, PropertyBase::MergeValues);
 
 		delete _property;
 	}
@@ -147,8 +148,28 @@ void ot::PropertyManager::updateProperty(const std::string& _groupName, Property
 	this->propertyChanged(prop);
 }
 
-void ot::PropertyManager::mergeWith(const PropertyManager& _other, PropertyMergeMode _mergeMode) {
-	
+void ot::PropertyManager::mergeWith(const PropertyManager& _other, const PropertyBase::MergeMode& _mergeMode) {
+	for (const auto& newIt : _other.getData()) {
+		OTAssertNullptr(newIt.second);
+
+		PropertyGroup* grp = nullptr;
+
+		for (const auto& oldIt : m_groups) {
+			if (oldIt.first == newIt.first) {
+				OTAssertNullptr(oldIt.second);
+				grp = oldIt.second;
+				break;
+			}
+		}
+
+		if (grp) {
+			grp->mergeWith(*newIt.second, _mergeMode);
+		}
+		else if (_mergeMode & Property::AddMissing) {
+			// Add copy of whole missing group
+			m_groups.insert_or_assign(newIt.first, new PropertyGroup(*newIt.second));
+		}
+	}
 }
 
 void ot::PropertyManager::updateProperty(const std::string& _groupName, const Property* _property, bool _deleteProvidedProperty) {
@@ -156,7 +177,7 @@ void ot::PropertyManager::updateProperty(const std::string& _groupName, const Pr
 
 	Property* prop = this->findProperty(_groupName, _property->getPropertyName());
 	if (prop) {
-		prop->setValueFromOther(_property);
+		prop->mergeWith(_property, PropertyBase::MergeValues);
 	}
 	else {
 		prop = this->addProperty(_groupName, _property->createCopy());
@@ -295,7 +316,17 @@ ot::PropertyDirectory* ot::PropertyManager::setDirectory(const std::string& _gro
 
 // Getter
 
-ot::Property* ot::PropertyManager::findProperty(const std::string& _groupName, const std::string& _valueName) const {
+ot::Property* ot::PropertyManager::findProperty(const std::string& _groupName, const std::string& _valueName) {
+	ot::PropertyGroup* grp = this->findGroup(_groupName);
+	if (grp) {
+		return grp->findPropertyByPath(_valueName);
+	}
+	else {
+		return nullptr;
+	}
+}
+
+const ot::Property* ot::PropertyManager::findProperty(const std::string& _groupName, const std::string& _valueName) const {
 	const ot::PropertyGroup* grp = this->findGroup(_groupName);
 	if (grp) {
 		return grp->findPropertyByPath(_valueName);

@@ -19,9 +19,14 @@ ot::PropertyDirectory::PropertyDirectory(const PropertyBase& _base)
 	: Property(_base)
 {}
 
-void ot::PropertyDirectory::setValueFromOther(const Property* _other) {
-	const PropertyDirectory* other = dynamic_cast<const PropertyDirectory*>(_other);
-	m_path = other->m_path;
+void ot::PropertyDirectory::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		const PropertyDirectory* other = dynamic_cast<const PropertyDirectory*>(_other);
+		OTAssertNullptr(other);
+		m_path = other->m_path;
+	}
 }
 
 ot::Property* ot::PropertyDirectory::createCopy(void) const {

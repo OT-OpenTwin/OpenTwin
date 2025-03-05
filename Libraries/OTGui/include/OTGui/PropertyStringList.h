@@ -33,7 +33,7 @@ namespace ot {
 		static std::string propertyTypeString(void) { return "StringList"; };
 		virtual std::string getPropertyType(void) const override { return PropertyStringList::propertyTypeString(); };
 
-		virtual void setValueFromOther(const Property* _other) override;
+		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode) override;
 
 		virtual Property* createCopy(void) const override;
 

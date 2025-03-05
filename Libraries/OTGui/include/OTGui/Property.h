@@ -62,7 +62,7 @@ namespace ot {
 		//! @brief Set the property values from the other property.
 		//! The base date won't be changed (base class method does nothing).
 		//! @param _other Other property.
-		virtual void setValueFromOther(const Property* _other);
+		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode = MergeFlag::MergeValues);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference

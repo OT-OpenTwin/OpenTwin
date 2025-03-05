@@ -32,10 +32,18 @@ ot::PropertyColor::PropertyColor(const std::string & _name, ot::Color _value, Pr
 	Property(_name, _flags), m_value(_value), m_includeAlpha(false)
 {}
 
-void ot::PropertyColor::setValueFromOther(const Property* _other) {
+void ot::PropertyColor::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
 	const PropertyColor* other = dynamic_cast<const PropertyColor*>(_other);
-	m_value = other->m_value;
-	m_includeAlpha = other->m_includeAlpha;
+	OTAssertNullptr(other);
+
+	if (_mergeMode & PropertyBase::MergeValues) {	
+		m_value = other->m_value;
+	}
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		m_includeAlpha = other->m_includeAlpha;
+	}
 }
 
 ot::Property* ot::PropertyColor::createCopy(void) const {

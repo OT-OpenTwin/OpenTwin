@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/PropertyBase.h"
 
 // std header
 #include <list>
@@ -57,8 +57,7 @@ namespace ot {
 		//! \brief Adds the contents of the other configuration to this configuration.
 		//! If an improved merge is required just subclass and implement 
 		//! \param _other Other group to merge into this.
-		//! \param _replaceExistingProperties If enabled existing properties will be replaced with their corresponding property in the other group. Note that the property type may change if the other group contains a different property type.
-		virtual void mergeWith(const PropertyGroup& _other, bool _replaceExistingProperties);
+		virtual void mergeWith(const PropertyGroup& _other, const PropertyBase::MergeMode& _mergeMode);
 
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
 		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
@@ -95,11 +94,23 @@ namespace ot {
 		//! \brief Returns all properties of all groups and nested groups.
 		std::list<Property*> getAllProperties(void) const;
 
-		//! \brief Returns the property at the given path.
-		//! The path contains the group names from root to the item.
-		//! The last path entry must be the property name.
-		Property* findPropertyByPath(std::list<std::string> _path) const;
-		Property* findPropertyByPath(const std::string& _path, char _pathDelimiter = '/') const;
+		//! @brief Returns the property at the given path.
+		//! @param _path Path to property. The path entry must be the property name.
+		Property* findPropertyByPath(std::list<std::string> _path);
+		
+		//! @brief Returns the property at the given path.
+		//! @param _path Path to property. The path substring must be the property name.
+		//! @param _pathDelimiter Delimiter used to split the path.
+		Property* findPropertyByPath(const std::string& _path, char _pathDelimiter = '/');
+
+		//! @brief Returns the property at the given path.
+		//! @param _path Path to property. The path entry must be the property name.
+		const Property* findPropertyByPath(std::list<std::string> _path) const;
+
+		//! @brief Returns the property at the given path.
+		//! @param _path Path to property. The path substring must be the property name.
+		//! @param _pathDelimiter Delimiter used to split the path.
+		const Property* findPropertyByPath(const std::string& _path, char _pathDelimiter = '/') const;
 
 		//! @brief Set the child groups.
 		//! This group takes ownership of the groups.

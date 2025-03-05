@@ -29,3 +29,11 @@ void ot::ManagedPropertyObject::addPropertiesToJsonObject(ot::JsonValue& _object
 void ot::ManagedPropertyObject::setPropertiesFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_manager->setFromJsonObject(_object);
 }
+
+ot::Property* ot::ManagedPropertyObject::findProperty(const std::string& _groupName, const std::string& _valueName) {
+	return m_manager->findProperty(_groupName, _valueName);
+}
+
+const ot::Property* ot::ManagedPropertyObject::findProperty(const std::string& _groupName, const std::string& _valueName) const {
+	return m_manager->findProperty(_groupName, _valueName);
+}

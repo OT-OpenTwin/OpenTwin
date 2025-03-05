@@ -72,14 +72,14 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	}
 }
 
-void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, bool _replaceExistingProperties) {
+void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, const PropertyBase::MergeMode& _mergeMode) {
 	if (this == &_other) return;
 
 	for (const PropertyGroup* group : _other.getRootGroups()) {
 		bool found = false;
 		for (PropertyGroup* ownGroup : m_rootGroups) {
 			if (group->getName() == ownGroup->getName()) {
-				ownGroup->mergeWith(*group, _replaceExistingProperties);
+				ownGroup->mergeWith(*group, _mergeMode);
 				found = true;
 				break;
 			}
@@ -149,11 +149,28 @@ std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const 
 	return ret;
 }
 
-ot::Property* ot::PropertyGridCfg::findPropertyByPath(const std::string& _path, char _delimiter) const {
+ot::Property* ot::PropertyGridCfg::findPropertyByPath(const std::string& _path, char _delimiter) {
 	return this->findPropertyByPath(ot::String::split(_path, _delimiter, true));
 }
 
-ot::Property* ot::PropertyGridCfg::findPropertyByPath(std::list<std::string> _path) const {
+const ot::Property* ot::PropertyGridCfg::findPropertyByPath(const std::string& _path, char _delimiter) const {
+	return this->findPropertyByPath(ot::String::split(_path, _delimiter, true));
+}
+
+ot::Property* ot::PropertyGridCfg::findPropertyByPath(std::list<std::string> _path) {
+	if (_path.empty()) return nullptr;
+	std::string rootName = _path.front();
+	_path.pop_front();
+
+	for (PropertyGroup* group : m_rootGroups) {
+		if (group->getName() == rootName) {
+			return group->findPropertyByPath(_path);
+		}
+	}
+	return nullptr;
+}
+
+const ot::Property* ot::PropertyGridCfg::findPropertyByPath(std::list<std::string> _path) const {
 	if (_path.empty()) return nullptr;
 	std::string rootName = _path.front();
 	_path.pop_front();

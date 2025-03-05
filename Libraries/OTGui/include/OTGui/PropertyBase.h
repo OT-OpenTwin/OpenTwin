@@ -42,6 +42,18 @@ namespace ot {
 		//! \copybrief PropertyBase::PropertyFlag
 		typedef Flags<PropertyFlag> PropertyFlags;
 
+		//! @brief Merge mode used when merging with other property manager.
+		enum MergeFlag {
+			NoMerge = 0 << 0, //! @brief No merge flags.
+			MergeValues = 0 << 0, //! @brief Merge values.
+			MergeConfig = 1 << 1, //! @brief Merge configuration (e.g. Flags, Name, ...).
+			AddMissing = 1 << 2, //! @brief Add missing entries.
+
+			//! @brief All merge flags set.
+			FullMerge = MergeValues | MergeConfig | AddMissing
+		};
+		typedef Flags<MergeFlag> MergeMode;
+
 		//! \brief Creates a string representation of the provided PropertyFlag.
 		static std::string toString(PropertyFlag _flag);
 
@@ -88,6 +100,11 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! @brief Set the property values from the other property.
+		//! The base date won't be changed (base class method does nothing).
+		//! @param _other Other property.
+		void mergeWith(const PropertyBase& _other, const MergeMode& _mergeMode = MergeFlag::MergeValues);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
@@ -131,4 +148,5 @@ namespace ot {
 
 }
 
+OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::MergeFlag)
 OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::PropertyFlag)

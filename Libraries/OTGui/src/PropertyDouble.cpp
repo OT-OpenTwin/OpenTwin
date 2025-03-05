@@ -35,12 +35,20 @@ ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, doub
 	: Property(_name, _flags), m_value(_value), m_min(_min), m_max(_max), m_precision(2)
 {}
 
-void ot::PropertyDouble::setValueFromOther(const Property* _other) {
+void ot::PropertyDouble::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
 	const PropertyDouble* other = dynamic_cast<const PropertyDouble*>(_other);
-	m_value = other->m_value;
-	m_min = other->m_min;
-	m_max = other->m_max;
-	m_precision = other->m_precision;
+	OTAssertNullptr(other);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		m_value = other->m_value;
+	}
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		m_min = other->m_min;
+		m_max = other->m_max;
+		m_precision = other->m_precision;
+	}
 }
 
 ot::Property* ot::PropertyDouble::createCopy(void) const {

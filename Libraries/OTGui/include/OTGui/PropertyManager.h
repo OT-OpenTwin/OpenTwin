@@ -7,12 +7,14 @@
 
 // OpenTwin header
 #include "OTCore/Rect.h"
+#include "OTCore/Flags.h"
 #include "OTCore/Color.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/Point3D.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Property.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/PropertyFilePath.h"
@@ -44,15 +46,6 @@ namespace ot {
 	//! It also supports serialization to and from JSON objects.
 	class OT_GUI_API_EXPORT PropertyManager : public Serializable {
 	public:
-		//! @brief Merge mode used when merging with other property manager.
-		enum PropertyMergeMode {
-			MergeValuesOnly, //! @brief Merge the property values only.
-			MergeValuesAndNew, //! @brief Merge the property values and add not existing properties.
-			MergeFully, //! @brief Merge property values, property settings and add all missing properties.
-		};
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
 		// Constructor
 
 		//! @brief Default constructor.
@@ -131,7 +124,7 @@ namespace ot {
 		//! @brief Merge the properties with the other manager.
 		//! @param _other Other property manager to copy values and properties from.
 		//! @param _mergeMode Mode to use when merging.
-		void mergeWith(const PropertyManager& _other, PropertyMergeMode _mergeMode = PropertyMergeMode::MergeValuesOnly);
+		void mergeWith(const PropertyManager& _other, const PropertyBase::MergeMode& _mergeMode = PropertyBase::MergeValues);
 
 		//! @brief Updates an existing property or creates a new one.
 		//! @param _groupName Name of group to add property to.
@@ -152,7 +145,7 @@ namespace ot {
 		//! @param _value The value to set.
 		//! @return Pointer to the set property.
 		PropertyInt* setInt(const std::string& _groupName, const std::string& _valueName, int _value);
-		
+
 		//! @brief Sets double property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
@@ -217,7 +210,13 @@ namespace ot {
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return Pointer to the found Property, or nullptr if not found.
-		Property* findProperty(const std::string& _groupName, const std::string& _valueName) const;
+		Property* findProperty(const std::string& _groupName, const std::string& _valueName);
+
+		//! @brief Finds a property by group and name.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return Pointer to the found Property, or nullptr if not found.
+		const Property* findProperty(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Retrieves boolean property value.
 		//! @param _groupName The property group name.
@@ -284,6 +283,10 @@ namespace ot {
 
 		//! @brief Removes all groups and properties.
 		void clear(void);
+
+		//! @brief Return data that is managed by this property manager.
+		//! @return Const reference to used object name to its PropertyGroup map.
+		const std::map<std::string, PropertyGroup*>& getData(void) const { return m_groups; };
 
 		//! @brief Register property manager notifier.
 		//! @param _notifier Notifier to add.

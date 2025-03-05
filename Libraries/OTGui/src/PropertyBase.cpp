@@ -98,6 +98,12 @@ void ot::PropertyBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_flags = this->stringListToFlags(json::getStringList(_object, "Flags"));
 }
 
+void ot::PropertyBase::mergeWith(const PropertyBase& _other, const MergeMode& _mergeMode) {
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		this->PropertyBase::operator=(_other);
+	}
+}
+
 ot::PropertyBase::PropertyBase(PropertyFlags _flags)
 	: m_flags(_flags)
 {}

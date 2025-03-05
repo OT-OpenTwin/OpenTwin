@@ -62,8 +62,8 @@ ot::Property* ot::Property::createCopyWithParents(void) const {
 	return newProperty;
 }
 
-void ot::Property::setValueFromOther(const Property* _other) {
-	
+void ot::Property::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	PropertyBase::mergeWith(*_other, _mergeMode);
 }
 
 ot::PropertyGroup* ot::Property::getRootGroup(void) const {

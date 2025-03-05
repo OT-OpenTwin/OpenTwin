@@ -31,9 +31,14 @@ ot::PropertyBool::PropertyBool(const std::string& _name, bool _value, PropertyFl
 	: Property(_name, _flags), m_value(_value) 
 {}
 
-void ot::PropertyBool::setValueFromOther(const Property* _other) {
-	const PropertyBool* other = dynamic_cast<const PropertyBool*>(_other);
-	m_value = other->m_value;
+void ot::PropertyBool::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
+	Property::mergeWith(_other, _mergeMode);
+
+	if (_mergeMode & PropertyBase::MergeValues) {
+		const PropertyBool* other = dynamic_cast<const PropertyBool*>(_other);
+		OTAssertNullptr(other);
+		m_value = other->m_value;
+	}
 }
 
 ot::Property* ot::PropertyBool::createCopy(void) const {

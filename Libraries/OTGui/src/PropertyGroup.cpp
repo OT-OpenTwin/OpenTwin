@@ -107,65 +107,48 @@ void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
-void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExistingProperties) {
-	if (this == &_other) return;
+void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, const PropertyBase::MergeMode& _mergeMode) {
+	if (_mergeMode & PropertyBase::MergeConfig) {
+		OTAssert(m_name == _other.m_name, "It is assumed that the names are equal before a merge");
+		m_title = _other.m_title;
+	}
 
-	for (const PropertyGroup* group : _other.getChildGroups()) {
+	for (const PropertyGroup* otherGroup : _other.getChildGroups()) {
+		OTAssertNullptr(otherGroup);
 		bool found = false;
+
 		for (PropertyGroup* ownGroup : m_childGroups) {
-			if (group->getName() == ownGroup->getName()) {
-				ownGroup->mergeWith(*group, _replaceExistingProperties);
+			OTAssertNullptr(ownGroup);
+			if (otherGroup->getName() == ownGroup->getName()) {
+				ownGroup->mergeWith(*otherGroup, _mergeMode);
 				found = true;
 				break;
 			}
 		}
-		if (!found) {
-			this->addChildGroup(new PropertyGroup(*group));
+		if (!found && _mergeMode & Property::AddMissing) {
+			this->addChildGroup(new PropertyGroup(*otherGroup));
 		}
 	}
 
-	std::list<ot::Property*> otherProperties = _other.getProperties();
-
-	bool replaced = true;
-	while (replaced && !otherProperties.empty()) {
-		if (_replaceExistingProperties) replaced = false;
-		const Property* prop = otherProperties.front();
-		otherProperties.pop_front();
-
+	for (const Property* otherProp : _other.getProperties()) {
+		OTAssertNullptr(otherProp);
 		bool found = false;
-		for (Property* ownProp : m_properties) {
-			if (prop->getPropertyName() == ownProp->getPropertyName()) {
-				if (_replaceExistingProperties) {
-					// Replace
-					auto it = std::find(m_properties.begin(), m_properties.end(), ownProp);
-					OTAssert(it != m_properties.end(), "Data mismatch");
-					Property* newProperty = prop->createCopy();
-					newProperty->setParentGroup(this);
-					*it = newProperty;
-					ownProp->setParentGroup(nullptr);
-					delete ownProp;
-					replaced = true;
-					found = true;
-					break;
-				}
-				else {
-					found = true;
-					break;
-				}
+		for (Property* prop : m_properties) {
+			OTAssertNullptr(prop);
+			if (prop->getPropertyName() == otherProp->getPropertyName()) {
+				prop->mergeWith(otherProp, _mergeMode);
+				found = true;
+				break;
 			}
 		}
-
-		if (!found) {
-			Property* newProperty = prop->createCopy();
-			newProperty->setParentGroup(this);
-			m_properties.push_back(newProperty);
+		if (!found && _mergeMode & Property::AddMissing) {
+			m_properties.push_back(otherProp->createCopy());
 		}
 	}
 }
 
 ot::PropertyGroup* ot::PropertyGroup::getRootGroup(void) {
-	if (m_parentGroup) return m_parentGroup->getRootGroup();
-	else return this;
+	return (m_parentGroup ? m_parentGroup->getRootGroup() : this);
 }
 
 void ot::PropertyGroup::setProperties(const std::list<Property*>& _properties)
@@ -215,12 +198,18 @@ std::list<ot::Property*> ot::PropertyGroup::getAllProperties(void) const {
 	return ret;
 }
 
-ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path) const {
-	if (_path.empty()) return nullptr;
+ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path) {
+	// Ensure the path is not empty
+	if (_path.empty()) {
+		return nullptr;
+	}
+
+	// Get next root node
 	std::string rootName = _path.front();
 	_path.pop_front();
 
 	if (_path.empty()) {
+		// Node is last is list, search in properties
 		for (Property* prop : m_properties) {
 			if (prop->getPropertyName() == rootName) {
 				return prop;
@@ -228,16 +217,53 @@ ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path
 		}
 	}
 	else {
+		// Node is not a property, search in child groups
+		for (PropertyGroup* group : m_childGroups) {
+			if (group->getName() == rootName) {
+				return group->findPropertyByPath(_path);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+ot::Property* ot::PropertyGroup::findPropertyByPath(const std::string& _path, char _pathDelimiter) {
+	OTAssert(!_path.empty(), "Empty path provided");
+	return this->findPropertyByPath(String::split(_path, _pathDelimiter, true));
+}
+
+const ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path) const {
+	// Ensure the path is not empty
+	if (_path.empty()) {
+		return nullptr;
+	}
+
+	// Get next root node
+	std::string rootName = _path.front();
+	_path.pop_front();
+
+	if (_path.empty()) {
+		// Node is last is list, search in properties
+		for (Property* prop : m_properties) {
+			if (prop->getPropertyName() == rootName) {
+				return prop;
+			}
+		}
+	}
+	else {
+		// Node is not a property, search in child groups
 		for (const PropertyGroup* group : m_childGroups) {
 			if (group->getName() == rootName) {
 				return group->findPropertyByPath(_path);
 			}
 		}
 	}
+
 	return nullptr;
 }
 
-ot::Property* ot::PropertyGroup::findPropertyByPath(const std::string& _path, char _pathDelimiter) const {
+const ot::Property* ot::PropertyGroup::findPropertyByPath(const std::string& _path, char _pathDelimiter) const {
 	OTAssert(!_path.empty(), "Empty path provided");
 	std::list<std::string> pth = String::split(_path, _pathDelimiter, true);
 	OTAssert(!pth.empty(), "Path split failed");

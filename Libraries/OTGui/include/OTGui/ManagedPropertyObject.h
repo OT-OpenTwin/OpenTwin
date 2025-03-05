@@ -53,6 +53,18 @@ namespace ot {
 		//! @brief Get the property manager that holds all properties.
 		PropertyManager* getPropertyManager(void) const { return m_manager; };
 
+		//! @brief Finds a property by group and name.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return Pointer to the found Property, or nullptr if not found.
+		Property* findProperty(const std::string& _groupName, const std::string& _valueName);
+
+		//! @brief Finds a property by group and name.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return Pointer to the found Property, or nullptr if not found.
+		const Property* findProperty(const std::string& _groupName, const std::string& _valueName) const;
+
 	private:
 		PropertyManager* m_manager; //! @brief Property manager.
 
