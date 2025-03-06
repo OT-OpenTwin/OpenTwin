@@ -502,6 +502,9 @@
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp">
       <Filter>src\PropertyLink</Filter>
     </ClCompile>
+    <ClCompile Include="src\GlobalShortcutWrapper.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1155,6 +1158,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h">
       <Filter>include\PropertyLink</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

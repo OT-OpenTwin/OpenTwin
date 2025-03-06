@@ -67,6 +67,7 @@
     </ClCompile>
     <ClCompile Include="src\FilePathEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
+    <ClCompile Include="src\GlobalShortcutWrapper.cpp" />
     <ClCompile Include="src\GraphicsArcItem.cpp" />
     <ClCompile Include="src\GraphicsElement.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
@@ -232,6 +233,7 @@
     <QtMoc Include="include\OTWidgets\DelayedCallHandler.h" />
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
+    <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
