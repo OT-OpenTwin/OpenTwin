@@ -34,6 +34,10 @@ public:
     void displayError(std::string _message);
     void handleResults(const QJsonValue& _result);
     void handleUnknownMessageType(std::string _message);
+
+    //Time Handling
+    void handleCircuitExecutionTiming(const QDateTime& _timePoint, std::string timeType);
+
     //Setter
     void setVecAmount(int amount)
     {

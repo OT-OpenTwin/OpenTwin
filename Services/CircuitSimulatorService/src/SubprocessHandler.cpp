@@ -1,5 +1,6 @@
 
 #include "SubprocessHandler.h"
+#include "SimulationResults.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
@@ -53,9 +54,6 @@ void SubprocessHandler::InitiateProcess()
 
 void SubprocessHandler::RunSubprocess()
 {	
-	QDateTime startTime = QDateTime::currentDateTime();
-	OT_LOG_D("Start time of Subservice: " + startTime.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString());
-
 	try
 	{
 		const bool startSuccessfull = startSubprocess();
@@ -84,6 +82,12 @@ bool SubprocessHandler::startSubprocess() {
 	{
 		OT_LOG_D("Starting the subprocess: " + m_subProcess.program().toStdString() + " trial: " + std::to_string(i) + "/" + std::to_string(m_numberOfRetries));
 		m_subProcess.start();
+
+		//Time of process started
+		QDateTime finishedStartTime = QDateTime::currentDateTime();
+		SimulationResults::getInstance()->handleCircuitExecutionTiming(finishedStartTime, "finishedInitTime");
+		
+
 		auto state = m_subProcess.state();
 		if (state == QProcess::NotRunning)
 		{

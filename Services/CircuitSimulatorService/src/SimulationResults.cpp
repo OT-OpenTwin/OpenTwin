@@ -82,4 +82,29 @@ void SimulationResults::handleUnknownMessageType(std::string _message) {
     this->getInstance()->_uiComponent->displayErrorPrompt("Unknown Message Type: " + _message);
 }
 
+void SimulationResults::handleCircuitExecutionTiming(const QDateTime& _timePoint, std::string timeType) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    ot::StyledTextBuilder timeMessage;
+
+    if(timeType == "startingInitTime") {
+        
+        timeMessage << "[" << ot::StyledText::Bold << ot::StyledText::Highlight << "Starting Initialization Time of CircuitExecution: " << ot::StyledText::ClearStyle
+            << _timePoint.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();  
+    } else if (timeType == "finishedInitTime") {
+        timeMessage << "[" << ot::StyledText::Bold << ot::StyledText::Highlight << "Finished Initialization Time of CircuitExecution: " << ot::StyledText::ClearStyle
+            << _timePoint.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();
+    }
+    else if (timeType == "finishedCircuitExecutionTime") {
+        timeMessage << "[" << ot::StyledText::Bold << ot::StyledText::Highlight << "Finished Time of CircuitExecution: " << ot::StyledText::ClearStyle
+            << _timePoint.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();
+    }
+    else {
+        timeMessage << "[" << ot::StyledText::Bold << ot::StyledText::Highlight << "Unidentified Time: " << ot::StyledText::ClearStyle
+            << _timePoint.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString();
+    }
+    
+
+    this->getInstance()->_uiComponent->displayStyledMessage(timeMessage);
+}
+
 

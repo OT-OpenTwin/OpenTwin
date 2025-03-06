@@ -368,6 +368,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_ngSpice.clearBufferStructure(name);
 
 	//And start the subprocess
+	QDateTime initTime = QDateTime::currentDateTime();
+	SimulationResults::getInstance()->handleCircuitExecutionTiming(initTime, "startingInitTime");
+
 	const int sessionCount = Application::instance()->getSessionCount();
 	const int serviceID = Application::instance()->getServiceIDAsInt();
 	if (m_subprocessHandler == nullptr) {

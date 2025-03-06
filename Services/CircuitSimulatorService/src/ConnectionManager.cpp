@@ -215,8 +215,8 @@ void ConnectionManager::handleDisconnected() {
 
 
     QDateTime endTime = QDateTime::currentDateTime();
-    OT_LOG_D("End time of Subservice: " + endTime.toString("yyyy-MM-dd HH:mm:ss.zzz").toStdString());
-
+    SimulationResults::getInstance()->handleCircuitExecutionTiming(endTime, "finishedCircuitExecutionTime");
+   
     OT_LOG_D("Client disconnected");
     delete m_socket;
     m_socket = nullptr;
