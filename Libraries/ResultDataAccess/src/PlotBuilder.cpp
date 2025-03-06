@@ -49,7 +49,7 @@ void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1
 	m_extender.processDataPoints(&(*datasets.begin()), seriesID);
 	
 	ot::QueryInformation queryInformation;
-	//queryInformation.m_query= createQuery(seriesID);
+	queryInformation.m_query= createQuery(seriesID);
 	queryInformation.m_projection = createProjection();
 	
 	_config.setQueryInformation(queryInformation);

@@ -227,18 +227,18 @@ void testPlot()
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getInt32TypeName();
 	parameter.unit = "[kOlf]";
-	QuantityDescriptionCurve quantDesc;
-	quantDesc.setName("SomeQuantity");
-	quantDesc.addValueDescription("", ot::TypeNames::getInt32TypeName(), "[Olf]");
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+	quantDesc->setName("SomeQuantity");
+	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "[Olf]");
 	
 	for (int i = 0; i <= 50; i++)
 	{
-		quantDesc.addDatapoint(ot::Variable(i));
+		quantDesc->addDatapoint(ot::Variable(i));
 		parameter.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 	
-	description.setQuantityDescription(&quantDesc);
+	description.setQuantityDescription(quantDesc.release());
 	description.addParameterDescription(parameterDesc);
 	
 	ot::Plot1DCurveCfg curveCfg;
