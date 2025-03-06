@@ -9,6 +9,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+class QWidget;
 namespace tt { class SubGroup; }
 
 namespace ot {
@@ -34,7 +35,7 @@ namespace ot {
 
 		// Child management
 
-
+		void addWidget(QWidget* _widget);
 
 	private:
 		std::string m_name;

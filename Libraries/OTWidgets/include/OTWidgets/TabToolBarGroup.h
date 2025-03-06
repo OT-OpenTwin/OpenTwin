@@ -15,6 +15,7 @@
 // std header
 #include <list>
 
+class QWidget;
 namespace tt { class Group; }
 
 namespace ot {
@@ -53,6 +54,8 @@ namespace ot {
 		TabToolBarSubGroup* findSubGroup(const std::string& _subGroupName);
 		const TabToolBarSubGroup* findSubGroup(const std::string& _subGroupName) const;
 		bool hasSubGroup(const std::string& _subGroupName) const { return this->findSubGroup(_subGroupName) != nullptr; };
+
+		void addWidget(QWidget* _widget);
 
 	private:
 		std::string m_name;

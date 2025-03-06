@@ -74,3 +74,7 @@ const ot::TabToolBarSubGroup* ot::TabToolBarGroup::findSubGroup(const std::strin
 	}
 	return nullptr;
 }
+
+void ot::TabToolBarGroup::addWidget(QWidget* _widget) {
+	m_group->AddWidget(_widget);
+}

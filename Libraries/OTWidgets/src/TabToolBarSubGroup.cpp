@@ -24,3 +24,7 @@ ot::TabToolBarSubGroup::~TabToolBarSubGroup() {
 	delete m_subGroup;
 	m_subGroup = nullptr;
 }
+
+void ot::TabToolBarSubGroup::addWidget(QWidget* _widget) {
+	m_subGroup->AddWidget(_widget);
+}
