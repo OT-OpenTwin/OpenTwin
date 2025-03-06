@@ -11,7 +11,7 @@ PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string&
 	:m_extender(_extender), m_owner(_owner)
 {}
 
-void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config)
+void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 {
 	const std::string labelY = _config.getYAxisTitle();
 	assert(labelY ==_dataSetDescription.getQuantityDescription()->getName());
@@ -23,7 +23,7 @@ void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DC
 	const std::string labelX = _config.getXAxisTitle();
 	assert(labelX ==xAxis->getMetadataParameter().parameterName);
 
-	storeCurve(std::move(_dataSetDescription), _config);
+	storeCurve(std::move(_dataSetDescription), _config,_seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
@@ -38,14 +38,16 @@ void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DC
 void PlotBuilder::buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 {
 	createPlot(_plotCfg);
+	m_extender.setSaveModel(false);
+	m_extender.storeCampaignChanges();
 	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot", _saveModelState);
 }
 
-void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config)
+void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 { 
 	std::list<DatasetDescription> datasets;
 	datasets.push_back(std::move(_dataSetDescription));
-	ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _config.getEntityName(), {});
+	ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _seriesName, {});
 	m_extender.processDataPoints(&(*datasets.begin()), seriesID);
 	
 	ot::QueryInformation queryInformation;

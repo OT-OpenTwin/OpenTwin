@@ -247,7 +247,7 @@ void testPlot()
 	curveCfg.setYAxisTitle("SomeQuantity");
 	curveCfg.setEntityName("Test/A_Curve");
 
-	builder.addCurve(std::move(description), curveCfg);
+	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName("Test/A_plot");
 	plotCfg.setTitle("Some title");
