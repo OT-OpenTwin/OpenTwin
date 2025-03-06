@@ -89,9 +89,12 @@
     </ClInclude>
     <ClInclude Include="include\EntityBlockCircuitConnector.h">
       <Filter>Header Files\Entities</Filter>
-      </ClInclude>
+    </ClInclude>
     <ClInclude Include="include\SharedResources.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityBlockCircuitTransmissionLine.h">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +162,9 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockCircuitConnector.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBlockCircuitTransmissionLine.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

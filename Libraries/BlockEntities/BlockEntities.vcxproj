@@ -172,6 +172,7 @@
     <ClInclude Include="include\EntityBlockCircuitDiode.h" />
     <ClInclude Include="include\EntityBlockCircuitGND.h" />
     <ClInclude Include="include\EntityBlockCircuitInductor.h" />
+    <ClInclude Include="include\EntityBlockCircuitTransmissionLine.h" />
     <ClInclude Include="include\EntityBlockCircuitVoltageSource.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
     <ClInclude Include="include\Connector.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="src\EntityBlockCircuitElement.cpp" />
     <ClCompile Include="src\EntityBlockCircuitGND.cpp" />
     <ClCompile Include="src\EntityBlockCircuitInductor.cpp" />
+    <ClCompile Include="src\EntityBlockCircuitTransmissionLine.cpp" />
     <ClCompile Include="src\EntityBlockCircuitVoltageSource.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
     <ClCompile Include="src\Connector.cpp" />
