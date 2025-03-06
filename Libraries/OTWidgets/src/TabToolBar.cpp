@@ -66,6 +66,18 @@ const QToolBar* ot::TabToolBar::getToolBar(void) const {
 	return m_toolBar;
 }
 
+void ot::TabToolBar::setCurrentPage(TabToolBarPage* _page) {
+	QTabWidget* w = m_toolBar->tabWidget();
+	for (int i = 0; i < w->count(); i++) {
+		if (w->widget(i) == _page->getPage()) {
+			w->setCurrentIndex(i);
+			return;
+		}
+	}
+
+	OTAssert(0, "Page not found");
+}
+
 ot::TabToolBarPage* ot::TabToolBar::addPage(const std::string& _pageName, bool _returnExisting) {
 	TabToolBarPage* newPage = this->findPage(_pageName);
 	if (newPage) {

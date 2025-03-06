@@ -17,7 +17,7 @@
 ot::TabToolBarGroup::TabToolBarGroup(TabToolBarPage* _parentPage, tt::Group* _group, const std::string& _name)
 	: m_name(_name), m_group(_group), m_parentPage(_parentPage)
 {
-	
+	OTAssertNullptr(m_group);
 }
 
 ot::TabToolBarGroup::~TabToolBarGroup() {

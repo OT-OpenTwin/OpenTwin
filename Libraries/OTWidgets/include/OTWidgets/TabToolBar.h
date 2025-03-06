@@ -52,6 +52,9 @@ namespace ot {
 		virtual QToolBar* getToolBar(void) override;
 		virtual const QToolBar* getToolBar(void) const override;
 
+		//! @brief Set current page.
+		void setCurrentPage(TabToolBarPage* _page);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Element creation

@@ -15,7 +15,7 @@
 ot::TabToolBarPage::TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name) :
 	m_name(_name), m_page(_page), m_parentTabToolBar(_parentTabToolBar)
 {
-
+	OTAssertNullptr(m_parentTabToolBar);
 }
 
 ot::TabToolBarPage::~TabToolBarPage() {
@@ -28,6 +28,11 @@ ot::TabToolBarPage::~TabToolBarPage() {
 
 	delete m_page;
 	m_page = nullptr;
+}
+
+void ot::TabToolBarPage::setAsCurrentPage(void) {
+	OTAssertNullptr(m_parentTabToolBar);
+	m_parentTabToolBar->setCurrentPage(this);
 }
 
 ot::TabToolBarGroup* ot::TabToolBarPage::addGroup(const std::string& _groupName, bool _returnExisting) {

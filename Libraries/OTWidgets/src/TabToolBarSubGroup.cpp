@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/TabToolBarGroup.h"
@@ -15,7 +16,7 @@
 ot::TabToolBarSubGroup::TabToolBarSubGroup(TabToolBarGroup* _parentGroup, tt::SubGroup* _subGroup, const std::string& _name)
 	: m_name(_name), m_subGroup(_subGroup), m_parentGroup(_parentGroup)
 {
-
+	OTAssertNullptr(m_subGroup);
 }
 
 ot::TabToolBarSubGroup::~TabToolBarSubGroup() {
