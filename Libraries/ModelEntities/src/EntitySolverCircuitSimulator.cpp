@@ -16,7 +16,7 @@ void EntitySolverCircuitSimulator::createProperties(const std::string circuitFol
 {
 	EntityPropertiesSelection::createProperty("Settings","Simulation Type", {".dc",".TRAN",".ac"}, ".dc", "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Settings", "Circuit", circuitFolderName, circuitFolderID, "", -1, "default", getProperties());
-	EntityPropertiesString::createProperty("Settings", "Print Settings", "print all", "CircuitSimulator", getProperties());
+	
 
 	createDCProperties();
 	createTranProperties();
