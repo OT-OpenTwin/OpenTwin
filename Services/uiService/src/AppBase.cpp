@@ -543,7 +543,7 @@ void AppBase::downloadInstaller(QString gssUrl)
 		std::string applicationPath = tempFolder + "\\" + fileName;
 		std::string commandLine = "\"" + applicationPath + "\" /S";
 		OT_PROCESS_HANDLE processHandle;
-		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle, false);
+		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle);
 		exit(0);
 	}
 	else
