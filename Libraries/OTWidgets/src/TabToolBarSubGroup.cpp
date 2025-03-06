@@ -4,6 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/ToolButton.h"
+#include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/TabToolBarGroup.h"
 #include "OTWidgets/TabToolBarSubGroup.h"
 
@@ -25,6 +27,10 @@ ot::TabToolBarSubGroup::~TabToolBarSubGroup() {
 	m_subGroup = nullptr;
 }
 
-void ot::TabToolBarSubGroup::addWidget(QWidget* _widget) {
-	m_subGroup->AddWidget(_widget);
+void ot::TabToolBarSubGroup::addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu) {
+	m_subGroup->AddWidget(TabToolBar::createButton(_iconPath, _text, _menu));
+}
+
+void ot::TabToolBarSubGroup::addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
+	m_subGroup->AddWidget(TabToolBar::createButton(_icon, _text, _menu));
 }

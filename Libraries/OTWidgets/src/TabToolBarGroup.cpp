@@ -5,6 +5,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/TabToolBar.h"
+#include "OTWidgets/ToolButton.h"
 #include "OTWidgets/TabToolBarPage.h"
 #include "OTWidgets/TabToolBarGroup.h"
 #include "OTWidgets/TabToolBarSubGroup.h"
@@ -75,6 +77,10 @@ const ot::TabToolBarSubGroup* ot::TabToolBarGroup::findSubGroup(const std::strin
 	return nullptr;
 }
 
-void ot::TabToolBarGroup::addWidget(QWidget* _widget) {
-	m_group->AddWidget(_widget);
+void ot::TabToolBarGroup::addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu) {
+	m_group->AddWidget(TabToolBar::createButton(_iconPath, _text, _menu));
+}
+
+void ot::TabToolBarGroup::addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
+	m_group->AddWidget(TabToolBar::createButton(_icon, _text, _menu));
 }

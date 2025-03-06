@@ -8,6 +8,7 @@
 #include "OTWidgets/MainWindow.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/TabToolBar.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/TabToolBarPage.h"
 #include "OTWidgets/TabToolBarButtonProxyStyle.h"
 
@@ -18,6 +19,10 @@
 // Qt header
 #include <QtWidgets/qstyle.h>
 #include <QtWidgets/qapplication.h>
+
+ot::ToolButton* ot::TabToolBar::createButton(const QString& _iconPath, const QString& _text, QMenu* _menu) {
+	return TabToolBar::createButton(IconManager::getIcon(_iconPath), _text, _menu);
+}
 
 ot::ToolButton* ot::TabToolBar::createButton(const QIcon& _icon, const QString& _text, QMenu* _menu) {
 	ToolButton* btn = new ot::ToolButton(_icon, _text);

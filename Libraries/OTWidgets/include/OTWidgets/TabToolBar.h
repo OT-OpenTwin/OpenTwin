@@ -30,6 +30,20 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TabToolBar : public AbstractToolBar {
 		OT_DECL_NOCOPY(TabToolBar)
 	public:
+		//! @brief Creates a default tool button that can be placed in a group or subgroup.
+		//! @param _iconPath Button icon path that will be used in the icon manager to load the icon.
+		//! @param _text Button text.
+		//! @param _menu Menu to set.
+		//! @return Created ToolButton.
+		//! @ref ToolButton
+		static ToolButton* createButton(const QString& _iconPath, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+
+		//! @brief Creates a default tool button that can be placed in a group or subgroup.
+		//! @param _icon Button icon.
+		//! @param _text Button text.
+		//! @param _menu Menu to set.
+		//! @return Created ToolButton.
+		//! @ref ToolButton
 		static ToolButton* createButton(const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
 
 		TabToolBar(MainWindow* _window = (MainWindow*)nullptr);
