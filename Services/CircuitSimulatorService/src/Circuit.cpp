@@ -59,15 +59,26 @@ void Circuit::setId(std::string id) {
 	this->id = id;
 }
 
-/*bool*/  void Circuit::addConnection(std::string connactable,const ot::UID& key, const Connection& obj) {
+void Circuit::addConnection(std::string connactable,const ot::UID& key, const Connection& obj) {
+
+	//Here we extrac the element out of the connectorName to check wheter its a connector or not 
+	std::string element = Application::instance()->extractStringAfterDelimiter(connactable, '/', 2);
+	element = element.substr(0, element.find('_'));
+
+
+	if (element == "Connector") {
+		//The Connector element we ignore because it does not belong to the CircuitElements so it does not need any connection 
+		return;
+	}
+
 	if (mapOfElements.find(key) != mapOfElements.end()) {
-		/*bool result =*/ mapOfElements[key]->addConnection(connactable,obj);
-		/*return result;*/
+		mapOfElements[key]->addConnection(connactable,obj);
+	
 
 	}
 	else {
 		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
-		/*return false;*/
+		
 
 	}
 
