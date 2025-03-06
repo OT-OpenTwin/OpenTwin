@@ -97,7 +97,7 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	itemSize.setWidth(_settings.value("GID.LastWidth", (qreal)300).toReal());
 	itemSize.setHeight(_settings.value("GID.LastHeight", (qreal)200).toReal());
 	m_view->getDesignerScene()->setItemSize(itemSize);
-	m_view->setSceneRect(QRectF(QPointF(0., 0.), itemSize));
+	m_view->setGraphicsSceneRect(QRectF(QPointF(0., 0.), itemSize));
 	m_view->fitInView(m_view->sceneRect(), Qt::KeepAspectRatio);
 	m_view->scale(0.9, 0.9);
 

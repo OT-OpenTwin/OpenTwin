@@ -16,14 +16,16 @@
 #include "OTWidgets/GraphicsEllipseItem.h"
 
 GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer)
-	: m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)
+	: GraphicsView(), m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)
 {
 	OTAssertNullptr(m_designer);
 
+	this->setGraphicsViewFlags(ot::GraphicsView::IgnoreConnectionByUser);
+
 	m_scene = new GraphicsItemDesignerScene(this);
-	this->setGraphicsScene(m_scene);
-	this->setGraphicsViewFlag(ot::GraphicsView::IgnoreConnectionByUser);
-	
+	this->setSceneMargins(QMarginsF(50, 50, 50, 50));
+	this->setGraphicsSceneRect(-5, -5, 810, 610);
+
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 
 	this->connect(m_scene, &GraphicsItemDesignerScene::selectionChangeFinished, this, &GraphicsItemDesignerView::slotSceneSelectionChanged);

@@ -35,7 +35,7 @@ void GraphicsItemDesignerPreview::updateCurrentItem(const ot::GraphicsItemCfg* _
 	if (!m_item) return;
 	this->addItem(m_item);
 
-	this->fitInView(m_item->getQGraphicsItem());
+	this->fitInView(m_item->getQGraphicsItem(), Qt::KeepAspectRatio);
 
 	const ViewportAnchor anchor = this->transformationAnchor();
 	this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);

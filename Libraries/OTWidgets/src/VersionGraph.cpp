@@ -223,7 +223,7 @@ void ot::VersionGraph::updateVersionPositions(void) {
 		itmRect = QRectF(itmRect.topLeft(), newSize);
 	}
 
-	this->setSceneRect(itmRect);
+	this->setGraphicsSceneRect(itmRect);
 
 	if (!m_activeVersion.empty()) {
 		this->slotCenterOnActiveVersion();

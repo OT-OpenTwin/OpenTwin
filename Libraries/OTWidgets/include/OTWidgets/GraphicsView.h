@@ -93,6 +93,10 @@ namespace ot {
 		void setSceneMargins(const QMarginsF& _margins) { m_sceneMargins = _margins; };
 		const QMarginsF& getSceneMargins(void) const { return m_sceneMargins; };
 
+		void setGraphicsSceneRect(double _posX, double _posY, double _sizeX, double _sizeY) { this->setGraphicsSceneRect(QRectF(QPointF(_posX, _posY), QSizeF(_sizeX, _sizeY))); };
+		void setGraphicsSceneRect(const QPointF& _pos, const QSize& _size) { this->setGraphicsSceneRect(QRectF(_pos, _size)); };
+		void setGraphicsSceneRect(const QRectF& _rect);
+
 		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);

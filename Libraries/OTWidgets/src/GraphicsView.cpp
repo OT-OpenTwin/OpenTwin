@@ -28,11 +28,15 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene)
 	: m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
 	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState), m_sceneMargins(5., 5., 5., 5.)
 {
-	if (!m_scene) m_scene = new GraphicsScene(this);
+	if (!m_scene) {
+		m_scene = new GraphicsScene(this);
+	}
 
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);
+	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	this->setUpdatesEnabled(true);
 
@@ -224,6 +228,15 @@ std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems(void) co
 		}
 	}
 	return sel;
+}
+
+void ot::GraphicsView::setGraphicsSceneRect(const QRectF& _rect) {
+	this->setSceneRect(_rect);
+	QRectF rec = _rect.marginsAdded(m_sceneMargins);
+	this->fitInView(rec, Qt::KeepAspectRatio);
+	this->centerOn(rec.center());
+	this->horizontalScrollBar()->setRange(rec.left(), rec.right());
+	this->verticalScrollBar()->setRange(rec.top(), rec.bottom());
 }
 
 bool ot::GraphicsView::addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config)

@@ -20,6 +20,10 @@
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
 	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_mode(NoMode), m_itemSize(300, 200)
 {
+	_view->setGraphicsScene(this);
+
+	this->setGridStep(10);
+	this->setWideGridLineCounter(10);
 	this->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::ShowWideLines);
 	this->setGridSnapMode(ot::Grid::SnapTopLeft);
 }
@@ -46,7 +50,7 @@ void GraphicsItemDesignerScene::disablePickingMode(void) {
 
 void GraphicsItemDesignerScene::setItemSize(const QSizeF& _size) {
 	m_itemSize = _size;
-	m_view->setSceneRect(QRect(0., 0., m_itemSize.width(), m_itemSize.height()));
+	m_view->setGraphicsSceneRect(QRect(0., 0., m_itemSize.width(), m_itemSize.height()));
 }
 
 QImage GraphicsItemDesignerScene::exportAsImage(const GraphicsItemDesignerImageExportConfig& _exportConfig) {
@@ -68,7 +72,7 @@ QImage GraphicsItemDesignerScene::exportAsImage(const GraphicsItemDesignerImageE
 		this->setGridFlags(ot::Grid::NoGridFlags);
 	}
 
-	m_view->setSceneRect(itmRect);
+	m_view->setGraphicsSceneRect(itmRect);
 
 	QImage image(itmRect.size().toSize(), QImage::Format_ARGB32);
 	image.fill(Qt::transparent);
@@ -76,7 +80,7 @@ QImage GraphicsItemDesignerScene::exportAsImage(const GraphicsItemDesignerImageE
 	QPainter painter(&image);
 	this->render(&painter, QRectF(), itmRect);
 
-	m_view->setSceneRect(oldSceneRect);
+	m_view->setGraphicsSceneRect(oldSceneRect);
 
 	this->setGridFlags(oldGridFlags);
 
