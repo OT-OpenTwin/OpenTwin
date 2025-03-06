@@ -54,7 +54,6 @@ namespace ot {
 
 	private Q_SLOTS:
 		void slotConfirm(void);
-		void slotCancel(void);
 		void slotTreeSelectionChanged(void);
 		void slotPropertyChanged(const Property* _property);
 		void slotPropertyDeleteRequested(const Property* _property);

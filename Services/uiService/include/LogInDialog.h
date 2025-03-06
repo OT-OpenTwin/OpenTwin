@@ -105,7 +105,6 @@ private Q_SLOTS:
 	void slotLogIn(void);
 	void slotRegister(void);
 	void slotChangePassword(void);
-	void slotCancel(void);
 	void slotToggleLogInAndRegisterMode(void);
 	void slotToggleChangePasswordMode(void);
 	void slotGSSChanged(void);

@@ -6,10 +6,12 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/Dialog.h"
+#include "OTWidgets/PushButton.h"
 #include "OTWidgets/Positioning.h"
 
 // Qt header
 #include <QtGui/qevent.h>
+#include <QtWidgets/qlayout.h>
 
 ot::Dialog::Dialog(QWidget* _parent)
 	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel), m_state(DialogState::NoState)
@@ -49,29 +51,54 @@ ot::Dialog::DialogResult ot::Dialog::showDialog(const ShowFlags& _showFlags) {
 
 // Public slots
 
-void ot::Dialog::close(DialogResult _result) {
+void ot::Dialog::closeDialog(DialogResult _result) {
 	m_result = _result;
-	this->QDialog::close();
+	this->close();
+}
+
+std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::list<std::pair<QString, DialogResult>>& _buttonTextToResultList, QLayout* _layout) {
+	std::list<PushButton*> result;
+	PushButton* btn = nullptr;
+	for (const auto& info : _buttonTextToResultList) {
+		result.push_back(btn = new PushButton(info.first));
+		if (_layout) {
+			_layout->addWidget(btn);
+		}
+
+		DialogResult x;
+		switch (x) {
+		case ot::Dialog::Ok: this->connect(btn, &PushButton::clicked, this, &Dialog::closeOk); break;
+		case ot::Dialog::Yes: this->connect(btn, &PushButton::clicked, this, &Dialog::closeYes); break;
+		case ot::Dialog::No: this->connect(btn, &PushButton::clicked, this, &Dialog::closeNo); break;
+		case ot::Dialog::Retry: this->connect(btn, &PushButton::clicked, this, &Dialog::closeRetry); break;
+		case ot::Dialog::Cancel: this->connect(btn, &PushButton::clicked, this, &Dialog::closeCancel); break;
+		default:
+			OT_LOG_EAS("Unknown dialog result (" + std::to_string((int)info.second) + ")");
+			break;
+		}
+	}
+
+	return result;
 }
 
 void ot::Dialog::closeOk(void) {
-	this->close(Dialog::Ok);
+	this->closeDialog(Dialog::Ok);
 }
 
 void ot::Dialog::closeYes(void) {
-	this->close(Dialog::Yes);
+	this->closeDialog(Dialog::Yes);
 }
 
 void ot::Dialog::closeNo(void) {
-	this->close(Dialog::No);
+	this->closeDialog(Dialog::No);
 }
 
 void ot::Dialog::closeRetry(void) {
-	this->close(Dialog::Retry);
+	this->closeDialog(Dialog::Retry);
 }
 
 void ot::Dialog::closeCancel(void) {
-	this->close(Dialog::Cancel);
+	this->closeDialog(Dialog::Cancel);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -66,7 +66,7 @@ ConnectToLoggerDialog::ConnectToLoggerDialog()
 
 	// Connect signals
 	connect(m_btnConnect, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotConnect);
-	connect(m_btnCancel, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotCancel);
+	connect(m_btnCancel, &QPushButton::clicked, this, &ConnectToLoggerDialog::closeCancel);
 }
 
 ConnectToLoggerDialog::~ConnectToLoggerDialog() {
@@ -87,10 +87,6 @@ void ConnectToLoggerDialog::queueRecenterRequest(void) {
 
 bool ConnectToLoggerDialog::mayCloseDialogWindow(void) {
 	return !m_workerRunning;
-}
-
-void ConnectToLoggerDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
 }
 
 void ConnectToLoggerDialog::slotConnect(void) {
@@ -128,7 +124,7 @@ void ConnectToLoggerDialog::slotDone(void) {
 	settings->setValue("LoggerServiceURL", m_url->text());
 
 	if (!(this->getDialogState() & ot::Dialog::DialogState::Closing)) {
-		this->close(ot::Dialog::Ok);
+		this->closeDialog(ot::Dialog::Ok);
 	}
 }
 

@@ -77,8 +77,8 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	// Connect signals
 	this->connect(m_available->getTreeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotAdd);
 	this->connect(m_selected->getTreeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotRemove);
-	this->connect(btnApply, &QPushButton::clicked, this, &SelectEntitiesDialog::slotApply);
-	this->connect(btnCancel, &QPushButton::clicked, this, &SelectEntitiesDialog::slotCancel);
+	this->connect(btnApply, &QPushButton::clicked, this, &SelectEntitiesDialog::closeOk);
+	this->connect(btnCancel, &QPushButton::clicked, this, &SelectEntitiesDialog::closeCancel);
 }
 
 SelectEntitiesDialog::~SelectEntitiesDialog() {
@@ -98,14 +98,6 @@ std::list<std::string> SelectEntitiesDialog::selectedItemPaths(char _pathDelimit
 	std::list<std::string> ret;
 	this->addSelectedPaths(m_selected->getTreeWidget()->invisibleRootItem(), ret, _pathDelimiter, _bottomLevelOnly);
 	return ret;
-}
-
-void SelectEntitiesDialog::slotApply(void) {
-	this->close(ot::Dialog::Ok);
-}
-
-void SelectEntitiesDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
 }
 
 void SelectEntitiesDialog::addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const {

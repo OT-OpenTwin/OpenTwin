@@ -259,7 +259,7 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 	// Connect signals
 	this->connect(addButton, &PushButton::clicked, this, &LogInGSSEditDialog::slotAdd);
 	this->connect(saveButton, &PushButton::clicked, this, &LogInGSSEditDialog::slotSave);
-	this->connect(cancelButton, &PushButton::clicked, this, &LogInGSSEditDialog::slotCancel);
+	this->connect(cancelButton, &PushButton::clicked, this, &LogInGSSEditDialog::closeCancel);
 
 }
 
@@ -290,7 +290,7 @@ void LogInGSSEditDialog::slotAdd(void) {
 
 void LogInGSSEditDialog::slotSave(void) {
 	if (!this->hasChangedData()) {
-		this->close(ot::Dialog::Cancel);
+		this->closeDialog(ot::Dialog::Cancel);
 		return;
 	}
 	
@@ -303,11 +303,7 @@ void LogInGSSEditDialog::slotSave(void) {
 		}
 	}
 
-	this->close(ot::Dialog::Ok);
-}
-
-void LogInGSSEditDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
+	this->closeDialog(ot::Dialog::Ok);
 }
 
 void LogInGSSEditDialog::slotDeleteEntry(int _row) {

@@ -186,7 +186,7 @@ LogInDialog::LogInDialog()
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);
 	this->connect(m_registerButton, &PushButton::clicked, this, &LogInDialog::slotRegister);
 	this->connect(m_changePasswordButton, &PushButton::clicked, this, &LogInDialog::slotChangePassword);
-	this->connect(m_exitButton, &PushButton::clicked, this, &LogInDialog::slotCancel);
+	this->connect(m_exitButton, &PushButton::clicked, this, &LogInDialog::closeCancel);
 	this->connect(m_gss, &ComboBox::currentTextChanged, this, &LogInDialog::slotGSSChanged);
 	this->connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
 
@@ -342,10 +342,6 @@ void LogInDialog::slotChangePassword(void) {
 	worker.detach();
 }
 
-void LogInDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
-}
-
 void LogInDialog::slotToggleLogInAndRegisterMode(void) {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
 
@@ -470,7 +466,7 @@ void LogInDialog::slotPasswordChanged(void) {
 void LogInDialog::slotLogInSuccess(void) {
 	m_state &= (~LogInStateFlag::WorkerRunning);
 	this->saveUserSettings();
-	this->close(ot::Dialog::Ok);
+	this->closeDialog(ot::Dialog::Ok);
 }
 
 void LogInDialog::slotRegisterSuccess(void) {
@@ -503,7 +499,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 
 	// Check for max login attempt
 	if (m_logInAttempt >= MAX_LOGIN_ATTEMPTS) {
-		this->close(ot::Dialog::Cancel);
+		this->closeDialog(ot::Dialog::Cancel);
 		return;
 	}
 

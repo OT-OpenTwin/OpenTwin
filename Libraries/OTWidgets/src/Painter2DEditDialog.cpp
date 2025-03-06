@@ -371,10 +371,10 @@ void ot::Painter2DEditDialog::slotUpdate(void) {
 
 void ot::Painter2DEditDialog::slotConfirm(void) {
 	if (m_changed) {
-		this->close(Dialog::Ok);
+		this->closeDialog(Dialog::Ok);
 	}
 	else {
-		this->close(Dialog::Cancel);
+		this->closeDialog(Dialog::Cancel);
 	}
 }
 

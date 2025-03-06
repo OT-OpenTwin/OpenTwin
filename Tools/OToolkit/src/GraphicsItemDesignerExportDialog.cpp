@@ -137,9 +137,9 @@ void GraphicsItemDesignerExportDialog::slotExport(void) {
 
 	OT_LOG_D("Graphics Item exported \"" + m_fileInput->getFilePath().toStdString() + "\"");
 
-	this->close(ot::Dialog::Ok);
+	this->closeDialog(ot::Dialog::Ok);
 }
 
 void GraphicsItemDesignerExportDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
+	this->closeDialog(ot::Dialog::Cancel);
 }

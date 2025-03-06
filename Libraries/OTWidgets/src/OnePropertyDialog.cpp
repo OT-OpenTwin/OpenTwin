@@ -45,7 +45,7 @@ ot::OnePropertyDialog::OnePropertyDialog(const OnePropertyDialogCfg& _config, QW
 	// Connect signals
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &OnePropertyDialog::slotValueChanged);
 	this->connect(btnConfirm, &QPushButton::clicked, this, &OnePropertyDialog::slotConfirm);
-	this->connect(btnCancel, &QPushButton::clicked, this, &OnePropertyDialog::slotCancel);
+	this->connect(btnCancel, &QPushButton::clicked, this, &OnePropertyDialog::closeCancel);
 }
 
 ot::OnePropertyDialog::~OnePropertyDialog() {
@@ -77,13 +77,9 @@ void ot::OnePropertyDialog::slotValueChanged(void) {
 
 void ot::OnePropertyDialog::slotConfirm(void) {
 	if ((this->dialogFlags() & DialogCfg::CancelOnNoChange) && !m_changed) {
-		this->close(Dialog::Cancel);
+		this->closeDialog(Dialog::Cancel);
 	}
 	else {
-		this->close(Dialog::Ok);
+		this->closeDialog(Dialog::Ok);
 	}
-}
-
-void ot::OnePropertyDialog::slotCancel(void) {
-	this->close(Dialog::Cancel);
 }

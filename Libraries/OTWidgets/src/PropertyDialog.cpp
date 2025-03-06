@@ -120,7 +120,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	// Connect signals
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
 	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
-	this->connect(btnCancel, &QPushButton::clicked, this, &PropertyDialog::slotCancel);
+	this->connect(btnCancel, &QPushButton::clicked, this, &PropertyDialog::closeCancel);
 	this->connect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyDialog::slotPropertyChanged);
 	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyDialog::slotPropertyDeleteRequested);
 }
@@ -180,15 +180,11 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 
 void ot::PropertyDialog::slotConfirm(void) {
 	if ((this->dialogFlags() & DialogCfg::CancelOnNoChange) && !m_changed) {
-		this->close(Dialog::Cancel);
+		this->closeDialog(Dialog::Cancel);
 	}
 	else {
-		this->close(Dialog::Ok);
+		this->closeDialog(Dialog::Ok);
 	}
-}
-
-void ot::PropertyDialog::slotCancel(void) {
-	this->close(Dialog::Cancel);
 }
 
 void ot::PropertyDialog::slotTreeSelectionChanged(void) {

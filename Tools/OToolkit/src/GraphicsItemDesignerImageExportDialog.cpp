@@ -106,7 +106,7 @@ GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(Gra
 
 	// Connect signals
 	this->connect(buttonExport, &ot::PushButton::clicked, this, &GraphicsItemDesignerImageExportDialog::slotExport);
-	this->connect(buttonCancel, &ot::PushButton::clicked, this, &GraphicsItemDesignerImageExportDialog::slotCancel);
+	this->connect(buttonCancel, &ot::PushButton::clicked, this, &GraphicsItemDesignerImageExportDialog::closeCancel);
 	
 	this->connect(m_showGrid, &ot::CheckBox::stateChanged, this, &GraphicsItemDesignerImageExportDialog::slotUpdatePreview);
 	this->connect(m_topMarginsInput, &ot::DoubleSpinBox::valueChanged, this, &GraphicsItemDesignerImageExportDialog::slotUpdatePreview);
@@ -163,11 +163,7 @@ void GraphicsItemDesignerImageExportDialog::slotExport(void) {
 
 	OT_LOG_I("Image saved \"" + m_pathInput->getFilePath().toStdString() + "\"");
 
-	this->close(ot::Dialog::Ok);
-}
-
-void GraphicsItemDesignerImageExportDialog::slotCancel(void) {
-	this->close(ot::Dialog::Cancel);
+	this->closeDialog(ot::Dialog::Ok);
 }
 
 void GraphicsItemDesignerImageExportDialog::slotUpdatePreview(void) {

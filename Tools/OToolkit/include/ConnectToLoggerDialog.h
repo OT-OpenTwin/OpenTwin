@@ -39,7 +39,6 @@ protected:
 	virtual bool mayCloseDialogWindow(void) override;
 
 private Q_SLOTS:
-	void slotCancel(void);
 	void slotConnect(void);
 	void slotPingFail(void);
 	void slotRegisterFail(void);

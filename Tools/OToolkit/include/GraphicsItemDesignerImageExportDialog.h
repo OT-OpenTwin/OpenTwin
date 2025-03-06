@@ -35,7 +35,6 @@ public:
 
 private Q_SLOTS:
 	void slotExport(void);
-	void slotCancel(void);
 	void slotUpdatePreview(void);
 
 private:

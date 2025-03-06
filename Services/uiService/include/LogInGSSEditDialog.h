@@ -81,7 +81,6 @@ public:
 private Q_SLOTS:
 	void slotAdd(void);
 	void slotSave(void);
-	void slotCancel(void);
 	void slotDeleteEntry(int _row);
 
 private:

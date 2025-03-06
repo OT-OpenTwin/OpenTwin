@@ -27,8 +27,7 @@ namespace ot {
 	private Q_SLOTS:
 		void slotValueChanged(void);
 		void slotConfirm(void);
-		void slotCancel(void);
-
+		
 	private:
 		PropertyInput* m_input;
 		bool m_changed;

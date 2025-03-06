@@ -44,8 +44,6 @@ public:
 	std::list<std::string> selectedItemPaths(char _pathDelimiter = '/', bool _bottomLevelOnly = true) const;
 
 private Q_SLOTS:
-	void slotApply(void);
-	void slotCancel(void);
 	void slotAdd(QTreeWidgetItem* _item, int _col);
 	void slotRemove(QTreeWidgetItem* _item, int _col);
 
