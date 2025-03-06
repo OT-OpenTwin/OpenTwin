@@ -62,8 +62,7 @@ LogInDialog::LogInDialog()
 	ImagePreview* titleImageView = new ImagePreview(IconManager::getPixmap("Images/OpenTwinIcon.png").scaled(QSize(192, 192), Qt::KeepAspectRatio).toImage());
 	titleImageView->setObjectName("LogInDialogImageView");
 	titleImageView->setEnableResizing(false);
-	titleImageView->setImageMargins(QMargins(0, 0, 0, 0));
-	titleImageView->setFixedSize(titleImageView->image().size());
+	titleImageView->setFixedSize(titleImageView->getImage().size());
 	titleImageView->setEnabled(false);
 
 	Label* gssLabel = new Label("Global Session Service:");

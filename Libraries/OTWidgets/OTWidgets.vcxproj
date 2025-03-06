@@ -99,6 +99,7 @@
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
+    <ClCompile Include="src\ImagePreview.cpp" />
     <ClCompile Include="src\ManagedPropertyLink.cpp" />
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
     <ClCompile Include="src\WidgetPropertyManager.cpp" />
@@ -115,7 +116,7 @@
     <ClCompile Include="src\WidgetManager.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\ImagePainterManager.cpp" />
-    <ClCompile Include="src\ImagePreview.cpp" />
+    <ClCompile Include="src\PixmapWidget.cpp" />
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
@@ -235,6 +236,7 @@
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
+    <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
@@ -297,7 +299,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h" />
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <QtMoc Include="include\OTWidgets\Label.h" />
-    <QtMoc Include="include\OTWidgets\ImagePreview.h" />
+    <QtMoc Include="include\OTWidgets\PixmapWidget.h" />
     <ClInclude Include="include\OTWidgets\WidgetManager.h" />
     <ClInclude Include="include\OTWidgets\ImagePainter.h" />
     <ClInclude Include="include\OTWidgets\ImagePainterManager.h" />

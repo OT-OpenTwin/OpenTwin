@@ -238,6 +238,9 @@
     <ClCompile Include="src\ImagePreview.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\PixmapWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
     <ClCompile Include="src\GraphicsPolygonItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -1063,7 +1066,7 @@
     <QtMoc Include="include\OTWidgets\LineEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\ImagePreview.h">
+    <QtMoc Include="include\OTWidgets\PixmapWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\WidgetViewManager.h">
@@ -1161,6 +1164,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ImagePreview.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

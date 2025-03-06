@@ -156,7 +156,7 @@ void GraphicsItemDesignerImageExportDialog::slotExport(void) {
 		if (msgBox.exec() != QMessageBox::Yes) return;
 	}
 
-	if (!m_imagePreview->image().save(m_pathInput->getFilePath())) {
+	if (!m_imagePreview->getImage().save(m_pathInput->getFilePath())) {
 		OT_LOG_E("Failed to save file \"" + m_pathInput->getFilePath().toStdString() + "\"");
 		return;
 	}

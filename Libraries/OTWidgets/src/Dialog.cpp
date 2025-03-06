@@ -65,8 +65,7 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::list<st
 			_layout->addWidget(btn);
 		}
 
-		DialogResult x;
-		switch (x) {
+		switch (info.second) {
 		case ot::Dialog::Ok: this->connect(btn, &PushButton::clicked, this, &Dialog::closeOk); break;
 		case ot::Dialog::Yes: this->connect(btn, &PushButton::clicked, this, &Dialog::closeYes); break;
 		case ot::Dialog::No: this->connect(btn, &PushButton::clicked, this, &Dialog::closeNo); break;
@@ -81,8 +80,62 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::list<st
 	return result;
 }
 
+std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::initializer_list<DialogResult>& _buttonResults, QLayout* _layout) {
+	std::list<DialogResult> lst(_buttonResults);
+	std::list<PushButton*> ret;
+	PushButton* btn = nullptr;
+
+	for (DialogResult result : _buttonResults) {
+		switch (result) {
+		case ot::Dialog::Ok:
+			ret.push_back(btn = new PushButton("Ok"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeOk); 
+			break;
+
+		case ot::Dialog::Confirm:
+			ret.push_back(btn = new PushButton("Confirm"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeConfirm);
+			break;
+
+		case ot::Dialog::Yes:
+			ret.push_back(btn = new PushButton("Yes"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeYes);
+			break;
+
+		case ot::Dialog::No:
+			ret.push_back(btn = new PushButton("No"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeNo);
+			break;
+
+		case ot::Dialog::Retry:
+			ret.push_back(btn = new PushButton("Retry"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeRetry);
+			break;
+
+		case ot::Dialog::Cancel:
+			ret.push_back(btn = new PushButton("Cancel"));
+			this->connect(btn, &PushButton::clicked, this, &Dialog::closeCancel);
+			break;
+
+		default:
+			OT_LOG_EAS("Unknown dialog result (" + std::to_string((int)result) + ")");
+			break;
+		}
+
+		if (_layout && btn) {
+			_layout->addWidget(btn);
+		}
+	}
+
+	return ret;
+}
+
 void ot::Dialog::closeOk(void) {
 	this->closeDialog(Dialog::Ok);
+}
+
+void ot::Dialog::closeConfirm(void) {
+	this->closeDialog(Dialog::Confirm);
 }
 
 void ot::Dialog::closeYes(void) {

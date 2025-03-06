@@ -33,27 +33,28 @@ namespace ot {
 	public:
 		//! @brief Defines possible dialog results.
 		enum DialogResult {
-			Ok,    //!< Represents an OK result.
-			Yes,   //!< Represents a Yes result.
-			No,    //!< Represents a No result.
-			Retry, //!< Represents a Retry result.
-			Cancel //!< Represents a Cancel result.
+			Ok,      //! @brief Represents an OK result.
+			Confirm, //! @brief Represents a Confirm result.
+			Yes,     //! @brief Represents a Yes result.
+			No,      //! @brief Represents a No result.
+			Retry,   //! @brief Represents a Retry result.
+			Cancel   //! @brief Represents a Cancel result.
 		};
 
 		//! @brief Flags for controlling how the dialog is displayed.
 		enum ShowFlag {
-			DefaultShow = 0 << 0, //!< Default behavior.
-			CenterOnParent = 1 << 0, //!< Positions this dialog in the middle of the parent widget.
-			FitOnScreen = 1 << 1, //!< Ensures the dialog fits on any screen.
-			IdealFit = CenterOnParent | FitOnScreen //!< Combines centering and fitting.
+			DefaultShow = 0 << 0,    //! @brief Default behavior.
+			CenterOnParent = 1 << 0, //! @brief Positions this dialog in the middle of the parent widget.
+			FitOnScreen = 1 << 1,    //! @brief Ensures the dialog fits on any screen.
+			IdealFit = CenterOnParent | FitOnScreen //! @brief Combines centering and fitting.
 		};
 		typedef Flags<ShowFlag> ShowFlags;
 
 		//! @brief Defines different states the dialog can be in.
 		enum class DialogState {
-			NoState = 0 << 0, //!< Default state.
-			MousePressed = 1 << 0, //!< The mouse is pressed.
-			Closing = 1 << 1  //!< The dialog is closing.
+			NoState = 0 << 0,      //! @brief Default state.
+			MousePressed = 1 << 0, //! @brief The mouse is pressed.
+			Closing = 1 << 1       //! @brief The dialog is closing.
 		};
 		typedef Flags<DialogState> DialogStateFlags;
 
@@ -81,6 +82,9 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
+
+		//! @brief Returns true if the result is either Ok or Confirm.
+		bool isSuccess(void) const { return m_result == Dialog::Ok || m_result == Dialog::Confirm; };
 
 		//! @brief Sets a dialog flag.
 		//! @param _flag The flag to set.
@@ -121,6 +125,12 @@ namespace ot {
 		//! @return The list of generated buttons.
 		std::list<PushButton*> generateDefaultButtons(const std::list<std::pair<QString, DialogResult>>& _buttonTextToResultList, QLayout* _layout = (QLayout*)nullptr);
 
+		//! @brief Generates default push buttons based on provided button results.
+		//! @param _buttonResults List of button results. Default text will be used for the results.
+		//! @param _layout If provided, buttons will be added to the layout in the given order.
+		//! @return The list of generated buttons.
+		std::list<PushButton*> generateDefaultButtons(const std::initializer_list<DialogResult>& _buttonResults, QLayout* _layout = (QLayout*)nullptr);
+
 	Q_SIGNALS:
 		//! @brief Emitted just before closing the dialog window.
 		//! Continue close is set to true by default.
@@ -134,6 +144,7 @@ namespace ot {
 	public Q_SLOTS:
 		void closeDialog(DialogResult _result);
 		void closeOk(void);
+		void closeConfirm(void);
 		void closeYes(void);
 		void closeNo(void);
 		void closeRetry(void);

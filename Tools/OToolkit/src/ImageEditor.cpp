@@ -232,8 +232,9 @@ bool ImageEditor::prepareToolShutdown(QSettings& _settings) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ImageEditor::slotOriginClicked(const QPoint& _px) {
-	if (_px.x() >= 0 && _px.x() < m_original->image().width() && _px.y() >= 0 && _px.y() < m_original->image().height()) {
-		m_toolBar->setFromColor(m_original->image().pixelColor(_px));
+	const QImage& pix = m_original->getImage();
+	if (_px.x() >= 0 && _px.x() < pix.width() && _px.y() >= 0 && _px.y() < pix.height()) {
+		m_toolBar->setFromColor(pix.pixelColor(_px));
 	}
 	else {
 		OT_LOG_E("PX issue");
@@ -256,7 +257,7 @@ void ImageEditor::slotImport(void) {
 }
 
 void ImageEditor::slotCalculate(void) {
-	QImage result = m_original->image();
+	QImage result = m_original->getImage();
 
 	int fR = m_toolBar->fromColor().red();
 	int fG = m_toolBar->fromColor().green();
@@ -332,7 +333,7 @@ void ImageEditor::slotCalculate(void) {
 }
 
 void ImageEditor::slotExport(void) {
-	if (m_currentFileName.isEmpty() || m_converted->image().isNull()) {
+	if (m_currentFileName.isEmpty() || m_converted->getImage().isNull()) {
 		OT_LOG_W("Noting to export");
 		return;
 	}
@@ -340,5 +341,5 @@ void ImageEditor::slotExport(void) {
 	QString fileName = QFileDialog::getSaveFileName(m_root->getViewWidget(), "Save Image", m_currentFileName, "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
 	if (fileName.isEmpty()) return;
 
-	m_converted->image().save(fileName);
+	m_converted->getImage().save(fileName);
 }
