@@ -20,6 +20,7 @@ namespace tt { class Group; }
 
 namespace ot {
 
+	class ToolButton;
 	class TabToolBarPage;
 	class TabToolBarSubGroup;
 
@@ -61,7 +62,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		void addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+		ToolButton* addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
 
 		//! @brief Creates and adds a default tool button.
 		//! @param _icon Button icon.
@@ -69,7 +70,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		void addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
+		ToolButton* addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu = (QMenu*)nullptr);
 
 	private:
 		std::string m_name;

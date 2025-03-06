@@ -14,6 +14,7 @@ namespace tt { class SubGroup; }
 
 namespace ot {
 
+	class ToolButton;
 	class TabToolBarGroup;
 
 	class OT_WIDGETS_API_EXPORT TabToolBarSubGroup {
@@ -41,7 +42,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		void addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu);
+		ToolButton* addToolButton(const QString& _iconPath, const QString& _text, QMenu* _menu);
 
 		//! @brief Creates and adds a default tool button.
 		//! @param _icon Button icon.
@@ -49,7 +50,7 @@ namespace ot {
 		//! @param _menu Menu to set.
 		//! @return Created ToolButton.
 		//! @ref ToolButton
-		void addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu);
+		ToolButton* addToolButton(const QIcon& _icon, const QString& _text, QMenu* _menu);
 
 	private:
 		std::string m_name;
