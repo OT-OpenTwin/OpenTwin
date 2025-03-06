@@ -23,6 +23,7 @@ namespace ot {
 		OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment, const QMargins& _overlayMargins = QMargins());
 		virtual ~OverlayWidgetBase();
 
+		void setOverlayMargins(int _left, int _top, int _right, int _bottom) { this->setOverlayMargins(QMargins(_left, _top, _right, _bottom)); };
 		void setOverlayMargins(const QMargins& _margins) { m_margins = _margins; this->updateOverlayGeometry(); };
 		const QMargins& overlayMargins(void) const { return m_margins; };
 

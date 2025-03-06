@@ -16,7 +16,7 @@ class GraphicsItemDesigner;
 
 class GraphicsItemDesignerInfoOverlay : public ot::OverlayWidgetBase {
 public:
-	GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view);
+	GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view, const QMargins& _overlayMargins = QMargins());
 
 	void setText(const QString& _text);
 

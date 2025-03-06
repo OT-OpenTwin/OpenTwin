@@ -11,9 +11,10 @@
 // Qt header
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qscrollbar.h>
 
-GraphicsItemDesignerInfoOverlay::GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view)
-	: ot::OverlayWidgetBase(_view, ot::AlignTop)
+GraphicsItemDesignerInfoOverlay::GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view, const QMargins& _overlayMargins)
+	: ot::OverlayWidgetBase(_view, ot::AlignTop, _overlayMargins)
 {
 	QHBoxLayout* lay = new QHBoxLayout(this);
 	m_label = new QLabel(_text);

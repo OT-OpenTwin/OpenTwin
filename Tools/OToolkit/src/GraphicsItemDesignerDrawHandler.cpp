@@ -23,7 +23,9 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/GraphicsScene.h"
+
+// QtWidgets
+#include <QtWidgets/qscrollbar.h>
 
 GraphicsItemDesignerDrawHandler::GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view)
 	: m_mode(NoMode), m_view(_view), m_overlay(nullptr), m_previewItem(nullptr), m_currentUid(0)
@@ -41,8 +43,7 @@ void GraphicsItemDesignerDrawHandler::startDraw(DrawMode _mode) {
 	if (m_mode == NoMode) return;
 
 	m_view->enablePickingMode();
-
-	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString(), m_view);
+	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString(), m_view, QMargins(0, 0, 0, m_view->horizontalScrollBar()->height()));
 
 	this->createPreviewItem();
 }

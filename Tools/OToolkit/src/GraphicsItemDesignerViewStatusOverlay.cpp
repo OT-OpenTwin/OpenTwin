@@ -11,9 +11,10 @@
 // Qt header
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qscrollbar.h>
 
-GraphicsItemDesignerViewStatusOverlay::GraphicsItemDesignerViewStatusOverlay(GraphicsItemDesignerView* _view)
-	: ot::OverlayWidgetBase(_view, ot::AlignBottomLeft)
+GraphicsItemDesignerViewStatusOverlay::GraphicsItemDesignerViewStatusOverlay(GraphicsItemDesignerView* _view) :
+	ot::OverlayWidgetBase(_view, ot::AlignBottomLeft, QMargins(0, 0, 0, _view->horizontalScrollBar()->height()))
 {
 	QHBoxLayout* lay = new QHBoxLayout(this);
 	m_posLabel = new QLabel("Pos: 0; 0");

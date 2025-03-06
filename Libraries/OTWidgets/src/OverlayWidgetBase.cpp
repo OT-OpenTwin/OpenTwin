@@ -61,7 +61,7 @@ bool ot::OverlayWidgetBase::eventFilter(QObject* _watched, QEvent* _event) {
 }
 
 void ot::OverlayWidgetBase::updateOverlayGeometry(void) {
-    QRect rec = m_parent->geometry().marginsRemoved(m_margins);
+    QRect rec = m_parent->geometry();
 
     if (this->minimumWidth() > rec.width() || this->minimumHeight() > rec.height()) {
         this->hide();
@@ -73,8 +73,6 @@ void ot::OverlayWidgetBase::updateOverlayGeometry(void) {
     rec.moveTo(m_parent->mapToGlobal(m_parent->pos()));
 
     QSize newSize = this->minimumSize().expandedTo(rec.size()).boundedTo(this->maximumSize());
-
-    rec = ot::Positioning::calculateChildRect(rec, newSize, m_alignment);
-
-    this->setGeometry(rec);
+    
+    this->setGeometry(ot::Positioning::calculateChildRect(rec, newSize + QSize(m_margins.left() + m_margins.right(), m_margins.top() + m_margins.bottom()), m_alignment).marginsRemoved(m_margins));    
 }
