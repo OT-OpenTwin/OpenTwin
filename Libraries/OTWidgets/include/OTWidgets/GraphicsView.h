@@ -139,7 +139,7 @@ namespace ot {
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 		void copyRequested(CopyInformation& _info);
-
+		  
 		void pasteRequested(CopyInformation& _info);
 
 	protected:
