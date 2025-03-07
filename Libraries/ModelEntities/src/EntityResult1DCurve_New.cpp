@@ -94,7 +94,10 @@ void EntityResult1DCurve_New::AddStorageData(bsoncxx::builder::basic::document& 
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("Query", m_queryInformation.m_query),
-		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.m_projection));
+		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.m_projection),
+		bsoncxx::builder::basic::kvp("QuantityFieldName", m_queryInformation.m_quantityFieldName),
+		bsoncxx::builder::basic::kvp("ParameterFieldName", m_queryInformation.m_parameterFieldName)
+	);
 }
 
 void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -102,5 +105,7 @@ void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::vi
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	m_queryInformation.m_query = doc_view["Query"].get_string();
 	m_queryInformation.m_projection = doc_view["Projection"].get_string();
+	m_queryInformation.m_quantityFieldName = doc_view["QuantityFieldName"].get_string();
+	m_queryInformation.m_parameterFieldName= doc_view["ParameterFieldName"].get_string();
 
 }

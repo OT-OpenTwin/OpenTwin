@@ -107,13 +107,13 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 	
-			/*const ot::Plot1DCfg tableCfg = curveEntity->getCurve();
+			const ot::Plot1DCurveCfg curveCfg = curveEntity->getCurve();
 			ot::JsonObject cfgObj;
-			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
+			curveCfg.addToJsonObject(cfgObj, document.GetAllocator());
 
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
 			std::string response;
-			Application::instance()->queuedRequestToFrontend(document);*/
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 	}
 	else

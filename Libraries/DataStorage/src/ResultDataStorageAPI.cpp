@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "../include/ResultDataStorageAPI.h"
 #include "Connection/ConnectionAPI.h"
-
+#include "bsoncxx/json.hpp"
 namespace DataStorageAPI
 {
 	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& collectionName)
@@ -27,6 +27,11 @@ namespace DataStorageAPI
 	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, int limit)
 	{
 		return documentAccess.GetAllDocuments(queryFilter, projectionQuery, limit);
+	}
+
+	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(const std::string& queryFilter, const std::string& projectionQuery, int limit)
+	{
+		return SearchInResultCollection(bsoncxx::from_json(queryFilter), bsoncxx::from_json(projectionQuery), limit);
 	}
 
 	void ResultDataStorageAPI::FlushQueuedData()

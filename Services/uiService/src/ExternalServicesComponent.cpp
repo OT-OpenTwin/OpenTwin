@@ -3724,6 +3724,76 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	return "";
 
 }
+
+#include "PlotManagerView.h"
+#include "PlotManager.h"
+#include "ResultDataStorageAPI.h"
+std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
+{
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	ot::Plot1DCurveCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	const std::string curveName = config.getEntityName();
+	const std::string plotName = curveName.substr(0,curveName.find_last_of('/'));
+
+
+	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findPlot(plotName);
+	if (plotViewManager != nullptr)
+	{
+		ot::PlotManager* plotManager = plotViewManager->getPlotManager();
+		
+		
+		const std::string collectionName = AppBase::instance()->getCollectionName();
+
+		DataStorageAPI::ResultDataStorageAPI dataAccess(collectionName);
+
+		auto queryInformation = config.getQueryInformation();
+		
+		DataStorageAPI::DataStorageResponse dbResponse =	dataAccess.SearchInResultCollection(queryInformation.m_query, queryInformation.m_projection,0);
+		if (dbResponse.getSuccess())
+		{
+			const std::string queryResponse = dbResponse.getResult();
+			ot::JsonDocument doc;
+			doc.fromJson(queryResponse);
+			auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+			const uint32_t numberOfDocuments = allMongoDocuments.Size();		
+			
+			std::vector<double> dataX, dataY;
+			dataX.reserve(numberOfDocuments);
+			dataY.reserve(numberOfDocuments);
+			for (uint32_t i = 0; i < numberOfDocuments; i++)
+			{
+				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+				auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityFieldName.c_str()];
+				auto& parameterEntry = singleMongoDocument[queryInformation.m_parameterFieldName.c_str()];
+
+				dataY.push_back(std::stod(quantityEntry.GetString()));
+				dataX.push_back(std::stod(parameterEntry.GetString()));
+			}
+
+			plotManager->addDataset(config,dataX.data(), dataY.data(), dataX.size());
+		}
+		
+	}
+
+	//const std::string& name = editor->getViewData().getEntityName();
+	//const auto& viewerType = editor->getViewData().getViewType();
+	//ot::UID globalActiveViewModel = -1;
+	//ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
+
+	return "";
+
+}
+
+
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 
