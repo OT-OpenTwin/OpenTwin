@@ -41,6 +41,8 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other) 
 
 		m_linePen = _other.m_linePen;
 		
+		m_queryInformation = _other.m_queryInformation;
+
 		m_pointsVisible = _other.m_pointsVisible;
 		m_pointsSize = _other.m_pointsSize;
 		m_pointsOulinePen = _other.m_pointsOulinePen;
@@ -56,6 +58,7 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const BasicEntityInformation& 
 }
 
 void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	
 	BasicEntityInformation::addToJsonObject(_object, _allocator);
 
 	OTAssertNullptr(m_pointsFillPainter);
@@ -84,6 +87,10 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	JsonObject pointFillPainterObj;
 	m_pointsFillPainter->addToJsonObject(pointFillPainterObj, _allocator);
 	_object.AddMember("PointFillPainter", pointFillPainterObj, _allocator);
+
+	JsonObject queryInfosObj;
+	m_queryInformation.addToJsonObject(queryInfosObj, _allocator);
+	_object.AddMember("QueryInformation", queryInfosObj, _allocator);
 }
 
 void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -105,6 +112,8 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_pointsVisible = json::getBool(_object, "PointsVisible");
 	m_pointsSize = json::getInt(_object, "PointsSize");
 	m_pointsOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
+
+	m_queryInformation.setFromJsonObject(json::getObject(_object, "QueryInformation"));
 
 	Painter2D* p = Painter2DFactory::create(json::getObject(_object, "PointFillPainter"));
 	if (p) {

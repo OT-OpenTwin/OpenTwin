@@ -3728,6 +3728,8 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 #include "PlotManagerView.h"
 #include "PlotManager.h"
 #include "ResultDataStorageAPI.h"
+#include "OTWidgets/PlotDataset.h"
+
 std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
 {
 	ot::BasicServiceInformation info;
@@ -3742,8 +3744,8 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	const std::string curveName = config.getEntityName();
-	const std::string plotName = curveName.substr(0,curveName.find_last_of('/'));
-
+	std::string plotName = curveName.substr(0,curveName.find_last_of('/'));
+	plotName = "Test/A_plot";
 
 	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findPlot(plotName);
 	if (plotViewManager != nullptr)
@@ -3766,20 +3768,29 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 			auto allMongoDocuments = ot::json::getArray(doc, "Documents");
 			const uint32_t numberOfDocuments = allMongoDocuments.Size();		
 			
-			std::vector<double> dataX, dataY;
-			dataX.reserve(numberOfDocuments);
-			dataY.reserve(numberOfDocuments);
+			//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership übernimmt
+			//dataX.reserve(numberOfDocuments);
+			//dataY.reserve(numberOfDocuments);
+
+			double* dataX(new double[numberOfDocuments]), *dataY(new double[numberOfDocuments]);
+			size_t counter(0);
 			for (uint32_t i = 0; i < numberOfDocuments; i++)
 			{
 				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
 				auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityFieldName.c_str()];
 				auto& parameterEntry = singleMongoDocument[queryInformation.m_parameterFieldName.c_str()];
 
-				dataY.push_back(std::stod(quantityEntry.GetString()));
-				dataX.push_back(std::stod(parameterEntry.GetString()));
+				(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
+				(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
+				counter++;
+				//dataY.push_back(static_cast<double>(quantityEntry.GetInt()));
+				//dataX.push_back(static_cast<double>(parameterEntry.GetInt()));
 			}
+			
+			auto dataSet =	plotManager->addDataset(config,dataX, dataY, numberOfDocuments);
 
-			plotManager->addDataset(config,dataX.data(), dataY.data(), dataX.size());
+			dataSet->updateCurveVisualization();
+			dataSet->attach();
 		}
 		
 	}

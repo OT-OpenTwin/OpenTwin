@@ -53,13 +53,15 @@ void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1
 	ot::QueryInformation queryInformation;
 	queryInformation.m_query= createQuery(seriesID);
 	queryInformation.m_projection = createProjection();
+	queryInformation.m_quantityFieldName = QuantityContainer::getFieldName();
+	queryInformation.m_parameterFieldName = std::to_string((*datasets.begin()->getParameters().begin())->getMetadataParameter().parameterUID);
 	
 	_config.setQueryInformation(queryInformation);
 }
 
 const std::string PlotBuilder::createQuery(ot::UID _seriesID)
 {
-	const std::string query = "{" + MetadataSeries::getFieldName() + ":" + std::to_string(_seriesID) + "}";
+	const std::string query = "{\"" + MetadataSeries::getFieldName() + "\":" + std::to_string(_seriesID) + "}";
 	return query;
 }
 
