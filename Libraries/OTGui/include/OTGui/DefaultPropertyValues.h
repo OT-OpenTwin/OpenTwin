@@ -28,10 +28,6 @@ namespace ot {
 		//! @brief Deserialize constructor.
 		DefaultPropertyValues(const ConstJsonObject& _object);
 
-		//! @brief Copy constructor.
-		//! @param _other Other object.
-		DefaultPropertyValues(const DefaultPropertyValues& _other);
-
 		//! @brief Move constructor.
 		//! @param _other Other object.
 		DefaultPropertyValues(DefaultPropertyValues&& _other) noexcept;
@@ -42,10 +38,6 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Operator
-
-		//! @brief Copy assignment operator.
-		//! @param _other Other object.
-		DefaultPropertyValues& operator = (const DefaultPropertyValues& _other);
 
 		//! @brief Move assignment operator.
 		//! @param _other Other object.
@@ -72,7 +64,7 @@ namespace ot {
 		//! @brief Store an objects properties.
 		//! @param _objectName Name of the object.
 		//! @param _properties 
-		void setObjectProperties(const std::string& _objectName, const PropertyManager& _properties);
+		void setObjectProperties(const std::string& _objectName, PropertyManager&& _properties);
 
 		//! @brief Get existing object properties.
 		//! If properties don't exist a reference to the default PropertyManager will be returned.

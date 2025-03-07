@@ -45,6 +45,7 @@ namespace ot {
 	//! The PropertyManager provides functions to set, get, and manage different property types.
 	//! It also supports serialization to and from JSON objects.
 	class OT_GUI_API_EXPORT PropertyManager : public Serializable {
+		OT_DECL_NOCOPY(PropertyManager)
 	public:
 		// Constructor
 
@@ -53,10 +54,6 @@ namespace ot {
 
 		//! @brief Deserialize constructor.
 		PropertyManager(const ConstJsonObject& _jsonObject);
-
-		//! @brief Copy constructor.
-		//! @param _other The PropertyManager to copy from.
-		PropertyManager(const PropertyManager& _other);
 
 		//! @brief Move constructor.
 		//! @param _other The PropertyManager to move from.
@@ -68,11 +65,6 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Operators
-
-		//! @brief Copy assignment operator.
-		//! @param _other The PropertyManager to copy from.
-		//! @return Reference to the updated PropertyManager.
-		PropertyManager& operator = (const PropertyManager& _other);
 
 		//! @brief Move assignment operator.
 		//! @param _other The PropertyManager to move from.
@@ -105,6 +97,11 @@ namespace ot {
 		//! @param _propertyGroupName Name of the group where the property should be located at.
 		//! @param _propertyName Name of the property. The name should be unique inside a group.
 		virtual void readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) const;
+
+		//! @brief Set the notifications silenced.
+		//! If set property access won't trigger any notification.
+		void setSilenceNotifications(bool _silence) { m_silenced = _silence; };
+		bool getSilenceNotifications(void) const { return m_silenced; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -345,6 +342,7 @@ namespace ot {
 		PropertyGroup* findOrCreateGroup(const std::string& _group);
 
 	private:
+		bool m_silenced; //! @brief If true any property access won't trigger a notification.
 		std::map<std::string, PropertyGroup*> m_groups; //! @brief Map containing all groups.
 		std::list<PropertyManagerNotifier*> m_notifier; //! @brief Notifier that will receive all property updates.
 		std::map<std::string, PropertyReadCallbackNotifier*> m_readNotifier;

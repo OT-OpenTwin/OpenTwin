@@ -12,10 +12,6 @@ ot::DefaultPropertyValues::DefaultPropertyValues(const ConstJsonObject& _object)
 	this->setFromJsonObject(_object);
 }
 
-ot::DefaultPropertyValues::DefaultPropertyValues(const DefaultPropertyValues& _other) :
-	m_defaultManager(_other.m_defaultManager), m_objectToPropertiesMap(_other.m_objectToPropertiesMap)
-{}
-
 ot::DefaultPropertyValues::DefaultPropertyValues(DefaultPropertyValues&& _other) noexcept :
 	m_defaultManager(std::move(_other.m_defaultManager)), m_objectToPropertiesMap(std::move(_other.m_objectToPropertiesMap))
 {
@@ -29,15 +25,6 @@ ot::DefaultPropertyValues::~DefaultPropertyValues() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Operator
-
-ot::DefaultPropertyValues& ot::DefaultPropertyValues::operator=(const DefaultPropertyValues& _other) {
-	if (this != &_other) {
-		m_defaultManager = _other.m_defaultManager;
-		m_objectToPropertiesMap = _other.m_objectToPropertiesMap;
-	}
-
-	return *this;
-}
 
 ot::DefaultPropertyValues& ot::DefaultPropertyValues::operator=(DefaultPropertyValues&& _other) noexcept {
 	if (this != &_other) {
@@ -87,8 +74,8 @@ void ot::DefaultPropertyValues::setFromJsonObject(const ot::ConstJsonObject& _ob
 
 // Setter / Getter
 
-void ot::DefaultPropertyValues::setObjectProperties(const std::string& _objectName, const PropertyManager& _properties) {
-	m_objectToPropertiesMap.insert_or_assign(_objectName, _properties);
+void ot::DefaultPropertyValues::setObjectProperties(const std::string& _objectName, PropertyManager&& _properties) {
+	m_objectToPropertiesMap.insert_or_assign(_objectName, std::move(_properties));
 }
 
 const ot::PropertyManager& ot::DefaultPropertyValues::getObjectProperties(const std::string& _objectName) const {

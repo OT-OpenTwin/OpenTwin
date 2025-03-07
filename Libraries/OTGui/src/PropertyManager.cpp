@@ -24,20 +24,15 @@
 #include "OTGui/PropertyReadCallbackNotifier.h"
 #include "OTGui/PropertyWriteCallbackNotifier.h"
 
-ot::PropertyManager::PropertyManager() {}
+ot::PropertyManager::PropertyManager() : m_silenced(false) {}
 
-ot::PropertyManager::PropertyManager(const ConstJsonObject& _jsonObject) {
+ot::PropertyManager::PropertyManager(const ConstJsonObject& _jsonObject) : m_silenced(false) {
 	this->setFromJsonObject(_jsonObject);
 }
 
-ot::PropertyManager::PropertyManager(const PropertyManager& _other) {
-	for (const auto& it : _other.m_groups) {
-		m_groups.insert_or_assign(it.first, it.second->createCopy(true));
-	}
-}
-
 ot::PropertyManager::PropertyManager(PropertyManager&& _other) noexcept :
-	m_groups(std::move(_other.m_groups))
+	m_silenced(std::move(_other.m_silenced)), m_groups(std::move(_other.m_groups)), m_notifier(std::move(_other.m_notifier)),
+	m_readNotifier(std::move(_other.m_readNotifier)), m_writeNotifier(std::move(_other.m_writeNotifier))
 {
 
 }
@@ -50,26 +45,21 @@ ot::PropertyManager::~PropertyManager() {
 
 // Operator
 
-ot::PropertyManager& ot::PropertyManager::operator=(const PropertyManager& _other) {
-	if (this != &_other) {
-		this->clear();
-
-		// Copy groups
-		for (const auto& it : _other.m_groups) {
-			m_groups.insert_or_assign(it.first, it.second->createCopy(true));
-		}
-	}
-
-	return *this;
-}
-
 ot::PropertyManager& ot::PropertyManager::operator=(PropertyManager&& _other) noexcept {
 	if (this != &_other) {
+		m_silenced = std::move(_other.m_silenced);
 		m_groups = std::move(_other.m_groups);
+		m_notifier = std::move(_other.m_notifier);
+		m_readNotifier = std::move(_other.m_readNotifier);
+		m_writeNotifier = std::move(_other.m_writeNotifier);
 	}
 
 	return *this;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
 
 void ot::PropertyManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	JsonArray arr;
@@ -98,6 +88,9 @@ void ot::PropertyManager::setFromJsonObject(const ot::ConstJsonObject& _object) 
 // Event handling
 
 void ot::PropertyManager::propertyChanged(const Property* _property) {
+	if (m_silenced) {
+		return;
+	}
 	const auto it = m_writeNotifier.find(_property->getPropertyPath());
 	if (it != m_writeNotifier.end()) {
 		it->second->call(_property);
@@ -109,6 +102,9 @@ void ot::PropertyManager::propertyChanged(const Property* _property) {
 }
 
 void ot::PropertyManager::readingProperty(const std::string& _propertyGroupName, const std::string& _propertyName) const {
+	if (m_silenced) {
+		return;
+	}
 	const auto it = m_readNotifier.find(_propertyGroupName + "/" + _propertyName);
 	if (it != m_readNotifier.end()) {
 		it->second->call(_propertyGroupName, _propertyName);

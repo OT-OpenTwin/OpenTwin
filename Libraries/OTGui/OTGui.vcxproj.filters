@@ -434,6 +434,9 @@
     <ClInclude Include="include\OTGui\QueryInformation.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PropertyManagerSilencer.h">
+      <Filter>Header Files\ManagedProperties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -765,6 +768,9 @@
     </ClCompile>
     <ClCompile Include="src\QueryInformation.cpp">
       <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyManagerSilencer.cpp">
+      <Filter>Source Files\ManagedProperties</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

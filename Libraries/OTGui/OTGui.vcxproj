@@ -93,6 +93,7 @@
     <ClInclude Include="include\OTGui\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTGui\Property.h" />
     <ClInclude Include="include\OTGui\PropertyManagerIterator.h" />
+    <ClInclude Include="include\OTGui\PropertyManagerSilencer.h" />
     <ClInclude Include="include\OTGui\PropertyReadCallbackNotifier.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
     <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Property.cpp" />
+    <ClCompile Include="src\PropertyManagerSilencer.cpp" />
     <ClCompile Include="src\PropertyReadCallbackNotifier.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
