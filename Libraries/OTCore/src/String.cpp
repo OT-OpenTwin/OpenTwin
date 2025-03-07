@@ -136,13 +136,13 @@ std::list<std::string> ot::String::split(const std::string& _str, char _splitBy,
 	while (it != std::string::npos) {
 		std::string sub = temp.substr(0, it);
 		if (!_skipEmpty || !sub.empty()) {
-			ret.push_back(sub);
+			ret.push_back(std::move(sub));
 		}
 		temp = temp.substr(it + 1);
 		it = temp.find(_splitBy);
 	}
 	if (!_skipEmpty || !temp.empty()) {
-		ret.push_back(temp);
+		ret.push_back(std::move(temp));
 	}
 	return ret;
 }
@@ -155,13 +155,13 @@ std::list<std::string> ot::String::split(const std::string& _str, const std::str
 	while (it != std::string::npos) {
 		std::string sub = temp.substr(0, it);
 		if (!_skipEmpty || !sub.empty()) {
-			ret.push_back(sub);
+			ret.push_back(std::move(sub));
 		}
 		temp = temp.substr(it + _splitBy.length());
 		it = temp.find(_splitBy);
 	}
 	if (!_skipEmpty || !temp.empty()) {
-		ret.push_back(temp);
+		ret.push_back(std::move(temp));
 	}
 	return ret;
 }
@@ -174,13 +174,13 @@ std::list<std::wstring> ot::String::split(const std::wstring& _str, wchar_t _spl
 	while (it != std::wstring::npos) {
 		std::wstring sub = temp.substr(0, it);
 		if (!_skipEmpty || !sub.empty()) {
-			ret.push_back(sub);
+			ret.push_back(std::move(sub));
 		}
 		temp = temp.substr(it + 1);
 		it = temp.find(_splitBy);
 	}
 	if (!_skipEmpty || !temp.empty()) {
-		ret.push_back(temp);
+		ret.push_back(std::move(temp));
 	}
 	return ret;
 }
@@ -193,13 +193,13 @@ std::list<std::wstring> ot::String::split(const std::wstring& _str, const std::w
 	while (it != std::wstring::npos) {
 		std::wstring sub = temp.substr(0, it);
 		if (!_skipEmpty || !sub.empty()) {
-			ret.push_back(sub);
+			ret.push_back(std::move(sub));
 		}
 		temp = temp.substr(it + _splitBy.length());
 		it = temp.find(_splitBy);
 	}
 	if (!_skipEmpty || !temp.empty()) {
-		ret.push_back(temp);
+		ret.push_back(std::move(temp));
 	}
 	return ret;
 }
@@ -256,7 +256,7 @@ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std
 				case '0':
 					// Since a string is always 0 terminated, we return.
 					if (!currentSegment.empty() || !_skipEmpty) {
-						result.push_back(currentSegment);
+						result.push_back(std::move(currentSegment));
 					}
 					return result;
 
@@ -296,7 +296,7 @@ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std
 		// Check for the delimiter
 		if (!insideQuotes && _str.find(_splitBy, i) == i) {
 			if (!currentSegment.empty() || !_skipEmpty) {
-				result.push_back(currentSegment);
+				result.push_back(std::move(currentSegment));
 			}
 			currentSegment.clear();
 			i += splitLen;
@@ -313,7 +313,7 @@ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std
 	}
 
 	if (!currentSegment.empty() || !_skipEmpty) {
-		result.push_back(currentSegment);
+		result.push_back(std::move(currentSegment));
 	}
 
 	if (insideQuotes) {
