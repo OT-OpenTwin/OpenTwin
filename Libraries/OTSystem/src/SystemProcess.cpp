@@ -74,7 +74,11 @@ ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::wstrin
 	info.cb = sizeof(info);
 	info.lpTitle = commandline;
 	info.dwFlags = STARTF_USESHOWWINDOW;
-	info.wShowWindow = SW_SHOW;
+	#ifdef OT_RELEASE_DEBUG
+		info.wShowWindow = SW_SHOW;
+	#else
+		info.wShowWindow = SW_HIDE;
+	#endif
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
 	const bool createSuccess = CreateProcess(applicationPath, commandline, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE | ABOVE_NORMAL_PRIORITY_CLASS, penv, NULL, &info, &processInfo);
