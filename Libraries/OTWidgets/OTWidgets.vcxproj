@@ -23,6 +23,7 @@
     <ClCompile Include="src\AbstractPlotAxis.cpp" />
     <ClCompile Include="src\Action.cpp" />
     <ClCompile Include="src\ApplicationPropertiesManager.cpp" />
+    <ClCompile Include="src\BasicAsciiNameValidator.cpp" />
     <ClCompile Include="src\BasicWidgetView.cpp" />
     <ClCompile Include="src\CartesianPlot.cpp" />
     <ClCompile Include="src\CartesianPlotAxis.cpp" />
@@ -228,6 +229,7 @@
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\AbstractStatusBar.h" />
     <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
+    <ClInclude Include="include\OTWidgets\BasicAsciiNameValidator.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h" />
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
     <QtMoc Include="include\OTWidgets\WidgetViewTab.h" />
