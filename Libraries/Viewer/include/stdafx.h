@@ -22,7 +22,7 @@
 #include <sstream>
 #include <cassert>
 
-#define DBOUT( s )            \
+#define DBOUT(s)            \
 {                             \
    std::ostringstream os_;    \
    os_ << s;                   \

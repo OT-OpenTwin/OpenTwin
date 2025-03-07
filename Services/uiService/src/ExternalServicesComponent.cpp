@@ -3699,6 +3699,31 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 
 // 1D Plot
 
+std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) 
+{
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	ot::Plot1DCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	const ot::PlotManagerView* plot = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	
+
+
+	//const std::string& name = editor->getViewData().getEntityName();
+	//const auto& viewerType = editor->getViewData().getViewType();
+	//ot::UID globalActiveViewModel = -1;
+	//ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
+
+	return "";
+
+}
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 

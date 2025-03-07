@@ -49,6 +49,8 @@
 
 #include "TextVisualiser.h"
 #include "TableVisualiser.h"
+#include "PlotVisualiser.h"
+#include "CurveVisualiser.h"
 
 #include <QtWidgets/qheaderview.h>
 
@@ -736,6 +738,18 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	{
 		auto textVis = new TextVisualiser(sceneNode);
 		sceneNode->addVisualiser(textVis);
+	}
+
+	if (_visualisationTypes.visualiseAsPlot1D())
+	{
+		auto plotVis = new PlotVisualiser(sceneNode);
+		sceneNode->addVisualiser(plotVis);
+	}
+
+	if (_visualisationTypes.visualiseAsCurve())
+	{
+		auto curveVis = new CurveVisualiser(sceneNode);
+		sceneNode->addVisualiser(curveVis);
 	}
 
 	// Get the parent scene node
