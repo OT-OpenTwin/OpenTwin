@@ -18,6 +18,8 @@ namespace ot {
 	
 	//! @class PropertyManagerGridLink
 	//! @brief The PropertyManagerGridLink is a link between properties of a PropertyManager and a PropertyGrid.
+	//! The PropertyManagerGridLink can be visualized at a grid.
+	//! When visualized any changes to the properties in the grid will be forwarded to the actual properties synchronizing a grid with a WidgetPropertyManager.
 	//! @ref PropertyGrid
 	//! @ref WidgetPropertyManager
 	class OT_WIDGETS_API_EXPORT PropertyManagerGridLink : public ManagedPropertyLink {

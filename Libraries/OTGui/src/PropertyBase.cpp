@@ -19,6 +19,7 @@ std::string ot::PropertyBase::toString(PropertyFlag _flag) {
 	case ot::PropertyBase::IsDeletable: return "IsDeletable";
 	case ot::PropertyBase::AllowCustomValues: return "AllowCustomValues";
 	case ot::PropertyBase::AllowMultiselection: return "AllowMultiselection";
+	case ot::PropertyBase::NoSerialize: return "NoSerialize";
 	default:
 		OT_LOG_EA("Unknown PropertyBase Flag");
 		return "<null>";
@@ -35,6 +36,7 @@ ot::PropertyBase::PropertyFlag ot::PropertyBase::stringToFlag(const std::string&
 	else if (_flag == PropertyBase::toString(PropertyBase::IsDeletable)) { return PropertyBase::IsDeletable; }
 	else if (_flag == PropertyBase::toString(PropertyBase::AllowCustomValues)) { return PropertyBase::AllowCustomValues; }
 	else if (_flag == PropertyBase::toString(PropertyBase::AllowMultiselection)) { return PropertyBase::AllowMultiselection; }
+	else if (_flag == PropertyBase::toString(PropertyBase::NoSerialize)) { return PropertyBase::NoSerialize; }
 	else {
 		OT_LOG_EAS("Unknown PropertyBase Flag \"" + _flag + "\"");
 		return PropertyBase::NoFlags;
@@ -51,6 +53,7 @@ std::list<std::string> ot::PropertyBase::toStringList(PropertyFlags _flags) {
 	if (_flags & PropertyBase::IsDeletable) ret.push_back(PropertyBase::toString(PropertyBase::IsDeletable));
 	if (_flags & PropertyBase::AllowCustomValues) ret.push_back(PropertyBase::toString(PropertyBase::AllowCustomValues));
 	if (_flags & PropertyBase::AllowMultiselection) ret.push_back(PropertyBase::toString(PropertyBase::AllowMultiselection));
+	if (_flags & PropertyBase::NoSerialize) ret.push_back(PropertyBase::toString(PropertyBase::NoSerialize));
 	return ret;
 }
 
