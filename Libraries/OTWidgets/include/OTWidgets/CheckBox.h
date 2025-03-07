@@ -19,6 +19,7 @@ namespace ot {
 	public:
 		CheckBox(QWidget* _parent = (QWidget*)nullptr);
 		CheckBox(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
+		CheckBox(Qt::CheckState _state, const QString& _text, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~CheckBox() {};
 
 		virtual QWidget* getQWidget(void) override { return this; };

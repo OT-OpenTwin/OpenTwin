@@ -45,16 +45,22 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
         if (opt.state & QStyle::State_MouseOver) { // Hover
             _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetHoverBackground).toBrush());
             textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetHoverForeground).toBrush());
-        }
+        } 
         else if (opt.state & QStyle::State_Selected) { // Selected
             _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetSelectionBackground).toBrush());
             textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetSelectionForeground).toBrush());
         }
-        else if (item->background().color().isValid()) { // Item has valid color set
-            _painter->fillRect(opt.rect, item->background());
-        }
-        else { // Default
-            _painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
+        else {
+            if (item->background().color().isValid()) { // Item has valid color set
+                _painter->fillRect(opt.rect, item->background());
+            }
+            else { // Default
+                _painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
+            }
+
+            if (item->foreground().color().isValid()) { // Item has valid foreground set
+                textPen.setBrush(item->foreground());
+            }
         }
     }
 
