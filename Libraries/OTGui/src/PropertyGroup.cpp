@@ -76,9 +76,12 @@ void ot::PropertyGroup::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 
 	JsonArray pArr;
 	for (Property* prop : m_properties) {
-		JsonObject pObj;
-		prop->addToJsonObject(pObj, _allocator);
-		pArr.PushBack(pObj, _allocator);
+		OTAssertNullptr(prop);
+		if (!(prop->getPropertyFlags() & PropertyBase::NoSerialize)) {
+			JsonObject pObj;
+			prop->addToJsonObject(pObj, _allocator);
+			pArr.PushBack(pObj, _allocator);
+		}
 	}
 	_object.AddMember("Properties", pArr, _allocator);
 }
