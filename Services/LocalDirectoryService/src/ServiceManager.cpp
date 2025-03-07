@@ -167,7 +167,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 
 			OT_LOG_D("Checking relay startup completed for relay service at \"" + newService->url() + "\"");
 
-			for (int attempt = 0; attempt < 3; attempt++) {
+			for (int attempt = 0; attempt < 60; attempt++) {
 				std::string response;
 				if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response)) {
 					if (response == OT_ACTION_RETURN_VALUE_TRUE) {
