@@ -23,8 +23,9 @@ ot::BasicAsciiNameValidator::State ot::BasicAsciiNameValidator::checkStringValid
 		}
 
 		for (; ix < _string.size(); ix++) {
-			if (!(chr >= 'A' && chr <= 'Z') && !(chr >= 'a' && chr <= 'z') && !(chr >= '0' && chr <= '9')) {
-				if (ix < _string.size() - 1) {
+			QChar chr = _string.at(ix);
+			if ((!(chr >= 'A' && chr <= 'Z')) && (!(chr >= 'a' && chr <= 'z')) && (!(chr >= '0' && chr <= '9'))) {
+				if (ix < (_string.size() - 1)) {
 					if (chr != ' ' && chr != '_') {
 						result = QValidator::State::Invalid;
 						break;
@@ -43,7 +44,7 @@ ot::BasicAsciiNameValidator::State ot::BasicAsciiNameValidator::checkStringValid
 }
 
 void ot::BasicAsciiNameValidator::fixup(QString& _input) const {
-	for (auto it = _input.begin(); it != _input.end(); it++) {
+		for (auto it = _input.begin(); it != _input.end(); it++) {
 		QChar chr = *it;
 		if (!(chr >= 'A' && chr <= 'Z') && !(chr >= 'a' && chr <= 'z') &&
 			!(chr >= '0' && chr <= '9') && chr != ' ' && chr != '_') {
