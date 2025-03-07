@@ -214,6 +214,7 @@
     <ClCompile Include="src\CircuitElements\Diode.cpp" />
     <ClCompile Include="src\CircuitElements\Inductor.cpp" />
     <ClCompile Include="src\CircuitElements\Resistor.cpp" />
+    <ClCompile Include="src\CircuitElements\TransmissionLine.cpp" />
     <ClCompile Include="src\CircuitElements\VoltageMeter.cpp" />
     <ClCompile Include="src\CircuitElements\VoltageSource.cpp" />
     <ClCompile Include="src\Connection.cpp" />
@@ -236,6 +237,7 @@
     <ClInclude Include="include\CircuitElements\Diode.h" />
     <ClInclude Include="include\CircuitElements\Inductor.h" />
     <ClInclude Include="include\CircuitElements\Resistor.h" />
+    <ClInclude Include="include\CircuitElements\TransmissionLine.h" />
     <ClInclude Include="include\CircuitElements\VoltageMeter.h" />
     <ClInclude Include="include\CircuitElements\VoltageSource.h" />
     <ClInclude Include="include\Connection.h" />

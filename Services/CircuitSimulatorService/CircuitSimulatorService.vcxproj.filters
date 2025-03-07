@@ -81,6 +81,9 @@
     <ClCompile Include="src\QtWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CircuitElements\TransmissionLine.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="include\QtWrapper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\TransmissionLine.h">
+      <Filter>Header Files\CircuitElements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

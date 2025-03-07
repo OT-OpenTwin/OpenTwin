@@ -9,6 +9,7 @@
 #include "CircuitElements/Capacitor.h"
 #include "CircuitElements/VoltageMeter.h"
 #include "CircuitElements/CurrentMeter.h"
+#include "CircuitElements/TransmissionLine.h"
 #include "SimulationResults.h"
 
 
@@ -22,6 +23,7 @@
 #include "EntityBlockCircuitInductor.h"
 #include "EntityBlockCircuitCurrentMeter.h"
 #include "EntityBlockCircuitGND.h"
+#include "EntityBlockCircuitTransmissionLine.h"
 
 //Third Party Header
 #include <string>
@@ -677,16 +679,23 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto currentMeter_p = currentMeter.release();
 			it->second.addElement(uid, currentMeter_p);
 		}
-		/*else if (blockEntity->getClassName() == "EntityBlockCircuitGND") {
-			auto myElement = dynamic_cast<EntityBlockCircuitGND*>(blockEntity.get());
-			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+		else if (blockEntity->getClassName() == "EntityBlockCircuitTransmissionLine") {
+			auto myElement = dynamic_cast<EntityBlockCircuitTransmissionLine*>(blockEntity.get());
+			auto transmissionLine = std::make_unique<TransmissionLine>(myElement->getImpedance(),myElement->getTransmissionDelay(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
-			currentMeter->setNetlistName(myElement->getNameOnly());
+			transmissionLine->setCustomName(myElement->getNameOnly());
+			transmissionLine->setNetlistName(assignElementID("T"));
 
-			ot::UID uid = currentMeter->getUID();
-			auto currentMeter_p = currentMeter.release();
-			it->second.addElement(uid, currentMeter_p);
-		}*/
+			//Add customName and netlistName to Map
+			if (!addToCustomNameToNetlistMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName()) ||
+				!addToNetlistNameToCustomMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName())) {
+				OT_LOG_E("customName and netlistName could not be added to map");
+			}
+
+			ot::UID uid = transmissionLine->getUID();
+			auto transmissionLine_p = transmissionLine.release();
+			it->second.addElement(uid, transmissionLine_p);
+		}
 	
 	}
 
@@ -915,13 +924,61 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			netlistLine += netlistElementName + " ";
 			netlistValue = inductor->getInductance();
 		}
+		else if (circuitElement->type() == "TransmissionLine") 
+		{
+			TransmissionLine* transmissionLine = dynamic_cast<TransmissionLine*>(circuitElement);
+			netlistElementName = transmissionLine->getNetlistName();
+			netlistLine += netlistElementName + " ";
+			netlistValue = transmissionLine->getImpedance() + " " + transmissionLine->getTransmissionDelay();
+		}
 		
 		
 		//insert connectionNodeNumbers into string
 		
 		std::unordered_set<std::string> temp;
 		auto connections = circuitElement->getList();
+
+		if (circuitElement->type() == "TransmissionLine") 
+		{
+			//Here check positive1/neg1 and pos2/neg2 need some work !!!
+			if (connections.find("PositivePole1") != connections.end()) {
+				auto& positiveConn = connections.at("PositivePole1");
+
+				if (positiveConn.getNodeNumber() != "voltageMeterConnection" ) {
+					netlistNodeNumbers += positiveConn.getNodeNumber() + " ";
+					temp.insert(positiveConn.getNodeNumber());
+				}
+			}
 			
+			if (connections.find("PositivePole2") != connections.end()) {
+				auto& positiveConn = connections.at("PositivePole2");
+
+				if (positiveConn.getNodeNumber() != "voltageMeterConnection") {
+					netlistNodeNumbers += positiveConn.getNodeNumber() + " ";
+					temp.insert(positiveConn.getNodeNumber());
+				}
+			}
+			
+
+			if (connections.find("NegativePole1") != connections.end()) {
+				auto& negativeConn = connections.at("NegativePole1");
+
+				if (negativeConn.getNodeNumber() != "voltageMeterConnection") {
+					netlistNodeNumbers += negativeConn.getNodeNumber() + " ";
+					temp.insert(negativeConn.getNodeNumber());
+				}
+			}
+
+			if (connections.find("NegativePole2") != connections.end()) {
+				auto& negativeConn = connections.at("NegativePole2");
+
+				if (negativeConn.getNodeNumber() != "voltageMeterConnection") {
+					netlistNodeNumbers += negativeConn.getNodeNumber() + " ";
+					temp.insert(negativeConn.getNodeNumber());
+				}
+			}
+		}
+		else {
 			if (connections.find("positivePole") != connections.end()) {
 				auto& positiveConn = connections.at("positivePole");
 
@@ -939,6 +996,9 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 					temp.insert(negativeConn.getNodeNumber());
 				}
 			}
+		}
+			
+	
 
 
 		
