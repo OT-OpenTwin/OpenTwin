@@ -25,6 +25,10 @@ namespace ot {
 		PixmapWidget(const QPixmap& _pixmap);
 		virtual ~PixmapWidget();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Virtual methods
+
 		virtual QWidget* getQWidget(void) override { return this; };
 		virtual const QWidget* getQWidget(void) const override { return this; };
 
@@ -38,13 +42,15 @@ namespace ot {
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Pixmap manipulation
+
 		void setPixmap(const QPixmap& _pixmap);
 		const QPixmap& getPixmap(void) const { return m_pixmap; };
-		
-		void scalePixmap(const QSize& _newSize);
 
-		void setEnableResizing(bool _enable) { m_enabledResizing = _enable; };
-		bool getEnableResizing(void) const { return m_enabledResizing; };
+		void setPixmapResizable(bool _resizable) { m_enabledResizing = _resizable; };
+		bool getPixmapResizable(void) const { return m_enabledResizing; };
 
 	Q_SIGNALS:
 		void imagePixedClicked(const QPoint& _px);
@@ -52,12 +58,16 @@ namespace ot {
 	protected:
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
+		virtual QSize calculateScaledPixmap(const QSize& _newPreferredSize);
+
 	private:
 		bool m_enabledResizing;
+		bool m_userResized;
 		QPixmap m_pixmap;
-		QSize m_fixedSize;
 		QPixmap m_scaledPixmap;
-		QSize m_scaleFactors;
+		QSizeF m_scaleFactors;
+
+		void updateScaleFactors(void);
 	};
 
 }
