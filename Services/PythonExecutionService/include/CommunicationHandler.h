@@ -10,6 +10,7 @@
 
 // Qt header
 #include <QtNetwork/qlocalserver.h>
+#include <mutex>
 
 class SubprocessManager;
 
@@ -55,14 +56,22 @@ private:
 	bool sendFrontendConfigToClient(void);
 	bool sendDataBaseConfigToClient(void);
 
+	ClientState getClientState();
+	void setClientState(ClientState _clientState);
+
+	//! @brief Waits the default timeout (30 sec) and checks every 10 msec if the client state has changed
 	bool waitForClient(void);
+	
+	//! @brief Danger? Waits infinitly for a response
 	bool sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response);
 
 	SubprocessManager* m_manager;
 	std::string m_serverName;
 
 	QLocalSocket* m_client;
-	ClientState m_clientState;
+	ClientState m_clientState; //State is accessed by two threads, use the threadsafe getter and setter
+	std::mutex m_clientStateMutex;
+
 	bool m_isInitializingClient;
 
 	bool m_serviceAndSessionInfoSet;

@@ -42,15 +42,19 @@ bool CommunicationHandler::sendConfigToClient(void) {
 	OT_LOG_D("Sending configuration to client");
 
 	if (!this->sendServiceInfoToClient()) {
+		OT_LOG_E("Failed to send service configuration");
 		return false;
 	}
 	if (!this->sendModelConfigToClient()) {
+		OT_LOG_E("Failed to send model configuration");
 		return false;
 	}
 	if (!this->sendFrontendConfigToClient()) {
+		OT_LOG_E("Failed to send frontend configuration");
 		return false;
 	}
 	if (!this->sendDataBaseConfigToClient()) {
+		OT_LOG_E("Failed to send database configuration");
 		return false;
 	}
 	
@@ -84,7 +88,7 @@ void CommunicationHandler::slotClientDisconnected(void) {
 		m_client = nullptr;
 	}
 
-	m_clientState = ClientState::Disconnected;
+	setClientState(ClientState::Disconnected);
 	
 	m_serviceAndSessionInfoSet = false;
 	m_modelUrlSet = false;
@@ -100,30 +104,47 @@ void CommunicationHandler::processNextEvent(void) {
 }
 
 bool CommunicationHandler::sendServiceInfoToClient(void) {
-	if (!m_serviceAndSessionInfoSet) {
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
-
-		QByteArray request = QByteArray::fromStdString(doc.toJson());
-		request.append('\n');
-
-		std::string response;
-		if (!this->sendToClient(request, true, response)) {
-			OT_LOG_E("Failed to send model info to client");
-			return false;
-		}
-
-		m_serviceAndSessionInfoSet = true;
+	bool success = true;
+	
+	if (m_serviceAndSessionInfoSet) 
+	{
+		OT_LOG_W("Repeated setting of service information.");
+		m_serviceAndSessionInfoSet = false; //may fail this time
 	}
 
-	return true;
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
+
+	QByteArray request = QByteArray::fromStdString(doc.toJson());
+	request.append('\n');
+
+	std::string response;
+	if (!this->sendToClient(request, true, response)) {
+		OT_LOG_E("Failed to send service info to client");
+		success = false;
+	}
+	else
+	{
+		m_serviceAndSessionInfoSet = true;
+	}
+	
+	return success;
 }
 
-bool CommunicationHandler::sendModelConfigToClient(void) {
-	if (!m_modelUrl.empty() && !m_modelUrlSet) {
+bool CommunicationHandler::sendModelConfigToClient(void) 
+{
+	bool success = true;
+	if (!m_modelUrl.empty()) {
+
+		if (m_modelUrlSet)
+		{
+			OT_LOG_W("Repeated setting of model config");
+			m_modelUrlSet = false; //may fail this time
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
@@ -135,17 +156,33 @@ bool CommunicationHandler::sendModelConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send model info to client");
-			return false;
+			success = false;
 		}
-
-		m_modelUrlSet = true;
+		else
+		{
+			m_modelUrlSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with model config, but the url is not set");
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
-bool CommunicationHandler::sendFrontendConfigToClient(void) {
-	if (!m_frontendUrl.empty() && !m_frontendUrlSet) {
+bool CommunicationHandler::sendFrontendConfigToClient(void) 
+{	
+	bool success = true;
+	if (!m_frontendUrl.empty()) 
+	{
+		if (m_frontendUrlSet)
+		{
+			OT_LOG_W("Repeated setting of frontend config");
+			m_frontendUrlSet = false;
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
@@ -157,17 +194,32 @@ bool CommunicationHandler::sendFrontendConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send frontend info to client");
-			return false;
+			success = false;
 		}
-
-		m_frontendUrlSet = true;
+		else
+		{
+			m_frontendUrlSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with frontend config, but they are not set");
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
 bool CommunicationHandler::sendDataBaseConfigToClient(void) {
-	if (m_databaseInfo.hasInfoSet() && !m_databaseInfoSet) {
+	bool success = true;
+	if (m_databaseInfo.hasInfoSet()) 
+	{
+		if (m_databaseInfoSet)
+		{
+			OT_LOG_W("Repeated setting of database information.");
+			m_databaseInfoSet= false; //may fail this time
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
@@ -184,21 +236,40 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send database info to client");
-			return false;
+			success = false;
 		}
-
-		m_databaseInfoSet = true;
+		else
+		{
+			m_databaseInfoSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with database config, but they are not set");
+		success = false;
 	}
 
-	return true;
+	return success;
+}
+
+CommunicationHandler::ClientState CommunicationHandler::getClientState()
+{
+	std::lock_guard<std::mutex> lock (m_clientStateMutex);
+	return m_clientState;
+}
+
+void CommunicationHandler::setClientState(ClientState _clientState)
+{
+	std::lock_guard<std::mutex> lock(m_clientStateMutex);
+	m_clientState = _clientState;
 }
 
 bool CommunicationHandler::waitForClient(void) {
 	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::connectionTimeout / tickTime;
-	while (m_clientState != ClientState::Ready || m_isInitializingClient) {
+	while (getClientState() != ClientState::Ready || m_isInitializingClient) {
 		if (timeout--) {
-			std::this_thread::sleep_for(std::chrono::microseconds(tickTime));
+			std::this_thread::sleep_for(std::chrono::milliseconds(tickTime));
 			this->processNextEvent();
 		}
 		else {
@@ -214,7 +285,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG_D("Message from client: \"" + _message + "\"");
 
 	// Check state
-	if (m_clientState == ClientState::WaitForPing) {
+	if (getClientState() == ClientState::WaitForPing) {
 		ot::JsonDocument responseDoc;
 		if (!responseDoc.fromJson(_message)) {
 			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");
@@ -231,15 +302,15 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 		}
 
 		m_isInitializingClient = true;
-		m_clientState = ClientState::Ready;
+		setClientState(ClientState::Ready);
 
 		if (!this->sendConfigToClient()) {
 			m_client->disconnect();
 		}
 	}
-	else if (m_clientState == ClientState::WaitForResponse) {
+	else if (getClientState() == ClientState::WaitForResponse) {
 		m_response = std::move(_message);
-		m_clientState = ClientState::ReponseReceived;
+		setClientState(ClientState::ReponseReceived);
 	}
 	else {
 		OT_LOG_W("Client send unexpected message: \"" + _message + "\"");
@@ -248,7 +319,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {
 	// Ensure client is in ready state
-	if (m_clientState != ClientState::Ready) {
+	if (getClientState() != ClientState::Ready) {
 		OT_LOG_EA("No client connected");
 		return false;
 	}
@@ -263,26 +334,35 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	OT_LOG_D("Writing to client: \"" + _data.toStdString() + "\"");
 
 	m_client->write(_data);
-	m_client->flush();
+	
+	setClientState(ClientState::WaitForResponse);
+	bool flushSuccess = m_client->flush(); //Any data was written.
+
+	if (!flushSuccess)
+	{
+		OT_LOG_E("Failed to flush data");
+		setClientState(ClientState::Ready);
+		return false;
+	}
 
 	if (!_expectResponse) {
 		return true;
 	}
 
 	// We know the request was sent successfully, so we set the state to wait for response and wait..
-	m_clientState = ClientState::WaitForResponse;
-
-	while (m_clientState == ClientState::WaitForResponse) {
-		std::this_thread::sleep_for(std::chrono::microseconds(Timeouts::defaultTickTime));
+	
+	OT_LOG_D("Waiting for response");
+	while (getClientState() == ClientState::WaitForResponse) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::defaultTickTime));
 		this->processNextEvent();
 	}
 
 	// Check if the client has received a response or disconnected.
-	if (m_clientState == ClientState::ReponseReceived) {
+	if (getClientState() == ClientState::ReponseReceived) {
 		OT_LOG_D("Client response received: \"" + _response + "\"");
 
 		_response = m_response;
-		m_clientState = ClientState::Ready;
+		setClientState(ClientState::Ready);
 		return true;
 	}
 	else {
@@ -308,8 +388,8 @@ void CommunicationHandler::slotNewConnection(void) {
 	}
 
 	// Ensure the state is set correctly
-	if (m_clientState != ClientState::Disconnected) {
-		OT_LOG_E("Client in undefined state (" + std::to_string((int)m_clientState) + ")");
+	if (getClientState() != ClientState::Disconnected) {
+		OT_LOG_E("Client in undefined state (" + std::to_string((int)getClientState()) + ")");
 		return;
 	}
 
@@ -317,7 +397,7 @@ void CommunicationHandler::slotNewConnection(void) {
 	m_client = newSocket;
 	
 	// Send ping to ensure stable connection
-	m_clientState = ClientState::WaitForPing;
+	setClientState(ClientState::WaitForPing);
 
 	this->connect(m_client, &QLocalSocket::readyRead, this, &CommunicationHandler::slotMessageReceived);
 	this->connect(m_client, &QLocalSocket::disconnected, this, &CommunicationHandler::slotClientDisconnected);
