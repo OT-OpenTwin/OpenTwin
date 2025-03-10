@@ -58,7 +58,10 @@ void ot::PropertyColor::getPropertyData(ot::JsonValue& _object, ot::JsonAllocato
 }
 
 void ot::PropertyColor::setPropertyData(const ot::ConstJsonObject& _object) {
-	m_includeAlpha = json::getBool(_object, "IncludeAlpha");
+	if (_object.HasMember("IncludeAlpha")) {
+		m_includeAlpha = json::getBool(_object, "IncludeAlpha");
+	}
+	
 	ConstJsonObject colorObj = json::getObject(_object, "Value");
 	m_value.setFromJsonObject(colorObj);
 }
