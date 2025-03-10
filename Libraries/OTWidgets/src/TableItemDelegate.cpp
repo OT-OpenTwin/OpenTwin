@@ -58,9 +58,6 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
                 _painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
             }
 
-            if (item->foreground().color().isValid()) { // Item has valid foreground set
-                textPen.setBrush(item->foreground());
-            }
         }
     }
 
