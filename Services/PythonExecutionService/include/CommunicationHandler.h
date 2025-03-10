@@ -56,6 +56,8 @@ private:
 	bool sendDataBaseConfigToClient(void);
 
 	bool waitForClient(void);
+	
+	//! @brief Danger? Waits infinitly for a response
 	bool sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response);
 
 	SubprocessManager* m_manager;

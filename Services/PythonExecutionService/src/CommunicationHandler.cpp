@@ -42,9 +42,11 @@ bool CommunicationHandler::sendConfigToClient(void) {
 	OT_LOG_D("Sending configuration to client");
 
 	if (!this->sendServiceInfoToClient()) {
+		OT_LOG_E("Failed to send service configuration");
 		return false;
 	}
 	if (!this->sendModelConfigToClient()) {
+		OT_LOG_E("Failed to send service configuration");
 		return false;
 	}
 	if (!this->sendFrontendConfigToClient()) {
@@ -263,7 +265,13 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	OT_LOG_D("Writing to client: \"" + _data.toStdString() + "\"");
 
 	m_client->write(_data);
-	m_client->flush();
+	bool flushSuccess = m_client->flush(); //Any data was written.
+
+	if (!flushSuccess)
+	{
+		OT_LOG_E("Failed to flush data");
+		return false;
+	}
 
 	if (!_expectResponse) {
 		return true;
@@ -271,7 +279,8 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 
 	// We know the request was sent successfully, so we set the state to wait for response and wait..
 	m_clientState = ClientState::WaitForResponse;
-
+	
+	OT_LOG_D("Waiting for response");
 	while (m_clientState == ClientState::WaitForResponse) {
 		std::this_thread::sleep_for(std::chrono::microseconds(Timeouts::defaultTickTime));
 		this->processNextEvent();
