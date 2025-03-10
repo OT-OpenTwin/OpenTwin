@@ -88,7 +88,7 @@ void CommunicationHandler::slotClientDisconnected(void) {
 		m_client = nullptr;
 	}
 
-	m_clientState = ClientState::Disconnected;
+	setClientState(ClientState::Disconnected);
 	
 	m_serviceAndSessionInfoSet = false;
 	m_modelUrlSet = false;
@@ -252,10 +252,22 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 	return success;
 }
 
+CommunicationHandler::ClientState CommunicationHandler::getClientState()
+{
+	std::lock_guard<std::mutex> lock (m_clientStateMutex);
+	return m_clientState;
+}
+
+void CommunicationHandler::setClientState(ClientState _clientState)
+{
+	std::lock_guard<std::mutex> lock(m_clientStateMutex);
+	m_clientState = _clientState;
+}
+
 bool CommunicationHandler::waitForClient(void) {
 	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::connectionTimeout / tickTime;
-	while (m_clientState != ClientState::Ready || m_isInitializingClient) {
+	while (getClientState() != ClientState::Ready || m_isInitializingClient) {
 		if (timeout--) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(tickTime));
 			this->processNextEvent();
@@ -273,7 +285,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG_D("Message from client: \"" + _message + "\"");
 
 	// Check state
-	if (m_clientState == ClientState::WaitForPing) {
+	if (getClientState() == ClientState::WaitForPing) {
 		ot::JsonDocument responseDoc;
 		if (!responseDoc.fromJson(_message)) {
 			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");
@@ -290,15 +302,15 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 		}
 
 		m_isInitializingClient = true;
-		m_clientState = ClientState::Ready;
+		setClientState(ClientState::Ready);
 
 		if (!this->sendConfigToClient()) {
 			m_client->disconnect();
 		}
 	}
-	else if (m_clientState == ClientState::WaitForResponse) {
+	else if (getClientState() == ClientState::WaitForResponse) {
 		m_response = std::move(_message);
-		m_clientState = ClientState::ReponseReceived;
+		setClientState(ClientState::ReponseReceived);
 	}
 	else {
 		OT_LOG_W("Client send unexpected message: \"" + _message + "\"");
@@ -307,7 +319,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {
 	// Ensure client is in ready state
-	if (m_clientState != ClientState::Ready) {
+	if (getClientState() != ClientState::Ready) {
 		OT_LOG_EA("No client connected");
 		return false;
 	}
@@ -322,11 +334,14 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	OT_LOG_D("Writing to client: \"" + _data.toStdString() + "\"");
 
 	m_client->write(_data);
+	
+	setClientState(ClientState::WaitForResponse);
 	bool flushSuccess = m_client->flush(); //Any data was written.
 
 	if (!flushSuccess)
 	{
 		OT_LOG_E("Failed to flush data");
+		setClientState(ClientState::Ready);
 		return false;
 	}
 
@@ -335,20 +350,19 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	}
 
 	// We know the request was sent successfully, so we set the state to wait for response and wait..
-	m_clientState = ClientState::WaitForResponse;
 	
 	OT_LOG_D("Waiting for response");
-	while (m_clientState == ClientState::WaitForResponse) {
+	while (getClientState() == ClientState::WaitForResponse) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::defaultTickTime));
 		this->processNextEvent();
 	}
 
 	// Check if the client has received a response or disconnected.
-	if (m_clientState == ClientState::ReponseReceived) {
+	if (getClientState() == ClientState::ReponseReceived) {
 		OT_LOG_D("Client response received: \"" + _response + "\"");
 
 		_response = m_response;
-		m_clientState = ClientState::Ready;
+		setClientState(ClientState::Ready);
 		return true;
 	}
 	else {
@@ -374,8 +388,8 @@ void CommunicationHandler::slotNewConnection(void) {
 	}
 
 	// Ensure the state is set correctly
-	if (m_clientState != ClientState::Disconnected) {
-		OT_LOG_E("Client in undefined state (" + std::to_string((int)m_clientState) + ")");
+	if (getClientState() != ClientState::Disconnected) {
+		OT_LOG_E("Client in undefined state (" + std::to_string((int)getClientState()) + ")");
 		return;
 	}
 
@@ -383,7 +397,7 @@ void CommunicationHandler::slotNewConnection(void) {
 	m_client = newSocket;
 	
 	// Send ping to ensure stable connection
-	m_clientState = ClientState::WaitForPing;
+	setClientState(ClientState::WaitForPing);
 
 	this->connect(m_client, &QLocalSocket::readyRead, this, &CommunicationHandler::slotMessageReceived);
 	this->connect(m_client, &QLocalSocket::disconnected, this, &CommunicationHandler::slotClientDisconnected);
