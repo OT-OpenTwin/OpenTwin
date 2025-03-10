@@ -116,6 +116,7 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	if (newText != this->toPlainText()) {
 		this->setCode(newText);
 	}
+	this->setReadOnly(_config.getTextReadOnly());
 
 	this->storeSyntaxHighlighter(newHighlighter);
 

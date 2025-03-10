@@ -37,11 +37,17 @@ namespace ot {
 		void setPlainText(const std::string& _text) { m_text = _text; };
 		const std::string& getPlainText(void) const { return m_text; };
 
+		//! @brief Set read only enabled.
+		//! @param _readOnly If true the text in the text editor can not be edited by the user.
+		void setTextReadOnly(bool _readOnly) { m_readOnly = _readOnly; };
+		bool getTextReadOnly(void) const { return m_readOnly; };
+		
 		void setDocumentSyntax(DocumentSyntax _syntax) { m_syntax = _syntax; };
 		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
 
 	private:
 		std::string m_text;
+		bool m_readOnly;
 		DocumentSyntax m_syntax;
 	};
 
