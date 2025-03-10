@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
+#include <chrono>
 
 // SessionService header
 #include "globalDatatypes.h"
@@ -55,7 +56,7 @@ extern "C"
 		std::string loggerServiceURL(_loggerServiceURL);
 
 		// Initialize logging
-#ifdef _DEBUG || OT_RELEASE_DEBUG
+#if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 		std::cout << "Local Session Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_SessionService, loggerServiceURL, true);
 #else
@@ -101,9 +102,26 @@ extern "C"
 
 			// Send request to GSS
 			std::string gssResponse;
-			if (!ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse)) {
-				OT_LOG_E("Failed to send request to GlobalSessionService");
-				return 20;
+
+			// In case of error:
+			// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
+			// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+			const int maxCt = 30;
+			int ct = 1;
+			bool ok = false;
+			do {
+				gssResponse.clear();
+
+				if (!(ok = ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse))) {
+					OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+					using namespace std::chrono_literals;
+					std::this_thread::sleep_for(500ms);
+				}
+			} while (!ok && ct++ <= maxCt);
+
+			if (!ok) {
+				OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attemts. Exiting...");
+				exit(1);
 			}
 
 			ot::JsonDocument gssResponseDoc;
@@ -138,7 +156,9 @@ extern "C"
 			gss->startHealthCheck();
 
 			// Connect to GDS
-			if (!gdsURL.empty()) sessionService->setGlobalDirectoryServiceURL(gdsURL);
+			if (!gdsURL.empty()) {
+				sessionService->setGlobalDirectoryServiceURL(gdsURL);
+			}
 #else
 			// Create session service and add data to session service
 			SessionService * sessionService = SessionService::instance();

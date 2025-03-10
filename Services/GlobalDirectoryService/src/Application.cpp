@@ -341,8 +341,7 @@ bool Application::requestToRunService(const ServiceStartupInformation& _info) {
 	return requestResult;
 }
 
-int Application::initialize(const char * _siteID, const char * _ownURL, const char * _globalSessionServiceURL)
-{
+int Application::initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL) {
 	setSiteId(_siteID);
 	setServiceURL(_ownURL);
 	m_globalSessionServiceURL = _globalSessionServiceURL;
@@ -356,17 +355,30 @@ int Application::initialize(const char * _siteID, const char * _ownURL, const ch
 
 	// Send message
 	std::string gssURL(_globalSessionServiceURL);
+
+
+	// Send request to GSS
 	std::string gssResponse;
-	if (!ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse)) {
-		OT_LOG_E("Failed to send message to Global Session Service (url = " + gssURL + ")");
-		return 1;
-	}
-	if (gssResponse != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invalid Global Session Service (url = " + gssURL + ") response: " + gssResponse);
-		return 1;
-	}
-	else {
-		OT_LOG_I("Registration at Global Session Service successful");
+
+	// In case of error:
+	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
+	// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+	const int maxCt = 30;
+	int ct = 1;
+	bool ok = false;
+	do {
+		gssResponse.clear();
+
+		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse))) {
+			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+		}
+	} while (!ok && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Registration at Global Session Service (" + gssURL + ") failed after " + std::to_string(maxCt) + " attemts. Exiting...");
+		exit(1);
 	}
 
 	return 0;
