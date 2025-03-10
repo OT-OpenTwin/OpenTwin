@@ -102,30 +102,47 @@ void CommunicationHandler::processNextEvent(void) {
 }
 
 bool CommunicationHandler::sendServiceInfoToClient(void) {
-	if (!m_serviceAndSessionInfoSet) {
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
-
-		QByteArray request = QByteArray::fromStdString(doc.toJson());
-		request.append('\n');
-
-		std::string response;
-		if (!this->sendToClient(request, true, response)) {
-			OT_LOG_E("Failed to send model info to client");
-			return false;
-		}
-
-		m_serviceAndSessionInfoSet = true;
+	bool success = true;
+	
+	if (m_serviceAndSessionInfoSet) 
+	{
+		OT_LOG_W("Repeated setting of service information.");
+		m_serviceAndSessionInfoSet = false; //may fail this time
 	}
 
-	return true;
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
+
+	QByteArray request = QByteArray::fromStdString(doc.toJson());
+	request.append('\n');
+
+	std::string response;
+	if (!this->sendToClient(request, true, response)) {
+		OT_LOG_E("Failed to send service info to client");
+		success = false;
+	}
+	else
+	{
+		m_serviceAndSessionInfoSet = true;
+	}
+	
+	return success;
 }
 
-bool CommunicationHandler::sendModelConfigToClient(void) {
-	if (!m_modelUrl.empty() && !m_modelUrlSet) {
+bool CommunicationHandler::sendModelConfigToClient(void) 
+{
+	bool success = true;
+	if (!m_modelUrl.empty()) {
+
+		if (m_modelUrlSet)
+		{
+			OT_LOG_W("Repeated setting of model config");
+			m_modelUrlSet = false; //may fail this time
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
@@ -137,17 +154,33 @@ bool CommunicationHandler::sendModelConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send model info to client");
-			return false;
+			success = false;
 		}
-
-		m_modelUrlSet = true;
+		else
+		{
+			m_modelUrlSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with model config, but the url is not set");
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
-bool CommunicationHandler::sendFrontendConfigToClient(void) {
-	if (!m_frontendUrl.empty() && !m_frontendUrlSet) {
+bool CommunicationHandler::sendFrontendConfigToClient(void) 
+{	
+	bool success = true;
+	if (!m_frontendUrl.empty()) 
+	{
+		if (m_frontendUrlSet)
+		{
+			OT_LOG_W("Repeated setting of frontend config");
+			m_frontendUrlSet = false;
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
@@ -159,17 +192,32 @@ bool CommunicationHandler::sendFrontendConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send frontend info to client");
-			return false;
+			success = false;
 		}
-
-		m_frontendUrlSet = true;
+		else
+		{
+			m_frontendUrlSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with frontend config, but they are not set");
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
 bool CommunicationHandler::sendDataBaseConfigToClient(void) {
-	if (m_databaseInfo.hasInfoSet() && !m_databaseInfoSet) {
+	bool success = true;
+	if (m_databaseInfo.hasInfoSet()) 
+	{
+		if (m_databaseInfoSet)
+		{
+			OT_LOG_W("Repeated setting of database information.");
+			m_databaseInfoSet= false; //may fail this time
+		}
+
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
@@ -186,13 +234,20 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		std::string response;
 		if (!this->sendToClient(request, true, response)) {
 			OT_LOG_E("Failed to send database info to client");
-			return false;
+			success = false;
 		}
-
-		m_databaseInfoSet = true;
+		else
+		{
+			m_databaseInfoSet = true;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Trying to initialise the client with database config, but they are not set");
+		success = false;
 	}
 
-	return true;
+	return success;
 }
 
 bool CommunicationHandler::waitForClient(void) {
