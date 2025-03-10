@@ -14,7 +14,7 @@
 
 GlobalDirectoryService::GlobalDirectoryService(void)
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService, "", ot::invalidServiceID, "0"),
-	m_connectionStatus(Disconnected)
+	m_connectionStatus(Disconnected), m_isShuttingDown(false)
 {
 	
 }
@@ -53,10 +53,27 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 
 	// Send request and check if the request was successful
 	std::string response;
-	if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response)) {
-		OT_LOG_E("Failed to send register request to global directory service");
-		return;
+
+	// In case of error:
+	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
+	// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+	const int maxCt = 30;
+	int ct = 1;
+	bool ok = false;
+	do {
+		response.clear();
+		if (!(ok = ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response))) {
+			OT_LOG_E("Register at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+		}
+	} while (!ok && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Registration at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed after " + std::to_string(maxCt) + " attempts. Exiting...");
+		exit(1);
 	}
+
 	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos ||
 		response.find(OT_ACTION_RETURN_INDICATOR_Warning) != std::string::npos) {
 		OT_LOG_E("Register at GDS failed:" + response);
