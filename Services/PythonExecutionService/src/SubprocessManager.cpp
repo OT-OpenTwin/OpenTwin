@@ -120,6 +120,7 @@ void SubprocessManager::shutdownSubprocess(void) {
 	m_subprocessHandler->shutdownSubprocess();
 }
 
+//! @brief Waits for currently 30 sec and checks in an interval of 10 msec, if the qt server is listening
 bool SubprocessManager::ensureWorkerRunning(void) {
 	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::connectionTimeout / tickTime;
