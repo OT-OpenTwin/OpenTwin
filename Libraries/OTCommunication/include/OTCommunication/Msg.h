@@ -18,10 +18,7 @@ namespace ot {
 	namespace msg {
 
 		//! @brief Will send the provided message to the microservice framework. Returns true if succeeded
-		//! @param _senderIP The sender IP address
-		//! @param _receiverIP The receiver IP address
-		//! @param _message The message to send
-		//! @param _response Here the response will be written to
+		//! @param _timeout Timeout of waiting for response in ms
 		OT_COMMUNICATION_API_EXPORT bool send(
 			const std::string &				_senderIP,
 			const std::string &				_receiverIP,

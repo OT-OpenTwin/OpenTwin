@@ -82,6 +82,8 @@ int Application::initialize(const char * _ownURL, const char * _globalDirectoryS
 	return LDS_EXIT_Ok;
 }
 
+
+//Request for each service comes in from GDS.
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
 	std::string serviceName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
@@ -122,6 +124,7 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	std::string websocketUrl;
 	
 	for (unsigned int attempt = 0; attempt < Configuration::instance().defaultMaxStartupRestarts(); attempt++) {
+		//Tries the next free port. Ports are iterated from start port (set in lds config).
 		if (m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL)) {
 			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 

@@ -19,12 +19,14 @@ namespace ot {
 	namespace app {
 		//! Describes the result of a run application request.
 		struct __declspec(dllexport) RunResult {
-			uint32_t m_value = 0;
+			const static uint32_t successCode = 0;
+			
+			uint32_t m_value = successCode;
 			std::string m_message = "";
 			
 			bool isOk()
 			{
-				return m_value == 0;
+				return m_value == successCode;
 			}
 
 			RunResult() = default;
