@@ -27,7 +27,7 @@ public:
 private:
 	std::string findSubprocessPath(void) const;
 	
-	//! @brief Checks every 100 micro sec if the process is still running
+	//! @brief Checks every 10 milli sec if the process is still running
 	void healthCheckWorker(void);
 
 	std::mutex m_mutex;

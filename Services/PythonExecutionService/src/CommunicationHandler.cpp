@@ -257,7 +257,7 @@ bool CommunicationHandler::waitForClient(void) {
 	int timeout = Timeouts::connectionTimeout / tickTime;
 	while (m_clientState != ClientState::Ready || m_isInitializingClient) {
 		if (timeout--) {
-			std::this_thread::sleep_for(std::chrono::microseconds(tickTime));
+			std::this_thread::sleep_for(std::chrono::milliseconds(tickTime));
 			this->processNextEvent();
 		}
 		else {
@@ -339,7 +339,7 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	
 	OT_LOG_D("Waiting for response");
 	while (m_clientState == ClientState::WaitForResponse) {
-		std::this_thread::sleep_for(std::chrono::microseconds(Timeouts::defaultTickTime));
+		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::defaultTickTime));
 		this->processNextEvent();
 	}
 

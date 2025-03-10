@@ -55,6 +55,7 @@ private:
 	bool sendFrontendConfigToClient(void);
 	bool sendDataBaseConfigToClient(void);
 
+	//! @brief Waits the default timeout (30 sec) and checks every 10 msec if the client state has changed
 	bool waitForClient(void);
 	
 	//! @brief Danger? Waits infinitly for a response

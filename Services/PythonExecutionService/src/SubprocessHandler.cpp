@@ -109,7 +109,7 @@ void SubprocessHandler::shutdownSubprocess(void) {
 
 void SubprocessHandler::healthCheckWorker(void) {
 	while (m_performHealthCheck) {
-		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::defaultTickTime));
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 			if (!ot::app::isApplicationRunning(m_clientHandle)) {

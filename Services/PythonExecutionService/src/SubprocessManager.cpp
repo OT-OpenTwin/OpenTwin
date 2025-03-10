@@ -84,6 +84,8 @@ bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::stri
 		return false;
 	}
 
+	//Until here is no check if the server is also initialised. This happens in sendToClient.waitForClient
+
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_communicationHandler->sendToClient(_document, _response);
 }
