@@ -84,44 +84,56 @@ ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, c
 #endif
 }
 
-bool Service::shutdown(void) {
-	if (m_isAlive) {
-#if defined(OT_OS_WINDOWS)
-		if (TerminateProcess(m_processHandle, 0) == FALSE) return false;
-		CloseHandle(m_processHandle);
-#endif
+ot::app::RunResult Service::shutdown(void) {
+	
+	ot::app::RunResult result;
+	if (m_isAlive) 
+	{
+	#if defined(OT_OS_WINDOWS)
+		const uint32_t somethingWentWrongExitCode = 1;
+		bool processTerminated = TerminateProcess(m_processHandle, somethingWentWrongExitCode); //Closing process without condition. Call is asynchronous, on return the process may not be terminated yet!
+		if (processTerminated == FALSE)
+		{
+			result = GetLastError();
+			result.m_message = "Failed in trying to terminate the process";
+		}
+		bool handleClosed = CloseHandle(m_processHandle);
+		if (!handleClosed)
+		{
+			result = GetLastError();
+			result.m_message = "Failed in closing the process handle";
+		}
+	#endif
 		m_isAlive = false;
 	}
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
-	return true;
+	return result;
 }
 
 void Service::incrStartCounter(void) {
 	m_startCounter++;
 }
 
-bool Service::checkAlive(void) {
-#if defined(OT_OS_WINDOWS)
+ot::app::RunResult Service::checkAlive() 
+{
+	ot::app::RunResult result;
+	#if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
 	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
 		if (exitCode != STILL_ACTIVE) {
-			m_isAlive = false;
-			CloseHandle(m_processHandle);
-			m_processHandle = OT_INVALID_PROCESS_HANDLE;
-			return false;
-		}
-		else {
-			return true;
+			
+			result = exitCode;
+			result.m_message = "Checked for process state but process is not active anymore\n";
 		}
 	}
-	else {
-		OT_LOG_E("Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")");
-		m_isAlive = false;
-		CloseHandle(m_processHandle);
-		m_processHandle = OT_INVALID_PROCESS_HANDLE;
-		return false;
+	else 
+	{		
+		result = CONTROL_C_EXIT;
+		result.m_message = "Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n";
 	}
+
+	return result;
 #else
 	assert(0);
 	OT_LOG_E("Function is implemented only for Windows OS");
