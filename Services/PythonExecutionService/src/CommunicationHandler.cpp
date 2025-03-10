@@ -46,13 +46,15 @@ bool CommunicationHandler::sendConfigToClient(void) {
 		return false;
 	}
 	if (!this->sendModelConfigToClient()) {
-		OT_LOG_E("Failed to send service configuration");
+		OT_LOG_E("Failed to send model configuration");
 		return false;
 	}
 	if (!this->sendFrontendConfigToClient()) {
+		OT_LOG_E("Failed to send frontend configuration");
 		return false;
 	}
 	if (!this->sendDataBaseConfigToClient()) {
+		OT_LOG_E("Failed to send database configuration");
 		return false;
 	}
 	
