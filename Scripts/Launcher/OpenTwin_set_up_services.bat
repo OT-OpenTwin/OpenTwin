@@ -77,9 +77,11 @@ if not defined OPEN_TWIN_LOGGING_MODE (
 	:: set OPEN_TWIN_LOGGING_MODE=ALL_LOG_FLAGS
 )
 
+pushd "%~dp0" 
 call OpenTwin_set_up_LDS.bat %1
+popd
 
-if "%OT_LOCALDIRECTORYSERVICE_CONFIGURATION%" == "" (
+if "%OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED%" == "" (
 	echo No LDS configuration created!
 	goto PAUSE_END
 )

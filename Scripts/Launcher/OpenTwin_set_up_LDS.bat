@@ -3,12 +3,11 @@
 :: This script can be used in the following two ways:
 :: 1) Regular:   Run the script, this will use the current directory as the root for the services.
 :: 2) Developer: Pass the "dev" argument when launching the script, this will use the OpenTwin environment to set up the LDS.
-:: In both cases this script will automatically skip the execution if the OT_LOCALDIRECTORYSERVICE_CONFIGURATION is already set.
+:: In both cases this script will automatically skip the execution if the OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED is already set.
 :: Otherwise the specified configuration will be set (later in the script).
 
-
 :: Dont set twice / dont overwrite
-if defined OT_LOCALDIRECTORYSERVICE_CONFIGURATION (
+if defined OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED (
 	goto END
 )
 
@@ -63,6 +62,7 @@ set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"PyritService"^
 		]^
 	}
+set OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED=1
 
 goto END
 
