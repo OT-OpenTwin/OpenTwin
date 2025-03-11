@@ -49,6 +49,9 @@
     <Filter Include="Source Files\LogIn">
       <UniqueIdentifier>{dcd98b09-6c9d-4000-9570-bd8df718c31c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CurveHelper">
+      <UniqueIdentifier>{6a16abfb-8bec-4bf9-ba56-1988a8166ab3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -187,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="include\DownloadFile.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ContainerFlexibleOwnership.h">
+      <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

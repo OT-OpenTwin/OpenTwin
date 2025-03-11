@@ -94,12 +94,47 @@ void EntityResult1DCurve_New::AddStorageData(bsoncxx::builder::basic::document& 
 {
 	EntityBase::AddStorageData(storage);
 
+	ot::QuantityContainerEntryDescription quantityDescription = m_queryInformation.m_quantityDescription;
+	bsoncxx::builder::basic::document quantityDescriptionSerialised = serialise(quantityDescription);
+	
+	bsoncxx::builder::basic::array arrayOfSubDocs;
+	for (ot::QuantityContainerEntryDescription& parameterDescr : m_queryInformation.m_parameterDescriptions)
+	{
+		bsoncxx::builder::basic::document parameterDescrDoc = serialise(parameterDescr);
+		arrayOfSubDocs.append(parameterDescrDoc.extract());
+	}
+
 	storage.append(
 		bsoncxx::builder::basic::kvp("Query", m_queryInformation.m_query),
 		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.m_projection),
-		bsoncxx::builder::basic::kvp("QuantityFieldName", m_queryInformation.m_quantityFieldName),
-		bsoncxx::builder::basic::kvp("ParameterFieldName", m_queryInformation.m_parameterFieldName)
+		bsoncxx::builder::basic::kvp("QuantityDescription", quantityDescriptionSerialised.extract()),
+		bsoncxx::builder::basic::kvp("ParameterDescription", arrayOfSubDocs.extract())
 	);
+
+	
+}
+
+bsoncxx::builder::basic::document EntityResult1DCurve_New::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription)
+{
+	bsoncxx::builder::basic::document subDocument;
+	subDocument.append(
+		bsoncxx::builder::basic::kvp("DataType", _quantityContainerEntryDescription.m_dataType),
+		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
+		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
+		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit)
+	);
+	return subDocument;
+}
+
+
+ot::QuantityContainerEntryDescription EntityResult1DCurve_New::deserialise(bsoncxx::v_noabi::document::view _subDocument)
+{
+	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
+	quantityContainerEntryDescription.m_dataType = _subDocument["DataType"].get_string();
+	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
+	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
+	quantityContainerEntryDescription.m_unit = _subDocument["Unit"].get_string();
+	return quantityContainerEntryDescription;
 }
 
 void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -107,7 +142,17 @@ void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::vi
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	m_queryInformation.m_query = doc_view["Query"].get_string();
 	m_queryInformation.m_projection = doc_view["Projection"].get_string();
-	m_queryInformation.m_quantityFieldName = doc_view["QuantityFieldName"].get_string();
-	m_queryInformation.m_parameterFieldName= doc_view["ParameterFieldName"].get_string();
 
+	auto& quantityDescriptionDoc =	doc_view["QuantityDescription"].get_document();
+
+	m_queryInformation.m_quantityDescription = deserialise(quantityDescriptionDoc);
+
+	bsoncxx::array::view parameterDescriptions	= doc_view["ParameterDescription"].get_array().value;
+	
+	for (size_t i = 0; i < parameterDescriptions.length(); i++)
+	{
+		auto& parameterDoc = parameterDescriptions[i].get_document();
+		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
+		m_queryInformation.m_parameterDescriptions.push_back(parameterDesc);
+	}
 }

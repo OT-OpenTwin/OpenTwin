@@ -31,5 +31,7 @@ private:
 	ot::QueryInformation m_queryInformation;
 	
 	virtual void AddStorageData(bsoncxx::builder::basic::document& storage);
+	bsoncxx::builder::basic::document serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription);
+	ot::QuantityContainerEntryDescription deserialise(bsoncxx::v_noabi::document::view _subDocument);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

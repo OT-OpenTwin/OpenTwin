@@ -114,6 +114,7 @@
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\PropertyString.h" />
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
+    <ClInclude Include="include\OTGui\QuantityContainerEntryDescription.h" />
     <ClInclude Include="include\OTGui\QueryInformation.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="src\PropertyPainter2D.cpp" />
     <ClCompile Include="src\PropertyString.cpp" />
     <ClCompile Include="src\PropertyStringList.cpp" />
+    <ClCompile Include="src\QuantityContainerEntryDescription.cpp" />
     <ClCompile Include="src\QueryInformation.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />

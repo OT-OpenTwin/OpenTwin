@@ -3729,6 +3729,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 #include "PlotManager.h"
 #include "ResultDataStorageAPI.h"
 #include "OTWidgets/PlotDataset.h"
+#include "ContainerFlexibleOwnership.h"
 
 std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
 {
@@ -3772,36 +3773,70 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 			//dataX.reserve(numberOfDocuments);
 			//dataY.reserve(numberOfDocuments);
 
-			double* dataX(new double[numberOfDocuments]), *dataY(new double[numberOfDocuments]);
+			std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
 			size_t counter(0);
+
 			for (uint32_t i = 0; i < numberOfDocuments; i++)
 			{
 				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-				auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityFieldName.c_str()];
-				auto& parameterEntry = singleMongoDocument[queryInformation.m_parameterFieldName.c_str()];
-
+				auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityDescription.m_fieldName.c_str()];
+				//Getter on base of queryInformation.m_quantityDescription.m_dataType
 				(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
-				(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
 				counter++;
-				//dataY.push_back(static_cast<double>(quantityEntry.GetInt()));
-				//dataX.push_back(static_cast<double>(parameterEntry.GetInt()));
 			}
-			
-			auto dataSet =	plotManager->addDataset(config,dataX, dataY, numberOfDocuments);
 
-			dataSet->updateCurveVisualization();
-			dataSet->attach();
+			size_t numberOfParameter = queryInformation.m_parameterDescriptions.size();
+			if (numberOfParameter == 1)
+			{
+				std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
+
+				//Single curve
+				auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+				for (uint32_t i = 0; i < numberOfDocuments; i++)
+				{
+					auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+					auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
+					(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
+					counter++;
+				}
+
+				//auto dataSet = plotManager->addDataset(config, dataX, dataY, numberOfDocuments);
+
+			}
+			else
+			{
+				auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
+				auto groupingParameter = queryInformation.m_parameterDescriptions.begin() ++;
+				
+				const std::string curveNameBase = groupingParameter->m_label + "_";
+				const std::string curveNameEnd = "_" + groupingParameter->m_unit;
+
+				std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurves;
+				for (uint32_t i = 0; i < numberOfDocuments; i++)
+				{
+					auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+					auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
+					
+					auto& groupingParameterEntry = singleMongoDocument[groupingParameter->m_fieldName.c_str()];
+							
+					const std::string curveName = curveName + ot::json::toJson(groupingParameterEntry) + curveNameEnd;
+					auto curve = familyOfCurves.find(curveName);
+					if (curve == familyOfCurves.end())
+					{
+						familyOfCurves.insert({ curveName, ContainerFlexibleOwnership<double>(numberOfDocuments) });
+						curve = familyOfCurves.find(curveName);
+					}
+					
+					(curve->second).pushBack(static_cast<double>(groupingParameterEntry.GetInt()));
+				}
+			}
+
+			//dataSet->updateCurveVisualization();
+			//dataSet->attach();
 		}
-		
+					
 	}
-
-	//const std::string& name = editor->getViewData().getEntityName();
-	//const auto& viewerType = editor->getViewData().getViewType();
-	//ot::UID globalActiveViewModel = -1;
-	//ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
-
 	return "";
-
 }
 
 

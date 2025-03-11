@@ -61,6 +61,7 @@
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <QtMoc Include="include\NavigationSelectionManager.h" />
+    <ClInclude Include="include\ContainerFlexibleOwnership.h" />
     <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="resource.h" />
