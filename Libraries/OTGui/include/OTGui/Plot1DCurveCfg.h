@@ -70,6 +70,7 @@ namespace ot {
 		void setLinePen(const PenFCfg& _pen) { m_linePen = _pen; };
 		void setLinePenWidth(double _width) { m_linePen.setWidth(_width); };
 		void setLinePenColor(const Color& _color) { m_linePen.setColor(_color); };
+		const ot::Color& getLinePenColor() const;
 		const PenFCfg& getLinePen(void) const { return m_linePen; };
 
 		void setPointsVisible(bool _visible) { m_pointsVisible = _visible; };

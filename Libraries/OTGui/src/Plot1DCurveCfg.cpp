@@ -121,6 +121,21 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
+const ot::Color& ot::Plot1DCurveCfg::getLinePenColor() const
+{
+
+	const ot::Painter2D* painter = m_linePen.painter();
+	const ot::FillPainter2D* fillPainter = dynamic_cast<const ot::FillPainter2D*>(painter);
+	if (fillPainter != nullptr)
+	{
+		return fillPainter->getColor();
+	}
+	else
+	{
+		throw std::exception("Colour not available for this object");
+	}
+}
+
 void ot::Plot1DCurveCfg::setPointsFillColor(const Color& _color) {
 	this->setPointsFillPainter(new FillPainter2D(_color));
 }
