@@ -213,6 +213,10 @@ XCOPY /S "%OT_PYTHON_ROOT%\DLLs" "%OT_DEPLOYMENT_DIR%\Python\DLLs\"
 REM NGSpice
 COPY "%NGSPICE_ROOT%\visualc\sharedspice\Release.x64\ngspice.dll" "%OT_DEPLOYMENT_DIR%"
 
+REM PYRIT
+MKDIR "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
+XCOPY /S "%OT_PYRIT_ROOT%\pyrit-packages\*.*" "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
+
 REM Visual Studio Redistributables
 MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
 COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
