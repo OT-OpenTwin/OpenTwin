@@ -23,6 +23,8 @@ public:
 	inline ConnectionStatus connectionStatus(void) const { return m_connectionStatus; }
 
 	bool requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID);
+	//! @brief Askes the GDS to start a service
+	//! @return false if the answer from GDS suggests a fail
 	bool requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID);
 	bool requestToStartRelayService(const std::string& _sessionID, std::string& _websocketURL, std::string& _relayServiceURL);
 	void notifySessionClosed(const std::string& _sessionID);

@@ -116,7 +116,7 @@ public:
 	);
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
-	//! @param _session The session
+	//! @return false if a debug or release service could not be handled
 	bool runMandatoryServices(
 		Session *								_session
 	);
@@ -139,6 +139,8 @@ public:
 
 	std::list<const Session *> sessions(void);
 	
+	//! @brief Create a config for the service that shall be started in Debug mode
+	//! @return false if the OPENTWIN_DEV_ROOT is not set since it is needed for the config path, otherwise true
 	bool runServiceInDebug(const std::string& _serviceName, const std::string& _serviceType, Session* _session, std::string& _serviceURL);
 	
 	bool runRelayService(Session * _session, std::string& _websocketURL, std::string& _serviceURL);
