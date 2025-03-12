@@ -65,7 +65,10 @@ void SubprocessHandler::RunSubprocess()
 		}
 		OT_LOG_D("Circuit Subprocess started");
 		
-		
+
+		//Time of process started
+		QDateTime finishedStartTime = QDateTime::currentDateTime();
+		SimulationResults::getInstance()->handleCircuitExecutionTiming(finishedStartTime, "finishedInitTime");
 
 	}
 	catch (std::exception& e)
@@ -82,11 +85,6 @@ bool SubprocessHandler::startSubprocess() {
 	{
 		OT_LOG_D("Starting the subprocess: " + m_subProcess.program().toStdString() + " trial: " + std::to_string(i) + "/" + std::to_string(m_numberOfRetries));
 		m_subProcess.start();
-
-		//Time of process started
-		QDateTime finishedStartTime = QDateTime::currentDateTime();
-		SimulationResults::getInstance()->handleCircuitExecutionTiming(finishedStartTime, "finishedInitTime");
-		
 
 		auto state = m_subProcess.state();
 		if (state == QProcess::NotRunning)
