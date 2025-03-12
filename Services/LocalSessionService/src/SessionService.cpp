@@ -648,7 +648,11 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	if (runMandatory) {
 		OT_LOG_D("Running mandatory services");
-		runMandatoryServices(theSession);
+		bool success = runMandatoryServices(theSession);
+		if (!success)
+		{
+			throw std::exception("Failed to start mandatory services");
+		}
 	}
 	else {
 		OT_LOG_D("Creator does NOT want the mandatory services to be started");
