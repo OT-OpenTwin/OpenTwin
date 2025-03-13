@@ -122,7 +122,7 @@ public:
 							      bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
 	void addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const OldTreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes);
 	
-	void addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable);
+	void addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes);
 	void addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
 									const OldTreeIcon &treeIcons, bool isHidden,
 									const double edgeColorRGB[3],

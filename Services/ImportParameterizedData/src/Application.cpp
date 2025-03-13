@@ -245,7 +245,7 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	curveCfg.setEntityName("Test/A_Curve");
+	curveCfg.setEntityName("Test/A_plot/A_Curve");
 
 	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");
 	ot::Plot1DCfg plotCfg;

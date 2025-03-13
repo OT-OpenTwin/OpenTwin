@@ -355,7 +355,7 @@ void Model::centerMouseCursor(void)
 	}
 }
 
-void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable)
+void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes)
 {
 	// Check whether we already have a container node
 	if (m_nameToSceneNodesMap.count(treeName) != 0)
@@ -372,6 +372,30 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	containerNode->setEditable(editable);
 	containerNode->setModelEntityID(modelEntityID);
 	containerNode->setOldTreeIcons(treeIcons);
+	
+	if (_visualisationTypes.visualiseAsTable())
+	{
+		auto tableVis = new TableVisualiser(containerNode);
+		containerNode->addVisualiser(tableVis);
+	}
+
+	if (_visualisationTypes.visualiseAsText())
+	{
+		auto textVis = new TextVisualiser(containerNode);
+		containerNode->addVisualiser(textVis);
+	}
+
+	if (_visualisationTypes.visualiseAsPlot1D())
+	{
+		auto plotVis = new PlotVisualiser(containerNode);
+		containerNode->addVisualiser(plotVis);
+	}
+
+	if (_visualisationTypes.visualiseAsCurve())
+	{
+		auto curveVis = new CurveVisualiser(containerNode);
+		containerNode->addVisualiser(curveVis);
+	}
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(treeName);

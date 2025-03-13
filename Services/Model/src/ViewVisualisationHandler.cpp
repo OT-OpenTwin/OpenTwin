@@ -78,46 +78,69 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	else if (_visualisationType == OT_ACTION_PARAM_VIEW1D_Setup)
 	{
 		IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
-		assert(plotEntity != nullptr);
 		if (plotEntity != nullptr && plotEntity->visualisePlot())
 		{
-			ot::JsonDocument document;
-			info.addToJsonObject(document, document.GetAllocator());
-			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
-			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
-			//document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
-
-			const ot::Plot1DCfg tableCfg = plotEntity->getPlot();
-			ot::JsonObject cfgObj;
-			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
-
-			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
-			std::string response;
-			Application::instance()->queuedRequestToFrontend(document);
+			setupPlot(baseEntity,_setAsActiveView);
 		}
-	}
-	else if (_visualisationType == OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot)
-	{
-		IVisualisationCurve* curveEntity = dynamic_cast<IVisualisationCurve*>(baseEntity);
-		assert(curveEntity != nullptr);
-		if (curveEntity != nullptr && curveEntity->visualiseCurve())
+		else
 		{
-			ot::JsonDocument document;
-			info.addToJsonObject(document, document.GetAllocator());
-			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, document.GetAllocator());
-			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
-	
-			const ot::Plot1DCurveCfg curveCfg = curveEntity->getCurve();
-			ot::JsonObject cfgObj;
-			curveCfg.addToJsonObject(cfgObj, document.GetAllocator());
-
-			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
-			std::string response;
-			Application::instance()->queuedRequestToFrontend(document);
+			IVisualisationCurve* curveEntity = dynamic_cast<IVisualisationCurve*>(baseEntity);
+			if (curveEntity != nullptr)
+			{
+				if (curveEntity->visualiseCurve())
+				{
+					EntityBase* plotEntityBase = baseEntity->getParent();
+					setupPlot(plotEntityBase, _setAsActiveView);
+				}
+			}
+			else
+			{
+				OT_LOG_D("Something tried to visualise as 1D but was neither a curve nor a plot");
+			}
 		}
 	}
 	else
 	{
 		OT_LOG_WAS("Unknown visualization request: \"" + _visualisationType + "\"");
+	}
+}
+
+void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView)
+{
+	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
+	IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(_plotEntityBase);
+	if (plotEntity != nullptr)
+	{
+		EntityContainer* containerEntity = dynamic_cast<EntityContainer*>(_plotEntityBase);
+		std::list<EntityBase*> curveEntities = containerEntity->getChildrenList();
+
+		ot::JsonDocument document;
+		info.addToJsonObject(document, document.GetAllocator());
+		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+
+		const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
+		ot::JsonObject cfgObj;
+		plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+
+		ot::JsonArray curveCfgs;
+		for (EntityBase* curveEntity : curveEntities)
+		{
+			IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
+			ot::Plot1DCurveCfg curveCfg = curve->getCurve();
+			ot::JsonObject curveCfgSerialised;
+			curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
+			curveCfgs.PushBack(curveCfgSerialised, document.GetAllocator());
+		}
+
+		document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
+
+		std::string response;
+		Application::instance()->queuedRequestToFrontend(document);
+	}
+	else
+	{
+		OT_LOG_E("Tried visualising an entity as plot which is not a plot.");
 	}
 }

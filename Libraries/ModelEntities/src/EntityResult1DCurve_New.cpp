@@ -149,9 +149,9 @@ void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::vi
 
 	bsoncxx::array::view parameterDescriptions	= doc_view["ParameterDescription"].get_array().value;
 	
-	for (size_t i = 0; i < parameterDescriptions.length(); i++)
+	for (auto parameterDescription = parameterDescriptions.begin(); parameterDescription != parameterDescriptions.end(); parameterDescription++)
 	{
-		auto& parameterDoc = parameterDescriptions[i].get_document();
+		auto& parameterDoc = parameterDescription->get_document();
 		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
 		m_queryInformation.m_parameterDescriptions.push_back(parameterDesc);
 	}

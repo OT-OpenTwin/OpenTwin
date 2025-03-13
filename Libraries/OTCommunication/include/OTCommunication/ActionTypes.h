@@ -589,7 +589,6 @@
 #define OT_ACTION_PARAM_MESH_NODE_ID "Mesh.Node.ID"
 #define OT_ACTION_PARAM_MESH_NODE_VERSION "Mesh.Node.Version"
 
-#define OT_ACTION_PARAM_VIEW1D_Setup "View1D.Setup"
 #define OT_ACTION_PARAM_VIEW1D_Title "View1D.Title"
 #define OT_ACTION_PARAM_VIEW1D_PlotType "View1D.PlotType"
 #define OT_ACTION_PARAM_VIEW1D_PlotQuantity "View1D.PlotQuantity"
@@ -610,6 +609,11 @@
 #define OT_ACTION_PARAM_VIEW1D_Xmax "View1D.Xmax"
 #define OT_ACTION_PARAM_VIEW1D_Ymin "View1D.Ymin"
 #define OT_ACTION_PARAM_VIEW1D_Ymax "View1D.Ymax"
+
+//Needed in new API
+#define OT_ACTION_PARAM_VIEW1D_CurveConfigs "View1D.CurveConfigs"
+#define OT_ACTION_PARAM_VIEW1D_Setup "View1D.Setup"
+
 
 #define OT_ACTION_PARAM_VIEW_SetActiveView "View.ActiveView.Set"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_Note "View.Rubberband.Note"

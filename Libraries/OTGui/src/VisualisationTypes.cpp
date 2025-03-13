@@ -21,25 +21,25 @@ void ot::VisualisationTypes::addCurveVisualisation()
 	m_visualisations.push_back(m_visualisationAsCurve);
 }
 
-bool ot::VisualisationTypes::visualiseAsText()
+bool ot::VisualisationTypes::visualiseAsText() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsText);
 	return entryIt != m_visualisations.end();
 }
 
-bool ot::VisualisationTypes::visualiseAsTable()
+bool ot::VisualisationTypes::visualiseAsTable() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsTable);
 	return entryIt != m_visualisations.end();
 }
 
-bool ot::VisualisationTypes::visualiseAsPlot1D()
+bool ot::VisualisationTypes::visualiseAsPlot1D() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsPlot1D);
 	return entryIt != m_visualisations.end();
 }
 
-bool ot::VisualisationTypes::visualiseAsCurve()
+bool ot::VisualisationTypes::visualiseAsCurve() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsCurve);
 	return entryIt != m_visualisations.end();
@@ -60,10 +60,13 @@ void ot::VisualisationTypes::addToJsonObject(ot::JsonValue& _object, ot::JsonAll
 
 void ot::VisualisationTypes::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
-	auto visualisations = _object["VisualisationTypes"].GetArray();
-	for (const auto& entry : visualisations)
+	if (_object.HasMember("VisualisationTypes"))
 	{
-		uint32_t visualisationIndx = entry.GetUint();
-		m_visualisations.push_back(visualisationIndx);
+		auto visualisations = _object["VisualisationTypes"].GetArray();
+		for (const auto& entry : visualisations)
+		{
+			uint32_t visualisationIndx = entry.GetUint();
+			m_visualisations.push_back(visualisationIndx);
+		}
 	}
 }

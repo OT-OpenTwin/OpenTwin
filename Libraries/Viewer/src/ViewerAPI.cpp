@@ -240,13 +240,13 @@ void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &
 	}
 }
 
-void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable)
+void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes)
 {
 	try
 	{
 		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
-		model->addVisualizationContainerNode(treeName, modelEntityID, treeIcons, editable);
+		model->addVisualizationContainerNode(treeName, modelEntityID, treeIcons, editable, _visualisationTypes);
 	}
 	catch (std::out_of_range)
 	{

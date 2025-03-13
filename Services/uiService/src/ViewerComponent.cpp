@@ -784,11 +784,11 @@ void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const s
 	catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addNodeFromFacetData()"); }
 }
 
-void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool editable)
+void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool editable, const ot::VisualisationTypes& _visualisationTypes)
 {
 	try {
 		try {
-			ViewerAPI::addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
+			ViewerAPI::addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable,_visualisationTypes);
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addVisualizationContainerNode()"); }
 		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationContainerNode()"); }

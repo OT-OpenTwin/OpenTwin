@@ -2990,8 +2990,9 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-	AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
+	ot::VisualisationTypes visualisationTypes;
+	visualisationTypes.setFromJsonObject(_document.GetConstObject());
+	AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable, visualisationTypes);
 	
 	return "";
 }
@@ -3698,6 +3699,152 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 }
 
 // 1D Plot
+#include "PlotManagerView.h"
+#include "PlotManager.h"
+#include "ResultDataStorageAPI.h"
+#include "OTWidgets/PlotDataset.h"
+#include "ContainerFlexibleOwnership.h"
+#include <algorithm>
+
+struct AdditionalParameterDescription
+{
+	std::string m_label = "";
+	std::string m_unit = "";
+	std::string m_value = "";
+};
+
+std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager)
+{
+	auto queryInformation = _config.getQueryInformation();
+
+	std::list<ot::PlotDataset*> dataSets;
+	DataStorageAPI::DataStorageResponse dbResponse = _dataAccess.SearchInResultCollection(queryInformation.m_query, queryInformation.m_projection, 0);
+	if (dbResponse.getSuccess())
+	{
+		const std::string queryResponse = dbResponse.getResult();
+		ot::JsonDocument doc;
+		doc.fromJson(queryResponse);
+		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+		const uint32_t numberOfDocuments = allMongoDocuments.Size();
+
+		//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership übernimmt
+		//dataX.reserve(numberOfDocuments);
+		//dataY.reserve(numberOfDocuments);
+
+		std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
+		size_t counter(0);
+
+		for (uint32_t i = 0; i < numberOfDocuments; i++)
+		{
+			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+			auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityDescription.m_fieldName.c_str()];
+			//Getter on base of queryInformation.m_quantityDescription.m_dataType
+			(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
+			counter++;
+		}
+
+		size_t numberOfParameter = queryInformation.m_parameterDescriptions.size();
+		if (numberOfParameter == 1)
+		{
+			std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
+
+			//Single curve
+			auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+			for (uint32_t i = 0; i < numberOfDocuments; i++)
+			{
+				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+				auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
+				(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
+				counter++;
+			}
+
+			auto dataSet = _plotManager->addDataset(_config, dataX.release(), dataY.release(), numberOfDocuments);
+			dataSets.push_back(dataSet);
+		}
+		else
+		{
+			//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>
+			//Should be selected via a property ToDo
+			auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
+
+			std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurves;
+			std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
+			for (uint32_t i = 0; i < numberOfDocuments; i++)
+			{
+				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+
+				//First build a unique name of the additional parameter values
+				std::string curveName("");
+				std::list<AdditionalParameterDescription> additionalParameterInfos;
+				for (auto additionalParameter = queryInformation.m_parameterDescriptions.begin()++; additionalParameter != queryInformation.m_parameterDescriptions.end(); additionalParameter++)
+				{
+					auto& additionalParameterEntry = singleMongoDocument[additionalParameter->m_fieldName.c_str()];
+					curveName = additionalParameter->m_label + "_" + ot::json::toJson(additionalParameterEntry) + "_" + additionalParameter->m_unit + "; ";
+
+					AdditionalParameterDescription additionalParameterInfo;
+					additionalParameterInfo.m_label = additionalParameter->m_label;
+					additionalParameterInfo.m_value = ot::json::toJson(additionalParameterEntry);
+					additionalParameterInfo.m_unit = additionalParameter->m_unit;
+					additionalParameterInfos.push_back(additionalParameterInfo);
+				}
+				curveName = curveName.substr(0, curveName.size() - 2);
+
+				auto curve = familyOfCurves.find(curveName);
+				if (curve == familyOfCurves.end())
+				{
+					familyOfCurves.insert({ curveName, ContainerFlexibleOwnership<double>(numberOfDocuments) });
+					additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
+					curve = familyOfCurves.find(curveName);
+				}
+
+				auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
+				(curve->second).pushBack(static_cast<double>(xAxisParameterEntry.GetInt()));
+			}
+
+			//In this case we need to make the names better readable. Since we have more then one parameter in the name 
+			if (numberOfParameter > 2)
+			{
+				std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurvesSimplerNames;
+				std::list <std::string> runIDDescriptions;
+
+				int counter(0);
+				for (auto curve : familyOfCurves)
+				{
+					const std::string simpleName = "RunID_" + std::to_string(counter);
+					familyOfCurvesSimplerNames.insert({ simpleName,curve.second });
+					counter++;
+					std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
+					std::string message =
+						simpleName + ":\n";
+					for (auto entry : additionalParameterDescription)
+					{
+						message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
+					}
+					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+				}
+
+				familyOfCurves = familyOfCurvesSimplerNames;
+			}
+
+			for (auto singleCurve : familyOfCurves)
+			{
+				ot::Plot1DCurveCfg singleCurveCfg = _config;
+				//singleCurveCfg.setXAxisTitle();
+				//singleCurveCfg.setXAxisUnit();
+				// Must be possible to set a label here. Seems that currently it is only possible to use the entity name for this purpose. 
+				// Could there be an issue that multiple curves are associated with a single curve entity ? Changes would always affect all curves in the family.
+				// Probably iterate the colour of each curve here
+				ot::Color colour = singleCurveCfg.getLinePenColor();
+				ot::PlotDataset* dataSet = _plotManager->addDataset(_config, singleCurve.second.release(), dataY.release(), numberOfDocuments);
+				dataSets.push_back(dataSet);
+			}
+		}
+		//dataSet->updateCurveVisualization();
+		//dataSet->attach();
+	}
+	return dataSets;
+}
+
 
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) 
 {
@@ -3712,32 +3859,26 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	ot::Plot1DCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	const ot::PlotManagerView* plot = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	ot::PlotManager* plotManager = plotViewManager->getPlotManager();
+
+
+	const std::string collectionName = AppBase::instance()->getCollectionName();
+	DataStorageAPI::ResultDataStorageAPI dataAccess(collectionName);
+	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document,OT_ACTION_PARAM_VIEW1D_CurveConfigs);
+	for (uint32_t i = 0; i < curveCfgs.Size(); i++)
+	{
+		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
+		ot::Plot1DCurveCfg curveCfg;
+		curveCfg.setFromJsonObject(curveCfgSerialised);
+	}
+
 	
-
-
-	//const std::string& name = editor->getViewData().getEntityName();
-	//const auto& viewerType = editor->getViewData().getViewType();
-	//ot::UID globalActiveViewModel = -1;
-	//ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
-
 	return "";
 
 }
 
-#include "PlotManagerView.h"
-#include "PlotManager.h"
-#include "ResultDataStorageAPI.h"
-#include "OTWidgets/PlotDataset.h"
-#include "ContainerFlexibleOwnership.h"
-#include <algorithm>
 
-struct AdditionalParameterDescription
-{
-	std::string m_label = "";
-	std::string m_unit = "";
-	std::string m_value = "";
-};
 
 std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
 {
@@ -3757,140 +3898,7 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 	plotName = "Test/A_plot";
 
 	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findPlot(plotName);
-	if (plotViewManager != nullptr)
-	{
-		ot::PlotManager* plotManager = plotViewManager->getPlotManager();
-		
-		
-		const std::string collectionName = AppBase::instance()->getCollectionName();
 
-		DataStorageAPI::ResultDataStorageAPI dataAccess(collectionName);
-
-		auto queryInformation = config.getQueryInformation();
-		
-		DataStorageAPI::DataStorageResponse dbResponse =	dataAccess.SearchInResultCollection(queryInformation.m_query, queryInformation.m_projection,0);
-		if (dbResponse.getSuccess())
-		{
-			const std::string queryResponse = dbResponse.getResult();
-			ot::JsonDocument doc;
-			doc.fromJson(queryResponse);
-			auto allMongoDocuments = ot::json::getArray(doc, "Documents");
-			const uint32_t numberOfDocuments = allMongoDocuments.Size();		
-			
-			//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership übernimmt
-			//dataX.reserve(numberOfDocuments);
-			//dataY.reserve(numberOfDocuments);
-
-			std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
-			size_t counter(0);
-
-			for (uint32_t i = 0; i < numberOfDocuments; i++)
-			{
-				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-				auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityDescription.m_fieldName.c_str()];
-				//Getter on base of queryInformation.m_quantityDescription.m_dataType
-				(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
-				counter++;
-			}
-
-			size_t numberOfParameter = queryInformation.m_parameterDescriptions.size();
-			if (numberOfParameter == 1)
-			{
-				std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
-
-				//Single curve
-				auto entryDescription = queryInformation.m_parameterDescriptions.begin();
-				for (uint32_t i = 0; i < numberOfDocuments; i++)
-				{
-					auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-					auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
-					(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
-					counter++;
-				}
-
-				auto dataSet = plotManager->addDataset(config, dataX.release(), dataY.release(), numberOfDocuments);
-
-			}
-			else
-			{
-				auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
-				
-				std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurves;
-				std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
-				for (uint32_t i = 0; i < numberOfDocuments; i++)
-				{
-					auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-					
-					std::string curveName("");
-					std::list<AdditionalParameterDescription> additionalParameterInfos;
-					for (auto additionalParameter = queryInformation.m_parameterDescriptions.begin()++; additionalParameter != queryInformation.m_parameterDescriptions.end(); additionalParameter++)
-					{
-						auto& additionalParameterEntry = singleMongoDocument[additionalParameter->m_fieldName.c_str()];
-						curveName = additionalParameter->m_label + "_" + ot::json::toJson(additionalParameterEntry) + "_" + additionalParameter->m_unit + "; ";
-						
-						AdditionalParameterDescription additionalParameterInfo;
-						additionalParameterInfo.m_label = additionalParameter->m_label;
-						additionalParameterInfo.m_value= ot::json::toJson(additionalParameterEntry);
-						additionalParameterInfo.m_unit= additionalParameter->m_unit;
-						additionalParameterInfos.push_back(additionalParameterInfo);
-					}
-					curveName = curveName.substr(0, curveName.size() - 2);
-
-					auto curve = familyOfCurves.find(curveName);
-					if (curve == familyOfCurves.end())
-					{
-						familyOfCurves.insert({ curveName, ContainerFlexibleOwnership<double>(numberOfDocuments)});
-						additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
-						curve = familyOfCurves.find(curveName);
-					}
-					
-					auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
-					(curve->second).pushBack(static_cast<double>(xAxisParameterEntry.GetInt()));
-				}
-
-				if (numberOfParameter > 2)
-				{
-					std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurvesSimplerNames;
-					std::list <std::string> runIDDescriptions;
-
-					int counter(0);
-					for (auto curve : familyOfCurves)
-					{
-						const std::string simpleName = "RunID_" + std::to_string(counter);
-						familyOfCurvesSimplerNames.insert({ simpleName,curve.second });
-						counter++;
-						std::list<AdditionalParameterDescription>& additionalParameterDescription =	additionalParameterDescByCurveName[curve.first];
-						std::string message =
-							simpleName + ":\n";
-						for (auto entry : additionalParameterDescription)
-						{
-							message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
-						}
-						AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-					}
-					
-					familyOfCurves = familyOfCurvesSimplerNames;
-				}
-
-				for (auto singleCurve : familyOfCurves)
-				{
-					ot::Plot1DCurveCfg singleCurveCfg = config;
-					//singleCurveCfg.setXAxisTitle();
-					//singleCurveCfg.setXAxisUnit();
-					// Must be possible to set a label here. Seems that currently it is only possible to use the entity name for this purpose. 
-					// Could there be an issue that multiple curves are associated with a single curve entity ? Changes would always affect all curves in the family.
-					// Probably iterate the colour of each curve here
-					ot::Color colour =	singleCurveCfg.getLinePenColor();
-					auto dataSet = plotManager->addDataset(config, singleCurve.second.release(), dataY.release(), numberOfDocuments);
-
-				}
-			}
-
-			//dataSet->updateCurveVisualization();
-			//dataSet->attach();
-		}
-					
-	}
 	return "";
 }
 

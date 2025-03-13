@@ -96,5 +96,7 @@ void PlotBuilder::createPlot(const ot::Plot1DCfg& _plotCfg)
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
 
-	ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, plotEntity);
+	m_newModelStateInformation.m_topologyEntityIDs.insert(m_newModelStateInformation.m_topologyEntityIDs.begin(), plotEntity.getEntityID());
+	m_newModelStateInformation.m_topologyEntityVersions.insert(m_newModelStateInformation.m_topologyEntityVersions.begin(), plotEntity.getEntityStorageVersion());
+	m_newModelStateInformation.m_forceVisible.push_back(false);
 }

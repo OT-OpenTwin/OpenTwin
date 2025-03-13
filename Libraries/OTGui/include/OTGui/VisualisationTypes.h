@@ -20,10 +20,10 @@ namespace ot
 		void addPlot1DVisualisation();
 		void addCurveVisualisation();
 
-		bool visualiseAsText();
-		bool visualiseAsTable();
-		bool visualiseAsPlot1D();
-		bool visualiseAsCurve();
+		bool visualiseAsText() const;
+		bool visualiseAsTable() const;
+		bool visualiseAsPlot1D() const;
+		bool visualiseAsCurve() const;
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
