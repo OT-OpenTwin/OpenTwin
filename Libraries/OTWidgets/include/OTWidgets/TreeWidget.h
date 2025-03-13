@@ -41,15 +41,15 @@ namespace ot {
 
 		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
 		
-		//! \brief Checks if the item at the given path exists.
-		//! \param _itemPath Path to the item (e.g. "Root/Child/Item" for a delimiter '/').
-		//! \param _delimiter Delimiter to separate the item path.
+		//! @brief Checks if the item at the given path exists.
+		//! @param _itemPath Path to the item (e.g. "Root/Child/Item" for a delimiter '/').
+		//! @param _delimiter Delimiter to separate the item path.
 		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
 
-		//! \brief Checks if an item with the given text exists.
+		//! @brief Checks if an item with the given text exists.
 		//! The item text is the text of the single item.
 		//! The item to check may be nested.
-		//! \param _itemText Text to check.
+		//! @param _itemText Text to check.
 		bool itemTextExists(const QString& _itemText) const;
 
 		QString getItemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
@@ -70,18 +70,18 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Protected: Helper
+		// Helper
 
-		//! \brief Checks if an item with the given text exists.
+		//! @brief Checks if an item with the given text exists.
 		//! The item text is the text of the single item.
 		//! The item to check may be nested.
-		//! \param _parent The parent item to check the childs.
-		//! \param _itemText Text to check.
+		//! @param _parent The parent item to check the childs.
+		//! @param _itemText Text to check.
 		bool itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const;
 
 		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 
-		QTreeWidgetItem* findItemText(QTreeWidgetItem* _parent, const QString& _itemText) const;
+		QTreeWidgetItem* findItemByText(QTreeWidgetItem* _parent, const QString& _itemText) const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

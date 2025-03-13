@@ -117,12 +117,12 @@ QTreeWidgetItem* ot::TreeWidget::findItem(QTreeWidgetItem* _item, const QStringL
 	return nullptr;
 }
 
-QTreeWidgetItem* ot::TreeWidget::findItemText(QTreeWidgetItem* _parent, const QString& _itemText) const {
+QTreeWidgetItem* ot::TreeWidget::findItemByText(QTreeWidgetItem* _parent, const QString& _itemText) const {
 	OTAssertNullptr(_parent);
 	QTreeWidgetItem* ret = nullptr;
 	for (int i = 0; i < _parent->childCount(); i++) {
 		if (_parent->child(i)->text(0) == _itemText) return _parent->child(i);
-		ret = this->findItemText(_parent->child(i), _itemText);
+		ret = this->findItemByText(_parent->child(i), _itemText);
 		if (ret) return ret;
 	}
 	return ret;

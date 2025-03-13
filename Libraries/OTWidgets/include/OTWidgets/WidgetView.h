@@ -35,7 +35,7 @@ namespace ot {
 		OT_DECL_NOCOPY(WidgetView)
 	public:
 		enum InsertFlag {
-			NoInsertFlags = 0 << 0,
+			NoInsertFlags    = 0 << 0,
 			KeepCurrentFocus = 1 << 0
 		};
 		typedef ot::Flags<InsertFlag> InsertFlags;

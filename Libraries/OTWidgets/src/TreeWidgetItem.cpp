@@ -66,16 +66,17 @@ void ot::TreeWidgetItem::expandAllParents(bool _expandThis) {
 	}
 }
 
-std::string ot::TreeWidgetItem::getTreeWidgetItemPath(char _delimiter, int _nameColumn) const {
+QString ot::TreeWidgetItem::getTreeWidgetItemPath(char _delimiter, int _nameColumn) const {
+	QString path;
 	const QTreeWidgetItem* itm = this;
-	std::string path;
 	while (itm) {
-		if (path.empty()) {
-			path = itm->text(_nameColumn).toStdString() + _delimiter + path;
+		if (path.isEmpty()) {
+			path = itm->text(_nameColumn) % _delimiter % path;
 		}
 		else {
-			path = itm->text(_nameColumn).toStdString();
+			path = itm->text(_nameColumn);
 		}
+
 		itm = itm->parent();
 	}
 	return path;

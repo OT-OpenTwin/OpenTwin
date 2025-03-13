@@ -19,8 +19,8 @@
 
 namespace ot {
 
-	//! \class WidgetViewBase
-	//! \brief General widget view information class.
+	//! @class WidgetViewBase
+	//! @brief General widget view information class.
 	//! The WidgetViewBase holds the general information of a WidgetView.
 	class OT_GUI_API_EXPORT WidgetViewBase : public BasicEntityInformation {
 		OT_DECL_NODEFAULT(WidgetViewBase)
@@ -29,7 +29,7 @@ namespace ot {
 		enum ViewFlag {
 			NoViewFlags              = 0x00, //! @brief Default value (no flags set)
 			ViewIsCloseable          = 0x01, //! @brief If set the view may be closed
-			ViewDefaultCloseHandling = 0x02, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour, otherwise a closeRequested signal is emitted.
+			ViewDefaultCloseHandling = 0x02, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour (close the view), otherwise a closeRequested signal is emitted.
 			ViewIsPinnable           = 0x04, //! @brief If set the view may be pinned to the auto hide areas.
 			ViewIsCentral            = 0x10, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsSide or ViewIsTool).
 			ViewIsSide               = 0x20, //! @brief If set the view is assumed to be a side view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
@@ -40,23 +40,23 @@ namespace ot {
 		//! @brief The ViewDockLocation is used to determine the dock location when adding the view to the manager.
 		enum ViewDockLocation {
 			Default, //! @brief Default (Central) dock location.
-			Left, //! @brief Left dock location.
-			Top, //! @brief Top dock location.
-			Right, //! @brief Right dock location.
-			Bottom //! @brief Bottom dock location.
+			Left,    //! @brief Left dock location.
+			Top,     //! @brief Top dock location.
+			Right,   //! @brief Right dock location.
+			Bottom   //! @brief Bottom dock location.
 		};
 
 		enum ViewType {
-			View3D, //! \brief 3D view.
-			View1D, //! \brief 1D plot view.
-			ViewText, //! \brief Text editor view.
-			ViewTable, //! \brief Table view.
-			ViewVersion, //! \brief Version graph view.
-			ViewGraphics, //! \brief Graphics view.
-			ViewGraphicsPicker, //! \brief Graphics picker view.
-			ViewProperties, //! \brief Properties view.
-			ViewNavigation, //! \brief Navigation view.
-			CustomView //! \brief Custom view.
+			View3D,             //! @brief 3D view.
+			View1D,             //! @brief 1D plot view.
+			ViewText,           //! @brief Text editor view.
+			ViewTable,          //! @brief Table view.
+			ViewVersion,        //! @brief Version graph view.
+			ViewGraphics,       //! @brief Graphics view.
+			ViewGraphicsPicker, //! @brief Graphics picker view.
+			ViewProperties,     //! @brief Properties view.
+			ViewNavigation,     //! @brief Navigation view.
+			CustomView          //! @brief Custom view.
 		};
 
 		//! @brief Returns a string representation of the provided view flag.
@@ -83,10 +83,10 @@ namespace ot {
 		//! @param _dockLocation The string representing the dock location (/ref toString(ViewDockLocation _dockLocation) "Dock location to string")
 		static ViewDockLocation stringToDockLocation(const std::string& _dockLocation);
 
-		//! \brief Returns the string representation of the provided view type.
+		//! @brief Returns the string representation of the provided view type.
 		static std::string toString(ViewType _type);
 
-		//! \brief Returns the view type represented by the provided string.
+		//! @brief Returns the view type represented by the provided string.
 		static ViewType stringToViewType(const std::string& _type);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -147,11 +147,11 @@ namespace ot {
 		void setEntityInformation(const BasicEntityInformation& _info);
 
 	private:
-		std::string m_title; //! \brief WidgetView title (if empty the name will be used).
+		std::string m_title; //! @brief WidgetView title (if empty the name will be used).
 
-		ViewFlags m_flags; //! \brief WidgetView flags.
-		ViewType m_type; //! \brief View Type
-		ViewDockLocation m_dockLocation; //! \brief WidgetView dock location.
+		ViewFlags m_flags; //! @brief WidgetView flags.
+		ViewType m_type; //! @brief View Type
+		ViewDockLocation m_dockLocation; //! @brief WidgetView dock location.
 	};
 
 }

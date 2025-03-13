@@ -28,7 +28,7 @@ namespace ot {
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
 		TreeWidgetItemInfo getFullInfo(void) const;
 
-		std::string getTreeWidgetItemPath(char _delimiter = '/', int _nameColumn = 0) const;
+		QString getTreeWidgetItemPath(char _delimiter = '/', int _nameColumn = 0) const;
 
 		void expandAllParents(bool _expandThis = false);
 

@@ -93,7 +93,7 @@ bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, con
 		return false;
 	}
 
-	QTreeWidgetItem* treeItem = this->findItemText(m_rootItem, _oldName);
+	QTreeWidgetItem* treeItem = this->findItemByText(m_rootItem, _oldName);
 	if (!treeItem) {
 		OT_LOG_E("Tree item not found");
 		return false;

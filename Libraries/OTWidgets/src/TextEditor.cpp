@@ -115,7 +115,7 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	newText.remove('\r');
 	if (newText != this->toPlainText()) {
 		this->setCode(newText);
-	}
+	}	
 	this->setReadOnly(_config.getTextReadOnly());
 
 	this->storeSyntaxHighlighter(newHighlighter);

@@ -508,6 +508,9 @@
     <ClCompile Include="src\GlobalShortcutWrapper.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\BasicAsciiNameValidator.cpp">
+      <Filter>src\Syntax</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -964,6 +967,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h">
       <Filter>include\PropertyLink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\BasicAsciiNameValidator.h">
+      <Filter>include\Syntax</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
