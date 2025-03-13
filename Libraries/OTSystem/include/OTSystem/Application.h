@@ -7,6 +7,7 @@
 
 #include "OTSystem/SystemAPIExport.h"
 #include "OTSystem/SystemTypes.h"
+#include "OTSystem/RunResult.h"
 
 #include <string>
 
@@ -17,51 +18,6 @@ namespace ot {
 	//! \namespace app
 	//! \brief The app namespace contains several functions that may be used to start processes.
 	namespace app {
-		//! Describes the result of a run application request.
-		struct __declspec(dllexport) RunResult {
-			const static uint32_t successCode = 0;
-			
-			uint32_t m_value = successCode;
-			std::string m_message = "";
-			
-			bool isOk()
-			{
-				return m_value == successCode;
-			}
-
-			RunResult() = default;
-			RunResult& operator=(const RunResult& _other) = default;
-			RunResult& operator=(RunResult&& _other) = default;
-			
-
-			RunResult& operator=(const uint32_t& _value)
-			{
-				m_value = _value;
-				return *this;
-			}
-			
-			RunResult& operator=(uint32_t&& _value)
-			{
-				m_value = _value;
-				return *this;
-			}
-
-			RunResult(const RunResult& _other) = default;
-			RunResult(RunResult&& _other) = default;
-
-			RunResult(const uint32_t& _other)
-				:m_value(_other)
-			{}
-
-			bool operator==(const RunResult& _other)
-			{
-				return m_value == _other.m_value;
-			}
-			bool operator!=(const RunResult& _other)
-			{
-				return !(*this == _other);
-			}
-		};
 
 		//! \brief Will start the application under the given application path.
 		//! \param _applicationPath The path the application is located at.

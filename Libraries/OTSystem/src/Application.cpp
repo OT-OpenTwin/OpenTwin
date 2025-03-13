@@ -56,8 +56,8 @@ ot::app::RunResult ot::app::runApplication(const std::wstring& _applicationPath,
 	success = CreateEnvironmentBlock((void**)&penv, hToken, TRUE);
 	if (!success) {
 		assert(0);
-		resultMessage =	GetLastError();
-		resultMessage.m_message = "creating an environment failed";
+		resultMessage.setAsError(GetLastError());
+		resultMessage.setErrorMessage( "creating an environment failed");
 		return resultMessage;
 	}
 	
@@ -86,8 +86,8 @@ ot::app::RunResult ot::app::runApplication(const std::wstring& _applicationPath,
 	}
 	else
 	{
-		resultMessage = GetLastError();
-		resultMessage.m_message = "starting a process failed";
+		resultMessage.setAsError(GetLastError());
+		resultMessage.setErrorMessage("starting a process failed");
 	}
 
 	delete[] commandline;

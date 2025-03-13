@@ -94,14 +94,14 @@ ot::app::RunResult Service::shutdown(void) {
 		bool processTerminated = TerminateProcess(m_processHandle, somethingWentWrongExitCode); //Closing process without condition. Call is asynchronous, on return the process may not be terminated yet!
 		if (processTerminated == FALSE)
 		{
-			result = GetLastError();
-			result.m_message = "Failed in trying to terminate the process";
+			result.setAsError(GetLastError());
+			result.setErrorMessage("Failed in trying to terminate the process");
 		}
 		bool handleClosed = CloseHandle(m_processHandle);
 		if (!handleClosed)
 		{
-			result = GetLastError();
-			result.m_message = "Failed in closing the process handle";
+			result.setAsError(GetLastError());
+			result.setErrorMessage("Failed in closing the process handle");
 		}
 	#endif
 		m_isAlive = false;
@@ -121,16 +121,18 @@ ot::app::RunResult Service::checkAlive()
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
 	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
-		if (exitCode != STILL_ACTIVE) {
-			
-			result = exitCode;
-			result.m_message = "Checked for process state but process is not active anymore\n";
+		if (exitCode != STILL_ACTIVE) 
+		{
+			result.setAsError(exitCode);
+			result.addToErrorMessage("Checked for process state but process is not active anymore\n");
+			OT_LOG_E("Check alive failed with: " + exitCode);
 		}
 	}
 	else 
 	{		
-		result = CONTROL_C_EXIT;
-		result.m_message = "Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n";
+		OT_LOG_E("Failed to get exit code");
+		result.setAsError(exitCode);
+		result.setErrorMessage("Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n");
 	}
 
 	return result;

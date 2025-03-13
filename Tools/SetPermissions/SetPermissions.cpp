@@ -19,7 +19,7 @@ void setPermissions(const std::string& path)
 	else
 	{
 		std::cout << "Failed to set permissions for " << path << std::endl;
-		std::cout << "Error code: " << result.m_value << " error message: " << result.m_message<< std::endl;
+		std::cout << "Error code: " << result.getErrorCode() << " error message: " << result.getErrorMessage() << std::endl;
 	}
 }
 
