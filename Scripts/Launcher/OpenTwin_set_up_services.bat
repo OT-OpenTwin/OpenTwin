@@ -1,11 +1,11 @@
 @echo off
 
-:: The script allows an argument to be passed that will be passed trough to the set up LDS script.
-:: Read the "OpenTwin_set_up_LDS.bat" script for more details.
+REM The script allows an argument to be passed that will be passed trough to the set up LDS script.
+REM Read the "OpenTwin_set_up_LDS.bat" script for more details.
 
-:: ##########################################################################################
+REM ##########################################################################################
 
-:: General
+REM General
 
 if not defined OPEN_TWIN_MONGODB_ADDRESS (
 	set OPEN_TWIN_MONGODB_ADDRESS=127.0.0.1:27017
@@ -55,26 +55,26 @@ if not defined OPEN_TWIN_DOWNLOAD_PORT  (
 	set OPEN_TWIN_DOWNLOAD_PORT=80
 )
 
-:: ##########################################################################################
+REM ##########################################################################################
 
-:: Logging url
+REM Logging url
 if not defined OPEN_TWIN_LOGGING_URL (
 	set OPEN_TWIN_LOGGING_URL=%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LOG_PORT%
 )
 
-:: Log mode
+REM Log mode
 if not defined OPEN_TWIN_LOGGING_MODE (
-	:: Error and Warning
+	REM Error and Warning
 	set OPEN_TWIN_LOGGING_MODE="WARNING_LOG|ERROR_LOG"
 
-	:: General (Info, Detailed, Warning, Error, NO message log)
-	:: set OPEN_TWIN_LOGGING_MODE=ALL_GENERAL_LOG_FLAGS
+	REM General (Info, Detailed, Warning, Error, NO message log)
+	REM set OPEN_TWIN_LOGGING_MODE=ALL_GENERAL_LOG_FLAGS
 
-	:: IO Messages (All inbound and outbound messages, NO general log)
-	:: set OPEN_TWIN_LOGGING_MODE=ALL_MESSAGE_LOG_FLAGS
+	REM IO Messages (All inbound and outbound messages, NO general log)
+	REM set OPEN_TWIN_LOGGING_MODE=ALL_MESSAGE_LOG_FLAGS
 
-	:: All
-	:: set OPEN_TWIN_LOGGING_MODE=ALL_LOG_FLAGS
+	REM All
+	REM set OPEN_TWIN_LOGGING_MODE=ALL_LOG_FLAGS
 )
 
 pushd "%~dp0" 
