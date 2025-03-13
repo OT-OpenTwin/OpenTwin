@@ -894,6 +894,10 @@ void AppBase::createUi(void) {
 			m_projectNavigation = new ot::NavigationTreeView;
 			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewNavigation, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsPermanent(true);
+			
+			this->connect(m_projectNavigation, &ot::NavigationTreeView::copyRequested, this, &AppBase::slotCopyRequested);
+			this->connect(m_projectNavigation, &ot::NavigationTreeView::pasteRequested, this, &AppBase::slotPasteRequested);
+
 			//m_projectNavigation->getTree()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
@@ -2276,14 +2280,15 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	}
 }
 
-void AppBase::slotCopyRequested(ot::CopyInformation& _info) {
-	_info.setOriginProjectName(m_currentProjectName);
+void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
+	ot::CopyInformation info(_info);
+	info.setOriginProjectName(m_currentProjectName);
 	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SelectedEntitiesSerialise, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject infoObj;
-	_info.addToJsonObject(infoObj, doc.GetAllocator());
+	info.addToJsonObject(infoObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
 
 	std::string response;
@@ -2309,7 +2314,7 @@ void AppBase::slotCopyRequested(ot::CopyInformation& _info) {
 	clip->setText(QString::fromStdString(rMsg.getWhat()));
 }
 
-void AppBase::slotPasteRequested(ot::CopyInformation& _info) {
+void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 	// Get current copy info from clipboard
 	QClipboard* clip = QApplication::clipboard();
 	if (!clip) {
@@ -2317,35 +2322,31 @@ void AppBase::slotPasteRequested(ot::CopyInformation& _info) {
 		return;
 	}
 
-	// Get data
+	// Get clipboard text
 	std::string importString = clip->text().toStdString();
 	if (importString.empty()) {
 		return;
 	}
 
-	ot::JsonDocument importDoc;
-	if (!importDoc.fromJson(importString)) {
-		return;
-	}
-	if (!importDoc.IsObject()) {
-		return;
-	}
+	// Create copy information from raw string
+	ot::CopyInformation info = ot::CopyInformation::fromRawString(importString);
 
-	ot::CopyInformation info;
-	info.setFromJsonObject(importDoc.GetConstObject());
-	
+	// Copy destination paste info
 	if (_info.getDestinationScenePosSet()) {
 		info.setDestinationScenePos(_info.getDestinationScenePos());
 	}
 	info.setDestinationViewInfo(_info.getDestinationViewInfo());
 
+	// Create request
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PasteEntities, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Raw, ot::JsonString(importString, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject infoObj;
 	info.addToJsonObject(infoObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, infoObj, doc.GetAllocator());
 
+	// Send request
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {

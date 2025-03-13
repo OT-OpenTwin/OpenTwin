@@ -167,9 +167,6 @@
     <ClInclude Include="$(BASE64_ROOT)\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\NavigationTreeView.h">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\ServiceDataUi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -243,6 +240,9 @@
     </QtMoc>
     <QtMoc Include="include\NavigationSelectionManager.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\NavigationTreeView.h">
+      <Filter>Header Files\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
