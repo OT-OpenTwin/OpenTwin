@@ -45,7 +45,7 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 			m_serverSocket = nullptr;
 			return false;
 		}
-
+		auto server = m_serverSocket->state();
 		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::tickRate));
 		this->processNextEvent();
 	}

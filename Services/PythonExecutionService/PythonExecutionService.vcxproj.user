@@ -4,7 +4,7 @@
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>$(TargetPath) "1" "127.0.0.1:XXXX" "127.0.0.1:8093" "unused"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLD);%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
@@ -25,15 +25,15 @@
     <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLR);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2024-11-26T13:38:18.9541817Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-03-14T14:00:21.6273639Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <QtLastBackgroundBuild>2024-11-26T13:38:19.0762093Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-03-14T14:00:21.7458998Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-11-26T13:38:19.2842574Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-03-14T14:00:21.8954635Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-11-26T13:38:19.3322685Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-03-14T14:00:21.9815975Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>
