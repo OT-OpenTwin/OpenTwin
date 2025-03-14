@@ -59,12 +59,12 @@ private:
 	struct RequestedService {
 		SessionInformation session;
 		ServiceInformation service;
-		unsigned int startAttempt;
+		unsigned int startAttempt = 0;
 	};
 	struct InitializingService {
 		Service * service;
 		RequestedService startInfo;
-		int initializeAttempt; 
+		int initializeAttempt = 0; 
 	};
 
 	void runThreads(void);

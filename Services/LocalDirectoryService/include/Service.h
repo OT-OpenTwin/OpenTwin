@@ -10,7 +10,7 @@
 
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/Network.h"
-
+#include <stdint.h>
 class ServiceManager;
 
 class Service
@@ -25,9 +25,9 @@ public:
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 	ot::SystemProcess::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
-	bool shutdown(void);
+	ot::SystemProcess::RunResult shutdown(void);
 
-	bool checkAlive(void);
+	ot::SystemProcess::RunResult checkAlive();
 	void incrStartCounter(void);
 
 	const ServiceInformation& information(void) const { return m_info; };
@@ -36,6 +36,7 @@ public:
 	ot::port_t port(void) const { return m_port; };
 	const std::string& websocketUrl(void) const { return m_websocketUrl; };
 	ot::port_t websocketPort(void) const { return m_websocketPort; };
+
 
 private:
 	ServiceInformation	m_info;
