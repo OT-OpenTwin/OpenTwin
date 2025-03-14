@@ -95,7 +95,7 @@ bool SubprocessManager::sendSingleRequest(const ot::JsonDocument& _document, std
 }
 
 bool SubprocessManager::ensureSubprocessRunning(void) {
-	/*
+
 	std::string serverName;
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
@@ -105,7 +105,6 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 		OT_LOG_E("Failed to start subprocess");
 		return false;
 	}
-	*/
 
 	return true;
 }

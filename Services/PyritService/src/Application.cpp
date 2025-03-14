@@ -354,10 +354,10 @@ void Application::runSolver(void)
 	ot::ModelServiceAPI::getEntityChildInformation("Meshes", meshInfo, false);
 
 	// Finally start the worker thread to run the solvers
-	//std::thread workerThread(&Application::solverThread, this, solverInfo, meshInfo, solverMap);
-	//workerThread.detach();
+	std::thread workerThread(&Application::solverThread, this, solverInfo, meshInfo, solverMap);
+	workerThread.detach();
 
-	solverThread(solverInfo, meshInfo, solverMap);
+	//solverThread(solverInfo, meshInfo, solverMap);
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {
