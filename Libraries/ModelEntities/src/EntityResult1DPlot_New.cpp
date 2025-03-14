@@ -34,6 +34,11 @@ void EntityResult1DPlot_New::addVisualizationNodes(void)
 	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
+
+	for (auto child : getChildrenList())
+	{
+		child->addVisualizationNodes();
+	}
 }
 
 bool EntityResult1DPlot_New::updateFromProperties(void)
