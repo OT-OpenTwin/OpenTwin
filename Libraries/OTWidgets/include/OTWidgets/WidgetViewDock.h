@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class WidgetViewDock : public ads::CDockWidget {
+	class OT_WIDGETS_API_EXPORT WidgetViewDock : public ads::CDockWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewDock)
 	public:
@@ -22,13 +22,17 @@ namespace ot {
 
 		void openView(void);
 		void closeView(void);
-
+		
 		void setCloseButtonVisible(bool _vis);
 		void setLockButtonVisible(bool _vis);
 
 	Q_SIGNALS:
+		void dockResized(const QSize& _newSize);
 		void dockCloseRequested(void);
 		void dockLockedChanged(bool _isLocked);
+
+	protected:
+		virtual void resizeEvent(QResizeEvent* _event) override;
 
 	private Q_SLOTS:
 		void slotCloseRequested(void);

@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class GraphicsInvisibleItem : public CustomGraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsInvisibleItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsInvisibleItem)
 	public:
 		GraphicsInvisibleItem();

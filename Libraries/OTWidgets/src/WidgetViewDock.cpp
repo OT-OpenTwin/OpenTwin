@@ -46,6 +46,11 @@ void ot::WidgetViewDock::setLockButtonVisible(bool _vis) {
 	}
 }
 
+void ot::WidgetViewDock::resizeEvent(QResizeEvent* _event) {
+	ads::CDockWidget::resizeEvent(_event);
+	Q_EMIT dockResized(_event->size());
+}
+
 void ot::WidgetViewDock::slotCloseRequested(void) {
 	Q_EMIT dockCloseRequested();
 }

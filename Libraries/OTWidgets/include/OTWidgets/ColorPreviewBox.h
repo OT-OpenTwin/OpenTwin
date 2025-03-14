@@ -18,7 +18,7 @@ namespace ot {
 
 	class PushButton;
 
-	class ColorPreviewBox : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ColorPreviewBox : public QFrame, public QWidgetInterface {
 		OT_DECL_NOCOPY(ColorPreviewBox)
 	public:
 		ColorPreviewBox(const QColor& _color = QColor(), QWidget* _parent = (QWidget*)nullptr);

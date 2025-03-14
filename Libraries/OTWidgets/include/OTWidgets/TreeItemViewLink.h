@@ -27,8 +27,9 @@ namespace ot {
 			CloseOnDeselect     = 1 << 1,
 			SelectOnFocus       = 1 << 2,
 			DeselectOnFocusLost = 1 << 3,
+			CentralViewsOnly    = 1 << 4, //! @brief If set only central views will be concidered.
 
-			DefaultFlags = OpenOnSelect | DeselectOnFocusLost | SelectOnFocus
+			DefaultFlags = OpenOnSelect | DeselectOnFocusLost | SelectOnFocus | CentralViewsOnly
 		};
 		typedef ot::Flags<LinkFlag> LinkFlags;
 

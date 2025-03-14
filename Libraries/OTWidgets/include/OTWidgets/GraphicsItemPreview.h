@@ -17,7 +17,7 @@ namespace ot {
 
 	class GraphicsItemPreviewDrag;
 
-	class GraphicsItemPreview : public QLabel {
+	class OT_WIDGETS_API_EXPORT GraphicsItemPreview : public QLabel {
 	public:
 		GraphicsItemPreview();
 		virtual ~GraphicsItemPreview();

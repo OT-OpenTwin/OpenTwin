@@ -38,6 +38,12 @@ void ot::TreeItemViewLink::slotTreeSelectionChanged() {
 }
 
 void ot::TreeItemViewLink::slotViewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView) {
+	if (_focusedView) {
+		if ((m_flags & CentralViewsOnly) && !(_focusedView->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral)) {
+			return;
+		}
+	}
+	
 	if ((m_flags & LinkFlag::SelectOnFocus) && _previousView == m_view && m_treeItem->isSelected()) {
 		m_treeItem->setSelected(false);
 	}

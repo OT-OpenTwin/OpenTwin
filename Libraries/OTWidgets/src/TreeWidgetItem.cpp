@@ -71,10 +71,10 @@ QString ot::TreeWidgetItem::getTreeWidgetItemPath(char _delimiter, int _nameColu
 	const QTreeWidgetItem* itm = this;
 	while (itm) {
 		if (path.isEmpty()) {
-			path = itm->text(_nameColumn) % _delimiter % path;
+			path = itm->text(_nameColumn);
 		}
 		else {
-			path = itm->text(_nameColumn);
+			path = itm->text(_nameColumn) % _delimiter % path;
 		}
 
 		itm = itm->parent();

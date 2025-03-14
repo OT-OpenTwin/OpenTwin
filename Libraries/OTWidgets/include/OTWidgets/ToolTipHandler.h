@@ -17,7 +17,7 @@
 
 namespace ot {
 
-	class ToolTipHandler : public QObject {
+	class OT_WIDGETS_API_EXPORT ToolTipHandler : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ToolTipHandler)
 	public:
