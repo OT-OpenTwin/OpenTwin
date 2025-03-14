@@ -8,6 +8,7 @@
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/IconManager.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -17,6 +18,7 @@ ot::Dialog::Dialog(QWidget* _parent)
 	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel), m_state(DialogState::NoState)
 {
 	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
+	this->setWindowIcon(IconManager::getApplicationIcon());
 }
 
 ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent) 
@@ -24,6 +26,8 @@ ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent)
 {
 	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
 	this->setWindowTitle(QString::fromStdString(_config.getTitle()));
+	this->setWindowIcon(IconManager::getApplicationIcon());
+
 	if (_config.getMinSize().width() >= 0) { this->setMinimumWidth(_config.getMinSize().width()); };
 	if (_config.getMinSize().height() >= 0) { this->setMinimumHeight(_config.getMinSize().height()); };
 	if (_config.getMaxSize().width() >= 0) { this->setMaximumWidth(_config.getMaxSize().width()); };
