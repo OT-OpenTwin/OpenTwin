@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OPENTWIN_DEV_ROOT%\Services\PyritService\PyritService.sln" %1 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_PYRIT_SERVICE_ROOT%\PyritService.sln" %1 %2 
 
 GOTO END
 

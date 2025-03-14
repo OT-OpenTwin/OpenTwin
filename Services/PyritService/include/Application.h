@@ -9,30 +9,36 @@
 #pragma once
 
 // Open twin header
-#include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "EntityInformation.h"
+#include "OTServiceFoundation/ApplicationBase.h"
 
-// C++ header
+// std header
 #include <string>
-#include <list>
-#include <map>
 
-// Forward declaration
-class EntityBase;
-namespace ot {
-	namespace components {
-		class UiComponent;
-		class ModelComponent;
-	}
-}
+class SubprocessManager;
 
 class Application : public ot::ApplicationBase {
 	OT_DECL_ACTION_HANDLER(Application)
 public:
+	static Application* instance(void);
+	static void deleteInstance(void);
+
+private:
 	Application();
 	virtual ~Application();
+public:
 
-	// ##################################################################################################################################
+	// ##################################################################################################################################################################################################################
+
+	// Add your custom functions/ members here
+
+	// A handler can be created to handle the the specified action
+	// In this example the first parameter is the name of the callback function
+	// The second parameter is the class name where the handler is created at
+	// The third parameter is a String containing the action name
+	// The last parameter are flags describing the allowed message types for this handler
+	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
+
+	// ##################################################################################################################################################################################################################
 
 	// Required functions
 
@@ -84,12 +90,12 @@ public:
 	//! The created class will be deleted after used for sending or synchronizing with the database.
 	//! The created settings will be requested upon Service startup to synchronize with the database,
 	//! aswell as when the uiService is connected
-	virtual ot::PropertyGridCfg createSettings(void) const override { return ot::PropertyGridCfg(); };
+	virtual ot::PropertyGridCfg createSettings(void) const override;
 
 	//! @brief This function will be called when the settings were synchronized with the database
 	//! At this point the values from the dataset should be stored since the dataset will be deleted after this function call
 	//! @param The dataset that contains all values
-	virtual void settingsSynchronized(const ot::PropertyGridCfg& _dataset) override {};
+	virtual void settingsSynchronized(const ot::PropertyGridCfg& _dataset) override;
 
 	//! @brief This function will be called when the settings were changed in the uiService
 	//! The value of the provided item should be stored.
@@ -97,25 +103,23 @@ public:
 	//! otherwise false. When returning true, the function createSettings() will be called and the created dataset will be
 	//! send to the uiService to update the Settings in the dialog
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
-	virtual bool settingChanged(const ot::Property* _item) override { return false; };
-	
-	// ##################################################################################################################################
+	virtual bool settingChanged(const ot::Property* _item) override;
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	// Handler
+	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
 
 	void modelSelectionChangedNotification(void);
 
 	void addSolver(void);
 	void runSolver(void);
-	void EnsureVisualizationModelIDKnown(void);
 
-	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap);
-	void runSingleSolver(ot::EntityInformation &solver, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity);
+	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap);
+	void runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity);
 	void deleteSingleSolverResults(EntityBase* solverEntity);
 
 private:
+	SubprocessManager*		m_subprocessManager;
 	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
-
 };
