@@ -24,10 +24,10 @@ public:
 	//! @param _object The JSON object to add the contents to
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
-	ot::SystemProcess::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
-	ot::SystemProcess::RunResult shutdown(void);
+	ot::RunResult run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
+	ot::RunResult shutdown(void);
 
-	ot::SystemProcess::RunResult checkAlive();
+	ot::RunResult checkAlive();
 	void incrStartCounter(void);
 
 	const ServiceInformation& information(void) const { return m_info; };

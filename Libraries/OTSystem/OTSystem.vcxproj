@@ -33,6 +33,7 @@
     <ClInclude Include="include\OTSystem\Network.h" />
     <ClInclude Include="include\OTSystem\OperatingSystem.h" />
     <ClInclude Include="include\OTSystem\PortManager.h" />
+    <ClInclude Include="include\OTSystem\RunResult.h" />
     <ClInclude Include="include\OTSystem\SystemAPIExport.h" />
     <ClInclude Include="include\OTSystem\SystemInformation.h" />
     <ClInclude Include="include\OTSystem\SystemTypes.h" />

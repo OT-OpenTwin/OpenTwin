@@ -149,7 +149,7 @@ bool ServiceManager::requestStartService(const SessionInformation& _sessionInfor
 bool ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
 	m_mutexRequestedServices.lock();
 
-	ot::SystemProcess::RunResult result;
+	ot::RunResult result;
 	Service * newService = new Service(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService));
 
 	do{
@@ -187,10 +187,11 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 					}
 
 					//Terminates the process 
-					ot::SystemProcess::RunResult result = newService->checkAlive();
+					ot::RunResult result = newService->checkAlive();
 					if (!result.isOk())
 					{
-						OT_LOG_E("Relayservice died while trying to check if it is allive. Exit code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+						
+						OT_LOG_E("Relayservice died while trying to check if it is allive. Exit code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 						// It is possible that the port was blocked. What happened: The process started but then died.
 						break;
 					}
@@ -203,8 +204,8 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 
 				// Service start failed
 				OT_LOG_E("Relay Service allive check failed.");
-				ot::SystemProcess::RunResult result =  newService->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+				ot::RunResult result =  newService->shutdown();
+				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
 				delete newService;
 				return false;
@@ -226,7 +227,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 			// Service start failed
 			delete newService;
 
-			OT_LOG_E("Service start failed with return value: " + std::to_string(result.m_value) + " and message: " + result.m_message);
+			OT_LOG_E("Service start failed with return value: " + std::to_string(result.getErrorCode()) + " and message: " + result.getErrorMessage());
 			return false;
 		}
 	} while (!result.isOk() );
@@ -356,6 +357,7 @@ void ServiceManager::serviceDisconnected(const std::string& _sessionID, const Se
 // Private functions
 
 void ServiceManager::runThreads(void) {
+	
 	if (m_threadServiceStarter == nullptr) {
 		//Starts thread to start the front entry of services to start
 		m_threadServiceStarter = new std::thread(&ServiceManager::workerServiceStarter, this);
@@ -503,6 +505,8 @@ void ServiceManager::workerServiceStarter(void) {
 			RequestedService info = m_requestedServices.front();
 			m_requestedServices.pop_front();
 
+			OT_LOG_D("Starting service: " + info.service.name());
+
 			m_mutexRequestedServices.unlock();
 			
 			// Increase start counter
@@ -523,9 +527,9 @@ void ServiceManager::workerServiceStarter(void) {
 			Service * newService = new Service(this, info.service);
 			
 			// Attempt to start service
-			ot::SystemProcess::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
+			ot::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
 			if (!result.isOk()) {
-				OT_LOG_E("Service start failed with error code: " + std::to_string(result.m_value) + " and error message: " + result.m_message);
+				OT_LOG_E("Service start failed with error code: " + std::to_string(result.getErrorCode()) + " and error message: " + result.getErrorMessage());
 				
 				// Clean up port numbers
 				ot::PortManager::instance().setPortNotInUse(newService->port());
@@ -575,10 +579,11 @@ void ServiceManager::workerServiceInitializer(void) {
 			InitializingService info = m_initializingServices.front();
 			m_initializingServices.pop_front();
 
+			OT_LOG_D("Initialising service: " + info.service->information().name());
 			m_mutexInitializingServices.unlock();
 
 			info.initializeAttempt = info.initializeAttempt + 1;
-			ot::SystemProcess::RunResult result =	info.service->checkAlive();
+			ot::RunResult result =	info.service->checkAlive();
 			if (result.isOk()) {
 				OT_LOG_D("Pinging service (name = \"" + info.service->information().name() + "\"; type = \"" + info.service->information().type() + "\")");
 
@@ -627,10 +632,10 @@ void ServiceManager::workerServiceInitializer(void) {
 			else {
 				OT_LOG_W("Service died while attempting to ping (name = \"" + info.service->information().name() + "\"; type = \"" +
 					info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
-				OT_LOG_W("Check allive error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+				OT_LOG_W("Check allive error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 				
-				ot::SystemProcess::RunResult result = info.service->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+				ot::RunResult result = info.service->shutdown();
+				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
 				serviceInitializeFailed(info);
 			}
@@ -674,14 +679,15 @@ void ServiceManager::workerHealthCheck(void) {
 			// Itereate through every service in every session
 			for (auto session : m_services) {
 				for (auto service : *session.second) {
+					
 					// Check if service crashed
-					ot::SystemProcess::RunResult result =	service->checkAlive();
+					ot::RunResult result =	service->checkAlive();
 					if (!result.isOk()) 
 					{
-						OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+						OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 						
-						ot::SystemProcess::RunResult result = service->shutdown();
-						OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+						ot::RunResult result = service->shutdown();
+						OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
 						if (service->startCounter() < service->information().maxCrashRestarts()) {
 							// Attempt to restart service, if successful the list did not change and
@@ -723,7 +729,7 @@ void ServiceManager::workerServiceStopper(void) {
 
 		for (auto service : servicesTocheck) 
 		{
-			ot::SystemProcess::RunResult result =	service->checkAlive();
+			ot::RunResult result =	service->checkAlive();
 			if (result.isOk()) 
 			{
 				// Service is still running
@@ -731,8 +737,8 @@ void ServiceManager::workerServiceStopper(void) {
 			}
 			else 
 			{
-				ot::SystemProcess::RunResult result = service->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
+				ot::RunResult result = service->shutdown();
+				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
 				// Clean up port numbers
 				ot::PortManager::instance().setPortNotInUse(service->port());

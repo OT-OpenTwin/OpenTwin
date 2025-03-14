@@ -18,12 +18,12 @@
 #include <UserEnv.h>
 
 
-ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath) {
+ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
 	return runApplication(strconverter.from_bytes(_applicationPath));
 }
 
-ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath) {
+ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath) {
 	RunResult result;
 #ifdef OT_OS_WINDOWS
 	std::wstring commandLine(L"CMD.exe /c \"");
@@ -39,25 +39,25 @@ ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::wstrin
 	return result;
 }
 
-ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
+ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
 	return runApplication(strconverter.from_bytes(_applicationPath), strconverter.from_bytes(_commandLine), _processHandle);
 }
 
 #if defined(OT_OS_WINDOWS)
-ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
+ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
 	HANDLE hToken = NULL;
 	BOOL success = OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &hToken);
 	assert(success);
 
 	wchar_t* penv = nullptr;
-	ot::SystemProcess::RunResult resultMessage;
+	ot::RunResult resultMessage;
 
 	success = CreateEnvironmentBlock((void**)&penv, hToken, TRUE);
 	if (!success) {
 		assert(0);
-		resultMessage =	GetLastError();
-		resultMessage.m_message = "creating an environment failed";
+		resultMessage.setAsError(GetLastError());
+		resultMessage.setErrorMessage( "creating an environment failed");
 		return resultMessage;
 	}
 	
@@ -90,8 +90,8 @@ ot::SystemProcess::RunResult ot::SystemProcess::runApplication(const std::wstrin
 	}
 	else
 	{
-		resultMessage = GetLastError();
-		resultMessage.m_message = "starting a process failed";
+		resultMessage.setAsError(GetLastError());
+		resultMessage.setErrorMessage("starting a process failed");
 	}
 
 	delete[] commandline;

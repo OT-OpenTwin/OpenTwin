@@ -7,7 +7,7 @@
 
 #include "OTSystem/SystemAPIExport.h"
 #include "OTSystem/SystemTypes.h"
-
+#include "OTSystem/RunResult.h"
 #include <string>
 
 #pragma warning(disable:4251)
@@ -19,50 +19,7 @@ namespace ot {
 	class OT_SYS_API_EXPORT SystemProcess
 	{
 	public:
-		//! Describes the result of a run application request.
-		struct RunResult {
-			uint32_t m_value = 0;
-			std::string m_message = "";
-
-			bool isOk()
-			{
-				return m_value == 0;
-			}
-
-			RunResult() = default;
-			RunResult& operator=(const RunResult& _other) = default;
-			RunResult& operator=(RunResult&& _other) = default;
-
-
-			RunResult& operator=(const uint32_t& _value)
-			{
-				m_value = _value;
-				return *this;
-			}
-
-			RunResult& operator=(uint32_t&& _value)
-			{
-				m_value = _value;
-				return *this;
-			}
-
-			RunResult(const RunResult& _other) = default;
-			RunResult(RunResult&& _other) = default;
-
-			RunResult(const uint32_t& _other)
-				:m_value(_other)
-			{}
-
-			bool operator==(const RunResult& _other)
-			{
-				return m_value == _other.m_value;
-			}
-			bool operator!=(const RunResult& _other)
-			{
-				return !(*this == _other);
-			}
-			};
-
+	
 	//! \brief Will start the application under the given application path.
 	//! \param _applicationPath The path the application is located at.
 	//! \param _waitForResponse If true, the function will wait until the process was successfully started.

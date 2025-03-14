@@ -47,10 +47,10 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 	std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
 
 	// Run sub
-	ot::SystemProcess::RunResult result = ot::SystemProcess::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle);
+	ot::RunResult result = ot::SystemProcess::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle);
 	if (!result.isOk()) {
 		m_clientHandle = nullptr;
-		OT_LOG_E("Failed to start subprocess");
+		OT_LOG_E("Failed to start subprocess with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 		return false;
 	}
 
@@ -109,7 +109,7 @@ void SubprocessHandler::shutdownSubprocess(void) {
 
 void SubprocessHandler::healthCheckWorker(void) {
 	while (m_performHealthCheck) {
-		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::defaultTickTime));
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 			if (!ot::SystemProcess::isApplicationRunning(m_clientHandle)) {

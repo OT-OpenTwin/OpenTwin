@@ -45,7 +45,7 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	_object.AddMember("WebsocketPort", m_websocketPort, _allocator);
 }
 
-ot::SystemProcess::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
+ot::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
 	OT_LOG_D("Starting service (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; Session.ID = \"" + 
 		_sessionInformation.id() + "\"; LSS.Url = \"" + _sessionInformation.sessionServiceURL() + "\")");
 
@@ -84,9 +84,9 @@ ot::SystemProcess::RunResult Service::run(const SessionInformation& _sessionInfo
 #endif
 }
 
-ot::SystemProcess::RunResult Service::shutdown(void) {
+ot::RunResult Service::shutdown(void) {
 	
-	ot::SystemProcess::RunResult result;
+	ot::RunResult result;
 	if (m_isAlive) 
 	{
 	#if defined(OT_OS_WINDOWS)
@@ -94,14 +94,14 @@ ot::SystemProcess::RunResult Service::shutdown(void) {
 		bool processTerminated = TerminateProcess(m_processHandle, somethingWentWrongExitCode); //Closing process without condition. Call is asynchronous, on return the process may not be terminated yet!
 		if (processTerminated == FALSE)
 		{
-			result = GetLastError();
-			result.m_message = "Failed in trying to terminate the process";
+			result.setAsError(GetLastError());
+			result.setErrorMessage("Failed in trying to terminate the process");
 		}
 		bool handleClosed = CloseHandle(m_processHandle);
 		if (!handleClosed)
 		{
-			result = GetLastError();
-			result.m_message = "Failed in closing the process handle";
+			result.setAsError(GetLastError());
+			result.setErrorMessage("Failed in closing the process handle");
 		}
 	#endif
 		m_isAlive = false;
@@ -114,23 +114,25 @@ void Service::incrStartCounter(void) {
 	m_startCounter++;
 }
 
-ot::SystemProcess::RunResult Service::checkAlive() 
+ot::RunResult Service::checkAlive() 
 {
-	ot::SystemProcess::RunResult result;
+	ot::RunResult result;
 	#if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
 	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
-		if (exitCode != STILL_ACTIVE) {
-			
-			result = exitCode;
-			result.m_message = "Checked for process state but process is not active anymore\n";
+		if (exitCode != STILL_ACTIVE) 
+		{
+			result.setAsError(exitCode);
+			result.addToErrorMessage("Checked for process state but process is not active anymore\n");
+			OT_LOG_E("Check alive failed with: " + exitCode);
 		}
 	}
 	else 
 	{		
-		result = CONTROL_C_EXIT;
-		result.m_message = "Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n";
+		OT_LOG_E("Failed to get exit code");
+		result.setAsError(exitCode);
+		result.setErrorMessage("Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n");
 	}
 
 	return result;
