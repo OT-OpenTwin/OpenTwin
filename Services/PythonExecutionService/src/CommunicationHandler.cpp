@@ -333,12 +333,11 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	// Write request
 	OT_LOG_D("Writing to client: \"" + _data.toStdString() + "\"");
 
-	m_client->write(_data);
-	
 	setClientState(ClientState::WaitForResponse);
+	uint64_t writteByte = m_client->write(_data);
 	bool flushSuccess = m_client->flush(); //Any data was written.
 
-	if (!flushSuccess)
+	if (!flushSuccess && writteByte == -1)
 	{
 		OT_LOG_E("Failed to flush data");
 		setClientState(ClientState::Ready);
