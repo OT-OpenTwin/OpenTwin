@@ -80,13 +80,13 @@ ot::SystemProcess::RunResult Service::run(const SessionInformation& _sessionInfo
 	return ot::SystemProcess::runApplication(launcherName, commandLine, m_processHandle);
 #else
 	otAssert(0, "Not implemented");
-	return ot::app::GeneralError;
+	return ot::SystemProcess::GeneralError;
 #endif
 }
 
-ot::app::RunResult Service::shutdown(void) {
+ot::SystemProcess::RunResult Service::shutdown(void) {
 	
-	ot::app::RunResult result;
+	ot::SystemProcess::RunResult result;
 	if (m_isAlive) 
 	{
 	#if defined(OT_OS_WINDOWS)
@@ -114,9 +114,9 @@ void Service::incrStartCounter(void) {
 	m_startCounter++;
 }
 
-ot::app::RunResult Service::checkAlive() 
+ot::SystemProcess::RunResult Service::checkAlive() 
 {
-	ot::app::RunResult result;
+	ot::SystemProcess::RunResult result;
 	#if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;

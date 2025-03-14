@@ -187,7 +187,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 					}
 
 					//Terminates the process 
-					ot::app::RunResult result = newService->checkAlive();
+					ot::SystemProcess::RunResult result = newService->checkAlive();
 					if (!result.isOk())
 					{
 						OT_LOG_E("Relayservice died while trying to check if it is allive. Exit code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
@@ -203,7 +203,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 
 				// Service start failed
 				OT_LOG_E("Relay Service allive check failed.");
-				ot::app::RunResult result =  newService->shutdown();
+				ot::SystemProcess::RunResult result =  newService->shutdown();
 				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 
 				delete newService;
@@ -578,7 +578,7 @@ void ServiceManager::workerServiceInitializer(void) {
 			m_mutexInitializingServices.unlock();
 
 			info.initializeAttempt = info.initializeAttempt + 1;
-			ot::app::RunResult result =	info.service->checkAlive();
+			ot::SystemProcess::RunResult result =	info.service->checkAlive();
 			if (result.isOk()) {
 				OT_LOG_D("Pinging service (name = \"" + info.service->information().name() + "\"; type = \"" + info.service->information().type() + "\")");
 
@@ -629,7 +629,7 @@ void ServiceManager::workerServiceInitializer(void) {
 					info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 				OT_LOG_W("Check allive error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 				
-				ot::app::RunResult result = info.service->shutdown();
+				ot::SystemProcess::RunResult result = info.service->shutdown();
 				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 
 				serviceInitializeFailed(info);
@@ -675,12 +675,12 @@ void ServiceManager::workerHealthCheck(void) {
 			for (auto session : m_services) {
 				for (auto service : *session.second) {
 					// Check if service crashed
-					ot::app::RunResult result =	service->checkAlive();
+					ot::SystemProcess::RunResult result =	service->checkAlive();
 					if (!result.isOk()) 
 					{
 						OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 						
-						ot::app::RunResult result = service->shutdown();
+						ot::SystemProcess::RunResult result = service->shutdown();
 						OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 
 						if (service->startCounter() < service->information().maxCrashRestarts()) {
@@ -723,7 +723,7 @@ void ServiceManager::workerServiceStopper(void) {
 
 		for (auto service : servicesTocheck) 
 		{
-			ot::app::RunResult result =	service->checkAlive();
+			ot::SystemProcess::RunResult result =	service->checkAlive();
 			if (result.isOk()) 
 			{
 				// Service is still running
@@ -731,7 +731,7 @@ void ServiceManager::workerServiceStopper(void) {
 			}
 			else 
 			{
-				ot::app::RunResult result = service->shutdown();
+				ot::SystemProcess::RunResult result = service->shutdown();
 				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.m_value) + "\nMessage: " + result.m_message);
 
 				// Clean up port numbers
