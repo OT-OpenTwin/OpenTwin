@@ -42,6 +42,7 @@ ECHO Build the software
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CleanAll.bat"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH REBUILD
 
 REM ===================================================================
