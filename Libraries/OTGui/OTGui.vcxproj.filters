@@ -236,9 +236,6 @@
     <ClInclude Include="include\OTGui\PropertyColor.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyDirectory.h">
-      <Filter>Header Files\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\PropertyDouble.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
@@ -251,7 +248,7 @@
     <ClInclude Include="include\OTGui\PropertyFactoryRegistrar.hpp">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\PropertyFilePath.h">
+    <ClInclude Include="include\OTGui\PropertyPath.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\PropertyGridCfg.h">
@@ -595,16 +592,13 @@
     <ClCompile Include="src\PropertyColor.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyDirectory.cpp">
-      <Filter>Source Files\Properties</Filter>
-    </ClCompile>
     <ClCompile Include="src\PropertyDouble.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyFactory.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyFilePath.cpp">
+    <ClCompile Include="src\PropertyPath.cpp">
       <Filter>Source Files\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyGridCfg.cpp">

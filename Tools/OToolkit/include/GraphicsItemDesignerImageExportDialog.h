@@ -18,9 +18,9 @@ class GraphicsItemDesigner;
 
 namespace ot {
 	class CheckBox;
-	class FilePathEdit;
 	class ImagePreview;
 	class DoubleSpinBox;
+	class PathBrowseEdit;
 }
 
 class GraphicsItemDesignerImageExportDialog : public ot::Dialog {
@@ -42,7 +42,7 @@ private:
 
 	ot::ImagePreview* m_imagePreview;
 
-	ot::FilePathEdit* m_pathInput;
+	ot::PathBrowseEdit* m_pathInput;
 	ot::CheckBox* m_showGrid;
 	ot::DoubleSpinBox* m_topMarginsInput;
 	ot::DoubleSpinBox* m_leftMarginsInput;

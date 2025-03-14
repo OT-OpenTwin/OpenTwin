@@ -66,7 +66,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
-    <ClCompile Include="src\FilePathEdit.cpp" />
+    <ClCompile Include="src\PathBrowseEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GlobalShortcutWrapper.cpp" />
     <ClCompile Include="src\GraphicsArcItem.cpp" />
@@ -159,14 +159,13 @@
     <ClCompile Include="src\PropertyGridView.cpp" />
     <ClCompile Include="src\PropertyInputBool.cpp" />
     <ClCompile Include="src\PropertyInputColor.cpp" />
-    <ClCompile Include="src\PropertyInputDirectory.cpp" />
     <ClCompile Include="src\PropertyInputDouble.cpp" />
     <ClCompile Include="src\PropertyInputFactory.cpp" />
     <ClCompile Include="src\PropertyGrid.cpp" />
     <ClCompile Include="src\PropertyGridItem.cpp" />
     <ClCompile Include="src\PropertyGridGroup.cpp" />
     <ClCompile Include="src\PropertyInput.cpp" />
-    <ClCompile Include="src\PropertyInputFilePath.cpp" />
+    <ClCompile Include="src\PropertyInputPath.cpp" />
     <ClCompile Include="src\PropertyInputInt.cpp" />
     <ClCompile Include="src\PropertyInputPainter2D.cpp" />
     <ClCompile Include="src\PropertyInputString.cpp" />
@@ -282,7 +281,7 @@
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <QtMoc Include="include\OTWidgets\ComboBox.h" />
-    <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
+    <QtMoc Include="include\OTWidgets\PathBrowseEdit.h" />
     <QtMoc Include="include\OTWidgets\CreateProjectDialog.h" />
     <QtMoc Include="include\OTWidgets\ContextMenu.h" />
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h" />
@@ -381,10 +380,9 @@
     <ClInclude Include="include\OTWidgets\MessageDialog.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h" />
-    <QtMoc Include="include\OTWidgets\PropertyInputDirectory.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputDouble.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputFactory.h" />
-    <QtMoc Include="include\OTWidgets\PropertyInputFilePath.h" />
+    <QtMoc Include="include\OTWidgets\PropertyInputPath.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputString.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputStringList.h" />
     <QtMoc Include="include\OTWidgets\SpinBox.h" />

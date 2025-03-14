@@ -16,7 +16,6 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/PropertyManager.h"
-#include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyManagerNotifier.h"
@@ -282,21 +281,8 @@ ot::PropertyPainter2D* ot::PropertyManager::setPainter2D(const std::string& _gro
 	return this->setPainter2D(_groupName, _valueName, static_cast<Painter2D*>(_painter->createCopy()));
 }
 
-ot::PropertyFilePath* ot::PropertyManager::setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path) {
-	PropertyFilePath* prop = dynamic_cast<PropertyFilePath*>(this->findProperty(_groupName, _valueName));
-	OTAssertNullptr(prop);
-
-	// Update value
-	prop->setPath(_path);
-
-	// Notify
-	this->propertyChanged(prop);
-
-	return prop;
-}
-
-ot::PropertyDirectory* ot::PropertyManager::setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path) {
-	PropertyDirectory* prop = dynamic_cast<PropertyDirectory*>(this->findProperty(_groupName, _valueName));
+ot::PropertyPath* ot::PropertyManager::setPath(const std::string& _groupName, const std::string& _valueName, const std::string& _path) {
+	PropertyPath* prop = dynamic_cast<PropertyPath*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
 	// Update value
@@ -386,19 +372,10 @@ const ot::Painter2D* ot::PropertyManager::getPainter2D(const std::string& _group
 	return prop->getPainter();
 }
 
-const std::string& ot::PropertyManager::getFilePath(const std::string& _groupName, const std::string& _valueName) const {
+const std::string& ot::PropertyManager::getPath(const std::string& _groupName, const std::string& _valueName) const {
 	this->readingProperty(_groupName, _valueName);
 
-	const PropertyFilePath* prop = dynamic_cast<const PropertyFilePath*>(this->findProperty(_groupName, _valueName));
-	OTAssertNullptr(prop);
-
-	return prop->getPath();
-}
-
-const std::string& ot::PropertyManager::getDirectory(const std::string& _groupName, const std::string& _valueName) const {
-	this->readingProperty(_groupName, _valueName);
-
-	const PropertyDirectory* prop = dynamic_cast<const PropertyDirectory*>(this->findProperty(_groupName, _valueName));
+	const PropertyPath* prop = dynamic_cast<const PropertyPath*>(this->findProperty(_groupName, _valueName));
 	OTAssertNullptr(prop);
 
 	return prop->getPath();

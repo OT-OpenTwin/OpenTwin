@@ -13,14 +13,13 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"
+#include "OTGui/PropertyPath.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyManager.h"
-#include "OTGui/PropertyFilePath.h"
-#include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/ManagedPropertyObject.h"
@@ -566,23 +565,23 @@
 //! @ref OT_DECL_MANAGED_GENERAL_PTR_PROPERTY_CALL
 #define OT_MANAGED_PROPERTY_PAINTER2D_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ...) OT_DECL_MANAGED_GENERAL_PTR_PROPERTY_CALL(ot::Painter2D, Painter2D, ___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, __VA_ARGS__)
 
-//! @def OT_MANAGED_PROPERTY_FILEPATH
-//! @brief Declare a file path property.
+//! @def OT_MANAGED_PROPERTY_PATH
+//! @brief Declare a path property.
 //! Will register the property at the objects PropertyManager.
 //! Use in the following way: <br>
 //! 
 //!		class MyClass : public ManagedPropertyObject {
 //!			// This will add the getMyProperty and setMyPropertyMethods.
 //!			// The created property will be initialized with an empty string.
-//!			OT_MANAGED_PROPERTY_FILEPATH(MyProperty, "General", "My Property", "");
+//!			OT_MANAGED_PROPERTY_PATH(MyProperty, "General", "My Property", "");
 //!		};
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
 //! @ref OT_DECL_MANAGED_GENERAL_REF_PROPERTY.
-#define OT_MANAGED_PROPERTY_FILEPATH(___propertyObjectName, ___propertyGroup, ___propertyName, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY(std::string, FilePath, ___propertyObjectName, ___propertyGroup, ___propertyName, __VA_ARGS__)
+#define OT_MANAGED_PROPERTY_PATH(___propertyObjectName, ___propertyGroup, ___propertyName, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY(std::string, Path, ___propertyObjectName, ___propertyGroup, ___propertyName, __VA_ARGS__)
 
-//! @def OT_MANAGED_PROPERTY_FILEPATH_CALL
-//! @brief Declare a file path property.
+//! @def OT_MANAGED_PROPERTY_PATH_CALL
+//! @brief Declare a path property.
 //! Will register the property at the objects PropertyManager.
 //! Lambdas for getter and setter method can be provided.
 //! Use in the following way: <br>
@@ -592,7 +591,7 @@
 //!			// The created property will be initialized with an empty string.
 //!			// The getter will remain default.
 //!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_MANAGED_PROPERTY_FILEPATH_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyFilePath* _property){
+//!			OT_MANAGED_PROPERTY_PATH_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyPath* _property){
 //!				this->myPropertyHasChanged(_property->getPath());
 //!			}, false);
 //! 
@@ -603,46 +602,7 @@
 //! 
 //! @note The object using this macro must inherit from ManagedPropertyObject.
 //! @ref OT_DECL_MANAGED_GENERAL_REF_PROPERTY_CALL
-#define OT_MANAGED_PROPERTY_FILEPATH_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY_CALL(std::string, FilePath, ___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, __VA_ARGS__)
-
-//! @def OT_MANAGED_PROPERTY_DIRECTORYPATH
-//! @brief Declare a directory path property.
-//! Will register the property at the objects PropertyManager.
-//! Use in the following way: <br>
-//! 
-//!		class MyClass : public ManagedPropertyObject {
-//!			// This will add the getMyProperty and setMyPropertyMethods.
-//!			// The created property will be initialized with an empty string.
-//!			OT_MANAGED_PROPERTY_DIRECTORYPATH(MyProperty, "General", "My Property", "");
-//!		};
-//! 
-//! @note The object using this macro must inherit from ManagedPropertyObject.
-//! @ref OT_DECL_MANAGED_GENERAL_REF_PROPERTY
-#define OT_MANAGED_PROPERTY_DIRECTORYPATH(___propertyObjectName, ___propertyGroup, ___propertyName, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY(std::string, Directory, ___propertyObjectName, ___propertyGroup, ___propertyName, __VA_ARGS__)
-
-//! @def OT_MANAGED_PROPERTY_DIRECTORYPATH_CALL
-//! @brief Declare a directory path property.
-//! Will register the property at the objects PropertyManager.
-//! Lambdas for getter and setter method can be provided.
-//! Use in the following way: <br>
-//! 
-//!		class MyClass : public ManagedPropertyObject {
-//!			// This will add the getMyProperty and setMyPropertyMethods.
-//!			// The created property will be initialized with an empty string.
-//!			// The getter will remain default.
-//!			// The setter will call the virtual method myPropertyHasChanged.
-//!			OT_MANAGED_PROPERTY_DIRECTORYPATH_CALL(MyProperty, "General", "My Property", (void), [=](const ot::PropertyDirectory* _property){
-//!				this->myPropertyHasChanged(_property->getPath());
-//!			}, "");
-//! 
-//!		protected:
-//!			// Will be called whenever MyProperty was written.
-//!			virtual void myPropertyHasChanged(const std::string& _newValue) {};
-//!		};
-//! 
-//! @note The object using this macro must inherit from ManagedPropertyObject.
-//! @ref OT_DECL_MANAGED_GENERAL_REF_PROPERTY_CALL
-#define OT_MANAGED_PROPERTY_DIRECTORYPATH_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY_CALL(std::string, Directory, ___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, __VA_ARGS__)
+#define OT_MANAGED_PROPERTY_PATH_CALL(___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, ...) OT_DECL_MANAGED_GENERAL_REF_PROPERTY_CALL(std::string, Path, ___propertyObjectName, ___propertyGroup, ___propertyName, ___setterCompletedCallback, ___getterStartedCallback, __VA_ARGS__)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

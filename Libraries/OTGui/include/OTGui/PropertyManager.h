@@ -17,7 +17,7 @@
 #include "OTGui/Property.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyPath.h"
 
 // std header
 #include <map>
@@ -34,7 +34,6 @@ namespace ot {
 	class PropertyColor;
 	class PropertyDouble;
 	class PropertyString;
-	class PropertyDirectory;
 	class PropertyPainter2D;
 	class PropertyStringList;
 	class PropertyManagerNotifier;
@@ -185,19 +184,12 @@ namespace ot {
 		//! @return Pointer to the set property.
 		PropertyPainter2D* setPainter2D(const std::string& _groupName, const std::string& _valueName, const Painter2D* _painter);
 
-		//! @brief Sets file path property.
+		//! @brief Sets path property.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @param _path The path to set.
 		//! @return Pointer to the set property.
-		PropertyFilePath* setFilePath(const std::string& _groupName, const std::string& _valueName, const std::string& _path);
-
-		//! @brief Sets directory path property.
-		//! @param _groupName The property group name.
-		//! @param _valueName The property value name.
-		//! @param _path The path to set.
-		//! @return Pointer to the set property.
-		PropertyDirectory* setDirectory(const std::string& _groupName, const std::string& _valueName, const std::string& _path);
+		PropertyPath* setPath(const std::string& _groupName, const std::string& _valueName, const std::string& _path);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -251,17 +243,11 @@ namespace ot {
 		//! @return The Painter2D value.
 		const Painter2D* getPainter2D(const std::string& _groupName, const std::string& _valueName) const;
 
-		//! @brief Retrieves file path property value.
+		//! @brief Retrieves path property value.
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return The file path.
-		const std::string& getFilePath(const std::string& _groupName, const std::string& _valueName) const;
-
-		//! @brief Retrieves Direcotry property value.
-		//! @param _groupName The property group name.
-		//! @param _valueName The property value name.
-		//! @return The Directory path.
-		const std::string& getDirectory(const std::string& _groupName, const std::string& _valueName) const;
+		const std::string& getPath(const std::string& _groupName, const std::string& _valueName) const;
 
 		//! @brief Finds a property by group and name.
 		//! The found property will be casted to the specified type.

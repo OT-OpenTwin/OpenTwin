@@ -1,4 +1,4 @@
-//! @file PropertyInputFilePath.h
+//! @file PropertyInputPath.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,19 +6,19 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyPath.h"
 #include "OTWidgets/PropertyInput.h"
 
 namespace ot {
 
-	class FilePathEdit;
+	class PathBrowseEdit;
 
-	class OT_WIDGETS_API_EXPORT PropertyInputFilePath : public PropertyInput {
+	class OT_WIDGETS_API_EXPORT PropertyInputPath : public PropertyInput {
 		Q_OBJECT
-		OT_DECL_NOCOPY(PropertyInputFilePath)
+		OT_DECL_NOCOPY(PropertyInputPath)
 	public:
-		PropertyInputFilePath();
-		virtual ~PropertyInputFilePath();
+		PropertyInputPath();
+		virtual ~PropertyInputPath();
 
 		virtual void addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) override;
 		virtual QVariant getCurrentValue(void) const override;
@@ -32,10 +32,7 @@ namespace ot {
 		QString currentFile(void) const;
 
 	private:
-		PropertyFilePath::BrowseMode m_mode;
-		FilePathEdit* m_path;
-		QString m_filter;
-		QString m_text;
+		PathBrowseEdit* m_path;
 	};
 
 }

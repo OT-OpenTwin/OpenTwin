@@ -16,8 +16,7 @@
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
-#include "OTWidgets/FilePathEdit.h"
-#include "OTWidgets/PropertyInputFilePath.h"
+#include "OTWidgets/PathBrowseEdit.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -36,7 +35,7 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 
 	// Create controls
 	ot::Label* fileNameLabel = new ot::Label("File Name:");
-	m_fileInput = new ot::FilePathEdit(ot::FilePathEdit::SaveFileMode);
+	m_fileInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile);
 	m_fileInput->setBrowseTitle("Select GraphicsItem Export");
 	m_fileInput->setFileFilter("GraphicsItem Files (*.ot.json)");
 	m_fileInput->getLineEdit()->setToolTip("File export location.");
@@ -52,7 +51,7 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 	m_autoAlignInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign);
 
 	// Initialize name and path
-	m_fileInput->setFilePath(m_designer->getExportConfig().getFileName());
+	m_fileInput->setPath(m_designer->getExportConfig().getFileName());
 	
 	// Setup layouts
 	rootLayout->addLayout(inputLayout, 1);
@@ -83,7 +82,7 @@ GraphicsItemDesignerExportDialog::~GraphicsItemDesignerExportDialog() {}
 GraphicsItemDesignerExportConfig GraphicsItemDesignerExportDialog::createExportConfig(void) const {
 	GraphicsItemDesignerExportConfig newExportConfig;
 
-	newExportConfig.setFileName(m_fileInput->getFilePath());
+	newExportConfig.setFileName(m_fileInput->getPath());
 	newExportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, m_autoAlignInput->isChecked());
 
 	return newExportConfig;
@@ -100,7 +99,7 @@ void GraphicsItemDesignerExportDialog::showEvent(QShowEvent* _event) {
 
 void GraphicsItemDesignerExportDialog::slotExport(void) {
 	// Check user inputs
-	if (m_fileInput->getFilePath().isEmpty()) {
+	if (m_fileInput->getPath().isEmpty()) {
 		OT_LOG_E("No file path set");
 		return;
 	}
@@ -128,14 +127,14 @@ void GraphicsItemDesignerExportDialog::slotExport(void) {
 	}
 
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		OT_LOG_E("Failed to open file for writing \"" + m_fileInput->getFilePath().toStdString() + "\"");
+		OT_LOG_E("Failed to open file for writing \"" + m_fileInput->getPath().toStdString() + "\"");
 		return;
 	}
 
 	file.write(QByteArray::fromStdString(configDoc.toJson()));
 	file.close();
 
-	OT_LOG_D("Graphics Item exported \"" + m_fileInput->getFilePath().toStdString() + "\"");
+	OT_LOG_D("Graphics Item exported \"" + m_fileInput->getPath().toStdString() + "\"");
 
 	this->closeDialog(ot::Dialog::Ok);
 }

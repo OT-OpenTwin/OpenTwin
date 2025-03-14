@@ -16,7 +16,7 @@ class GraphicsItemDesigner;
 namespace ot {
 	class CheckBox;
 	class LineEdit;
-	class FilePathEdit;
+	class PathBrowseEdit;
 }
 
 class GraphicsItemDesignerExportDialog : public ot::Dialog {
@@ -39,6 +39,6 @@ private Q_SLOTS:
 private:
 	GraphicsItemDesigner* m_designer;
 
-	ot::FilePathEdit* m_fileInput;
+	ot::PathBrowseEdit* m_fileInput;
 	ot::CheckBox* m_autoAlignInput;
 };

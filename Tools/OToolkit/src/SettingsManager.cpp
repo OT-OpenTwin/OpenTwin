@@ -9,9 +9,9 @@
 
 // OpenTwin header
 #include "OTGui/Property.h"
+#include "OTGui/PropertyPath.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/ColorStyleTypes.h"
-#include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
@@ -67,7 +67,7 @@ void SettingsManager::generalSettingsChanged(const std::string& _propertyPath, c
 		m_app->createSettingsInstance()->setValue("ColorStyle", QString::fromStdString(actualProperty->getCurrent()));
 	}
 	else if (_propertyPath == "External Tools/Library Path") {
-		const ot::PropertyDirectory* actualProperty = dynamic_cast<const ot::PropertyDirectory*>(_property);
+		const ot::PropertyPath* actualProperty = dynamic_cast<const ot::PropertyPath*>(_property);
 		if (!actualProperty) {
 			OT_LOG_E("Invalid property { \"Property\": \"" + _propertyPath + "\" }");
 			return;
@@ -79,7 +79,7 @@ void SettingsManager::generalSettingsChanged(const std::string& _propertyPath, c
 		OT_LOG_W("Please restart the OToolkit to apply the changes.");
 	}
 	else if (_propertyPath == "External Tools/Library Debug Path") {
-		const ot::PropertyDirectory* actualProperty = dynamic_cast<const ot::PropertyDirectory*>(_property);
+		const ot::PropertyPath* actualProperty = dynamic_cast<const ot::PropertyPath*>(_property);
 		if (!actualProperty) {
 			OT_LOG_E("Invalid property { \"Property\": \"" + _propertyPath + "\" }");
 			return;
@@ -147,11 +147,11 @@ void SettingsManager::updateGeneralSettings(void) {
 	m_externalToolsPath = settingsRef->value("ExternalToolsPath", QString()).toString();
 	m_externalToolsDebugPath = settingsRef->value("ExternalToolsDebugPath", QString()).toString();
 
-	ot::PropertyDirectory* libPathProp = new ot::PropertyDirectory("Library Path", m_externalToolsPath.toStdString());
+	ot::PropertyPath* libPathProp = new ot::PropertyPath("Library Path", m_externalToolsPath.toStdString(), ot::PathBrowseMode::Directory);
 	libPathProp->setPropertyTip("Library path for external tools that will be loaded in the Release mode of the OToolkit.\nTools need to have the *.ottool extension.");
 	externalToolsGroup->addProperty(libPathProp);
 
-	ot::PropertyDirectory* libPathDebugProp = new ot::PropertyDirectory("Library Debug Path", m_externalToolsDebugPath.toStdString());
+	ot::PropertyPath* libPathDebugProp = new ot::PropertyPath("Library Debug Path", m_externalToolsDebugPath.toStdString(), ot::PathBrowseMode::Directory);
 	libPathDebugProp->setPropertyTip("Library path for external tools that will be loaded in the Debug mode of the OToolkit.\nTools need to have the *.ottoold extension.");
 	externalToolsGroup->addProperty(libPathDebugProp);
 

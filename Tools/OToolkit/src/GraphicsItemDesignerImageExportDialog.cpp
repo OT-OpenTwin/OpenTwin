@@ -17,8 +17,8 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/ImagePreview.h"
-#include "OTWidgets/FilePathEdit.h"
 #include "OTWidgets/DoubleSpinBox.h"
+#include "OTWidgets/PathBrowseEdit.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -40,7 +40,7 @@ GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(Gra
 
 	// Create controls
 	ot::Label* pathLabel = new ot::Label("File:");
-	m_pathInput = new ot::FilePathEdit(ot::FilePathEdit::SaveFileMode);
+	m_pathInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile);
 	m_pathInput->setBrowseTitle("Select Image Export");
 	m_pathInput->setFileFilter("Image Files (*.png)");
 
@@ -98,7 +98,7 @@ GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(Gra
 	m_bottomMarginsInput->setValue(oldMargins.bottom());
 
 	// Initialize file name
-	m_pathInput->setFilePath(m_designer->getImageExportConfig().getFileName());
+	m_pathInput->setPath(m_designer->getImageExportConfig().getFileName());
 
 	// Initialize window
 	this->setWindowTitle("Export As Image");
@@ -125,7 +125,7 @@ GraphicsItemDesignerImageExportDialog::~GraphicsItemDesignerImageExportDialog() 
 GraphicsItemDesignerImageExportConfig GraphicsItemDesignerImageExportDialog::createImageExportConfig(void) const {
 	GraphicsItemDesignerImageExportConfig newConfig;
 	
-	newConfig.setFileName(m_pathInput->getFilePath());
+	newConfig.setFileName(m_pathInput->getPath());
 	
 	QMarginsF newMargins;
 	newMargins.setTop(m_topMarginsInput->value());
@@ -144,24 +144,34 @@ GraphicsItemDesignerImageExportConfig GraphicsItemDesignerImageExportDialog::cre
 // Private slots
 
 void GraphicsItemDesignerImageExportDialog::slotExport(void) {
-	if (m_pathInput->getFilePath().isEmpty()) {
+	const QString path = m_pathInput->getPath();
+
+	if (path.isEmpty()) {
 		OT_LOG_E("No image path set");
 		return;
 	}
 
-	QFile file(m_pathInput->getFilePath());
+	QFile file(path);
 
 	if (file.exists()) {
-		QMessageBox msgBox(QMessageBox::NoIcon, "Item Exists", "The file \"" + m_pathInput->getFilePath() + "\" already exists. Do you want to replace it?", QMessageBox::Yes | QMessageBox::No, this);
-		if (msgBox.exec() != QMessageBox::Yes) return;
+		QMessageBox msgBox(
+			QMessageBox::NoIcon, 
+			"Item Exists", "The file \"" + path + "\" already exists. Do you want to replace it?",
+			QMessageBox::Yes | QMessageBox::No, 
+			this
+		);
+
+		if (msgBox.exec() != QMessageBox::Yes) {
+			return;
+		}
 	}
 
-	if (!m_imagePreview->getImage().save(m_pathInput->getFilePath())) {
-		OT_LOG_E("Failed to save file \"" + m_pathInput->getFilePath().toStdString() + "\"");
+	if (!m_imagePreview->getImage().save(path)) {
+		OT_LOG_E("Failed to save file \"" + path.toStdString() + "\"");
 		return;
 	}
 
-	OT_LOG_I("Image saved \"" + m_pathInput->getFilePath().toStdString() + "\"");
+	OT_LOG_I("Image saved \"" + path.toStdString() + "\"");
 
 	this->closeDialog(ot::Dialog::Ok);
 }

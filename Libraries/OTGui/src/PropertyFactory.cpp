@@ -5,16 +5,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/Property.h"
 #include "OTGui/PropertyFactory.h"
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyFilePath.h"
-#include "OTGui/PropertyDirectory.h"
 
 ot::PropertyFactory& ot::PropertyFactory::instance(void) {
 	static PropertyFactory g_instance;

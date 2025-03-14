@@ -115,10 +115,7 @@
     <ClCompile Include="src\PropertyInputStringList.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyInputDirectory.cpp">
-      <Filter>src\Properties</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PropertyInputFilePath.cpp">
+    <ClCompile Include="src\PropertyInputPath.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyInputDouble.cpp">
@@ -256,7 +253,7 @@
     <ClCompile Include="src\GraphicsItemLoader.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\FilePathEdit.cpp">
+    <ClCompile Include="src\PathBrowseEdit.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsArcItem.cpp">
@@ -1006,10 +1003,7 @@
     <QtMoc Include="include\OTWidgets\PropertyInputString.h">
       <Filter>include\Properties</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\PropertyInputFilePath.h">
-      <Filter>include\Properties</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\PropertyInputDirectory.h">
+    <QtMoc Include="include\OTWidgets\PropertyInputPath.h">
       <Filter>include\Properties</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsItemPreviewDrag.h">
@@ -1078,7 +1072,7 @@
     <QtMoc Include="include\OTWidgets\WidgetViewManager.h">
       <Filter>include\WidgetView</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\FilePathEdit.h">
+    <QtMoc Include="include\OTWidgets\PathBrowseEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h">

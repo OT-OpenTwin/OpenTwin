@@ -99,12 +99,11 @@
     <ClInclude Include="include\OTGui\PropertyBool.h" />
     <ClInclude Include="include\OTGui\PropertyColor.h" />
     <ClInclude Include="include\OTGui\PropertyDialogCfg.h" />
-    <ClInclude Include="include\OTGui\PropertyDirectory.h" />
     <ClInclude Include="include\OTGui\PropertyDouble.h" />
     <ClInclude Include="include\OTGui\PropertyFactory.h" />
     <ClInclude Include="include\OTGui\PropertyFactoryRegistrar.h" />
     <ClInclude Include="include\OTGui\PropertyFactoryRegistrar.hpp" />
-    <ClInclude Include="include\OTGui\PropertyFilePath.h" />
+    <ClInclude Include="include\OTGui\PropertyPath.h" />
     <ClInclude Include="include\OTGui\PropertyGridCfg.h" />
     <ClInclude Include="include\OTGui\PropertyGroup.h" />
     <ClInclude Include="include\OTGui\PropertyInt.h" />
@@ -216,10 +215,9 @@
     <ClCompile Include="src\PropertyBool.cpp" />
     <ClCompile Include="src\PropertyColor.cpp" />
     <ClCompile Include="src\PropertyDialogCfg.cpp" />
-    <ClCompile Include="src\PropertyDirectory.cpp" />
     <ClCompile Include="src\PropertyDouble.cpp" />
     <ClCompile Include="src\PropertyFactory.cpp" />
-    <ClCompile Include="src\PropertyFilePath.cpp" />
+    <ClCompile Include="src\PropertyPath.cpp" />
     <ClCompile Include="src\PropertyGridCfg.cpp" />
     <ClCompile Include="src\PropertyGroup.cpp" />
     <ClCompile Include="src\PropertyInt.cpp" />

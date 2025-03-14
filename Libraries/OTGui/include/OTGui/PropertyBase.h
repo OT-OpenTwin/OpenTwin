@@ -9,6 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header

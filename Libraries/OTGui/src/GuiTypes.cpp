@@ -598,3 +598,28 @@ ot::SortOrder ot::stringToSortOrder(const std::string& _order) {
 		return SortOrder::Ascending;
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Path Browse Mode
+
+std::string ot::toString(PathBrowseMode _mode) {
+	switch (_mode) {
+	case ot::PathBrowseMode::ReadFile: return "Read File";
+	case ot::PathBrowseMode::WriteFile: return "Write File";
+	case ot::PathBrowseMode::Directory: return "Directory";
+	default:
+		OT_LOG_EA("Unknown browse mode");
+		return "Read File";
+	}
+}
+
+ot::PathBrowseMode ot::stringToPathBrowseMode(const std::string& _mode) {
+	if (_mode == ot::toString(PathBrowseMode::ReadFile)) return PathBrowseMode::ReadFile;
+	else if (_mode == ot::toString(PathBrowseMode::WriteFile)) return PathBrowseMode::WriteFile;
+	else if (_mode == ot::toString(PathBrowseMode::Directory)) return PathBrowseMode::Directory;
+	else {
+		OT_LOG_EA("Unknown browse mode");
+		return PathBrowseMode::ReadFile;
+	}
+}

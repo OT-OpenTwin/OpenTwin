@@ -1,4 +1,4 @@
-//! @file PropertyFilePath.h
+//! @file PropertyPath.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -13,31 +13,26 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT PropertyFilePath : public Property {
-		OT_DECL_NOCOPY(PropertyFilePath)
+	class OT_GUI_API_EXPORT PropertyPath : public Property {
+		OT_DECL_NOCOPY(PropertyPath)
 	public:
 		typedef std::string FilePathValueType;
 		using PropertyValueType = FilePathValueType;
-
-		enum BrowseMode {
-			ReadFile = 0,
-			WriteFile = 1
-		};
 
 		struct FilterInfo {
 			std::string extension;
 			std::string text;
 		};
 
-		PropertyFilePath(const PropertyFilePath* _other);
-		PropertyFilePath(const PropertyBase& _base);
-		PropertyFilePath(BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyFilePath(const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
-		PropertyFilePath(const std::string& _name, const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
-		virtual ~PropertyFilePath() {};
+		PropertyPath(const PropertyPath* _other);
+		PropertyPath(const PropertyBase& _base);
+		PropertyPath(PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyPath(const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyPath(const std::string& _name, const std::string& _path, PathBrowseMode _mode = PathBrowseMode::ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
+		virtual ~PropertyPath() {};
 
 		static std::string propertyTypeString(void) { return "FilePath"; };
-		virtual std::string getPropertyType(void) const override { return PropertyFilePath::propertyTypeString(); };
+		virtual std::string getPropertyType(void) const override { return PropertyPath::propertyTypeString(); };
 
 		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode) override;
 
@@ -46,8 +41,8 @@ namespace ot {
 		void setPath(const std::string& _path) { m_path = _path; };
 		const std::string& getPath(void) const { return m_path; };
 
-		void setBrowseMode(BrowseMode _mode) { m_browseMode = _mode; };
-		BrowseMode getBrowseMode(void) const { return m_browseMode; };
+		void setBrowseMode(PathBrowseMode _mode) { m_browseMode = _mode; };
+		PathBrowseMode getBrowseMode(void) const { return m_browseMode; };
 
 		void setFilters(const std::list<FilterInfo>& _filters) { m_filters = _filters; };
 		void addFilter(const std::string& _extension, const std::string& _text) { this->addFilter(FilterInfo{ _extension, _text }); };
@@ -68,7 +63,7 @@ namespace ot {
 
 	private:
 		std::string m_path;
-		BrowseMode m_browseMode;
+		PathBrowseMode m_browseMode;
 		std::list<FilterInfo> m_filters;
 	};
 

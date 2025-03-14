@@ -320,6 +320,19 @@ namespace ot {
 
 	OT_GUI_API_EXPORT SortOrder stringToSortOrder(const std::string& _order);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Path Browse Mode
+
+	enum class PathBrowseMode {
+		ReadFile = 0,
+		WriteFile = 1,
+		Directory = 2
+	};
+
+	OT_GUI_API_EXPORT std::string toString(PathBrowseMode _mode);
+
+	OT_GUI_API_EXPORT PathBrowseMode stringToPathBrowseMode(const std::string& _mode);
 
 }
 
