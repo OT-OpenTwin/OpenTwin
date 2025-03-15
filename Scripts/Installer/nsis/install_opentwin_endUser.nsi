@@ -256,6 +256,31 @@ Function DumpLog
     Pop $5
 FunctionEnd
 
+Function RestartRequired
+	Exch $R1         ;Original Variable
+	Push $R2
+	Push $R3         ;Counter Variable
+ 
+	StrCpy $R1 "0" 1     ;initialize variable with 0
+	StrCpy $R3 "0" 0    ;Counter Variable
+ 
+	;First Check Current User RunOnce Key
+	EnumRegValue $R2 HKCU "Software\Microsoft\Windows\CurrentVersion\RunOnce" $R3
+	StrCmp $R2 "" 0 FoundRestart
+ 
+	;Next Check Local Machine Key
+	EnumRegValue $R2 HKLM "Software\Microsoft\Windows\CurrentVersion\RunOnce" $R3
+	StrCmp $R2 "" ExitFunc 0
+ 
+	FoundRestart:
+		StrCpy $R1 "1" 1
+ 
+	ExitFunc:
+		Pop $R3
+		Pop $R2
+		Exch $R1
+FunctionEnd
+
 #=================================================================
 #						END OF DEFINES
 #=================================================================
@@ -918,7 +943,7 @@ FunctionEnd
 	#!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenTwin_local.bat"
 	
 	!define MUI_TEXT_FINISH_INFO_TEXT "Installation complete. All programs and dependencies have been setup and installed successfully. Click on Finish to close the installer."
-
+	!define MUI_FINISHPAGE_REBOOTLATER_DEFAULT
 	!insertmacro MUI_PAGE_FINISH
 
 	; Uninstaller pages
@@ -980,6 +1005,18 @@ Section "OpenTwin Main Files (Required)" SEC02
 	${Else}
 		Goto +2
 	${EndIf}
+	
+	DetailPrint "Installing VC Redistributable..."
+	# The 32bit version is required for Apache
+	ExecWait '"$INSTDIR\VC_Redist\VC_redist.x86.exe" /install /quiet /norestart'
+	ExecWait '"$INSTDIR\VC_Redist\VC_redist.x64.exe" /install /quiet /norestart'
+
+	; Check whether a reboot is required
+	Push $R1
+	Call RestartRequired
+	Exch $R1
+	StrCmp $R1 "1" 0 +2
+	SetRebootFlag true
 
 	ExecWait '"$INSTDIR\uiFrontend.exe" -c' ; Check the graphics card and activate software rendering, if necessary
 	

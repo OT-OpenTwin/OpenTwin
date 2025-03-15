@@ -222,8 +222,8 @@ MKDIR "%OT_DEPLOYMENT_DIR%\Apache"
 XCOPY /S "%APACHE_ROOT%\*.*" "%OT_DEPLOYMENT_DIR%\Apache"
 
 REM Visual Studio Redistributables
-REM MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
-REM COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
+MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
+COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
 
 REM Documentation
 MKDIR "%OT_DEPLOYMENT_DIR%\Documentation"
