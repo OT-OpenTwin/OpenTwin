@@ -1032,8 +1032,6 @@ Section "-Extract Installer Tools (Required)" SEC01
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Installer\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x64.exe"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x86.exe"
 	
 	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
@@ -1090,11 +1088,6 @@ SectionGroup /e "OpenTwin"
 		${Else}
 			Goto +2
 		${EndIf}
-
-		DetailPrint "Installing VC Redistributable..."
-		# The 32bit version is required for Apache
-		ExecWait '"$TempToolChain\VC_redist.x86.exe" /silent'
-		ExecWait '"$TempToolChain\VC_redist.x64.exe" /silent'
 
 		DetailPrint "Setting environment variables..."
 

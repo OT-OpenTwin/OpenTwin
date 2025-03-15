@@ -944,8 +944,6 @@ Section "-Extract Installer Tools (Required)" SEC01
 	SetOutPath "$INSTDIR\Tools\ThirdParty"
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x64.exe"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x86.exe"
 	
 	SetOutPath ${LOG_PATH}
 	File "${HELPER_FILES_PATH}\BuildInfo.txt"
@@ -982,11 +980,6 @@ Section "OpenTwin Main Files (Required)" SEC02
 	${Else}
 		Goto +2
 	${EndIf}
-
-	DetailPrint "Installing VC Redistributable..."
-	# The 32bit version is required for Apache
-	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x86.exe" /silent'					
-	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64.exe" /silent'		
 
 	ExecWait '"$INSTDIR\uiFrontend.exe" -c' ; Check the graphics card and activate software rendering, if necessary
 	
