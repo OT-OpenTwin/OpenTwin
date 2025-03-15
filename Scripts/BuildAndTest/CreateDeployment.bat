@@ -217,13 +217,13 @@ REM PYRIT
 MKDIR "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
 XCOPY /S "%OT_PYRIT_ROOT%\pyrit-packages\*.*" "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
 
-REM Visual Studio Redistributables
-MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
-COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
-
 REM Apache Server
 MKDIR "%OT_DEPLOYMENT_DIR%\Apache"
 XCOPY /S "%APACHE_ROOT%\*.*" "%OT_DEPLOYMENT_DIR%\Apache"
+
+REM Visual Studio Redistributables
+REM MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
+REM COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
 
 REM Documentation
 MKDIR "%OT_DEPLOYMENT_DIR%\Documentation"
