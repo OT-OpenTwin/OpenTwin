@@ -70,8 +70,7 @@ if "!NSIS_REG_VALUE!"=="" (
 echo +++ COMPILE TIME +++
 
 	echo Extracting Third Party Toolchain using 7-Zip...
-	RMDIR /S /Q "!THIRDPARTY_UNZIP_PATH!
-	MKDIR "!THIRDPARTY_UNZIP_PATH!"
+	RMDIR /S /Q "!THIRDPARTY_UNZIP_PATH!\ThirdParty"
 	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
 	
 REM	echo Extracting EnVar plugin for NSIS using 7-Zip...
