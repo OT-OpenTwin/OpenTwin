@@ -3727,7 +3727,7 @@ std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorage
 		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
 		const uint32_t numberOfDocuments = allMongoDocuments.Size();
 
-		//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership übernimmt
+		//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership uebernimmt
 		//dataX.reserve(numberOfDocuments);
 		//dataY.reserve(numberOfDocuments);
 
