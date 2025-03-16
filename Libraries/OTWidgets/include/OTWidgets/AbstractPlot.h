@@ -16,13 +16,13 @@
 
 namespace ot {
 
-	class Plot;
+	class PlotBase;
 
 	class OT_WIDGETS_API_EXPORT AbstractPlot {
 		OT_DECL_NOCOPY(AbstractPlot)
 		OT_DECL_NODEFAULT(AbstractPlot)
 	public:
-		AbstractPlot(Plot* _ownerPlot);
+		AbstractPlot(PlotBase* _ownerPlot);
 
 		virtual ~AbstractPlot();
 
@@ -76,12 +76,12 @@ namespace ot {
 
 		// Getter
 
-		Plot* getOwner(void) const { return m_owner; }
+		PlotBase* getOwner(void) const { return m_owner; }
 
 		const Plot1DCfg& getConfiguration(void) const { return m_config; };
 
 	private:
-		Plot* m_owner;
+		PlotBase* m_owner;
 		Plot1DCfg m_config;
 
 		AbstractPlotAxis* m_axisXBottom;

@@ -23,8 +23,8 @@ namespace ot {
 		PlotDatasetData(double* _dataX, double* _dataXcalc, double* _dataY, double* _dataYim, double* _dataYcalc, long _dataSize);
 		~PlotDatasetData();
 
-		PlotDatasetData(PlotDatasetData&&) = default;
-		PlotDatasetData& operator = (PlotDatasetData&&) = default;
+		PlotDatasetData(PlotDatasetData&& _other) noexcept;
+		PlotDatasetData& operator = (PlotDatasetData&& _other) noexcept;
 		
 		PlotDatasetData createCopy(void) const;
 

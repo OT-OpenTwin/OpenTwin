@@ -46,6 +46,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "ResultDataStorageAPI.h"
 
 class AppBase;
 class LockManager;
@@ -57,6 +58,8 @@ namespace ot { class Property; };
 namespace ot { class TableView; };
 namespace ot { class WidgetView; };
 namespace ot { class ServiceBase; };
+namespace ot { class PlotDataset; };
+namespace ot { class PlotManager; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier {
 	Q_OBJECT
@@ -397,6 +400,8 @@ private:
 	void determineViews(const std::string& modelServiceURL);
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
+
+	std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager);
 
 	// #################################################################
 

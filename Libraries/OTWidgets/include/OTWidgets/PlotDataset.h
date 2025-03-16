@@ -24,14 +24,14 @@ class QwtPolarCurve;
 
 namespace ot {
 
-	class Plot;
+	class PlotBase;
 	class PolarPlotData;
 
 	class OT_WIDGETS_API_EXPORT PlotDataset {
 		OT_DECL_NOCOPY(PlotDataset)
 		OT_DECL_NODEFAULT(PlotDataset)
 	public:
-		PlotDataset(Plot* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data);
+		PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data);
 		virtual ~PlotDataset();
 
 		void attach(void);
@@ -85,6 +85,9 @@ namespace ot {
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
+		QwtPlotCurve* getCartesianCurve(void) const { return m_cartesianCurve; };
+		QwtPolarCurve* getPolarCurve(void) const { return m_polarCurve; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data Setter / Getter
@@ -103,11 +106,11 @@ namespace ot {
 		void updateCurveVisualization(void);
 
 	private:
-		friend class Plot;
+		friend class PlotBase;
 
 		// Plot data
 
-		Plot* m_ownerPlot;
+		PlotBase* m_ownerPlot;
 
 		bool m_isAttatched;
 

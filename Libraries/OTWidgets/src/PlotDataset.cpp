@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/Plot.h"
+#include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotDataset.h"
@@ -18,7 +18,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_polar_curve.h>
 
-ot::PlotDataset::PlotDataset(Plot* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
+ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
 	m_config(_config), m_data(std::move(_data)), m_ownerPlot(_ownerPlot), m_isAttatched(false), m_polarData(nullptr)
 {
 	m_cartesianCurve = new QwtPlotCurve(QString::fromStdString(m_config.getTitle()));
@@ -35,9 +35,8 @@ ot::PlotDataset::PlotDataset(Plot* _ownerPlot, const Plot1DCurveCfg& _config, Pl
 ot::PlotDataset::~PlotDataset() {
 	this->detach();
 	
-	delete m_polarCurvePointSymbol;
-	delete m_polarData;
 	delete m_polarCurve;
+	// point and data is deleted by the polar curve
 
 	delete m_cartesianCurvePointSymbol;
 	delete m_cartesianCurve;

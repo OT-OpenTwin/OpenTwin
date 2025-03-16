@@ -1356,36 +1356,6 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 	}
 }
 
-void ExternalServicesComponent::determineViews(const std::string &modelServiceURL)
-{
-	ot::JsonDocument sendingDoc;
-
-	sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PARAM_MODEL_ViewsForProjectType, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-
-	std::string response;
-	sendHttpRequest(EXECUTE, modelServiceURL, sendingDoc, response);
-	// Check if response is an error or warning
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		assert(0); // ERROR
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		assert(0); // WARNING
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
-	bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
-	bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
-
-	AppBase* app{ AppBase::instance() };
-
-	app->setVisible3D(visible3D);
-	app->setVisible1D(visible1D);
-	app->setVisibleBlockPicker(visibleBlockPicker);
-}
-
 void ExternalServicesComponent::closeProject(bool _saveChanges) {
 	try {
 		AppBase* app{ AppBase::instance() };
@@ -3706,148 +3676,9 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 #include "ContainerFlexibleOwnership.h"
 #include <algorithm>
 
-struct AdditionalParameterDescription
-{
-	std::string m_label = "";
-	std::string m_unit = "";
-	std::string m_value = "";
-};
-
-std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager)
-{
-	auto queryInformation = _config.getQueryInformation();
-
-	std::list<ot::PlotDataset*> dataSets;
-	DataStorageAPI::DataStorageResponse dbResponse = _dataAccess.SearchInResultCollection(queryInformation.m_query, queryInformation.m_projection, 0);
-	if (dbResponse.getSuccess())
-	{
-		const std::string queryResponse = dbResponse.getResult();
-		ot::JsonDocument doc;
-		doc.fromJson(queryResponse);
-		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
-		const uint32_t numberOfDocuments = allMongoDocuments.Size();
-
-		//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership uebernimmt
-		//dataX.reserve(numberOfDocuments);
-		//dataY.reserve(numberOfDocuments);
-
-		std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
-		size_t counter(0);
-
-		for (uint32_t i = 0; i < numberOfDocuments; i++)
-		{
-			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-			auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityDescription.m_fieldName.c_str()];
-			//Getter on base of queryInformation.m_quantityDescription.m_dataType
-			(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
-			counter++;
-		}
-
-		size_t numberOfParameter = queryInformation.m_parameterDescriptions.size();
-		if (numberOfParameter == 1)
-		{
-			std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
-
-			//Single curve
-			auto entryDescription = queryInformation.m_parameterDescriptions.begin();
-			for (uint32_t i = 0; i < numberOfDocuments; i++)
-			{
-				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-				auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
-				(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
-				counter++;
-			}
-
-			auto dataSet = _plotManager->addDataset(_config, dataX.release(), dataY.release(), numberOfDocuments);
-			dataSets.push_back(dataSet);
-		}
-		else
-		{
-			//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>
-			//Should be selected via a property ToDo
-			auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
-
-			std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurves;
-			std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
-			for (uint32_t i = 0; i < numberOfDocuments; i++)
-			{
-				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-
-				//First build a unique name of the additional parameter values
-				std::string curveName("");
-				std::list<AdditionalParameterDescription> additionalParameterInfos;
-				for (auto additionalParameter = queryInformation.m_parameterDescriptions.begin()++; additionalParameter != queryInformation.m_parameterDescriptions.end(); additionalParameter++)
-				{
-					auto& additionalParameterEntry = singleMongoDocument[additionalParameter->m_fieldName.c_str()];
-					curveName = additionalParameter->m_label + "_" + ot::json::toJson(additionalParameterEntry) + "_" + additionalParameter->m_unit + "; ";
-
-					AdditionalParameterDescription additionalParameterInfo;
-					additionalParameterInfo.m_label = additionalParameter->m_label;
-					additionalParameterInfo.m_value = ot::json::toJson(additionalParameterEntry);
-					additionalParameterInfo.m_unit = additionalParameter->m_unit;
-					additionalParameterInfos.push_back(additionalParameterInfo);
-				}
-				curveName = curveName.substr(0, curveName.size() - 2);
-
-				auto curve = familyOfCurves.find(curveName);
-				if (curve == familyOfCurves.end())
-				{
-					familyOfCurves.insert({ curveName, ContainerFlexibleOwnership<double>(numberOfDocuments) });
-					additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
-					curve = familyOfCurves.find(curveName);
-				}
-
-				auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
-				(curve->second).pushBack(static_cast<double>(xAxisParameterEntry.GetInt()));
-			}
-
-			//In this case we need to make the names better readable. Since we have more then one parameter in the name 
-			if (numberOfParameter > 2)
-			{
-				std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurvesSimplerNames;
-				std::list <std::string> runIDDescriptions;
-
-				int counter(0);
-				for (auto curve : familyOfCurves)
-				{
-					const std::string simpleName = "RunID_" + std::to_string(counter);
-					familyOfCurvesSimplerNames.insert({ simpleName,curve.second });
-					counter++;
-					std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-					std::string message =
-						simpleName + ":\n";
-					for (auto entry : additionalParameterDescription)
-					{
-						message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
-					}
-					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-				}
-
-				familyOfCurves = familyOfCurvesSimplerNames;
-			}
-
-			for (auto singleCurve : familyOfCurves)
-			{
-				ot::Plot1DCurveCfg singleCurveCfg = _config;
-				//singleCurveCfg.setXAxisTitle();
-				//singleCurveCfg.setXAxisUnit();
-				// Must be possible to set a label here. Seems that currently it is only possible to use the entity name for this purpose. 
-				// Could there be an issue that multiple curves are associated with a single curve entity ? Changes would always affect all curves in the family.
-				// Probably iterate the colour of each curve here
-				ot::Color colour = singleCurveCfg.getLinePenColor();
-				ot::PlotDataset* dataSet = _plotManager->addDataset(_config, singleCurve.second.release(), dataY.release(), numberOfDocuments);
-				dataSets.push_back(dataSet);
-			}
-		}
-		//dataSet->updateCurveVisualization();
-		//dataSet->attach();
-	}
-	return dataSets;
-}
-
-
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) 
 {
+	// Get view info from document
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
@@ -3856,13 +3687,17 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 
+	// Get plot
 	ot::Plot1DCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
 	ot::PlotManager* plotManager = plotViewManager->getPlotManager();
 
+	// Clear plot if exists
+	plotManager->clear(true);
 
+	// Create curves
 	const std::string collectionName = AppBase::instance()->getCollectionName();
 	DataStorageAPI::ResultDataStorageAPI dataAccess(collectionName);
 	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document,OT_ACTION_PARAM_VIEW1D_CurveConfigs);
@@ -3871,14 +3706,12 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setFromJsonObject(curveCfgSerialised);
+
+		createCurve(curveCfg, dataAccess, plotManager);
 	}
 
-	
 	return "";
-
 }
-
-
 
 std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
 {
@@ -3901,7 +3734,6 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 
 	return "";
 }
-
 
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
@@ -4453,6 +4285,39 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	return "";
 }
 
+// ###################################################################################################
+
+// Private functions
+
+void ExternalServicesComponent::determineViews(const std::string& modelServiceURL) {
+	ot::JsonDocument sendingDoc;
+
+	sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PARAM_MODEL_ViewsForProjectType, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+
+	std::string response;
+	sendHttpRequest(EXECUTE, modelServiceURL, sendingDoc, response);
+	// Check if response is an error or warning
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		assert(0); // ERROR
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		assert(0); // WARNING
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
+		bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
+		bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
+
+		AppBase* app{ AppBase::instance() };
+
+		app->setVisible3D(visible3D);
+		app->setVisible1D(visible1D);
+		app->setVisibleBlockPicker(visibleBlockPicker);
+}
+
 void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
@@ -4477,6 +4342,184 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		OT_LOG_WAS(response);
 	}
+}
+
+std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager) {
+	struct AdditionalParameterDescription {
+		std::string m_label = "";
+		std::string m_unit = "";
+		std::string m_value = "";
+	};
+	
+	std::list<ot::PlotDataset*> dataSets;
+
+	// Start test code --------------
+	if (true) {
+		double* xDa = new double[3];
+		double* yDa = new double[3];
+		xDa[0] = -1.;
+		xDa[1] = 0.;
+		xDa[2] = 1.;
+		yDa[0] = -2.;
+		yDa[1] = 0;
+		yDa[2] = 2.;
+
+
+		ot::PlotDataset* dataSet = _plotManager->addDataset(_config, xDa, yDa, 3);
+		_plotManager->addDatasetToCache(dataSet);
+		dataSet->attach();
+		dataSets.push_back(dataSet);
+		return dataSets;
+	}
+	// End test code --------------
+
+
+	auto queryInformation = _config.getQueryInformation();
+
+	DataStorageAPI::DataStorageResponse dbResponse = _dataAccess.SearchInResultCollection(queryInformation.m_query, queryInformation.m_projection, 0);
+	if (dbResponse.getSuccess()) {
+		const std::string queryResponse = dbResponse.getResult();
+		ot::JsonDocument doc;
+		doc.fromJson(queryResponse);
+		auto allMongoDocuments = ot::json::getArray(doc, "Documents");
+		const uint32_t numberOfDocuments = allMongoDocuments.Size();
+
+		//std::vector<double> dataX, dataY; Geht aktuell nicht mit Vector, weil der plotmanager die memory ownership uebernimmt
+		//dataX.reserve(numberOfDocuments);
+		//dataY.reserve(numberOfDocuments);
+
+		std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
+		size_t counter(0);
+
+		for (uint32_t i = 0; i < numberOfDocuments; i++) {
+			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+			auto& quantityEntry = singleMongoDocument[queryInformation.m_quantityDescription.m_fieldName.c_str()];
+			//Getter on base of queryInformation.m_quantityDescription.m_dataType
+			(dataY)[counter] = static_cast<double>(quantityEntry.GetInt());
+			counter++;
+		}
+
+		size_t numberOfParameter = queryInformation.m_parameterDescriptions.size();
+		if (numberOfParameter == 1) {
+			std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
+
+			//Single curve
+			auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+			for (uint32_t i = 0; i < numberOfDocuments; i++) {
+				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+				auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
+				(dataX)[counter] = static_cast<double>(parameterEntry.GetInt());
+				counter++;
+			}
+
+			double* xData = dataX.release();
+			double* yData = dataY.release();
+			/*
+			std::string dbg = "Adding cuve with points:";
+			for (size_t i = 0; i < numberOfDocuments; i++) {
+				dbg.append("\n[" + std::to_string(i) + "]: " + std::to_string(xData[i]) + "; " + std::to_string(yData[i]));
+			}
+			dbg.append("\n\nn = " + std::to_string(numberOfDocuments) + "\n\n");
+
+			OT_LOG_W(dbg);
+			*/
+
+			auto dataSet = _plotManager->addDataset(_config, xData, yData, numberOfDocuments);
+			_plotManager->addDatasetToCache(dataSet);
+			dataSet->attach();
+			dataSet->updateCurveVisualization();
+			dataSets.push_back(dataSet);
+		}
+		else {
+			//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>
+			//Should be selected via a property ToDo
+			auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
+
+			std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurves;
+			std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
+			for (uint32_t i = 0; i < numberOfDocuments; i++) {
+				auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
+
+				//First build a unique name of the additional parameter values
+				std::string curveName("");
+				std::list<AdditionalParameterDescription> additionalParameterInfos;
+				for (auto additionalParameter = queryInformation.m_parameterDescriptions.begin()++; additionalParameter != queryInformation.m_parameterDescriptions.end(); additionalParameter++) {
+					auto& additionalParameterEntry = singleMongoDocument[additionalParameter->m_fieldName.c_str()];
+					curveName = additionalParameter->m_label + "_" + ot::json::toJson(additionalParameterEntry) + "_" + additionalParameter->m_unit + "; ";
+
+					AdditionalParameterDescription additionalParameterInfo;
+					additionalParameterInfo.m_label = additionalParameter->m_label;
+					additionalParameterInfo.m_value = ot::json::toJson(additionalParameterEntry);
+					additionalParameterInfo.m_unit = additionalParameter->m_unit;
+					additionalParameterInfos.push_back(additionalParameterInfo);
+				}
+				curveName = curveName.substr(0, curveName.size() - 2);
+
+				auto curve = familyOfCurves.find(curveName);
+				if (curve == familyOfCurves.end()) {
+					familyOfCurves.insert({ curveName, ContainerFlexibleOwnership<double>(numberOfDocuments) });
+					additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
+					curve = familyOfCurves.find(curveName);
+				}
+
+				auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
+				(curve->second).pushBack(static_cast<double>(xAxisParameterEntry.GetInt()));
+			}
+
+			//In this case we need to make the names better readable. Since we have more then one parameter in the name 
+			if (numberOfParameter > 2) {
+				std::map<std::string, ContainerFlexibleOwnership<double>> familyOfCurvesSimplerNames;
+				std::list <std::string> runIDDescriptions;
+
+				int counter(0);
+				for (auto curve : familyOfCurves) {
+					const std::string simpleName = "RunID_" + std::to_string(counter);
+					familyOfCurvesSimplerNames.insert({ simpleName,curve.second });
+					counter++;
+					std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
+					std::string message =
+						simpleName + ":\n";
+					for (auto entry : additionalParameterDescription) {
+						message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
+					}
+					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+				}
+
+				familyOfCurves = familyOfCurvesSimplerNames;
+			}
+
+			for (auto singleCurve : familyOfCurves) {
+				ot::Plot1DCurveCfg singleCurveCfg = _config;
+				//singleCurveCfg.setXAxisTitle();
+				//singleCurveCfg.setXAxisUnit();
+				// Must be possible to set a label here. Seems that currently it is only possible to use the entity name for this purpose. 
+				// Could there be an issue that multiple curves are associated with a single curve entity ? Changes would always affect all curves in the family.
+				// Probably iterate the colour of each curve here
+				ot::Color colour = singleCurveCfg.getLinePenColor();
+
+				double* xData = singleCurve.second.release();
+				double* yData = dataY.release();
+				/*
+				std::string dbg = "Adding cuve with points:";
+				for (size_t i = 0; i < numberOfDocuments; i++) {
+					dbg.append("\n[" + std::to_string(i) + "]: " + std::to_string(xData[i]) + "; " + std::to_string(yData[i]));
+				}
+				dbg.append("\n\nn = " + std::to_string(numberOfDocuments) + "\n\n");
+
+				OT_LOG_W(dbg);
+				*/
+				ot::PlotDataset* dataSet = _plotManager->addDataset(_config, xData, yData, numberOfDocuments);
+				_plotManager->addDatasetToCache(dataSet);
+				dataSet->attach();
+				dataSet->updateCurveVisualization();
+				dataSets.push_back(dataSet);
+			}
+		}
+		//dataSet->updateCurveVisualization();
+		//dataSet->attach();
+	}
+
+	return dataSets;
 }
 
 void ExternalServicesComponent::keepAlive()

@@ -140,9 +140,8 @@
     <ClCompile Include="src\Painter2DPreview.cpp" />
     <ClCompile Include="src\PixmapImagePainter.cpp" />
     <ClCompile Include="src\PlainTextEditView.cpp" />
-    <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\PlotBase.cpp" />
     <ClCompile Include="src\PlotDataset.cpp" />
-    <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlot.cpp" />
     <ClCompile Include="src\PolarPlotAxis.cpp" />
     <ClCompile Include="src\PolarPlotData.cpp" />
@@ -309,10 +308,9 @@
     <ClInclude Include="include\OTWidgets\MessageBoxManager.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
-    <QtMoc Include="include\OTWidgets\Plot.h" />
+    <QtMoc Include="include\OTWidgets\PlotBase.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PlotDataset.h" />
-    <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlot.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotAxis.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotData.h" />

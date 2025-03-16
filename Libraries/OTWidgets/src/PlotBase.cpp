@@ -1,4 +1,4 @@
-//! @file Plot.cpp
+//! @file PlotBase.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/Plot.h"
+#include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
@@ -26,7 +26,7 @@
 // std header
 #include <memory>
 
-ot::Plot::Plot()
+ot::PlotBase::PlotBase()
 	: m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget;
@@ -45,7 +45,7 @@ ot::Plot::Plot()
 
 }
 
-ot::Plot::~Plot() {
+ot::PlotBase::~PlotBase() {
 
 }
 
@@ -53,7 +53,7 @@ ot::Plot::~Plot() {
 
 // Setter
 
-void ot::Plot::setPlotType(Plot1DCfg::PlotType _type) {
+void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 	if (_type == m_currentPlotType) {
 		return;
 	}
@@ -87,44 +87,11 @@ void ot::Plot::setPlotType(Plot1DCfg::PlotType _type) {
 	}
 }
 
-ot::PlotDataset * ot::Plot::addDataset(const Plot1DCurveCfg& _config, double * _dataX, double * _dataY, int _dataSize) {
+ot::PlotDataset * ot::PlotBase::addDataset(const Plot1DCurveCfg& _config, double * _dataX, double * _dataY, int _dataSize) {
 	return new PlotDataset(this, _config, PlotDatasetData(_dataX, nullptr, _dataY, nullptr, nullptr, _dataSize));
 }
 
-void ot::Plot::setFromDataBaseConfig(const Plot1DDataBaseCfg& _config) {
-	// Detach all current data and refresh the title
-	this->clear(false);
-
-	m_config = _config;
-
-	// Check cache
-	std::list<Plot1DCurveCfg> entitiesToImport;
-	for (const Plot1DCurveCfg& curveInfo : _config.getCurves()) {
-		// Check for entity ID
-		auto itm = m_cache.find(curveInfo.getEntityID());
-		if (itm != m_cache.end()) {
-			// Check if the entity Versions match
-			if (itm->second.first != curveInfo.getEntityVersion()) {
-				entitiesToImport.push_back(curveInfo);
-			}
-			else {
-				itm->second.second->setNavigationId(curveInfo.getNavigationId());  // We need to update the tree id, since this might have changed due to undo / redo or open project
-				itm->second.second->setDimmed(curveInfo.getDimmed(), true);
-				itm->second.second->attach();
-			}
-		}
-		else {
-			entitiesToImport.push_back(curveInfo);
-		}
-	}
-
-	// Import remaining entities
-	this->importData(_config.getProjectName(), entitiesToImport);
-
-	this->applyConfig();
-}
-
-void ot::Plot::resetView(void) {
+void ot::PlotBase::resetView(void) {
 	assert(0);
 }
 
@@ -132,7 +99,7 @@ void ot::Plot::resetView(void) {
 
 // Data handling
 
-void ot::Plot::setErrorState(bool _isError, const QString & _message) {
+void ot::PlotBase::setErrorState(bool _isError, const QString & _message) {
 	
 	// Get the current or new plot widget
 	// The widget depends on the current polot type
@@ -168,26 +135,21 @@ void ot::Plot::setErrorState(bool _isError, const QString & _message) {
 	}
 }
 
-void ot::Plot::setIncompatibleData(void) {
+void ot::PlotBase::setIncompatibleData(void) {
 	clear(false);
 	setErrorState(true, "Incompatible data");
 }
 
-void ot::Plot::refresh(void) {
+void ot::PlotBase::refresh(void) {
 	this->applyConfig();
 }
 
-void ot::Plot::clear(bool _clearCache) {
+void ot::PlotBase::clear(bool _clearCache) {
 	if (_clearCache) {
-		for (auto itm : m_cache) {
-			delete itm.second.second;
-		}
-		m_cache.clear();
+		this->clearCache();
 	}
 	else {
-		for (auto itm : m_cache) {
-			itm.second.second->detach();
-		}
+		this->detachAllCached();
 	}
 
 	m_cartesianPlot->setTitle("");
@@ -229,15 +191,7 @@ void ot::Plot::clear(bool _clearCache) {
 	return;
 }
 
-void ot::Plot::removeFromCache(unsigned long long _entityID) {
-	auto itm = m_cache.find(_entityID);
-	if (itm != m_cache.end()) {
-		delete itm->second.second;
-		m_cache.erase(_entityID);
-	}
-}
-
-void ot::Plot::datasetSelectionChanged(PlotDataset * _selectedDataset) {
+void ot::PlotBase::datasetSelectionChanged(PlotDataset * _selectedDataset) {
 	bool ctrlPressed = (QApplication::keyboardModifiers() & Qt::ControlModifier);
 
 	if (_selectedDataset == nullptr) {
@@ -250,71 +204,11 @@ void ot::Plot::datasetSelectionChanged(PlotDataset * _selectedDataset) {
 	}
 }
 
-ot::PlotDataset* ot::Plot::findDataset(QwtPlotCurve * _curve) {
-	for (auto itm : m_cache) {
-		if (itm.second.second->m_cartesianCurve == _curve) {
-			return itm.second.second;
-		}
-	}
-	return nullptr;
+void ot::PlotBase::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
+	this->calculateDataInCache(_quantity);
 }
 
-ot::PlotDataset* ot::Plot::findDataset(QwtPolarCurve * _curve) {
-	for (auto itm : m_cache) {
-		if (itm.second.second->m_polarCurve == _curve) {
-			return itm.second.second;
-		}
-	}
-	return nullptr;
-}
-
-ot::PlotDataset* ot::Plot::findDataset(UID _entityID) {
-	auto it = m_cache.find(_entityID);
-	if (it == m_cache.end()) {
-		return nullptr;
-	}
-	else {
-		return it->second.second;
-	}
-}
-
-void ot::Plot::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
-	for (auto itm : m_cache) {
-		itm.second.second->calculateData(_quantity);
-	}
-}
-
-bool ot::Plot::hasCachedEntity(UID _entityID) const {
-	return m_cache.find(_entityID) != m_cache.end();
-}
-
-bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion) {
-	auto it = m_cache.find(_entityID);
-	if (it == m_cache.end()) {
-		return false;
-	}
-
-	if (it->second.first == _newEntityVersion) {
-		return false;
-	}
-	else {
-		it->second.first = _newEntityVersion;
-		it->second.second->setEntityVersion(_newEntityVersion);
-		return true;
-	}
-}
-
-std::list<ot::PlotDataset*> ot::Plot::getDatasets(void) const {
-	std::list<PlotDataset*> result;
-
-	for (const auto& it : m_cache) {
-		result.push_back(it.second.second);
-	}
-
-	return result;
-}
-
-void ot::Plot::applyConfig(void) {
+void ot::PlotBase::applyConfig(void) {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
 
@@ -326,14 +220,21 @@ void ot::Plot::applyConfig(void) {
 	std::string axisTitleX;
 	std::string axisTitleY;
 
-	if (!m_cache.empty()) {
-		axisTitleX = m_cache.begin()->second.second->getConfig().getXAxisTitle();
-		axisTitleY = m_cache.begin()->second.second->getConfig().getYAxisTitle();
+	std::list<PlotDataset*> cache = this->getAllDatasets();
+	if (!cache.empty()) {
+		axisTitleX = cache.front()->getConfig().getXAxisTitle();
+		axisTitleY = cache.front()->getConfig().getYAxisTitle();
+		cache.pop_front();
 
-		for (const auto& itm : m_cache) {
-			if (axisTitleX != m_cache.begin()->second.second->getConfig().getXAxisTitle()) compatible = false;
-			if (axisTitleY != m_cache.begin()->second.second->getConfig().getYAxisTitle()) compatible = false;
-			if (!compatible) break;
+		for (const PlotDataset* itm : cache) {
+			if (axisTitleX != itm->getConfig().getXAxisTitle()) {
+				compatible = false;
+				break;
+			}
+			if (axisTitleY != itm->getConfig().getYAxisTitle()) {
+				compatible = false;
+				break;
+			}
 		}
 	}
 

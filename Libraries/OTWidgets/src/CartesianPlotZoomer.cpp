@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/Plot.h"
+#include "OTWidgets/PlotBase.h"
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/CartesianPlotZoomer.h"
 

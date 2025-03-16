@@ -328,14 +328,11 @@
     <ClCompile Include="src\AbstractPlotAxis.cpp">
       <Filter>src\Plot\Base</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plot.cpp">
+    <ClCompile Include="src\PlotBase.cpp">
       <Filter>src\Plot\Base</Filter>
     </ClCompile>
     <ClCompile Include="src\PlotDataset.cpp">
       <Filter>src\Plot\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlotView.cpp">
-      <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\CartesianPlot.cpp">
       <Filter>src\Plot\Cartesian</Filter>
@@ -818,9 +815,6 @@
     <ClInclude Include="include\OTWidgets\AbstractPlotAxis.h">
       <Filter>include\Plot\Base</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PlotView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotDataset.h">
       <Filter>include\Plot\Base</Filter>
     </ClInclude>
@@ -1099,7 +1093,7 @@
     <QtMoc Include="include\OTWidgets\ToolButton.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\Plot.h">
+    <QtMoc Include="include\OTWidgets\PlotBase.h">
       <Filter>include\Plot\Base</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ContextMenu.h">

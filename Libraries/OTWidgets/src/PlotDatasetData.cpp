@@ -28,6 +28,39 @@ ot::PlotDatasetData::~PlotDatasetData() {
 	this->memFree();
 }
 
+ot::PlotDatasetData::PlotDatasetData(PlotDatasetData&& _other) noexcept :
+	m_dataSize(std::move(_other.m_dataSize)), m_dataX(std::move(_other.m_dataX)), m_dataXcalc(std::move(_other.m_dataXcalc)),
+	m_dataY(std::move(_other.m_dataY)), m_dataYim(std::move(_other.m_dataYim)), m_dataYcalc(std::move(_other.m_dataYcalc))
+{
+	_other.m_dataSize = 0;
+	_other.m_dataX = nullptr;
+	_other.m_dataXcalc = nullptr;
+	_other.m_dataY = nullptr;
+	_other.m_dataYim = nullptr;
+	_other.m_dataYcalc = nullptr;
+}
+
+ot::PlotDatasetData& ot::PlotDatasetData::operator=(PlotDatasetData&& _other) noexcept {
+	if (this != &_other) {
+		this->memFree();
+		m_dataSize = std::move(_other.m_dataSize);
+		m_dataX = std::move(_other.m_dataX);
+		m_dataXcalc = std::move(_other.m_dataXcalc);
+		m_dataY = std::move(_other.m_dataY);
+		m_dataYim = std::move(_other.m_dataYim);
+		m_dataYcalc = std::move(_other.m_dataYcalc);
+
+		_other.m_dataSize = 0;
+		_other.m_dataX = nullptr;
+		_other.m_dataXcalc = nullptr;
+		_other.m_dataY = nullptr;
+		_other.m_dataYim = nullptr;
+		_other.m_dataYcalc = nullptr;
+	}
+
+	return *this;
+}
+
 ot::PlotDatasetData ot::PlotDatasetData::createCopy(void) const {
 	long dataSize = m_dataSize;
 	double* dataX = nullptr;

@@ -7,7 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/AbstractPlot.h"
 
-ot::AbstractPlot::AbstractPlot(Plot* _ownerPlot)
+ot::AbstractPlot::AbstractPlot(PlotBase* _ownerPlot)
 	: m_axisXBottom(nullptr), m_axisXTop(nullptr), m_axisYLeft(nullptr), m_axisYRight(nullptr), m_owner(_ownerPlot)
 {}
 

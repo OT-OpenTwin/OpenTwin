@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/Plot.h"
+#include "OTWidgets/PlotBase.h"
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/CartesianPlotAxis.h"
 #include "OTWidgets/CartesianPlotGrid.h"
@@ -25,7 +25,7 @@
 #include <QtCore/qmath.h>
 #include <QtGui/qevent.h>
 
-ot::CartesianPlot::CartesianPlot(Plot * _owner)
+ot::CartesianPlot::CartesianPlot(PlotBase* _owner)
 	: AbstractPlot(_owner)
 {
 	setPlotAxis(new CartesianPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new CartesianPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);

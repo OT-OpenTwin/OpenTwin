@@ -21,6 +21,129 @@ ot::PlotManager::~PlotManager() {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Virtual methods
+
+ot::PlotDataset* ot::PlotManager::findDataset(QwtPlotCurve* _curve) {
+	for (auto itm : m_cache) {
+		if (itm.second.second->getCartesianCurve() == _curve) {
+			return itm.second.second;
+		}
+	}
+	return nullptr;
+}
+
+ot::PlotDataset* ot::PlotManager::findDataset(QwtPolarCurve* _curve) {
+	for (auto itm : m_cache) {
+		if (itm.second.second->getPolarCurve() == _curve) {
+			return itm.second.second;
+		}
+	}
+	return nullptr;
+}
+
+ot::PlotDataset* ot::PlotManager::findDataset(UID _entityID) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second.second;
+	}
+}
+
+std::list<ot::PlotDataset*> ot::PlotManager::getAllDatasets(void) const {
+	std::list<PlotDataset*> result;
+
+	for (const auto& it : m_cache) {
+		result.push_back(it.second.second);
+	}
+
+	return result;
+}
+
+void ot::PlotManager::addDatasetToCache(PlotDataset* _dataset) {
+	m_cache.insert_or_assign(
+		_dataset->getEntityID(),
+		std::pair<UID, PlotDataset*>(
+			_dataset->getEntityVersion(),
+			_dataset
+		)
+	);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Data handling
+
+void ot::PlotManager::setFromDataBaseConfig(const Plot1DDataBaseCfg& _config) {
+	// Detach all current data and refresh the title
+	this->clear(false);
+
+	{
+		Plot1DCfg cfg = _config;
+		this->replaceConfig(std::move(cfg));
+	}
+
+	// Check cache
+	std::list<Plot1DCurveCfg> entitiesToImport;
+	for (const Plot1DCurveCfg& curveInfo : _config.getCurves()) {
+		// Check for entity ID
+		auto itm = m_cache.find(curveInfo.getEntityID());
+		if (itm != m_cache.end()) {
+			// Check if the entity Versions match
+			if (itm->second.first != curveInfo.getEntityVersion()) {
+				entitiesToImport.push_back(curveInfo);
+			}
+			else {
+				itm->second.second->setNavigationId(curveInfo.getNavigationId());  // We need to update the tree id, since this might have changed due to undo / redo or open project
+				itm->second.second->setDimmed(curveInfo.getDimmed(), true);
+				itm->second.second->attach();
+			}
+		}
+		else {
+			entitiesToImport.push_back(curveInfo);
+		}
+	}
+
+	// Import remaining entities
+	this->importData(_config.getProjectName(), entitiesToImport);
+
+	this->applyConfig();
+}
+
+void ot::PlotManager::removeFromCache(unsigned long long _entityID) {
+	auto itm = m_cache.find(_entityID);
+	if (itm != m_cache.end()) {
+		delete itm->second.second;
+		m_cache.erase(_entityID);
+	}
+}
+
+bool ot::PlotManager::hasCachedEntity(UID _entityID) const {
+	return m_cache.find(_entityID) != m_cache.end();
+}
+
+bool ot::PlotManager::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return false;
+	}
+
+	if (it->second.first == _newEntityVersion) {
+		return false;
+	}
+	else {
+		it->second.first = _newEntityVersion;
+		it->second.second->setEntityVersion(_newEntityVersion);
+		return true;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected virtual methods
 
 void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _entitiesToImport) {
 	if (_entitiesToImport.empty()) return;
@@ -66,9 +189,8 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 		bool loadCurveDataRequired = true;
 
-		std::map<UID, std::pair<UID, PlotDataset*>>& cache = this->getCache();
-		auto it = cache.find(newDataset->getEntityID());
-		if (it != cache.end()) {
+		auto it = m_cache.find(newDataset->getEntityID());
+		if (it != m_cache.end()) {
 			PlotDataset* oldDataset = it->second.second;
 
 			if (oldDataset != nullptr) {
@@ -97,7 +219,7 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 		removeFromCache(newDataset->getEntityID());
 
-		cache.insert_or_assign(newDataset->getEntityID(), std::pair<UID, PlotDataset*>(newDataset->getEntityVersion(), newDataset));
+		this->addDatasetToCache(newDataset);
 	}
 
 	if (prefetchCurveData.empty()) return; // Nothing to load
@@ -196,5 +318,24 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 		// Attatch the curve to the plot
 		item->attach();
+	}
+}
+
+void ot::PlotManager::clearCache(void) {
+	for (auto itm : m_cache) {
+		delete itm.second.second;
+	}
+	m_cache.clear();
+}
+
+void ot::PlotManager::detachAllCached(void) {
+	for (auto itm : m_cache) {
+		itm.second.second->detach();
+	}
+}
+
+void ot::PlotManager::calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) {
+	for (auto itm : m_cache) {
+		itm.second.second->calculateData(_axisQuantity);
 	}
 }

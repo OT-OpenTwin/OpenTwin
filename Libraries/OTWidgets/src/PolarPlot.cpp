@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/Plot.h"
+#include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/PolarPlotGrid.h"
 #include "OTWidgets/PolarPlotAxis.h"
@@ -16,7 +16,7 @@
 // Qt header
 #include <QtGui/qevent.h>
 
-ot::PolarPlot::PolarPlot(Plot * _owner)
+ot::PolarPlot::PolarPlot(PlotBase* _owner)
 	: AbstractPlot(_owner)
 {
 	m_grid = new PolarPlotGrid(this);
