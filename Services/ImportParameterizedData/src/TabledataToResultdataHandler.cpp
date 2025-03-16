@@ -453,9 +453,10 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 	//Loading quantity information
 	KeyValuesExtractor quantityData;
 	quantityData.loadAllRangeSelectionInformation(*quantityAssembly, _loadedTables);
-	DataCategorizationConsistencyChecker checker;
-
+	
+	//DataCategorizationConsistencyChecker checker;
 	//bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
+
 	bool isValid = true;
 	std::list<DatasetDescription> datasetDescriptions;
 
