@@ -69,7 +69,7 @@ extern "C" {
 	{
 		std::string loggerServiceURL(_loggerServiceURL);
 
-#ifdef _DEBUG || OT_RELEASE_DEBUG
+#if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 		std::cout << "Global Directory Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, loggerServiceURL, true);
 #else

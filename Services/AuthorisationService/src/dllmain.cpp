@@ -87,7 +87,7 @@ extern "C"{
 	{
 		std::string loggerServiceURL(_loggerServiceURL);
 
-#ifdef _DEBUG || OT_RELEASE_DEBUG
+#if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 	std::cout << "Authorization Service" << std::endl;
 	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_AuthorisationService, loggerServiceURL, true);
 #else
