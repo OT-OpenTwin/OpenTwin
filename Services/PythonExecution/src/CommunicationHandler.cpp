@@ -46,6 +46,8 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 			return false;
 		}
 		auto server = m_serverSocket->state();
+		
+		OT_LOG_D("Connecting with server failed due to state: " + std::to_string(server));
 		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::tickRate));
 		this->processNextEvent();
 	}

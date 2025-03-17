@@ -109,45 +109,24 @@ void PythonWrapper::AddToSysPath(const std::string& newPathComponent) {
 }
 
 std::string PythonWrapper::DeterminePythonRootDirectory() {
-#ifdef _RELEASEDEBUG
-	std::string envName = "OT_PYTHON_ROOT";
-	const char*  pythonRoot = ot::OperatingSystem::getEnvironmentVariable(envName.c_str());
-	assert(pythonRoot != nullptr);
-	return std::string(pythonRoot);
-#else
+	std::string path;
+
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
 	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
-
-	if (devEnvRoot != nullptr)
+	if (devEnvRoot == nullptr)
 	{
-		// Execution from deployment folder
-		return std::string(devEnvRoot) + "\\Deployment\\Python";
+		path = ".\\Python";
 	}
 	else
-	{		
-		// Execution from current working directory folder
-		return ".\\Python";
+	{
+		path = std::string(devEnvRoot) + "\\Deployment\\Python";
 	}
-#endif
+	return path;
 }
 
 std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
 
-	std::string path;
-
-#ifdef _RELEASEDEBUG
-	//If we are in debug, we are a developer. And we want the path to the deployment folder.
-	
-	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-	const char* devEnvRoot = ot::OperatingSystem::getEnvironmentVariable(devEnvRootName.c_str());
-	assert(devEnvRoot != nullptr);
-	
-	path = std::string(devEnvRoot) + "\\Deployment\\Python";
-
-#else
-	//In Release we are already in the deployment folder
-	path = ".\\Python";
-#endif
+	std::string path = DeterminePythonRootDirectory();
 
 	path += "\\Lib\\site-packages";
 	return path;
