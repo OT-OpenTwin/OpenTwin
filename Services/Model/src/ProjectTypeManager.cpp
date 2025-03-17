@@ -38,6 +38,10 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypePyrit();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION)
+	{
+		initializeProjectTypeCircuitSimulation();
+	}
 	else
 	{
 		// This is an unknown project type which defaults to development
@@ -48,6 +52,7 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 void ProjectTypeManager::initializeProjectType3DSimulation(void)
 {
 	_hasGeometryRoot				= true;
+	_hasCircuitsRoot				= false;
 	_hasMaterialRoot				= true;
 	_hasMeshRoot					= true;
 	_hasSolverRoot					= true;
@@ -67,6 +72,7 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 {
 	_hasGeometryRoot				= false;
+	_hasCircuitsRoot				= false;
 	_hasMaterialRoot				= false;
 	_hasMeshRoot					= false;
 	_hasSolverRoot					= false;
@@ -92,6 +98,7 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 {
 	_hasGeometryRoot = true;
+	_hasCircuitsRoot = false;
 	_hasMaterialRoot = true;
 	_hasMeshRoot = false;
 	_hasSolverRoot = false;
@@ -114,6 +121,7 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 {
 	_hasGeometryRoot = false;
+	_hasCircuitsRoot = false;
 	_hasMaterialRoot = false;
 	_hasMeshRoot = false;
 	_hasSolverRoot = false;
@@ -136,6 +144,7 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 void ProjectTypeManager::initializeProjectTypePyrit(void)
 {
 	_hasGeometryRoot = true;
+	_hasCircuitsRoot = false;
 	_hasMaterialRoot = true;
 	_hasMeshRoot = true;
 	_hasSolverRoot = true;
@@ -151,6 +160,27 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 	_has1DView = true;
 	_hasBlockPicker = false;
 }
+
+void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
+{
+	_hasGeometryRoot = false;
+	_hasCircuitsRoot = true;
+	_hasMaterialRoot = false;
+	_hasMeshRoot = false;
+	_hasSolverRoot = true;
+	_hasScriptsRoot = false;
+	_hasUnitRoot = true;
+	_hasDataCategorizationRoot = false;
+	_hasRMDCategorization = false;
+	_hasRMDCategorizationPreview = false;
+	_hasDatasetRoot = false;
+	_hasDatasetRMD = false;
+
+	_has3DView = false;
+	_has1DView = true;
+	_hasBlockPicker = true;
+}
+
 std::string ProjectTypeManager::getViews(void)
 {
 	ot::JsonDocument newDoc;

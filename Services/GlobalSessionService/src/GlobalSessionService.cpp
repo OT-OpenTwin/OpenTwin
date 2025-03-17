@@ -295,6 +295,24 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	{
 		using namespace ot;
+		ProjectTemplateInformation defaultCircuitSimulation;
+		defaultCircuitSimulation.setName(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION);
+		defaultCircuitSimulation.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION);
+		defaultCircuitSimulation.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "Circuit Simulation Project" << StyledText::Text <<
+			"Create and modify electrical circuits. Run circuit simulations.";
+
+		defaultCircuitSimulation.setDescription(description);
+
+		ot::JsonObject objPyrit;
+		defaultCircuitSimulation.addToJsonObject(objPyrit, result.GetAllocator());
+		result.PushBack(objPyrit, result.GetAllocator());
+	}
+
+	{
+		using namespace ot;
 		ProjectTemplateInformation defaultDevelopment;
 		defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
 		defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);

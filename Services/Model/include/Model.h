@@ -82,6 +82,7 @@ public:
 	EntityBase *getRootNode(void) { return entityRoot; };
 
 	std::string getGeometryRootName(void) { return "Geometry"; };
+	std::string getCircuitsRootName(void) { return "Circuits"; };
 	std::string getMaterialRootName(void) { return "Materials"; };
 	std::string getParameterRootName(void) { return "Parameters"; };
 	std::string getMeshRootName(void) { return "Meshes"; };

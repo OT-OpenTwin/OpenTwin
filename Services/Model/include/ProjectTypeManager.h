@@ -9,6 +9,7 @@ public:
 	ProjectTypeManager() = delete;
 
 	bool hasGeometryRoot(void)				{ return _hasGeometryRoot; }
+	bool hasCircuitsRoot(void)				{ return _hasCircuitsRoot; }
 	bool hasMaterialRoot(void)				{ return _hasMaterialRoot; }
 	bool hasMeshRoot(void)					{ return _hasMeshRoot; }
 	bool hasSolverRoot(void)				{ return _hasSolverRoot; }
@@ -33,8 +34,10 @@ private:
 	void initializeProjectTypeStudioSuite(void);
 	void initializeProjectTypeLTSpice(void);
 	void initializeProjectTypePyrit(void);
+	void initializeProjectTypeCircuitSimulation(void);
 
 	bool _hasGeometryRoot				= true;
+	bool _hasCircuitsRoot				= true;
 	bool _hasMaterialRoot				= true;
 	bool _hasMeshRoot					= true;
 	bool _hasSolverRoot					= true;

@@ -181,6 +181,13 @@ void Model::resetToNew(void)
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
 	}
 
+	if (typeManager.hasCircuitsRoot())
+	{
+		EntityBase* entityCircuitsRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
+		entityCircuitsRoot->setName(getCircuitsRootName());
+		addEntityToModel(entityCircuitsRoot->getName(), entityCircuitsRoot, entityRoot, true, allNewEntities);
+	}
+
 	if (typeManager.hasMaterialRoot())
 	{
 		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());

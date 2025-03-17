@@ -111,6 +111,15 @@ SessionService::SessionService()
 	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
 	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_PYRIT, PyritSessionServices);
+
+	//
+	// Circuit Simulation services list (this contains all services relevant for Pyrit integration)
+	//
+	std::vector<ot::ServiceBase>* CircuitSimulationSessionServices = new std::vector<ot::ServiceBase>;
+	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
+	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, CircuitSimulationSessionServices);
 }
 
 bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {

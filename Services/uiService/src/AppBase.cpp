@@ -230,6 +230,7 @@ bool AppBase::initialize() {
 			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/LTSpice.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_PYRIT, "ProjectTemplates/Pyrit.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, "ProjectTemplates/CircuitSimulation.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/Development.png"}
 			});
 
@@ -239,6 +240,7 @@ bool AppBase::initialize() {
 			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/CustomLTSpice.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_PYRIT, "ProjectTemplates/CustomPyrit.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, "ProjectTemplates/CustomCircuitSimulation.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/CustomDevelopment.png"}
 			});
 
