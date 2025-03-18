@@ -1603,7 +1603,11 @@ void AppBase::replaceInfoMessage(const QString& _message) {
 
 void AppBase::appendInfoMessage(const QString & _message) {
 	if (m_output) {
-		m_output->getPlainTextEdit()->appendPlainText(_message);
+		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
+		m_output->getPlainTextEdit()->insertPlainText(_message);
+		m_output->getPlainTextEdit()->moveCursor(QTextCursor::End);
+
+//		m_output->getPlainTextEdit()->appendPlainText(_message);
 	}
 }
 
