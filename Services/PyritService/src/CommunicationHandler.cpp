@@ -103,7 +103,7 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	if (!m_serviceAndSessionInfoSet) {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYRIT, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
 

@@ -455,7 +455,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//	solverManager.setModelUrl(this->modelComponent()->getServiceURL());
 	//}
 
-	std::string command = "import winsound\nwinsound.Beep(2500, 1000)";
+	std::string command = "print('Hello World')\n";
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());

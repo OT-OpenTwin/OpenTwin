@@ -11,6 +11,10 @@
 // std header
 #include <thread>
 
+#ifdef _DEBUG
+	#define _SUBSERVICEDEBUG
+#endif
+
 SubprocessManager::SubprocessManager(Application* _app) 
 	: m_app(_app), m_communicationHandler(nullptr), m_workerThread(nullptr)
 {
@@ -18,7 +22,7 @@ SubprocessManager::SubprocessManager(Application* _app)
 	m_subprocessHandler = new SubprocessHandler(this);
 
 	// Start worker thread for Qt event loop
-	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->sessionID() + "_" OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
+	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->sessionID() + "_" OT_INFO_SERVICE_TYPE_PYRIT);
 }
 
 SubprocessManager::~SubprocessManager() {
@@ -101,9 +105,12 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 		std::lock_guard<std::mutex> lock(m_mutex);
 		serverName = m_communicationHandler->getServerName();
 	}
-	if (!m_subprocessHandler->ensureSubprocessRunning(serverName)) {
-		OT_LOG_E("Failed to start subprocess");
-		return false;
+	if (serverName != "TestServerPython")
+	{
+		if (!m_subprocessHandler->ensureSubprocessRunning(serverName)) {
+			OT_LOG_E("Failed to start subprocess");
+			return false;
+		}
 	}
 
 	return true;
@@ -158,7 +165,11 @@ void SubprocessManager::worker(std::string _projectName) {
 		// Create communication handler
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
+#ifdef _SUBSERVICEDEBUG
+			m_communicationHandler = new CommunicationHandler(this, "TestServerPython");
+#else
 			m_communicationHandler = new CommunicationHandler(this, _projectName);
+#endif		
 		}
 
 		// Run Qt event loop
