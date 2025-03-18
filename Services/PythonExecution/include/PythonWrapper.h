@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <thread>
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
@@ -29,6 +30,7 @@ public:
 	~PythonWrapper();
 
 	static void setSitePackage(const std::string& sitePackageName) { m_customSitePackage = sitePackageName; }
+	static void setRedirectOutput(bool redirectOutput) { m_redirectOutput = redirectOutput; }
 
 	void InitializePythonInterpreter();
 	void ResetSysPath();
@@ -49,16 +51,20 @@ private:
 	std::string _pythonRoot;
 	std::string _defaultSitePackagesPath;
 	bool _interpreterSuccessfullyInitialized = false;
+	int pipe_fds[2];
 
 	int initiateNumpy();
 	std::string checkNumpyVersion();
 	std::string DeterminePythonRootDirectory();
 	std::string determineMandatoryPythonSitePackageDirectory();
 	void addOptionalUserPythonSitePackageDirectory();
+	void readOutput();
 
 	static void signalHandlerAbort(int sig);
 
 	CPythonObjectNew GetModule(const std::string& moduleName);
 
 	static std::string m_customSitePackage;
+	static bool m_redirectOutput;
+	std::thread* m_outputWorkerThread;
 };

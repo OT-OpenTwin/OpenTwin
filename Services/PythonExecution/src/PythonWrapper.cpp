@@ -1,6 +1,8 @@
 #include <signal.h>
 #include "PythonWrapper.h"
 #include "PythonExtension.h"
+#include "Application.h"
+
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 
@@ -10,9 +12,15 @@
 
 #include "PythonObjectBuilder.h"
 
-std::string PythonWrapper::m_customSitePackage;
+#include <fcntl.h>
+#include <windows.h>
+#include <io.h>
+#include <iostream>
 
-PythonWrapper::PythonWrapper() {
+std::string PythonWrapper::m_customSitePackage;
+bool PythonWrapper::m_redirectOutput = false;
+
+PythonWrapper::PythonWrapper() : m_outputWorkerThread(nullptr) {
 	_pythonRoot = DeterminePythonRootDirectory();
 	
 	OT_LOG_D("Setting Python root path: " + _pythonRoot);
@@ -29,6 +37,34 @@ PythonWrapper::PythonWrapper() {
 
 	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
 	signal(SIGABRT, &signalHandlerAbort);
+
+	if (m_redirectOutput)
+	{
+		// Create a pipe for getting the standard output
+		if (_pipe(pipe_fds, 4096, _O_TEXT) == -1) {
+			OT_LOG_EA("Creating pipe for capturing Python output failed.");
+		}
+	}
+}
+
+void PythonWrapper::readOutput() {
+	char buffer[256];
+	while (m_redirectOutput)
+	{
+		DWORD bytes_available = 0;
+		if (PeekNamedPipe((HANDLE)_get_osfhandle(pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
+			if (bytes_available > 0) {
+				int count = _read(pipe_fds[0], buffer, sizeof(buffer) - 1);
+				if (count > 0) {
+					buffer[count] = '\0';
+					//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
+					Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::string(buffer));
+				}
+			}
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
 }
 
 int PythonWrapper::initiateNumpy() {
@@ -48,6 +84,15 @@ std::string PythonWrapper::checkNumpyVersion() {
 PythonWrapper::~PythonWrapper() {
 	if (!_interpreterSuccessfullyInitialized) {
 		ClosePythonInterpreter();
+	}
+
+	if (m_outputWorkerThread)
+	{
+		m_redirectOutput = false;
+		m_outputWorkerThread->join();
+
+		delete m_outputWorkerThread;
+		m_outputWorkerThread = nullptr;
 	}
 }
 
@@ -97,6 +142,19 @@ void PythonWrapper::InitializePythonInterpreter() {
 
 	const std::string numpyVersion = checkNumpyVersion();
 	OT_LOG_D("Initiated numpy version: " + numpyVersion);
+
+	if (m_redirectOutput)
+	{
+		// Redirect output to pipe
+		std::string command = 
+			"import sys\n"
+			"import os\n"
+			"sys.stdout = os.fdopen(" + std::to_string(pipe_fds[1]) + ", 'w')\n"
+			"sys.stdout.reconfigure(line_buffering = True)\n";
+		PyRun_SimpleString(command.c_str());
+
+		m_outputWorkerThread = new std::thread(&PythonWrapper::readOutput, this);
+	}
 }
 
 void PythonWrapper::ResetSysPath() {

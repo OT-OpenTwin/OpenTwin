@@ -18,6 +18,7 @@ public:
 	const std::string& getServerName(void) const { return m_serverName; };
 
 	bool ensureConnectionToServer(void);
+	bool writeToServer(const std::string& _message);
 
 Q_SIGNALS:
 	void disconnected(void);
@@ -28,7 +29,6 @@ private Q_SLOTS:
 	void slotDisconnected(void);
 
 private:
-	bool writeToServer(const std::string& _message);
 	void processNextEvent(void);
 
 	std::string m_serverName;

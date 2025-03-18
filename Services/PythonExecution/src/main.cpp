@@ -37,6 +37,14 @@ namespace ot {
 				PythonWrapper::setSitePackage(_argv[2]);
 			}
 
+			if (_argc > 3)
+			{
+				if (std::string(_argv[3]) == "1")
+				{
+					PythonWrapper::setRedirectOutput(true);
+				}
+			}
+
 			return true;
 		}
 	}
