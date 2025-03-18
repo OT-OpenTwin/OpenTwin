@@ -7,6 +7,9 @@
 // Qt header
 #include <QtWidgets/qapplication.h>
 
+#undef slots
+#include "PythonWrapper.h"
+
 namespace ot {
 	namespace intern {
 		void initializeLogger(void) {
@@ -26,7 +29,14 @@ namespace ot {
 				return false;
 			}
 			Application::instance().getCommunicationHandler().setServerName(_argv[1]);
+
+
 #endif
+			if (_argc > 2)
+			{
+				PythonWrapper::setSitePackage(_argv[2]);
+			}
+
 			return true;
 		}
 	}

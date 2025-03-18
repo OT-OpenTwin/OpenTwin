@@ -28,6 +28,8 @@ public:
 
 	~PythonWrapper();
 
+	static void setSitePackage(const std::string& sitePackageName) { m_customSitePackage = sitePackageName; }
+
 	void InitializePythonInterpreter();
 	void ResetSysPath();
 	void AddToSysPath(const std::string& newPathComponent);
@@ -58,4 +60,5 @@ private:
 
 	CPythonObjectNew GetModule(const std::string& moduleName);
 
+	static std::string m_customSitePackage;
 };

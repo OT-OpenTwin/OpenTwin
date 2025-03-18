@@ -85,6 +85,12 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
 		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
 	}
+	else if (serviceName == OT_INFO_SERVICE_TYPE_PYRIT) {
+		OT_LOG_D("Initialise UID Generator");
+		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
+		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
+		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
+	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");
 		const std::string url = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);

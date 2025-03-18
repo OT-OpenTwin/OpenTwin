@@ -10,6 +10,8 @@
 
 #include "PythonObjectBuilder.h"
 
+std::string PythonWrapper::m_customSitePackage;
+
 PythonWrapper::PythonWrapper() {
 	_pythonRoot = DeterminePythonRootDirectory();
 	
@@ -19,7 +21,12 @@ PythonWrapper::PythonWrapper() {
 	_pythonPath.push_back(_pythonRoot + "\\DLLs");
 	std::string sitePackageDirectory = determineMandatoryPythonSitePackageDirectory();
 	_pythonPath.push_back(sitePackageDirectory);
-	addOptionalUserPythonSitePackageDirectory();
+
+	if (m_customSitePackage.empty())
+	{
+		addOptionalUserPythonSitePackageDirectory();
+	}
+
 	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
 	signal(SIGABRT, &signalHandlerAbort);
 }
@@ -128,7 +135,15 @@ std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
 
 	std::string path = DeterminePythonRootDirectory();
 
-	path += "\\Lib\\site-packages";
+	if (!m_customSitePackage.empty())
+	{
+		path += "\\Lib\\" + m_customSitePackage;
+
+	}
+	else
+	{
+		path += "\\Lib\\site-packages";
+	}
 	return path;
 }
 
