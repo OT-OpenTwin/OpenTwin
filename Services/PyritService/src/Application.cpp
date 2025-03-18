@@ -455,7 +455,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//	solverManager.setModelUrl(this->modelComponent()->getServiceURL());
 	//}
 
-	std::string command = "print('Hello World')\n";
+	//std::string command = "print('Hello World', flush=True)\n";
+
+	std::string command =   "import time\n"
+							"for i in range(5):\n"
+							"    print(f'Python schreibt: {i}')\n"
+							"    time.sleep(1)";
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());

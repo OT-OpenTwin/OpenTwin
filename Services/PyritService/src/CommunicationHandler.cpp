@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 // Qt header
 #include <QtCore/qeventloop.h>
@@ -212,6 +213,25 @@ bool CommunicationHandler::waitForClient(void) {
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG_D("Message from client: \"" + _message + "\"");
+
+	while (_message.substr(0, 7) == "OUTPUT:")
+	{
+		std::string text = _message.substr(7, _message.length()-1-7); // There is always an additional \n at the end of the message which needs to be removed here
+
+		//size_t msgStart = _message.find(':', 7);
+		//std::string length = _message.substr(7, msgStart-7);
+		//long msgLength = atol(length.c_str());
+		//std::string text = _message.substr(msgStart+1, msgLength);
+		//_message = _message.substr(msgStart+1 + msgLength + 1); // There is always an additional \n at the end of the message which needs to be removed here
+
+		Application::instance()->uiComponent()->displayMessage(text);
+		return;
+	}
+
+	//if (_message.empty())
+	//{
+	//	return;
+	//}
 
 	// Check state
 	if (m_clientState == ClientState::WaitForPing) {

@@ -44,7 +44,7 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 
 	// Create start args
 	std::string subprocessPath = this->findSubprocessPath();
-	std::string commandLine = "\"" + subprocessPath + m_executableName + "\" \"" + _serverName + "\" pyrit-packages" ;
+	std::string commandLine = "\"" + subprocessPath + m_executableName + "\" \"" + _serverName + "\" pyrit-packages 1" ;
 
 	// Run sub
 	ot::RunResult result = ot::SystemProcess::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle);

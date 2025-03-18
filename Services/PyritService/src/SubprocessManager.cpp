@@ -12,7 +12,7 @@
 #include <thread>
 
 #ifdef _DEBUG
-	#define _SUBSERVICEDEBUG
+	//#define _SUBSERVICEDEBUG
 #endif
 
 SubprocessManager::SubprocessManager(Application* _app) 
