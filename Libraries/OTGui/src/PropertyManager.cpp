@@ -110,6 +110,20 @@ void ot::PropertyManager::readingProperty(const std::string& _propertyGroupName,
 	}
 }
 
+void ot::PropertyManager::notifyAllChanged(void) {
+	std::list<Property*> props;
+	
+	// Get all properties
+	for (const auto& it : m_groups) {
+		props.splice(props.end(), it.second->getAllProperties());
+	}
+
+	// Notify for all
+	for (const Property* prop : props) {
+		this->propertyChanged(prop);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter

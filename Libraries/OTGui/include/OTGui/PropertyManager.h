@@ -102,6 +102,10 @@ namespace ot {
 		void setSilenceNotifications(bool _silence) { m_silenced = _silence; };
 		bool getSilenceNotifications(void) const { return m_silenced; };
 
+		//! @brief Will call PropertyManager::propertyChanged for every property that is currently registered.
+		//! Calling this method if the manager is currently silenced will have no effect.
+		void notifyAllChanged(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter
