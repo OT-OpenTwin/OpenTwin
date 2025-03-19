@@ -43,14 +43,13 @@ ot::PlotDataset* ot::PlotManager::findDataset(QwtPolarCurve* _curve) {
 	return nullptr;
 }
 
-ot::PlotDataset* ot::PlotManager::findDataset(UID _entityID) {
+std::list<ot::PlotDataset*> ot::PlotManager::findDatasets(UID _entityID) {
+	std::list<ot::PlotDataset*> result;
 	auto it = m_cache.find(_entityID);
-	if (it == m_cache.end()) {
-		return nullptr;
+	if (it != m_cache.end()) {
+		result.push_back(it->second.second);
 	}
-	else {
-		return it->second.second;
-	}
+	return result;
 }
 
 std::list<ot::PlotDataset*> ot::PlotManager::getAllDatasets(void) const {
@@ -145,6 +144,29 @@ bool ot::PlotManager::changeCachedDatasetEntityVersion(UID _entityID, UID _newEn
 
 // Protected virtual methods
 
+void ot::PlotManager::clearCache(void) {
+	for (auto itm : m_cache) {
+		delete itm.second.second;
+	}
+	m_cache.clear();
+}
+
+void ot::PlotManager::detachAllCached(void) {
+	for (auto itm : m_cache) {
+		itm.second.second->detach();
+	}
+}
+
+void ot::PlotManager::calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) {
+	for (auto itm : m_cache) {
+		itm.second.second->calculateData(_axisQuantity);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private
+
 void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _entitiesToImport) {
 	if (_entitiesToImport.empty()) return;
 
@@ -168,13 +190,13 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 		UID curveDataStorageVersion = curve->getCurveDataStorageVersion();
 		baseEntity = handler.readEntityFromEntityIDandVersion(curveDataStorageId, curveDataStorageVersion);
 		std::unique_ptr<EntityResult1DCurveData> curveData(dynamic_cast<EntityResult1DCurveData*>(baseEntity));
-		
+
 		Plot1DCurveCfg cfg = curveCfg;
 
 		cfg.setTitle(curve->getName());
 
 		cfg.setLinePenColor(curve->getColor());
-		
+
 		cfg.setXAxisUnit(curve->getUnitX());
 		cfg.setYAxisUnit(curve->getUnitY());
 
@@ -196,7 +218,7 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 			if (oldDataset != nullptr) {
 				if (oldDataset->getStorageEntityInfo().getEntityID() == newDataset->getStorageEntityInfo().getEntityID()
 					&& oldDataset->getStorageEntityInfo().getEntityVersion() == newDataset->getStorageEntityInfo().getEntityVersion()) {
-					
+
 					// The curve data in the previous data set is the same as the one in the new data set
 					double* x = nullptr, * y = nullptr;
 					long n;
@@ -318,24 +340,5 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 		// Attatch the curve to the plot
 		item->attach();
-	}
-}
-
-void ot::PlotManager::clearCache(void) {
-	for (auto itm : m_cache) {
-		delete itm.second.second;
-	}
-	m_cache.clear();
-}
-
-void ot::PlotManager::detachAllCached(void) {
-	for (auto itm : m_cache) {
-		itm.second.second->detach();
-	}
-}
-
-void ot::PlotManager::calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) {
-	for (auto itm : m_cache) {
-		itm.second.second->calculateData(_axisQuantity);
 	}
 }

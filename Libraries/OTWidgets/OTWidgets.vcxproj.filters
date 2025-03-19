@@ -505,6 +505,12 @@
     <ClCompile Include="src\BasicValidator.cpp">
       <Filter>src\Syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\Plot.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -961,6 +967,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\BasicValidator.h">
       <Filter>include\Syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Plot.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

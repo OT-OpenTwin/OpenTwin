@@ -49,6 +49,7 @@
 
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Table.h"
+#include "OTWidgets/PlotView.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -3691,11 +3692,11 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	ot::Plot1DCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
-	ot::PlotManager* plotManager = plotViewManager->getPlotManager();
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	ot::Plot* plot = plotView->getPlot();
 
 	// Clear plot if exists
-	plotManager->clear(true);
+	plot->clear(true);
 
 	// Create curves
 	const std::string collectionName = AppBase::instance()->getCollectionName();
@@ -3707,7 +3708,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setFromJsonObject(curveCfgSerialised);
 
-		createCurve(curveCfg, dataAccess, plotManager);
+		createCurve(curveCfg, dataAccess, plot);
 	}
 
 	return "";
@@ -3730,7 +3731,7 @@ std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _documen
 	std::string plotName = curveName.substr(0,curveName.find_last_of('/'));
 	plotName = "Test/A_plot";
 
-	const ot::PlotManagerView* plotViewManager = AppBase::instance()->findPlot(plotName);
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
 
 	return "";
 }
@@ -4344,7 +4345,7 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	}
 }
 
-std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager) {
+std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::Plot* _plot) {
 	struct AdditionalParameterDescription {
 		std::string m_label = "";
 		std::string m_unit = "";
@@ -4365,8 +4366,8 @@ std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCur
 		yDa[2] = 2.;
 
 
-		ot::PlotDataset* dataSet = _plotManager->addDataset(_config, xDa, yDa, 3);
-		_plotManager->addDatasetToCache(dataSet);
+		ot::PlotDataset* dataSet = _plot->addDataset(_config, xDa, yDa, 3);
+		_plot->addDatasetToCache(dataSet);
 		dataSet->attach();
 		dataSets.push_back(dataSet);
 		return dataSets;
@@ -4424,8 +4425,8 @@ std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCur
 			OT_LOG_W(dbg);
 			*/
 
-			auto dataSet = _plotManager->addDataset(_config, xData, yData, numberOfDocuments);
-			_plotManager->addDatasetToCache(dataSet);
+			auto dataSet = _plot->addDataset(_config, xData, yData, numberOfDocuments);
+			_plot->addDatasetToCache(dataSet);
 			dataSet->attach();
 			dataSet->updateCurveVisualization();
 			dataSets.push_back(dataSet);
@@ -4508,13 +4509,13 @@ std::list<ot::PlotDataset*> ExternalServicesComponent::createCurve(ot::Plot1DCur
 
 				OT_LOG_W(dbg);
 				*/
-				ot::PlotDataset* dataSet = _plotManager->addDataset(_config, xData, yData, numberOfDocuments);
-				_plotManager->addDatasetToCache(dataSet);
+				ot::PlotDataset* dataSet = _plot->addDataset(_config, xData, yData, numberOfDocuments);
+				_plot->addDatasetToCache(dataSet);
 				dataSet->attach();
 				dataSet->updateCurveVisualization();
 				dataSets.push_back(dataSet);
 			}
-		}
+		}	
 		//dataSet->updateCurveVisualization();
 		//dataSet->attach();
 	}

@@ -64,8 +64,10 @@ class ToolBar;
 class ProjectOverviewWidget;
 namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
+
 namespace ot { class Label; }
 namespace ot { class Property; }
+namespace ot { class PlotView; }
 namespace ot { class TableView; }
 namespace ot { class WidgetView; }
 namespace ot { class GraphicsItem; }
@@ -429,11 +431,11 @@ public:
 
 	// Plot
 
-	ot::PlotManagerView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::PlotView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
-	ot::PlotManagerView* findPlot(const std::string& _entityName);
+	ot::PlotView* findPlot(const std::string& _entityName);
 
-	ot::PlotManagerView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	// ######################################################################################################################
 
@@ -620,7 +622,7 @@ private:
 	std::map<std::string, ot::GraphicsViewView*> m_graphicsViews;
 	std::map<std::string, ot::TextEditorView*> m_textEditors;
 	std::map<std::string, ot::TableView*> m_tables;
-	std::map<std::string, ot::PlotManagerView*> m_plots;
+	std::map<std::string, ot::PlotView*> m_plots;
 	
 	QIcon m_defaultProjectTypeIcon;
 	std::map<std::string, std::string> m_projectTypeDefaultIconNameMap;

@@ -54,12 +54,12 @@ class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
+namespace ot { class Plot; };
 namespace ot { class Property; };
 namespace ot { class TableView; };
 namespace ot { class WidgetView; };
 namespace ot { class ServiceBase; };
 namespace ot { class PlotDataset; };
-namespace ot { class PlotManager; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier {
 	Q_OBJECT
@@ -401,7 +401,7 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
-	std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::PlotManager* _plotManager);
+	std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::Plot* _plot);
 
 	// #################################################################
 

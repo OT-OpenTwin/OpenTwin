@@ -54,6 +54,7 @@
 
 #include "OTWidgets/Label.h"
 #include "OTWidgets/Table.h"
+#include "OTWidgets/PlotView.h"
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/WidgetView.h"
@@ -1895,8 +1896,8 @@ void AppBase::closeTable(const std::string& _entityName) {
 
 // Plot
 
-ot::PlotManagerView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::PlotManagerView* newPlot = this->findPlot(_config.getEntityName());
+ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
+	ot::PlotView* newPlot = this->findPlot(_config.getEntityName());
 	if (newPlot != nullptr) {
 		OT_LOG_D("Plot already exists { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newPlot;
@@ -1907,7 +1908,7 @@ ot::PlotManagerView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const 
 		return nullptr;
 	}
 
-	newPlot = new ot::PlotManagerView;
+	newPlot = new ot::PlotView;
 	newPlot->setViewData(_config);
 	this->setupNewCentralView(newPlot);
 
@@ -1921,7 +1922,7 @@ ot::PlotManagerView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const 
 	return newPlot;
 }
 
-ot::PlotManagerView* AppBase::findPlot(const std::string& _entityName) {
+ot::PlotView* AppBase::findPlot(const std::string& _entityName) {
 	auto it = m_plots.find(_entityName);
 	if (it == m_plots.end()) {
 		return nullptr;
@@ -1931,8 +1932,8 @@ ot::PlotManagerView* AppBase::findPlot(const std::string& _entityName) {
 	}
 }
 
-ot::PlotManagerView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::PlotManagerView* v = this->findPlot(_config.getEntityName());
+ot::PlotView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
+	ot::PlotView* v = this->findPlot(_config.getEntityName());
 	if (v) {
 		return v;
 	}

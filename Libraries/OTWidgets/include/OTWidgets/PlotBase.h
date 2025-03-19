@@ -95,7 +95,7 @@ namespace ot {
 		//! \brief Returns the cached dataset for the given entity id.
 		//! Returns NULL if the dataset does not exist.
 		//! The Plot keeps ownership of the dataset.
-		virtual PlotDataset* findDataset(UID _entityID) = 0;
+		virtual std::list<PlotDataset*> findDatasets(UID _entityID) = 0;
 		
 		virtual void addDatasetToCache(PlotDataset* _dataset) = 0;
 
@@ -109,8 +109,6 @@ namespace ot {
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
 
 	protected:
-		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport) = 0;
-
 		virtual void clearCache(void) = 0;
 		virtual void detachAllCached(void) = 0;
 		virtual void calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) = 0;

@@ -1,6 +1,6 @@
-//! @file PlotManager.h
+//! @file Plot.h
 //! @author Alexander Kuester (alexk95)
-//! @date October 2024
+//! @date March 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -10,10 +10,15 @@
 
 namespace ot {
 
-	class __declspec(dllexport) PlotManager : public PlotBase {
+	//! @class Plot
+	//! @brief Basic plot.
+	//! The plot allows multiple Datasets to be added for the same UID.
+	class OT_WIDGETS_API_EXPORT Plot : public PlotBase {
+		OT_DECL_NOCOPY(Plot)
+		OT_DECL_NOMOVE(Plot)
 	public:
-		PlotManager();
-		virtual ~PlotManager();
+		Plot();
+		virtual ~Plot();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -33,13 +38,15 @@ namespace ot {
 
 		// Data handling
 
-		void setFromDataBaseConfig(const Plot1DDataBaseCfg& _config);
+		//! @brief Removes all datasets assigned to the provided UID.
+		//! @param _entityID Entity UID.
+		void removeFromCache(UID _entityID);
 
-		void removeFromCache(unsigned long long _entityID);
-
+		//! @brief Returns true if at least one dataset exists for the specified UID.
+		//! @param _entityID Entity UID.
 		bool hasCachedEntity(UID _entityID) const;
 
-		//! \brief Updates the entity version of the specified dataset if needed.
+		//! @brief Updates the entity version of the specified dataset if needed.
 		//! Returns false if the dataset does not exist or the version did not change.
 		bool changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion);
 
@@ -52,14 +59,9 @@ namespace ot {
 		virtual void detachAllCached(void) override;
 		virtual void calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) override;
 
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Private
-
 	private:
-		std::map<UID, std::pair<UID, PlotDataset*>> m_cache;
-
-		void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport);
+		std::map<UID, std::list<PlotDataset*>> m_cache;
+		
 	};
 
 }
