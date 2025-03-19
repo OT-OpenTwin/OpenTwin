@@ -32,14 +32,25 @@ namespace ot {
 		//! @brief Default constructor.
 		MatrixVectorizedXAlign();
 
-		//! @brief Constructs a 2D vector with given dimensions.
+		//! @brief Constructs a 2D vector with the given dimensions.
 		//! @param _dimensions New dimensions.
 		MatrixVectorizedXAlign(const MatrixIndex& _dimensions);
 
-		//! @brief Constructs a 2D vector with given dimensions and default value.
+		//! @brief Constructs a 2D vector with the given dimensions and default value.
 		//! @param _dimensions New dimensions.
 		//! @param _default Default value for all elements.
 		MatrixVectorizedXAlign(const MatrixIndex& _dimensions, const T& _default);
+
+		//! @brief Constructs a 2D vector with the given gimensions and data.
+		//! @param _x X dimensions to set.
+		//! @param _y Y dimensions to set.
+		//! @param _data Data to set.
+		MatrixVectorizedXAlign(MatrixIndex::ValueType _x, MatrixIndex::ValueType _y, std::vector<T>&& _data) : MatrixVectorizedXAlign(MatrixIndex(_x, _y), std::move(_data)) {};
+
+		//! @brief Constructs a 2D vector with the given gimensions and data.
+		//! @param _dimensions Dimensions to set.
+		//! @param _data Data to set.
+		MatrixVectorizedXAlign(MatrixIndex&& _dimensions, std::vector<T>&& _data);
 
 		//! @brief Constructs a 2D vector from the provided other vector by copying the data.
 		//! @param _other Other vector.
@@ -100,12 +111,14 @@ namespace ot {
 
 		//! @brief Resizes the 2D vector.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
+		//! Uses 0 as default.
 		//! @param _x New column count.
 		//! @param _y New row count.
 		void resize(MatrixIndex::ValueType _x, MatrixIndex::ValueType _y) { this->resize(MatrixIndex(_x, _y), static_cast<const T>(0)); };
 
 		//! @brief Resizes the 2D vector.
 		//! Complexity: O(r * c) where r = _rows, c = _cols.
+		//! Uses 0 as default.
 		//! @param _dimensions New dimensions.
 		void resize(const MatrixIndex& _dimensions) { this->resize(_dimensions, static_cast<const T>(0)); };
 
@@ -252,6 +265,13 @@ ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(const MatrixIndex& _dimens
 	MatrixVectorizedXAlign()
 {
 	this->resize(_dimensions, _default);
+}
+
+template<typename T>
+inline ot::MatrixVectorizedXAlign<T>::MatrixVectorizedXAlign(MatrixIndex&& _dimensions, std::vector<T>&& _data) :
+	m_size(std::move(_dimensions)), m_data(std::move(_data))
+{
+	OTAssert(m_data.size() == m_size.x * m_size.y, "Invalid data size");
 }
 
 template<typename T>
