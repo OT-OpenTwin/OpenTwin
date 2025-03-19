@@ -20,12 +20,14 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityAPI.h"
+#include "OTGui/StyledTextBuilder.h"
 
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "EntitySolverPyrit.h"
 #include "EntityResultText.h"
+#include "EntityFileText.h"
 #include "ClassFactory.h"
 
 Application * g_instance{ nullptr };
@@ -247,11 +249,16 @@ void Application::addSolver(void)
 
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
+	std::string scriptFolderName, scriptName;
+	ot::UID scriptFolderID{ 0 }, scriptID{ 0 };
+
+	ot::ModelServiceAPI::getAvailableScripts(scriptFolderName, scriptFolderID, scriptName, scriptID);
+
 	// Create the new solver item and store it in the data base
 	EntitySolverPyrit* solverEntity = new EntitySolverPyrit(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
-	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
+	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID, scriptFolderName, scriptFolderID, scriptName, scriptID);
 
 	solverEntity->StoreToDataBase();
 
@@ -394,73 +401,86 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		return;
 	}
 
-	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
-	assert(mesh != nullptr);
+	EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Problem type"));
+	assert(problemType != nullptr);
 
-	if (mesh == nullptr)
+	if (problemType == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read mesh information for solver.\n");
+		m_uiComponent->displayMessage("ERROR: Unable to read problem type for solver.\n");
 		return;
 	}
 
-	// First check whether a mesh with the given ID exists
-	bool meshFound = false;
-	ot::UID meshEntityID = mesh->getValueID();
+	std::string command;
 
-	for (auto meshItem : meshInfo)
+	if (problemType->getValue() == "Custom")
 	{
-		if (meshItem.getEntityID() == meshEntityID)
-		{
-			meshFound = true;
-			break;
-		}
+		command = problemTypeScript(solverEntity);
 	}
-
-	// If the mesh with the given ID does not exist anymore, we search for a mesh with the same name as the last selected one.
-	if (!meshFound)
+	else if (problemType->getValue() == "Electrostatics")
 	{
-		meshEntityID = 0;
-		for (auto meshItem : meshInfo)
-		{
-			if (meshItem.getEntityName() == mesh->getValueName())
-			{
-				meshEntityID = meshItem.getEntityID();
-				break;
-			}
-		}
+
+
 	}
-
-	if (meshEntityID == 0)
+	else
 	{
-		m_uiComponent->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
+		m_uiComponent->displayMessage("ERROR: Unknown problem type.\n");
 		return;
 	}
+
+	if (command.empty())
+	{
+		return;
+	}
+
+
+	//EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
+	//assert(mesh != nullptr);
+
+	//if (mesh == nullptr)
+	//{
+	//	m_uiComponent->displayMessage("ERROR: Unable to read mesh information for solver.\n");
+	//	return;
+	//}
+
+	//// First check whether a mesh with the given ID exists
+	//bool meshFound = false;
+	//ot::UID meshEntityID = mesh->getValueID();
+
+	//for (auto meshItem : meshInfo)
+	//{
+	//	if (meshItem.getEntityID() == meshEntityID)
+	//	{
+	//		meshFound = true;
+	//		break;
+	//	}
+	//}
+
+	//// If the mesh with the given ID does not exist anymore, we search for a mesh with the same name as the last selected one.
+	//if (!meshFound)
+	//{
+	//	meshEntityID = 0;
+	//	for (auto meshItem : meshInfo)
+	//	{
+	//		if (meshItem.getEntityName() == mesh->getValueName())
+	//		{
+	//			meshEntityID = meshItem.getEntityID();
+	//			break;
+	//		}
+	//	}
+	//}
+
+	//if (meshEntityID == 0)
+	//{
+	//	m_uiComponent->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
+	//	return;
+	//}
 
 	deleteSingleSolverResults(solverEntity);
 
-	//SubprocessManager solverManager(this);
-	//DataBaseInfo info;
-	//info.setSiteId(this->siteID());
-	//info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
-	//info.setCollectionName(this->m_collectionName);
-	//info.setUserName(DataBase::GetDataBase()->getUserName());
-	//info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
-
-	//solverManager.setDataBaseInfo(info);
-
-	//if (this->uiComponent()) {
-	//	solverManager.setFrontendUrl(this->uiComponent()->getServiceURL());
-	//}
-	//if (this->modelComponent()) {
-	//	solverManager.setModelUrl(this->modelComponent()->getServiceURL());
-	//}
-
-	//std::string command = "print('Hello World', flush=True)\n";
-
-	std::string command =   "import time\n"
-							"for i in range(5):\n"
-							"    print(f'Python schreibt: {i}')\n"
-							"    time.sleep(1)";
+	//std::string command =   "import time\n"
+	//						"for i in range(5):\n"
+	//						"    print(f'Python schreibt: {i}')\n"
+	//						"    time.sleep(1)";
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
@@ -472,6 +492,24 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute pyrit script").toJson();
 	}
 
+	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
+	
+	if (returnValue.getStatus() == ot::ReturnMessage::Ok)
+	{
+		m_uiComponent->displayMessage("\nPyrit solver successfully completed.\n");
+	}
+	else if (returnValue.getStatus() == ot::ReturnMessage::Failed)
+	{
+		ot::StyledTextBuilder message;
+		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "Pyrit solver failed : (" << returnValue.getWhat() << ")\n";
+
+		m_uiComponent->displayStyledMessage(message);
+	}
+	else
+	{
+		m_uiComponent->displayMessage("ERROR: Unknown return status: " + returnValue.getStatusString() + "\n");
+	}
+
 	//GetDPLauncher getDPSolver(this);
 	//modelComponent()->clearNewEntityList();
 
@@ -479,7 +517,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
 	//											 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	//m_uiComponent->displayMessage(output + "\n");
-
+	 
 	std::string logFileText;
 	std::string output;
 
@@ -501,4 +539,47 @@ void Application::deleteSingleSolverResults(EntityBase* solverEntity)
 	entityNameList.push_back(solverEntity->getName() + "/Output");
 
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entityNameList, false);
+}
+
+std::string Application::problemTypeScript(EntityBase* solverEntity)
+{
+	EntityPropertiesEntityList* script = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Script"));
+	assert(script != nullptr);
+
+	if (script == nullptr)
+	{
+		m_uiComponent->displayMessage("ERROR: Unable to read script information for solver.\n");
+		return "";
+	}
+
+	ot::EntityInformation scriptInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(script->getValueName(), scriptInfo))
+	{
+		if (script == nullptr)
+		{
+			m_uiComponent->displayMessage("ERROR: Unable to read script.\n");
+			return "";
+		}
+	}
+
+	EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(scriptInfo.getEntityID(), scriptInfo.getEntityVersion(), getClassFactory());
+
+	if (entity == nullptr)
+	{
+		m_uiComponent->displayMessage("ERROR: Unable to read script.\n");
+		return "";
+	}
+
+	EntityFileText* scriptEntity = dynamic_cast<EntityFileText*>(entity);
+
+	if (scriptEntity == nullptr)
+	{
+		delete entity;
+		m_uiComponent->displayMessage("ERROR: Unable to read script (wrong data type).\n");
+		return "";
+	}
+
+	std::string command = scriptEntity->getText();
+
+	return command;
 }

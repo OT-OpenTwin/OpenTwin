@@ -123,6 +123,27 @@ void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& 
 	_meshID = meshInfo.front().getEntityID();
 }
 
+void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UID& _scriptFolderID, std::string& _scriptName, UID& _scriptID) {
+	std::list<std::string> scriptFolder = { "Scripts" };
+	std::list<EntityInformation> scriptFolderInfo;
+	getEntityInformation(scriptFolder, scriptFolderInfo);
+
+	assert(scriptFolderInfo.size() == 1);
+	if (scriptFolderInfo.size() != 1) return;
+
+	_scriptFolderName = scriptFolderInfo.front().getEntityName();
+	_scriptFolderID = scriptFolderInfo.front().getEntityID();
+
+	std::list<EntityInformation> scriptInfo;
+	getEntityChildInformation(_scriptFolderName, scriptInfo, false);
+
+	if (scriptInfo.empty()) return;
+
+	_scriptName = scriptInfo.front().getEntityName();
+	_scriptID = scriptInfo.front().getEntityID();
+}
+
+
 void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible,
 	std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList,
 	const std::string& _changeComment, bool askForBranchCreation, bool saveModel) {

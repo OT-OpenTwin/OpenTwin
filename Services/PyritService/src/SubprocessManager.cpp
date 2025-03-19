@@ -112,6 +112,10 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 			return false;
 		}
 	}
+	else
+	{
+		assert(0); // Need to run PythonExecution now
+	}
 
 	return true;
 }

@@ -13,6 +13,8 @@
 #include <vector>
 #include <list>
 #include <thread>
+#include <atomic>
+
 #include "CPythonObjectBorrowed.h"
 #include "CPythonObjectNew.h"
 #include "PythonException.h"
@@ -59,6 +61,7 @@ private:
 	std::string determineMandatoryPythonSitePackageDirectory();
 	void addOptionalUserPythonSitePackageDirectory();
 	void readOutput();
+	void flushOutput();
 
 	static void signalHandlerAbort(int sig);
 
@@ -67,4 +70,5 @@ private:
 	static std::string m_customSitePackage;
 	static bool m_redirectOutput;
 	std::thread* m_outputWorkerThread;
+	std::atomic<long long> m_outputProcessingCount = 0;
 };

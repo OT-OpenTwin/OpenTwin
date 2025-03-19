@@ -29,6 +29,7 @@ namespace ot {
 		static UID getCurrentVisualizationModelID(void);
 		static std::list<std::string> getListOfFolderItems(const std::string& _folder, bool recursive = false);
 		static void getAvailableMeshes(std::string& _meshFolderName, UID& _meshFolderID, std::string& _meshName, UID& _meshID);
+		static void getAvailableScripts(std::string& _meshFolderName, UID& _meshFolderID, std::string& _meshName, UID& _meshID);
 		static std::list<UID> getIDsOfFolderItemsOfType(const std::string& _folder, const std::string& _entityClassName, bool recursive);
 		static void enableMessageQueueing(bool flag);
 		static void modelChangeOperationCompleted(const std::string& description);

@@ -63,6 +63,8 @@ void PythonWrapper::readOutput() {
 			}
 		}
 
+		m_outputProcessingCount++;
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
@@ -221,14 +223,32 @@ void PythonWrapper::signalHandlerAbort(int sig) {
 	throw std::exception("Abort was called.");
 }
 
+void PythonWrapper::flushOutput()
+{
+	if (m_redirectOutput && m_outputWorkerThread != nullptr)
+	{
+		long long currentOutputProcessingCount = m_outputProcessingCount;
+
+		// Wait until all messages have been sent
+		while (currentOutputProcessingCount == m_outputProcessingCount)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		}
+	}
+}
+
 CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName) {
 	CPythonObjectNew module(GetModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
 	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
+
+	flushOutput();
+
 	if (result == nullptr)
 	{
 		throw PythonException();
 	}
+
 	return result;
 }
 
@@ -236,6 +256,8 @@ CPythonObjectNew PythonWrapper::ExecuteFunction(const std::string& functionName,
 	CPythonObjectNew function(GetFunction(functionName, moduleName)); //Really borrowed?
 	CPythonObjectNew returnValue(PyObject_CallObject(function, parameter));
 	
+	flushOutput();
+
 	if (!returnValue.ReferenceIsSet())
 	{
 		throw PythonException();
