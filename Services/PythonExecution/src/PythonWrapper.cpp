@@ -65,7 +65,7 @@ void PythonWrapper::readOutput() {
 
 		m_outputProcessingCount++;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 }
 
@@ -230,9 +230,9 @@ void PythonWrapper::flushOutput()
 		long long currentOutputProcessingCount = m_outputProcessingCount;
 
 		// Wait until all messages have been sent
-		while (currentOutputProcessingCount == m_outputProcessingCount)
+		while (m_outputProcessingCount < currentOutputProcessingCount + 2)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 }
