@@ -16,7 +16,7 @@
 #endif
 
 SubprocessManager::SubprocessManager(Application* _app) 
-	: m_app(_app), m_communicationHandler(nullptr), m_workerThread(nullptr)
+	: m_app(_app), m_communicationHandler(nullptr), m_workerThread(nullptr), m_isLogging(false)
 {
 	// Create subprocess handler
 	m_subprocessHandler = new SubprocessHandler(this);
@@ -192,4 +192,38 @@ void SubprocessManager::worker(std::string _projectName) {
 	delete m_communicationHandler;
 	m_communicationHandler = nullptr;
 
+}
+
+void SubprocessManager::startLogging()
+{
+	m_logText.clear();
+	m_isLogging = true;
+}
+
+void SubprocessManager::addLogText(const std::string& text)
+{
+	if (!m_isLogging) return;
+	m_logText.push_back(text);
+}
+
+void SubprocessManager::endLogging(std::string& logText)
+{
+	logText.clear();
+
+	if (!m_isLogging) return;
+
+	m_isLogging = false;
+
+	size_t size = 0;
+	for (std::string& text : m_logText)
+	{
+		size += text.size();
+	}
+
+	logText.reserve(size + 1);
+
+	for (std::string& text : m_logText)
+	{
+		logText.append(text);
+	}
 }

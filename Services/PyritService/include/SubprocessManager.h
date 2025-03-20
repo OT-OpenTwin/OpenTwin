@@ -41,6 +41,10 @@ public:
 	//! @brief Stops the connection handler.
 	void stopConnectionHandlingAfterCrash(void);
 
+	void startLogging();
+	void addLogText(const std::string& text);
+	void endLogging(std::string &logText);
+
 private:
 	void shutdownSubprocess(void);
 
@@ -62,4 +66,6 @@ private:
 
 	SubprocessHandler* m_subprocessHandler;
 	CommunicationHandler* m_communicationHandler;
+	std::list<std::string> m_logText;
+	bool m_isLogging;
 };

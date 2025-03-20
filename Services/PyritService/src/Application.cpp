@@ -487,6 +487,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(command, doc.GetAllocator()), doc.GetAllocator());
 
+	m_subprocessManager->startLogging();
+
 	std::string returnMessage;
 	if (!m_subprocessManager->sendRequest(doc, returnMessage)) {
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute pyrit script").toJson();
@@ -496,7 +498,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	
 	if (returnValue.getStatus() == ot::ReturnMessage::Ok)
 	{
-		m_uiComponent->displayMessage("\nPyrit solver successfully completed.\n");
+		std::string message = "\nPyrit solver successfully completed.\n";
+		m_uiComponent->displayMessage(message);
+		m_subprocessManager->addLogText(message);
 	}
 	else if (returnValue.getStatus() == ot::ReturnMessage::Failed)
 	{
@@ -504,10 +508,13 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "Pyrit solver failed : (" << returnValue.getWhat() << ")\n";
 
 		m_uiComponent->displayStyledMessage(message);
+		m_subprocessManager->addLogText("ERROR: Pyrit solver failed : (" + returnValue.getWhat() + ")\n");
 	}
 	else
 	{
-		m_uiComponent->displayMessage("ERROR: Unknown return status: " + returnValue.getStatusString() + "\n");
+		std::string message = "ERROR: Unknown return status: " + returnValue.getStatusString() + "\n";
+		m_uiComponent->displayMessage(message);
+		m_subprocessManager->addLogText(message);
 	}
 
 	//GetDPLauncher getDPSolver(this);
@@ -519,11 +526,11 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//m_uiComponent->displayMessage(output + "\n");
 	 
 	std::string logFileText;
-	std::string output;
+	m_subprocessManager->endLogging(logFileText);
 
 	// Store the output in a result item
 
-	EntityResultText* text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText + output);
+	EntityResultText* text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
 
 	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
