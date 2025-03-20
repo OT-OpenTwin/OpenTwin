@@ -16,7 +16,7 @@
 
 ServiceManager::ServiceManager()
 	: m_isShuttingDown(false), m_threadServiceStarter(nullptr), m_threadServiceInitializer(nullptr), m_threadHealthCheck(nullptr),
-	m_threadServiceStopper(nullptr)
+	m_threadServiceStopper(nullptr), m_generalWait(false)
 {
 	
 }
@@ -244,53 +244,11 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 }
 
 void ServiceManager::sessionClosed(const std::string& _sessionID) {
-	// Clean up startup requests
-	m_mutexRequestedServices.lock();
-	bool erased = true;
-	while (erased) {
-		erased = false;
-		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
-			if (it->session.id() == _sessionID) {
-				m_requestedServices.erase(it);
-				erased = true;
-				break;
-			}
-		}
-	}
-	m_mutexRequestedServices.unlock();
+	this->cleanUpSession_RequestedList(_sessionID);
 
-	// Clean up initializing services
-	m_mutexInitializingServices.lock();
-	m_mutexStoppingServices.lock();
-	erased = true;
-	while (erased) {
-		erased = false;
-		for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); it++) {
-			if (it->startInfo.session.id() == _sessionID) {
-				m_stoppingServices.push_back(it->service);
-				m_initializingServices.erase(it);
-				erased = true;
-				break;
-			}
-		}
-	}
-	m_mutexInitializingServices.unlock();
-
-	// Clean up current services
-	m_mutexServices.lock();
-
-	for (auto s : m_services) {
-		if (s.first.id() == _sessionID) {
-			for (auto service : *s.second) {
-				m_stoppingServices.push_back(service);
-			}
-			m_services.erase(s.first);
-			break;
-		}
-	}
-
-	m_mutexStoppingServices.unlock();
-	m_mutexServices.unlock();
+	std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
+	this->cleanUpSession_IniList(_sessionID);
+	this->cleanUpSession_AliveList(_sessionID);
 }
 
 void ServiceManager::serviceDisconnected(const std::string& _sessionID, const ServiceInformation& _info, const std::string& _serviceURL) {
@@ -427,7 +385,6 @@ void ServiceManager::serviceInitializeFailed(InitializingService _info) {
 	m_mutexRequestedServices.lock();
 	m_requestedServices.push_back(_info.startInfo);
 	m_mutexRequestedServices.unlock();
-
 }
 
 std::vector<Service *> * ServiceManager::sessionServices(const SessionInformation& _sessionInformation) {
@@ -441,7 +398,8 @@ std::vector<Service *> * ServiceManager::sessionServices(const SessionInformatio
 }
 
 bool ServiceManager::restartServiceAfterCrash(const SessionInformation& _sessionInformation, Service * _service) {
-	//todo: Well we have to do something, dont we :D
+	// Currently services are not restarted after a crash.
+	// A service crash will lead to a session shutdow of the session the service was running in.
 	return false;
 }
 
@@ -450,7 +408,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	ServiceInformation service = _crashedService->information();
 
 	// Clean up startup requests
-	m_mutexRequestedServices.lock();
+	std::lock_guard<std::mutex> lock(m_mutexRequestedServices);
 
 	OT_LOG_E("Preparing Session Emergency Shutdown for session: \"" + session.id() + "\". Reason: Service crashed (Name = \"" + service.name() + "\"; Type = \"" + service.type() + "\")");
 
@@ -478,8 +436,6 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	}
 	m_services.erase(session);
 
-	m_mutexRequestedServices.unlock();
-		
 	// Notify session service about the crash
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceFailure, doc.GetAllocator()), doc.GetAllocator());
@@ -491,22 +447,76 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	ot::msg::sendAsync("", session.sessionServiceURL(), ot::EXECUTE, doc.toJson());
 }
 
+void ServiceManager::cleanUpSession_RequestedList(const std::string& _sessionID) {
+	std::lock_guard<std::mutex> reqLock(m_mutexRequestedServices);
+
+	bool erased = true;
+	while (erased) {
+		erased = false;
+		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
+			if (it->session.id() == _sessionID) {
+				OT_LOG_D("Handling Session Closed (Session: " + _sessionID + "): Removing requested service: " + it->service.name());
+				m_requestedServices.erase(it);
+				erased = true;
+				break;
+			}
+		}
+	}
+}
+
+void ServiceManager::cleanUpSession_IniList(const std::string& _sessionID) {
+	std::lock_guard<std::mutex> iniLock(m_mutexInitializingServices);
+
+	bool erased = true;
+	while (erased) {
+		erased = false;
+		for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); it++) {
+			if (it->startInfo.session.id() == _sessionID) {
+				m_stoppingServices.push_back(it->service);
+				m_initializingServices.erase(it);
+				erased = true;
+				break;
+			}
+		}
+	}
+}
+
+void ServiceManager::cleanUpSession_AliveList(const std::string& _sessionID) {
+	std::lock_guard<std::mutex> serviceLock(m_mutexServices);
+
+	for (auto s : m_services) {
+		if (s.first.id() == _sessionID) {
+			for (auto service : *s.second) {
+				m_stoppingServices.push_back(service);
+			}
+			m_services.erase(s.first);
+			break;
+		}
+	}
+}
+
 void ServiceManager::workerServiceStarter(void) {
 	while (!m_isShuttingDown) {
 
 		// Check if a service was requested
 		m_mutexRequestedServices.lock();
+		
 		if (m_requestedServices.empty()) {
+			// Nothing to do, unlock and wait
 			m_mutexRequestedServices.unlock();
+
+			// Sleep for 100ms before next check
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(100ms);
 		}
 		else {
+			// Get next requested service and remove it from list
 			RequestedService info = m_requestedServices.front();
 			m_requestedServices.pop_front();
 
 			OT_LOG_D("Starting service: " + info.service.name());
 
+			// Requested services modifications completed
 			m_mutexRequestedServices.unlock();
 			
 			// Increase start counter
@@ -519,7 +529,7 @@ void ServiceManager::workerServiceStarter(void) {
 					") reached for service (name = \"" + info.service.name() + "\"; type = \"" + info.service.type() + "\")");
 				
 				// Notify and skip
-				serviceStartFailed(info);
+				this->serviceStartFailed(info);
 				continue;
 			}
 
@@ -528,6 +538,7 @@ void ServiceManager::workerServiceStarter(void) {
 			
 			// Attempt to start service
 			ot::RunResult result = newService->run(info.session, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
+			
 			if (!result.isOk()) {
 				OT_LOG_E("Service start failed with error code: " + std::to_string(result.getErrorCode()) + " and error message: " + result.getErrorMessage());
 				
@@ -535,26 +546,26 @@ void ServiceManager::workerServiceStarter(void) {
 				ot::PortManager::instance().setPortNotInUse(newService->port());
 				ot::PortManager::instance().setPortNotInUse(newService->websocketPort());
 
-				//todo: are multiple start attempts needed in this case?
+				//! @todo are multiple start attempts needed in this case?
+				//! We have failed to launch the executable.
+				//! The port is not yet an issue at this point since
+				//! the webserver is launched in a different thread later in the start logic.
 
 				// Service start failed
 				delete newService;
-
-				serviceStartFailed(info);
+				this->serviceStartFailed(info);
 			}
 			else {
 				OT_LOG_D("Service was started (name = \"" + info.service.name() + "\"; type = \"" + info.service.type() + "\")");
 
-				// Move from start to initialize
-				m_mutexInitializingServices.lock();
+				std::lock_guard<std::mutex> iniLock(m_mutexInitializingServices);
 
+				// Move from start to initialize
 				InitializingService iniInfo;
 				iniInfo.initializeAttempt = 0;
 				iniInfo.startInfo = info;
 				iniInfo.service = newService;
 				m_initializingServices.push_back(iniInfo);
-
-				m_mutexInitializingServices.unlock();
 			}
 		}
 	}
@@ -570,21 +581,32 @@ void ServiceManager::workerServiceInitializer(void) {
 
 		// Check if a service was requested
 		m_mutexInitializingServices.lock();
+
 		if (m_initializingServices.empty()) {
 			m_mutexInitializingServices.unlock();
+
+			// Nothing to initialize, sleep
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(100ms);
 		}
 		else {
+			// Get next service to initialize and remove it from the list
 			InitializingService info = m_initializingServices.front();
 			m_initializingServices.pop_front();
 
-			OT_LOG_D("Initialising service: " + info.service->information().name());
 			m_mutexInitializingServices.unlock();
 
+			OT_LOG_D("Initialising service: " + info.service->information().name());
+
+			// Increase initialize attempt of the service
 			info.initializeAttempt = info.initializeAttempt + 1;
+
+			// Check if service executable is still running
 			ot::RunResult result =	info.service->checkAlive();
+
 			if (result.isOk()) {
+				// Service executable is 
+
 				OT_LOG_D("Pinging service (name = \"" + info.service->information().name() + "\"; type = \"" + info.service->information().type() + "\")");
 
 				// Attempt to send ping
@@ -597,7 +619,7 @@ void ServiceManager::workerServiceInitializer(void) {
 
 					if (info.initializeAttempt > 3) {
 						OT_LOG_W("Failed to ping service 3 times. Moving service back to restart");
-						serviceInitializeFailed(info);
+						this->serviceInitializeFailed(info);
 					}
 					else {
 						m_mutexInitializingServices.lock();
@@ -612,7 +634,7 @@ void ServiceManager::workerServiceInitializer(void) {
 						info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
 
 					if (info.initializeAttempt > 3) {
-						serviceInitializeFailed(info);
+						this->serviceInitializeFailed(info);
 					}
 					else {
 						m_mutexInitializingServices.lock();
@@ -626,18 +648,21 @@ void ServiceManager::workerServiceInitializer(void) {
 
 					// Service alive
 
-					sendInitializeMessage(info);
+					this->sendInitializeMessage(info);
 				}
 			}
 			else {
-				OT_LOG_W("Service died while attempting to ping (name = \"" + info.service->information().name() + "\"; type = \"" +
-					info.service->information().type() + "\"; url = \"" + info.service->url() + "\")");
-				OT_LOG_W("Check allive error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+				OT_LOG_E("Service check alive failed during initialization: { "
+					"\"AppErrorCode\": " + std::to_string(result.getErrorCode()) + 
+					"\", \"ServiceName\": \"" + info.service->information().name() +
+					"\", \"ServiceType\": \"" + info.service->information().type() +
+					"\", \"ServiceUrl\": \"" + info.service->url() +
+					"\" }. App Error Message: " + result.getErrorMessage());
 				
-				ot::RunResult result = info.service->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+				result = info.service->shutdown();
+				OT_LOG_I("Service shutdown after crash completed with Error code: " + std::to_string(result.getErrorCode()) + " and Message: " + result.getErrorMessage());
 
-				serviceInitializeFailed(info);
+				this->serviceInitializeFailed(info);
 			}
 		}
 	}
@@ -673,50 +698,51 @@ void ServiceManager::GetSessionInformation(ot::JsonArray& sessionInfo, ot::JsonA
 void ServiceManager::workerHealthCheck(void) {
 	while (!m_isShuttingDown) {
 		// Lock mutex for entire health check
-		m_mutexServices.lock();
-		if (!m_services.empty()) {
-			bool erased = false;
-			// Itereate through every service in every session
-			for (auto session : m_services) {
-				for (auto service : *session.second) {
-					
-					// Check if service crashed
-					ot::RunResult result =	service->checkAlive();
-					if (!result.isOk()) 
-					{
-						OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
-						
-						ot::RunResult result = service->shutdown();
-						OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+		{
+			std::lock_guard<std::mutex> lock(m_mutexServices);
+			if (!m_services.empty()) {
+				bool erased = false;
+				// Itereate through every service in every session
+				for (auto session : m_services) {
+					for (auto service : *session.second) {
 
-						if (service->startCounter() < service->information().maxCrashRestarts()) {
-							// Attempt to restart service, if successful the list did not change and
-							// we can continue the health check
-							if (restartServiceAfterCrash(session.first, service))
-							{
-								continue;
+						// Check if service crashed
+						ot::RunResult result = service->checkAlive();
+						if (!result.isOk()) {
+							OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+
+							ot::RunResult result = service->shutdown();
+							OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+
+							if (service->startCounter() < service->information().maxCrashRestarts()) {
+								// Attempt to restart service, if successful the list did not change and
+								// we can continue the health check.
+								if (this->restartServiceAfterCrash(session.first, service)) {
+									continue;
+								}
 							}
-						}
 
-						// Either the restart failed or the restart counter reached its max value
-						// We notify the session service, clean up the lists and cancel the current health check
-						// Health check will not be terminated just the current loop will be cancelled
-						notifySessionEmergencyShutdown(session.first, service);
-						erased = true;
+							// Either the restart failed or the restart counter reached its max value.
+							// We notify the session service, clean up the lists and cancel the current health check.
+							// Health check will not be terminated just the current loop will be cancelled.
+							this->notifySessionEmergencyShutdown(session.first, service);
+							erased = true;
+							break;
+						}
+					}
+					
+					if (erased) {
 						break;
 					}
-				}
-				if (erased)
-				{
-					break;
-				}
-			}
-		}
 
-		// Unlock mutex and wait for 1 second before next health check
-		m_mutexServices.unlock();
+				} // for session
+			} // !services.empty
+		} // mutex lock scope
+
+		// sleep for one second
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(1s);
+
 	}
 }
 
@@ -738,7 +764,8 @@ void ServiceManager::workerServiceStopper(void) {
 			else 
 			{
 				ot::RunResult result = service->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+
+				// This is not an error, we simply wait for the exe to die to free up the port after the complete shutdown.
 
 				// Clean up port numbers
 				ot::PortManager::instance().setPortNotInUse(service->port());

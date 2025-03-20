@@ -77,6 +77,12 @@ private:
 	bool restartServiceAfterCrash(const SessionInformation& _sessionInformation, Service * _service);
 	void notifySessionEmergencyShutdown(const SessionInformation& _sessionInformation, Service * _crashedService);
 
+	//! @brief Clean up session related information from requested services list.
+	//! @param _sessionID Session info to clean up.
+	void cleanUpSession_RequestedList(const std::string& _sessionID);
+	void cleanUpSession_IniList(const std::string& _sessionID);
+	void cleanUpSession_AliveList(const std::string& _sessionID);
+	
 	void workerServiceStarter(void);
 	void workerServiceInitializer(void);
 	void workerHealthCheck(void);
@@ -92,6 +98,8 @@ private:
 	std::thread *											m_threadServiceInitializer;
 	std::thread *											m_threadHealthCheck;
 	std::thread *											m_threadServiceStopper;
+
+	std::atomic_bool m_generalWait;
 
 	std::map<SessionInformation, std::vector<Service *> *>	m_services;
 	std::mutex												m_mutexServices;

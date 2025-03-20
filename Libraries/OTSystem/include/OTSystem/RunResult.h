@@ -39,18 +39,30 @@ namespace ot
 			{
 				m_message = _message;
 			}
+
 			void addToErrorMessage(const std::string& _message)
 			{
-				m_message += _message;
+				if (m_message.empty()) {
+					m_message = _message;
+				}
+				else {
+					m_message += ("\n" + _message);
+				}
 			}
 
 			const std::string getErrorMessage() const 
 			{
-				if (m_fallBackToGenericErrorCode)
-				{
-					return m_message + std::string("\nOrriginal error code was 0 (success), but it was logged as error");
+				if (m_fallBackToGenericErrorCode) {
+					if (m_message.empty()) {
+						return "Original error code was 0 (success), but it was logged as error.";
+					}
+					else {
+						return m_message + std::string("\nOriginal error code was 0 (success), but it was logged as error.");
+					}
 				}
-				return m_message;
+				else {
+					return m_message;
+				}
 			}
 
 			RunResult() = default;

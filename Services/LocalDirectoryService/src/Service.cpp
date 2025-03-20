@@ -121,18 +121,16 @@ ot::RunResult Service::checkAlive()
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
 	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
-		if (exitCode != STILL_ACTIVE) 
-		{
+		if (exitCode != STILL_ACTIVE) {
 			result.setAsError(exitCode);
-			result.addToErrorMessage("Checked for process state but process is not active anymore\n");
-			OT_LOG_E("Check alive failed with: " + exitCode);
+			result.addToErrorMessage("Checked for process state but process is not active anymore.");
 		}
 	}
 	else 
 	{		
 		OT_LOG_E("Failed to get exit code");
 		result.setAsError(exitCode);
-		result.setErrorMessage("Failed to get service exit code (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; URL = \"" + m_url + "\")\n");
+		result.setErrorMessage("Failed to get service exit code { \"Name\": \"" + m_info.name() + "\"; \"Type\": \"" + m_info.type() + "\"; \"URL\": \"" + m_url + "\" }.");
 	}
 
 	return result;
