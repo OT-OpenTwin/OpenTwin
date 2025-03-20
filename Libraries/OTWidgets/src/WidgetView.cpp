@@ -27,7 +27,7 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType)
 	: m_isPermanent(false), m_isDeletedByManager(false),
 	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
 {
-	m_dockWidget = new WidgetViewDock;
+	m_dockWidget = new WidgetViewDock(this);
 
 	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
 	this->connect(m_dockWidget, &WidgetViewDock::dockLockedChanged, this, &WidgetView::slotLockedChanged);

@@ -14,17 +14,23 @@
 
 namespace ot {
 
+	class WidgetView;
+
 	class OT_WIDGETS_API_EXPORT WidgetViewDock : public ads::CDockWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewDock)
+		OT_DECL_NODEFAULT(WidgetViewDock)
 	public:
-		WidgetViewDock();
+		WidgetViewDock(WidgetView* _view);
+		virtual ~WidgetViewDock();
 
 		void openView(void);
 		void closeView(void);
 		
 		void setCloseButtonVisible(bool _vis);
 		void setLockButtonVisible(bool _vis);
+
+		WidgetView* getWidgetView(void) const { return m_view; };
 
 	Q_SIGNALS:
 		void dockResized(const QSize& _newSize);
@@ -37,6 +43,9 @@ namespace ot {
 	private Q_SLOTS:
 		void slotCloseRequested(void);
 		void slotLockedChanged(bool _isLocked);
+
+	private:
+		WidgetView* m_view;
 	};
 
 }

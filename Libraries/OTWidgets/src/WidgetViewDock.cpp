@@ -8,7 +8,9 @@
 #include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
 
-ot::WidgetViewDock::WidgetViewDock() : ads::CDockWidget(QString()) {
+ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
+	ads::CDockWidget(QString()), m_view(_view)
+{
 	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (actualTab) {
 		this->connect(actualTab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
@@ -22,6 +24,10 @@ ot::WidgetViewDock::WidgetViewDock() : ads::CDockWidget(QString()) {
 	this->setFeature(ads::CDockWidget::DockWidgetClosable, false);
 
 	this->connect(this, &ads::CDockWidget::closeRequested, this, &WidgetViewDock::slotCloseRequested);
+}
+
+ot::WidgetViewDock::~WidgetViewDock() {
+
 }
 
 void ot::WidgetViewDock::openView(void) {
