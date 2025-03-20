@@ -148,11 +148,14 @@ void PythonWrapper::InitializePythonInterpreter() {
 	if (m_redirectOutput)
 	{
 		// Redirect output to pipe
-		std::string command = 
+		std::string command =
 			"import sys\n"
 			"import os\n"
+			"import logging\n"
 			"sys.stdout = os.fdopen(" + std::to_string(pipe_fds[1]) + ", 'w')\n"
-			"sys.stdout.reconfigure(line_buffering = True)\n";
+			"sys.stdout.reconfigure(line_buffering = True)\n"
+			"logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))\n";
+			
 		PyRun_SimpleString(command.c_str());
 
 		m_outputWorkerThread = new std::thread(&PythonWrapper::readOutput, this);
