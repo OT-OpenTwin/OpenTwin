@@ -178,7 +178,7 @@ bool LogModeSetter::sendGlobalMode(const std::string& _gss, const ot::LogFlags& 
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", _gss, ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
+	if (!ot::msg::send("", _gss, ot::EXECUTE, doc.toJson(), response, 30000, false, false)) {
 		OT_LOG_E("Failed to send request");
 		return false;
 	}
