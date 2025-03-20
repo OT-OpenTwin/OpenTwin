@@ -32,7 +32,7 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
-    <ClCompile Include="src\OTEnvInfo.cpp" />
+    <ClCompile Include="src\ThisComputerInfo.cpp" />
     <ClCompile Include="src\OTObject.cpp" />
     <ClCompile Include="src\RuntimeTests.cpp" />
     <ClCompile Include="src\StringToNumericCheck.cpp" />
@@ -82,7 +82,7 @@
     <ClInclude Include="include\OTCore\Matrix2.hpp" />
     <ClInclude Include="include\OTCore\Matrix2Factory.h" />
     <ClInclude Include="include\OTCore\Matrix2Factory.hpp" />
-    <ClInclude Include="include\OTCore\OTEnvInfo.h" />
+    <ClInclude Include="include\OTCore\ThisComputerInfo.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h" />
     <ClInclude Include="include\OTCore\ReturnMessageProposal.h" />

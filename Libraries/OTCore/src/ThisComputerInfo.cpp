@@ -1,4 +1,4 @@
-//! @file OTEnvInfo.h
+//! @file ThisComputerInfo.h
 //! @author Alexander Kuester (alexk95)
 //! @date March 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -8,18 +8,47 @@
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
-#include "OTCore/OTEnvInfo.h"
+#include "OTCore/ThisComputerInfo.h"
 
 // std header
 #include <fstream>
 
 #define OT_LCL_LOG_INFO(___text) ot::LogDispatcher::instance().dispatch(___text, "Environment Information", ot::INFORMATION_LOG)
 
-ot::OTEnvInfo::OTEnvInfo() {
-	this->resetData();
+void ot::ThisComputerInfo::logInformation(const InformationModeFlags& _mode) {
+	ThisComputerInfo(_mode).logCurrentInformation();
 }
 
-void ot::OTEnvInfo::gatherInformation(const InformationModeFlags& _mode) {
+std::string ot::ThisComputerInfo::getEnvEntry(EnvironemntEntry entry) {
+	using os = OperatingSystem;
+
+	// Otherwise, retrieve from the environment
+
+	switch (entry) {
+	case EnvAdminPort:             return os::getEnvironmentVariableString("OPEN_TWIN_ADMIN_PORT");
+	case EnvAuthPort:              return os::getEnvironmentVariableString("OPEN_TWIN_AUTH_PORT");
+	case EnvCertPath:              return os::getEnvironmentVariableString("OPEN_TWIN_CERTS_PATH");
+	case EnvDownloadPort:          return os::getEnvironmentVariableString("OPEN_TWIN_DOWNLOAD_PORT");
+	case EnvGssPort:               return os::getEnvironmentVariableString("OPEN_TWIN_GSS_PORT");
+	case EnvLssPort:               return os::getEnvironmentVariableString("OPEN_TWIN_LSS_PORT");
+	case EnvGdsPort:               return os::getEnvironmentVariableString("OPEN_TWIN_GDS_PORT");
+	case EnvLdsPort:               return os::getEnvironmentVariableString("OPEN_TWIN_LDS_PORT");
+	case EnvMessageTimeout:        return os::getEnvironmentVariableString("OPEN_TWIN_GLOBAL_TIMEOUT");
+	case EnvMongoDBAddress:        return os::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS");
+	case EnvMongoServicesAddress:  return os::getEnvironmentVariableString("OPEN_TWIN_SERVICES_ADDRESS");
+	default:                        return ""; // Handle unexpected values gracefully
+	}
+}
+
+ot::ThisComputerInfo::ThisComputerInfo(const InformationModeFlags& _mode) {
+	m_envData.dataSet = false;
+	m_mongoData.dataSet = false;
+
+
+	this->gatherInformation(_mode);
+}
+
+ot::ThisComputerInfo& ot::ThisComputerInfo::gatherInformation(const InformationModeFlags& _mode) {
 	if (_mode & InformationModeFlag::Environment) {
 		this->gatherEnvData();
 	}
@@ -30,9 +59,11 @@ void ot::OTEnvInfo::gatherInformation(const InformationModeFlags& _mode) {
 			}
 		}
 	}
+
+	return *this;
 }
 
-void ot::OTEnvInfo::logCurrentInformation(void) {
+ot::ThisComputerInfo& ot::ThisComputerInfo::logCurrentInformation(void) {
 	const std::string delimiterLine = "---------------------------------------------------------------------------";
 
 	// Environment
@@ -48,7 +79,7 @@ void ot::OTEnvInfo::logCurrentInformation(void) {
 		OT_LCL_LOG_INFO("Local Session Service Port:    " + m_envData.lssPort);
 		OT_LCL_LOG_INFO("Global Directory Service Port: " + m_envData.gdsPort);
 		OT_LCL_LOG_INFO("Local Directory Service Port:  " + m_envData.ldsPort);
-		OT_LCL_LOG_INFO("MongoDB Adress:                " + m_envData.mongoDBAdress);
+		OT_LCL_LOG_INFO("MongoDB Address:               " + m_envData.mongoDBAddress);
 		OT_LCL_LOG_INFO("MongoDB Services Address:      " + m_envData.mongoServicesAddress);
 		OT_LCL_LOG_INFO("");
 	}
@@ -79,34 +110,31 @@ void ot::OTEnvInfo::logCurrentInformation(void) {
 		}
 		OT_LCL_LOG_INFO("");
 	}
+
+	return *this;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
 
-void ot::OTEnvInfo::resetData(void) {
-	m_envData.dataSet = false;
-	m_mongoData.dataSet = false;
-}
-
-void ot::OTEnvInfo::gatherEnvData(void) {
-	using os = OperatingSystem;
-	m_envData.adminPort = os::getEnvironmentVariableString("OPEN_TWIN_ADMIN_PORT");
-	m_envData.authorizationPort = os::getEnvironmentVariableString("OPEN_TWIN_AUTH_PORT");
-	m_envData.certificatePath = os::getEnvironmentVariableString("OPEN_TWIN_CERTS_PATH");
-	m_envData.downloadPort = os::getEnvironmentVariableString("OPEN_TWIN_DOWNLOAD_PORT");
-	m_envData.gssPort = os::getEnvironmentVariableString("OPEN_TWIN_GSS_PORT");
-	m_envData.lssPort = os::getEnvironmentVariableString("OPEN_TWIN_LSS_PORT");
-	m_envData.gdsPort = os::getEnvironmentVariableString("OPEN_TWIN_GDS_PORT");
-	m_envData.ldsPort = os::getEnvironmentVariableString("OPEN_TWIN_LDS_PORT");
-	m_envData.mongoDBAdress = os::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS");
-	m_envData.mongoServicesAddress = os::getEnvironmentVariableString("OPEN_TWIN_SERVICES_ADDRESS");
+void ot::ThisComputerInfo::gatherEnvData(void) {
+	m_envData.adminPort            = this->getEnvEntry(EnvAdminPort);
+	m_envData.authorizationPort    = this->getEnvEntry(EnvAuthPort);
+	m_envData.certificatePath      = this->getEnvEntry(EnvCertPath);
+	m_envData.downloadPort         = this->getEnvEntry(EnvDownloadPort);
+	m_envData.gssPort              = this->getEnvEntry(EnvGssPort);
+	m_envData.lssPort              = this->getEnvEntry(EnvLssPort);
+	m_envData.gdsPort              = this->getEnvEntry(EnvGdsPort);
+	m_envData.ldsPort              = this->getEnvEntry(EnvLdsPort);
+	m_envData.globalMessageTimeout = this->getEnvEntry(EnvMessageTimeout);
+	m_envData.mongoDBAddress       = this->getEnvEntry(EnvMongoDBAddress);
+	m_envData.mongoServicesAddress = this->getEnvEntry(EnvMongoServicesAddress);
 
 	m_envData.dataSet = true;
 }
 
-bool ot::OTEnvInfo::gatherMongoDBData(void) {
+bool ot::ThisComputerInfo::gatherMongoDBData(void) {
 	if (m_mongoData.info.loadSystemServiceConfig("MongoDB")) {
 		m_mongoData.dataSet = true;
 		return true;
@@ -116,7 +144,7 @@ bool ot::OTEnvInfo::gatherMongoDBData(void) {
 	}
 }
 
-void ot::OTEnvInfo::gatherMongoDBConfigFileContent(void) {
+void ot::ThisComputerInfo::gatherMongoDBConfigFileContent(void) {
 	if (m_mongoData.info.getConfigPath().empty()) {
 		OT_LOG_E("Configuration file path is empty");
 		return;

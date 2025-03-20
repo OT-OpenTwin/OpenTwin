@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/OTEnvInfo.h"
+#include "OTCore/ThisComputerInfo.h"
 
 // std header
 #include <fstream>
@@ -48,10 +48,8 @@ int main(int _argc, const char* _argv[]) {
     OT_LOG_I(BUILD_INFO);
 
     // Gather info
-    OTEnvInfo info;
-    info.gatherInformation(OTEnvInfo::Environment | OTEnvInfo::MongoDBConfig | OTEnvInfo::MongoDBConfigFileContent);
-    info.logCurrentInformation();
-
+    ThisComputerInfo::logInformation(ThisComputerInfo::Environment | ThisComputerInfo::MongoDBConfig | ThisComputerInfo::MongoDBConfigFileContent);
+    
     // Finalize logging
     fileLogger->flushAndCloseStream();
 

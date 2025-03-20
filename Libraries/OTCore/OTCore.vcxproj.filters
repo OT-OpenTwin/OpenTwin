@@ -121,7 +121,7 @@
     <ClCompile Include="src\UIDNamePair.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\OTEnvInfo.cpp">
+    <ClCompile Include="src\ThisComputerInfo.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\SystemServiceConfigInfo.cpp">
@@ -324,7 +324,7 @@
     <ClInclude Include="include\OTCore\UIDNamePair.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\OTEnvInfo.h">
+    <ClInclude Include="include\OTCore\ThisComputerInfo.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h">
