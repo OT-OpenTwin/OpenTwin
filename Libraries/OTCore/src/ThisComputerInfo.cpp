@@ -6,17 +6,15 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/String.h"
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTCore/ThisComputerInfo.h"
 
 // std header
 #include <fstream>
 
-#define OT_LCL_LOG_INFO(___text) ot::LogDispatcher::instance().dispatch(___text, "Environment Information", ot::INFORMATION_LOG)
-
-void ot::ThisComputerInfo::logInformation(const InformationModeFlags& _mode) {
-	ThisComputerInfo(_mode).logCurrentInformation();
+std::string ot::ThisComputerInfo::toInfoString(const InformationModeFlags& _mode) {
+	return ThisComputerInfo(_mode).toInfoString();
 }
 
 std::string ot::ThisComputerInfo::getEnvEntry(EnvironemntEntry entry) {
@@ -63,55 +61,71 @@ ot::ThisComputerInfo& ot::ThisComputerInfo::gatherInformation(const InformationM
 	return *this;
 }
 
-ot::ThisComputerInfo& ot::ThisComputerInfo::logCurrentInformation(void) {
+std::string ot::ThisComputerInfo::toInfoString(void) {
+	std::stringstream ss;
+	bool empty = true;
 	const std::string delimiterLine = "---------------------------------------------------------------------------";
 
 	// Environment
 	if (m_envData.dataSet) {
-		OT_LCL_LOG_INFO(delimiterLine);
-		OT_LCL_LOG_INFO("         ENVIRONMENT");
-		OT_LCL_LOG_INFO("");
-		OT_LCL_LOG_INFO("Admin Port:                    " + m_envData.adminPort);
-		OT_LCL_LOG_INFO("Authorization Port:            " + m_envData.authorizationPort);
-		OT_LCL_LOG_INFO("Certificate Path:              " + m_envData.certificatePath);
-		OT_LCL_LOG_INFO("Download Port:                 " + m_envData.downloadPort);
-		OT_LCL_LOG_INFO("Global Session Service Port:   " + m_envData.gssPort);
-		OT_LCL_LOG_INFO("Local Session Service Port:    " + m_envData.lssPort);
-		OT_LCL_LOG_INFO("Global Directory Service Port: " + m_envData.gdsPort);
-		OT_LCL_LOG_INFO("Local Directory Service Port:  " + m_envData.ldsPort);
-		OT_LCL_LOG_INFO("MongoDB Address:               " + m_envData.mongoDBAddress);
-		OT_LCL_LOG_INFO("MongoDB Services Address:      " + m_envData.mongoServicesAddress);
-		OT_LCL_LOG_INFO("");
+		if (!empty) {
+			ss << std::endl;
+		}
+		empty = false;
+
+		ss << delimiterLine << std::endl;
+		ss << "         ENVIRONMENT" << std::endl;
+		ss << "" << std::endl;
+		ss << "Admin Port:                    " + m_envData.adminPort << std::endl;
+		ss << "Authorization Port:            " + m_envData.authorizationPort << std::endl;
+		ss << "Certificate Path:              " + m_envData.certificatePath << std::endl;
+		ss << "Download Port:                 " + m_envData.downloadPort << std::endl;
+		ss << "Global Session Service Port:   " + m_envData.gssPort << std::endl;
+		ss << "Local Session Service Port:    " + m_envData.lssPort << std::endl;
+		ss << "Global Directory Service Port: " + m_envData.gdsPort << std::endl;
+		ss << "Local Directory Service Port:  " + m_envData.ldsPort << std::endl;
+		ss << "MongoDB Address:               " + m_envData.mongoDBAddress << std::endl;
+		ss << "MongoDB Services Address:      " + m_envData.mongoServicesAddress << std::endl;
+		ss << "";
 	}
 
 	// MongoDB
 	if (m_mongoData.dataSet) {
-		OT_LCL_LOG_INFO(delimiterLine);
-		OT_LCL_LOG_INFO("         MONGODB CONFIG");
-		OT_LCL_LOG_INFO("");
-		OT_LCL_LOG_INFO("Service Name:                  " + m_mongoData.info.getServiceName());
-		OT_LCL_LOG_INFO("Display Name:                  " + m_mongoData.info.getDisplayName());
-		OT_LCL_LOG_INFO("Binary Path:                   " + m_mongoData.info.getBinaryPath());
-		OT_LCL_LOG_INFO("Config Path:                   " + m_mongoData.info.getConfigPath());
-		OT_LCL_LOG_INFO("Service Path:                  " + m_mongoData.info.getServicePath());
-		OT_LCL_LOG_INFO("Start Type:                    " + m_mongoData.info.getStartType());
-		OT_LCL_LOG_INFO("");
+		if (!empty) {
+			ss << std::endl;
+		}
+		empty = false;
+
+		ss << delimiterLine << std::endl;
+		ss << "         MONGODB CONFIG" << std::endl;
+		ss << "" << std::endl;
+		ss << "Service Name:                  " + m_mongoData.info.getServiceName() << std::endl;
+		ss << "Display Name:                  " + m_mongoData.info.getDisplayName() << std::endl;
+		ss << "Binary Path:                   " + m_mongoData.info.getBinaryPath() << std::endl;
+		ss << "Config Path:                   " + m_mongoData.info.getConfigPath() << std::endl;
+		ss << "Service Path:                  " + m_mongoData.info.getServicePath() << std::endl;
+		ss << "Start Type:                    " + m_mongoData.info.getStartType() << std::endl;
+		ss << "" << std::endl;
 
 		// MongoDB Config file
-		OT_LCL_LOG_INFO(delimiterLine);
-		OT_LCL_LOG_INFO("         MONGODB CONFIG FILE CONTENT");
+		ss << delimiterLine << std::endl;
+		ss << "         MONGODB CONFIG FILE CONTENT" << std::endl;
+		ss << "" << std::endl;
 
 		if (!m_mongoData.configFileContent.empty()) {
-			OT_LCL_LOG_INFO("\nFile (" + m_mongoData.info.getConfigPath() + "):\n\n" + m_mongoData.configFileContent);
+			ss << "File (" << m_mongoData.info.getConfigPath() << "):" << std::endl;
+			ss << std::endl;
+			ss << m_mongoData.configFileContent << std::endl;
 		}
 		else {
-			OT_LCL_LOG_INFO("");
-			OT_LCL_LOG_INFO("<Mongo config file is empty>");
+			ss << "" << std::endl;
+			ss << "<Mongo config file is empty>" << std::endl;
 		}
-		OT_LCL_LOG_INFO("");
-	}
 
-	return *this;
+		ss << "";
+	}
+		
+	return ss.str();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

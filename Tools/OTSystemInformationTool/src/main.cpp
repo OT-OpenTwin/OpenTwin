@@ -4,10 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTCore/Logger.h"
 #include "OTCore/ThisComputerInfo.h"
 
 // std header
+#include <chrono>
+#include <iomanip>
 #include <fstream>
 #include <iostream>
 
@@ -48,8 +51,11 @@ int main(int _argc, const char* _argv[]) {
     OT_LOG_I(BUILD_INFO);
 
     // Gather info
-    ThisComputerInfo::logInformation(ThisComputerInfo::Environment | ThisComputerInfo::MongoDBConfig | ThisComputerInfo::MongoDBConfigFileContent);
-    
+    std::string info = ThisComputerInfo::toInfoString(ThisComputerInfo::Environment | ThisComputerInfo::MongoDBConfig | ThisComputerInfo::MongoDBConfigFileContent);
+
+    OT_LOG_I("Timestamp: " + ot::DateTime::currentTimestamp(ot::DateTime::RFC3339));
+    OT_LOG_I("Information:\n\n" + info);
+
     // Finalize logging
     fileLogger->flushAndCloseStream();
 

@@ -23,9 +23,6 @@
 #include <string>
 #include <ostream>
 
-//! @brief Time format string for the timetamps
-#define OT_LOG_TIME_FORMAT_STDSTRING "%Y-%m-%d %H:%M:%S"
-
 //! @brief OpenTwin log macros enabled
 //! If undefined all the OT_LOG macros wont generate any code (empty line)
 #define OT_GLOBAL_LOGFLAG_LOGEnabled
@@ -364,18 +361,18 @@ namespace ot {
 		void setFlags(const LogFlags& _flags) { m_flags = _flags; };
 		const LogFlags& getFlags(void) const { return m_flags; };
 
-		//! \see getLocalSystemTime
+		//! @see getLocalSystemTime
 		void setLocalSystemTime(const std::string& _timeString) { m_localSystemTime = _timeString; };
 
 		//! @brief String representation of the system timestamp at message creation.
-		//! OT_LOG_TIME_FORMAT_STDSTRING contains the string format.
+		//! @ref ot::DateTime::DateFormat::SimpleUTC
 		const std::string& getLocalSystemTime(void) const { return m_localSystemTime; };
 
-		//! \see getGlobalSystemTime
+		//! @see getGlobalSystemTime
 		void setGlobalSystemTime(const std::string& _timeString) { m_globalSystemTime = _timeString; };
 
 		//! @brief String representation of the system timestamp at when the message was received by the Logger Service.
-		//! OT_LOG_TIME_FORMAT_STDSTRING contains the string format.
+		//! @ref ot::DateTime::DateFormat::SimpleUTC
 		const std::string& getGlobalSystemTime(void) const { return m_globalSystemTime; };
 
 		//! @brief Set the current system time as message creation timestamp.
@@ -409,8 +406,8 @@ namespace ot {
 		LogFlags    m_flags;				//! @brief Log flags tha describe the type of the message.
 		std::string m_localSystemTime;		//! @brief Message creation timestamp.
 		std::string m_globalSystemTime;		//! @brief Message received by LoggerService timestamp.
-		std::string m_userName;             //! \brief Current user when this message was generated.
-		std::string m_projectName;          //! \brief Project in which this message was generated.
+		std::string m_userName;             //! @brief Current user when this message was generated.
+		std::string m_projectName;          //! @brief Project in which this message was generated.
 	};
 
 	//! @brief Writes the log message in a typical "log line" format to the provided output stream.
@@ -454,7 +451,7 @@ namespace ot {
 
 	// ######################################################################################################################################################
 
-	//! \brief Used to write created log messages to std cout in a way a human could read it.
+	//! @brief Used to write created log messages to std cout in a way a human could read it.
 	class OT_CORE_API_EXPORT LogNotifierStdCout : public AbstractLogNotifier {
 	public:
 		virtual ~LogNotifierStdCout() {};
@@ -539,7 +536,7 @@ namespace ot {
 
 		//! @brief Dispatch a log message with the provided params.
 		//! Will set the current system time as message creation time (local system time).
-		//! //! Will apply the current user and project names to the log message before dispatching.
+		//! Will apply the current user and project names to the log message before dispatching.
 		//! @param _message The message to dispatch.
 		void dispatch(const LogMessage& _message);
 

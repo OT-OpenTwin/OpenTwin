@@ -73,7 +73,7 @@ namespace ot {
 
 		//! @brief Will gather and log the information according to the mode flags provided.
 		//! @param _mode Information to gather and log.
-		static void logInformation(const InformationModeFlags& _mode);
+		static std::string toInfoString(const InformationModeFlags& _mode);
 
 		//! @brief Reads and returns a single environment entry
 		//! @param _entry 
@@ -94,7 +94,7 @@ namespace ot {
 		//! Will only log information of data that was set previously.
 		//! @param _mode Information gather mode.
 		//! @return Reference to this object.
-		ThisComputerInfo& logCurrentInformation(void);
+		std::string toInfoString(void);
 
 		//! @brief Currently set environment data.
 		inline const EnvData& getEnvData(void) const { return m_envData; };

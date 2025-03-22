@@ -1,20 +1,15 @@
-/*
- *	Logger.cpp
- *
- *  Created on: April 03, 2023
- *	Author: Alexander Kuester
- *  Copyright (c) 2023, OpenTwin
- */
-
-//#define _CRT_SECURE_NO_WARNINGS
+//! @file Logger.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Open Twin header
+#include "OTSystem/DateTime.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ServiceBase.h"
 
-// Std header
-#include <ctime>
+// std header
 #include <thread>
 #include <fstream>
 #include <iostream>
@@ -89,27 +84,11 @@ ot::LogMessage& ot::LogMessage::operator = (const LogMessage& _other) {
 }
 
 void ot::LogMessage::setCurrentTimeAsLocalSystemTime(void) {
-	time_t rawtime;
-	struct tm timeinfo;
-	char buffer[128];
-
-	time(&rawtime);
-	gmtime_s(&timeinfo, &rawtime);
-
-	strftime(buffer, sizeof(buffer), OT_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
-	m_localSystemTime = buffer;
+	m_localSystemTime = DateTime::currentTimestamp(DateTime::SimpleUTC);
 }
 
 void ot::LogMessage::setCurrentTimeAsGlobalSystemTime(void) {
-	time_t rawtime;
-	struct tm timeinfo;
-	char buffer[128];
-
-	time(&rawtime);
-	gmtime_s(&timeinfo, &rawtime);
-
-	strftime(buffer, sizeof(buffer), OT_LOG_TIME_FORMAT_STDSTRING, &timeinfo);
-	m_globalSystemTime = buffer;
+	m_globalSystemTime = DateTime::currentTimestamp(DateTime::SimpleUTC);
 }
 
 void ot::LogMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

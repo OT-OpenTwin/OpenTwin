@@ -19,12 +19,8 @@
 
 
 void Application::testHello(void) {
-	OT_LOG_T("Hello :-)");
-
-	ot::ThisComputerInfo info(ot::ThisComputerInfo::GatherAllMode);
-	info.logCurrentInformation();
+	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
 }
-
 
 Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()) 
