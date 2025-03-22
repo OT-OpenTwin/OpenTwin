@@ -17,6 +17,9 @@
 namespace ot {
 	namespace msg {
 
+		//! @brief Default OpenTwin message send timeout (30 seconds).
+		static const int defaultTimeout = 30000;
+
 		//! @brief Will send the provided message to the microservice framework. Returns true if succeeded
 		//! @param _senderIP The sender IP address
 		//! @param _receiverIP The receiver IP address

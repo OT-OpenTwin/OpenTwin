@@ -144,7 +144,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, doc.GetAllocator()), doc.GetAllocator());
 
 		std::string response;
-		bool sendResult = ot::msg::send("", _url.toStdString(), ot::EXECUTE, doc.toJson(), response, 30000, false, false);
+		bool sendResult = ot::msg::send("", _url.toStdString(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, false, false);
 
 		if (m_stopWorker) {
 			m_workerRunning = false;
@@ -176,7 +176,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 		registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
 		registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 
-		sendResult = ot::msg::send("", _url.toStdString(), ot::EXECUTE, registerDoc.toJson(), response, 30000, false, false);
+		sendResult = ot::msg::send("", _url.toStdString(), ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, false, false);
 
 		if (m_stopWorker) {
 			m_workerRunning = false;

@@ -45,7 +45,7 @@ namespace ot {
 					g_instance.m_timeout = ot::String::toNumber<int>(ThisComputerInfo::getEnvEntry(ThisComputerInfo::EnvMessageTimeout), failed);
 					// Ensure valid timeout is set
 					if (failed || g_instance.m_timeout <= 0) {
-						g_instance.m_timeout = 30000;
+						g_instance.m_timeout = msg::defaultTimeout;
 					}
 				}
 

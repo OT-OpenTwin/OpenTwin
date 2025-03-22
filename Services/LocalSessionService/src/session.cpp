@@ -247,8 +247,8 @@ void Session::broadcast(Service * _sender, const ot::JsonDocument& _message, boo
 				// Send the message to the current reciever
 				response.clear();
 				if (_async) {
-					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, 30000);
-				} else if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, 30000, _shutdown)) {
+					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout);
+				} else if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, ot::msg::defaultTimeout, _shutdown)) {
 					OT_LOG_E("Failed to send broadcast message to: " + itm.second->url());
 				}
 			}

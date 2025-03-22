@@ -611,7 +611,7 @@ void ServiceManager::workerServiceInitializer(void) {
 
 				// Attempt to send ping
 				std::string response;
-				if (!ot::msg::send("", info.service->url(), ot::EXECUTE, pingCommand, response, 30000)) {
+				if (!ot::msg::send("", info.service->url(), ot::EXECUTE, pingCommand, response, ot::msg::defaultTimeout)) {
 					// Failed to ping
 
 					OT_LOG_D("Failed to ping service (attempt = \"" + std::to_string(info.initializeAttempt) + "\"; name = \"" + info.service->information().name() + "\"; type = \"" +

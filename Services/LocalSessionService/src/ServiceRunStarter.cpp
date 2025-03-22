@@ -131,7 +131,7 @@ void ServiceRunStarter::worker(void) {
 void ServiceRunStarter::sendRunMessageToService(std::string serviceURL, std::string messageOut, std::string serviceName, std::string serviceType, std::string serviceId)
 {
 	std::string response;
-	if (!ot::msg::send("", serviceURL, ot::EXECUTE, messageOut, response, 30000)) {
+	if (!ot::msg::send("", serviceURL, ot::EXECUTE, messageOut, response, ot::msg::defaultTimeout)) {
 		assert(0);
 		OT_LOG_E("Failed to send run command to service (name = \"" + serviceName + "\"; type = \"" + serviceType + "\"; id = \"" + serviceId + "\")");
 		// todo: add error handling for startup error
