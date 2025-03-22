@@ -38,7 +38,7 @@ void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
 		JsonDocument pingDoc;
 		pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
 		std::string response;
-		if (ot::msg::send("", _url, ot::EXECUTE_ONE_WAY_TLS, pingDoc.toJson(), response, 0, false, false)) {
+		if (ot::msg::send("", _url, ot::EXECUTE_ONE_WAY_TLS, pingDoc.toJson(), response, ot::msg::defaultTimeout, false, false)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				m_loggingServiceURL = _url;
 			}
@@ -66,7 +66,7 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 
 	try {
 		// Write log message to logger service
-		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, 0, false, false)) {
+		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, false, false)) {
 			OTAssert(0, "Failed to send log message");
 			m_loggingServiceURL.clear();
 		}
