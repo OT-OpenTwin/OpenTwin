@@ -717,7 +717,7 @@
 #define OT_INFO_SERVICE_TYPE_GETDP "GetDPService"
 #define OT_INFO_SERVICE_TYPE_ELMERFEM "ElmerFEMService"
 #define OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "PythonExecutionService"
-#define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
+#define OT_INFO_SERVICE_TYPE_DebugService "DebugService"
 #define OT_INFO_SERVICE_TYPE_CircuitSimulatorService "CircuitSimulatorService"
 #define OT_INFO_SERVICE_TYPE_STUDIOSUITE "StudioSuiteService"
 #define OT_INFO_SERVICE_TYPE_LTSPICE "LTSpiceService"

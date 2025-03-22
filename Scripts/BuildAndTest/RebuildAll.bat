@@ -338,9 +338,9 @@ ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Service: BlockEditorService
+ECHO Build Service: DebugService
 ECHO ===============================================================
-CALL "%OT_BLOCKEDITORSERVICE_ROOT%\build.bat" %1 %2
+CALL "%OT_DEBUGSERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: DataProcessingService

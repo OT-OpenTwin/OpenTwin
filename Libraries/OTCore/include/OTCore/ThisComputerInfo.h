@@ -27,7 +27,9 @@ namespace ot {
 			NoRunFlags               = 0 << 0, //! @brief Default. No information gathered.
 			Environment              = 1 << 0, //! @brief Environment information will be read.
 			MongoDBConfig            = 1 << 1, //! @brief Mongo DB configuration will be read.
-			MongoDBConfigFileContent = 1 << 2  //! @brief Mongo DB file content wil be read. Requires InformationModeFlag::MongoDBConfig to be set.
+			MongoDBConfigFileContent = 1 << 2, //! @brief Mongo DB file content wil be read. Requires InformationModeFlag::MongoDBConfig to be set.
+
+			GatherAllMode            = Environment | MongoDBConfig | MongoDBConfigFileContent
 		};
 		typedef Flags<InformationModeFlag> InformationModeFlags;
 

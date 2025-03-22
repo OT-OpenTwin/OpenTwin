@@ -66,11 +66,11 @@ SET OT_LTSPICE_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\LTSpiceService
 SET OT_UI_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\uiService
 SET OT_PYTHON_EXECUTION_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PythonExecutionService
 SET OT_PYTHON_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\PythonExecution
-SET OT_BLOCKEDITORSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\BlockEditorService
 SET OT_DATA_PROCESSING_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\DataProcessingService
 SET OT_CIRCUIT_SIMULATOR_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService
 SET	OT_CIRCUIT_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitExecution
 SET OT_PYRIT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PyritService
+SET OT_DEBUGSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\DebugService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths

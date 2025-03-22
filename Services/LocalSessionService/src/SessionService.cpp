@@ -54,7 +54,7 @@ SessionService::SessionService()
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
+	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService));
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
@@ -117,7 +117,6 @@ SessionService::SessionService()
 	//
 	std::vector<ot::ServiceBase>* CircuitSimulationSessionServices = new std::vector<ot::ServiceBase>;
 	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_BlockEditorService, OT_INFO_SERVICE_TYPE_BlockEditorService));
 	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, CircuitSimulationSessionServices);
 }

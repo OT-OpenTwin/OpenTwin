@@ -1,56 +1,60 @@
-/*
- * Application.h
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+//! @file Application.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-// Open twin header
+// OpenTwin header
+#include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
-// C++ header
+// std header
+#include <map>
 #include <string>
-
-// Forward declaration
-namespace ot {
-	namespace components {
-		class UiComponent;
-		class ModelComponent;
-	}
-}
+#include <functional>
 
 class Application : public ot::ApplicationBase {
 	OT_DECL_ACTION_HANDLER(Application)
+private:
+	Application();
+
 public:
+	void testHello(void);
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Default
+
 	static Application * instance(void);
 	static void deleteInstance(void);
 
 private:
-	Application();
 	virtual ~Application();
+
+	struct ButtonInfo {
+		ButtonInfo(const std::string& _group, const std::string& _buttonNameAndTitle, const std::string& _icon, const std::function<void(void)>& _callback) :
+			group(_group), name(_buttonNameAndTitle), title(_buttonNameAndTitle), callback(_callback), icon(_icon)
+		{}
+
+		std::string group;
+		std::string name;
+		std::string title;
+		std::string icon;
+		std::function<void(void)> callback;
+	};
+
+	std::map<std::string, ButtonInfo> m_testButtons;
 
 public:
 
 	// ##################################################################################################################################################################################################################
-
-	// Add your custom functions/ members here
-
-	// A handler can be created to handle the the specified action
-	// In this example the first parameter is the name of the callback function
-	// The second parameter is the class name where the handler is created at
-	// The third parameter is a String containing the action name
-	// The last parameter are flags describing the allowed message types for this handler
-	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
-
+		
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleEditorSaveRequested, Application, OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleTableSaved, Application, OT_ACTION_CMD_UI_TABLE_SaveRequest, ot::SECURE_MESSAGE_TYPES)
-	
-	std::string test(void);
 	
 	// ##################################################################################################################################################################################################################
 

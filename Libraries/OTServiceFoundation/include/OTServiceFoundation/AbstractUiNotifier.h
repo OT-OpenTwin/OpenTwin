@@ -15,7 +15,7 @@ namespace ot {
 
 		//! @brief Will be called when a key sequence was activated in the ui
 		//! @param _keySequence The key sequence that was activated
-		virtual void shortcutActivated(const std::string& _keySquence) = 0;
+		virtual void shortcutActivated(const std::string& _keySquence) {};
 
 	private:
 		AbstractUiNotifier(AbstractUiNotifier&) = delete;
