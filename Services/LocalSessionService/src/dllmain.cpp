@@ -112,7 +112,7 @@ extern "C"
 			do {
 				gssResponse.clear();
 
-				if (!(ok = ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse))) {
+				if (!(ok = ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout))) {
 					OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 					using namespace std::chrono_literals;
 					std::this_thread::sleep_for(500ms);

@@ -65,7 +65,7 @@ void GlobalSessionService::healthCheck(void) {
 		std::string response;
 
 		// Send ping
-		if (!ot::msg::send(m_owner->url(), m_serviceURL, ot::EXECUTE, pingMessage, response)) {
+		if (!ot::msg::send(m_owner->url(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout)) {
 			OT_LOG_W("Global session service can not be reached");
 			m_connectionStatus = ConnectionFailed;
 		}
@@ -89,7 +89,7 @@ void GlobalSessionService::healthCheck(void) {
 
 			response.clear();
 			// Send registration
-			if (!ot::msg::send(m_owner->url(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response)) {
+			if (!ot::msg::send(m_owner->url(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout)) {
 				OT_LOG_E("Failed to send register message to global session service");
 			}
 			else OT_ACTION_IF_RESPONSE_ERROR(response) {

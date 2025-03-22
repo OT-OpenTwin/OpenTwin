@@ -252,7 +252,7 @@ void AppBase::workerNotify(std::list<std::string> _receiver, std::string _messag
 	std::list<std::string> failed;
 	for (auto r : _receiver) {
 		std::string response;
-		if (!ot::msg::send("", r, ot::EXECUTE, _message, response)) {
+		if (!ot::msg::send("", r, ot::EXECUTE, _message, response, ot::msg::defaultTimeout)) {
 			failed.push_back(r);
 		}
 		else if (response != OT_ACTION_RETURN_VALUE_OK) {

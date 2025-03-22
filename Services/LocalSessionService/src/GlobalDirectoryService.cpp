@@ -47,7 +47,7 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -85,7 +85,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -114,10 +114,18 @@ bool GlobalDirectoryService::requestToStartRelayService(const std::string& _sess
 	
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) return false;
-	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos) return false;
-	if (response.find(OT_ACTION_RETURN_INDICATOR_Warning) != std::string::npos) return false;
-	if (response == OT_ACTION_RETURN_VALUE_FAILED) return false;
+	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
+		return false;
+	}
+	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos) {
+		return false;
+	}
+	if (response.find(OT_ACTION_RETURN_INDICATOR_Warning) != std::string::npos) {
+		return false;
+	}
+	if (response == OT_ACTION_RETURN_VALUE_FAILED) {
+		return false;
+	}
 
 	// Check reponse
 	ot::JsonDocument responseDoc;
@@ -141,7 +149,7 @@ void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) 
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance()->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(SessionService::instance()->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(SessionService::instance()->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to send session shutdown notification to GDS at " + m_serviceURL);
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -163,7 +171,7 @@ void GlobalDirectoryService::healthCheck(void) {
 		std::string response;
 		// todo: scr: code rm line !current 1
 		OT_LOG_D("!!!! ######################################################################################");
-		if (ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, pingMessage, response)) {
+		if (ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				if (m_connectionStatus == CheckingNewConnection) {
 					m_connectionStatus = Connected;

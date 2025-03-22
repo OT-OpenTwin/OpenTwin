@@ -277,7 +277,7 @@ void SessionService::serviceClosing(
 		gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 		
 		std::string response;
-		if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
+		if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout)) {
 			OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
 		}
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -820,7 +820,7 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
+	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -1039,7 +1039,7 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
+	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -1092,7 +1092,7 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
+	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {

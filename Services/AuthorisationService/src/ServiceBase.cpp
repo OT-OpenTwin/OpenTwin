@@ -592,7 +592,7 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetSystemInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(getServiceURL(), gssUrl, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(getServiceURL(), gssUrl, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_E("Failed to retrieve information. Reason: Failed to send http request to GSS (URL = \"" + gssUrl + "\")");
 		return "";
 	}

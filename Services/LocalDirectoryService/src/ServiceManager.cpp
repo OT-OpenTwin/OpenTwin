@@ -171,7 +171,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 
 			for (int attempt = 0; attempt < 60; attempt++) {
 				std::string response;
-				if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response)) {
+				if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout)) {
 					if (response == OT_ACTION_RETURN_VALUE_TRUE) {
 						checkOk = true;
 						break;
@@ -346,7 +346,7 @@ void ServiceManager::serviceStartFailed(RequestedService _info) {
 	//todo: Check which information to clear
 
 	// Fire message
-	ot::msg::sendAsync("", _info.session.sessionServiceURL(), ot::EXECUTE, doc.toJson());
+	ot::msg::sendAsync("", _info.session.sessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout);
 }
 
 void ServiceManager::sendInitializeMessage(InitializingService _info) {
@@ -359,7 +359,7 @@ void ServiceManager::sendInitializeMessage(InitializingService _info) {
 	
 	// Send message
 	std::string response;
-	if (!ot::msg::send("", _info.service->url(), ot::EXECUTE, doc.toJson(), response)) {
+	if (!ot::msg::send("", _info.service->url(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout)) {
 		OT_LOG_W("Failed to send initialize message to service (name = \"" + _info.service->information().name() + "\"; type = \"" +
 			_info.service->information().type() + "\"; url = \"" + _info.service->url() + "\")");
 
@@ -444,7 +444,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const SessionInformation& _s
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session.id(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Fire message
-	ot::msg::sendAsync("", session.sessionServiceURL(), ot::EXECUTE, doc.toJson());
+	ot::msg::sendAsync("", session.sessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout);
 }
 
 void ServiceManager::cleanUpSession_RequestedList(const std::string& _sessionID) {

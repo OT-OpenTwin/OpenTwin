@@ -293,7 +293,7 @@ void Session::serviceFailure(Service * _failedService) {
 		auto s = m_serviceMap.begin();
 		
 		// Fire message
-		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg);
+		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout);
 
 		oldCt = m_serviceMap.size();
 		SessionService::instance()->serviceClosing(s->second, false, false);
