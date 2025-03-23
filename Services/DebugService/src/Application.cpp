@@ -62,7 +62,7 @@ void Application::testHello(void) {
 void Application::actionAboutToBePerformed(const char* _json) {
 	ot::JsonDocument doc;
 	if (!doc.fromJson(_json)) {
-		OT_LOG_EA("Failed to deserialize request: \"" + std::string(_json) + "\"");
+		OT_LOG_EAS("Failed to deserialize request: \"" + std::string(_json) + "\"");
 		return;
 	}
 
