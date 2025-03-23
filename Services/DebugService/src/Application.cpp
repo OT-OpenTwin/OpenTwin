@@ -14,18 +14,13 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
 
-
-void Application::testHello(void) {
-	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
-}
-
 Application::Application() :
-	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()) 
-{
-	// Add bugttons here
+	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()) {
+	// Add buttons here
 	std::list<ButtonInfo> buttons;
 
 	buttons.push_back(ButtonInfo("Test", "Hello", "SmileyGlasses", std::bind(&Application::testHello, this)));
@@ -39,6 +34,46 @@ Application::Application() :
 		m_testButtons.emplace(OT_DEBUG_SERVICE_PAGE_NAME ":" + btn.group + ":" + btn.name, std::move(btn)); // |
 	}                                 //                                                                       |
 	// --------------------------------------------------------------------------------------------------------+
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Button callbacks
+
+void Application::testHello(void) {
+	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::SleepOnHello)) {
+		OT_LOG_I("Sleeping for " + std::to_string(this->getFeatureSleepTime()) + "ms");
+		std::this_thread::sleep_for(std::chrono::milliseconds(this->getFeatureSleepTime()));
+		OT_LOG_I("Woke up");
+	}
+
+	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnHello)) {
+		OT_LOG_I("Performing exit on \"hello\"");
+		exit(0);
+	}
+
+	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// General feature handling
+
+void Application::actionAboutToBePerformed(const char* _json) {
+	ot::JsonDocument doc;
+	if (!doc.fromJson(_json)) {
+		OT_LOG_EA("Failed to deserialize request: \"" + std::string(_json) + "\"");
+		return;
+	}
+
+	std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
+
+	if (action == OT_ACTION_CMD_Ping) {
+		if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnPing)) {
+			OT_LOG_I("Performing exit on ping");
+			exit(0);
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -84,8 +119,11 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 // Required functions
 
-void Application::run(void)
-{
+void Application::run(void) {
+	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnRun)) {
+		OT_LOG_I("Performing exit on run");
+		exit(0);
+	}
 	// Add code that should be executed when the service is started and may start its work
 }
 
@@ -145,7 +183,10 @@ void Application::serviceDisconnected(const ot::ServiceBase * _service)
 }
 
 void Application::preShutdown(void) {
-
+	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnPreShutdown)) {
+		OT_LOG_I("Performing exit on pre shutdown");
+		exit(0);
+	}
 }
 
 void Application::shuttingDown(void)

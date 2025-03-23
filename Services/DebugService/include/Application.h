@@ -5,6 +5,9 @@
 
 #pragma once
 
+// DebugService header
+#include "DebugServiceConfig.h"
+
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
@@ -17,11 +20,35 @@
 class Application : public ot::ApplicationBase {
 	OT_DECL_ACTION_HANDLER(Application)
 private:
+	//! @brief Constructor
+	//! Register buttons here!
 	Application();
 
 public:
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Button callbacks
+
 	void testHello(void);
 	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// General feature handling
+
+	DebugServiceConfig m_config;
+
+	void actionAboutToBePerformed(const char* _json);
+
+	void enableFeature(const DebugServiceConfig::FeatureFlag& _flag, bool _enabled = true) { m_config.setFeatureFlag(_flag, _enabled); };
+	void disableFeature(const DebugServiceConfig::FeatureFlag& _flag) { m_config.setFeatureFlag(_flag, false); };
+	bool getFeatureEnabled(const DebugServiceConfig::FeatureFlag& _flag) const { return m_config.getFeatureFlags().flagIsSet(_flag); };
+	
+	void setFeatures(const DebugServiceConfig::Features& _features) { m_config.setFeatureFlags(_features); };
+	const DebugServiceConfig::Features& getFeatures(void) const { return m_config.getFeatureFlags(); };
+
+	void setFeatureSleepTime(int _time) { m_config.setSleepTime(_time); };
+	int getFeatureSleepTime(void) const { return m_config.getSleepTime(); };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
