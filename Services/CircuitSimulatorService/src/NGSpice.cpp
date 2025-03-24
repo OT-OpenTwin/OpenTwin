@@ -516,7 +516,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		it->second.addBlockEntity(blockEntity->getClassName(), blockEntity);
 		
 
-		if (blockEntity->getBlockTitle() == "Voltage Source")
+		if (blockEntity->getClassName() == "EntityBlockCircuitVoltageSource")
 		{
 
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
@@ -582,7 +582,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			it->second.addElement(uid, voltageSource_p);
 
 		}
-		else if (blockEntity->getBlockTitle() == "Resistor")
+		else if (blockEntity->getClassName() == "EntityBlockCircuitResistor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 			auto resistor = std::make_unique<Resistor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
@@ -601,7 +601,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto resistor_p = resistor.release();
 			it->second.addElement(uid, resistor_p);
 		}
-		else if (blockEntity->getBlockTitle() == "Diode")
+		else if (blockEntity->getClassName() == "EntityBlockCircuitDiode")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			auto diode = std::make_unique<Diode>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
@@ -620,7 +620,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto diode_p = diode.release();
 			it->second.addElement(uid, diode_p);
 		}
-		else if (blockEntity->getBlockTitle() == "Capacitor")
+		else if (blockEntity->getClassName() == "EntityBlockCircuitCapacitor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 			auto capacitor = std::make_unique<Capacitor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
@@ -639,7 +639,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto capacitor_p = capacitor.release();
 			it->second.addElement(uid, capacitor_p);
 		}
-		else if (blockEntity->getBlockTitle() == "Inductor")
+		else if (blockEntity->getClassName() == "EntityBlockCircuitInductor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
 			auto inductor = std::make_unique<Inductor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
@@ -658,7 +658,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto inductor_p = inductor.release();
 			it->second.addElement(uid, inductor_p);
 		}
-		else if (blockEntity->getBlockTitle() == "Voltage Meter") {
+		else if (blockEntity->getClassName() == "EntityBlockCircuitVoltageMeter") {
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
 			auto voltMeter = std::make_unique<VoltageMeter>( myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
@@ -669,7 +669,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto voltMeter_p = voltMeter.release();
 			it->second.addElement(uid, voltMeter_p);
 		}
-		else if (blockEntity->getBlockTitle() == "Current Meter") {
+		else if (blockEntity->getClassName() == "EntityBlockCircuitCurrentMeter") {
 			auto myElement = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
 			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
