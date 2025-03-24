@@ -300,29 +300,49 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				testPlot();
 				/*m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
-				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);*/
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				 bool success =_parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
+				 if (!success)
+				 {
+					 delete m_twoPartsAction;
+					 m_twoPartsAction = nullptr;
+				 }*/
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
-				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
+				if (!success)
+				{
+					delete m_twoPartsAction;
+					m_twoPartsAction = nullptr;
+				}
 			}
 			else if (action == _buttonCreateParameterEntry.GetFullDescription())
 			{			
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
-				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
+				if (!success)
+				{
+					delete m_twoPartsAction;
+					m_twoPartsAction = nullptr;
+				}
 			}
 			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
-				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
+				if (!success)
+				{
+					delete m_twoPartsAction;
+					m_twoPartsAction = nullptr;
+				}
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{

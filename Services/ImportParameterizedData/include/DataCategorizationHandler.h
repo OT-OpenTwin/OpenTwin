@@ -34,7 +34,7 @@ public:
 	DataCategorizationHandler(const DataCategorizationHandler& other) = delete;
 	DataCategorizationHandler& operator=(const DataCategorizationHandler& other) = delete;
 	
-	void markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
+	bool markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 

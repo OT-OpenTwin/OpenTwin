@@ -24,7 +24,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, s
 
 }
 
-void DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	ensureEssentials();
 	clearBufferedMetadata();
@@ -63,7 +63,7 @@ void DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 		{
 			requestRangeSelection(tableName);
 		}
-		
+		return true;
 	}
 	catch (std::exception e)
 	{
@@ -74,6 +74,7 @@ void DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 			delete entity;
 			entity = nullptr;
 		}
+		return false;
 	}
 }
 
@@ -96,8 +97,7 @@ bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _select
 	}
 	else
 	{
-		_uiComponent->displayMessage("Data categorisation requires a single selected table.");
-		return false;
+		throw std::exception("Data categorisation requires a single selected table.");
 	}
 }
 
