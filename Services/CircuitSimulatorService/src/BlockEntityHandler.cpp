@@ -42,8 +42,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 
-	std::string entName = CreateNewUniqueTopologyName(_blockFolder + "/" + editorName, blockEntity->getBlockTitle());
-	blockEntity->setName(entName);
+	
 	blockEntity->setEditable(true);
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
@@ -62,7 +61,27 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
 	
-	InitSpecialisedCircuitElementEntity(blockEntity);
+	std::string elementName = InitSpecialisedCircuitElementEntity(blockEntity);
+	if (elementName != "") {
+	//Create block Titles
+	//First get a list of all folder items of the Circuit folder
+		std::list<std::string> circuitItems = ot::ModelServiceAPI::getListOfFolderItems("Circuits/" + editorName);
+		// Create a unique name for the new circuit item
+		int count = 1;
+		std::string circuitItemName;
+		std::string circuitAbbraviationName;
+		do {
+			circuitAbbraviationName = _blockFolder + "/" + editorName +"/"+ elementName + std::to_string(count);
+			count++;
+		} while (std::find(circuitItems.begin(), circuitItems.end(), circuitAbbraviationName) != circuitItems.end());
+		blockEntity->setName(circuitAbbraviationName);
+	}
+	else {
+		std::string entName = CreateNewUniqueTopologyName(_blockFolder + "/" + editorName, blockEntity->getBlockTitle());
+		blockEntity->setName(entName);
+	}
+
+
 
 	blockEntity->StoreToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
@@ -353,39 +372,56 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 	}
 }
 
-void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
+std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
 	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 	if (CircuitElement != nullptr) {
 		CircuitElement->createProperties();
-		
+		return "V";
 	}
 
 	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 	if (resistor != nullptr) {
 		resistor->createProperties();
+		return "R";
 	}
 
 	EntityBlockCircuitDiode* diode = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 	if (diode != nullptr) {
 		diode->createProperties();
+		return "D";
 	}
 
 	EntityBlockCircuitCapacitor* capacitor = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 	if (capacitor != nullptr) {
 		capacitor->createProperties();
+		return "C";
 	}
 
 	EntityBlockCircuitInductor* inductor = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
 	if (inductor != nullptr) {
 		inductor->createProperties();
+		return "L";
 	}
 	
+	EntityBlockCircuitVoltageMeter* voltMeter = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
+	if (voltMeter != nullptr) {
+		return "VM";
+	}
+
+	EntityBlockCircuitCurrentMeter* currentMeter = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
+	if (currentMeter != nullptr) {
+		return "CM";
+	}
+
 	EntityBlockCircuitTransmissionLine* transmissionLine = dynamic_cast<EntityBlockCircuitTransmissionLine*>(blockEntity.get());
 	if (transmissionLine != nullptr) {
 		transmissionLine->createProperties();
+		return "T";
 	}
 
-	
+
+
+	return "";
 }
 
 

@@ -207,7 +207,7 @@ void Application::addSolver()
 	// Get new Entity Id for the new item
 	ot::UID entityID = m_modelComponent->createEntityUID();
 
-	// Create a unique na,e for the new solver item
+	// Create a unique name for the new solver item
 	int count = 1;
 	std::string solverName;
 	do {
