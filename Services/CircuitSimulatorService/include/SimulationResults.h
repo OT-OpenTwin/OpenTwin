@@ -10,7 +10,7 @@
 
 //Open Twin Header
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-
+#include "EntityResultText.h"
 //C++ Header
 #include <vector>
 #include <map>
@@ -34,6 +34,7 @@ public:
     void displayError(std::string _message);
     void handleResults(const QJsonValue& _result);
     void handleUnknownMessageType(std::string _message);
+    void storeLogDataInResultText();
 
     //Time Handling
     void handleCircuitExecutionTiming(const QDateTime& _timePoint, std::string timeType);
@@ -60,6 +61,7 @@ private:
     std::string simulationType;
     std::string circuitName;
     std::mutex m_mutex;
+    std::string logData;
 
 
 };

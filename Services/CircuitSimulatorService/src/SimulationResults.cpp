@@ -1,5 +1,6 @@
 #include "SimulationResults.h"
-
+// Open Twin Header
+#include "OTModelAPI/ModelServiceAPI.h"
 SimulationResults* SimulationResults::instance = nullptr;
 
 SimulationResults* SimulationResults::getInstance()
@@ -62,6 +63,7 @@ void SimulationResults::setSolverInformation(std::string _solverName, std::strin
 void SimulationResults::displayMessage(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
     this->getInstance()->_uiComponent->displayMessage(_message);
+    this->logData.append(_message + "\n");
 }
 
 void SimulationResults::displayError(std::string _message) {
@@ -69,17 +71,41 @@ void SimulationResults::displayError(std::string _message) {
     ot::StyledTextBuilder errorMessage;
     errorMessage << "[" << ot::StyledText::Bold << ot::StyledText::Error << "Error" << ot::StyledText::ClearStyle << "] " << _message;
     this->getInstance()->_uiComponent->displayStyledMessage(errorMessage);
+    this->logData.append(_message + "\n");
 }
 
 void SimulationResults::handleResults(const QJsonValue& _result) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     addResults(_result);
+    storeLogDataInResultText();
 }
 
 void SimulationResults::handleUnknownMessageType(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
     this->getInstance()->_uiComponent->displayErrorPrompt("Unknown Message Type: " + _message);
+}
+
+void SimulationResults::storeLogDataInResultText() {
+    EntityResultText* output = _modelComponent->addResultTextEntity(solverName + "/Output", logData);
+
+    std::list<ot::UID> topologyEntityIDList;
+    std::list<ot::UID> topologyEntityVersionList;
+    std::list<bool> topologyEntityForceVisibleList;
+    std::list<ot::UID> dataEntityIDList;
+    std::list<ot::UID> dataEntityVersionList;
+    std::list<ot::UID> dataEntityParentList;
+
+    topologyEntityIDList.push_back(output->getEntityID());
+    topologyEntityVersionList.push_back(output->getEntityStorageVersion());
+    topologyEntityForceVisibleList.push_back(false);
+
+    dataEntityIDList.push_back(output->getTextDataStorageId());
+    dataEntityVersionList.push_back(output->getTextDataStorageVersion());
+    dataEntityParentList.push_back(output->getEntityID());
+
+    
+    ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added Circuit Simulation results");
 }
 
 void SimulationResults::handleCircuitExecutionTiming(const QDateTime& _timePoint, std::string timeType) {
