@@ -19,17 +19,31 @@
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
 
 Application::Application() :
-	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()) {
+	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier())
+{
 	// Add buttons here
 	std::list<ButtonInfo> buttons;
 
 	buttons.push_back(ButtonInfo("Test", "Hello", "SmileyGlasses", std::bind(&Application::testHello, this)));
 
+	// Enable features (Exit)
+	
+	//this->enableFeature(DebugServiceConfig::ExitOnInit, true);
+	//this->enableFeature(DebugServiceConfig::ExitOnRun, true);
+	//this->enableFeature(DebugServiceConfig::ExitOnPing, true);
+	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown, true);
+	//this->enableFeature(DebugServiceConfig::ExitOnHello, true);
+	
+	// Enable features (Sleep)
 
+	//this->enableFeature(DebugServiceConfig::SleepOnHello, true);
+	
+	// Enable features (Other)
 
+	//this->enableFeature(DebugServiceConfig::ExportOnStart, true);
 
 	// --------------------------------------------------------------------------------------------------------+
-	// Buttons will be added to the map                                                                        |
+	// Buttons will be added to the map (added previously in the constructor)                                  |
 	for (ButtonInfo& btn : buttons) { //                                                                       |
 		m_testButtons.emplace(OT_DEBUG_SERVICE_PAGE_NAME ":" + btn.group + ":" + btn.name, std::move(btn)); // |
 	}                                 //                                                                       |
@@ -42,13 +56,13 @@ Application::Application() :
 
 void Application::testHello(void) {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::SleepOnHello)) {
-		OT_LOG_I("Sleeping for " + std::to_string(this->getFeatureSleepTime()) + "ms");
+		OT_LOG_T("Sleeping for " + std::to_string(this->getFeatureSleepTime()) + "ms");
 		std::this_thread::sleep_for(std::chrono::milliseconds(this->getFeatureSleepTime()));
-		OT_LOG_I("Woke up");
+		OT_LOG_T("Woke up");
 	}
 
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnHello)) {
-		OT_LOG_I("Performing exit on \"hello\"");
+		OT_LOG_T("Performing exit on \"hello\"");
 		exit(0);
 	}
 
@@ -70,7 +84,7 @@ void Application::actionAboutToBePerformed(const char* _json) {
 
 	if (action == OT_ACTION_CMD_Ping) {
 		if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnPing)) {
-			OT_LOG_I("Performing exit on ping");
+			OT_LOG_T("Performing exit on ping");
 			exit(0);
 		}
 	}
@@ -121,7 +135,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 void Application::run(void) {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnRun)) {
-		OT_LOG_I("Performing exit on run");
+		OT_LOG_T("Performing exit on run");
 		exit(0);
 	}
 	// Add code that should be executed when the service is started and may start its work
@@ -184,7 +198,7 @@ void Application::serviceDisconnected(const ot::ServiceBase * _service)
 
 void Application::preShutdown(void) {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnPreShutdown)) {
-		OT_LOG_I("Performing exit on pre shutdown");
+		OT_LOG_T("Performing exit on pre shutdown");
 		exit(0);
 	}
 }
