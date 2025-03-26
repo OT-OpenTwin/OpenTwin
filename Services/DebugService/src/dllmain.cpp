@@ -31,10 +31,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
+		Application::instance()->actionAboutToBePerformed(_json);
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
+		Application::instance()->actionAboutToBePerformed(_json);
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
