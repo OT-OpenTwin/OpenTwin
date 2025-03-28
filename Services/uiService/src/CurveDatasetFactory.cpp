@@ -6,7 +6,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg
 {
 	auto queryInformation = _config.getQueryInformation();
 
-	ot::ConstJsonArray allMongoDocuments = queryCurveData(queryInformation);
+	ot::JsonDocument entireResult = queryCurveData(queryInformation);
+	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
+	
+	const std::string tt =	ot::json::toJson(allMongoDocuments);
 	CurveType curveType = determineCurveType(queryInformation);
 	
 	std::list<ot::PlotDataset*> dataSets;
@@ -23,7 +26,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg
 	return dataSets;
 }
 
-ot::ConstJsonArray CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation)
+ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation)
 {
 	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.SearchInResultCollection(_queryInformation.m_query, _queryInformation.m_projection, 0);
 	if (dbResponse.getSuccess()) 
@@ -31,8 +34,7 @@ ot::ConstJsonArray CurveDatasetFactory::queryCurveData(const ot::QueryInformatio
 		const std::string queryResponse = dbResponse.getResult();
 		ot::JsonDocument doc;
 		doc.fromJson(queryResponse);
-		ot::ConstJsonArray allMongoDocuments = ot::json::getArray(doc, "Documents");
-		return allMongoDocuments;
+		return doc;
 	}
 	else
 	{

@@ -39,6 +39,7 @@ bool EntityResult1DCurve_New::updateFromProperties(void)
 void EntityResult1DCurve_New::createProperties(void)
 {
 	EntityPropertiesColor::createProperty("General", "Color", { 255, 0, 0 }, "", getProperties());
+	EntityPropertiesString::createProperty("General", "Curve title", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis label", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis unit", "", "", getProperties());
 	EntityPropertiesString::createProperty("Y axis", "Y axis label", "", "", getProperties());
@@ -66,12 +67,16 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	const std::string yAxisLabel =PropertyHelper::getStringPropertyValue(this, "Y axis label");
 	const std::string yAxisUnit =PropertyHelper::getStringPropertyValue(this, "Y axis unit");
 	
+	const std::string curveTitle = PropertyHelper::getStringPropertyValue(this, "Curve title");
+
 	curveCfg.setLinePenColor(colour);
 	curveCfg.setXAxisTitle(xAxisLabel);
 	curveCfg.setXAxisUnit(xAxisUnit);
 
 	curveCfg.setYAxisTitle(yAxisLabel);
 	curveCfg.setYAxisUnit(yAxisUnit);
+
+	curveCfg.setTitle(curveTitle);
 
 	curveCfg.setQueryInformation(m_queryInformation);
 	return curveCfg;
@@ -86,6 +91,8 @@ void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisTitle(), this, "Y axis label");
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisUnit(), this, "Y axis unit");
+	
+	PropertyHelper::setStringPropertyValue(_curve.getTitle(), this, "Curve title");
 
 	m_queryInformation = _curve.getQueryInformation();
 }

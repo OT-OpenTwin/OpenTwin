@@ -27,7 +27,7 @@ private:
 
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 
-	ot::ConstJsonArray queryCurveData(const ot::QueryInformation& _queryInformation);
+	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation);
 	CurveType determineCurveType(const ot::QueryInformation& _curveCfg);
 	ot::PlotDataset* createSingleCurve(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
 	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
