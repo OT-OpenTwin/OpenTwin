@@ -10,10 +10,10 @@ void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _obje
 
 void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
-	std::string m_fieldName = ot::json::getString(_object, "FieldName");;
-	std::string m_label = ot::json::getString(_object, "Label");;
-	std::string m_unit = ot::json::getString(_object, "Unit");;
-	std::string m_dataType = ot::json::getString(_object, "DataType");;
+	m_fieldName = ot::json::getString(_object, "FieldName");;
+	m_label = ot::json::getString(_object, "Label");;
+	m_unit = ot::json::getString(_object, "Unit");;
+	m_dataType = ot::json::getString(_object, "DataType");;
 }
 
 

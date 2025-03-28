@@ -13,6 +13,10 @@ void ot::QueryInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 		quantityContainerEntryDescription.PushBack(entry, _allocator);
 	}
 	_object.AddMember("ParameterDescriptions",quantityContainerEntryDescription,_allocator);
+
+	ot::JsonObject entry;
+	m_quantityDescription.addToJsonObject(entry, _allocator);
+	_object.AddMember("QuantityDescription", entry, _allocator);
 }
 
 void ot::QueryInformation::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -29,4 +33,6 @@ void ot::QueryInformation::setFromJsonObject(const ot::ConstJsonObject& _object)
 		 parameterDescsr.setFromJsonObject(entry);
 		 m_parameterDescriptions.push_back(parameterDescsr);
 	}
+	ot::ConstJsonObject quantityDescription = ot::json::getObject(_object,"QuantityDescription");
+	m_quantityDescription.setFromJsonObject(quantityDescription);
 }
