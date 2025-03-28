@@ -44,6 +44,8 @@ namespace ot {
 		
 		const Plot1DCurveCfg& getConfig(void) const { return m_config; };
 
+		void setOwnerPlot(PlotBase* _ownerPlot);
+
 		void setEntityName(const std::string& _name) { m_config.setEntityName(_name); };
 		const std::string& getEntityName(void) const { return m_config.getEntityName(); };
 

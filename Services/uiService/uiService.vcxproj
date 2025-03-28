@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="$(BASE64_ROOT)\base64.c" />
     <ClCompile Include="src\CopyProjectDialog.cpp" />
+    <ClCompile Include="src\CurveDatasetFactory.cpp" />
     <ClCompile Include="src\DevLogger.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
@@ -62,6 +63,7 @@
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <QtMoc Include="include\NavigationSelectionManager.h" />
     <ClInclude Include="include\ContainerFlexibleOwnership.h" />
+    <ClInclude Include="include\CurveDatasetFactory.h" />
     <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="resource.h" />

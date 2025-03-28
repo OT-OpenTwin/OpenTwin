@@ -52,6 +52,9 @@
     <Filter Include="Header Files\CurveHelper">
       <UniqueIdentifier>{6a16abfb-8bec-4bf9-ba56-1988a8166ab3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\CurveHelper">
+      <UniqueIdentifier>{ebe95a16-44d8-4985-84f3-7a7054f30416}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -141,6 +144,9 @@
     <ClCompile Include="src\DownloadFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CurveDatasetFactory.cpp">
+      <Filter>Source Files\CurveHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -189,6 +195,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ContainerFlexibleOwnership.h">
+      <Filter>Header Files\CurveHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurveDatasetFactory.h">
       <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
   </ItemGroup>

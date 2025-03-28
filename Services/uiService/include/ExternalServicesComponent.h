@@ -401,8 +401,6 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
-	std::list<ot::PlotDataset*> createCurve(ot::Plot1DCurveCfg& _config, DataStorageAPI::ResultDataStorageAPI& _dataAccess, ot::Plot* _plot);
-
 	// #################################################################
 
 	std::string										m_sessionServiceURL;
@@ -424,7 +422,7 @@ private:
 	std::string										m_uiRelayServiceWS;
 	WebsocketClient *								m_websocket;
 	QTimer*											m_keepAliveTimer;
-
+	
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
 
