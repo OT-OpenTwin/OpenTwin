@@ -312,7 +312,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
 				if (!success)
 				{
@@ -324,7 +324,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{			
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
 				if (!success)
 				{
@@ -336,7 +336,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
 				if (!success)
 				{
