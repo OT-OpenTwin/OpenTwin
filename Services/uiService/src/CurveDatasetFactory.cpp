@@ -1,5 +1,6 @@
 #include "CurveDatasetFactory.h"
 #include "ContainerFlexibleOwnership.h"
+#include "OTCore/TypeNames.h"
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config)
 {
@@ -69,16 +70,15 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 
 	auto entryDescription = queryInformation.m_parameterDescriptions.begin();
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
-		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
-		
+		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
+
 		//Get quantity value
-		const auto& quantityEntry = singleMongoDocument[quantityInformation.m_fieldName.c_str()];
-		int32_t quantityValue = quantityEntry.GetInt();
-		(dataY)[i] = static_cast<double>(quantityValue);
+		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
+		(dataY)[i] = quantityValue;
 		
 		//Get parameter value
-		const auto& parameterEntry = singleMongoDocument[entryDescription->m_fieldName.c_str()];
-		int32_t parameterValue = parameterEntry.GetInt();
+		
+		double parameterValue = jsonToDouble(entryDescription->m_fieldName, singleMongoDocument, entryDescription->m_dataType);
 		(dataX)[i] = static_cast<double>(parameterValue);
 	}
 
@@ -114,8 +114,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
 
 		//Get quantity value
-		const auto& quantityEntry = singleMongoDocument[quantityInformation.m_fieldName.c_str()];
-		int32_t quantityValue = quantityEntry.GetInt();
+		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
 		(dataY)[i] = static_cast<double>(quantityValue);
 
 		//First build a unique name of the additional parameter values
@@ -140,8 +139,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			curve = familyOfCurves.find(curveName);
 		}
 
-		auto& xAxisParameterEntry = singleMongoDocument[xAxisParameter->m_fieldName.c_str()];
-		(curve->second).pushBack(static_cast<double>(xAxisParameterEntry.GetInt()));
+		const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
+		(curve->second).pushBack(xAxisParameterValue);
 	}
 
 	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
@@ -189,4 +188,30 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	}
 
 	return dataSets;
+}
+
+double CurveDatasetFactory::jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jsonEntry, const std::string& _dataType)
+{
+	double value;
+	if (_dataType == ot::TypeNames::getFloatTypeName()) {
+		float serialisedVal = ot::json::getFloat(_jsonEntry, _memberName);
+		value =	static_cast<double>(serialisedVal);
+	}
+	else if (_dataType== ot::TypeNames::getDoubleTypeName()) {
+		value = ot::json::getDouble(_jsonEntry,_memberName);
+	}
+	else if (_dataType == ot::TypeNames::getInt32TypeName()) {
+		int32_t serialisedVal = ot::json::getInt(_jsonEntry, _memberName);
+		value = static_cast<double>(serialisedVal);
+	}
+	else if (_dataType == ot::TypeNames::getInt64TypeName()) {
+		int64_t serialisedVal = ot::json::getInt64(_jsonEntry, _memberName);
+		value = static_cast<double>(serialisedVal);
+	}
+	else
+	{
+		throw std::invalid_argument("Curve data has not supported type: "+ _dataType);
+	}
+
+	return value;
 }
