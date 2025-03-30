@@ -33,11 +33,7 @@ Application::Application() :
 	//this->enableFeature(DebugServiceConfig::ExitOnPing, true);
 	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown, true);
 	//this->enableFeature(DebugServiceConfig::ExitOnHello, true);
-	
-	// Enable features (Sleep)
-
-	//this->enableFeature(DebugServiceConfig::SleepOnHello, true);
-	
+		
 	// Enable features (Other)
 
 	//this->enableFeature(DebugServiceConfig::ExportOnStart, true);
@@ -61,12 +57,6 @@ Application::Application() :
 // Button callbacks
 
 void Application::testHello(void) {
-	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::SleepOnHello)) {
-		OT_LOG_T("Sleeping for " + std::to_string(this->getFeatureSleepTime()) + "ms");
-		std::this_thread::sleep_for(std::chrono::milliseconds(this->getFeatureSleepTime()));
-		OT_LOG_T("Woke up");
-	}
-
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnHello)) {
 		OT_LOG_T("Performing exit on \"hello\"");
 		exit(0);
@@ -144,7 +134,8 @@ void Application::run(void) {
 		OT_LOG_T("Performing exit on run");
 		exit(0);
 	}
-	// Add code that should be executed when the service is started and may start its work
+
+
 }
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)

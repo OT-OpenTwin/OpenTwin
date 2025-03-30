@@ -22,10 +22,7 @@ public:
 		ExitOnPing        = 1 << 2, //! @brief Exit the service on ping action.
 		ExitOnPreShutdown = 1 << 3, //! @brief Exit the service on ping action.
 		ExitOnHello       = 1 << 4, //! @brief Exit the service on hello button press.
-		//! @brief Sleep on hello button press.
-		//! @ref DebugServiceConfig::setSleepTime
-		SleepOnHello      = 1 << 5,
-		ExportOnStart     = 1 << 6  //! @brief Export the configuration on service start.
+		ExportOnStart     = 1 << 5  //! @brief Export the configuration on service start.
 	};
 	typedef ot::Flags<FeatureFlag> Features; //! @brief Feature flags type.
 
@@ -55,20 +52,15 @@ public:
 
 	// Setter / Getter
 
-	inline void setSleepTime(int _sleepTime) { m_sleepTime = _sleepTime; };
-	inline int getSleepTime(void) const { return m_sleepTime; };
-
 	inline void setFeatureFlag(FeatureFlag _flag, bool _set = true) { m_features.setFlag(_flag, _set); };
 	inline void setFeatureFlags(const Features& _features) { m_features = _features; };
 	inline const Features& getFeatureFlags(void) const { return m_features; };
 
 	inline void reset(void) {
-		m_sleepTime = (2 * ot::msg::defaultTimeout);
 		m_features = FeatureFlag::FeaturesDisabled;
 	}
 
 private:
-	int m_sleepTime;
 	Features m_features;
 };
 

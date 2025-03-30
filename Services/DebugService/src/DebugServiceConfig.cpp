@@ -17,7 +17,6 @@ std::string DebugServiceConfig::toString(FeatureFlag _flag) {
 	case FeatureFlag::ExitOnPing: return "ExitOnPing";
 	case FeatureFlag::ExitOnPreShutdown: return "ExitOnPreShutdown";
 	case FeatureFlag::ExitOnHello: return "ExitOnHello";
-	case FeatureFlag::SleepOnHello: return "SleepOnHello";
 	default:
 		OT_LOG_EAS("Unknown ConfigFlag (" + std::to_string(_flag) + ")");
 		return "FeaturesDisabled";
@@ -31,7 +30,6 @@ DebugServiceConfig::FeatureFlag DebugServiceConfig::stringToFeatureFlag(const st
 	else if (_flag == toString(FeatureFlag::ExitOnPing)) { return FeatureFlag::ExitOnPing; }
 	else if (_flag == toString(FeatureFlag::ExitOnPreShutdown)) { return FeatureFlag::ExitOnPreShutdown; }
 	else if (_flag == toString(FeatureFlag::ExitOnHello)) { return FeatureFlag::ExitOnHello; }
-	else if (_flag == toString(FeatureFlag::SleepOnHello)) { return FeatureFlag::SleepOnHello; }
 	else {
 		OT_LOG_EAS("Unknown ConfigFlag \"" + _flag + "\"");
 		return FeatureFlag::FeaturesDisabled;
@@ -46,7 +44,6 @@ std::list<std::string> DebugServiceConfig::toStringList(const Features& _feature
 	if (_features & FeatureFlag::ExitOnPing) { result.push_back(toString(FeatureFlag::ExitOnPing)); }
 	if (_features & FeatureFlag::ExitOnPreShutdown) { result.push_back(toString(FeatureFlag::ExitOnPreShutdown)); }
 	if (_features & FeatureFlag::ExitOnHello) { result.push_back(toString(FeatureFlag::ExitOnHello)); }
-	if (_features & FeatureFlag::SleepOnHello) { result.push_back(toString(FeatureFlag::SleepOnHello)); }
 
 	return result;
 }
@@ -64,7 +61,7 @@ DebugServiceConfig::Features DebugServiceConfig::stringListToFeatures(const std:
 // Constructor
 
 DebugServiceConfig::DebugServiceConfig(const Features& _features, int _sleepTime)
-	: m_sleepTime(_sleepTime), m_features(_features)
+	: m_features(_features)
 {}
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -72,14 +69,10 @@ DebugServiceConfig::DebugServiceConfig(const Features& _features, int _sleepTime
 // Virtual functions
 
 void DebugServiceConfig::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("SleepTime", m_sleepTime, _allocator);
 	_object.AddMember("Features", ot::JsonArray(toStringList(m_features), _allocator), _allocator);
 }
 
 void DebugServiceConfig::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	if (_object.HasMember("SleepTime")) {
-		m_sleepTime = ot::json::getInt(_object, "SleepTime");
-	}
 	if (_object.HasMember("Features")) {
 		m_features = stringListToFeatures(ot::json::getStringList(_object, "Features"));
 	}
