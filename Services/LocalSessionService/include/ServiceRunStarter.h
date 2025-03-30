@@ -18,14 +18,7 @@ public:
 	void sessionClosing(const std::string& _sessionId);
 
 private:
-	ServiceRunStarter();
-	virtual ~ServiceRunStarter();
-
-	bool queueEmpty(void);
-	void worker(void);
-	void sendRunMessageToService(std::string serviceURL, std::string messageOut, std::string serviceName, std::string serviceType, std::string serviceId);
-
-	struct startupInformation {
+	struct StartupInformation {
 		std::string sessionId;
 
 		std::string serviceName;
@@ -35,7 +28,7 @@ private:
 
 		std::string credentialsUserName;
 		std::string credentialsUserPassword;
-		
+
 		std::string databaseUserName;
 		std::string databaseUserPassword;
 
@@ -46,5 +39,13 @@ private:
 	std::mutex						m_mutex;
 	bool							m_isStopping;
 	bool							m_isRunning;
-	std::list<startupInformation>	m_queue;
+	std::list<StartupInformation>	m_queue;
+
+	ServiceRunStarter();
+	virtual ~ServiceRunStarter();
+
+	bool queueEmpty(void);
+	void worker(void);
+	bool sendRunMessageToService(const StartupInformation& _info, const std::string& _message);
+
 };

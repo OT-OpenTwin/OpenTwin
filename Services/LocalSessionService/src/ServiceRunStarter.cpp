@@ -18,7 +18,7 @@ ServiceRunStarter& ServiceRunStarter::instance() {
 void ServiceRunStarter::addService(Session * _session, Service * _service) {
 	m_mutex.lock();
 
-	startupInformation info;
+	StartupInformation info;
 	
 	info.sessionId = _session->id();
 
@@ -85,7 +85,7 @@ void ServiceRunStarter::worker(void) {
 		}
 		else {
 			// Get next notifier
-			startupInformation info = m_queue.front();
+			StartupInformation info = m_queue.front();
 			m_queue.pop_front();
 
 			// Create run document
@@ -105,7 +105,7 @@ void ServiceRunStarter::worker(void) {
 
 				OT_LOG_W("Session not found. Cleaning up");
 				// Clean up session information
-				sessionClosing(info.sessionId);
+				this->sessionClosing(info.sessionId);
 				continue;
 			}
 			else {
@@ -116,29 +116,33 @@ void ServiceRunStarter::worker(void) {
 				m_mutex.unlock();																// Unlock
 			}
 
-			OT_LOG_D("Sending run command to service (name = \"" + info.serviceName + "\"; type = \"" + info.serviceType +
-				"\"; id = \"" + std::to_string(info.serviceId) + "\")");
-
-			std::string messageOut = doc.toJson();
-
-			std::thread runThread(&ServiceRunStarter::sendRunMessageToService, this, info.serviceUrl, messageOut, info.serviceName, info.serviceType, std::to_string(info.serviceId));
-			runThread.detach();
+			if (!this->sendRunMessageToService(info, doc.toJson())) {
+				// Request failed, clean up session
+				this->sessionClosing(info.sessionId);
+				continue;
+			}
 		}
 	}
 	m_isRunning = false;
 }
 
-void ServiceRunStarter::sendRunMessageToService(std::string serviceURL, std::string messageOut, std::string serviceName, std::string serviceType, std::string serviceId)
-{
-	std::string response;
-	if (!ot::msg::send("", serviceURL, ot::EXECUTE, messageOut, response, ot::msg::defaultTimeout)) {
-		assert(0);
-		OT_LOG_E("Failed to send run command to service (name = \"" + serviceName + "\"; type = \"" + serviceType + "\"; id = \"" + serviceId + "\")");
-		// todo: add error handling for startup error
+bool ServiceRunStarter::sendRunMessageToService(const StartupInformation& _info, const std::string& _message) {
+	try {
+		std::string response;
+		if (!ot::msg::send("", _info.serviceUrl, ot::EXECUTE, _message, response, ot::msg::defaultTimeout)) {
+			OT_LOG_E("Failed to send run command to service (name = \"" + _info.serviceName + "\"; type = \"" + _info.serviceType + "\"; id = \"" + std::to_string(_info.serviceId) + "\")");
+			return false;
+		}
+
+		if (response != OT_ACTION_RETURN_VALUE_OK) {
+			OT_LOG_E("Invalid service response (expected: \"" OT_ACTION_RETURN_VALUE_OK "\"): " + response);
+			return false;
+		}
+
+		return true;
 	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		// todo: response should be OK
-		//assert(0);
-		//OT_LOG_E("Invalid service response (expected: \"" OT_ACTION_RETURN_VALUE_OK "\"): " + response);
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+		return false;
 	}
 }
