@@ -7,8 +7,8 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsElement.h"
 
-ot::GraphicsElement::GraphicsElement() 
-	: m_state(NoState), m_scene(nullptr)
+ot::GraphicsElement::GraphicsElement() :
+	m_state(NoState), m_scene(nullptr)
 {
 }
 

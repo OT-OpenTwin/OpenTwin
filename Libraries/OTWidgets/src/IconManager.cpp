@@ -111,8 +111,8 @@ QString ot::IconManager::findFullPath(const QString& _subPath) {
 	return QString();
 }
 
-ot::IconManager::IconManager()
-	: m_emptyIcon(new QIcon), m_emptyMovie(new QMovie), m_emptyPixmap(new QPixmap), m_emptySvgData(new QByteArray)
+ot::IconManager::IconManager() :
+	m_emptyIcon(new QIcon), m_emptyMovie(new QMovie), m_emptyPixmap(new QPixmap), m_emptySvgData(new QByteArray)
 {
 
 }

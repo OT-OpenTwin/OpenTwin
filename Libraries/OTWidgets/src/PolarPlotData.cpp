@@ -7,8 +7,8 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/PolarPlotData.h"
 
-ot::PolarPlotData::PolarPlotData(double* _azimuth, double* _radius, size_t _dataSize)
-	: m_azimuth(_azimuth), m_radius(_radius), m_size(_dataSize)
+ot::PolarPlotData::PolarPlotData(double* _azimuth, double* _radius, size_t _dataSize) :
+	m_azimuth(_azimuth), m_radius(_radius), m_size(_dataSize)
 {
 
 }

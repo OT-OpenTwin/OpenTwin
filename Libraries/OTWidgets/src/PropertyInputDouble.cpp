@@ -17,8 +17,8 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDouble> propertyInputD
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR
 
-ot::PropertyInputDouble::PropertyInputDouble()
-	: m_lineEdit(nullptr), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
+ot::PropertyInputDouble::PropertyInputDouble() :
+	m_lineEdit(nullptr), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
 {
 	m_spinBox = new DoubleSpinBox;
 	this->connect(m_spinBox, &DoubleSpinBox::valueChangeCompleted, this, &PropertyInputDouble::lclValueChanged);

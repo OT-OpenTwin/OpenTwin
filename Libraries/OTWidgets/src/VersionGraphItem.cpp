@@ -18,8 +18,8 @@
 #define OT_VERSIONGRAPHITEM_VSpacing 30.
 #define OT_VERSIONGRAPHITEM_HSpacing 60.
 
-ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, const std::string& _activeVersion, GraphicsScene* _scene)
-	: m_parentVersion(nullptr), m_parentConnection(nullptr), m_row(_row), m_config(_config)
+ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, const std::string& _activeVersion, GraphicsScene* _scene) :
+	m_parentVersion(nullptr), m_parentConnection(nullptr), m_row(_row), m_config(_config)
 {
 	OTAssertNullptr(_scene);
 	this->setGraphicsScene(_scene);

@@ -18,6 +18,7 @@ class QTreeWidgetItem;
 
 namespace ot {
 
+	class PushButton;
 	class PropertyGrid;
 	class PropertyGridItem;
 	class PropertyGridGroup;
@@ -44,10 +45,16 @@ namespace ot {
 
 		const std::list<const Property*>& getChangedProperties(void) const { return m_changedProperties; };
 
+		void setConfirmButtonEnabled(bool _enabled);
+
 	Q_SIGNALS:
 		void propertyChanged(const Property* _property);
 		void propertyDeleteRequested(const Property* _property);
-		
+
+		//! @brief Is emitted whenever the property grid was setup from the active configuration.
+		//! The active configuration depends on the selected tree item.
+		void propertyGridRefreshed(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private slots
@@ -81,6 +88,7 @@ namespace ot {
 
 		std::list<const Property*> m_changedProperties;
 		PropertyDialogNavigation* m_navigation;
+		PushButton* m_confirmButton;
 		PropertyGrid* m_grid;
 		bool m_changed;
 	};

@@ -9,8 +9,8 @@
 // Qt header
 #include <QtWidgets/qstatusbar.h>
 
-ot::StatusBarManager::StatusBarManager()
-	: m_statusBar(nullptr)
+ot::StatusBarManager::StatusBarManager() :
+	m_statusBar(nullptr)
 {
 	m_statusBar = new QStatusBar;
 }

@@ -26,8 +26,8 @@
 // std header
 #include <memory>
 
-ot::PlotBase::PlotBase()
-	: m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
+ot::PlotBase::PlotBase() :
+	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget;
 	m_centralLayout = new QVBoxLayout(m_centralWidget);

@@ -324,8 +324,8 @@ ot::Painter2D* ot::Painter2DEditDialogReferenceEntry::createPainter(void) const 
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2D* _painter) 
-	: m_currentEntry(nullptr), m_changed(false)
+ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2D* _painter) :
+	m_currentEntry(nullptr), m_changed(false)
 {
 	// Initialize data
 	if (_painter) m_painter = _painter->createCopy();
@@ -479,8 +479,8 @@ void ot::Painter2DEditDialog::applyPainter(const Painter2D* _painter) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::intern::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter)
-	: m_layout(_layout)
+ot::intern::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVBoxLayout* _layout, const GradientPainter2D* _painter) :
+	m_layout(_layout)
 {
 	std::vector<GradientPainterStop2D> tmp;
 	if (_painter) {

@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/PushButton.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -18,7 +19,6 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qscrollbar.h>
-#include <QtWidgets/qpushbutton.h>
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -49,12 +49,9 @@ namespace ot {
 
 		class PropertyDialog::PropertyDialogEntry {
 		public:
-			PropertyDialog::PropertyDialogEntry()
-				: m_treeItem(nullptr)
-			{}
+			PropertyDialog::PropertyDialogEntry() : m_treeItem(nullptr) {};
 
-			PropertyDialogEntry(const PropertyDialogEntry& _other)
-			{
+			PropertyDialogEntry(const PropertyDialogEntry& _other) {
 				*this = _other;
 			}
 
@@ -98,8 +95,8 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	m_grid = new PropertyGrid;
 	m_navigation = new PropertyDialogNavigation;
 
-	QPushButton* btnConfirm = new QPushButton("Confirm");
-	QPushButton* btnCancel = new QPushButton("Cancel");
+	m_confirmButton = new PushButton("Confirm");
+	PushButton* btnCancel = new PushButton("Cancel");
 
 	// Setup layouts
 	cLay->addWidget(cSplitter, 1);
@@ -108,7 +105,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	cSplitter->addWidget(m_navigation->getQWidget());
 	cSplitter->addWidget(m_grid->getQWidget());
 	btnLay->addStretch(1);
-	btnLay->addWidget(btnConfirm);
+	btnLay->addWidget(m_confirmButton);
 	btnLay->addWidget(btnCancel);
 
 	this->setupFromConfiguration(_config);
@@ -119,10 +116,12 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 
 	// Connect signals
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
-	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
+	this->connect(m_confirmButton, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
 	this->connect(btnCancel, &QPushButton::clicked, this, &PropertyDialog::closeCancel);
 	this->connect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyDialog::slotPropertyChanged);
 	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyDialog::slotPropertyDeleteRequested);
+
+	this->slotTreeSelectionChanged();
 }
 
 ot::PropertyDialog::~PropertyDialog() {
@@ -157,21 +156,29 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 	this->iniData(_config);
 
 	// Restore selected item
-	if (currentFocus.empty()) return;
+	if (!currentFocus.empty()) {
+		QTreeWidgetItem* newFocus = this->findTreeItem(m_navigation->getTreeWidget()->invisibleRootItem(), currentFocus);
+		if (newFocus) {
+			newFocus->setSelected(true);
 
-	QTreeWidgetItem* newFocus = this->findTreeItem(m_navigation->getTreeWidget()->invisibleRootItem(), currentFocus);
-	if (newFocus) {
-		newFocus->setSelected(true);
-
-		newFocus = newFocus->parent();
-
-		while (newFocus) {
-			newFocus->setExpanded(true);
 			newFocus = newFocus->parent();
-		}
 
-		m_grid->getTreeWidget()->verticalScrollBar()->setSliderPosition(currentSliderPos);
+			while (newFocus) {
+				newFocus->setExpanded(true);
+				newFocus = newFocus->parent();
+			}
+
+			m_grid->getTreeWidget()->verticalScrollBar()->setSliderPosition(currentSliderPos);
+		}
 	}
+	else if (m_navigation->getTreeWidget()->topLevelItemCount() > 0) {
+		QTreeWidgetItem* itm = m_navigation->getTreeWidget()->topLevelItem(0);
+		itm->setSelected(true);
+	}
+}
+
+void ot::PropertyDialog::setConfirmButtonEnabled(bool _enabled) {
+	m_confirmButton->setEnabled(_enabled);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -198,6 +205,8 @@ void ot::PropertyDialog::slotTreeSelectionChanged(void) {
 	}
 
 	m_grid->setupGridFromConfig(it->second.getGridConfig());
+
+	Q_EMIT propertyGridRefreshed();
 }
 
 void ot::PropertyDialog::slotPropertyChanged(const Property* _property) {

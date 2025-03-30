@@ -11,8 +11,8 @@
 #include <QtGui/qpainter.h>
 #include <QtSvg/qsvgrenderer.h>
 
-ot::SvgImagePainter::SvgImagePainter(QSvgRenderer* _renderer) 
-	: m_svgRenderer(_renderer)
+ot::SvgImagePainter::SvgImagePainter(QSvgRenderer* _renderer) :
+	m_svgRenderer(_renderer)
 {
 	OTAssertNullptr(m_svgRenderer);
 }
