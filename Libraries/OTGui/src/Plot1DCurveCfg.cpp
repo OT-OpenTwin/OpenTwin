@@ -18,10 +18,50 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _na
 {}
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(const Plot1DCurveCfg& _other) : m_pointsFillPainter(nullptr) {
-	*this = _other;
+	this->operator=(_other);
+}
+
+ot::Plot1DCurveCfg::Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept :
+	m_pointsFillPainter(nullptr)
+{
+	this->operator=(std::move(_other));
 }
 
 ot::Plot1DCurveCfg::~Plot1DCurveCfg() {}
+
+ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexcept {
+	if (this != &_other) {
+		BasicEntityInformation::operator=(std::move(_other));
+		
+		m_navigationId = _other.m_navigationId;
+
+		m_title = std::move(_other.m_title);
+
+		m_axisTitleX = std::move(_other.m_axisTitleX);
+		m_axisUnitX = std::move(_other.m_axisUnitX);
+		m_axisTitleY = std::move(_other.m_axisTitleY);
+		m_axisUnitY = std::move(_other.m_axisUnitY);
+
+		m_visible = _other.m_visible;
+		m_dimmed = _other.m_dimmed;
+
+		m_linePen = std::move(_other.m_linePen);
+
+		m_pointsVisible = _other.m_pointsVisible;
+		m_pointsSize = _other.m_pointsSize;
+		m_pointsOulinePen = std::move(_other.m_pointsOulinePen);
+
+		if (m_pointsFillPainter) {
+			delete m_pointsFillPainter;
+		}
+		m_pointsFillPainter = _other.m_pointsFillPainter;
+		_other.m_pointsFillPainter = nullptr;
+
+		m_queryInformation = std::move(_other.m_queryInformation);
+	}
+
+	return *this;
+}
 
 ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other) {
 	BasicEntityInformation::operator=(_other);

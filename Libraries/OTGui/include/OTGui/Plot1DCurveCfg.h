@@ -24,8 +24,10 @@ namespace ot {
 		Plot1DCurveCfg();
 		Plot1DCurveCfg(UID _id, UID _version, const std::string& _name);
 		Plot1DCurveCfg(const Plot1DCurveCfg& _other);
+		Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept;
 		virtual ~Plot1DCurveCfg();
 
+		Plot1DCurveCfg& operator = (Plot1DCurveCfg&& _other) noexcept;
 		Plot1DCurveCfg& operator = (const Plot1DCurveCfg& _other);
 		Plot1DCurveCfg& operator = (const BasicEntityInformation& _other);
 
@@ -110,6 +112,7 @@ namespace ot {
 		int m_pointsSize;
 		PenFCfg m_pointsOulinePen;
 		Painter2D* m_pointsFillPainter;
+
 		QueryInformation m_queryInformation;
 	};
 

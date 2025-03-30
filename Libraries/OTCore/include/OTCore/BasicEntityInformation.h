@@ -21,9 +21,11 @@ namespace ot {
 		BasicEntityInformation();
 		BasicEntityInformation(UID _entityId, UID _entityVersion);
 		BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion);
+		BasicEntityInformation(BasicEntityInformation&& _other) noexcept;
 		BasicEntityInformation(const BasicEntityInformation& _other);
 		virtual ~BasicEntityInformation();
 
+		BasicEntityInformation& operator = (BasicEntityInformation&& _other) noexcept;
 		BasicEntityInformation& operator = (const BasicEntityInformation& _other);
 
 		bool operator == (const BasicEntityInformation& _other) const;

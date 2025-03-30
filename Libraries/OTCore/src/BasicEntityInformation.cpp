@@ -8,26 +8,35 @@
 
 ot::BasicEntityInformation::BasicEntityInformation()
 	: m_entityId(0), m_entityVersion(0)
-{
-}
+{}
 
 ot::BasicEntityInformation::BasicEntityInformation(UID _entityId, UID _entityVersion)
 	: m_entityId(_entityId), m_entityVersion(_entityVersion)
-{
-}
+{}
 
-ot::BasicEntityInformation::BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion) 
+ot::BasicEntityInformation::BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion)
 	: m_entityName(_entityName), m_entityId(_entityId), m_entityVersion(_entityVersion)
-{
-}
+{}
+
+ot::BasicEntityInformation::BasicEntityInformation(BasicEntityInformation&& _other) noexcept :
+	m_entityName(std::move(_other.m_entityName)), m_entityId(_other.m_entityId), m_entityVersion(_other.m_entityVersion)
+{}
 
 ot::BasicEntityInformation::BasicEntityInformation(const BasicEntityInformation& _other) 
 	: m_entityName(_other.m_entityName), m_entityId(_other.m_entityId), m_entityVersion(_other.m_entityVersion)
-{
-
-}
+{}
 
 ot::BasicEntityInformation::~BasicEntityInformation() {}
+
+ot::BasicEntityInformation& ot::BasicEntityInformation::operator=(BasicEntityInformation&& _other) noexcept {
+	if (this != &_other) {
+		m_entityName = std::move(_other.m_entityName);
+		m_entityId = _other.m_entityId;
+		m_entityVersion = _other.m_entityVersion;
+	}
+
+	return *this;
+}
 
 ot::BasicEntityInformation& ot::BasicEntityInformation::operator=(const BasicEntityInformation& _other) {
 	if (this != &_other) {
