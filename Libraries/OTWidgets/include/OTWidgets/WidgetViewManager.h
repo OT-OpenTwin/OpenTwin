@@ -204,8 +204,10 @@ namespace ot {
 		void viewTabClicked(WidgetView* _view);
 		void viewDataModifiedChanged(ot::WidgetView* _view);
 
-	private Q_SLOTS:
+	public Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
+
+	private Q_SLOTS:
 		void slotViewCloseRequested(void);
 		void slotUpdateViewVisibility(void);
 		void slotViewTabClicked(void);
