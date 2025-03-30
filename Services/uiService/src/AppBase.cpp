@@ -4,26 +4,27 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Frontend header
-#include "AppBase.h"		// Corresponding header
-#include "UserSettings.h"
-#include "ServiceDataUi.h"
-#include "ViewerComponent.h"	// Viewer component
-#include "ExternalServicesComponent.h"		// ExternalServices component
-#include "UserManagement.h"
-#include "ProjectManagement.h"
-#include "ControlsManager.h"
+#include "AppBase.h"
 #include "ToolBar.h"
-#include "ShortcutManager.h"
-#include "ManageGroups.h"
-#include "ManageAccess.h"
 #include "DevLogger.h"
 #include "LogInDialog.h"
-#include "NavigationTreeView.h"
-#include "ProjectOverviewWidget.h"
-#include "CopyProjectDialog.h"
-#include "RenameProjectDialog.h"
 #include "ManageOwner.h"
+#include "ManageAccess.h"
+#include "ManageGroups.h"
+#include "UserSettings.h"
 #include "DownloadFile.h"
+#include "ViewStateCfg.h"
+#include "ServiceDataUi.h"
+#include "UserManagement.h"
+#include "ViewerComponent.h"
+#include "ControlsManager.h"
+#include "ShortcutManager.h"
+#include "CopyProjectDialog.h"
+#include "ProjectManagement.h"
+#include "NavigationTreeView.h"
+#include "RenameProjectDialog.h"
+#include "ProjectOverviewWidget.h"
+#include "ExternalServicesComponent.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -326,7 +327,10 @@ bool AppBase::logIn(void) {
 		}
 
 		// Restore view state
-		ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+		ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
+		if (!viewStateCfg.getViewConfig().empty()) {
+			ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+		}
 
 		this->initializeDefaultUserSettings();
 
@@ -453,7 +457,9 @@ bool AppBase::closeEvent() {
 		}
 
 		if (m_currentStateWindow.viewShown) {
-			m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+			ViewStateCfg viewStateCfg;
+			viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+			m_currentStateWindow.view = viewStateCfg.toJson();
 		}
 	}
 
@@ -1335,10 +1341,16 @@ void AppBase::restoreSessionState(void) {
 	}
 
 	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
-	if (s.empty()) return;
+	if (s.empty()) {
+		return;
+	}
 
 	m_currentStateWindow.view = s;
-	ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+
+	ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
+	if (!viewStateCfg.getViewConfig().empty()) {
+		ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+	}
 
 	// Set first tab as current view in central view
 	OTAssertNullptr(m_defaultView);
@@ -1366,7 +1378,9 @@ void AppBase::storeSessionState(void) {
 
 	UserManagement uM(m_loginData);
 
-	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+	ViewStateCfg viewStateCfg;
+	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+	m_currentStateWindow.view = viewStateCfg.toJson();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
 
 	if (m_versionGraph) {
