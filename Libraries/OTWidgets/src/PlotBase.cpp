@@ -92,7 +92,8 @@ ot::PlotDataset * ot::PlotBase::addDataset(const Plot1DCurveCfg& _config, double
 }
 
 void ot::PlotBase::resetView(void) {
-	assert(0);
+	m_cartesianPlot->resetPlotView();
+	m_polarPlot->resetPlotView();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -239,7 +240,7 @@ void ot::PlotBase::applyConfig(void) {
 	}
 
 	if (!compatible) {
-		setIncompatibleData();
+		this->setIncompatibleData();
 		return;
 	}
 

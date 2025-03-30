@@ -16,6 +16,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(const ot::Plot1DCu
 		const uint32_t numberOfDocuments = allMongoDocuments.Size();
 
 		std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
+		std::unique_ptr<double[]> dataYim(new double[numberOfDocuments]);
 		size_t counter(0);
 
 		for (uint32_t i = 0; i < numberOfDocuments; i++) {
@@ -42,10 +43,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(const ot::Plot1DCu
 
 			double* xData = dataX.release();
 			double* yData = dataY.release();
-
-			double* dataXIm(nullptr), * dataYIm(nullptr);
-
-			dataSets.push_back(new ot::PlotDataset(nullptr, _config, ot::PlotDatasetData(xData, dataXIm, yData, dataYIm, nullptr, counter)));
+			double* yimData = dataYim.release();
+			dataSets.push_back(new ot::PlotDataset(nullptr, _config, ot::PlotDatasetData(xData, nullptr, yData, yimData, nullptr, counter)));
 		}
 		else {
 			//Lables of curves will be <parameter_Label_1>_<parameter_Value_1>_<parameter_Unit_1>_ ... _<parameter_Label_n>_<parameter_Value_n>_<parameter_Unit_n>

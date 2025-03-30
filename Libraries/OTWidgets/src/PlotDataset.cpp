@@ -43,6 +43,8 @@ ot::PlotDataset::~PlotDataset() {
 }
 
 void ot::PlotDataset::attach(void) {
+	OTAssertNullptr(m_ownerPlot);
+
 	if (m_isAttatched) {
 		//OT_LOG_WA("Dataset already attached");
 		return;

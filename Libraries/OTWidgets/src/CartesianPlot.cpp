@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/CartesianPlot.h"
@@ -75,6 +76,39 @@ void ot::CartesianPlot::clearPlot(void) {
 void ot::CartesianPlot::setZoomerPen(const QPen & _pen) {
 	m_plotZoomer->setRubberBandPen(_pen);
 	m_plotZoomer->setTrackerPen(_pen);
+}
+
+void ot::CartesianPlot::resetPlotView(void) {
+	double xMin = std::numeric_limits<double>::max();
+	double xMax = std::numeric_limits<double>::lowest();
+	double yMin = std::numeric_limits<double>::max();
+	double yMax = std::numeric_limits<double>::lowest();
+
+	for (QwtPlotItem* item : this->itemList()) {
+		if (item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+			OTAssertNullptr(dynamic_cast<QwtPlotCurve*>(item));
+			QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(item);
+
+			if (curve && curve->isVisible()) {
+				const QwtSeriesData<QPointF>* data = curve->data();
+				for (size_t i = 0; i < data->size(); ++i) {
+					QPointF p = data->sample(i);
+					xMin = std::min(xMin, p.x());
+					xMax = std::max(xMax, p.x());
+					yMin = std::min(yMin, p.y());
+					yMax = std::max(yMax, p.y());
+				}
+			}
+		}
+	}
+
+	if (xMin < xMax && yMin < yMax) {
+		const Plot1DCfg& cfg = this->getConfiguration();
+
+		this->setAxisScale(QwtPlot::xBottom, std::max(xMin, cfg.getXAxisMin()), std::min(xMax, cfg.getXAxisMax()));
+		this->setAxisScale(QwtPlot::yLeft, std::max(yMin, cfg.getYAxisMin()), std::min(yMax, cfg.getYAxisMax()));
+		this->replot();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

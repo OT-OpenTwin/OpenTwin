@@ -34,6 +34,8 @@ namespace ot {
 
 		virtual void rescale(double _factor) override;
 
+		virtual void widgetKeyPressEvent(QKeyEvent* _event) override;
+
 	private:
 		QPointF m_cursorPos;
 		bool m_rightMouseIsPressed;
