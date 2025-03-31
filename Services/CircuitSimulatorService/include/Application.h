@@ -72,7 +72,6 @@ public:
 
 	void addSolver();
 	void runCircuitSimulation();
-	void solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion,  std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
 	void sendNetlistToSubService(std::list<std::string>& _netlist);
 

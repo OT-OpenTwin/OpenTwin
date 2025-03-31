@@ -22,11 +22,9 @@ public:
 	~SubprocessHandler();
 
 
-	void RunSubprocess();
+	bool RunSubprocess();
 	bool startSubprocess();
 	void stopSubprocess();
-	bool isSubprocessHealthy();
-	void restartSubprocess();
 
 	
 

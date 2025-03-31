@@ -310,33 +310,33 @@ void Application::runCircuitSimulation() {
 
 	// Get the current model version
 	std::string modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
-	 
-	// Finally start the worker thread to run the solvers
-	std::thread workerThread(&Application::solverThread, this, solverInfo, modelVersion, solverMap);
-	workerThread.detach();
-}
 
-void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::map<std::string, EntityBase*> solverMap) {
+	// run all selected solver
 	for (auto solver : solverInfo) {
 		runSingleSolver(solver, modelVersion, solverMap[solver.getEntityName()]);
 	}
+
 }
+
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
-	//Enusre that subprocessHandler is null before starting
+	// Enusre that subprocessHandler is null before starting
 	m_subprocessHandler = nullptr;
 	
-	
+	// Get circuit name
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
+	// Get simulation type
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
 
-
+	// Get only circuit name
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
+
+	// Get solver name
 	std::string solverName = solver.getEntityName();
 
 	if (name == "failed")
@@ -345,15 +345,20 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
-	//Setting the members of SimulationResults
+	// Setting the members of SimulationResults
 	SimulationResults::getInstance()->setSolverInformation(solverName, simulationTypeProperty->getValue(), circuitName->getValueName());
 
+	// Set circuit
 	m_blockEntityHandler.setPackageName(name);
+
+	// Get all Entities
+
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
 
-	//Here i generate my netlist
+	// Here i generate my netlist
+
 	std::list<std::string> _netlist = m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
 	if (_netlist.empty())
 	{
@@ -362,21 +367,38 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
-	//Now i send the netlist to the subprocess
-	sendNetlistToSubService(_netlist);
-
-	m_ngSpice.clearBufferStructure(name);
-
-	//And start the subprocess
+	// After generating the netlist I start the subprocess
+	// Initialization time of subprocess
 	QDateTime initTime = QDateTime::currentDateTime();
 	SimulationResults::getInstance()->handleCircuitExecutionTiming(initTime, "startingInitTime");
 
+	// Initialization of subprocess
 	const int sessionCount = Application::instance()->getSessionCount();
 	const int serviceID = Application::instance()->getServiceIDAsInt();
 	if (m_subprocessHandler == nullptr) {
-
 		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
-	}	
+	}
+	else {
+		OT_LOG_E("Initialization of subprocess failed!");
+	}
+
+#ifndef _DEBUG
+	// Starting subprocess
+	if (m_subprocessHandler->RunSubprocess()) {
+		OT_LOG_D("Sub process started successfull.");
+	}
+	else {
+		OT_LOG_E("Sub process failed to start.");
+		return;
+	}
+#endif // !_DEBUG
+
+
+	// Now i set the netlist to the ConnectionManager and afterwards it is being send
+	sendNetlistToSubService(_netlist);
+
+	m_ngSpice.clearBufferStructure(name);
+	
 }
 
 void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {
@@ -384,8 +406,17 @@ void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {
 		OT_LOG_W("QtWrapper is nullptr");
 	}
 
+	m_qtWrapper->getConnectionManager()->setNetlist(ConnectionManager::ExecuteNetlist, _netlist);
+	if (m_qtWrapper->getConnectionManager()->sendNetlist()) {
+		OT_LOG_D("Netlist sent successfull");
+		return;
+	}
+	else {
+		OT_LOG_E("Failed to send netlist");
+		return;
+	}
 	
-	m_qtWrapper->getConnectionManager()->queueRequest(ConnectionManager::ExecuteNetlist, _netlist);
+
 }
 
 
