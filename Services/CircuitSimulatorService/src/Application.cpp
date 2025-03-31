@@ -310,7 +310,7 @@ void Application::runCircuitSimulation() {
 
 	// Get the current model version
 	std::string modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
-
+	 
 	// Finally start the worker thread to run the solvers
 	std::thread workerThread(&Application::solverThread, this, solverInfo, modelVersion, solverMap);
 	workerThread.detach();
@@ -525,7 +525,11 @@ void Application::run(void) {
 	{
 		assert(0);
 	}
+#ifdef _DEBUG
+	m_serverName = "TestServerCircuit";
+#else
 	m_serverName = sessionID() + OT_INFO_SERVICE_TYPE_CircuitSimulatorService;
+#endif // _DEBUG
 	m_qtWrapper = new QtWrapper();
 	m_qtWrapper->run(m_serverName);
 
@@ -549,16 +553,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
-	/*m_blockEntityHandler.setPackageName("Circuit"); */
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
 	SimulationResults::getInstance()->setUIComponent(_ui);
-	//if (m_subprocessHandler == nullptr)
-	//{
-	//	const int sessionCount = Application::instance()->getSessionCount();
-	//	const int serviceID = Application::instance()->getServiceIDAsInt();
-	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	//}
-	//m_subprocessHandler->setUIComponent(_ui);
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
@@ -572,13 +568,6 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
 	SimulationResults::getInstance()->setModelComponent(_model);
-	//if (m_subprocessHandler == nullptr)
-	//{
-	//	const int sessionCount = Application::instance()->getSessionCount();
-	//	const int serviceID = Application::instance()->getServiceIDAsInt();
-	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	//}
-	//m_subprocessHandler->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model) {
