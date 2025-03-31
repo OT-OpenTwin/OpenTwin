@@ -380,11 +380,13 @@ void ConnectionManager::handleConnection() {
     OT_LOG_D("Subprocess connected");
     connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::handleReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
-    QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
+
     healthCheckTimer = new QTimer(this);
+    connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
 
     healthCheckTimer->setInterval(5000);
     healthCheckTimer->start();
+
     //I only send the netlist when the connection is established to prevent sending before connected
     OT_LOG_D("Send netlist");
     m_socket->write(m_netlist);
