@@ -8,7 +8,8 @@
 #include "QtCore/qjsonarray.h"
 #include "QtCore/qjsondocument.h"
 #include "QtCore/qjsonobject.h"
-
+#include "QtCore/qcoreapplication.h"
+#include <QtCore/qelapsedtimer>
 // OpenTwin Header
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
@@ -35,6 +36,7 @@ ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent) {
     m_socket = nullptr;
     waitForHealthcheck = false;
     healthCheckTimer = nullptr;
+    m_netlist = nullptr;
 }
 
 ConnectionManager::~ConnectionManager()
@@ -57,11 +59,34 @@ void ConnectionManager::startListen(const std::string& _serverName) {
     OT_LOG_D("CircuitSimulatorService starting to listen: " + _serverName);
 }
 
-void ConnectionManager::queueRequest(RequestType _type, const std::list<std::string>& _data) {
-    
-    QMetaObject::invokeMethod(this, "handleQueueRequest", Qt::QueuedConnection, Q_ARG(RequestType, _type), Q_ARG(std::list<std::string>, _data));
-   
+bool ConnectionManager::sendNetlist() {
+    if (!this->waitForClient()) {
+        return false;
+    }
+
+    m_socket->write(m_netlist);
+    m_socket->flush();
+    return true;
 }
+
+bool ConnectionManager::waitForClient(void) {
+
+    const int tickTime = 10;
+    int timeout = 30000 / tickTime;
+    while ( m_socket == nullptr) {
+        if (timeout--) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(tickTime));
+            QCoreApplication::processEvents();
+        }
+        else {
+            OT_LOG_E("Client connection timeout");
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 bool ConnectionManager::isSingleJsonObject(const QByteArray& data) {
     QJsonParseError parseError;
@@ -170,6 +195,25 @@ void ConnectionManager::send(std::string messageType, std::string message) {
     m_socket->flush();
 }
 
+void ConnectionManager::setNetlist(RequestType _type,std::list<std::string>& _netlist) {
+    //In this function I set the netlist which I got from Application
+    QJsonObject jsonObject;
+
+    jsonObject["type"] = toString(_type);
+
+    QJsonArray jsonArray;
+
+    for (const auto& str : _netlist) {
+        jsonArray.append(QString::fromStdString(str));
+    }
+    jsonObject["data"] = jsonArray;
+
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    m_netlist = jsonData;
+}
+
 
 void ConnectionManager::handleReadyRead() {
     QByteArray rawData = m_socket->readAll();
@@ -222,26 +266,6 @@ void ConnectionManager::handleDisconnected() {
     m_socket = nullptr;
 }
 
-void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::string> _data) {
-
-    //In this function I set the netlist which I got from Application
-    QJsonObject jsonObject;
-
-    jsonObject["type"] = toString(_type);
-
-    QJsonArray jsonArray;
-
-    for (const auto& str : _data) {
-        jsonArray.append(QString::fromStdString(str));
-    }
-    jsonObject["data"] = jsonArray;
-
-    QJsonDocument jsonDoc(jsonObject);
-    QByteArray jsonData = jsonDoc.toJson();
-
-    m_netlist = jsonData;
-    
-}
 
 void ConnectionManager::sendHealthcheck() {
     if (m_socket == nullptr)         {
@@ -374,7 +398,6 @@ void ConnectionManager::handleConnection() {
         return;
     }
 
-   
     
     m_socket = clientSocket;
     OT_LOG_D("Subprocess connected");
@@ -386,13 +409,6 @@ void ConnectionManager::handleConnection() {
 
     healthCheckTimer->setInterval(5000);
     healthCheckTimer->start();
-
-    //I only send the netlist when the connection is established to prevent sending before connected
-    OT_LOG_D("Send netlist");
-    m_socket->write(m_netlist);
-    m_socket->flush(); 
-
-
 }
 
 

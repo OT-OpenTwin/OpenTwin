@@ -1,7 +1,7 @@
 #pragma once
 
 
-//Qt Header
+// Qt Header
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qtimer.h>
@@ -27,8 +27,8 @@ public:
 
 
 	void startListen(const std::string& _serverName);
-	void queueRequest(RequestType _type, const std::list<std::string>& _data);
-
+	bool sendNetlist();
+	bool waitForClient(void);
 
 	// Json Functions
 	bool isSingleJsonObject(const QByteArray& data);
@@ -37,11 +37,14 @@ public:
 	int findEndOfJsonObject(const QByteArray& data);
 	QList<QJsonObject> handleMultipleJsonObjects(const QByteArray& jsonStram);
 	void send(std::string messageType, std::string message);
+
+	// Setter
+	void setNetlist(RequestType _type,std::list<std::string>& _netlist);
+
 private Q_SLOTS:
 	void handleConnection();
 	void handleReadyRead();
 	void handleDisconnected();
-	void handleQueueRequest(RequestType _type, std::list<std::string> _data);
 	void sendHealthcheck();
 
 private:
