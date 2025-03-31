@@ -69,6 +69,7 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 
 	std::unique_ptr<double[]> dataY(new double[numberOfDocuments]);
 	std::unique_ptr<double[]> dataX(new double[numberOfDocuments]);
+	std::unique_ptr<double[]> dataYIm(new double[numberOfDocuments]);
 
 	auto entryDescription = queryInformation.m_parameterDescriptions.begin();
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
@@ -86,13 +87,14 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 
 	double* xData = dataX.release();
 	double* yData = dataY.release();
-	double* dataXIm(nullptr), * dataYIm(nullptr); //Currently no complex numbers
+	double* yDataIm = dataYIm.release();
+	double* dataXIm(nullptr); //Currently no complex numbers
 	
 	if (_curveCfg.getXAxisUnit().empty())
 	{
 		_curveCfg.setXAxisUnit(entryDescription->m_unit); //Could be overwritten be the calling code, the default is the parameter unit.
 	}
-	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(xData, dataXIm, yData, dataYIm, nullptr, numberOfDocuments));
+	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(xData, dataXIm, yData, yDataIm, nullptr, numberOfDocuments));
 	return singleCurve;
 }
 
