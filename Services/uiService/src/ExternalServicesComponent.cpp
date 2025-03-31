@@ -3722,8 +3722,6 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	// Get plot
 	ot::Plot1DCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-	config.setGridVisible(true);
-	config.setLegendVisible(true);
 
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
 	ot::Plot* plot = plotView->getPlot();
