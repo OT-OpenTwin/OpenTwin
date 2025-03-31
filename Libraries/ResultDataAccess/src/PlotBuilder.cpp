@@ -77,6 +77,10 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 	const MetadataSeries* series =	m_extender.findMetadataSeries(seriesID);
 	const std::list<MetadataQuantity>& quantities = series->getQuantities();
 	assert(quantities.size() == 1);
+	if (quantities.size() != 1)
+	{
+		throw std::invalid_argument("Creating a curve is only possible with a single quantity");
+	}
 	auto quantity =	quantities.begin()->valueDescriptions.begin();
 	
 	ot::QuantityContainerEntryDescription quantityInformation;
@@ -85,20 +89,16 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 	quantityInformation.m_dataType = quantity->dataTypeName;
 	queryInformation.m_quantityDescription = quantityInformation;
 
-	for (auto& dataSetDescription : _dataSetDescriptions)
-	{
-		for (auto parameterDescription : dataSetDescription.getParameters())
-		{
-			MetadataParameter& parameter =	parameterDescription->getMetadataParameter();
-		
-			ot::QuantityContainerEntryDescription qcDescription;
-			qcDescription.m_label =  parameter.parameterLabel;
-			qcDescription.m_dataType=  parameter.typeName;
-			qcDescription.m_fieldName=  std::to_string(parameter.parameterUID);
-			qcDescription.m_unit =  parameter.unit;
-			queryInformation.m_parameterDescriptions.push_back(qcDescription);
-		}
+	const std::list<MetadataParameter>& parameters = series->getParameter();
 
+	for (const auto& parameter : parameters)
+	{	
+		ot::QuantityContainerEntryDescription qcDescription;
+		qcDescription.m_label =  parameter.parameterLabel;
+		qcDescription.m_dataType=  parameter.typeName;
+		qcDescription.m_fieldName=  std::to_string(parameter.parameterUID);
+		qcDescription.m_unit =  parameter.unit;
+		queryInformation.m_parameterDescriptions.push_back(qcDescription);
 	}
 
 	_config.setQueryInformation(queryInformation);
