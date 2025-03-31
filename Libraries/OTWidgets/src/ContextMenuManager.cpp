@@ -8,8 +8,8 @@
 #include "OTWidgets/ContextMenu.h"
 #include "OTWidgets/ContextMenuManager.h"
 
-ot::ContextMenuManager::ContextMenuManager(QWidget* _widget)
-	: m_widget(_widget), m_menu(nullptr) 
+ot::ContextMenuManager::ContextMenuManager(QWidget* _widget) :
+	m_widget(_widget), m_menu(nullptr) 
 {
 	OTAssertNullptr(m_widget);
 }

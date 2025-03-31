@@ -9,8 +9,8 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-ot::PixmapImagePainter::PixmapImagePainter(const QPixmap& _pixmap) 
-	: m_pixmap(_pixmap)
+ot::PixmapImagePainter::PixmapImagePainter(const QPixmap& _pixmap) :
+	m_pixmap(_pixmap)
 {
 
 }

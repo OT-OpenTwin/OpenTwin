@@ -23,7 +23,7 @@ namespace ot {
 		virtual bool eventFilter(QObject* _object, QEvent* _event) override;
 
 	private:
-		bool		m_mouseIsPressed;
+		bool m_mouseIsPressed;
 	};
 
 }

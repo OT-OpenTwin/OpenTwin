@@ -26,8 +26,8 @@
 // std header
 #include <memory>
 
-ot::PlotBase::PlotBase()
-	: m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
+ot::PlotBase::PlotBase() :
+	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
 	m_centralWidget = new QWidget;
 	m_centralLayout = new QVBoxLayout(m_centralWidget);
@@ -92,7 +92,8 @@ ot::PlotDataset * ot::PlotBase::addDataset(const Plot1DCurveCfg& _config, double
 }
 
 void ot::PlotBase::resetView(void) {
-	assert(0);
+	m_cartesianPlot->resetPlotView();
+	m_polarPlot->resetPlotView();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -239,7 +240,7 @@ void ot::PlotBase::applyConfig(void) {
 	}
 
 	if (!compatible) {
-		setIncompatibleData();
+		this->setIncompatibleData();
 		return;
 	}
 

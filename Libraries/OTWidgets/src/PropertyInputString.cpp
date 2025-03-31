@@ -12,8 +12,8 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputString> propertyInputStringRegistrar(ot::PropertyString::propertyTypeString());
 
-ot::PropertyInputString::PropertyInputString(const QString& _text) 
-	: m_text(_text)
+ot::PropertyInputString::PropertyInputString(const QString& _text) :
+	m_text(_text)
 {
 	m_lineEdit = new LineEdit;
 	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);

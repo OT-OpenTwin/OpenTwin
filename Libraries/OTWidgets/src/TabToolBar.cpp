@@ -38,8 +38,8 @@ ot::ToolButton* ot::TabToolBar::createButton(const QIcon& _icon, const QString& 
 	return btn;
 }
 
-ot::TabToolBar::TabToolBar(MainWindow* _window)
-	: m_toolBar(nullptr)
+ot::TabToolBar::TabToolBar(MainWindow* _window) :
+	m_toolBar(nullptr)
 {
 	m_toolBar = new tt::TabToolbar;
 

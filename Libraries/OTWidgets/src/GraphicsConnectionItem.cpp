@@ -16,8 +16,8 @@
 #include <QtGui/qpainter.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsConnectionItem::GraphicsConnectionItem()
-	: m_dest(nullptr), m_origin(nullptr)
+ot::GraphicsConnectionItem::GraphicsConnectionItem() :
+	m_dest(nullptr), m_origin(nullptr)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);

@@ -15,8 +15,8 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qstyleoption.h>
 
-ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner)
-	: m_widget(nullptr), m_itemName(_itemName), m_queueCount(0), m_owner(_owner)
+ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner) :
+	m_widget(nullptr), m_itemName(_itemName), m_queueCount(0), m_owner(_owner)
 {}
 
 ot::GraphicsItemPreviewDrag::~GraphicsItemPreviewDrag() {}

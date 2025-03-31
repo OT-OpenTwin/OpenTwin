@@ -47,8 +47,8 @@ ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter(void) {
 
 // Constructor / Destructor
 
-ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration)
-	: m_config(_configuration), m_moveStartPt(0., 0.), m_parent(nullptr), m_requestedSize(-1., -1.),
+ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration) :
+	m_config(_configuration), m_moveStartPt(0., 0.), m_parent(nullptr), m_requestedSize(-1., -1.),
 	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_forwardSizeChanges(false)
 {
 

@@ -33,8 +33,8 @@ namespace intern {
 	};
 }
 
-ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation)
-	: m_navigation(nullptr), m_splitter(nullptr), m_repaintPreviewRequired(false), m_previewSize(48, 48)
+ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) :
+	m_navigation(nullptr), m_splitter(nullptr), m_repaintPreviewRequired(false), m_previewSize(48, 48)
 {
 	// Create controls
 	m_splitter = new Splitter(_orientation);

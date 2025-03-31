@@ -3671,75 +3671,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 	return "";
 }
 
-std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) 
-{
-	// Get view info from document
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
-	}
-
-	// Get plot
-	ot::Plot1DCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
-	ot::Plot* plot = plotView->getPlot();
-
-	// Clear plot if exists
-	plot->clear(true);
-
-	// Create curves
-	const std::string collectionName = AppBase::instance()->getCollectionName();
-	CurveDatasetFactory curveFactory(collectionName);
-	
-	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document,OT_ACTION_PARAM_VIEW1D_CurveConfigs);
-	std::list<ot::PlotDataset*> dataSets;
-	for (uint32_t i = 0; i < curveCfgs.Size(); i++)
-	{
-		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
-		const std::string t =	ot::json::toJson(curveCfgs);
-		ot::Plot1DCurveCfg curveCfg;
-		curveCfg.setFromJsonObject(curveCfgSerialised);
-		std::list<ot::PlotDataset*> newCurveDatasets =	curveFactory.createCurves(curveCfg);
-		dataSets.splice(dataSets.begin(), newCurveDatasets);
-	}
-
-	//Now we add the data sets to the plot and visualise them
-	for (ot::PlotDataset* dataSet : dataSets)
-	{
-		dataSet->setOwnerPlot(plot);
-		plot->addDatasetToCache(dataSet);
-		dataSet->attach();
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document)
-{
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
-	}
-
-	ot::Plot1DCurveCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	const std::string curveName = config.getEntityName();
-	std::string plotName = curveName.substr(0,curveName.find_last_of('/'));
-	plotName = "Test/A_plot";
-
-	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
-
-	return "";
-}
+// Plot
 
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
@@ -3773,6 +3705,78 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 
 		ViewerAPI::visualizationResult1DPropertiesChanged(visualizationUID, curve.getEntityID(), curve.getEntityVersion());
 	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
+	// Get view info from document
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	// Get plot
+	ot::Plot1DCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	config.setGridVisible(true);
+	config.setLegendVisible(true);
+
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	ot::Plot* plot = plotView->getPlot();
+
+	// Clear plot if exists
+	plot->clear(true);
+
+	// Create curves
+	const std::string collectionName = AppBase::instance()->getCollectionName();
+	CurveDatasetFactory curveFactory(collectionName);
+
+	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
+	std::list<ot::PlotDataset*> dataSets;
+	for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
+		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
+		const std::string t = ot::json::toJson(curveCfgs);
+		ot::Plot1DCurveCfg curveCfg;
+		curveCfg.setFromJsonObject(curveCfgSerialised);
+		std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg);
+		dataSets.splice(dataSets.begin(), newCurveDatasets);
+	}
+
+	//Now we add the data sets to the plot and visualise them
+	for (ot::PlotDataset* dataSet : dataSets) {
+		dataSet->setOwnerPlot(plot);
+		dataSet->updateCurveVisualization();
+		plot->addDatasetToCache(dataSet);
+		dataSet->attach();
+	}
+
+	plot->refresh();
+	plot->resetView();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
+	ot::Plot1DCurveCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	const std::string curveName = config.getEntityName();
+	std::string plotName = curveName.substr(0, curveName.find_last_of('/'));
+	plotName = "Test/A_plot";
+
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
 
 	return "";
 }

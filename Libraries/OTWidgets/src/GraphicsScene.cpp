@@ -19,8 +19,8 @@
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
-ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
-	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
+ot::GraphicsScene::GraphicsScene(GraphicsView* _view) :
+	m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
 	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
 {

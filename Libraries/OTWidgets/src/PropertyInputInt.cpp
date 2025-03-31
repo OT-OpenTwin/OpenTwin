@@ -17,8 +17,8 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntR
 #define OT_PROPERTY_INT_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_INT_MULTIPLEVALUESTEXT OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR
 
-ot::PropertyInputInt::PropertyInputInt()
-	: m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max())
+ot::PropertyInputInt::PropertyInputInt() :
+	m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max())
 {
 	m_spinBox = new SpinBox;
 	this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);

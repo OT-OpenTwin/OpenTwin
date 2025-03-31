@@ -14,14 +14,14 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-ot::PathBrowseEdit::PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent)
-	: m_mode(_mode), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
+ot::PathBrowseEdit::PathBrowseEdit(PathBrowseMode _mode, QWidget* _parent) :
+	m_mode(_mode), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
 {
 	this->ini(_parent);
 }
 
-ot::PathBrowseEdit::PathBrowseEdit(const QString& _path, PathBrowseMode _mode, QWidget* _parent)
-	: m_mode(_mode), m_path(_path), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
+ot::PathBrowseEdit::PathBrowseEdit(const QString& _path, PathBrowseMode _mode, QWidget* _parent) :
+	m_mode(_mode), m_path(_path), m_root(nullptr), m_edit(nullptr), m_button(nullptr)
 {
 	this->ini(_parent);
 }

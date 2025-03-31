@@ -9,8 +9,8 @@
 #include "OTWidgets/VersionGraphItem.h"
 #include "OTWidgets/SignalBlockWrapper.h"
 
-ot::VersionGraph::VersionGraph() 
-	: m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
+ot::VersionGraph::VersionGraph() :
+	m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);

@@ -14,8 +14,9 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
 
-ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn) 
-	: m_tree(_tree), m_filterColumn(_filterColumn) {
+ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn) :
+	m_tree(_tree), m_filterColumn(_filterColumn)
+{
 	m_layoutW = new QWidget;
 	m_layoutW->setObjectName("OT_W_TreeWidgetFilterTemplateLayoutW");
 	//m_layoutW->setContentsMargins(0, 0, 0, 0);

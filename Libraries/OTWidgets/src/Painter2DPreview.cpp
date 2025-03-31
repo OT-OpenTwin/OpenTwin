@@ -16,8 +16,8 @@
 #include <QtGui/qpainter.h>
 #include <QtCore/qrect.h>
 
-ot::Painter2DPreview::Painter2DPreview(const ot::Painter2D* _painter)
-	: m_maintainAspectRatio(false)
+ot::Painter2DPreview::Painter2DPreview(const ot::Painter2D* _painter) :
+	m_maintainAspectRatio(false)
 {
 	this->setMinimumSize(10, 10);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));

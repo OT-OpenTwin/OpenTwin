@@ -11,14 +11,14 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorStyleValue.h"
 
-ot::ColorStyleValue::ColorStyleValue()
-	: m_painter(nullptr), m_entryKey(ColorStyleValueEntry::WidgetBackground)
+ot::ColorStyleValue::ColorStyleValue() :
+	m_painter(nullptr), m_entryKey(ColorStyleValueEntry::WidgetBackground)
 {
 	m_painter = new FillPainter2D;
 }
 
-ot::ColorStyleValue::ColorStyleValue(const ColorStyleValue& _other)
-	: m_entryKey(_other.m_entryKey), m_painter(nullptr)
+ot::ColorStyleValue::ColorStyleValue(const ColorStyleValue& _other) :
+	m_entryKey(_other.m_entryKey), m_painter(nullptr)
 {
 	m_painter = _other.m_painter->createCopy();
 }

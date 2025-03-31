@@ -14,8 +14,8 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qscrollarea.h>
 
-ot::SVGWidgetGrid::SVGWidgetGrid()
-	: m_itemSize(22, 22), m_delayedLoadTimer(this)
+ot::SVGWidgetGrid::SVGWidgetGrid() :
+	m_itemSize(22, 22), m_delayedLoadTimer(this)
 {
 	QWidget* rootW = new QWidget;
 	rootW->setSizePolicy(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::MinimumExpanding);

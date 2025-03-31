@@ -7,14 +7,11 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/Widget.h"
 
-ot::Widget::Widget()
-	: m_isEnabled(true), m_isUnlocked(true), m_disabledCounter(0) {
+ot::Widget::Widget() :
+	m_isEnabled(true), m_isUnlocked(true), m_disabledCounter(0) 
+{}
 
-}
-
-ot::Widget::~Widget() {
-
-}
+ot::Widget::~Widget() {}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

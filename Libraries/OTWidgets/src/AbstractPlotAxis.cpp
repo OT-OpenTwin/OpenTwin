@@ -8,8 +8,8 @@
 // OpenTwin header
 #include "OTWidgets/AbstractPlotAxis.h"
 
-ot::AbstractPlotAxis::AbstractPlotAxis(AxisID _id)
-	: m_id{ _id }, m_isLogScaleSet(false)
+ot::AbstractPlotAxis::AbstractPlotAxis(AxisID _id) :
+	m_id{ _id }, m_isLogScaleSet(false)
 {}
 
 ot::AbstractPlotAxis::~AbstractPlotAxis() {}

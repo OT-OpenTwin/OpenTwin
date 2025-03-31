@@ -160,8 +160,8 @@ ot::PropertyGridCfg ot::ApplicationPropertiesManager::buildDialogConfiguration(v
 	return gridCfg;
 }
 
-ot::ApplicationPropertiesManager::ApplicationPropertiesManager()
-	: m_propertyReplaceOnMerge(false), m_dialog(nullptr)
+ot::ApplicationPropertiesManager::ApplicationPropertiesManager() :
+	m_propertyReplaceOnMerge(false), m_dialog(nullptr)
 {}
 
 ot::ApplicationPropertiesManager::~ApplicationPropertiesManager() {

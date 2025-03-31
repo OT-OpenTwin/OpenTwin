@@ -57,6 +57,7 @@
     <ClCompile Include="src\UserManagement.cpp" />
     <ClCompile Include="src\UserSettings.cpp" />
     <ClCompile Include="src\ViewerComponent.cpp" />
+    <ClCompile Include="src\ViewStateCfg.cpp" />
     <ClCompile Include="src\WebsocketClient.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +67,7 @@
     <ClInclude Include="include\CurveDatasetFactory.h" />
     <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProjectInformation.h" />
+    <ClInclude Include="include\ViewStateCfg.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="include\CopyProjectDialog.h" />
     <QtMoc Include="include\WebsocketClient.h" />

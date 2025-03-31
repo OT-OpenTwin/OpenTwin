@@ -10,8 +10,8 @@
 #include <QtCore/qtimer.h>
 #include <QtCore/qeventloop.h>
 
-ot::DelayedCallHandler::DelayedCallHandler(int _delayInMs) 
-	: m_waitForCall(false)
+ot::DelayedCallHandler::DelayedCallHandler(int _delayInMs) :
+	m_waitForCall(false)
 {
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(_delayInMs);

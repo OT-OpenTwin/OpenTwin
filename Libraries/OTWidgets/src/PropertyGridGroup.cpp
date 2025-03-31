@@ -28,9 +28,7 @@ namespace ot {
 	}
 }
 
-ot::PropertyGridGroup::PropertyGridGroup() 
-	: m_parentGroup(nullptr)
-{
+ot::PropertyGridGroup::PropertyGridGroup() : m_parentGroup(nullptr) {
 	m_titleLabel = new QLabel;
 	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
 	m_titleIconLabel = new QLabel;

@@ -56,7 +56,7 @@ ot::Plot1DCfg::AxisQuantity ot::Plot1DCfg::stringToAxisQuantity(const std::strin
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::Plot1DCfg::Plot1DCfg() : 
-	WidgetViewBase(WidgetViewBase::View1D), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
+	WidgetViewBase(WidgetViewBase::View1D), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Real),
 	m_gridVisible(false), m_gridWidth(1.), m_isHidden(false), m_legendVisible(false)
 {}
 

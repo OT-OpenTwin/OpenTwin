@@ -11,8 +11,8 @@
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qlabel.h>
 
-ot::CentralWidgetManager::CentralWidgetManager(MainWindow* _window)
-	: m_currentCentral(nullptr), m_animationVisible(false)
+ot::CentralWidgetManager::CentralWidgetManager(MainWindow* _window) :
+	m_currentCentral(nullptr), m_animationVisible(false)
 {
 	// Create animation label
 	m_animationLabel = new QLabel("");

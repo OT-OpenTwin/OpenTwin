@@ -7,9 +7,7 @@
 #include "OTWidgets/Action.h"
 #include "OTWidgets/ToolButton.h"
 
-ot::ToolButton::ToolButton()
-	: m_action(nullptr) 
-{
+ot::ToolButton::ToolButton() : m_action(nullptr) {
 	m_action = new Action;
 	this->ini();
 }

@@ -4,26 +4,27 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Frontend header
-#include "AppBase.h"		// Corresponding header
-#include "UserSettings.h"
-#include "ServiceDataUi.h"
-#include "ViewerComponent.h"	// Viewer component
-#include "ExternalServicesComponent.h"		// ExternalServices component
-#include "UserManagement.h"
-#include "ProjectManagement.h"
-#include "ControlsManager.h"
+#include "AppBase.h"
 #include "ToolBar.h"
-#include "ShortcutManager.h"
-#include "ManageGroups.h"
-#include "ManageAccess.h"
 #include "DevLogger.h"
 #include "LogInDialog.h"
-#include "NavigationTreeView.h"
-#include "ProjectOverviewWidget.h"
-#include "CopyProjectDialog.h"
-#include "RenameProjectDialog.h"
 #include "ManageOwner.h"
+#include "ManageAccess.h"
+#include "ManageGroups.h"
+#include "UserSettings.h"
 #include "DownloadFile.h"
+#include "ViewStateCfg.h"
+#include "ServiceDataUi.h"
+#include "UserManagement.h"
+#include "ViewerComponent.h"
+#include "ControlsManager.h"
+#include "ShortcutManager.h"
+#include "CopyProjectDialog.h"
+#include "ProjectManagement.h"
+#include "NavigationTreeView.h"
+#include "RenameProjectDialog.h"
+#include "ProjectOverviewWidget.h"
+#include "ExternalServicesComponent.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -326,7 +327,10 @@ bool AppBase::logIn(void) {
 		}
 
 		// Restore view state
-		ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+		ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
+		if (!viewStateCfg.getViewConfig().empty()) {
+			ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+		}
 
 		this->initializeDefaultUserSettings();
 
@@ -453,7 +457,9 @@ bool AppBase::closeEvent() {
 		}
 
 		if (m_currentStateWindow.viewShown) {
-			m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+			ViewStateCfg viewStateCfg;
+			viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+			m_currentStateWindow.view = viewStateCfg.toJson();
 		}
 	}
 
@@ -890,7 +896,7 @@ void AppBase::createUi(void) {
 			this->connect(m_output->getPlainTextEdit(), &ot::PlainTextEdit::customContextMenuRequested, this, &AppBase::slotShowOutputContextMenu);
 
 			m_propertyGrid = new ot::PropertyGridView;
-			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsPermanent(true);
 			//m_propertyGrid->getPropertyGrid()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
@@ -904,7 +910,7 @@ void AppBase::createUi(void) {
 			//m_projectNavigation->getTree()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
-			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewGraphicsPicker, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewGraphicsPicker, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_graphicsPicker->setViewIsPermanent(true);
 			//m_graphicsPicker->getGraphicsPicker()->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			//m_graphicsPicker->getGraphicsPicker()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
@@ -1125,7 +1131,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::View3D, ot::WidgetViewBase::ViewIsCentral));
 		this->setupNewCentralView(wv);
 
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
 	else
 	{
@@ -1158,7 +1164,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
 		m_versionGraph->getVersionGraphManager()->getGraph()->setVersionGraphConfigFlags(ot::VersionGraph::IgnoreActivateRequestOnReadOnly);
-		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getVersionGraphManager()->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
@@ -1311,6 +1317,9 @@ void AppBase::closeAllViewerTabs(void) {
 	m_versionGraph = nullptr;
 	m_lastFocusedCentralView = nullptr;
 	ot::WidgetViewManager::instance().closeViews();
+
+	ot::SignalBlockWrapper sigBlock(&ot::WidgetViewManager::instance());
+	ot::WidgetViewManager::instance().slotViewFocused(nullptr, m_defaultView->getViewDockWidget());
 }
 
 void AppBase::clearSessionInformation(void) {
@@ -1335,10 +1344,16 @@ void AppBase::restoreSessionState(void) {
 	}
 
 	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
-	if (s.empty()) return;
+	if (s.empty()) {
+		return;
+	}
 
 	m_currentStateWindow.view = s;
-	ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+
+	ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
+	if (!viewStateCfg.getViewConfig().empty()) {
+		ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
+	}
 
 	// Set first tab as current view in central view
 	OTAssertNullptr(m_defaultView);
@@ -1366,7 +1381,9 @@ void AppBase::storeSessionState(void) {
 
 	UserManagement uM(m_loginData);
 
-	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+	ViewStateCfg viewStateCfg;
+	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
+	m_currentStateWindow.view = viewStateCfg.toJson();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
 
 	if (m_versionGraph) {

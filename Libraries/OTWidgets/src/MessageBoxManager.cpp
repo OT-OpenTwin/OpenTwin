@@ -49,11 +49,7 @@ ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::forwardPromt(const Mess
 	}
 }
 
-ot::MessageBoxManager::MessageBoxManager() 
-	: m_handler(nullptr)
-{
-
-}
+ot::MessageBoxManager::MessageBoxManager() : m_handler(nullptr) {}
 
 ot::MessageBoxManager::~MessageBoxManager() {
 

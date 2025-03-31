@@ -23,8 +23,8 @@ std::string ot::WidgetView::createStoredViewName(const std::string& _entityName,
 	return _entityName + "$" + WidgetViewBase::toString(_viewType);
 }
 
-ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType)
-	: m_isPermanent(false), m_isDeletedByManager(false),
+ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType) :
+	m_isPermanent(false), m_isDeletedByManager(false),
 	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
 {
 	m_dockWidget = new WidgetViewDock(this);

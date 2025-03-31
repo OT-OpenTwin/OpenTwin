@@ -18,9 +18,7 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
-ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_parentGroup(nullptr)
-{
+ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullptr) {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
 	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);

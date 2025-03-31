@@ -121,6 +121,11 @@ void ot::PlotDatasetData::calculateData(Plot1DCfg::AxisQuantity _axisQuantity, Q
 
 	switch (_axisQuantity) {
 	case Plot1DCfg::Magnitude:
+		if (!m_dataYim) {
+			OT_LOG_EAS("No imaginary data available for magnitude calculation");
+			return;
+		}
+
 		m_dataYcalc = new double[m_dataSize];
 
 		for (int i = 0; i < m_dataSize; i++) {
@@ -134,6 +139,11 @@ void ot::PlotDatasetData::calculateData(Plot1DCfg::AxisQuantity _axisQuantity, Q
 		break;
 
 	case Plot1DCfg::Phase:
+		if (!m_dataYim) {
+			OT_LOG_EAS("No imaginary data available for phase calculation");
+			return;
+		}
+
 		m_dataYcalc = new double[m_dataSize];
 
 		for (int i = 0; i < m_dataSize; i++) {
@@ -149,11 +159,21 @@ void ot::PlotDatasetData::calculateData(Plot1DCfg::AxisQuantity _axisQuantity, Q
 		break;
 
 	case Plot1DCfg::Imaginary:
+		if (!m_dataYim) {
+			OT_LOG_EAS("No imaginary data available for imaginary calculation");
+			return;
+		}
+
 		_cartesianCurve->setRawSamples(m_dataX, m_dataYim, m_dataSize);
 		_polarData->setData(m_dataX, m_dataYim, m_dataSize);
 		break;
 
 	case Plot1DCfg::Complex:
+		if (!m_dataYim) {
+			OT_LOG_EAS("No imaginary data available for complex calculation");
+			return;
+		}
+
 		m_dataYcalc = new double[m_dataSize];
 		m_dataXcalc = new double[m_dataSize];
 
@@ -177,8 +197,13 @@ void ot::PlotDatasetData::replaceData(double* _dataX, double* _dataXcalc, double
 	this->memFree();
 
 	m_dataSize = _dataSize;
+
 	m_dataX = _dataX;
+	m_dataXcalc = _dataXcalc;
+
 	m_dataY = _dataY;
+	m_dataYim = _dataYim;
+	m_dataYcalc = _dataYcalc;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -203,6 +228,10 @@ bool ot::PlotDatasetData::getData(double*& _x, double*& _y, long& _size) {
 }
 
 bool ot::PlotDatasetData::getYim(double*& _yim, long& _size) {
+	if (!m_dataYim && m_dataSize > 0) {
+		OT_LOG_EAS("No imaginary data available");
+	}
+
 	_yim = m_dataYim;
 	_size = m_dataSize;
 	return m_dataSize > 0;

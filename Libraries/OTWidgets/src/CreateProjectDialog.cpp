@@ -22,8 +22,8 @@
 
 #define OT_CREATEPROJECTDIALOG_TitlePrefix "Create Project"
 
-ot::CreateProjectDialogEntry::CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog)
-	: m_info(_info) 
+ot::CreateProjectDialogEntry::CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog) :
+	m_info(_info) 
 {
 	this->setText(QString::fromStdString(m_info.getName()));
 	this->setToolTip(QString::fromStdString(m_info.getBriefDescription()));

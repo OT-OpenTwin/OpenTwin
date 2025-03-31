@@ -9,12 +9,12 @@
 
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationTreeItemFlags) {}
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags)
-	: m_text(_text), m_icon(_icon), m_flags(_flags)
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags) :
+	m_text(_text), m_icon(_icon), m_flags(_flags)
 {}
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
-	: m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config) :
+	m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
 {
 	if (!_config.iconPath().empty()) {
 		m_icon = IconManager::getIcon(QString::fromStdString(_config.iconPath()));
@@ -25,8 +25,8 @@ ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
 	}
 }
 
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const TreeWidgetItemInfo& _other)
-	: m_text(_other.m_text), m_icon(_other.m_icon), m_flags(_other.m_flags), m_childs(_other.m_childs)
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const TreeWidgetItemInfo& _other) :
+	m_text(_other.m_text), m_icon(_other.m_icon), m_flags(_other.m_flags), m_childs(_other.m_childs)
 {}
 
 ot::TreeWidgetItemInfo::~TreeWidgetItemInfo() {
