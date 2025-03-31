@@ -12,6 +12,7 @@ class __declspec(dllexport) PlotBuilder
 public:
 	PlotBuilder(ResultCollectionExtender& _extender, const std::string& _owner);
 	void addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	void addCurveFamily(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
 	void buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState = true);
 
 private:
@@ -19,7 +20,9 @@ private:
 	const std::string m_owner;
 	ResultCollectionExtender& m_extender;
 
-	void storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
+
+	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
 	
 	const std::string createQuery(ot::UID _seriesID);
 	const std::string createProjection();

@@ -13,17 +13,18 @@ PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string&
 
 void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 {
-	const std::string labelY = _config.getYAxisTitle();
-	assert(labelY ==_dataSetDescription.getQuantityDescription()->getName());
+	std::list<DatasetDescription> datasets;
+	datasets.push_back(std::move(_dataSetDescription));
+ 	addCurveFamily(std::move(datasets), _config, _seriesName);
+}
 
-	auto parameters = _dataSetDescription.getParameters();
-	assert(parameters.size() == 1);
-	std::shared_ptr<ParameterDescription> xAxis = *parameters.begin();
+
+void PlotBuilder::addCurveFamily(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+{
+	const bool valid = validityCheck(_dataSetDescriptions, _config);
+	assert(valid);
 	
-	const std::string labelX = _config.getXAxisTitle();
-	assert(labelX ==xAxis->getMetadataParameter().parameterName);
-
-	storeCurve(std::move(_dataSetDescription), _config,_seriesName);
+	storeCurve(std::move(_dataSetDescriptions), _config, _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
@@ -43,12 +44,31 @@ void PlotBuilder::buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot", _saveModelState);
 }
 
-void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config)
+{
+	bool valid = true;
+	const std::string labelY = _config.getYAxisTitle();
+	
+	for (auto& datasetDescription : _dataSetDescriptions)
+	{
+		valid &= (labelY == datasetDescription.getQuantityDescription()->getName());
+		auto parameters = datasetDescription.getParameters();
+
+		std::shared_ptr<ParameterDescription> xAxis = *parameters.begin();
+		const std::string labelX = _config.getXAxisTitle();
+		valid &= (labelX == xAxis->getMetadataParameter().parameterName);
+	}
+
+	return valid;
+}
+
+void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 { 
-	std::list<DatasetDescription> datasets;
-	datasets.push_back(std::move(_dataSetDescription));
-	ot::UID seriesID = m_extender.buildSeriesMetadata(datasets, _seriesName, {});
-	m_extender.processDataPoints(&(*datasets.begin()), seriesID);
+	ot::UID seriesID = m_extender.buildSeriesMetadata(_dataSetDescriptions, _seriesName, {});
+	for (auto& dataset : _dataSetDescriptions)
+	{
+		m_extender.processDataPoints(&dataset, seriesID);
+	}
 	
 	ot::QueryInformation queryInformation;
 	queryInformation.m_query= createQuery(seriesID);
@@ -65,20 +85,22 @@ void PlotBuilder::storeCurve(DatasetDescription&& _dataSetDescription, ot::Plot1
 	quantityInformation.m_dataType = quantity->dataTypeName;
 	queryInformation.m_quantityDescription = quantityInformation;
 
-	auto dataSetDescription = datasets.begin();
-	const auto& parameterDescriptions = dataSetDescription->getParameters();
-	for (auto parameterDescription : parameterDescriptions)
+	for (auto& dataSetDescription : _dataSetDescriptions)
 	{
-		MetadataParameter& parameter =	parameterDescription->getMetadataParameter();
+		for (auto parameterDescription : dataSetDescription.getParameters())
+		{
+			MetadataParameter& parameter =	parameterDescription->getMetadataParameter();
 		
-		ot::QuantityContainerEntryDescription qcDescription;
-		qcDescription.m_label =  parameter.parameterLabel;
-		qcDescription.m_dataType=  parameter.typeName;
-		qcDescription.m_fieldName=  std::to_string(parameter.parameterUID);
-		qcDescription.m_unit =  parameter.unit;
-		queryInformation.m_parameterDescriptions.push_back(qcDescription);
+			ot::QuantityContainerEntryDescription qcDescription;
+			qcDescription.m_label =  parameter.parameterLabel;
+			qcDescription.m_dataType=  parameter.typeName;
+			qcDescription.m_fieldName=  std::to_string(parameter.parameterUID);
+			qcDescription.m_unit =  parameter.unit;
+			queryInformation.m_parameterDescriptions.push_back(qcDescription);
+		}
+
 	}
-	
+
 	_config.setQueryInformation(queryInformation);
 }
 
