@@ -78,6 +78,7 @@ void SimulationResults::handleResults(const QJsonValue& _result) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     addResults(_result);
+    OT_LOG_D("Added Results to Curves");
     storeLogDataInResultText();
 }
 

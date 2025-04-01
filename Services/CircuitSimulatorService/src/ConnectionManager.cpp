@@ -275,13 +275,18 @@ void ConnectionManager::sendHealthcheck() {
         if (waitForHealthcheck == false) {
             waitForHealthcheck = true;
             send("Ping", "Healthcheck");
+            return;
         }
         else {
             send("Disconnect", "Healthcheck failed");
+            return;
         }
     }
-
-    OT_LOG_E("No connection established, healthcheck failed");
+    else {
+        OT_LOG_E("No connection established, healthcheck failed");
+        return;
+    }
+    
 }
 
 
@@ -357,12 +362,12 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             }
         }
         else if (_actionType.toStdString() == "SendResults") {
-
-            SimulationResults::getInstance()->handleResults(data);
+            
             send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
-            if (healthCheckTimer != nullptr) {
-                healthCheckTimer->stop();
-            }
+            OT_LOG_D("Got Results");
+            SimulationResults::getInstance()->handleResults(data);
+            
+           
             
         }
         else if (_actionType.toStdString() == "Ping") {

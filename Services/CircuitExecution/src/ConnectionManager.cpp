@@ -25,7 +25,6 @@ QString ConnectionManager::toString(RequestType _type) {
 ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
-    m_ngSpice = new NGSpice();
     healthCheckTimer = nullptr;
     SimulationResults* simulationResults = SimulationResults::getInstance();
 
@@ -54,9 +53,6 @@ ConnectionManager::~ConnectionManager() {
         healthCheckTimer = nullptr;
     }
     
-
-    delete m_ngSpice;
-    m_ngSpice = nullptr;
 
     delete m_socket;
     m_socket = nullptr;
@@ -118,12 +114,9 @@ void ConnectionManager::receiveResponse() {
 
     handleActionType(typeString, jsonArray);
 
-    //After Simulating I send back the results
-    //sendBackResults(SimulationResults::getInstance()->getResultMap());
+ 
 
 }
-
-
 
 void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
     OT_LOG_E("Error in establishing connection to CircuitSimulatorService: " + m_socket->errorString().toStdString());
@@ -190,18 +183,9 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
 }
 
 void ConnectionManager::handleRunSimulation(std::list<std::string> _netlist) {
-  
-    //Initialize Callbacks of NGSpice
-    m_ngSpice->initializeCallbacks();
+    
+    NGSpice::runNGSpice(_netlist);
 
-    //Intialize NGSpice
-    m_ngSpice->intializeNGSpice();
-
-    //Executing run from NGSpice
-    m_ngSpice->runSimulation(_netlist);
-
-    //The results are being pushed in the callbacks to SimulationResults map
-    sendBackResults(SimulationResults::getInstance()->getResultMap());
 
 }
 
@@ -211,8 +195,6 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
         OT_LOG_E("No Results");
         handleDisconnected();
     }
-
-    
 
     QJsonObject jsonObject;
     QJsonArray jsonArray;
@@ -241,5 +223,5 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     m_socket->write(data);
     m_socket->flush();
 
-    //handleDisconnected();
+   // handleDisconnected();
 }

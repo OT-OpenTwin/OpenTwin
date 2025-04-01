@@ -40,6 +40,10 @@ void Application::start(const std::string& _serverName)
 	
 }
 
+ConnectionManager* Application::getConnectionManager() {
+	return m_connectionManager;
+}
+
 Application::Application() {
 	m_connectionManager = nullptr;
 
