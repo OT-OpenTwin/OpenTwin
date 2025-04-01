@@ -258,10 +258,19 @@ namespace ot {
 		//! @param _groupName The property group name.
 		//! @param _valueName The property value name.
 		//! @return Pointer to the found Property, or nullptr if not found.
-		template <class T> T* getProperty(const std::string& _groupName, const std::string& _valueName) const {
-			T* prop = dynamic_cast<T*>(this->findProperty(_groupName, _valueName));
-			OTAssertNullptr(prop);
-			return prop;
+		template <class T> T* getProperty(const std::string& _groupName, const std::string& _valueName) {
+			OTAssertNullptr(dynamic_cast<T*>(this->findProperty(_groupName, _valueName)));
+			return static_cast<T*>(this->findProperty(_groupName, _valueName));
+		}
+
+		//! @brief Finds a property by group and name.
+		//! The found property will be casted to the specified type.
+		//! @param _groupName The property group name.
+		//! @param _valueName The property value name.
+		//! @return Pointer to the found Property, or nullptr if not found.
+		template <class T> const T* getProperty(const std::string& _groupName, const std::string& _valueName) const {
+			OTAssertNullptr(dynamic_cast<const T*>(this->findProperty(_groupName, _valueName)));
+			return static_cast<const T*>(this->findProperty(_groupName, _valueName));
 		}
 
 		//! @brief Creates a grid configuration that can be used to serialize or visualize the properties.

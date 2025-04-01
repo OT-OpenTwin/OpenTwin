@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/OTAssert.h"
 
 // std header
 #include <type_traits>
