@@ -12,7 +12,7 @@
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/PolarPlotData.h"
 #include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/CoordinateTransformer.h"
+#include "OTWidgets/CoordinateFormatConverter.h"
 // Qwt header
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
@@ -26,7 +26,7 @@ ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config
 	{
 		m_cartesianCurve = new QwtPlotCurve(QString::fromStdString(m_config.getTitle()));
 		m_cartesianCurvePointSymbol = new QwtSymbol();
-		ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
+		ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
 		m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 	}
 	else
@@ -34,7 +34,7 @@ ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config
 		assert(_ownerPlot->getConfig().getAxisQuantity() == Plot1DCfg::AxisQuantity::Complex);
 		m_polarCurve = new QwtPolarCurve(QString::fromStdString(m_config.getTitle()));
 		m_polarCurvePointSymbol = new QwtSymbol();
-		ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
+		ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
 		m_polarData = new PolarPlotData(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 		m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 		m_polarCurve->setData(m_polarData);
@@ -222,6 +222,6 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 
 const ot::PointsContainer ot::PlotDataset::getDisplayedPoints()
 {
-	ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
+	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	return points;
 }

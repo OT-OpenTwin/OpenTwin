@@ -22,7 +22,7 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, ComplexNumber
 		{
 			throw std::exception("Cannot create plot with different numbers of x and y values.");
 		}
-		if (cartesianData->m_real.size() == 0 && cartesianData->m_imag.size())
+		if (cartesianData->m_real.size() == 0 && cartesianData->m_imag.size() == 0)
 		{
 			throw std::exception("Plot data set requires data for the y axis set");
 		}
@@ -36,7 +36,7 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, ComplexNumber
 		{
 			throw std::exception("Cannot create plot with different numbers of x and y values.");
 		}
-		if (polarData->m_magnitudes.size() == 0 && polarData->m_phases.size())
+		if (polarData->m_magnitudes.size() == 0 && polarData->m_phases.size() == 0)
 		{
 			throw std::exception("Plot data set requires data for the y axis set");
 		}
@@ -54,7 +54,7 @@ ot::PlotDatasetData::~PlotDatasetData()
 }
 
 ot::PlotDatasetData::PlotDatasetData(PlotDatasetData&& _other) noexcept
-	:m_dataX(std::move(_other.m_dataX)), m_dataY(_other.m_dataY)
+	:m_dataX(std::move(_other.m_dataX)), m_dataY(_other.m_dataY), m_numberOfDatapoints(_other.m_numberOfDatapoints)
 {
 	_other.m_dataY = nullptr;
 }

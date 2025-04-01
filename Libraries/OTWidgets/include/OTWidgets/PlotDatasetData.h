@@ -18,7 +18,7 @@ namespace ot {
 
 	class PolarPlotData;
 
-	class OT_WIDGETS_API_EXPORT PlotDatasetData 
+	class __declspec(dllexport) PlotDatasetData
 	{
 		OT_DECL_NOCOPY(PlotDatasetData)
 		OT_DECL_NODEFAULT(PlotDatasetData)

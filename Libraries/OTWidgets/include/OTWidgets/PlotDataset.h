@@ -10,7 +10,7 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
-#include "CoordinateTransformer.h"
+#include "CoordinateFormatConverter.h"
 // Qt header
 #include <QtCore/qstring.h>
 #include <QtGui/qcolor.h>
@@ -104,7 +104,7 @@ namespace ot {
 		bool m_isAttatched = false;
 
 		PlotDatasetData m_data;
-		CoordinateTransformer m_coordinateTransformer;
+		CoordinateFormatConverter m_CoordinateFormatConverter;
 		// Plot elements
 		QwtPlotCurve* m_cartesianCurve = nullptr;
 

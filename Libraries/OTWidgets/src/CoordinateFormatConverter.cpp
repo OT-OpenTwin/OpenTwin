@@ -1,9 +1,9 @@
-#include "OTWidgets/CoordinateTransformer.h"
+#include "OTWidgets/CoordinateFormatConverter.h"
 #include <cmath>
 #include <numbers>
 #include <functional>
 
-ot::PointsContainer ot::CoordinateTransformer::defineXYPoints(const PlotDatasetData& _datasetData, Plot1DCfg::AxisQuantity _axisQuantity)
+ot::PointsContainer ot::CoordinateFormatConverter::defineXYPoints(const PlotDatasetData& _datasetData, Plot1DCfg::AxisQuantity _axisQuantity)
 {
 	PointsContainer pointsContainer;
 	pointsContainer.m_xData = {};
@@ -59,6 +59,27 @@ ot::PointsContainer ot::CoordinateTransformer::defineXYPoints(const PlotDatasetD
 		{
 			pointsContainer.m_yData = getBufferedPhase(_datasetData, false);
 		}
+	}
+	else if (_axisQuantity == Plot1DCfg::AxisQuantity::Complex)
+	{
+		const ComplexNumberContainerPolar* polar = dynamic_cast<const ComplexNumberContainerPolar*>(yDataPointer);
+		if (polar!= nullptr)
+		{
+			//Original data exists in polar format
+			if (polar->m_phases.size() == 0)
+			{
+				pointsContainer.m_yData = getBufferedPhase(_datasetData, true,true);
+			}
+			else
+			{
+				pointsContainer.m_yData = &polar->m_phases;
+			}
+		}
+		else
+		{
+			pointsContainer.m_yData = getBufferedPhase(_datasetData, false,true);
+		}
+		
 	}
 	else if (_axisQuantity == Plot1DCfg::AxisQuantity::Magnitude)
 	{
@@ -120,7 +141,7 @@ ot::PointsContainer ot::CoordinateTransformer::defineXYPoints(const PlotDatasetD
 	return pointsContainer;
 }
 
-ot::CoordinateTransformer::~CoordinateTransformer()
+ot::CoordinateFormatConverter::~CoordinateFormatConverter()
 {
 	if (m_buffer != nullptr)
 	{
@@ -129,7 +150,7 @@ ot::CoordinateTransformer::~CoordinateTransformer()
 	}
 }
 
-std::vector<double> ot::CoordinateTransformer::calculateMagnitude(const PlotDatasetData& _datasetData)
+std::vector<double> ot::CoordinateFormatConverter::calculateMagnitude(const PlotDatasetData& _datasetData)
 {
 	const ComplexNumberContainerCartesian* cartesian = dynamic_cast<const ComplexNumberContainerCartesian*>(&_datasetData.getDataY());
 	assert(cartesian != nullptr);
@@ -172,7 +193,7 @@ std::vector<double> ot::CoordinateTransformer::calculateMagnitude(const PlotData
 	return magnitudes;
 }
 
-std::vector<double> ot::CoordinateTransformer::calculatePhase(const PlotDatasetData& _datasetData)
+std::vector<double> ot::CoordinateFormatConverter::calculatePhase(const PlotDatasetData& _datasetData)
 {
 	const ComplexNumberContainerCartesian* cartesian = dynamic_cast<const ComplexNumberContainerCartesian*>(&_datasetData.getDataY());
 	assert(cartesian != nullptr);
@@ -189,21 +210,21 @@ std::vector<double> ot::CoordinateTransformer::calculatePhase(const PlotDatasetD
 	{
 		f_calculatePhase = [&yRe](size_t index)
 			{
-				return std::atan2(yRe[index], 0) / std::numbers::pi * 180;
+				return std::atan2(0,yRe[index]) / std::numbers::pi * 180;
 			};
 	}
 	else if (yRe.size() == 0)
 	{
 		f_calculatePhase = [&yIm](size_t index)
 			{
-				return std::atan2(0,yIm[index]) / std::numbers::pi * 180;
+				return std::atan2(yIm[index],0) / std::numbers::pi * 180;
 			};
 	}
 	else
 	{
 		f_calculatePhase = [&yRe, &yIm](size_t index)
 			{
-				return std::atan2(yRe[index], yIm[index]) / std::numbers::pi * 180;
+				return std::atan2(yIm[index], yRe[index]) / std::numbers::pi * 180;
 			};
 	}
 
@@ -215,7 +236,7 @@ std::vector<double> ot::CoordinateTransformer::calculatePhase(const PlotDatasetD
 	return phases;
 }
 
-std::vector<double> ot::CoordinateTransformer::calculateImag(const PlotDatasetData& _datasetData)
+std::vector<double> ot::CoordinateFormatConverter::calculateImag(const PlotDatasetData& _datasetData)
 {
 	const ComplexNumberContainerPolar* polar = dynamic_cast<const ComplexNumberContainerPolar*>(&_datasetData.getDataY());
 	assert(polar != nullptr);
@@ -251,7 +272,7 @@ std::vector<double> ot::CoordinateTransformer::calculateImag(const PlotDatasetDa
 	return imagValues;
 }
 
-std::vector<double> ot::CoordinateTransformer::calculateReal(const PlotDatasetData& _datasetData)
+std::vector<double> ot::CoordinateFormatConverter::calculateReal(const PlotDatasetData& _datasetData)
 {
 	const ComplexNumberContainerPolar* polar = dynamic_cast<const ComplexNumberContainerPolar*>(&_datasetData.getDataY());
 	assert(polar != nullptr);
@@ -294,26 +315,23 @@ std::vector<double> ot::CoordinateTransformer::calculateReal(const PlotDatasetDa
 	return realValues;
 }
 
-std::vector<double>* ot::CoordinateTransformer::getBufferedPhase(const PlotDatasetData& _datasetData, bool allZeros)
+std::vector<double>* ot::CoordinateFormatConverter::getBufferedPhase(const PlotDatasetData& _datasetData, bool _allZeros, bool _keepBuffer)
 {
 	//First check the buffer if it already has the right data
 	if (m_buffer != nullptr)
 	{
 		ComplexNumberContainerPolar* polar = dynamic_cast<ComplexNumberContainerPolar*>(m_buffer);
-		if (polar != nullptr)
+		if (polar != nullptr && polar->m_phases.size() != 0)
 		{
 			return &polar->m_phases;
 		}
 	}
 
-	//If the buffer has not the right data, we need to build a new buffer with the correct data.
-	if (m_buffer != nullptr)
-	{
-		delete m_buffer;
-	}
-	m_buffer = new ComplexNumberContainerPolar();
+	//Now we deal with an already existing buffer
+	resetBufferPolar(_keepBuffer);
+	
 	ComplexNumberContainerPolar* polar = dynamic_cast<ComplexNumberContainerPolar*>(m_buffer);
-	if (allZeros)
+	if (_allZeros)
 	{
 		polar->m_phases = std::vector<double>(_datasetData.getNumberOfDatapoints(), 0);
 	}
@@ -324,26 +342,23 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedPhase(const PlotDatas
 	return &polar->m_phases;
 }
 
-std::vector<double>* ot::CoordinateTransformer::getBufferedMagnitude(const PlotDatasetData& _datasetData, bool allZeros)
+std::vector<double>* ot::CoordinateFormatConverter::getBufferedMagnitude(const PlotDatasetData& _datasetData, bool _allZeros, bool _keepBuffer)
 {
 	//First check the buffer if it already has the right data
 	if (m_buffer != nullptr)
 	{
 		ComplexNumberContainerPolar* polar = dynamic_cast<ComplexNumberContainerPolar*>(m_buffer);
-		if (polar != nullptr)
+		if (polar != nullptr && polar->m_magnitudes.size() != 0)
 		{
 			return &polar->m_magnitudes;
 		}
 	}
 	
-	//If the buffer has not the right data, we need to build a new buffer with the correct data.
-	if(m_buffer != nullptr)
-	{
-		delete m_buffer;
-	}
-	m_buffer = new ComplexNumberContainerPolar();
+	//Now we deal with an already existing buffer
+	resetBufferPolar(_keepBuffer);
+
 	ComplexNumberContainerPolar* polar = dynamic_cast<ComplexNumberContainerPolar*>(m_buffer);
-	if (allZeros)
+	if (_allZeros)
 	{
 		polar->m_magnitudes = std::vector<double>(_datasetData.getNumberOfDatapoints(), 0);
 	}
@@ -354,7 +369,7 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedMagnitude(const PlotD
 	return &polar->m_magnitudes;
 }
 
-std::vector<double>* ot::CoordinateTransformer::getBufferedImaginary(const PlotDatasetData& _datasetData, bool allZeros)
+std::vector<double>* ot::CoordinateFormatConverter::getBufferedImaginary(const PlotDatasetData& _datasetData, bool allZeros, bool _keepBuffer)
 {
 	//First check the buffer if it already has the right data
 	if (m_buffer != nullptr)
@@ -365,13 +380,9 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedImaginary(const PlotD
 			return &cartesian->m_imag;
 		}
 	}
+	
+	resetBufferCartesian(_keepBuffer);	
 
-	//If the buffer has not the right data, we need to build a new buffer with the correct data.
-	if (m_buffer != nullptr)
-	{
-		delete m_buffer;
-	}
-	m_buffer = new ComplexNumberContainerCartesian();
 	ComplexNumberContainerCartesian* cartesian = dynamic_cast<ComplexNumberContainerCartesian*>(m_buffer);
 	if (allZeros)
 	{
@@ -384,7 +395,7 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedImaginary(const PlotD
 	return &cartesian->m_imag;
 }
 
-std::vector<double>* ot::CoordinateTransformer::getBufferedReal(const PlotDatasetData& _datasetData, bool allZeros)
+std::vector<double>* ot::CoordinateFormatConverter::getBufferedReal(const PlotDatasetData& _datasetData, bool allZeros, bool _keepBuffer)
 {
 	//First check the buffer if it already has the right data
 	if (m_buffer != nullptr)
@@ -396,12 +407,10 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedReal(const PlotDatase
 		}
 	}
 
-	//If the buffer has not the right data, we need to build a new buffer with the correct data.
-	if (m_buffer != nullptr)
-	{
-		delete m_buffer;
-	}
-	m_buffer = new ComplexNumberContainerCartesian();
+	//If the buffer has not the right data, we need to build a new buffer with the correct data
+	resetBufferCartesian(_keepBuffer);
+
+
 	ComplexNumberContainerCartesian* cartesian = dynamic_cast<ComplexNumberContainerCartesian*>(m_buffer);
 	if (allZeros)
 	{
@@ -412,5 +421,43 @@ std::vector<double>* ot::CoordinateTransformer::getBufferedReal(const PlotDatase
 		cartesian->m_real= calculateReal(_datasetData);
 	}
 	return &cartesian->m_real;
+}
+
+void ot::CoordinateFormatConverter::resetBufferPolar(bool _keepBuffer)
+{
+	if (m_buffer != nullptr)
+	{
+		ComplexNumberContainerPolar* polar = dynamic_cast<ComplexNumberContainerPolar*>(m_buffer);
+		//If the buffer has not the right data, we need to build a new buffer with the correct data. Also for building up the entire tuple we may want to keep the buffer
+		//Keep buffer if polar != nullptr && _keepBuffer
+		if (polar == nullptr || !_keepBuffer)
+		{
+			delete m_buffer;
+			m_buffer = new ComplexNumberContainerPolar();
+		}
+	}
+	else
+	{
+		m_buffer = new ComplexNumberContainerPolar();
+	}
+}
+
+void ot::CoordinateFormatConverter::resetBufferCartesian(bool _keepBuffer)
+{
+	if (m_buffer != nullptr)
+	{
+		ComplexNumberContainerCartesian* cartesian = dynamic_cast<ComplexNumberContainerCartesian*>(m_buffer);
+		//If the buffer has not the right data, we need to build a new buffer with the correct data. Also for building up the entire tuple we may want to keep the buffer
+		//Keep buffer if polar != nullptr && _keepBuffer
+		if (cartesian == nullptr || !_keepBuffer)
+		{
+			delete m_buffer;
+			m_buffer = new ComplexNumberContainerCartesian();
+		}
+	}
+	else
+	{
+		m_buffer = new ComplexNumberContainerCartesian();
+	}
 }
 
