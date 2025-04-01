@@ -26,27 +26,34 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
     m_ngSpice = new NGSpice();
+    healthCheckTimer = nullptr;
     SimulationResults* simulationResults = SimulationResults::getInstance();
 
-    QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHealthCheck);
+    QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::handleConnected);
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
     QObject::connect(m_socket, &QLocalSocket::errorOccurred, this, &ConnectionManager::handleError);
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
     QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::send);
 
     waitForHealthcheck = false;
-
+#ifndef _DEBUG
     // Adding healthcheck
     healthCheckTimer = new QTimer(this);
     QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
     healthCheckTimer->setInterval(5000);
     healthCheckTimer->start();
+#endif // !_DEBUG
+
+
 }
 
 ConnectionManager::~ConnectionManager() {
-    healthCheckTimer->stop();
-    delete healthCheckTimer;
-    healthCheckTimer = nullptr;
+    if (healthCheckTimer != nullptr) {
+        healthCheckTimer->stop();
+        delete healthCheckTimer;
+        healthCheckTimer = nullptr;
+    }
+    
 
     delete m_ngSpice;
     m_ngSpice = nullptr;
@@ -77,15 +84,21 @@ void ConnectionManager::send(std::string messageType, std::string message) {
 
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();
-
-    OT_LOG(data.toStdString(),ot::OUTGOING_MESSAGE_LOG);
+#ifndef _DEBUG
+    OT_LOG(data.toStdString(), ot::OUTGOING_MESSAGE_LOG);
+#endif // !_DEBUG
     m_socket->write(data);
     m_socket->flush();
 }
 
 void ConnectionManager::receiveResponse() {
+
     QByteArray jsonData = m_socket->readAll();
+#ifndef _DEBUG
     OT_LOG(jsonData.toStdString(), ot::INBOUND_MESSAGE_LOG);
+#endif // !_DEBUG
+
+   
 
   
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
@@ -102,17 +115,11 @@ void ConnectionManager::receiveResponse() {
     
     //Getting data
     QJsonArray jsonArray = jsonObject["data"].toArray();
-    std::list<std::string> data;
-    for (const QJsonValue& value : jsonArray) {
-        data.push_back(value.toString().toStdString());
-    }
 
     handleActionType(typeString, jsonArray);
 
     //After Simulating I send back the results
     //sendBackResults(SimulationResults::getInstance()->getResultMap());
-
-
 
 }
 
@@ -125,7 +132,9 @@ void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
 void ConnectionManager::handleDisconnected() {
     OT_LOG_D("Client disconnected from server");
     SimulationResults::getInstance()->getResultMap().clear();
-    healthCheckTimer->stop();
+    if (healthCheckTimer != nullptr) {
+        healthCheckTimer->stop();
+    }
     exit(0);
 }
 
@@ -145,6 +154,10 @@ void ConnectionManager::sendHealthCheck() {
     
 }
 
+void ConnectionManager::handleConnected() {
+    OT_LOG_D("Hello CircuitSimulatorService!");
+}
+
 void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) {
 
  
@@ -153,9 +166,9 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
         std::list<std::string> netlist;
 
         for (const QJsonValue& value : _data) {
-            // Umwandlung von QJsonValue (String) zu std::string
+            
             QString item = value.toString();
-            netlist.push_back(item.toStdString());  // QString zu std::string konvertieren
+            netlist.push_back(item.toStdString());  
         }
         handleRunSimulation(netlist);
     }

@@ -31,6 +31,7 @@ private slots:
 	void handleError(QLocalSocket::LocalSocketError error);
 	void handleDisconnected();
 	void sendHealthCheck();
+	void handleConnected();
 
 private:
 	QLocalSocket* m_socket;
