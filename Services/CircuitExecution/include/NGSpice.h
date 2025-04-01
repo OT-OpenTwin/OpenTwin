@@ -1,29 +1,36 @@
 #pragma once
-//ThirdPartyHeader
+
+// ThirdParty header
 #include <ngspice/sharedspice.h>
 
-//OpenTwin Header
+// OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/OTClassHelper.h"
 
-//Service Header
+// Service header
 #include "ConnectionManager.h"
+
 class NGSpice {
+	OT_DECL_NODEFAULT(NGSpice)
 public:
-	NGSpice();
-	//Callback functions from NGSpice
+	static void runNGSpice(std::list<std::string> _netlist);
+
+private:
+	// Callback functions from NGSpice
+
 	static int MySendCharFunction(char*, int, void*);
 	static int MySendStat(char*, int, void*);
 	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
 	static int MySendDataFunction(pvecvaluesall, int, int, void*);
 	static int MySendInitDataFunction(pvecinfoall, int, void*);
 
-	
+	// Starting Functions
 
-	void runSimulation(std::list<std::string>& _netlist);
-	void initializeCallbacks();
-	void intializeNGSpice();
-
-private:
+	static void init(std::list<std::string> _netlist);
+	static void runSimulation(std::list<std::string>& _netlist);
+	static void initializeCallbacks();
+	static void intializeNGSpice();
 
 	static double calculateMagnitude(double real, double imag);
+
 };

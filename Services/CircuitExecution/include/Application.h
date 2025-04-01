@@ -28,7 +28,7 @@ public:
 
 	void start(const std::string& _serverName);
 
-
+	ConnectionManager* getConnectionManager();
 
 private:
 	Application();

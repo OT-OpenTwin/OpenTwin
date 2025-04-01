@@ -2,16 +2,19 @@
 #include "NGSpice.h"
 #include "SimulationResults.h"
 #include "ConnectionManager.h"
+#include "Application.h"
 
-NGSpice::NGSpice() {
-	
-	
-	
+// C++ Header
+#include <thread>
 
 
+void NGSpice::runNGSpice(std::list<std::string> _netlist) {
+	std::thread workerThread(&NGSpice::init, _netlist);
+	workerThread.detach();
 }
 
-//Callback Functions for NGSpice
+
+// Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
 	std::string callback = std::string(output);
@@ -20,6 +23,14 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 		
 		const std::string stdoutPrefix = "stdout";
 		callback.erase(0, stdoutPrefix.size());
+
+		if(callback.find("Simulation Completed!") != std::string::npos)
+		{
+			//The results are being pushed in the callbacks to SimulationResults map
+			Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
+			/*OT_LOG_W("Sended Back INIT Results and Thread is ended");*/
+
+		}
 		SimulationResults::getInstance()->triggerCallback("Message", callback);
 	}
 	else if (callback.rfind("stderr",0) == 0) {
@@ -27,7 +38,6 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 		const std::string sterrPrefix = "stderr";
 		callback.erase(0, sterrPrefix.size());
 		SimulationResults::getInstance()->triggerCallback("Error", callback);
-
 	}
 	
 #ifndef _DEBUG
@@ -118,6 +128,18 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 }
 
 
+
+void NGSpice::init(std::list<std::string> _netlist) {
+	//Initialize Callbacks of NGSpice
+	initializeCallbacks();
+
+	//Intialize NGSpice
+	intializeNGSpice();
+
+	
+	//Executing run from NGSpice
+	runSimulation(_netlist);
+}
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {
 	for (const std::string& command : _netlist) {

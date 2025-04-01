@@ -23,7 +23,7 @@ public:
 	~ConnectionManager();
 
 	void connectToCircuitSimulatorService(const QString& serverName);
-
+	void sendBackResults(std::map<std::string, std::vector<double>> _results);
 public slots:
 	void send(std::string messageType,std::string message);
 private slots:
@@ -36,11 +36,10 @@ private slots:
 private:
 	QLocalSocket* m_socket;
 	QTimer* healthCheckTimer;
-	NGSpice* m_ngSpice;
 	bool waitForHealthcheck;
 	void handleActionType(QString _actionType, QJsonArray _data);
 	void handleRunSimulation( std::list<std::string> _netlist);
-	void sendBackResults(std::map<std::string, std::vector<double>> _results);
+	
 
 	
 
