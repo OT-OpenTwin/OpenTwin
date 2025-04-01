@@ -85,8 +85,8 @@ namespace ot {
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
-		QwtPlotCurve* getCartesianCurve(void) const { return m_cartesianCurve; };
-		QwtPolarCurve* getPolarCurve(void) const { return m_polarCurve; };
+		QwtPlotCurve* getCartesianCurve(void) ;
+		QwtPolarCurve* getPolarCurve(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -98,6 +98,9 @@ namespace ot {
 
 	private:
 		friend class PlotBase;
+
+		void buildCartesianCurve();
+		void buildPolarCurve();
 
 		PlotBase* m_ownerPlot = nullptr;
 

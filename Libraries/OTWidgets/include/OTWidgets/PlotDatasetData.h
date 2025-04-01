@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"

@@ -172,7 +172,8 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchCurves);
 
 	std::list<std::pair<UID, UID>> prefetchCurveData;
-	std::list< PlotDataset*> curves;
+	std::list<BasicEntityInformation> curveEntityInfos;
+	std::list<const Plot1DCurveCfg*> newCurvesCfgs;
 
 	for (const Plot1DCurveCfg& curveCfg : _entitiesToImport) {
 		EntityHandler handler;
@@ -197,8 +198,6 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 		cfg.setXAxisTitle(curve->getAxisLabelX() + " [" + curve->getUnitX() + "]");
 		cfg.setYAxisTitle(curve->getAxisLabelY() + " [" + curve->getUnitY() + "]");
 
-
-		PlotDataset* newDataset = nullptr;
 		//PlotDataset* newDataset = addDataset(cfg, nullptr, nullptr, 0);
 		//newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
 		//newDataset->updateCurveVisualization();
@@ -233,25 +232,20 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 
 		if (loadCurveDataRequired) {
 			prefetchCurveData.push_back(std::pair<UID, UID>(curveDataStorageId, curveDataStorageVersion));
-			
-			newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
-			newDataset->updateCurveVisualization();
-			curves.push_back(newDataset);
+			curveEntityInfos.push_back(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
+			newCurvesCfgs.push_back(&curveCfg);
 		}
-
-		removeFromCache(newDataset->getEntityID());
-		this->addDatasetToCache(newDataset);
 	}
 
 	if (prefetchCurveData.empty()) return; // Nothing to load
 
 	// Now load the curve data
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchCurveData);
-
-	for (PlotDataset* item : curves) {
+	auto newCurveCfg = newCurvesCfgs.begin();
+	for (auto& curveEntityInfo : curveEntityInfos) {
 		// Here we get the storage data of the underlying curve data
-		UID entityID = item->getStorageEntityInfo().getEntityID();
-		UID entityVersion = item->getStorageEntityInfo().getEntityVersion();
+		UID entityID = curveEntityInfo.getEntityID();
+		UID entityVersion = curveEntityInfo.getEntityVersion();
 
 		auto doc = bsoncxx::builder::basic::document{};
 
@@ -318,10 +312,21 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 				iYim++;
 			}
 		}
-
-		item->setPlotData(ot::PlotDatasetData(std::move(xData), yData.release()));
 		
+		removeFromCache(curveEntityInfo.getEntityID());
+
+		PlotDataset* newDataset = new PlotDataset(this, **newCurveCfg, ot::PlotDatasetData(std::move(xData), yData.release()));
+		
+		newDataset->setEntityInformation(curveEntityInfo);
+		newDataset->setOwnerPlot(this);
+		newDataset->updateCurveVisualization();
+		this->addDatasetToCache(newDataset);
+		newDataset->attach();	
 		// Attatch the curve to the plot
-		item->attach();
+
+		if (newCurveCfg != newCurvesCfgs.end())
+		{
+			newCurveCfg++;
+		}
 	}
 }
