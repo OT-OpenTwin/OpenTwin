@@ -664,7 +664,7 @@ void AppBase::exportLogs(void) {
 	requestDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(m_loginData.getUserName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response)) {
+	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response, ot::msg::defaultTimeout)) {
 		return;
 	}
 

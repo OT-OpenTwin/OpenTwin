@@ -285,7 +285,7 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout))
 	{
 		throw std::exception("Could not get the projectlist of the authorization service.");
 	}
@@ -4389,7 +4389,7 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 			// Try to send message and check the response
 			std::string response;
 			try {
-				if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, ping, response)) { sessionServiceDied = true; }
+				if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, ping, response, ot::msg::defaultTimeout)) { sessionServiceDied = true; }
 				else OT_ACTION_IF_RESPONSE_ERROR(response) { sessionServiceDied = true; }
 				else OT_ACTION_IF_RESPONSE_WARNING(response) { sessionServiceDied = true; }
 				else if (response != OT_ACTION_CMD_Ping) { sessionServiceDied = true; }
