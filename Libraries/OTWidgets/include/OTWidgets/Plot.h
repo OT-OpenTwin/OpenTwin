@@ -57,8 +57,7 @@ namespace ot {
 	protected:
 		virtual void clearCache(void) override;
 		virtual void detachAllCached(void) override;
-		virtual void calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) override;
-
+		
 	private:
 		std::map<UID, std::list<PlotDataset*>> m_cache;
 		

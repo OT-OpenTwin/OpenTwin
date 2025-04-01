@@ -5,6 +5,19 @@ class ContainerFlexibleOwnership
 public:
 	ContainerFlexibleOwnership(size_t _size);
 	~ContainerFlexibleOwnership();
+	ContainerFlexibleOwnership(ContainerFlexibleOwnership&& _other)
+	{
+		m_data = _other.m_data;
+		_other.m_data = nullptr;
+	}
+	ContainerFlexibleOwnership& operator=(const ContainerFlexibleOwnership& _other)
+	{
+		m_data = _other.m_data;
+		_other.m_data = nullptr;
+	}
+	ContainerFlexibleOwnership(const ContainerFlexibleOwnership& _other) = delete;
+	ContainerFlexibleOwnership& operator=(ContainerFlexibleOwnership&& _other) = default;
+
 	const T& operator[](size_t _index);
 	void pushBack(const T& _value);
 	T* release();

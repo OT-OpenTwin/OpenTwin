@@ -51,17 +51,15 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override { return m_centralWidget; };
 		virtual const QWidget* getQWidget(void) const override { return m_centralWidget; };
 
-		CartesianPlot* getCartesianPlot(void) { return m_cartesianPlot; };
 
-		PolarPlot* getPolarPlot(void) { return m_polarPlot; };
-
+		AbstractPlot* getPlot();
+		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter
 
 		void setPlotType(Plot1DCfg::PlotType _type);
-
-		PlotDataset* addDataset(const Plot1DCurveCfg& _config, double* _dataX, double* _dataY, int _dataSize);
+		Plot1DCfg::PlotType getCurrentPlotType() { return m_currentPlotType; }
 
 		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
 		const Plot1DCfg& getConfig(void) const { return m_config; };
@@ -102,8 +100,6 @@ namespace ot {
 		//! @brief Returns all datasets.
 		virtual std::list<PlotDataset*> getAllDatasets(void) const = 0;
 
-		void setAxisQuantity(Plot1DCfg::AxisQuantity _quantity);
-
 	Q_SIGNALS:
 		void resetItemSelectionRequest(void);
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
@@ -111,8 +107,7 @@ namespace ot {
 	protected:
 		virtual void clearCache(void) = 0;
 		virtual void detachAllCached(void) = 0;
-		virtual void calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) = 0;
-
+	
 		void replaceConfig(Plot1DCfg&& _config) { m_config = std::move(_config); };
 		void applyConfig(void);
 		

@@ -47,6 +47,7 @@
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\ContextMenuAction.cpp" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
+    <ClCompile Include="src\CoordinateTransformer.cpp" />
     <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\DelayedCallHandler.cpp" />
@@ -237,6 +238,7 @@
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
+    <ClInclude Include="include\OTWidgets\CoordinateTransformer.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />

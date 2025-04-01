@@ -270,6 +270,7 @@
       </SDLCheck>
       <PreprocessorDefinitions>$(Qt_DEFINES_);%(PreprocessorDefinitions);_PerformanceTest;_DEBUG</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

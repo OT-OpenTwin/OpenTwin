@@ -10,64 +10,37 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+#include "OTCore/ComplexNumberContainer.h"
+
 class QwtPlotCurve;
 
 namespace ot {
 
 	class PolarPlotData;
 
-	class OT_WIDGETS_API_EXPORT PlotDatasetData {
+	class OT_WIDGETS_API_EXPORT PlotDatasetData 
+	{
 		OT_DECL_NOCOPY(PlotDatasetData)
 		OT_DECL_NODEFAULT(PlotDatasetData)
 	public:
-		PlotDatasetData(double* _dataX, double* _dataXcalc, double* _dataY, double* _dataYim, double* _dataYcalc, long _dataSize);
+		//! @brief Takes over ownership over ComplexNumberContainer
+		PlotDatasetData(std::vector<double>&& _dataX, ComplexNumberContainer* _complexNumberContainer);
 		~PlotDatasetData();
 
 		PlotDatasetData(PlotDatasetData&& _other) noexcept;
-		PlotDatasetData& operator = (PlotDatasetData&& _other) noexcept;
+		PlotDatasetData& operator = (PlotDatasetData&& _other) noexcept = default;
 		
-		PlotDatasetData createCopy(void) const;
-
-		void calculateData(Plot1DCfg::AxisQuantity _axisQuantity, QwtPlotCurve* _cartesianCurve, PolarPlotData* _polarData);
-
-		void replaceData(double* _dataX, double* _dataXcalc, double* _dataY, double* _dataYim, double* _dataYcalc, long _dataSize);
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Getter
-
-		double* getDataX(void) const { return m_dataX; };
+		//Depends on the ComplexNumberContainer what data is behind x and y
+		const std::vector<double>& getDataX(void) const { return m_dataX; };
+		const ComplexNumberContainer& getDataY(void) const { return *m_dataY; };
 		
-		double* getDataXcalc(void) const { return m_dataXcalc; };
+		//! @brief Takes over ownership over ComplexNumberContainer
+		void overrideDataY(ComplexNumberContainer* _complexNumberContainer);
+		const size_t getNumberOfDatapoints() const { return m_numberOfDatapoints; }
 		
-		double* getDataY(void) const { return m_dataY; };
-		
-		void setDataYim(double* _dataYim) { m_dataYim = _dataYim; };
-		double* getDataYim(void) const { return m_dataYim; };
-		
-		double* getDataYcalc(void) const { return m_dataYcalc; };
-		
-		long getDataSize(void) const { return m_dataSize; };
-
-		bool getDataAt(int _index, double& _x, double& _y);
-
-		bool getData(double*& _x, double*& _y, long& _size);
-
-		bool getYim(double*& _yim, long& _size);
-
-		bool getCopyOfData(double*& _x, double*& _y, long& _size);
-
-		bool getCopyOfYim(double*& _yim, long& _size);
-
 	private:
-		void memFree(void);
-
-		double* m_dataX;
-		double* m_dataXcalc;
-		double* m_dataY;
-		double* m_dataYim;
-		double* m_dataYcalc;
-		long    m_dataSize;
+		std::vector<double> m_dataX;
+		ComplexNumberContainer* m_dataY = nullptr;
+		size_t m_numberOfDatapoints = 0;
 	};
-
 }

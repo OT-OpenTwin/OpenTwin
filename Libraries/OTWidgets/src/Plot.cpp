@@ -132,12 +132,3 @@ void ot::Plot::detachAllCached(void) {
 		}
 	}
 }
-
-void ot::Plot::calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) {
-	for (auto it : m_cache) {
-		for (PlotDataset* dataset : it.second) {
-			OTAssertNullptr(dataset);
-			dataset->calculateData(_axisQuantity);
-		}
-	}
-}

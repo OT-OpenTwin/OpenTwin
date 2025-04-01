@@ -12,24 +12,33 @@
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/PolarPlotData.h"
 #include "OTWidgets/GlobalColorStyle.h"
-
+#include "OTWidgets/CoordinateTransformer.h"
 // Qwt header
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
 #include <qwt_polar_curve.h>
 
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
-	m_config(_config), m_data(std::move(_data)), m_ownerPlot(_ownerPlot), m_isAttatched(false), m_polarData(nullptr)
+	m_config(_config), m_data(std::move(_data)), m_ownerPlot(_ownerPlot)
 {
-	m_cartesianCurve = new QwtPlotCurve(QString::fromStdString(m_config.getTitle()));
-	m_cartesianCurvePointSymbol = new QwtSymbol;
-	m_cartesianCurve->setRawSamples(m_data.getDataX(), m_data.getDataY(), m_data.getDataSize());
-
-	m_polarCurve = new QwtPolarCurve(QString::fromStdString(m_config.getTitle()));
-	m_polarCurvePointSymbol = new QwtSymbol;
-	m_polarData = new PolarPlotData(m_data.getDataX(), m_data.getDataY(), m_data.getDataSize());
-	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
-	m_polarCurve->setData(m_polarData);
+	assert(_ownerPlot != nullptr);
+	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
+	{
+		m_cartesianCurve = new QwtPlotCurve(QString::fromStdString(m_config.getTitle()));
+		m_cartesianCurvePointSymbol = new QwtSymbol();
+		ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
+		m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
+	}
+	else
+	{
+		assert(_ownerPlot->getConfig().getAxisQuantity() == Plot1DCfg::AxisQuantity::Complex);
+		m_polarCurve = new QwtPolarCurve(QString::fromStdString(m_config.getTitle()));
+		m_polarCurvePointSymbol = new QwtSymbol();
+		ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, _ownerPlot->getConfig().getAxisQuantity());
+		m_polarData = new PolarPlotData(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
+		m_polarCurve->setSymbol(m_polarCurvePointSymbol);
+		m_polarCurve->setData(m_polarData);
+	}
 }
 
 ot::PlotDataset::~PlotDataset() {
@@ -51,8 +60,15 @@ void ot::PlotDataset::attach(void) {
 	}
 	m_isAttatched = true;
 
-	m_cartesianCurve->attach(m_ownerPlot->getCartesianPlot());
-	m_polarCurve->attach(m_ownerPlot->getPolarPlot());
+	AbstractPlot* plot = m_ownerPlot->getPlot();
+	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
+	{
+		m_cartesianCurve->attach(dynamic_cast<CartesianPlot*>(plot));
+	}
+	else
+	{
+		m_polarCurve->attach(dynamic_cast<PolarPlot*>(plot));
+	}
 }
 
 void ot::PlotDataset::detach(void) {
@@ -143,33 +159,9 @@ void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
 	}
 }
 
-void ot::PlotDataset::calculateData(Plot1DCfg::AxisQuantity _axisQuantity) {
-	m_data.calculateData(_axisQuantity, m_cartesianCurve, m_polarData);
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data Setter / Getter
-
-void ot::PlotDataset::replaceData(double* _dataX, double* _dataY, long _dataSize) {
-	m_data.replaceData(_dataX, nullptr, _dataY, nullptr, nullptr, _dataSize);
-
-	m_cartesianCurve->setRawSamples(m_data.getDataX(), m_data.getDataY(), m_data.getDataSize());
-	m_polarData->setData(m_data.getDataX(), m_data.getDataY(), m_data.getDataSize());
-}
-
-bool ot::PlotDataset::getDataAt(int _index, double& _x, double& _y) {
-	return m_data.getDataAt(_index, _x, _y);
-}
-
-bool ot::PlotDataset::getCopyOfData(double*& _x, double*& _y, long& _size) {
-	return m_data.getCopyOfData(_x, _y, _size);
-}
-
-bool ot::PlotDataset::getCopyOfYim(double*& _yim, long& _size) {
-	return m_data.getCopyOfYim(_yim, _size);
-}
-
 void ot::PlotDataset::updateCurveVisualization(void) {
 	QPen linePen = QtFactory::toQPen(m_config.getLinePen());
 
@@ -226,4 +218,10 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 
 	m_cartesianCurve->setVisible(m_config.getVisible());
 	m_polarCurve->setVisible(m_config.getVisible());
+}
+
+const ot::PointsContainer ot::PlotDataset::getDisplayedPoints()
+{
+	ot::PointsContainer points = m_coordinateTransformer.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
+	return points;
 }

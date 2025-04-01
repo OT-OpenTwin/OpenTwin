@@ -55,13 +55,13 @@ namespace ot {
 		QwtPlotCurve* findNearestCurve(const QPoint& _pos, int& _pointIx);
 
 	private:
-		CartesianPlotZoomer* m_plotZoomer;
-		CartesianPlotMagnifier* m_plotMagnifier;
-		CartesianPlotPanner* m_plotPanner;
-		CartesianPlotWidgetCanvas* m_canvas;
-		CartesianPlotLegend* m_legend;
-		CartesianPlotGrid* m_grid;
-		CartesianPlotPicker* m_picker;
+		CartesianPlotZoomer* m_plotZoomer  = nullptr;
+		CartesianPlotMagnifier* m_plotMagnifier = nullptr;
+		CartesianPlotPanner* m_plotPanner = nullptr;
+		CartesianPlotWidgetCanvas* m_canvas = nullptr;
+		CartesianPlotLegend* m_legend = nullptr;
+		CartesianPlotGrid* m_grid = nullptr;
+		CartesianPlotPicker* m_picker = nullptr;
 	};
 
 }

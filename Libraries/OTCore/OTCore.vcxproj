@@ -67,6 +67,7 @@
     <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h" />
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\BasicRAIIWrapper.h" />
+    <ClInclude Include="include\OTCore\ComplexNumberContainer.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.hpp" />

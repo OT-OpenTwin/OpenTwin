@@ -511,6 +511,9 @@
     <ClCompile Include="src\PlotView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\CoordinateTransformer.cpp">
+      <Filter>src\Plot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -973,6 +976,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotView.h">
       <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CoordinateTransformer.h">
+      <Filter>include\Plot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -53,6 +53,18 @@ ot::PlotBase::~PlotBase() {
 
 // Setter
 
+ot::AbstractPlot* ot::PlotBase::getPlot()
+{
+	if (m_currentPlotType == Plot1DCfg::PlotType::Cartesian)
+	{
+		return m_cartesianPlot;
+	}
+	else
+	{
+		return m_polarPlot;
+	}
+}
+
 void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 	if (_type == m_currentPlotType) {
 		return;
@@ -85,10 +97,6 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 			return;
 		}
 	}
-}
-
-ot::PlotDataset * ot::PlotBase::addDataset(const Plot1DCurveCfg& _config, double * _dataX, double * _dataY, int _dataSize) {
-	return new PlotDataset(this, _config, PlotDatasetData(_dataX, nullptr, _dataY, nullptr, nullptr, _dataSize));
 }
 
 void ot::PlotBase::resetView(void) {
@@ -205,9 +213,6 @@ void ot::PlotBase::datasetSelectionChanged(PlotDataset * _selectedDataset) {
 	}
 }
 
-void ot::PlotBase::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
-	this->calculateDataInCache(_quantity);
-}
 
 void ot::PlotBase::applyConfig(void) {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
@@ -243,8 +248,6 @@ void ot::PlotBase::applyConfig(void) {
 		this->setIncompatibleData();
 		return;
 	}
-
-	this->setAxisQuantity(m_config.getAxisQuantity());
 
 	// Setup plot XY
 	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);

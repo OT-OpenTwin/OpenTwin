@@ -7,18 +7,15 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/PolarPlotData.h"
 
-ot::PolarPlotData::PolarPlotData(double* _azimuth, double* _radius, size_t _dataSize) :
-	m_azimuth(_azimuth), m_radius(_radius), m_size(_dataSize)
+ot::PolarPlotData::PolarPlotData(const double* _phase, const double* _magnitude, size_t _numberOfEntries) :
+	m_azimuth(_phase), m_radius(_magnitude), m_numberOfEntries(_numberOfEntries)
 {
-
-}
-
-ot::PolarPlotData::~PolarPlotData() {
-
+	assert(m_azimuth != nullptr && m_radius != nullptr);
+	assert(m_numberOfEntries >= 0);
 }
 
 QwtPointPolar ot::PolarPlotData::sample(size_t _i) const {
-	if (_i < m_size) {
+	if (_i < m_numberOfEntries) {
 		return QwtPointPolar(m_azimuth[_i], m_radius[_i]);
 	}
 	else {
@@ -27,8 +24,7 @@ QwtPointPolar ot::PolarPlotData::sample(size_t _i) const {
 	}
 }
 
-void ot::PolarPlotData::setData(double* _azimuth, double* _radius, size_t _dataSize) {
-	m_azimuth = _azimuth;
-	m_radius = _radius;
-	m_size = _dataSize;
+size_t ot::PolarPlotData::size() const
+{
+	return m_numberOfEntries;
 }

@@ -157,12 +157,6 @@ void ot::PlotManager::detachAllCached(void) {
 	}
 }
 
-void ot::PlotManager::calculateDataInCache(Plot1DCfg::AxisQuantity _axisQuantity) {
-	for (auto itm : m_cache) {
-		itm.second.second->calculateData(_axisQuantity);
-	}
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
@@ -203,44 +197,49 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 		cfg.setXAxisTitle(curve->getAxisLabelX() + " [" + curve->getUnitX() + "]");
 		cfg.setYAxisTitle(curve->getAxisLabelY() + " [" + curve->getUnitY() + "]");
 
-		PlotDataset* newDataset = addDataset(cfg, nullptr, nullptr, 0);
-		newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
-		newDataset->updateCurveVisualization();
+
+		PlotDataset* newDataset = nullptr;
+		//PlotDataset* newDataset = addDataset(cfg, nullptr, nullptr, 0);
+		//newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
+		//newDataset->updateCurveVisualization();
 
 		// Check whether we already have the curve data
 
-		bool loadCurveDataRequired = true;
 
-		auto it = m_cache.find(newDataset->getEntityID());
+		bool loadCurveDataRequired = true;
+		ot::UID dataEntityID =	curve->getCurveDataStorageId();
+		ot::UID dataEntityVersion =	curve->getEntityStorageVersion();
+		auto it = m_cache.find(dataEntityID);
 		if (it != m_cache.end()) {
 			PlotDataset* oldDataset = it->second.second;
 
 			if (oldDataset != nullptr) {
-				if (oldDataset->getStorageEntityInfo().getEntityID() == newDataset->getStorageEntityInfo().getEntityID()
-					&& oldDataset->getStorageEntityInfo().getEntityVersion() == newDataset->getStorageEntityInfo().getEntityVersion()) {
+				if (oldDataset->getStorageEntityInfo().getEntityID() == dataEntityID
+					&& oldDataset->getStorageEntityInfo().getEntityVersion() == dataEntityVersion) {
 
 					// The curve data in the previous data set is the same as the one in the new data set
 					double* x = nullptr, * y = nullptr;
 					long n;
-
-					if (oldDataset->getCopyOfData(x, y, n)) {
-						newDataset->replaceData(x, y, n);
-						loadCurveDataRequired = false;
-						newDataset->attach();
-					}
+					PlotDatasetData& oldDatasetData = oldDataset->getPlotData();
+					PlotDatasetData newDatasetData(std::move(oldDatasetData));
+					PlotDataset* newDataset = new PlotDataset(this,cfg, std::move(newDatasetData));
+					loadCurveDataRequired = false;
+					newDataset->attach();
+					newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
+					newDataset->updateCurveVisualization();
 				}
-
 			}
 		}
 
 		if (loadCurveDataRequired) {
 			prefetchCurveData.push_back(std::pair<UID, UID>(curveDataStorageId, curveDataStorageVersion));
-
+			
+			newDataset->setStorageEntityInfo(BasicEntityInformation(curve->getCurveDataStorageId(), curve->getCurveDataStorageVersion()));
+			newDataset->updateCurveVisualization();
 			curves.push_back(newDataset);
 		}
 
 		removeFromCache(newDataset->getEntityID());
-
 		this->addDatasetToCache(newDataset);
 	}
 
@@ -286,58 +285,42 @@ void ot::PlotManager::importData(const std::string& _projectName, const std::lis
 		size_t nYre = std::distance(arrayYre.begin(), arrayYre.end());
 		size_t nYim = std::distance(arrayYim.begin(), arrayYim.end());
 
-		double* x = new double[nX];
+		std::vector<double> xData;
+		xData.reserve(nX);
+		
 		auto iX = arrayX.begin();
-
 		for (unsigned long index = 0; index < nX; index++) {
-			x[index] = iX->get_double();
+			xData.push_back(iX->get_double());
 			iX++;
 		}
 
-		double* yre = nullptr, * yim = nullptr;
+		std::unique_ptr<ComplexNumberContainerCartesian> yData(new ComplexNumberContainerCartesian());
 
-		if (nYre > 0) {
-			yre = new double[nYre];
-
+		if (nYre > 0) 
+		{	
+			assert(nX == nYre);
+			yData->m_real.reserve(nYre);
 			auto iYre = arrayYre.begin();
-
 			for (unsigned long index = 0; index < nYre; index++) {
-				yre[index] = iYre->get_double();
+				yData->m_real.push_back(iYre->get_double());
 				iYre++;
 			}
 		}
-		else {
-			yre = new double[nX];
-			for (unsigned long index = 0; index < nX; index++) {
-				yre[index] = 0;
-			}
-		}
 
-		// First we set the new data
-		item->replaceData(x, yre, nX);
 
-		if (nYim > 0) {
-			yim = new double[nYim];
-
+		if (nYim > 0) 
+		{
+			assert(nX == nYim);
+			yData->m_imag.reserve(nYim);
 			auto iYim = arrayYim.begin();
-
 			for (unsigned long index = 0; index < nYim; index++) {
-				yim[index] = iYim->get_double();
+				yData->m_imag.push_back(iYim->get_double());
 				iYim++;
 			}
-
-			// Set the imaginary values
-			assert(nX == nYre);
-		}
-		else {
-			yim = new double[nX];
-			for (unsigned long index = 0; index < nX; index++) {
-				yim[index] = 0;
-			}
 		}
 
-		item->setYim(yim);
-
+		item->setPlotData(ot::PlotDatasetData(std::move(xData), yData.release()));
+		
 		// Attatch the curve to the plot
 		item->attach();
 	}

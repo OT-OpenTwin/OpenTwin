@@ -10,7 +10,7 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
-
+#include "CoordinateTransformer.h"
 // Qt header
 #include <QtCore/qstring.h>
 #include <QtGui/qcolor.h>
@@ -82,8 +82,6 @@ namespace ot {
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
-		void calculateData(Plot1DCfg::AxisQuantity _axisQuantity);
-
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
@@ -93,39 +91,28 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data Setter / Getter
-
-		void replaceData(double* _dataX, double* _dataY, long _dataSize);
-
-		bool getDataAt(int _index, double& _x, double& _y);
-
-		void setYim(double* _dataYim) { m_data.setDataYim(_dataYim); };
-		double* getYim(void) const { return m_data.getDataYim(); };
-
-		bool getCopyOfData(double*& _x, double*& _y, long& _size);
-
-		bool getCopyOfYim(double*& _yim, long& _size);
-
 		void updateCurveVisualization(void);
+		PlotDatasetData& getPlotData() { return m_data; }
+		const PointsContainer getDisplayedPoints();
+		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 
 	private:
 		friend class PlotBase;
 
-		// Plot data
+		PlotBase* m_ownerPlot = nullptr;
 
-		PlotBase* m_ownerPlot;
-
-		bool m_isAttatched;
+		bool m_isAttatched = false;
 
 		PlotDatasetData m_data;
-		PolarPlotData* m_polarData;
-
+		CoordinateTransformer m_coordinateTransformer;
 		// Plot elements
+		QwtPlotCurve* m_cartesianCurve = nullptr;
 
-		QwtPlotCurve* m_cartesianCurve;
-		QwtPolarCurve* m_polarCurve;
+		QwtPolarCurve* m_polarCurve = nullptr;
+		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 
 
-		QwtSymbol* m_cartesianCurvePointSymbol;
-		QwtSymbol* m_polarCurvePointSymbol;
+		QwtSymbol* m_cartesianCurvePointSymbol = nullptr;
+		QwtSymbol* m_polarCurvePointSymbol = nullptr;
 
 		// Config
 

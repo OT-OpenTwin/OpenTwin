@@ -169,12 +169,19 @@ void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
 
 		PlotDataset* dataset = m_plot->getOwner()->findDataset(curve);
 		OTAssertNullptr(dataset);
-
-		double x, y;
-		if (!dataset->getDataAt(itemIx, x, y)) {
+		const PlotDatasetData& datasetData = dataset->getPlotData();
+		const ot::PointsContainer displayedPoints = dataset->getDisplayedPoints();
+		double x(0), y(0);
+		if (itemIx < 0 || itemIx >= datasetData.getNumberOfDatapoints())
+		{
 			return;
 		}
-
+		else
+		{
+			x = (*displayedPoints.m_xData)[itemIx];
+			y = (*displayedPoints.m_yData)[itemIx];
+		}
+		
 		// Set new label
 		QwtText newText(QString::number(x) + "; " + QString::number(y), QwtText::PlainText);
 		newText.setColor(QColor(255, 50, 50));

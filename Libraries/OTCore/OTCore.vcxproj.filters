@@ -357,6 +357,9 @@
     <ClInclude Include="include\OTCore\Matrix.h">
       <Filter>include\Container</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\ComplexNumberContainer.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

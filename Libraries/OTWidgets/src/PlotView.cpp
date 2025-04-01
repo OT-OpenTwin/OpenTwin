@@ -8,7 +8,7 @@
 
 ot::PlotView::PlotView()
 	: WidgetView(WidgetViewBase::View1D) {
-	m_plot = new Plot;
+	m_plot = new Plot();
 
 	this->addWidgetInterfaceToDock(m_plot);
 }

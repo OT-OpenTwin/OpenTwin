@@ -223,7 +223,7 @@ void testPlot()
 	PlotBuilder builder(extender, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 
 	//Single curve
-	/*DatasetDescription description;
+	DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getInt32TypeName();
@@ -248,23 +248,21 @@ void testPlot()
 	curveCfg.setYAxisTitle("SomeQuantity");
 	curveCfg.setEntityName("Test/A_plot/A_Curve");
 
-	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
+	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");
 
 	// Family of curves
-	MetadataParameter parameter;
+	/*MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "[kOlf]";
-	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-	quantDesc->setName("SomeQuantity");
-	quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
+
 	
 	
 	ot::Plot1DCurveCfg curveCfg;
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	curveCfg.setEntityName("Test/A_plot/A_Curve");
+	curveCfg.setEntityName("Test/A_plot/A_FamilyOfCurves");
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -272,7 +270,11 @@ void testPlot()
 	for (int runID = 0; runID < 3; runID++)
 	{
 		DatasetDescription description;
-
+		
+		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+		quantDesc->setName("SomeQuantity");
+		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
+		
 		for (float i = 0.; i <= 50.; i++)
 		{
 			float value = i * (runID+1);
@@ -297,7 +299,7 @@ void testPlot()
 		descriptions.push_back(std::move(description));
 	}
 	
-	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
+	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");*/
 
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName("Test/A_plot");

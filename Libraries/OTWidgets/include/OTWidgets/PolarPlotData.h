@@ -16,21 +16,17 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PolarPlotData : public QwtSeriesData<QwtPointPolar> {
 	public:
-		PolarPlotData(double* _azimuth, double* _radius, size_t _dataSize);
-		virtual ~PolarPlotData();
-
-		virtual size_t size(void) const override { return m_size; }
-
+		PolarPlotData(const double* _phase, const double* _magnitude,size_t _numberOfEntries);
+	
 		virtual QwtPointPolar sample(size_t _i) const override;
 
-		//! \brief Sets the data.
-		//! The caller keeps ownership of the data.
-		void setData(double* _azimuth, double* _radius, size_t _dataSize);
-
 	private:
-		double* m_azimuth;
-		double* m_radius;
-		size_t m_size;
+		//Expressions as they are more used in for the plot geometry. Magnitude ^= radius and in this context phase ^= azimuth
+		const double* m_azimuth = nullptr;
+		const double* m_radius = nullptr;
+		size_t m_numberOfEntries = 0;
+
+		size_t size() const override;
 	};
 
 }
