@@ -360,7 +360,10 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
 
             SimulationResults::getInstance()->handleResults(data);
             send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
-            healthCheckTimer->stop();
+            if (healthCheckTimer != nullptr) {
+                healthCheckTimer->stop();
+            }
+            
         }
         else if (_actionType.toStdString() == "Ping") {
             send("ResultPing", "Healthcheck");
@@ -403,12 +406,18 @@ void ConnectionManager::handleConnection() {
     OT_LOG_D("Subprocess connected");
     connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::handleReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
-
+#ifndef _DEBUG
     healthCheckTimer = new QTimer(this);
     connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
 
     healthCheckTimer->setInterval(5000);
     healthCheckTimer->start();
+#endif // !_DEBUG
+
+    OT_LOG_D("Hello CircuitExecution!");
+
+
+
 }
 
 

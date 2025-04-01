@@ -30,8 +30,11 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
 	}
 	
-	
+#ifndef _DEBUG
 	OT_LOG_D(std::string(output));
+#endif // !_DEBUG
+
+	
 	
 	return 0;
 }
@@ -39,7 +42,10 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 	
 	SimulationResults::getInstance()->triggerCallback("Message", std::string(outputReturn));
+#ifndef _DEBUG
 	OT_LOG_D(std::string(outputReturn));
+#endif // !_DEBUG
+
 
 	return 0;
 }
