@@ -68,11 +68,10 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 		// Write log message to logger service
 		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, false, false)) {
 			OTAssert(0, "Failed to send log message");
+			std::cout << "Failed to send log message" << std::endl;
 			m_loggingServiceURL.clear();
 		}
 	}
-
-#ifdef _DEBUG
 	catch (const std::exception& _e) {
 		assert(0);
 		std::cout << "[FATAL] Error while logging: " << _e.what() << std::endl;
@@ -81,11 +80,6 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 		assert(0);
 		std::cout << "[FATAL] Error while logging: Unknown Error" << std::endl;
 	}
-#else
-	catch (...) {
-		// todo: in release mode the error handling for sending log messages does not exists in any way..
-	}
-#endif // _DEBUG
 }
 
 ot::ServiceLogNotifier::ServiceLogNotifier()

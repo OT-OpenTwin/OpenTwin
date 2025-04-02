@@ -128,13 +128,10 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _ob
 					m_items[r][c] = itm;
 				}
 				catch (const std::exception& _e) {
-					if (itm) delete itm;
+					if (itm) {
+						delete itm;
+					}
 					throw _e;
-				}
-				catch (...) {
-					if (itm) delete itm;
-					OT_LOG_EA("Unknown error occured");
-					throw std::exception("Unknown error");
 				}
 			}
 		}

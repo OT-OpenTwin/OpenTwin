@@ -74,17 +74,11 @@ void ot::GraphicsPickerCollectionCfg::setFromJsonObject(const ConstJsonObject& _
 	ConstJsonArray collectionArr = json::getArray(_object, OT_JSON_Member_Collections);
 	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {
 		ConstJsonObject collectionObj = json::getObject(collectionArr, i);
+		
 		GraphicsPickerCollectionCfg* newChild = new GraphicsPickerCollectionCfg;
-		try {
-			newChild->setFromJsonObject(collectionObj);
-			m_collections.push_back(newChild);
-		}
-		catch (...) {
-			OT_LOG_E("Failed to create child collection. Abort");
-			delete newChild;
-			this->memFree();
-			throw std::exception("Failed to create graphics collection");
-		}
+		newChild->setFromJsonObject(collectionObj);
+		
+		m_collections.push_back(newChild);
 	}
 
 	ConstJsonArray itemArr = json::getArray(_object, OT_JSON_Member_Items);

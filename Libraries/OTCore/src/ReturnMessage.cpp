@@ -41,9 +41,6 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 		catch (const std::exception& _e) {
 			msg = "Failed to deserialize return message \"" + _json + "\" with error: "  + std::string(_e.what());
 		}
-		catch (...) {
-			msg = "Failed to deserialize return message \"" + _json + "\": Unknown error";
-		}
 	}
 	else {
 		msg = "Failed to deserialize return message \"" + _json + "\": Invalid format";

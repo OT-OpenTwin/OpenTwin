@@ -48,11 +48,6 @@ bool ot::GraphicsPixmapItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		this->setBlockConfigurationNotifications(false);
 		return false;
 	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-		this->setBlockConfigurationNotifications(false);
-		return false;
-	}
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 

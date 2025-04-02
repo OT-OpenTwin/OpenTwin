@@ -88,13 +88,9 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_EAS("Failed to create child item from factory: " + std::string(_e.what()));
-			if (itm) delete itm;
-			throw _e;
-		}
-		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
-			if (itm) delete itm;
-			throw std::exception("[FATAL] Unknown error");
+			if (itm) {
+				delete itm;
+			}
 		}
 	}
 }

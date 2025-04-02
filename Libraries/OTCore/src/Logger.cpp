@@ -173,20 +173,17 @@ bool ot::importLogMessagesFromString(const std::string& _string, std::list<LogMe
 		return false;
 	}
 
-	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
-		try {
+	try {
+		for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
 			ot::ConstJsonObject obj = ot::json::getObject(doc, i);
 
 			ot::LogMessage msg;
 			msg.setFromJsonObject(obj);
 			_messages.push_back(msg);
 		}
-		catch (const std::exception& _e) {
-			OT_LOG_E(_e.what());
-		}
-		catch (...) {
-			OT_LOG_E("[FATAL] Unknown error");
-		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 
 	return true;
@@ -328,18 +325,7 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 		}
 		catch (const std::exception& _e) {
 			OTAssert(0, "Error occured while dispatching log message");
-#ifdef _DEBUG
-			std::cerr << "Dispatch error: " << _e.what() << std::endl;
-#else
-			OT_UNUSED(_e);
-#endif // _DEBUG
-
-		}
-		catch (...) {
-			OTAssert(0, "Unknown error while dispatching log message");
-#ifdef _DEBUG
-			std::cerr << "Dispatch error: [FATAL] Unknown error" << std::endl;
-#endif // _DEBUG
+			std::cout << "Dispatch error: " << _e.what() << std::endl;
 		}
 	}
 }

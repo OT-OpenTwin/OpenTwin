@@ -55,12 +55,23 @@ namespace ot {
 				// Try to send message and check the response
 				std::string ret;
 				try {
-					if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE, ping, ret)) { alive = false; }
-					else OT_ACTION_IF_RESPONSE_ERROR(ret) { alive = false; }
-			else OT_ACTION_IF_RESPONSE_WARNING(ret) { alive = false; }
-			else if (ret != OT_ACTION_CMD_Ping) { alive = false; }
+					if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE, ping, ret)) {
+						alive = false;
+					}
+					else OT_ACTION_IF_RESPONSE_ERROR(ret) {
+						alive = false;
+					}
+					else OT_ACTION_IF_RESPONSE_WARNING(ret) {
+						alive = false;
+					}
+					else if (ret != OT_ACTION_CMD_Ping) {
+						alive = false;
+					}
 				}
-				catch (...) { alive = false; }
+				catch (const std::exception& _e) {
+					OT_LOG_E(_e.what());
+					alive = false;
+				}
 			}
 
 			OT_LOG_E("Session service has died unexpectedly. Shutting down...");
@@ -392,10 +403,6 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 
 		OT_LOG_E(e.what());
 		return ex;
-	}
-	catch (...) {
-		OT_LOG_E("[FATAL] Unknown error occured");
-		return OT_ACTION_RETURN_UnknownError;
 	}
 }
 

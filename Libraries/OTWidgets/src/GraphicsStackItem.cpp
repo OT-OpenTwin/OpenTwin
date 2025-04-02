@@ -66,12 +66,6 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			this->setBlockConfigurationNotifications(false);
 			throw _e;
 		}
-		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
-			if (i) delete i;
-			this->setBlockConfigurationNotifications(false);
-			throw std::exception("[FATAL] Unknown error");
-		}
 	}
 
 	this->setBlockConfigurationNotifications(false);

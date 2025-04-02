@@ -61,27 +61,15 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _obj
 		}
 		else if (pairObj[OT_JSON_MEMBER_Item].IsObject()) {
 			GraphicsItemCfg* itm = nullptr;
-			try {
-				ConstJsonObject itemObj = json::getObject(pairObj, OT_JSON_MEMBER_Item);
-				itm = GraphicsItemCfgFactory::create(itemObj);
-				if (!itm) {
-					continue;
-				}
-				m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
+			ConstJsonObject itemObj = json::getObject(pairObj, OT_JSON_MEMBER_Item);
+			itm = GraphicsItemCfgFactory::create(itemObj);
+			if (!itm) {
+				continue;
 			}
-			catch (const std::exception& _e) {
-				OT_LOG_E("Error occured");
-				if (itm) delete itm;
-				throw _e;
-			}
-			catch (...) {
-				OT_LOG_EA("Unknown error occured");
-				if (itm) delete itm;
-				throw std::exception("Unknown error");
-			}
+			m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
 		}
 		else {
-			OT_LOG_EA("Invalid JSON Object type");
+			OT_LOG_EAS("Invalid JSON Object type");
 		}
 	}
 }

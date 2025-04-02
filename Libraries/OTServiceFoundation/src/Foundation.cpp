@@ -32,9 +32,8 @@ namespace ot {
 				response.append(_e.what());
 			}
 			catch (...) {
-				OT_LOG_EAS("[FATAL] Unknown error occured");
-
-				response = OT_ACTION_RETURN_INDICATOR_Error "[FATAL] Unknown error occured";
+				OT_LOG_EAS("[FATAL] Unknown error occured. Shutting down");
+				exit(1);
 			}
 
 			// Copy the return value.The memory of this value will be deallocated in the deallocateData function
@@ -72,9 +71,7 @@ const char* ot::foundation::getServiceURL(void)
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("Unknown error");
+		exit(-1);
 	}
 	char* retVal = new char[1] { 0 };
 	return retVal;
@@ -158,10 +155,12 @@ int ot::foundation::init(
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
+		exit(-1);
 		return -1;
 	}
 	catch (...) {
 		OT_LOG_EA("Unknown error");
+		exit(-2);
 		return -2;
 	}
 }
@@ -233,10 +232,12 @@ int ot::foundation::initDebugExplicit(
 	}
 	catch (const std::exception& e) {
 		OT_LOG_EAS(e.what());
+		exit(-1);
 		return -1;
 	}
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error occured");
+		exit(-2);
 		return -2;
 	}
 }

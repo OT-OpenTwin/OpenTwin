@@ -93,11 +93,6 @@ bool ot::SimpleQueue::executeQueue(void) {
 
 			return false;
 		}
-		catch (...) {
-			OT_LOG_EA("Failed to execute queue: Unknown error");
-			clearQueue();
-			return false;
-		}
 	}
 	return true;
 }

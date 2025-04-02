@@ -117,12 +117,8 @@ extern "C"
 				Qt::DirectConnection, Q_RETURN_ARG(char *, retval), Q_ARG(const char*, json), Q_ARG(const char*, senderIP));
 		}
 		catch (const std::exception & e) {
-			int x = 1;
-			assert(0); // Error
-		}
-		catch (...) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
+			exit(-1);
 		}
 		return retval;
 	};
@@ -143,12 +139,8 @@ extern "C"
 			QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
 		}
 		catch (const std::exception & e) {
-			int x = 1;
-			assert(0); // Error
-		}
-		catch (...) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
+			exit(-1);
 		}
 		return retval;
 	};
@@ -163,10 +155,8 @@ extern "C"
 			}
 		}
 		catch (const std::exception & e) {
-			assert(0); // Error
-		}
-		catch (...) {
-			assert(0); // Error
+			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
+			exit(-1);
 		}
 	};
 }
@@ -340,17 +330,19 @@ bool ExternalServicesComponent::deleteModel(ModelUIDtype modelID)
 			return true;
 		}
 		catch (std::out_of_range)
-		{ return false; }
+		{
+			return false;
+		}
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_EAS("Failed to delete model: " + std::string(_e.what()));
 		return false;
 	}
 }
 
 void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID)
 {
-	assert(0); // Not in use anymore
+	OT_LOG_EAS("NOT IN USE ANYMORE");
 	try {
 		ot::JsonDocument inDoc;
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetVisualizationModel, inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -363,16 +355,16 @@ void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, Mode
 			// Check if response is an error or warning
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_EAS("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
+				OT_LOG_EAS("Warning response: " + response);
+				}
 		}
 
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -389,10 +381,10 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_EAS("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+				OT_LOG_EAS("Warning response: " + response);
 			}
 		}
 		//NOTE, WARNING, at this point only the last response will be taken into accout..
@@ -408,51 +400,39 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 	}
 }
 
-bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID)
-{
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetIsModified, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
-		std::string response;
+bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID) {
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetIsModified, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
+	std::string response;
 
-		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
+	for (auto reciever : m_modelViewNotifier) {
+		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_EAS("Error response: " + response);
 		}
-		//NOTE, WARNING, at this point only the last response will be taken into accout..
+			else OT_ACTION_IF_RESPONSE_WARNING(response) {
+				OT_LOG_EAS("Warning response: " + response);
+			}
+	}
+	//NOTE, WARNING, at this point only the last response will be taken into accout..
 
-		ot::JsonDocument outDoc;
-		outDoc.fromJson(response);
-		bool modified = outDoc[OT_ACTION_PARAM_BASETYPE_Bool].GetBool();
-		return modified;
-	}
-	catch (...) {
-		assert(0); // Error handling
-		return false;
-	}
+	ot::JsonDocument outDoc;
+	outDoc.fromJson(response);
+	bool modified = outDoc[OT_ACTION_PARAM_BASETYPE_Bool].GetBool();
+	return modified;
 }
 
-bool ExternalServicesComponent::isCurrentModelModified(void)
-{
-	try {
-		// Get the id of the curently active model
-		ModelUIDtype modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
-		if (modelID == 0) return false;  // No project currently active
-
+bool ExternalServicesComponent::isCurrentModelModified(void) {
+	// Get the id of the curently active model
+	ModelUIDtype modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
+	if (modelID == 0) {
+		return false;  // No project currently active
+	}
+	else {
 		return isModelModified(modelID);
 	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-
-	return false;
 }
 
 // ###################################################################################################
@@ -498,66 +478,48 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
 	}
-	catch (...) {
-		OT_LOG_EA("Unknown error");
-	}
 }
 
 void ExternalServicesComponent::fillPropertyGrid(const std::string& _settings) {
 
 }
 
-void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype> &selectedEntityID, std::list<ModelUIDtype> &selectedVisibleEntityID)
-{
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(selectedEntityID, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs, ot::JsonArray(selectedVisibleEntityID, inDoc.GetAllocator()), inDoc.GetAllocator());
+void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype>& selectedEntityID, std::list<ModelUIDtype>& selectedVisibleEntityID) {
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(selectedEntityID, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs, ot::JsonArray(selectedVisibleEntityID, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-		std::string response;
-		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
+	std::string response;
+	for (auto reciever : m_modelViewNotifier) {
+		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_EAS("Error response: " + response);
 		}
-	}
-	catch (const std::exception & e) {
-		assert(0); // Error handling
-	}
-	catch (...) {
-		assert(0); // Error handling
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_EAS("Warning response: " + response);
+		}
 	}
 }
 
-void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::string &newName)
-{
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ItemRenamed, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, rapidjson::Value(newName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::string& newName) {
+	ot::JsonDocument inDoc;
+	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ItemRenamed, inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, rapidjson::Value(newName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
-		std::string response;
-		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			}
+	std::string response;
+	for (auto reciever : m_modelViewNotifier) {
+		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			OT_LOG_EAS("Error response: " + response);
 		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_EAS("Warning response: " + response);
+		}
 	}
 }
 
@@ -646,9 +608,6 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());
 	}
-	catch (...) {
-		OT_LOG_E("Unknown error occured");
-	}
 }
 
 void ExternalServicesComponent::propertyGridValueDeleteRequested(const ot::Property* _property) {
@@ -689,8 +648,8 @@ void ExternalServicesComponent::propertyGridValueDeleteRequested(const ot::Prope
 			}
 		}
 	}
-	catch (...) {
-		OT_LOG_E("[FATAL] Unknown error occured");
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 
 	AppBase::instance()->lockPropertyGrid(false);
@@ -715,15 +674,15 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 			sendHttpRequest(EXECUTE, receiver->getServiceURL(), inDoc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_EAS("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
+				OT_LOG_EAS("Warning response: " + response);
 			}
 		}
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
 }
 
@@ -740,17 +699,17 @@ void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype
 			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_EAS("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+				OT_LOG_EAS("Warning response: " + response);
 			}
 		}
 
 
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -782,17 +741,6 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 
 // Messaging
 
-size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
-	try {
-		data->append((char*)ptr, size * nmemb);
-		return size * nmemb;
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-	return 0;
-}
-
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response) {
 	auto it = m_serviceIdMap.find(_service.getId());
 	if (it == m_serviceIdMap.end()) {
@@ -817,15 +765,8 @@ void ExternalServicesComponent::sendToModelService(const std::string& _message, 
 	sendHttpRequest(QUEUE, m_modelServiceURL, _message, _response);
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
-{
-	try { 
-		return sendHttpRequest(operation, url, doc.toJson(), response); 
-	}
-	catch (...) {
-		assert(0); // Error handling
-		return false;
-	}
+bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response) {
+	return sendHttpRequest(operation, url, doc.toJson(), response); 
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response) {
@@ -855,10 +796,11 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 		return success;
 	}
-	catch (...) {
-		assert(0); // Error handling
-		return false;
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
+
+	return false;
 }
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
@@ -938,15 +880,15 @@ void ExternalServicesComponent::sendRubberbandResultsToService(ot::serviceID_t _
 		sendHttpRequest(EXECUTE, receiver->second->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
+			OT_LOG_EAS("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+			OT_LOG_EAS("Warning response: " + response);
 		}
 
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
 }
 
@@ -964,15 +906,15 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_EAS("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
+				OT_LOG_EAS("Warning response: " + response);
 			}
 		}
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
 }
 
@@ -993,17 +935,14 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 		this->sendHttpRequest(EXECUTE, model->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
+			OT_LOG_EAS("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
+			OT_LOG_EAS("Warning response: " + response);
 		}
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -1030,9 +969,6 @@ void ExternalServicesComponent::versionDeselected(void) {
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -1062,9 +998,6 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -1352,11 +1285,6 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		app->showErrorPrompt(e.what(), "Error");
 		ot::LogDispatcher::instance().setProjectName("");
 	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-		app->showErrorPrompt("Unknown error occured while creating a new session", "Fatal Error");
-		ot::LogDispatcher::instance().setProjectName("");
-	}
 }
 
 void ExternalServicesComponent::closeProject(bool _saveChanges) {
@@ -1482,9 +1410,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());
 	}
-	catch (...) {
-		OT_LOG_E("Unknown error");
-	}
 }
 
 void ExternalServicesComponent::saveProject() {
@@ -1512,8 +1437,8 @@ void ExternalServicesComponent::saveProject() {
 
 		AppBase::instance()->setCurrentProjectIsModified(false);
 	}
-	catch (...) {
-		assert(0); // Error handling
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
 	}
 }
 
@@ -1590,24 +1515,21 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 // Slots
 
-char *ExternalServicesComponent::performAction(const char *json, const char *senderIP)
-{
+char* ExternalServicesComponent::performAction(const char* json, const char* senderIP) {
 	using namespace std::chrono_literals;
 	static bool lock = false;
-	while (lock) std::this_thread::sleep_for(1ms);
+
+	while (lock) {
+		std::this_thread::sleep_for(1ms);
+	}
+
 	lock = true;
 
-	try {
-		char *retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::QUEUE);
-		
-		lock = false;
-		return retval;
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error occured");
-		lock = false;
-		return nullptr;
-	}
+	char* retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::QUEUE);
+
+	lock = false;
+	
+	return retval;
 }
 
 void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
@@ -1627,27 +1549,24 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(const char *json, const char *senderIP)
-{
+void ExternalServicesComponent::queueAction(const char* json, const char* senderIP) {
 	using namespace std::chrono_literals;
 	static bool lock = false;
-	while (lock) std::this_thread::sleep_for(1ms);
+
+	while (lock) {
+		std::this_thread::sleep_for(1ms);
+	}
+
 	lock = true;
 
-	try {
-		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+	ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
 
-		delete[] senderIP;
-		senderIP = nullptr;
+	delete[] senderIP;
+	senderIP = nullptr;
 
-		// Now notify the end of the currently processed message
-		if (m_websocket != nullptr)
-		{
-			m_websocket->finishedProcessingQueuedMessage();
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+	// Now notify the end of the currently processed message
+	if (m_websocket != nullptr) {
+		m_websocket->finishedProcessingQueuedMessage();
 	}
 
 	lock = false;
@@ -1757,22 +1676,15 @@ void ExternalServicesComponent::activateModelVersion(const char* version)
 
 // JSON helper functions
 
-std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArrayFromDocument(ot::JsonDocument &doc, const std::string &itemNname)
-{
+std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArrayFromDocument(ot::JsonDocument& doc, const std::string& itemNname) {
 	std::vector<std::array<double, 3>> result;
-	try {
-		rapidjson::Value vectorDouble = doc[itemNname.c_str()].GetArray();
-		result.resize(vectorDouble.Size() / 3);
+	rapidjson::Value vectorDouble = doc[itemNname.c_str()].GetArray();
+	result.resize(vectorDouble.Size() / 3);
 
-		for (unsigned int i = 0; i < vectorDouble.Size() / 3; i++)
-		{
-			result[i][0] = vectorDouble[3 * i].GetDouble();
-			result[i][1] = vectorDouble[3 * i + 1].GetDouble();
-			result[i][2] = vectorDouble[3 * i + 2].GetDouble();
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+	for (unsigned int i = 0; i < vectorDouble.Size() / 3; i++) {
+		result[i][0] = vectorDouble[3 * i].GetDouble();
+		result[i][1] = vectorDouble[3 * i + 1].GetDouble();
+		result[i][2] = vectorDouble[3 * i + 2].GetDouble();
 	}
 	return result;
 }
@@ -1781,83 +1693,53 @@ OldTreeIcon ExternalServicesComponent::getOldTreeIconsFromDocument(ot::JsonDocum
 {
 	OldTreeIcon treeIcons;
 
-	try {
-		treeIcons.size = doc[OT_ACTION_PARAM_UI_TREE_IconSize].GetInt();
-		treeIcons.visibleIcon = doc[OT_ACTION_PARAM_UI_TREE_IconItemVisible].GetString();
-		treeIcons.hiddenIcon = doc[OT_ACTION_PARAM_UI_TREE_IconItemHidden].GetString();
-	}
-	catch (...) 
-	{
-		treeIcons.size = 0;
-		treeIcons.visibleIcon.clear();
-		treeIcons.hiddenIcon.clear();
-	}
+	treeIcons.size = doc[OT_ACTION_PARAM_UI_TREE_IconSize].GetInt();
+	treeIcons.visibleIcon = doc[OT_ACTION_PARAM_UI_TREE_IconItemVisible].GetString();
+	treeIcons.hiddenIcon = doc[OT_ACTION_PARAM_UI_TREE_IconItemHidden].GetString();
 
 	return treeIcons;
 }
 
-void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::vector<Geometry::Node> &result)
-{
-	try {
-		rapidjson::Value nodeList = doc[itemName.c_str()].GetArray();
-		int numberOfNodes = nodeList.Size() / 8;
-		for (unsigned int i = 0; i < numberOfNodes; i++)
-		{
-			Geometry::Node n;
-			n.setCoords(nodeList[i * 8].GetDouble(), nodeList[i * 8 + 1].GetDouble(), nodeList[i * 8 + 2].GetDouble());
-			n.setNormals(nodeList[i * 8 + 3].GetDouble(), nodeList[i * 8 + 4].GetDouble(), nodeList[i * 8 + 5].GetDouble());
-			n.setUVpar(nodeList[i * 8 + 6].GetDouble(), nodeList[i * 8 + 7].GetDouble());
-			result.push_back(n);
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::vector<Geometry::Node>& result) {
+	rapidjson::Value nodeList = doc[itemName.c_str()].GetArray();
+	int numberOfNodes = nodeList.Size() / 8;
+	for (unsigned int i = 0; i < numberOfNodes; i++) {
+		Geometry::Node n;
+		n.setCoords(nodeList[i * 8].GetDouble(), nodeList[i * 8 + 1].GetDouble(), nodeList[i * 8 + 2].GetDouble());
+		n.setNormals(nodeList[i * 8 + 3].GetDouble(), nodeList[i * 8 + 4].GetDouble(), nodeList[i * 8 + 5].GetDouble());
+		n.setUVpar(nodeList[i * 8 + 6].GetDouble(), nodeList[i * 8 + 7].GetDouble());
+		result.push_back(n);
 	}
 }
 
-void ExternalServicesComponent::getListTriangleFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::list <Geometry::Triangle > &result)
-{
-	try {
-		rapidjson::Value triangleList = doc[itemName.c_str()].GetArray();
-		int numberOfTriangles = triangleList.Size() / 4;
-		for (unsigned int i = 0; i < numberOfTriangles; i++)
-		{
-			Geometry::Triangle t(triangleList[i * 4].GetInt64(), triangleList[i * 4 + 1].GetInt64(), triangleList[i * 4 + 2].GetInt64(), triangleList[i * 4 + 3].GetInt64());
+void ExternalServicesComponent::getListTriangleFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::list <Geometry::Triangle >& result) {
+	rapidjson::Value triangleList = doc[itemName.c_str()].GetArray();
+	int numberOfTriangles = triangleList.Size() / 4;
+	for (unsigned int i = 0; i < numberOfTriangles; i++) {
+		Geometry::Triangle t(triangleList[i * 4].GetInt64(), triangleList[i * 4 + 1].GetInt64(), triangleList[i * 4 + 2].GetInt64(), triangleList[i * 4 + 3].GetInt64());
 
-			result.push_back(t);
-		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+		result.push_back(t);
 	}
 }
 
-void ExternalServicesComponent::getListEdgeFromDocument(ot::JsonDocument &doc, const std::string &itemName, std::list <Geometry::Edge > &result)
-{
-	try {
-		rapidjson::Value edgeList = doc[itemName.c_str()].GetArray();
-		long numberOfEdges = edgeList[0].GetInt64();
-		long edgeIndex = 1;
+void ExternalServicesComponent::getListEdgeFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::list <Geometry::Edge >& result) {
+	rapidjson::Value edgeList = doc[itemName.c_str()].GetArray();
+	long numberOfEdges = edgeList[0].GetInt64();
+	long edgeIndex = 1;
 
-		for (long i = 0; i < numberOfEdges; i++)
-		{
-			Geometry::Edge e;
-			e.setFaceId(edgeList[edgeIndex].GetInt64());
-			edgeIndex++;
-			e.setNpoints(edgeList[edgeIndex].GetInt64());
-			edgeIndex++;
+	for (long i = 0; i < numberOfEdges; i++) {
+		Geometry::Edge e;
+		e.setFaceId(edgeList[edgeIndex].GetInt64());
+		edgeIndex++;
+		e.setNpoints(edgeList[edgeIndex].GetInt64());
+		edgeIndex++;
 
-			for (long np = 0; np < e.getNpoints(); np++)
-			{
-				e.setPoint(np, edgeList[edgeIndex].GetDouble(), edgeList[edgeIndex + 1].GetDouble(), edgeList[edgeIndex + 2].GetDouble());
-				edgeIndex += 3;
-			}
-
-			result.push_back(e);
+		for (long np = 0; np < e.getNpoints(); np++) {
+			e.setPoint(np, edgeList[edgeIndex].GetDouble(), edgeList[edgeIndex + 1].GetDouble(), edgeList[edgeIndex + 2].GetDouble());
+			edgeIndex += 3;
 		}
-	}
-	catch (...) {
-		assert(0); // Error handling
+
+		result.push_back(e);
 	}
 }
 
@@ -1865,24 +1747,12 @@ void ExternalServicesComponent::getListEdgeFromDocument(ot::JsonDocument &doc, c
 
 // Viewer helper functions
 
-void ExternalServicesComponent::getSelectedModelEntityIDs(std::list<ModelUIDtype> &selected)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->getSelectedModelEntityIDs(selected);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
+void ExternalServicesComponent::getSelectedModelEntityIDs(std::list<ModelUIDtype> &selected) {
+	AppBase::instance()->getViewerComponent()->getSelectedModelEntityIDs(selected);
 }
 
-void ExternalServicesComponent::getSelectedVisibleModelEntityIDs(std::list<ModelUIDtype> &selected)
-{
-	try {
-		AppBase::instance()->getViewerComponent()->getSelectedVisibleModelEntityIDs(selected);
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
+void ExternalServicesComponent::getSelectedVisibleModelEntityIDs(std::list<ModelUIDtype> &selected) {
+	AppBase::instance()->getViewerComponent()->getSelectedVisibleModelEntityIDs(selected);
 }
 
 // ###################################################################################################
@@ -3440,10 +3310,10 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	try {
 		ot::IconManager::addSearchPath(QString::fromStdString(iconPath));
-		OT_LOG_D("[ERROR] Added icon search path: " + iconPath);
+		OT_LOG_D("Icon search path added: \"" + iconPath + "\"");
 	}
-	catch (...) {
-		OT_LOG_EA("[ERROR] Failed to add icon search path: Path not found");
+	catch (const std::exception& _e) {
+		OT_LOG_EAS("[ERROR] Failed to add icon search path: " + std::string(_e.what()));
 	}
 #endif // _DEBUG
 

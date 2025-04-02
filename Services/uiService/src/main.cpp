@@ -262,11 +262,11 @@ int main(int _argc, char *_argv[])
 	}
 	catch (const std::exception & e) {
 		std::string errorText = e.what();
-		assert(0); // Something went wrong
+		OT_LOG_EAS(errorText);
 		return -601;
 	}
 	catch (...) {
-		assert(0);	// Something went horribly wrong
+		OT_LOG_EAS("[FATAL] Unknown error");
 		return -602;
 	}
 }
