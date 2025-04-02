@@ -4,6 +4,7 @@
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config)
 {
+	m_runIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
 	ot::JsonDocument entireResult = queryCurveData(queryInformation);
@@ -184,6 +185,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			for (auto entry : additionalParameterDescription) {
 				message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
 			}
+			m_runIDDescriptions.push_back(message);
 		}
 
 		familyOfCurves = std::move(familyOfCurvesSimplerNames);

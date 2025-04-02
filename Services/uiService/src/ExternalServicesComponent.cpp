@@ -3614,6 +3614,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setFromJsonObject(curveCfgSerialised);
 		std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg);
+		for (const std::string& message : curveFactory.getRunIDDescriptions())
+		{
+			AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+		}
 		dataSets.splice(dataSets.begin(), newCurveDatasets);
 	}
 
