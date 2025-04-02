@@ -20,17 +20,11 @@
 #include "OTWidgets/PlotDataset.h"
 
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
-	m_config(_config), m_data(std::move(_data)), m_ownerPlot(_ownerPlot)
+	m_config(_config), m_data(std::move(_data))
 {
-	assert(_ownerPlot != nullptr);
-	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
+	if (_ownerPlot != nullptr)
 	{
-		buildCartesianCurve();
-	}
-	else
-	{
-		assert(_ownerPlot->getConfig().getAxisQuantity() == Plot1DCfg::AxisQuantity::Complex);
-		buildPolarCurve();
+		setOwnerPlot(_ownerPlot);
 	}
 }
 
@@ -90,7 +84,17 @@ void ot::PlotDataset::detach(void) {
 
 void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 {
+	assert(_ownerPlot != nullptr);
 	m_ownerPlot = _ownerPlot;
+	if (m_ownerPlot->getCurrentPlotType() == Plot1DCfg::PlotType::Cartesian)
+	{
+		buildCartesianCurve();
+	}
+	else
+	{
+		assert(_ownerPlot->getConfig().getAxisQuantity() == Plot1DCfg::AxisQuantity::Complex);
+		buildPolarCurve();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

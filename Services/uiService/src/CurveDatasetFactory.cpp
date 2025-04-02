@@ -77,12 +77,12 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 
 		//Get quantity value
 		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
-		dataY->m_real[i] = quantityValue;
+		dataY->m_real.push_back(quantityValue);
 		
 		//Get parameter value
 		
 		double parameterValue = jsonToDouble(entryDescription->m_fieldName, singleMongoDocument, entryDescription->m_dataType);
-		dataX[i] = static_cast<double>(parameterValue);
+		dataX.push_back(parameterValue);
 	}
 	
 	if (_curveCfg.getXAxisUnit().empty())
@@ -93,6 +93,22 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 	return singleCurve;
 }
 
+struct Datapoints
+{
+	std::vector<double> m_xData;
+	std::vector<double> m_yData;
+	void reserve(size_t numberOfDataPoints)
+	{
+		m_xData.reserve(numberOfDataPoints);
+		m_yData.reserve(numberOfDataPoints);
+	}
+	void shrinkToFit()
+	{
+		m_xData.shrink_to_fit();
+		m_yData.shrink_to_fit();
+	}
+};
+
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	std::list<ot::PlotDataset*> dataSets;
@@ -102,20 +118,13 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.m_quantityDescription;
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
-
-	std::vector<double> dataY;
-	dataY.reserve(numberOfDocuments);
-
+	
 	//Should be selected via a property ToDo
 	auto xAxisParameter = queryInformation.m_parameterDescriptions.begin();
-	std::map<std::string, std::vector<double>> familyOfCurves;
+	std::map<std::string, Datapoints> familyOfCurves;
 	std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
-
-		//Get quantity value
-		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
-		dataY[i] = quantityValue;
 
 		//First build a unique name of the additional parameter values
 		std::string curveName("");
@@ -135,28 +144,39 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		curveName = curveName.substr(0, curveName.size() - 2);
 
 		auto curve = familyOfCurves.find(curveName);
-		if (curve == familyOfCurves.end()) {
-			std::vector<double> temp;
-			temp.reserve(numberOfDocuments);
-			familyOfCurves.insert(std::make_pair(curveName, std::move(temp)));
+		if (curve == familyOfCurves.end()) 
+		{
+			Datapoints dataPoints;
+			dataPoints.reserve(numberOfDocuments - i);
+			familyOfCurves.insert(std::make_pair(curveName, std::move(dataPoints)));
 			additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
 			curve = familyOfCurves.find(curveName);
 		}
 
+		//Get quantity value
+		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
+		(curve->second).m_yData.push_back(quantityValue);
 		const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
-		(curve->second).push_back(xAxisParameterValue);
+		(curve->second).m_xData.push_back(xAxisParameterValue);
+	}
+
+
+	for (auto& curve : familyOfCurves)
+	{
+		curve.second.shrinkToFit();
 	}
 
 	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
 	if (numberOfParameter > 2) {
-		std::map<std::string, std::vector<double>> familyOfCurvesSimplerNames;
+		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
 		std::list <std::string> runIDDescriptions;
 
 		int counter(0);
 		for (auto& curve : familyOfCurves) {
 			const std::string simpleName = "RunID_" + std::to_string(counter);
 			familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
+			curve.second = Datapoints();
 			counter++;
 			std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
 			std::string message =
@@ -176,18 +196,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 
 		// Probably iterate the colour of each curve here
-		ot::Color colour = singleCurveCfg.getLinePenColor();
+		//ot::Color colour = singleCurveCfg.getLinePenColor();
+		std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
+		yData->m_real = std::move(singleCurve.second.m_yData);
 
-		
-		/*
-		std::string dbg = "Adding cuve with points:";
-		for (size_t i = 0; i < numberOfDocuments; i++) {
-			dbg.append("\n[" + std::to_string(i) + "]: " + std::to_string(xData[i]) + "; " + std::to_string(yData[i]));
-		}
-		dbg.append("\n\nn = " + std::to_string(numberOfDocuments) + "\n\n");
-
-		OT_LOG_W(dbg);
-		*/
+		ot::PlotDatasetData datasetData(std::move(singleCurve.second.m_xData), yData.release());
+		ot::PlotDataset dataset(nullptr,singleCurveCfg, std::move(datasetData));
 	}
 
 	return dataSets;
