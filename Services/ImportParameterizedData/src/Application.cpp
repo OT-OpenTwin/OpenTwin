@@ -223,7 +223,7 @@ void testPlot()
 	PlotBuilder builder(extender, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 
 	//Single curve
-	DatasetDescription description;
+	/*DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getInt32TypeName();
@@ -246,12 +246,13 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	curveCfg.setEntityName("Test/A_plot/A_Curve");
+	const std::string plotName = "Test/A_plot";
+	curveCfg.setEntityName(plotName + "/A_Curve");
 
-	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");
+	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
 
 	// Family of curves
-	/*MetadataParameter parameter;
+	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "[kOlf]";
@@ -262,7 +263,8 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	curveCfg.setEntityName("Test/A_plot/A_FamilyOfCurves");
+	const std::string plotName = "Test/A_plot2";
+	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -299,10 +301,11 @@ void testPlot()
 		descriptions.push_back(std::move(description));
 	}
 	
-	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");*/
+	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
 
+	//Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setEntityName("Test/A_plot");
+	plotCfg.setEntityName(plotName);
 	plotCfg.setTitle("Some title");
 	plotCfg.setGridColor(ot::Color(ot::DefaultColor::Black));
 	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);

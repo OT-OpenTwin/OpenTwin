@@ -191,9 +191,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 	for (auto& singleCurve : familyOfCurves) {
 		ot::Plot1DCurveCfg singleCurveCfg = _curveCfg;
+		singleCurveCfg.setTitle(singleCurve.first);
 		//singleCurveCfg.setXAxisTitle();
 		//singleCurveCfg.setXAxisUnit();
-
 
 		// Probably iterate the colour of each curve here
 		//ot::Color colour = singleCurveCfg.getLinePenColor();
@@ -201,7 +201,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		yData->m_real = std::move(singleCurve.second.m_yData);
 
 		ot::PlotDatasetData datasetData(std::move(singleCurve.second.m_xData), yData.release());
-		ot::PlotDataset dataset(nullptr,singleCurveCfg, std::move(datasetData));
+		auto dataset = new ot::PlotDataset (nullptr,singleCurveCfg, std::move(datasetData));
+		dataSets.push_back(dataset);
 	}
 
 	return dataSets;
