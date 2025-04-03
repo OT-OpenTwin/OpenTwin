@@ -23,9 +23,9 @@ public:
 	~ConnectionManager();
 
 	void connectToCircuitSimulatorService(const QString& serverName);
-	void sendBackResults(std::map<std::string, std::vector<double>> _results);
+	void sendBackResults(std::map<std::string, std::vector<double>>& _results);
 public slots:
-	void send(std::string messageType,std::string message);
+	void sendMessage(std::string messageType,std::string message);
 private slots:
 	void receiveResponse();
 	void handleError(QLocalSocket::LocalSocketError error);
@@ -39,6 +39,7 @@ private:
 	bool waitForHealthcheck;
 	void handleActionType(QString _actionType, QJsonArray _data);
 	void handleRunSimulation( std::list<std::string> _netlist);
+	void sendJson(QByteArray _data);
 	
 
 	

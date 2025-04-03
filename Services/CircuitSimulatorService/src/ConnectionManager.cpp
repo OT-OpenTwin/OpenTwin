@@ -276,7 +276,6 @@ void ConnectionManager::handleDisconnected() {
 
 
 void ConnectionManager::sendHealthcheck() {
-    OT_LOG_D("sendHealthcheck");
     if (m_socket == nullptr)         {
         return;
     }
@@ -284,7 +283,7 @@ void ConnectionManager::sendHealthcheck() {
         if (waitForHealthcheck == false) {
             waitForHealthcheck = true;
             send("Ping", "Healthcheck");
-            OT_LOG_D("Healthcheck send");
+            OT_LOG_D("CircuitSimulatorService Healthcheck");
             return;
         }
         else {
