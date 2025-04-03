@@ -102,7 +102,7 @@ std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) 
 		}
 	}
 	
-	if (!m_serviceManager.requestStartService(sessionInfo, serviceInfo)) {
+	if (m_serviceManager.requestStartService(sessionInfo, serviceInfo) != ServiceManager::RequestResult::Success) {
 		return OT_ACTION_RETURN_INDICATOR_Error + m_serviceManager.lastError();
 	}
 	else {
@@ -122,7 +122,8 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	std::string websocketUrl;
 	
 	for (unsigned int attempt = 0; attempt < Configuration::instance().defaultMaxStartupRestarts(); attempt++) {
-		if (m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL)) {
+		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL);
+		if (result == ServiceManager::RequestResult::Success) {
 			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
 			ot::JsonDocument responseDoc;

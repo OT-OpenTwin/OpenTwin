@@ -393,7 +393,9 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 	{
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
 		_serviceURL = "";
-		if (!m_globalDirectoryService->requestToStartRelayService(_session->id(), _websocketURL, _serviceURL)) return false;
+		if (!m_globalDirectoryService->requestToStartRelayService(_session->id(), _websocketURL, _serviceURL)) {
+			return false;
+		}
 	}
 	return true;
 

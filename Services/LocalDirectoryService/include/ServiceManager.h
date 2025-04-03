@@ -17,6 +17,12 @@ namespace std { class thread; }
 
 class ServiceManager {
 public:
+	enum class RequestResult {
+		Success,
+		FailedOnStart,
+		FailedOnPing
+	};
+
 	ServiceManager();
 	virtual ~ServiceManager();
 
@@ -44,9 +50,9 @@ public:
 	//! @param _sessionInformation Information about the session where the service should be connected to
 	//! @param _serviceInformation Information about the service that should be started
 	//! @param _serviceURL The URL where the service will be running will be written here
-	bool requestStartService(const SessionInformation& _sessionInformation, const ServiceInformation& _serviceInformation);
+	RequestResult requestStartService(const SessionInformation& _sessionInformation, const ServiceInformation& _serviceInformation);
 
-	bool requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
+	RequestResult requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
 
 	void sessionClosed(const std::string& _sessionID);
 

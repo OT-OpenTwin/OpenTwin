@@ -122,12 +122,12 @@ void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 
 // Service control
 
-bool ServiceManager::requestStartService(const SessionInformation& _sessionInformation, const ServiceInformation& _serviceInformation) {
+ServiceManager::RequestResult ServiceManager::requestStartService(const SessionInformation& _sessionInformation, const ServiceInformation& _serviceInformation) {
 	// Check if the service is supported
 	if (!LDS_CFG.supportsService(_serviceInformation.name())) {
 		OT_LOG_E("The service \"" + _serviceInformation.name() + "\" is not supported by this Local Directory Service");
 		m_lastError = "The service \"" + _serviceInformation.name() + "\" is not supported by this Local Directory Service";
-		return false;
+		return RequestResult::FailedOnStart;
 	}
 
 	m_mutexRequestedServices.lock();
@@ -143,94 +143,91 @@ bool ServiceManager::requestStartService(const SessionInformation& _sessionInfor
 
 	runThreads();
 
-	return true;
+	return RequestResult::Success;
 }
 
-bool ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
+ServiceManager::RequestResult ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
 	m_mutexRequestedServices.lock();
 
-	ot::RunResult result;
-	Service * newService = new Service(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService));
+	Service* newService = new Service(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService));
 
-	do{
-		// Attempt to start service
-		result = newService->run(_sessionInformation, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
+	// Attempt to start service
 
-		if (result.isOk()) {
-			// The relay could be started, now ensure its alive
-			OT_LOG_D("Relay started successfully. Now checking if allive.");
-			ot::JsonDocument checkCommandDoc;
-			checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
-			std::string checkCommandString = checkCommandDoc.toJson();
-			
-			int attempt = 0;
-			bool checkOk = false;
-			std::string errorMessage;
+	ot::RunResult result = newService->run(_sessionInformation, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
+	if (!result.isOk()) {
+		m_mutexRequestedServices.unlock();
 
-			OT_LOG_D("Checking relay startup completed for relay service at \"" + newService->url() + "\"");
+		ot::PortManager::instance().setPortNotInUse(newService->port());
+		ot::PortManager::instance().setPortNotInUse(newService->websocketPort());
 
-			for (int attempt = 0; attempt < 60; attempt++) {
-				std::string response;
-				if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout)) {
-					if (response == OT_ACTION_RETURN_VALUE_TRUE) {
-						checkOk = true;
-						break;
-					}
-					else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
-						using namespace std::chrono_literals;
-						std::this_thread::sleep_for(500ms);
-					}
-					else {
-						OT_LOG_E("Invalid response \"" + response + "\"");
-						using namespace std::chrono_literals;
-						std::this_thread::sleep_for(500ms);
-					}
+		// Service start failed
+		delete newService;
 
-					//Terminates the process 
-					ot::RunResult result = newService->checkAlive();
-					if (!result.isOk())
-					{
-						
-						OT_LOG_E("Relayservice died while trying to check if it is allive. Exit code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
-						// It is possible that the port was blocked. What happened: The process started but then died.
-						break;
-					}
-				}
+		OT_LOG_E("Service start failed with return value: " + std::to_string(result.getErrorCode()) + " and message: " + result.getErrorMessage());
+		return RequestResult::FailedOnStart;
+	}
+
+	// The relay could be started, now ensure its alive
+	OT_LOG_D("Relay started successfully. Now checking if allive.");
+	ot::JsonDocument checkCommandDoc;
+	checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+	std::string checkCommandString = checkCommandDoc.toJson();
+
+	int attempt = 0;
+	bool checkOk = false;
+	std::string errorMessage;
+
+	OT_LOG_D("Checking relay startup completed for relay service at \"" + newService->url() + "\"");
+
+	for (int attempt = 0; attempt < 3; attempt++) {
+		std::string response;
+		if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout)) {
+			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+				checkOk = true;
+				break;
+			}
+			else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
+			}
+			else {
+				OT_LOG_E("Invalid response \"" + response + "\"");
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
 			}
 
-			//Process started and we tried to ping it repeatedly but the service was not responsive. Consider it dead. 
-			if (!checkOk) {
-				m_mutexRequestedServices.unlock();
-
-				// Service start failed
-				OT_LOG_E("Relay Service allive check failed.");
-				ot::RunResult result =  newService->shutdown();
-				OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
-
-				delete newService;
-				return false;
-			}
-			else
-			{
-				OT_LOG_D("Varified that relay service is allive.");
-
-				_relayServiceURL = newService->url();
-				_websocketUrl = newService->websocketUrl();
+			// Ensure process is still running
+			ot::RunResult result = newService->checkAlive();
+			if (!result.isOk()) {
+				// It is possible that the port was blocked. What happened: The process started but then died.
+				OT_LOG_E("Relayservice died while trying to check if it is alive. Exit code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+				break;
 			}
 		}
 		else {
-			m_mutexRequestedServices.unlock();
-
-			ot::PortManager::instance().setPortNotInUse(newService->port());
-			ot::PortManager::instance().setPortNotInUse(newService->websocketPort());
-
-			// Service start failed
-			delete newService;
-
-			OT_LOG_E("Service start failed with return value: " + std::to_string(result.getErrorCode()) + " and message: " + result.getErrorMessage());
-			return false;
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
 		}
-	} while (!result.isOk() );
+	}
+
+	// Process started and we tried to ping it repeatedly but the service was not responsive. Consider it dead. 
+	if (!checkOk) {
+		m_mutexRequestedServices.unlock();
+
+		// Service start failed
+		OT_LOG_E("Relay Service check alive failed.");
+		ot::RunResult result = newService->shutdown();
+		OT_LOG_E("Shutting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+
+		delete newService;
+		return RequestResult::FailedOnPing;
+	}
+
+	OT_LOG_D("Verified that relay service is alive");
+
+	_relayServiceURL = newService->url();
+	_websocketUrl = newService->websocketUrl();
+
 
 	// Store information
 	m_mutexRequestedServices.unlock();
@@ -240,7 +237,7 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 
 	m_mutexServices.unlock();
 
-	return true;
+	return RequestResult::Success;
 }
 
 void ServiceManager::sessionClosed(const std::string& _sessionID) {
