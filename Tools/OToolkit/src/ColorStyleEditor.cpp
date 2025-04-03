@@ -415,6 +415,17 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(230, 57, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(255, 140, 66))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(255, 215, 0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(80, 200, 120))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	
@@ -610,6 +621,17 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(230, 57, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(255, 140, 66))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(255, 215, 0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(80, 200, 120))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -807,6 +829,17 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(230, 57, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(255, 140, 66))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(255, 215, 0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(80, 200, 120))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));

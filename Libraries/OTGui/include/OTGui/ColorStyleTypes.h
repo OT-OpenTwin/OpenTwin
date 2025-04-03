@@ -197,6 +197,20 @@ namespace ot {
 		BorderHover,
 		BorderSelection,
 
+		Rainbow0,
+		Rainbow1,
+		Rainbow2,
+		Rainbow3,
+		Rainbow4,
+		Rainbow5,
+		Rainbow6,
+		Rainbow7,
+		Rainbow8,
+		Rainbow9,
+
+		RainbowFirst = Rainbow0, //! @brief Helper to iterate over the rainbow. First rainbow entry.
+		RainbowLast = Rainbow9, //! @brief Helper to iterate over the rainbow. Last rainbow entry.
+
 		ToolBarFirstTabBackground,
 		ToolBarFirstTabForeground,
 

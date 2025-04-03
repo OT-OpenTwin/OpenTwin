@@ -372,6 +372,17 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::BorderHover: return "Border Hover Color";
 	case ot::ColorStyleValueEntry::BorderSelection: return "Border Selection Color";
 
+	case ot::ColorStyleValueEntry::Rainbow0: return "Rainbow 0";
+	case ot::ColorStyleValueEntry::Rainbow1: return "Rainbow 1";
+	case ot::ColorStyleValueEntry::Rainbow2: return "Rainbow 2";
+	case ot::ColorStyleValueEntry::Rainbow3: return "Rainbow 3";
+	case ot::ColorStyleValueEntry::Rainbow4: return "Rainbow 4";
+	case ot::ColorStyleValueEntry::Rainbow5: return "Rainbow 5";
+	case ot::ColorStyleValueEntry::Rainbow6: return "Rainbow 6";
+	case ot::ColorStyleValueEntry::Rainbow7: return "Rainbow 7";
+	case ot::ColorStyleValueEntry::Rainbow8: return "Rainbow 8";
+	case ot::ColorStyleValueEntry::Rainbow9: return "Rainbow 9";
+
 	case ot::ColorStyleValueEntry::ToolBarFirstTabBackground: return "TabToolBar First Tab Background";
 	case ot::ColorStyleValueEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
 
@@ -447,6 +458,17 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderDisabled)) return ColorStyleValueEntry::BorderDisabled;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderHover)) return ColorStyleValueEntry::BorderHover;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderSelection)) return ColorStyleValueEntry::BorderSelection;
+
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow0)) return ColorStyleValueEntry::Rainbow0;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow1)) return ColorStyleValueEntry::Rainbow1;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow2)) return ColorStyleValueEntry::Rainbow2;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow3)) return ColorStyleValueEntry::Rainbow3;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow4)) return ColorStyleValueEntry::Rainbow4;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow5)) return ColorStyleValueEntry::Rainbow5;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow6)) return ColorStyleValueEntry::Rainbow6;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow7)) return ColorStyleValueEntry::Rainbow7;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow8)) return ColorStyleValueEntry::Rainbow8;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Rainbow9)) return ColorStyleValueEntry::Rainbow9;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabBackground)) return ColorStyleValueEntry::ToolBarFirstTabBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabForeground)) return ColorStyleValueEntry::ToolBarFirstTabForeground;
