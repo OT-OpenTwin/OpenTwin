@@ -195,8 +195,10 @@ void AddGroupDialog::slotConfirm()
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
-		OT_LOG_EA("Failed to send message");
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -293,8 +295,10 @@ void RenameGroupDialog::slotConfirm() {
 	doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(m_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
-		OT_LOG_EA("Failed to send request");
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -555,9 +559,10 @@ void ManageGroups::slotDeleteGroup(void)
 		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
 		std::string response;
-		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-		{
-			assert(0);
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request");
+			AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+			exit(0);
 			return;
 		}
 
@@ -599,9 +604,10 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		OT_LOG_EAS("Failed to send request");
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -642,8 +648,10 @@ void ManageGroups::slotFillGroupsList(void) {
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -753,8 +761,10 @@ void ManageGroups::slotFillMembersList(void) {
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -855,9 +865,10 @@ void ManageGroups::readUserList(void)
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 

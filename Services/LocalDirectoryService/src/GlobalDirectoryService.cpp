@@ -62,7 +62,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	bool ok = false;
 	do {
 		response.clear();
-		if (!(ok = ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout))) {
+		if (!(ok = ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Register at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
@@ -114,7 +114,7 @@ void GlobalDirectoryService::healthCheck(void) {
 		addSystemValues(systemStatusDoc);
 
 		std::string response;
-		if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response, ot::msg::defaultTimeout)) {
+		if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send updated system load to global directory service");
 			LDS_APP->globalDirectoryServiceCrashed();
 			return;

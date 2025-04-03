@@ -275,7 +275,7 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout))
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
 	{
 		throw std::exception("Could not get the projectlist of the authorization service.");
 	}
@@ -770,37 +770,37 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response) {
+	bool success = false;
+	
 	try {
-
 		std::string globalServiceURL = AppBase::instance()->getServiceURL();
 
 		if (m_websocket != nullptr) {
-			return sendRelayedRequest(operation, url, message, response);
+			// If a websocket is set send the request as a relayed request trough the relay service
+			success = this->sendRelayedRequest(operation, url, message, response);
 		}
+		else {
+			// If no websocket is set send the request directly via a curl request
+			switch (operation) {
+			case EXECUTE:
+				success = ot::msg::send(globalServiceURL, url, ot::EXECUTE_ONE_WAY_TLS, message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+				break;
 
-		bool success = false;
+			case QUEUE:
+				success = ot::msg::send(globalServiceURL, url, ot::QUEUE, message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+				break;
 
-		switch (operation) {
-		case EXECUTE:
-			success = ot::msg::send(globalServiceURL, url, ot::EXECUTE_ONE_WAY_TLS, message, response);
-			break;
-
-		case QUEUE:
-			success = ot::msg::send(globalServiceURL, url, ot::QUEUE, message, response);
-			break;
-
-		default:
-			OTAssert(0, "Unknown request type");
-			break;
+			default:
+				OT_LOG_EA("Unknown request type");
+				break;
+			}
 		}
-
-		return success;
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
 	}
 
-	return false;
+	return success;
 }
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
@@ -4259,12 +4259,23 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 			// Try to send message and check the response
 			std::string response;
 			try {
-				if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, ping, response, ot::msg::defaultTimeout)) { sessionServiceDied = true; }
-				else OT_ACTION_IF_RESPONSE_ERROR(response) { sessionServiceDied = true; }
-				else OT_ACTION_IF_RESPONSE_WARNING(response) { sessionServiceDied = true; }
-				else if (response != OT_ACTION_CMD_Ping) { sessionServiceDied = true; }
+				if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, ping, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					sessionServiceDied = true;
+				}
+				else OT_ACTION_IF_RESPONSE_ERROR(response) {
+					sessionServiceDied = true;
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response) {
+					sessionServiceDied = true;
+				}
+				else if (response != OT_ACTION_CMD_Ping) {
+					sessionServiceDied = true;
+				}
 			}
-			catch (...) { sessionServiceDied = true; }
+			catch (const std::exception& _e) {
+				OT_LOG_E(_e.what());
+				sessionServiceDied = true;
+			}
 		}
 	}
 

@@ -318,7 +318,7 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	std::string json = doc.toJson();
 	for (LocalDirectoryService* lds : m_localDirectoryServices) {
 		std::string response;
-		if (!ot::msg::send("", lds->getServiceURL(), ot::EXECUTE, json, response, ot::msg::defaultTimeout)) {
+		if (!ot::msg::send("", lds->getServiceURL(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_EAS("Failed to send message to LSS at \"" + lds->getServiceURL() + "\"");
 		}
 	}
@@ -369,7 +369,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	do {
 		gssResponse.clear();
 
-		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout))) {
+		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);

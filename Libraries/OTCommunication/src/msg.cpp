@@ -1,10 +1,7 @@
-/*
- *	msg.cpp
- *
- *  Created on: January 03, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file Msg.h
+//! @authors Alexander Kuester, Peter Thoma
+//! @date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
@@ -12,6 +9,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/OTAssert.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTCommunication/Msg.h"			// Corresponding header
 #include "OTCommunication/ActionTypes.h"
@@ -19,6 +17,7 @@
 // Curl header
 #include "curl/curl.h"
 
+// std header
 #include <mutex>
 #include <thread>
 #include <chrono>
@@ -30,22 +29,40 @@
 namespace ot {
 	namespace intern {
 
+		//! @class TimeoutManager
+		//! @brief The TimeoutManager is used to handle the default timeout in case no timeout was provided to a send method.
+		//! The "global default timeout" is loaded once from the environment and buffered.
 		class TimeoutManager {
 			OT_DECL_NOCOPY(TimeoutManager)
 			OT_DECL_NOMOVE(TimeoutManager)
 		public:
 			static int getTimeout(void) {
-				static std::mutex g_mutex;
-				std::lock_guard<std::mutex> lock(g_mutex);
-
 				static TimeoutManager g_instance;
+
 				if (g_instance.m_timeout <= 0) {
-					// Read timeout from env
-					bool failed = true;
-					g_instance.m_timeout = ot::String::toNumber<int>(ThisComputerInfo::getEnvEntry(ThisComputerInfo::EnvMessageTimeout), failed);
-					// Ensure valid timeout is set
-					if (failed || g_instance.m_timeout <= 0) {
-						g_instance.m_timeout = msg::defaultTimeout;
+					static std::atomic_bool readingEnv{ false };
+					if (readingEnv) {
+						while (readingEnv) {};
+					}
+					else {
+						readingEnv = true;
+
+						// Read timeout from env
+						bool failed = true;
+						const std::string envEntry = ThisComputerInfo::getEnvEntry(ThisComputerInfo::EnvMessageTimeout);
+						g_instance.m_timeout = ot::String::toNumber<int>(envEntry, failed);
+
+						// Ensure valid timeout is set
+						if (failed) {
+							g_instance.m_timeout = msg::defaultTimeout;
+							OT_LOG_E("Failed to convert global timeout from environment: \"" + envEntry + "\"");
+						}
+						else if (g_instance.m_timeout <= 0) {
+							g_instance.m_timeout = msg::defaultTimeout;
+							OT_LOG_I("Setting global default timeout to " + std::to_string(msg::defaultTimeout) + " since environment timeout is 0");
+						}
+
+						readingEnv = false;
 					}
 				}
 
@@ -56,10 +73,10 @@ namespace ot {
 			TimeoutManager() : m_timeout(0) {};
 			~TimeoutManager() {};
 
-			int m_timeout;
+			std::atomic_int m_timeout;
 		};
 
-		void sendAsyncWorker(const std::string& _senderURL, const std::string& _receiverURL, ot::MessageType _type, const std::string& _message, int _timeout, bool _createLogMessage);
+		void sendAsyncWorker(const std::string& _senderURL, const std::string& _receiverURL, ot::MessageType _type, const std::string& _message, int _timeout, const ot::msg::RequestFlags& _flags);
 	}
 }
 
@@ -79,46 +96,41 @@ std::string get_env_var(std::string const& key)
 	return std::string(buffer);
 }
 
-bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, std::string& _response, int _timeout, bool _shutdownMessage, bool _createLogMessage) {
+bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, std::string& _response, int _timeout, const RequestFlags& _flags) {
 	// Block explicit self message (allow by providing empty sender)
 	if (_senderIP == _receiverIP) {
-		if (_createLogMessage) {
+		if (_flags & msg::CreateLogMessage) {
 			OT_LOG_W("Receiver is the same as sender: \"" + _receiverIP + "\". Ignoring message...");
 		}
 		return true;
 	}
 
 	// If log message should be generated, do so now
-	if (_createLogMessage) {
+	if (_flags & msg::CreateLogMessage) {
 		OT_LOG("Sending message to (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Message = \"" + _message + "\"", ot::OUTGOING_MESSAGE_LOG);
 	}
-
-	// By default a send fail will simply return false.
-	// If using the default timeout exit will be called on send fail.
-	bool shutdownOnSendFail = false;
 
 	// Update timeout if needed
 	if (_timeout <= 0) {
 		_timeout = intern::TimeoutManager::getTimeout();
-		shutdownOnSendFail = true;
 	}
 
 	// Setting up the shared data between handles.
 	thread_local static CURLSH* share = nullptr;
 
-	if (!_shutdownMessage) {
+	if (_flags & msg::IsShutdownMessage) {
+		if (share != nullptr) {
+			curl_share_cleanup(share);
+			share = nullptr;
+		}
+	}
+	else {
 		if (share == nullptr) {
 			share = curl_share_init();
 			curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
 			curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
 			curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION); // Share SSL Cache
 			curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT); // Share Connection Cache
-		}
-	}
-	else {
-		if (share != nullptr) {
-			curl_share_cleanup(share);
-			share = nullptr;
 		}
 	}
 
@@ -211,7 +223,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, 0); // For testing purposes set to 1
 
-	if (!_shutdownMessage) {
+	if (!(_flags & msg::IsShutdownMessage)) {
 		curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
 
 		// SHARED CACHES CONFIG
@@ -230,13 +242,13 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	curl = NULL;
 
 	if (errorCode == CURLE_OK) {
-		if (_createLogMessage)  {
+		if (_flags & msg::CreateLogMessage)  {
 			OT_LOG(".. Message sent successful (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG); 
 		}
 		return true;
 	}
 	else {
-		if (_createLogMessage) {
+		if (_flags & msg::CreateLogMessage) {
 			OT_LOG_E("Message sent failed: { \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
 				"\", \"Error buffer\": \"" + errbuf + 
 				"\", \"Receiver\": \"" + _receiverIP +
@@ -244,7 +256,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 				" }");
 		}
 
-		if (shutdownOnSendFail) {
+		if (_flags & msg::ExitOnFail) {
 			exit(1);
 		}
 
@@ -252,21 +264,14 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 }
 
-void ot::msg::sendAsync(
-	const std::string &				_senderIP,
-	const std::string &				_receiverIP,
-	MessageType						_type,
-	const std::string &				_message,
-	int								_timeout,
-	bool							_createLogMessage
-) {
-	std::thread t(ot::intern::sendAsyncWorker, _senderIP, _receiverIP, _type, _message, _timeout, _createLogMessage);
+void ot::msg::sendAsync(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, int _timeout, const RequestFlags& _flags) {
+	std::thread t(ot::intern::sendAsyncWorker, _senderIP, _receiverIP, _type, _message, _timeout, _flags);
 	t.detach();
 }
 
-void ot::intern::sendAsyncWorker(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, const std::string& _message, int _timeout, bool _createLogMessage) {
+void ot::intern::sendAsyncWorker(const std::string& _senderIP, const std::string& _receiverIP, ot::MessageType _type, const std::string& _message, int _timeout, const ot::msg::RequestFlags& _flags) {
 	std::string response;
-	if (!ot::msg::send(_senderIP, _receiverIP, _type, _message, response, _timeout, false, _createLogMessage)) {
+	if (!ot::msg::send(_senderIP, _receiverIP, _type, _message, response, _timeout, _flags)) {
 		OT_LOG_E("[ASYNC] Failed to send message to \"" + _receiverIP + "\"");
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {

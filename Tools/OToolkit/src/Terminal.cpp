@@ -1237,7 +1237,7 @@ void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 
 void Terminal::workerSendMessage(const std::string& _receiverUrl, ot::MessageType _messageType, const QByteArray& _data) {
 	std::string response;
-	if (!ot::msg::send("", _receiverUrl, _messageType, _data.toStdString(), response, ot::msg::defaultTimeout, false, false)) {
+	if (!ot::msg::send("", _receiverUrl, _messageType, _data.toStdString(), response, ot::msg::defaultTimeout, ot::msg::NoRequestFlags)) {
 		if (!QMetaObject::invokeMethod(this, "slotMessageSendFailed", Qt::QueuedConnection, Q_ARG(const QString&, QString(
 			"Failed to send message to \"" + QString::fromStdString(_receiverUrl) + "\""
 		)))) {

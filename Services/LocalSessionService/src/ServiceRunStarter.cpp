@@ -129,7 +129,7 @@ void ServiceRunStarter::worker(void) {
 bool ServiceRunStarter::sendRunMessageToService(const StartupInformation& _info, const std::string& _message) {
 	try {
 		std::string response;
-		if (!ot::msg::send("", _info.serviceUrl, ot::EXECUTE, _message, response, ot::msg::defaultTimeout)) {
+		if (!ot::msg::send("", _info.serviceUrl, ot::EXECUTE, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send run command to service (name = \"" + _info.serviceName + "\"; type = \"" + _info.serviceType + "\"; id = \"" + std::to_string(_info.serviceId) + "\")");
 			return false;
 		}

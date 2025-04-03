@@ -81,8 +81,10 @@ bool UserManagement::checkConnectionAuthorizationService(void) const {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -130,8 +132,10 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -161,8 +165,10 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -196,8 +202,10 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 //	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(newPassword, doc.GetAllocator()), doc.GetAllocator());
 //
 //	std::string response;
-//	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-//	{
+//	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+//		OT_LOG_E("Failed to send request");
+//		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+//		exit(0);
 //		return false;
 //	}
 //
@@ -221,8 +229,10 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -242,8 +252,10 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, isEncryptedPassword, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -440,10 +452,11 @@ std::string UserManagement::getUserSettingsCollection(void)
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		OT_LOG_E("Failed to send message");
-		return "ERROR: Failed to send message";
+	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
+		exit(0);
+		return "ERROR: Failed to request user data from Authorization Serivce";
 	}
 
 	ot::JsonDocument responseDoc;

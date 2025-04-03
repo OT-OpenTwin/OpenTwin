@@ -29,7 +29,7 @@ void downloadFrontendInstallerWorker(std::string _gssUrl, int _timeout, std::str
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFrontendInstaller, doc.GetAllocator()), doc.GetAllocator());
 
-	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), *response, _timeout, false, false))
+	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), *response, _timeout, ot::msg::DefaultFlagsNoExit))
 	{
 		*success = 0;
 	}
@@ -49,7 +49,7 @@ bool downloadFrontendInstaller(
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PrepareFrontendInstaller, doc.GetAllocator()), doc.GetAllocator());
 	std::string response;
 
-	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, _timeout))
+	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, _timeout, ot::msg::DefaultFlagsNoExit))
 	{
 		_error = "Unable to get frontend installer size";
 		OT_LOG_E(_error);

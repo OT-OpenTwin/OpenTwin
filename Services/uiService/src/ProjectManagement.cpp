@@ -83,8 +83,10 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -117,8 +119,10 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -139,8 +143,10 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_NAME, ot::JsonString(newProjectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -160,8 +166,10 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 		
@@ -229,8 +237,10 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return "";
 	}
 
@@ -269,9 +279,10 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		OT_LOG_E("Request failed");
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return "";
 	}
 
@@ -316,8 +327,10 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 
@@ -422,8 +435,10 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(_projects, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return false;
 	}
 

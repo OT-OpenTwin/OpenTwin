@@ -246,10 +246,17 @@ void Session::broadcast(Service * _sender, const ot::JsonDocument& _message, boo
 			if (senderIP != itm.second->url()) {
 				// Send the message to the current reciever
 				response.clear();
+				ot::msg::RequestFlags reqFlags = ot::msg::DefaultFlagsNoExit;
 				if (_async) {
-					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout);
-				} else if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, ot::msg::defaultTimeout, _shutdown)) {
-					OT_LOG_E("Failed to send broadcast message to: " + itm.second->url());
+					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout, reqFlags);
+				} else {
+					if (_shutdown) {
+						reqFlags |= ot::msg::IsShutdownMessage;
+					}
+
+					if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, ot::msg::defaultTimeout, reqFlags)) {
+						OT_LOG_E("Failed to send broadcast message to: " + itm.second->url());
+					}
 				}
 			}
 		}
@@ -293,7 +300,7 @@ void Session::serviceFailure(Service * _failedService) {
 		auto s = m_serviceMap.begin();
 		
 		// Fire message
-		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout);
+		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 
 		oldCt = m_serviceMap.size();
 		SessionService::instance()->serviceClosing(s->second, false, false);

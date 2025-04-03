@@ -121,6 +121,6 @@ void StartupDispatcher::serviceStartRequestFailed(const ServiceStartupInformatio
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.serviceInformation().type(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
 	
-	// Fire message
-	ot::msg::sendAsync(Application::instance()->getServiceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout);
+	// Send message asynchronously
+	ot::msg::sendAsync(Application::instance()->getServiceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 }

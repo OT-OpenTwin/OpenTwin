@@ -532,14 +532,12 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 
 	std::string response;
 	for (auto ss : m_sessionServiceIdMap) {
-		if (!ot::msg::send("", ss.second->url(), ot::EXECUTE, lssDoc.toJson(), response, ot::msg::defaultTimeout)) {
-			assert(0);
-			OT_LOG_E("Failed to send message to Local Session Service (url = " + ss.second->url() + ")");
+		if (!ot::msg::send("", ss.second->url(), ot::EXECUTE, lssDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + ss.second->url() + ")");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + ss.second->url() + ")";
 		}
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			assert(0);
-			OT_LOG_E("Invalid response from LSS (url = " + ss.second->url() + "): " + response);
+			OT_LOG_EAS("Invalid response from LSS (url = " + ss.second->url() + "): " + response);
 		}
 	}
 	
@@ -562,22 +560,22 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 	std::string json = doc.toJson();
 	for (const auto& it : m_sessionServiceIdMap) {
 		std::string response;
-		if (!ot::msg::send("", it.second->url(), ot::EXECUTE, json, response, ot::msg::defaultTimeout)) {
+		if (!ot::msg::send("", it.second->url(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_EAS("Failed to send message to LSS at \"" + it.second->url() + "\"");
 		}
 	}
 
 	std::string tmp;
-	if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout)) {
+	if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_EAS("Failed to send message to GDS at \"" + m_globalDirectoryUrl + "\"");
 	}
 
-	if (!ot::msg::send("", m_authorizationUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout)) {
+	if (!ot::msg::send("", m_authorizationUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_EAS("Failed to send message to Authorization Service at \"" + m_authorizationUrl + "\"");
 	}
 
 	if (!ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
-		if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE, json, tmp, ot::msg::defaultTimeout)) {
+		if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_EAS("Failed to send message to Logging Service at \"" + ot::ServiceLogNotifier::instance().loggingServiceURL() + "\"");
 		}
 	}
@@ -619,7 +617,7 @@ void GlobalSessionService::healthCheck() {
 					try {
 						std::string response;
 						// Try to ping
-						if (!ot::msg::send(m_url, it.second->url(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout)) {
+						if (!ot::msg::send(m_url, it.second->url(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second->url() + ")");
 							removeSessionService(it.second);
 							running = true;

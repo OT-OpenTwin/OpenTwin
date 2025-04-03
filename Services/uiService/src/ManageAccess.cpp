@@ -268,9 +268,10 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
@@ -317,9 +318,10 @@ void ManageAccess::fillGroupsList(void)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
@@ -422,9 +424,10 @@ void ManageAccess::readGroupsList(void)
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(0);
 		return;
 	}
 
