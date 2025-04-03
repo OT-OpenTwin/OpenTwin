@@ -27,7 +27,7 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 		if(callback.find("Simulation Completed!") != std::string::npos)
 		{
 			//The results are being pushed in the callbacks to SimulationResults map
-			Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
+			//Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
 			/*OT_LOG_W("Sended Back INIT Results and Thread is ended");*/
 
 		}
@@ -139,6 +139,8 @@ void NGSpice::init(std::list<std::string> _netlist) {
 	
 	//Executing run from NGSpice
 	runSimulation(_netlist);
+
+	Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
 }
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {
