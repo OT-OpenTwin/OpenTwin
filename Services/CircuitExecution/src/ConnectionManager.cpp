@@ -32,14 +32,14 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
     QObject::connect(m_socket, &QLocalSocket::errorOccurred, this, &ConnectionManager::handleError);
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
-    QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::send);
+    QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::sendMessage);
 
     waitForHealthcheck = false;
 #ifndef _DEBUG
     // Adding healthcheck
     healthCheckTimer = new QTimer(this);
     QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
-    healthCheckTimer->setInterval(5000);
+    healthCheckTimer->setInterval(2000);
     healthCheckTimer->start();
 #endif // !_DEBUG
 
@@ -72,7 +72,7 @@ void ConnectionManager::connectToCircuitSimulatorService(const QString& serverNa
 
 }
 
-void ConnectionManager::send(std::string messageType, std::string message) {
+void ConnectionManager::sendMessage(std::string messageType, std::string message) {
     QJsonObject jsonObject;
 
     jsonObject["type"] = messageType.c_str();
@@ -83,8 +83,7 @@ void ConnectionManager::send(std::string messageType, std::string message) {
 #ifndef _DEBUG
     OT_LOG(data.toStdString(), ot::OUTGOING_MESSAGE_LOG);
 #endif // !_DEBUG
-    m_socket->write(data);
-    m_socket->flush();
+    sendJson(data);
 }
 
 void ConnectionManager::receiveResponse() {
@@ -135,7 +134,8 @@ void ConnectionManager::sendHealthCheck() {
     if (m_socket->state() == QLocalSocket::ConnectedState) {
         if (waitForHealthcheck == false)             {
             waitForHealthcheck = true;
-            send("Ping", "Healthcheck");
+            sendMessage("Ping", "Healthcheck");
+            OT_LOG_D("CircuitExecution Healthcheck");
         }
         else{
             handleDisconnected();
@@ -169,7 +169,7 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
         handleDisconnected();
     }
     else if (_actionType.toStdString() == "Ping") {
-        send("ResultPing", "Healthcheck");
+        sendMessage("ResultPing", "Healthcheck");
     }
     else if (_actionType.toStdString() == "ResultPing") {
         waitForHealthcheck = false;
@@ -189,7 +189,34 @@ void ConnectionManager::handleRunSimulation(std::list<std::string> _netlist) {
 
 }
 
-void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double>> _results) {
+void ConnectionManager::sendJson(QByteArray _data) {
+    if (m_socket && m_socket->state() == QLocalSocket::ConnectedState) {
+        qint64 bytesWritten = m_socket->write(_data);
+
+        if (bytesWritten == -1) {
+            OT_LOG_E("Error writing data");
+            return;
+        }
+
+        // wait until all bytes are written
+        if (!m_socket->waitForBytesWritten()) {
+            OT_LOG_E("Error: waitForBytesWritten failed " + m_socket->error());
+
+        }
+        else {
+            OT_LOG_D("Data successfully sent.");
+        }
+
+        m_socket->flush();   
+    }
+    else {
+        OT_LOG_E("Socket not connected!");
+        return;
+    }
+
+}
+
+void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double>>& _results) {
 
     if (_results.empty()) {
         OT_LOG_E("No Results");
@@ -220,8 +247,5 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     
     
     OT_LOG_D("Sending Back Results");
-    m_socket->write(data);
-    m_socket->flush();
-
-   // handleDisconnected();
+    sendJson(data);
 }
