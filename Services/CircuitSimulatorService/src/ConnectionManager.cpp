@@ -262,12 +262,21 @@ void ConnectionManager::handleDisconnected() {
     SimulationResults::getInstance()->handleCircuitExecutionTiming(endTime, "finishedCircuitExecutionTime");
    
     OT_LOG_D("Client disconnected");
+
+    if (healthCheckTimer != nullptr) {
+        healthCheckTimer->stop();
+        delete healthCheckTimer;
+        healthCheckTimer = nullptr;
+    }
+
+
     delete m_socket;
     m_socket = nullptr;
 }
 
 
 void ConnectionManager::sendHealthcheck() {
+    OT_LOG_D("sendHealthcheck");
     if (m_socket == nullptr)         {
         return;
     }
@@ -275,6 +284,7 @@ void ConnectionManager::sendHealthcheck() {
         if (waitForHealthcheck == false) {
             waitForHealthcheck = true;
             send("Ping", "Healthcheck");
+            OT_LOG_D("Healthcheck send");
             return;
         }
         else {
@@ -362,16 +372,14 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             }
         }
         else if (_actionType.toStdString() == "SendResults") {
-            
+            SimulationResults::getInstance()->handleResults(data);
             send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
             OT_LOG_D("Got Results");
-            SimulationResults::getInstance()->handleResults(data);
-            
-           
-            
+               
         }
         else if (_actionType.toStdString() == "Ping") {
             send("ResultPing", "Healthcheck");
+            OT_LOG_D("CircuitSimulator Heathcheck send");
 
         }
         else if (_actionType.toStdString() == "ResultPing") {
@@ -415,7 +423,7 @@ void ConnectionManager::handleConnection() {
     healthCheckTimer = new QTimer(this);
     connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
 
-    healthCheckTimer->setInterval(5000);
+    healthCheckTimer->setInterval(2000);
     healthCheckTimer->start();
 #endif // !_DEBUG
 
