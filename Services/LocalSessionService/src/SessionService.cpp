@@ -159,11 +159,15 @@ Session * SessionService::createSession(
 	const std::string &						_collectionName,
 	const std::string &						_sessionType
 ) {
-	if (_sessionID.length() == 0) { throw ErrorException("Session ID may not be empty"); }
+	if (_sessionID.length() == 0) {
+		throw ErrorException("Session ID must not be empty");
+	}
 
 	auto itm = m_sessionMap.find(_sessionID);
 
-	if (itm != m_sessionMap.end()) { return itm->second; }
+	if (itm != m_sessionMap.end()) {
+		return itm->second;
+	}
 
 	Session * newSession = new Session(_sessionID, _userName, _projectName, _collectionName, _sessionType);
 	m_sessionMap.insert_or_assign(_sessionID, newSession);
@@ -581,7 +585,9 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Example: {...; 'Session.ID':'The new sessions ID'; 'User.Name':'New user name'; 'Project.Name': 'The projects name'; 'Collection.Name':'The collections name'; 'Session.Type':'The session type'}
 
-	if (!m_globalDirectoryService->isConnected()) return OT_ACTION_RETURN_INDICATOR_Error "No global directory service connected";
+	if (!m_globalDirectoryService->isConnected()) {
+		return OT_ACTION_RETURN_INDICATOR_Error "No global directory service connected";
+	}
 
 	// Required session params
 	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
@@ -607,10 +613,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Optional params
 	bool runMandatory = true;
-	bool shouldRunRelayService = false;
-
-	try { shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY); }
-	catch (...) {}
+	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
 
 	// Create the session
 	Session * theSession = createSession(sessionID, userName, projectName, collectionName, sessionType);

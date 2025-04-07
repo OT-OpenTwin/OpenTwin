@@ -13,7 +13,7 @@
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 // std header
-#include <map>
+#include <list>
 #include <string>
 #include <functional>
 
@@ -24,16 +24,32 @@ private:
 	//! Register buttons here!
 	Application();
 
+	int m_nameCounter; //! @brief The name counter is used to generate unique debug object names
+
 public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Button callbacks
 
 	void testHello(void);
+
+	void testTableSmall(void);
+	void testTableMedium(void);
+	void testTableBig(void);
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// Helper
+
+private:
+
+	void sendTable(int _rows, int _columns);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// General feature handling
+
+public:
 
 	DebugServiceConfig m_config;
 
@@ -72,7 +88,9 @@ private:
 		std::function<void(void)> callback;
 	};
 
-	std::map<std::string, ButtonInfo> m_testButtons;
+	std::list<ButtonInfo> m_testButtons;
+
+	std::string getButtonKey(const ButtonInfo& _info) const;
 
 public:
 

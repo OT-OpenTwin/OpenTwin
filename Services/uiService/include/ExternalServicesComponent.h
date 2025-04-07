@@ -290,7 +290,6 @@ public:
 	OT_HANDLER(handleAddPlot1D_New, ExternalServicesComponent, OT_ACTION_PARAM_VIEW1D_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddCurve, ExternalServicesComponent, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, ot::MessageType::ALL_MESSAGE_TYPES)
 
-
 	// Graphics Editor	
 	OT_HANDLER(handleFillGraphicsPicker, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCreateGraphicsEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, ot::MessageType::ALL_MESSAGE_TYPES)

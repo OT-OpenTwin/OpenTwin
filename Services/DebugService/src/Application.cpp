@@ -9,6 +9,7 @@
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ThisComputerInfo.h"
+#include "OTGui/TableCfg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
@@ -19,12 +20,15 @@
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
 
 Application::Application() :
-	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier())
+	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
+	m_nameCounter(0)
 {
 	// Add buttons here
-	std::list<ButtonInfo> buttons;
-
-	buttons.push_back(ButtonInfo("Test", "Hello", "SmileyGlasses", std::bind(&Application::testHello, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Hello", "SmileyGlasses", std::bind(&Application::testHello, this)));
+	
+	m_testButtons.push_back(ButtonInfo("Table", "Small (100k)", "GreenCircle", std::bind(&Application::testTableSmall, this)));
+	m_testButtons.push_back(ButtonInfo("Table", "Medium (1M)", "YellowCircle", std::bind(&Application::testTableMedium, this)));
+	m_testButtons.push_back(ButtonInfo("Table", "Big (10M)", "RedCircle", std::bind(&Application::testTableBig, this)));
 
 	// Enable features (Exit)
 	
@@ -38,11 +42,6 @@ Application::Application() :
 
 	//this->enableFeature(DebugServiceConfig::ExportOnStart, true);
 
-	// --------------------------------------------------------------------------------------------------------+
-	// Buttons will be added to the map (added previously in the constructor)                                  |
-	for (ButtonInfo& btn : buttons) { //                                                                       |
-		m_testButtons.emplace(OT_DEBUG_SERVICE_PAGE_NAME ":" + btn.group + ":" + btn.name, std::move(btn)); // |
-	}                                 //                                                                       |
 	// --------------------------------------------------------------------------------------------------------+
 
 	// If exit on init is enabled, exit the service
@@ -63,6 +62,49 @@ void Application::testHello(void) {
 	}
 
 	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
+}
+
+void Application::testTableSmall(void) {
+	this->sendTable(1000, 100);
+}
+
+void Application::testTableMedium(void) {
+	this->sendTable(10000, 100);
+}
+
+void Application::testTableBig(void) {
+	this->sendTable(10000, 1000);
+}
+
+void Application::sendTable(int _rows, int _columns) {
+	using namespace ot;
+
+	JsonDocument doc;
+	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
+
+	TableCfg cfg(_rows, _columns);
+	for (int r = 0; r < _rows; r++) {
+		for (int c = 0; c < _columns; c++) {
+			cfg.setCellText(r, c, "Cell " + std::to_string(r) + ":" + std::to_string(c));
+		}
+	}
+	cfg.setEntityName("Test (" + std::to_string(m_nameCounter++) + "): Table");
+	cfg.setCellText(0, 0, "Cell count: " + std::to_string(_rows * _columns));
+
+	JsonObject cfgObj;
+	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+
+	auto ui = this->uiComponent();
+	if (!ui) {
+		OT_LOG_E("No ui? How?");
+		return;
+	}
+
+	std::string resp;
+	ui->sendMessage(true, doc, resp);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -114,15 +156,22 @@ Application::~Application()
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 
-	auto it = m_testButtons.find(action);
-	if (it != m_testButtons.end()) {
-		it->second.callback();
+	ButtonInfo* info = nullptr;
+	for (ButtonInfo& btn : m_testButtons) {
+		if (action == this->getButtonKey(btn)) {
+			btn.callback();
+			return std::string();
+		}
 	}
-	else {
-		OT_LOG_WAS("Unknown model action \"" + action + "\"");
-	}
-
+	
+	OT_LOG_WAS("Unknown model action \"" + action + "\"");
 	return std::string();
+}
+
+// ##################################################################################################################################################################################################################
+
+std::string Application::getButtonKey(const ButtonInfo& _info) const {
+	return OT_DEBUG_SERVICE_PAGE_NAME ":" + _info.group + ":" + _info.name;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -157,12 +206,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	std::list<std::string> addedGroups;
 	for (const auto& it : m_testButtons) {
 		// Add group if needed
-		if (std::find(addedGroups.begin(), addedGroups.end(), it.second.group) == addedGroups.end()) {
-			_ui->addMenuGroup(OT_DEBUG_SERVICE_PAGE_NAME, it.second.group);
-			addedGroups.push_back(it.second.group);
+		if (std::find(addedGroups.begin(), addedGroups.end(), it.group) == addedGroups.end()) {
+			_ui->addMenuGroup(OT_DEBUG_SERVICE_PAGE_NAME, it.group);
+			addedGroups.push_back(it.group);
 		}
 
-		_ui->addMenuButton(OT_DEBUG_SERVICE_PAGE_NAME, it.second.group, it.second.name, it.second.title, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, it.second.icon);
+		_ui->addMenuButton(OT_DEBUG_SERVICE_PAGE_NAME, it.group, it.name, it.title, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, it.icon);
 	}
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
