@@ -50,16 +50,23 @@ namespace ot {
 						// Read timeout from env
 						bool failed = true;
 						const std::string envEntry = ThisComputerInfo::getEnvEntry(ThisComputerInfo::EnvMessageTimeout);
-						g_instance.m_timeout = ot::String::toNumber<int>(envEntry, failed);
-
-						// Ensure valid timeout is set
-						if (failed) {
+						
+						if (envEntry.empty()) {
 							g_instance.m_timeout = msg::defaultTimeout;
-							OT_LOG_E("Failed to convert global timeout from environment: \"" + envEntry + "\"");
+							OT_LOG_I("Setting global default timeout to " + std::to_string(msg::defaultTimeout) + " since no timeout was set in the environment");
 						}
-						else if (g_instance.m_timeout <= 0) {
-							g_instance.m_timeout = msg::defaultTimeout;
-							OT_LOG_I("Setting global default timeout to " + std::to_string(msg::defaultTimeout) + " since environment timeout is 0");
+						else {
+							g_instance.m_timeout = ot::String::toNumber<int>(envEntry, failed);
+
+							// Ensure valid timeout is set
+							if (failed) {
+								g_instance.m_timeout = msg::defaultTimeout;
+								OT_LOG_E("Failed to convert global timeout from environment: \"" + envEntry + "\"");
+							}
+							else if (g_instance.m_timeout <= 0) {
+								g_instance.m_timeout = msg::defaultTimeout;
+								OT_LOG_I("Setting global default timeout to " + std::to_string(msg::defaultTimeout) + " since environment timeout is 0");
+							}
 						}
 
 						readingEnv = false;
