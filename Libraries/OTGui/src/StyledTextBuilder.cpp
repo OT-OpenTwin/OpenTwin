@@ -7,12 +7,41 @@
 #include "OTCore/Logger.h"
 #include "OTGui/StyledTextBuilder.h"
 
-ot::StyledTextBuilder::StyledTextBuilder() {
+ot::StyledTextBuilder::StyledTextBuilder(const BuilderFlags& _flags) :
+	m_flags(_flags)
+{
 	m_entries.push_back(StyledTextEntry());
 }
 
-ot::StyledTextBuilder::StyledTextBuilder(const ConstJsonObject& _jsonObject) {
+ot::StyledTextBuilder::StyledTextBuilder(const ConstJsonObject& _jsonObject) :
+	m_flags(NoFlags)
+{
 	this->setFromJsonObject(_jsonObject);
+}
+
+ot::StyledTextBuilder::StyledTextBuilder(const StyledTextBuilder& _other) {
+	*this = _other;
+}
+
+ot::StyledTextBuilder::StyledTextBuilder(StyledTextBuilder&& _other) noexcept {
+	*this = std::move(_other);
+}
+
+ot::StyledTextBuilder& ot::StyledTextBuilder::operator=(const StyledTextBuilder& _other) {
+	if (this != &_other) {
+		m_flags = _other.m_flags;
+		m_entries = _other.m_entries;
+	}
+	return *this;
+}
+
+ot::StyledTextBuilder& ot::StyledTextBuilder::operator=(StyledTextBuilder&& _other) noexcept {
+	if (this != &_other) {
+		m_flags = std::move(_other.m_flags);
+		m_entries = std::move(_other.m_entries);
+	}
+	
+	return *this;
 }
 
 void ot::StyledTextBuilder::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -23,6 +52,12 @@ void ot::StyledTextBuilder::addToJsonObject(ot::JsonValue& _object, ot::JsonAllo
 		entriesArray.PushBack(entryObject, _allocator);
 	}
 	_object.AddMember("Entries", entriesArray, _allocator);
+
+	JsonArray flagsArray;
+	if (m_flags.flagIsSet(BuilderFlag::EvaluateSubstitutionTokens)) {
+		flagsArray.PushBack("EvaluateSubstitutionTokens", _allocator);
+	}
+	_object.AddMember("Flags", flagsArray, _allocator);
 }
 
 void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -30,6 +65,16 @@ void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object
 	ConstJsonObjectList entriesArray = json::getObjectList(_object, "Entries");
 	for (const ConstJsonObject& entryObject : entriesArray) {
 		m_entries.push_back(StyledTextEntry(entryObject));
+	}
+
+	m_flags = StyledTextBuilder::NoFlags;
+	for (const std::string& flag : json::getStringList(_object, "Flags")) {
+		if (flag == "EvaluateSubstitutionTokens") {
+			m_flags.setFlag(StyledTextBuilder::EvaluateSubstitutionTokens, true);
+		}
+		else {
+			OT_LOG_EAS("Unknown StyledTextBuilder flag \"" + flag + "\"");
+		}
 	}
 }
 
@@ -52,6 +97,12 @@ ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(const char* _text) {
 
 ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(const std::string& _text) {
 	m_entries.back().getText().append(_text);
+	return *this;
+}
+
+ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(StyledText::SubstitutionToken _token) {
+	m_entries.back().getText().append("$(" + StyledText::toString(_token) + ")");
+	m_flags.setFlag(BuilderFlag::EvaluateSubstitutionTokens, true);
 	return *this;
 }
 

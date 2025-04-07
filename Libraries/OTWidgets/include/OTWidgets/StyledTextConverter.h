@@ -21,11 +21,9 @@ namespace ot {
 	private:
 		static void addHtmlSpan(const StyledTextStyle& _style, QString& _destination, const QString& _text);
 		static QString getColorFromReference(StyledText::ColorReference _colorReference);
+		static QString evaluateSubstitutionTokens(const std::string& _text);
 
 		StyledTextConverter() = delete;
-		~StyledTextConverter() = delete;
-		StyledTextConverter(const StyledTextConverter&) = delete;
-		StyledTextConverter& operator = (const StyledTextConverter&) = delete;
 	};
 
 }

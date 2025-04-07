@@ -10,11 +10,16 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/StyledTextConverter.h"
 
+// Qt header
+#include <QtCore/qdatetime.h>
+
 // std header
 #include <sstream>
 
 QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 	QString result("<p>");
+
+	bool evalTokens = _builder.getFlags() & StyledTextBuilder::EvaluateSubstitutionTokens;
 	
 	for (const StyledTextEntry& entry : _builder.getEntries()) {
 		std::list<std::string> lst = ot::String::split(entry.getText(), "\n");
@@ -24,11 +29,19 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 				result = result % "</p>\n<p>";
 			}
 
-			if (entry.getStyle().hasStyleSet()) {
-				StyledTextConverter::addHtmlSpan(entry.getStyle(), result, QString::fromStdString(text));
+			QString finalText;
+			if (evalTokens) {
+				finalText = StyledTextConverter::evaluateSubstitutionTokens(text);
 			}
 			else {
-				result = result % QString::fromStdString(text);
+				finalText = QString::fromStdString(text);
+			}
+
+			if (entry.getStyle().hasStyleSet()) {
+				StyledTextConverter::addHtmlSpan(entry.getStyle(), result, finalText);
+			}
+			else {
+				result = result % finalText;
 			}
 			first = false;
 		}
@@ -137,4 +150,70 @@ QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReferenc
 			<< ";";
 		return QString::fromStdString(oss.str());
 	}
+}
+
+QString ot::StyledTextConverter::evaluateSubstitutionTokens(const std::string& _text) {
+	QString result;
+	size_t ix = 0;
+	size_t startIx = _text.find("$(", ix);
+
+	while (startIx != std::string::npos) {
+		// Append any text before the token
+		if (startIx > ix) {
+			result += QString::fromStdString(_text.substr(ix, startIx - ix));
+			ix = startIx + 1;
+		}
+
+		size_t endIx = _text.find(")", startIx);
+		if (endIx == std::string::npos) {
+			// Unterminated token, append the rest as-is and break
+			result += QString::fromStdString(_text.substr(ix + 1));
+			break;
+		}
+
+		std::string tokenStr = _text.substr(startIx + 2, endIx - startIx - 2);
+		StyledText::SubstitutionToken token = StyledText::stringToSubstitutionToken(tokenStr);
+
+		QString replacement;
+		switch (token) {
+		case ot::StyledText::EmptyToken:
+			replacement = "";
+			break;
+
+		case ot::StyledText::DateYYYYMMDD:
+		{
+			QDateTime dt = QDateTime::currentDateTime();
+			replacement = dt.toString("yyyy-MM-dd");
+			break;
+		}
+		case ot::StyledText::TimeHHMMSS:
+		{
+			QDateTime dt = QDateTime::currentDateTime();
+			replacement = dt.toString("HH:mm:ss");
+			break;
+		}
+		case ot::StyledText::TimeHHMMSSZZZZ:
+		{
+			QDateTime dt = QDateTime::currentDateTime();
+			replacement = dt.toString("HH:mm:ss.zzz");
+			break;
+		}
+		default:
+			// Unknown token, keep it as-is
+			OT_LOG_EAS("Unknown text token (" + std::to_string(static_cast<int>(token)) + ")");
+			replacement = QString::fromStdString(_text.substr(startIx, endIx - startIx + 1));
+			break;
+		}
+
+		result += replacement;
+		ix = endIx + 1;
+		startIx = _text.find("$(", ix);
+	}
+
+	// Append any remaining text after last token
+	if (ix < _text.length()) {
+		result += QString::fromStdString(_text.substr(ix));
+	}
+
+	return result;
 }

@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Flags.h"
 #include "OTGui/StyledTextEntry.h"
 
 // std header
@@ -15,11 +16,20 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT StyledTextBuilder : public Serializable {
 	public:
-		StyledTextBuilder();
+		enum BuilderFlag {
+			NoFlags                    = 0 << 0, //! @brief No flags set.
+			EvaluateSubstitutionTokens = 1 << 0  //! @brief Evaluate substitution tokens when converting text.
+		};
+		typedef Flags<BuilderFlag> BuilderFlags;
+
+		StyledTextBuilder(const BuilderFlags& _flags = BuilderFlag::NoFlags);
 		StyledTextBuilder(const ConstJsonObject& _jsonObject);
-		StyledTextBuilder(const StyledTextBuilder& _other) = default;
-		virtual ~StyledTextBuilder() = default;
-		StyledTextBuilder& operator = (const StyledTextBuilder& _other) = default;
+		StyledTextBuilder(const StyledTextBuilder& _other);
+		StyledTextBuilder(StyledTextBuilder&& _other) noexcept;
+		virtual ~StyledTextBuilder() {};
+
+		StyledTextBuilder& operator = (const StyledTextBuilder& _other);
+		StyledTextBuilder& operator = (StyledTextBuilder&& _other) noexcept;
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -34,23 +44,45 @@ namespace ot {
 		//! @brief Returns true if the builder has no entries that should be displayed (no text provided).
 		bool isEmpty(void) const;
 
+		void setFlag(BuilderFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlags(const BuilderFlags& _flags) { m_flags = _flags; };
+		const BuilderFlags& getFlags(void) const { return m_flags; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Builder
 
+		//! @brief Return all entries that should be displayed.
 		const std::list<StyledTextEntry> getEntries(void) const { return m_entries; };
 
+		//! @brief Append text to the current section.
 		StyledTextBuilder& operator << (const char* _text);
+
+		//! @brief Append text to the current section.
 		StyledTextBuilder& operator << (const std::string& _text);
 
+		//! @brief Append the provided SubstitutionToken as a text to the current section.
+		//! The token will be replaced when visualizing the text.
+		//! @note Using a StyledText::SubstitutionToken will automatically enable the BuilderFlag::EvaluateSubstitutionTokens flag.
+		StyledTextBuilder& operator << (StyledText::SubstitutionToken _token);
+
+		//! @brief Set the StyledText::ColorReference for the next/current section.
+		//! If the current section contains text, a new section will be created by copying the style of the current section and applying the new ColorReference to the new section.
 		StyledTextBuilder& operator << (StyledText::ColorReference _colorReference);
 
+		//! @brief Apply the StyledText::TextControl for the next/current section.
+		//! If the current section contains text, a new section will be created by copying the style of the current section and applying the StyledText::TextControl.
 		StyledTextBuilder& operator << (StyledText::TextControl _control);
 
 	private:
+		//! @brief Apply the provided StyledTextStyle to the current/next section.
+		//! If the current section contains text, a new section will be created and the style will be applied to the new section, otherwise the style will be applied to the current section.
 		void applyNextStyle(const StyledTextStyle& _style);
 
+		BuilderFlags m_flags;
 		std::list<StyledTextEntry> m_entries;
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::StyledTextBuilder::BuilderFlag)

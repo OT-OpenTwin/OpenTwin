@@ -5,6 +5,9 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTGui/OTGuiAPIExport.h"
+
 // std header
 #include <string>
 
@@ -13,8 +16,17 @@
 namespace ot {
 
 	//! @brief The StyledText is used to manipulate the style when working with the StyledTextBuilder.
-	class StyledText {
+	class OT_GUI_API_EXPORT StyledText {
 	public:
+		//! @brief The SubstitutionToken is used to add a token  to the text that will be replaced when visualizing the text.
+		//! @note Using a SubstitutionToken in a StyledTextBuilder will automatically enable the StyledTextBuilder::BuilderFlag::EvaluateSubstitutionTokens flag.
+		enum SubstitutionToken {
+			EmptyToken,    //! @brief Empty token (no replacement).
+			DateYYYYMMDD,  //! @brief Date in YYYY-MM-DD format.
+			TimeHHMMSS,    //! @brief Time in HH:MM:SS format.
+			TimeHHMMSSZZZZ //! @brief Time in HH:MM:SS.ZZZZ format.
+		};
+
 		//! \brief Controls color style references.
 		enum ColorReference {
 			Default, //! \brief Default text color.
@@ -54,6 +66,12 @@ namespace ot {
 			Header3,
 			Text, //! \brief Regular text (disable Header).
 		};
+
+		//! @brief Creates a string representation of the provided token.
+		static std::string toString(SubstitutionToken _substitutionToken);
+
+		//! @brief Creates a SubstitutionToken from the provided string.
+		static SubstitutionToken stringToSubstitutionToken(const std::string& _substitutionToken);
 
 		//! @brief Creates a string representation of the provided ColorReference.
 		static std::string toString(ColorReference _colorReference);

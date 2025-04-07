@@ -7,6 +7,7 @@
 #include "Application.h"
 
 // OpenTwin header
+#include "OTCore/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTGui/TableCfg.h"
@@ -16,6 +17,9 @@
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+
+// std header
+#include <thread>
 
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
 
@@ -65,25 +69,44 @@ void Application::testHello(void) {
 }
 
 void Application::testTableSmall(void) {
-	this->sendTable(1000, 100);
+	std::thread t(&Application::sendTableWorker, this, 1000, 100);
+	t.detach();
 }
 
 void Application::testTableMedium(void) {
-	this->sendTable(10000, 100);
+	std::thread t(&Application::sendTableWorker, this, 10000, 100);
+	t.detach();
 }
 
 void Application::testTableBig(void) {
-	this->sendTable(10000, 1000);
+	std::thread t(&Application::sendTableWorker, this, 10000, 1000);
+	t.detach();
 }
 
-void Application::sendTable(int _rows, int _columns) {
+void Application::sendTableWorker(int _rows, int _columns) {
 	using namespace ot;
 
+	auto ui = this->uiComponent();
+	if (!ui) {
+		OT_LOG_E("No ui? How?");
+		return;
+	}
+
+	// Check interval
+	RuntimeIntervalTest intervalTest;
+
+	// Display start info
+	StyledTextBuilder startInfo;
+	startInfo << "Test table with " + std::to_string(_rows) + " rows and " + std::to_string(_columns) + " columns. Started at " << StyledText::TimeHHMMSSZZZZ << " (user computer time).";
+	ui->displayStyledMessage(startInfo);
+
+	// Create table document
 	JsonDocument doc;
 	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
 
+	// Fill cells with some default values
 	TableCfg cfg(_rows, _columns);
 	for (int r = 0; r < _rows; r++) {
 		for (int c = 0; c < _columns; c++) {
@@ -97,14 +120,13 @@ void Application::sendTable(int _rows, int _columns) {
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
-	auto ui = this->uiComponent();
-	if (!ui) {
-		OT_LOG_E("No ui? How?");
-		return;
-	}
-
 	std::string resp;
 	ui->sendMessage(true, doc, resp);
+
+	// Display end info
+	StyledTextBuilder endInfo;
+	endInfo << "Table test finished at " << StyledText::TimeHHMMSSZZZZ << " (user computer time). Debug service needed " + intervalTest.currentIntervalString() + " to handle the button event.";
+	ui->displayStyledMessage(endInfo);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
