@@ -28,25 +28,27 @@ std::string ViewStateCfg::toJson(void) const {
 ViewStateCfg ViewStateCfg::fromJson(const std::string& _json) {
 	ViewStateCfg result;
 
-	ot::JsonDocument doc;
+	if (!_json.empty()) {
+		ot::JsonDocument doc;
 
-	if (!doc.fromJson(_json)) {
-		OT_LOG_W("Invalid view state format. Fallback to default state.");
-	}
-	else if (!doc.IsObject()) {
-		OT_LOG_W("Invalid view state syntax. Fallback to default state.");
-	}
-	else if (!doc.HasMember("Version") || !doc.HasMember("ViewCfg")) {
-		OT_LOG_W("Invalid view state structure. Fallback to default state.");
-	}
-	else if (!doc["Version"].IsString() || !doc["ViewCfg"].IsString()) {
-		OT_LOG_W("Invalid view state members. Fallback to default state.");
-	}
-	else if (doc["Version"].GetString() != intern::c_viewConfigVersion) {
-		OT_LOG_W("Invalid view state version. Fallback to default state.");
-	}
-	else {
-		result.m_viewConfig = doc["ViewCfg"].GetString();
+		if (!doc.fromJson(_json)) {
+			OT_LOG_W("Invalid view state format. Fallback to default state.");
+		}
+		else if (!doc.IsObject()) {
+			OT_LOG_W("Invalid view state syntax. Fallback to default state.");
+		}
+		else if (!doc.HasMember("Version") || !doc.HasMember("ViewCfg")) {
+			OT_LOG_W("Invalid view state structure. Fallback to default state.");
+		}
+		else if (!doc["Version"].IsString() || !doc["ViewCfg"].IsString()) {
+			OT_LOG_W("Invalid view state members. Fallback to default state.");
+		}
+		else if (doc["Version"].GetString() != intern::c_viewConfigVersion) {
+			OT_LOG_W("Invalid view state version. Fallback to default state.");
+		}
+		else {
+			result.m_viewConfig = doc["ViewCfg"].GetString();
+		}
 	}
 
 	return result;
