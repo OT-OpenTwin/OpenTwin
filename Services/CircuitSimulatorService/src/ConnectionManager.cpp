@@ -372,8 +372,9 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
         }
         else if (_actionType.toStdString() == "SendResults") {
             SimulationResults::getInstance()->handleResults(data);
-            send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
             OT_LOG_D("Got Results");
+            send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
+            
                
         }
         else if (_actionType.toStdString() == "Ping") {
@@ -422,7 +423,7 @@ void ConnectionManager::handleConnection() {
     healthCheckTimer = new QTimer(this);
     connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
 
-    healthCheckTimer->setInterval(2000);
+    healthCheckTimer->setInterval(100);
     healthCheckTimer->start();
 #endif // !_DEBUG
 

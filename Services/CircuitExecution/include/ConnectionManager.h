@@ -18,6 +18,8 @@ public:
 	};
 	static QString toString(RequestType _type);
 	
+	//Json function
+	QList<QJsonObject> handleMultipleJsonObjects(const QByteArray& jsonStream);
 
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager();
