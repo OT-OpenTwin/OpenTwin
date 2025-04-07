@@ -45,11 +45,13 @@ namespace ot {
 		//! @brief Returns the interval in ms from creation of this instance.
 		long long currentInterval(void) const;
 
+		std::string currentIntervalString(void) const { return this->niceIntervalString(this->currentInterval()); };
+
 		void logOnDelete(const std::string& _message);
 
 	private:
 		std::string niceIntervalString(long long _ms) const;
-		
+
 		bool m_logOnDeleteEnabled;
 		std::string m_logOnDelete;
 		std::chrono::steady_clock::time_point m_startTime;
