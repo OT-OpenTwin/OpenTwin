@@ -30,12 +30,7 @@ public:
 	bool sendNetlist();
 	bool waitForClient(void);
 
-	// Json Functions
-	bool isSingleJsonObject(const QByteArray& data);
-	bool isJsonArray(const QByteArray& data);
-	bool isMixed(const QByteArray& data);
-	int findEndOfJsonObject(const QByteArray& data);
-	QList<QJsonObject> handleMultipleJsonObjects(const QByteArray& jsonStram);
+	
 	void send(std::string messageType, std::string message);
 
 	// Setter
@@ -54,7 +49,6 @@ private:
 	QByteArray m_netlist;
 	QTimer* healthCheckTimer;
 	bool waitForHealthcheck;
-	void handleWithJson(const QJsonObject& data);
 	void handleMessageType(QString& _actionType, const QJsonValue& _data);
 
 

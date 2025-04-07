@@ -22,50 +22,6 @@ QString ConnectionManager::toString(RequestType _type) {
     }
 }
 
-QList<QJsonObject> ConnectionManager::handleMultipleJsonObjects(const QByteArray& jsonStream) {
-    QList<QJsonObject> parsedObjects;
-    int startIndex = 0;
-    int braceCount = 0;
-    int objectStart = -1;
-
-    for (int i = 0; i < jsonStream.size(); ++i) {
-        char currentChar = jsonStream[i];
-
-
-        if (currentChar == '{') {
-            if (braceCount == 0) {
-                objectStart = i;
-            }
-            braceCount++;
-        }
-
-        else if (currentChar == '}') {
-            braceCount--;
-
-            if (braceCount == 0 && objectStart != -1) {
-
-                QByteArray singleObject = jsonStream.mid(objectStart, i - objectStart + 1);
-
-
-                QJsonParseError parseError;
-                QJsonDocument jsonDoc = QJsonDocument::fromJson(singleObject, &parseError);
-
-                if (parseError.error == QJsonParseError::NoError && jsonDoc.isObject()) {
-                    parsedObjects.append(jsonDoc.object());
-                }
-                else {
-                    OT_LOG_E("Error by parsing of JSON_Objects");
-                }
-
-
-                objectStart = -1;
-            }
-        }
-    }
-
-    return parsedObjects;
-}
-
 ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
@@ -123,7 +79,9 @@ void ConnectionManager::sendMessage(std::string messageType, std::string message
     jsonObject["results"] = message.c_str();
 
     QJsonDocument jsonDoc(jsonObject);
-    QByteArray data = jsonDoc.toJson();
+    QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
+
+    data.append('\n');
 #ifndef _DEBUG
     OT_LOG(data.toStdString(), ot::OUTGOING_MESSAGE_LOG);
 #endif // !_DEBUG
@@ -131,62 +89,35 @@ void ConnectionManager::sendMessage(std::string messageType, std::string message
 }
 
 void ConnectionManager::receiveResponse() {
-
-    QByteArray jsonData = m_socket->readAll();
+    QByteArray jsonReceive = m_socket->readAll();
+    QByteArray buffer = jsonReceive;
 
 #ifndef _DEBUG
-    OT_LOG(jsonData.toStdString(), ot::INBOUND_MESSAGE_LOG);
+    OT_LOG(buffer.toStdString(), ot::INBOUND_MESSAGE_LOG);
 #endif // !_DEBUG
 
-    QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
-    if (parseError.error == QJsonParseError::NoError) {
-        if (jsonDoc.isObject()) {
-            // Single json Object
-            OT_LOG_W("Single Json Object");
-            OT_LOG_W(jsonData.toStdString());
-            QJsonObject jsonObject = jsonDoc.object();
-
-            QString typeString = jsonObject["type"].toString();
-            QJsonArray jsonArray = jsonObject["data"].toArray();
-
-            handleActionType(typeString, jsonArray);
-
+while (true) {
+        int newlineIndex = buffer.indexOf('\n');
+        if (newlineIndex == -1 || newlineIndex == 0) {
+            break;
         }
-        else if (jsonDoc.isArray()) {
-            // Multiple json objects in json Array
-            OT_LOG_W("Json Array");
-            OT_LOG_W(jsonData.toStdString());
-            QJsonArray messages = jsonDoc.array();
-            for (const QJsonValue& val : messages) {
-                if (!val.isObject()) {
-                    OT_LOG_E("Element in array is not a JSON object");
-                    continue;
-                }
+          
+        QByteArray line = buffer.left(newlineIndex);
+        buffer.remove(0, newlineIndex + 1);
 
-                QJsonObject jsonObject = val.toObject();
-
-                QString typeString = jsonObject["type"].toString();
-                QJsonArray jsonArray = jsonObject["data"].toArray();
-
-                handleActionType(typeString, jsonArray);
-            }
-
+        QJsonParseError parseError;
+        QJsonDocument doc = QJsonDocument::fromJson(line, &parseError);
+        if (parseError.error != QJsonParseError::NoError) {
+            qWarning() << "JSON parse error:" << parseError.errorString();
+            continue;
         }
-        else {
-            OT_LOG_E("Invalid JSON format!");
-            return;
-        }
-    }
-    else {
-        OT_LOG_W("Multiple Json Objects");
-        OT_LOG_W(jsonData.toStdString());
-        QList<QJsonObject> objectList = handleMultipleJsonObjects(jsonData);
-        for (const QJsonObject& jsonObject : objectList) {
-            QString typeString = jsonObject["type"].toString();
-            QJsonArray jsonArray = jsonObject["data"].toArray();
-            handleActionType(typeString, jsonArray);
-        }
+
+        QJsonObject jsonObject = doc.object();
+
+        QString typeString = jsonObject["type"].toString();
+        QJsonArray jsonArray = jsonObject["data"].toArray();
+
+        handleActionType(typeString, jsonArray);
     }
 
     
@@ -321,8 +252,8 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     jsonObject["type"] = toString(ConnectionManager::SendResults);
     
     QJsonDocument jsonDoc(jsonObject);
-    QByteArray data = jsonDoc.toJson();
-    
+    QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
+    data.append('\n');
     
     OT_LOG_D("Sending Back Results");
     sendJson(data);
