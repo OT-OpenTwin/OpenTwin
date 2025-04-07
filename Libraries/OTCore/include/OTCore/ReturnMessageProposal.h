@@ -38,11 +38,11 @@ namespace ot {
 		}
 
 		static ReturnMessageFlag stringToFlag(const std::string& _flag) {
-			if (_flag == flagToString(ReturnMessageFlag::Ok)) return ReturnMessageFlag::Ok;
-			else if (_flag == flagToString(ReturnMessageFlag::GeneralError)) return ReturnMessageFlag::GeneralError;
-			else if (_flag == flagToString(ReturnMessageFlag::IOError)) return ReturnMessageFlag::IOError;
-			else if (_flag == flagToString(ReturnMessageFlag::DeserializeFailed)) return ReturnMessageFlag::DeserializeFailed;
-			else if (_flag == flagToString(ReturnMessageFlag::Failed)) return ReturnMessageFlag::Failed;
+			if (_flag == flagToString(ReturnMessageFlag::Ok)) { return ReturnMessageFlag::Ok; }
+			else if (_flag == flagToString(ReturnMessageFlag::GeneralError)) { return ReturnMessageFlag::GeneralError; }
+			else if (_flag == flagToString(ReturnMessageFlag::IOError)) { return ReturnMessageFlag::IOError; }
+			else if (_flag == flagToString(ReturnMessageFlag::DeserializeFailed)) { return ReturnMessageFlag::DeserializeFailed; }
+			else if (_flag == flagToString(ReturnMessageFlag::Failed)) { return ReturnMessageFlag::Failed; }
 			else {
 				OT_LOG_E("Unknown return message flag \"" + _flag + "\"");
 				return ReturnMessageFlag::DeserializeFailed;
@@ -52,11 +52,11 @@ namespace ot {
 		static std::list<std::string> statusToStringList(const ReturnMessageStatus& _status) {
 			std::list<std::string> result;
 
-			if (_status & ReturnMessageFlag::Ok) result.push_back(flagToString(ReturnMessageFlag::Ok));
-			if (_status & ReturnMessageFlag::GeneralError) result.push_back(flagToString(ReturnMessageFlag::GeneralError));
-			if (_status & ReturnMessageFlag::IOError) result.push_back(flagToString(ReturnMessageFlag::IOError));
-			if (_status & ReturnMessageFlag::DeserializeFailed) result.push_back(flagToString(ReturnMessageFlag::DeserializeFailed));
-			if (_status & ReturnMessageFlag::Failed) result.push_back(flagToString(ReturnMessageFlag::Failed));
+			if (_status & ReturnMessageFlag::Ok) { result.push_back(flagToString(ReturnMessageFlag::Ok)); }
+			if (_status & ReturnMessageFlag::GeneralError) { result.push_back(flagToString(ReturnMessageFlag::GeneralError)); }
+			if (_status & ReturnMessageFlag::IOError) { result.push_back(flagToString(ReturnMessageFlag::IOError)); }
+			if (_status & ReturnMessageFlag::DeserializeFailed) { result.push_back(flagToString(ReturnMessageFlag::DeserializeFailed)); }
+			if (_status & ReturnMessageFlag::Failed) { result.push_back(flagToString(ReturnMessageFlag::Failed)); }
 
 			return result;
 		}
@@ -69,7 +69,7 @@ namespace ot {
 			return result;
 		}
 
-		static ReturnMessage2&& fromJson(const std::string& _json) {
+		static ReturnMessage2 fromJson(const std::string& _json) {
 			ReturnMessage2 result(ReturnMessageFlag::Ok);
 
 			if (!_json.empty()) {
@@ -93,12 +93,19 @@ namespace ot {
 
 		}
 
-		ReturnMessage2(ReturnMessage2&&) = default;
-		ReturnMessage2& operator = (ReturnMessage2&&) = default;
+		ReturnMessage2(ReturnMessage2&& _other) noexcept :
+			m_status(_other.m_status), m_text(std::move(_other.m_text)), m_importDataObject(std::move(_other.m_importDataObject))
+		{}
 
-		// No copy
-		ReturnMessage2(const ReturnMessage2&) = delete;
-		ReturnMessage2& operator = (const ReturnMessage2&) = delete;
+		ReturnMessage2& operator = (ReturnMessage2&& _other) noexcept {
+			if (this != &_other) {
+				m_status = _other.m_status;
+				m_text = std::move(_other.m_text);
+				m_importDataObject = std::move(_other.m_importDataObject);
+			}
+
+			return *this;
+		}
 
 		ReturnMessage2& operator = (ReturnMessageStatus _status) {
 			m_status = _status;
@@ -120,7 +127,7 @@ namespace ot {
 		}
 
 		//! @brief Exports the ReturnMessage as a json string.
-		//! @note The importDataObject will only be deserialized.
+		//! @note The importDataObject will not be serialized.
 		std::string toJson(void) const {
 			JsonDocument doc;
 			JsonObject obj;
@@ -128,7 +135,7 @@ namespace ot {
 		}
 
 		//! @brief Exports the ReturnMessage as a json string.
-		//! @note The importDataObject will only be deserialized.
+		//! @note The importDataObject will not be serialized.
 		//! @param _document Data will be written here before serializing.
 		std::string toJson(JsonDocument& _document) const {
 			JsonObject obj;
@@ -136,7 +143,7 @@ namespace ot {
 		}
 
 		//! @brief Exports the ReturnMessage as a json string.
-		//! @note The importDataObject will only be deserialized.
+		//! @note The importDataObject will not be serialized.
 		//! @param _document Data will be written here before serializing.
 		//! @param _dataObject The data object.
 		std::string toJson(JsonDocument& _document, JsonObject& _dataObject) const {
@@ -153,15 +160,15 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& getText(void) const { return m_text; };
 
-		//! @brief Returns a readable object which contains deserialized data.
+		//! @brief Returns a readable object which contains the deserialized data object.
 		//! @note The object will not be concidered when serializing the ReturnMessage.
 		const ConstJsonObject& getData(void) const { return m_importDataObject; };
 
 	private:
-		ReturnMessageStatus m_status;
-		std::string m_text;
+		ReturnMessageStatus m_status; //! @brief Status of the message.
+		std::string m_text; //! @brief Text of the message.
 
-		ConstJsonObject m_importDataObject;
+		ConstJsonObject m_importDataObject; //! @brief The object which contains the deserialized data object.
 		
 		void setImportDataObject(const ConstJsonObject& _obj) { m_importDataObject = _obj; }
 

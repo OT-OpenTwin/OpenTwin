@@ -543,11 +543,6 @@ void ServiceManager::workerServiceStarter(void) {
 				ot::PortManager::instance().setPortNotInUse(newService->port());
 				ot::PortManager::instance().setPortNotInUse(newService->websocketPort());
 
-				//! @todo are multiple start attempts needed in this case?
-				//! We have failed to launch the executable.
-				//! The port is not yet an issue at this point since
-				//! the webserver is launched in a different thread later in the start logic.
-
 				// Service start failed
 				delete newService;
 				this->serviceStartFailed(info);
