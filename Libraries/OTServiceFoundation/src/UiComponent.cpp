@@ -519,7 +519,7 @@ void ot::components::UiComponent::displayMessage(
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 }
 
-void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& _builder) const {
+void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& _builder, const ot::msg::RequestFlags& _requestFlags) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayStyledMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
@@ -528,7 +528,7 @@ void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& 
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, builderObject, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, m_serviceName, cmdDoc, response, _requestFlags);
 }
 
 void ot::components::UiComponent::displayErrorPrompt(

@@ -14,6 +14,7 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/StyledTextBuilder.h"
+#include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/MenuButtonDescription.h"
 
@@ -112,7 +113,6 @@ namespace ot {
 				const std::string &			_iconFolder = std::string("Default"),
 				const std::string &			_keySequence = std::string("")
 			);
-
 
 			//! @brief Will add a new ToolButton in the specified menu sub group at the UI
 			//! @param _pageName The name of the page the group is located at
@@ -336,7 +336,7 @@ namespace ot {
 
 			//! \brief Will display a styled text message in the Frontends output window.
 			//! \param _builder StyledTextBuilder containing the message
-			void displayStyledMessage(const StyledTextBuilder& _builder) const;
+			void displayStyledMessage(const StyledTextBuilder& _builder, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags) const;
 
 			//! @brief Will display a message in a error prompt dialog
 			//! @param _message The message to display

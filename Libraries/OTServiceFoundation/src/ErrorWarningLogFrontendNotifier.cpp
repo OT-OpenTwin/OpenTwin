@@ -41,7 +41,7 @@ void ot::ErrorWarningLogFrontendNotifier::log(const LogMessage& _message) {
 			message << "] [" << _message.getServiceName() << "] " << _message.getText();
 			
 			// Display
-			m_app->uiComponent()->displayStyledMessage(message);
+			m_app->uiComponent()->displayStyledMessage(message, msg::ExitOnFail);
 		}
 	}
 }

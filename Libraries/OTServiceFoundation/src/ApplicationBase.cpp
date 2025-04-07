@@ -188,13 +188,13 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 	}
 }
 
-bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response)
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
-	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, _response);
+	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, _response, _requestFlags);
 }
 
-bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response)
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
 	auto destination = m_serviceNameMap.find(_serviceName);
 	if (destination == m_serviceNameMap.end()) {
@@ -242,7 +242,7 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 	}
 	else
 	{
-		return ot::msg::send(m_serviceURL, destination->second.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response);
+		return ot::msg::send(m_serviceURL, destination->second.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
 	}
 }
 
