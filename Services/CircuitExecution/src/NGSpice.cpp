@@ -130,6 +130,7 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 
 
 void NGSpice::init(std::list<std::string> _netlist) {
+
 	//Initialize Callbacks of NGSpice
 	initializeCallbacks();
 
@@ -139,6 +140,8 @@ void NGSpice::init(std::list<std::string> _netlist) {
 	
 	//Executing run from NGSpice
 	runSimulation(_netlist);
+
+	std::this_thread::sleep_for(std::chrono::seconds(30));
 
 	Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
 }

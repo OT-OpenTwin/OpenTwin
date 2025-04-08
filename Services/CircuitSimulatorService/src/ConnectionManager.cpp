@@ -15,6 +15,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTGui/StyledTextBuilder.h"
+#include "Application.h"
 
 QString ConnectionManager::toString(RequestType _type) {
     
@@ -175,7 +176,7 @@ void ConnectionManager::handleDisconnected() {
         healthCheckTimer = nullptr;
     }
 
-
+    waitForHealthcheck = false;
     delete m_socket;
     m_socket = nullptr;
 }
@@ -188,12 +189,14 @@ void ConnectionManager::sendHealthcheck() {
     if (m_socket->state() == QLocalSocket::ConnectedState) {
         if (waitForHealthcheck == false) {
             waitForHealthcheck = true;
+            OT_LOG_D("Sending Ping. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
             send("Ping", "Healthcheck");
-            OT_LOG_D("CircuitSimulatorService Healthcheck");
             return;
         }
         else {
-            send("Disconnect", "Healthcheck failed");
+            OT_LOG_W("Ping timeout. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
+            Application::instance()->getSubProcessHandler()->stopSubprocess();
+            handleDisconnected();
             return;
         }
     }
@@ -252,12 +255,12 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
                
         }
         else if (_actionType.toStdString() == "Ping") {
-            send("ResultPing", "Healthcheck");
-            OT_LOG_D("CircuitSimulator Heathcheck send");
-
+                send("ResultPing", "Healthcheck");
+                OT_LOG_D("Sending Ping. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
         }
         else if (_actionType.toStdString() == "ResultPing") {
             waitForHealthcheck = false;
+            OT_LOG_D("Received ResultPing. waitForHealthcheck before reset: " + std::to_string(waitForHealthcheck));
         }
         else {
             if (data.isString()) {
@@ -297,13 +300,12 @@ void ConnectionManager::handleConnection() {
     healthCheckTimer = new QTimer(this);
     connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthcheck);
 
-    healthCheckTimer->setInterval(100);
+    healthCheckTimer->setInterval(5000);
     healthCheckTimer->start();
+    waitForHealthcheck = false;
 #endif // !_DEBUG
 
     OT_LOG_D("Hello CircuitExecution!");
-
-
 
 }
 
