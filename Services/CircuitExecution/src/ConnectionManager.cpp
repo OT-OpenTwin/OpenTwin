@@ -35,14 +35,6 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
     QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::sendMessage);
 
     waitForHealthcheck = false;
-#ifndef _DEBUG
-    // Adding healthcheck
-    healthCheckTimer = new QTimer(this);
-    QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
-    healthCheckTimer->setInterval(100);
-    healthCheckTimer->start();
-#endif // !_DEBUG
-
 
 }
 
@@ -129,6 +121,7 @@ while (true) {
 
 void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
     OT_LOG_E("Error in establishing connection to CircuitSimulatorService: " + m_socket->errorString().toStdString());
+    exit(1);
 }
 
 void ConnectionManager::handleDisconnected() {
@@ -136,6 +129,8 @@ void ConnectionManager::handleDisconnected() {
     SimulationResults::getInstance()->getResultMap().clear();
     if (healthCheckTimer != nullptr) {
         healthCheckTimer->stop();
+        delete healthCheckTimer;
+        healthCheckTimer = nullptr;
     }
     exit(0);
 }
@@ -144,27 +139,31 @@ void ConnectionManager::sendHealthCheck() {
     if (m_socket->state() == QLocalSocket::ConnectedState) {
         if (waitForHealthcheck == false)             {
             waitForHealthcheck = true;
+            OT_LOG_D("Sending Ping. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
             sendMessage("Ping", "Healthcheck");
-            OT_LOG_D("CircuitExecution Healthcheck");
         }
         else{
-            handleDisconnected();
-            OT_LOG_E("No connection established, healthcheck failed");
+            OT_LOG_W("Ping timeout. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
+            OT_LOG_E("Terminating CircuitExecution");
+            exit(1);
         }
-    } 
-
-    
-    
+    }    
 }
 
 void ConnectionManager::handleConnected() {
     OT_LOG_D("Hello CircuitSimulatorService!");
+
+    waitForHealthcheck = false;
+#ifndef _DEBUG
+    // Adding healthcheck
+    healthCheckTimer = new QTimer(this);
+    QObject::connect(healthCheckTimer, &QTimer::timeout, this, &ConnectionManager::sendHealthCheck);
+    healthCheckTimer->setInterval(5000);
+    healthCheckTimer->start();
+#endif // !_DEBUG
 }
 
 void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) {
-
- 
-
     if (_actionType.toStdString() == "ExecuteNetlist") {
         std::list<std::string> netlist;
 
@@ -179,9 +178,11 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
         handleDisconnected();
     }
     else if (_actionType.toStdString() == "Ping") {
-        sendMessage("ResultPing", "Healthcheck");
+        OT_LOG_D("Sending Ping. waitForHealthcheck: " + std::to_string(waitForHealthcheck));
+        sendMessage("ResultPing", "Healthcheck");    
     }
     else if (_actionType.toStdString() == "ResultPing") {
+        OT_LOG_D("Received ResultPing. waitForHealthcheck before reset: " + std::to_string(waitForHealthcheck));
         waitForHealthcheck = false;
     }
     else {

@@ -81,7 +81,7 @@ public:
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
 	NGSpice& getNGSpice() { return m_ngSpice; }
 	std::string getCircuitRootName(void) { return "Circuits/"; }
-	
+	SubprocessHandler* getSubProcessHandler();
 
 	// ##################################################################################################################################################################################################################
 

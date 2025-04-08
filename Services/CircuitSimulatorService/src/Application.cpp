@@ -39,6 +39,7 @@
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
+
 // Third Party Header
 #include <ngspice/sharedspice.h>
 #include <iostream>
@@ -445,6 +446,10 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 	{
 		return "failed";
 	}
+}
+
+SubprocessHandler* Application::getSubProcessHandler() {
+	return m_subprocessHandler;
 }
 
 
