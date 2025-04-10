@@ -265,7 +265,6 @@ namespace ot {
 		void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo);
 		UID getPrefetchedEntityVersion(UID entityID);
 
-
 		std::string getLogInUserName() const;
 		std::string getLogInUserPsw() const;
 

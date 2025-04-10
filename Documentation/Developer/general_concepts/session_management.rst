@@ -20,5 +20,5 @@ Since currently the Frontend Application is the only "Service" that can be start
 
 ...
 
-.. image:: images/service_start_logic_sequence.png
-    :scale: 100%
+.. image:: images/service_start_logic_sequence.svg
+    :width: 40%
