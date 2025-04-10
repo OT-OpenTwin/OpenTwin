@@ -28,11 +28,11 @@
     "title": "LifeLine With Thread"
   },
   {
-    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=none;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry y=\"5.684341886080802e-14\" width=\"485\" height=\"520\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
-    "w": 485,
-    "h": 520,
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;\" edge=\"1\" parent=\"1\"&gt;&lt;mxGeometry relative=\"1\" as=\"geometry\"&gt;&lt;mxPoint x=\"4.547473508864641e-13\" y=\"30\" as=\"targetPoint\"/&gt;&lt;mxPoint x=\"6.821210263296962e-13\" as=\"sourcePoint\"/&gt;&lt;Array as=\"points\"&gt;&lt;mxPoint x=\"38.000000000000455\"/&gt;&lt;mxPoint x=\"38.000000000000455\" y=\"30\"/&gt;&lt;mxPoint x=\"4.547473508864641e-13\" y=\"30\"/&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id=\"3\" value=\"1: Self Message\" style=\"text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry x=\"50.000000000000455\" width=\"120\" height=\"30\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 170.00000000000037,
+    "h": 30.02040816326519,
     "aspect": "fixed",
-    "title": "Frame"
+    "title": "Self Message"
   },
   {
     "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"\" style=\"html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;\" edge=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"80\" relative=\"1\" as=\"geometry\"&gt;&lt;mxPoint y=\"20\" as=\"sourcePoint\"/&gt;&lt;mxPoint x=\"160\" y=\"20\" as=\"targetPoint\"/&gt;&lt;mxPoint as=\"offset\"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id=\"3\" value=\"1: Request\" style=\"text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry x=\"50\" width=\"80\" height=\"10\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
@@ -63,10 +63,17 @@
     "title": "Response R"
   },
   {
-    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;\" edge=\"1\" parent=\"1\"&gt;&lt;mxGeometry relative=\"1\" as=\"geometry\"&gt;&lt;mxPoint x=\"4.547473508864641e-13\" y=\"30\" as=\"targetPoint\"/&gt;&lt;mxPoint x=\"6.821210263296962e-13\" as=\"sourcePoint\"/&gt;&lt;Array as=\"points\"&gt;&lt;mxPoint x=\"38.000000000000455\"/&gt;&lt;mxPoint x=\"38.000000000000455\" y=\"30\"/&gt;&lt;mxPoint x=\"4.547473508864641e-13\" y=\"30\"/&gt;&lt;/Array&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id=\"3\" value=\"1: Self Message\" style=\"text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry x=\"50.000000000000455\" width=\"120\" height=\"30\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
-    "w": 170.00000000000037,
-    "h": 30.02040816326519,
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=none;connectable=0;allowArrows=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry y=\"5.684341886080802e-14\" width=\"485\" height=\"520\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 485,
+    "h": 520,
     "aspect": "fixed",
-    "title": "Self Message"
+    "title": "Box"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"frame\" style=\"shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;connectable=0;allowArrows=0;recursiveResize=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"280\" height=\"200\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 280,
+    "h": 200,
+    "aspect": "fixed",
+    "title": "Frame"
   }
 ]</mxlibrary>
