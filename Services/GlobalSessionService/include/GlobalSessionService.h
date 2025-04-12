@@ -27,10 +27,10 @@ class LocalSessionService;
 
 class GlobalSessionService : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(GlobalSessionService)
+	OT_DECL_NOCOPY(GlobalSessionService)
+	OT_DECL_NOMOVE(GlobalSessionService)
 public:
-	static GlobalSessionService * instance(void);
-	static bool hasInstance(void);
-	static void deleteInstance(void);
+	static GlobalSessionService& instance(void);
 
 	// ###################################################################################################
 
@@ -38,23 +38,27 @@ public:
 
 	bool addSessionService(LocalSessionService& _service);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
 	void setUrl(const std::string& _url) { m_url = _url; };
-	const std::string& url(void) const { return m_url; };
+	const std::string& getUrl(void) const { return m_url; };
 
 	void setDatabaseUrl(const std::string& _url);
-	const std::string databaseUrl(void) const { return m_databaseUrl; };
+	const std::string getDatabaseUrl(void) const { return m_databaseUrl; };
 
 	void setAuthorizationUrl(const std::string& _url) { m_authorizationUrl = _url; };
-	const std::string& authorizationUrl(void) const { return m_authorizationUrl; };
+	const std::string& getAuthorizationUrl(void) const { return m_authorizationUrl; };
 
 	void setGlobalDirectoryUrl(const std::string& _url) { m_globalDirectoryUrl = _url; };
-	const std::string& globalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
+	const std::string& getGlobalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
 
 private:
 
 	// ###################################################################################################
 
-	// Handler
+	// Action handler
 
 	OT_HANDLER(handleGetDBUrl, GlobalSessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetGlobalServicesURL, GlobalSessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES)
@@ -81,7 +85,7 @@ private:
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
 	void removeSessionService(LocalSessionService* _service);
 
-	LocalSessionService* leastLoadedSessionService(void);
+	LocalSessionService* determineLeastLoadedLSS(void);
 
 	void getCustomProjectTemplates(ot::JsonDocument& _resultArray, const std::string& _user, const std::string& _password);
 
@@ -92,7 +96,7 @@ private:
 
 	void setHealthCheckRunning(bool _isRunning) { m_healthCheckRunning = _isRunning; };
 	void readFileContent(const std::string& fileName, std::string& fileContent);
-	void loadFrontendInstallerFile();
+	void loadFrontendInstallerFile(void);
 
 	std::string m_url;
 	std::string m_databaseUrl;
@@ -100,7 +104,7 @@ private:
 	std::string m_globalDirectoryUrl;
 	bool m_healthCheckRunning;
 
-	std::mutex									m_mapMutex;
+	std::mutex									m_mutex;
 	std::map<std::string, LocalSessionService*>		m_sessionToServiceMap;
 	std::map<ot::serviceID_t, LocalSessionService*>	m_sessionServiceIdMap;
 	ot::IDManager<ot::serviceID_t>				m_sessionServiceIdManager;
@@ -109,7 +113,4 @@ private:
 
 	ot::LogModeManager m_logModeManager;
 	std::string m_frontendInstallerFileContent;
-
-	GlobalSessionService(GlobalSessionService&) = delete;
-	GlobalSessionService& operator = (GlobalSessionService&) = delete;
 };

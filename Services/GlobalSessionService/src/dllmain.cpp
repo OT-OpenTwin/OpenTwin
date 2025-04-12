@@ -43,21 +43,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseIP, const char * _authURL)
-	{
-		if (GlobalSessionService::hasInstance()) {
-			OTAssert(0, "Global session service was already initialized");
-			return -1;
-		}
-
-		// Now store the command line arguments and perform the initialization
-		if (_ownIP == nullptr) { return -1; }
-		if (_databaseIP == nullptr) { return -2; }
-		if (_authURL == nullptr) { return -3; }
-
+	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseIP, const char * _authURL) {
+		// Initialize logging
 		std::string loggerServiceURL(_loggerServiceURL);
 
-		// Initialize logging
 #if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 		std::cout << "Global Session Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_GlobalSessionService, loggerServiceURL, true);
@@ -65,11 +54,40 @@ extern "C"
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_GlobalSessionService, loggerServiceURL, false);
 #endif
 
+		// Ensure arguments were passed
+		if (_ownIP == nullptr) {
+			OT_LOG_EA("Service URL not provided");
+			return -1;
+		}
+		if (_databaseIP == nullptr) {
+			OT_LOG_EA("Data Base URL not provided");
+			return -2;
+		}
+		if (_authURL == nullptr) {
+			OT_LOG_EA("Authorization Service URL not provided");
+			return -3;
+		}
+
+
 		// Create session service and add data to session service
-		GlobalSessionService * sessionService = GlobalSessionService::instance();
-		sessionService->setDatabaseUrl(_databaseIP);
-		sessionService->setUrl(_ownIP);
-		sessionService->setAuthorizationUrl(_authURL);
+		GlobalSessionService& gss = GlobalSessionService::instance();
+		gss.setDatabaseUrl(_databaseIP);
+		gss.setUrl(_ownIP);
+		gss.setAuthorizationUrl(_authURL);
+
+		// Ensure data is somewhat valid
+		if (gss.getUrl().empty()) {
+			OT_LOG_EA("Empty Service URL provided");
+			return -4;
+		}
+		if (gss.getDatabaseUrl().empty()) {
+			OT_LOG_EA("Empty Data Base URL provided");
+			return -5;
+		}
+		if (gss.getAuthorizationUrl().empty()) {
+			OT_LOG_EA("Empty Authorization Service URL provided");
+			return -6;
+		}
 
 		OT_LOG_I("Service initialized");
 
@@ -94,14 +112,7 @@ extern "C"
 	{
 		char * returnValue = nullptr;
 
-		// Check if the global session service was initialized
-		if (!GlobalSessionService::hasInstance()) {
-			OTAssert(0, "Global session service not initialized");
-			returnValue = new char[1]{ 0 };
-			return returnValue;
-		}
-
-		std::string serviceURL = GlobalSessionService::instance()->url();
+		std::string serviceURL = GlobalSessionService::instance().getUrl();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());
