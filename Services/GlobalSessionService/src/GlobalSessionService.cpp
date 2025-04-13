@@ -46,31 +46,27 @@ GlobalSessionService& GlobalSessionService::instance(void) {
 
 // Service handling
 
-bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
+bool GlobalSessionService::addSessionService(LocalSessionService&& _service) {
 	// Check URL duplicate
-	for (auto it : m_sessionServiceIdMap) {
-		if (it.second->getUrl() == _service.getUrl()) {
+	for (auto& it : m_lssMap) {
+		if (it.second.getUrl() == _service.getUrl()) {
 			OT_LOG_WAS("LSS with given url already registered. Url: \"" + _service.getUrl() + "\"");
 			return true;
 		}
 	}
 
 	// Create copy and assign uid
-	LocalSessionService* newEntry = new LocalSessionService(_service);
-	ot::serviceID_t newID = m_sessionServiceIdManager.grabNextID();
+	ot::serviceID_t newID = m_lssIdManager.grabNextID();
 	_service.setId(newID);
-	newEntry->setId(newID);
 
-	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(newEntry->getId()) + ", \"URL\": \"" + newEntry->getUrl() + "\" }");
+	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(_service.getId()) + ", \"URL\": \"" + _service.getUrl() + "\" }");
 
 	// Register already opened sessions
-	for (const std::string& session : newEntry->getSessionIds()) {
-		m_sessionToServiceMap.insert_or_assign(session, newEntry);
+	for (const std::string& session : _service.getSessionIds()) {
+		m_sessionMap.insert_or_assign(session, _service.getId());
 		OT_LOG_D("Adding already running session: \"" + session + "\"");
 	}
-	m_sessionServiceIdMap.insert_or_assign(newID, newEntry);
+	m_lssMap.insert_or_assign(newID, std::move(_service));
 
 	// Check if the health check is aready running, otherwise start it
 	if (!m_workerRunning) {
@@ -126,11 +122,12 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto it = m_sessionToServiceMap.find(newSession.getId());
-	if (it != m_sessionToServiceMap.end()) {
+	auto it = m_sessionMap.find(newSession.getId());
+	if (it != m_sessionMap.end()) {
 		// Session already open
+		const LocalSessionService& lss = this->getLssFromSessionId(newSession.getId());
 
-		if (newSession.getUserName() == it->second->getSessionUser(newSession.getId())) {
+		if (newSession.getUserName() == lss.getSessionUser(newSession.getId())) {
 			// Session open by same user in a different instance
 			OT_LOG_WAS("Session already opened by same user. Session: \"" + newSession.getId() + "\"");
 			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session already open in another instance");
@@ -156,7 +153,7 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 
 		// Store session for the given LSS
 		OT_LOG_D("LSS determined { \"URL\": \"" + lss->getUrl() + "\", \"ID\": " + std::to_string(lss->getId()) + ", \"Session\": \"" + newSession.getId() + "\" }");
-		m_sessionToServiceMap.insert_or_assign(newSession.getId(), lss);
+		m_sessionMap.insert_or_assign(newSession.getId(), lss->getId());
 
 		// Add session to the LSS ini list
 		lss->addIniSession(std::move(newSession));
@@ -169,6 +166,7 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
 	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
 
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 
 	ot::ReturnMessage response(ot::ReturnMessage::Ok);
@@ -180,15 +178,15 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto it = m_sessionToServiceMap.find(projectName);
-	if (it == m_sessionToServiceMap.end()) {
+	auto it = m_sessionMap.find(projectName);
+	if (it == m_sessionMap.end()) {
 		// Session does not exist
 		return std::string();
 	}
 	else {
 		try {
 			// Get user (may throw if not found...)
-			return it->second->getSessionUser(projectName);
+			return this->getLssFromSessionId(projectName).getSessionUser(projectName);
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());
@@ -337,16 +335,14 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 	return result.toJson();
 }
 
-std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _doc)
-{
+std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _doc) {
 	ot::SystemInformation info;
 	std::string buildInfo = info.getBuildInformation();
 
 	return buildInfo;
 }
 
-std::string GlobalSessionService::handlePrepareFrontendInstaller(ot::JsonDocument& _doc)
-{
+std::string GlobalSessionService::handlePrepareFrontendInstaller(ot::JsonDocument& _doc) {
 	m_frontendInstallerFileContent.clear();
 	
 	loadFrontendInstallerFile();
@@ -371,10 +367,10 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
-	m_SystemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
 
 	double processCpuLoad = 0, processMemoryLoad = 0;
-	m_SystemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+	m_systemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
 
 	ot::JsonDocument reply;
 	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
@@ -385,11 +381,11 @@ std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _
 	// Now we add information about the session services
 	ot::JsonArray servicesInfo;
 
-	for (auto it : m_sessionServiceIdMap) {
+	for (auto& it : m_lssMap) {
 		ot::JsonValue info;
 		info.SetObject();
 
-		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second->getUrl(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second.getUrl(), reply.GetAllocator()), reply.GetAllocator());
 
 		servicesInfo.PushBack(info, reply.GetAllocator());
 	}
@@ -403,12 +399,18 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	LocalSessionService nService;
 	// Gather information from document
 	nService.setFromJsonObject(_doc.GetConstObject());
-
-	// Add to GSS
-	if (!addSessionService(nService)) { return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information"; }
+	
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::JsonDocument reply;
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, nService.getId(), reply.GetAllocator());
+
+	// Add to GSS
+	if (!this->addSessionService(std::move(nService))) { 
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information";
+	}
+
+	// Finish creating reply message
 	reply.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, reply.GetAllocator()), reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
 	if (!m_globalDirectoryUrl.empty()) {
@@ -429,13 +431,17 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto it = m_sessionToServiceMap.find(sessionID);
-	if (it != m_sessionToServiceMap.end()) {
-		LocalSessionService* lss = it->second;
-		OTAssertNullptr(lss);
-		lss->closeSession(sessionID);
+	auto id = m_sessionMap.find(sessionID);
+	if (id != m_sessionMap.end()) {
+		auto lss = m_lssMap.find(id->second);
+		if (lss == m_lssMap.end()) {
+			OT_LOG_EA("LSS data mismatch");
+			throw std::out_of_range("LSS entry not found for existing session");
+		}
 
-		m_sessionToServiceMap.erase(sessionID);
+		lss->second.closeSession(sessionID);
+
+		m_sessionMap.erase(sessionID);
 	}
 
 	OT_LOG_D("Session was closed (ID = \"" + sessionID + "\")");
@@ -479,13 +485,13 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string response;
-	for (auto ss : m_sessionServiceIdMap) {
-		if (!ot::msg::send("", ss.second->getUrl(), ot::EXECUTE, lssDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + ss.second->getUrl() + ")");
-			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + ss.second->getUrl() + ")";
+	for (auto& lss : m_lssMap) {
+		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
+			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")";
 		}
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_EAS("Invalid response from LSS (url = " + ss.second->getUrl() + "): " + response);
+			OT_LOG_EAS("Invalid response from LSS (url = " + lss.second.getUrl() + "): " + response);
 		}
 	}
 	
@@ -506,10 +512,10 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 	
 	std::string json = doc.toJson();
-	for (const auto& it : m_sessionServiceIdMap) {
+	for (const auto& it : m_lssMap) {
 		std::string response;
-		if (!ot::msg::send("", it.second->getUrl(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to LSS at \"" + it.second->getUrl() + "\"");
+		if (!ot::msg::send("", it.second.getUrl(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to LSS at \"" + it.second.getUrl() + "\"");
 		}
 	}
 
@@ -539,40 +545,59 @@ GlobalSessionService::GlobalSessionService() :
 	ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
 	m_workerRunning(false), m_forceHealthCheck(false)
 {
-	m_SystemLoadInformation.initialize();
+	m_systemLoadInformation.initialize();
 }
 
 GlobalSessionService::~GlobalSessionService() {
 
 }
 
-void GlobalSessionService::removeSessionService(LocalSessionService * _service) {
-	if (_service) {
-		// Service UID map
-		m_sessionServiceIdMap.erase(_service->getId());
-
-		// Session to Service map
-		bool erased{ true };
-		while (erased) {
-			erased = false;
-			for (auto it : m_sessionToServiceMap) {
-				if (it.second == _service) {
-					erased = true;
-					m_sessionToServiceMap.erase(it.first);
-					break;
-				}
-			}
-		}
-		delete _service;
+void GlobalSessionService::removeSessionService(const LocalSessionService& _service) {
+	for (const std::string& session : _service.getSessionIds()) {
+		m_sessionMap.erase(session);
 	}
+
+	m_lssMap.erase(_service.getId());
 }
 
-LocalSessionService * GlobalSessionService::determineLeastLoadedLSS(void) {
-	LocalSessionService * leastLoadedSessionService{ nullptr };
+LocalSessionService& GlobalSessionService::getLssFromSessionId(const std::string& _sessionId) {
+	auto id = m_sessionMap.find(_sessionId);
+	if (id == m_sessionMap.end()) {
+		OT_LOG_E("Session was not registered. Session: \"" + _sessionId + "\"");
+		throw std::out_of_range("Session was not registered.  Session: \"" + _sessionId + "\"");
+	}
+
+	auto lss = m_lssMap.find(id->second);
+	if (lss == m_lssMap.end()) {
+		OT_LOG_E("Session service not found for registered session. LSS.ID: " + std::to_string(id->second) + ". Session: \"" + _sessionId + "\".");
+		throw std::out_of_range("Session service not found for registered session. LSS.ID: " + std::to_string(id->second) + ". Session: \"" + _sessionId + "\".");
+	}
+
+	return lss->second;
+}
+
+const LocalSessionService& GlobalSessionService::getLssFromSessionId(const std::string& _sessionId) const {
+	const auto id = m_sessionMap.find(_sessionId);
+	if (id == m_sessionMap.end()) {
+		OT_LOG_E("Session was not registered. Session: \"" + _sessionId + "\"");
+		throw std::out_of_range("Session was not registered.  Session: \"" + _sessionId + "\"");
+	}
+
+	const auto lss = m_lssMap.find(id->second);
+	if (lss == m_lssMap.end()) {
+		OT_LOG_E("Session service not found for registered session. LSS.ID: " + std::to_string(id->second) + ". Session: \"" + _sessionId + "\".");
+		throw std::out_of_range("Session service not found for registered session. LSS.ID: " + std::to_string(id->second) + ". Session: \"" + _sessionId + "\".");
+	}
+
+	return lss->second;
+}
+
+LocalSessionService* GlobalSessionService::determineLeastLoadedLSS(void) {
+	LocalSessionService* leastLoadedSessionService{ nullptr };
 	size_t minLoad{ UINT64_MAX };
-	for (auto it : m_sessionServiceIdMap) {
-		if (it.second->getSessionCount() < minLoad) {
-			leastLoadedSessionService = it.second;
+	for (auto& it : m_lssMap) {
+		if (it.second.getSessionCount() < minLoad) {
+			leastLoadedSessionService = &it.second;
 			minLoad = leastLoadedSessionService->getSessionCount();
 		}
 	}
@@ -764,35 +789,35 @@ void GlobalSessionService::workerHealthCheck(void) {
 			// Use running in case of a disconnected service
 			while (running) {
 				running = false;
-				for (auto it : m_sessionServiceIdMap) {
+				for (auto& it : m_lssMap) {
 
-					OT_LOG_D("Performing health check for LSS (url = " + it.second->getUrl() + ")");
+					OT_LOG_D("Performing health check for LSS (url = " + it.second.getUrl() + ")");
 
 					try {
 						std::string response;
 						// Try to ping
-						if (!ot::msg::send(m_url, it.second->getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second->getUrl() + ")");
+						if (!ot::msg::send(m_url, it.second.getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second.getUrl() + ")");
 							removeSessionService(it.second);
 							running = true;
 							break;
 						}
 						// Check ping response
 						if (response != OT_ACTION_CMD_Ping) {
-							OT_LOG_W("Invalid ping response from LSS (url = " + it.second->getUrl() + ")");
+							OT_LOG_W("Invalid ping response from LSS (url = " + it.second.getUrl() + ")");
 							removeSessionService(it.second);
 							running = true;
 							break;
 						}
 					}
 					catch (const std::exception& e) {
-						OT_LOG_E("Health check for LSS (url = " + it.second->getUrl() + ") failed: " + e.what());
+						OT_LOG_E("Health check for LSS (url = " + it.second.getUrl() + ") failed: " + e.what());
 						removeSessionService(it.second);
 						running = true;
 						break;
 					}
 					catch (...) {
-						OT_LOG_E("[FATAL] Health check for LSS (url = " + it.second->getUrl() + ") failed: Unknown error");
+						OT_LOG_E("[FATAL] Health check for LSS (url = " + it.second.getUrl() + ") failed: Unknown error");
 						removeSessionService(it.second);
 						running = true;
 						break;
@@ -810,22 +835,32 @@ void GlobalSessionService::workerSessionIni(void) {
 			
 			std::list<Session> timedOut;
 
-			std::list<LocalSessionService*> lssList = ot::ContainerHelper::listFromMapValues(m_sessionToServiceMap);
-			lssList.unique();
+			auto lssIdList = ot::ContainerHelper::listFromMapValues(m_sessionMap);
+			lssIdList.unique();
+
+			std::list<LocalSessionService*> lssList;
+
+			for (auto id : lssIdList) {
+				auto it = m_lssMap.find(id);
+				if (it == m_lssMap.end()) {
+					OT_LOG_E("LSS data mismatch");
+					continue;
+				}
+				lssList.push_back(&it->second);
+			}
 
 			// Check all sessions
 			for (LocalSessionService* lss : lssList) {
-				timedOut.splice(timedOut.end(), lss->checkTimedOutIniSessions(5 * ot::msg::defaultTimeout));
+				timedOut.splice(timedOut.end(), lss->checkTimedOutIniSessions(1 * ot::msg::defaultTimeout));
 			}
 
 			// Remove all sessions that timed out
 			for (Session& session : timedOut) {
-				OT_LOG_E("Session timed out while wating for LSS confirmation. Session: \"" + session.getId() + "\"");
+				OT_LOG_E("Session timed out while wating for LSS confirmation. Unlocking session. Session: \"" + session.getId() + "\"");
 
-
+				// Remove from map, LSS already removed session from its list
+				m_sessionMap.erase(session.getId());
 			}
-
-
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));

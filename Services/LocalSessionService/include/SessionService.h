@@ -32,11 +32,11 @@ class GlobalSessionService;
 
 class SessionService {
 	OT_DECL_ACTION_HANDLER(SessionService)
-public:
+private:
 	SessionService();
-	virtual ~SessionService() {}; // todo: add cleanup
-	
-	static SessionService * instance(void);
+	~SessionService() {};
+public:
+	static SessionService& instance(void);
 
 	// ######################################################################################
 

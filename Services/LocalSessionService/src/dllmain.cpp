@@ -141,23 +141,23 @@ extern "C"
 			}
 			
 			// Create session service and add data to session service
-			SessionService * sessionService = SessionService::instance();
-			sessionService->setDataBaseURL(databaseURL);
-			sessionService->setIp(ip);
-			sessionService->setPort(port);
-			sessionService->setId(ssID);
-			sessionService->setAuthorisationServiceURL(authURL);
-			sessionService->updateLogMode(logManager);
+			SessionService& lss = SessionService::instance();
+			lss.setDataBaseURL(databaseURL);
+			lss.setIp(ip);
+			lss.setPort(port);
+			lss.setId(ssID);
+			lss.setAuthorisationServiceURL(authURL);
+			lss.updateLogMode(logManager);
 
 			// Initialize GSS
 			OT_LOG_D("Initializing GlobalSessionService...");
-			GlobalSessionService * gss = new GlobalSessionService(_globalSessionServiceURL, sessionService);
-			sessionService->setGlobalSessionService(gss);
+			GlobalSessionService * gss = new GlobalSessionService(_globalSessionServiceURL);
+			lss.setGlobalSessionService(gss);
 			gss->startHealthCheck();
 
 			// Connect to GDS
 			if (!gdsURL.empty()) {
-				sessionService->setGlobalDirectoryServiceURL(gdsURL);
+				lss.setGlobalDirectoryServiceURL(gdsURL);
 			}
 #else
 			// Create session service and add data to session service
@@ -201,7 +201,7 @@ extern "C"
 
 	_declspec(dllexport) const char *getServiceURL(void) {
 		assert(initDone);	// Init function not called
-		std::string serviceURL = SessionService::instance()->url();
+		std::string serviceURL = SessionService::instance().url();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());

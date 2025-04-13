@@ -21,9 +21,11 @@ class LocalSessionService : public ot::Serializable {
 public:
 	LocalSessionService();
 	LocalSessionService(const LocalSessionService& _other);
+	LocalSessionService(LocalSessionService&& _other) noexcept;
 	virtual ~LocalSessionService();
 
 	LocalSessionService& operator = (const LocalSessionService& _other);
+	LocalSessionService& operator = (LocalSessionService&& _other) noexcept;
 
 	// ###################################################################
 

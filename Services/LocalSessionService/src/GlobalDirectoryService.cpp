@@ -146,10 +146,10 @@ void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) 
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance()->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(SessionService::instance()->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(SessionService::instance().url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send session shutdown notification to GDS at " + m_serviceURL);
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {

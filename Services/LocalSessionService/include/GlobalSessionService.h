@@ -2,7 +2,6 @@
 
 #include "OTCore/ServiceBase.h"
 
-class SessionService;
 namespace std { class thread; }
 
 class GlobalSessionService : public ot::ServiceBase {
@@ -12,8 +11,10 @@ public:
 		ConnectionFailed
 	};
 
-	GlobalSessionService(const std::string& _url, SessionService * _owner);
+	GlobalSessionService(const std::string& _url);
 	virtual ~GlobalSessionService();
+
+	bool confirmSession(const std::string& _sessionId);
 
 	void startHealthCheck(void);
 
@@ -23,7 +24,6 @@ private:
 
 	void healthCheck(void);
 
-	SessionService *		m_owner;
 	bool					m_healthCheckRunning;
 	ConnectionStatus		m_connectionStatus;
 	std::thread *			m_workerThread;

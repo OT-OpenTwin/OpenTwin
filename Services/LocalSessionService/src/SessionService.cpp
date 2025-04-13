@@ -30,10 +30,6 @@
 #include <iostream>
 #include <algorithm>
 
-static SessionService *		g_instance{ nullptr };
-
-size_t writeFunction(void *, size_t, size_t, std::string*);
-
 SessionService::SessionService() 
 	: m_globalSessionService(nullptr), m_globalDirectoryService(nullptr), m_id(ot::invalidServiceID)
 {
@@ -125,10 +121,8 @@ bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {
 	return (m_serviceDebugList.count(_serviceName) > 0);
 }
 
-SessionService * SessionService::instance(void) {
-	if (g_instance == nullptr) {
-		g_instance = new SessionService;
-	}
+SessionService& SessionService::instance(void) {
+	static SessionService g_instance;
 	return g_instance;
 }
 
@@ -614,6 +608,11 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	// Optional params
 	bool runMandatory = true;
 	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
+
+	// Notify GSS that the session request was received (confirm session)
+	if (!m_globalSessionService->confirmSession(sessionID)) {
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to confirm session at GSS";
+	}
 
 	// Create the session
 	Session * theSession = createSession(sessionID, userName, projectName, collectionName, sessionType);

@@ -20,11 +20,13 @@ LocalSessionService::LocalSessionService() : m_id(ot::invalidServiceID) {
 }
 
 LocalSessionService::LocalSessionService(const LocalSessionService& _other) :
-	m_url(_other.m_url), m_id(_other.m_id) 
+	m_url(_other.m_url), m_sessions(_other.m_sessions), m_iniSessions(_other.m_iniSessions), m_id(_other.m_id)
+{}
+
+LocalSessionService::LocalSessionService(LocalSessionService&& _other) noexcept :
+	m_url(std::move(_other.m_url)), m_sessions(std::move(_other.m_sessions)), m_iniSessions(std::move(_other.m_iniSessions)), m_id(_other.m_id)
 {
-	for (const Session& session : _other.m_sessions) {
-		m_sessions.push_back(Session(session));
-	}
+
 }
 
 LocalSessionService::~LocalSessionService() {
@@ -32,11 +34,24 @@ LocalSessionService::~LocalSessionService() {
 }
 
 LocalSessionService& LocalSessionService::operator = (const LocalSessionService& _other) {
-	m_url = _other.m_url;
-	m_id = _other.m_id;
-	for (const Session& session : _other.m_sessions) {
-		m_sessions.push_back(Session(session));
+	if (this != &_other) {
+		m_url = _other.m_url;
+		m_sessions = _other.m_sessions;
+		m_iniSessions = _other.m_iniSessions;
+		m_id = _other.m_id;
 	}
+
+	return *this;
+}
+
+LocalSessionService& LocalSessionService::operator=(LocalSessionService&& _other) noexcept {
+	if (this != &_other) {
+		m_url = std::move(_other.m_url);
+		m_sessions = std::move(_other.m_sessions);
+		m_iniSessions = std::move(_other.m_iniSessions);
+		m_id = _other.m_id;
+	}
+
 	return *this;
 }
 
@@ -56,9 +71,10 @@ std::list<Session> LocalSessionService::checkTimedOutIniSessions(int _timeout) {
 	auto currentTime = std::chrono::steady_clock::now();
 
 	for (IniSessionType& session : tmp) {
-		if (_timeout < std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - session.first).count()) {
+		long long dur = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - session.first).count();
+		if (dur > _timeout) {
 			// Session timed out
-			OT_LOG_E("Session inintialize timeout. Session id: \"" + session.second.getId() + "\"");
+			OT_LOG_D("Session inintialize timeout. Session id: \"" + session.second.getId() + "\"");
 			timedOut.push_back(std::move(session.second));
 		}
 		else {

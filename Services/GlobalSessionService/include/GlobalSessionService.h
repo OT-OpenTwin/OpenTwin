@@ -36,7 +36,7 @@ public:
 
 	// Service handling
 
-	bool addSessionService(LocalSessionService& _service);
+	bool addSessionService(LocalSessionService&& _service);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,7 +85,15 @@ private:
 	~GlobalSessionService();
 
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
-	void removeSessionService(LocalSessionService* _service);
+	void removeSessionService(const LocalSessionService& _service);
+
+	//! @brief Returns the LSS associated with the session id.
+	//! Will throw an exception if the LSS was not found.
+	LocalSessionService& getLssFromSessionId(const std::string& _sessionId);
+
+	//! @brief Returns the LSS associated with the session id.
+	//! Will throw an exception if the LSS was not found.
+	const LocalSessionService& getLssFromSessionId(const std::string& _sessionId) const;
 
 	LocalSessionService* determineLeastLoadedLSS(void);
 
@@ -114,10 +122,10 @@ private:
 	std::atomic_bool m_forceHealthCheck;
 
 	std::mutex									m_mutex;
-	std::map<std::string, LocalSessionService*>		m_sessionToServiceMap;
-	std::map<ot::serviceID_t, LocalSessionService*>	m_sessionServiceIdMap;
-	ot::IDManager<ot::serviceID_t>				m_sessionServiceIdManager;
-	ot::SystemInformation						m_SystemLoadInformation;
+	std::map<std::string, ot::serviceID_t>		m_sessionMap;
+	std::map<ot::serviceID_t, LocalSessionService>	m_lssMap;
+	ot::IDManager<ot::serviceID_t>				m_lssIdManager;
+	ot::SystemInformation						m_systemLoadInformation;
 
 	ot::LogModeManager m_logModeManager;
 	std::string m_frontendInstallerFileContent;

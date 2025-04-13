@@ -275,7 +275,7 @@ void Session::shutdown(Service * _sender) {
 	auto itm = m_serviceMap.begin();
 	while (itm != m_serviceMap.end()) {
 		if (itm->second != _sender) {
-			SessionService::instance()->serviceClosing(itm->second, false, false);
+			SessionService::instance().serviceClosing(itm->second, false, false);
 		}
 		else {
 			m_serviceMap.erase(_sender->id());
@@ -288,7 +288,7 @@ void Session::serviceFailure(Service * _failedService) {
 	if (_failedService != nullptr) {
 		OT_LOG_W("Handling service failure (name = \"" + _failedService->name() + "\"; type = \"" + _failedService->type() + 
 			"\"; id = \"" + std::to_string(_failedService->id()) + "\"");
-		SessionService::instance()->serviceClosing(_failedService, false, false);
+		SessionService::instance().serviceClosing(_failedService, false, false);
 	}
 
 	ot::JsonDocument shutdownDoc;
@@ -303,7 +303,7 @@ void Session::serviceFailure(Service * _failedService) {
 		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 
 		oldCt = m_serviceMap.size();
-		SessionService::instance()->serviceClosing(s->second, false, false);
+		SessionService::instance().serviceClosing(s->second, false, false);
 		if (oldCt == m_serviceMap.size()) {
 			assert(0);
 		}
