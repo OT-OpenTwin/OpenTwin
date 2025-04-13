@@ -1059,7 +1059,7 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	return result;
 }
 
-void ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName) {
+bool ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName) {
 
 	AppBase * app{ AppBase::instance() };
 	try {
@@ -1087,13 +1087,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			OT_LOG_EA("Failed to send \"Create new session\" request to the global session service");
 			app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
-			return;
+			return false;
 		}
 		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 		if (responseMessage != ot::ReturnMessage::Ok) {
 			app->showErrorPrompt(responseMessage.getWhat(), "Error");
 			ot::LogDispatcher::instance().setProjectName("");
-			return;
+			return false;
 		}
 
 		m_sessionServiceURL = responseMessage.getWhat();
@@ -1138,19 +1138,19 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
-			return;
+			return false;
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
 			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
-			return;
+			return false;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
 			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
-			return;
+			return false;
 		}
 		
 		// Check response
@@ -1281,11 +1281,14 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		uiLock.setNoUnlock();
 
 		OT_LOG_D("Open project completed");
+
+		return true;
 	}
 	catch (const std::exception & e) {
 		OT_LOG_EAS(e.what());
 		app->showErrorPrompt(e.what(), "Error");
 		ot::LogDispatcher::instance().setProjectName("");
+		return false;
 	}
 }
 

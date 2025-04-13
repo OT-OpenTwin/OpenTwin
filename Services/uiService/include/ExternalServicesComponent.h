@@ -165,7 +165,7 @@ public:
 	// Project handling
 
 	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates(void);
-	void openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName);
+	bool openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName);
 	void closeProject(bool saveChanges);
 	void saveProject();
 	bool projectIsOpened(const std::string& projectName, std::string& projectUser);

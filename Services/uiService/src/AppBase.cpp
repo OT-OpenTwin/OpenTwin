@@ -2778,14 +2778,15 @@ void AppBase::slotCreateProject(void) {
 	assert(manager.checkConnection()); // Failed to connect
 	manager.addRecentProject(currentName);
 
-	// Perform open project
+	// Close project
 	if (m_currentProjectName.length() > 0) {
 		m_ExternalServicesComponent->closeProject(false);
 		m_state &= (~AppState::ProjectOpenState);
 	}
 
-	m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName));
-	m_state |= AppState::ProjectOpenState;
+	if (m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName))) {
+		m_state |= AppState::ProjectOpenState;
+	}
 }
 
 void AppBase::slotOpenProject(void) {
@@ -2805,52 +2806,46 @@ void AppBase::slotOpenProject(void) {
 		ProjectManagement projectManager(m_loginData);
 
 		if (projectManager.projectExists(selectedProjectName, canBeDeleted)) {
-			bool projectIsOpened = false;
-
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
 				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "Open Project");
-
-				projectIsOpened = true;
+				return;
 			}
 			else {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					std::string msg("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".");
-
-					this->showErrorPrompt(msg, "Open Project");
-
-					projectIsOpened = true;
+					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "Open Project");
+					return;
 				}
 			}
 
-			if (!projectIsOpened) {
-				// Now we need to check whether we are able to open this project
-				std::string projectCollection = projectManager.getProjectCollection(selectedProjectName);
-				std::string projectType = projectManager.getProjectType(selectedProjectName);
+			// Now we need to check whether we are able to open this project
+			std::string projectCollection = projectManager.getProjectCollection(selectedProjectName);
+			std::string projectType = projectManager.getProjectType(selectedProjectName);
 
-				UserManagement userManager(m_loginData);
-				assert(userManager.checkConnection()); // Failed to connect
+			UserManagement userManager(m_loginData);
+			assert(userManager.checkConnection()); // Failed to connect
 
-				if (!projectManager.canAccessProject(projectCollection)) {
-					this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
+			if (!projectManager.canAccessProject(projectCollection)) {
+				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
 
-					userManager.removeRecentProject(selectedProjectName);
-					m_welcomeScreen->refreshProjectList();
-				}
-				else {
-					//Store project info
-					userManager.addRecentProject(selectedProjectName);
+				userManager.removeRecentProject(selectedProjectName);
+				m_welcomeScreen->refreshProjectList();
+				return;
+			}
 
-					// Perform open project
-					if (m_currentProjectName.length() > 0) {
-						m_ExternalServicesComponent->closeProject(false);
-						m_state &= (~AppState::ProjectOpenState);
-					}
-					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
-					m_state |= AppState::ProjectOpenState;
-				}
+			// Close already opened project
+			if (m_currentProjectName.length() > 0) {
+				m_ExternalServicesComponent->closeProject(false);
+				m_state &= (~AppState::ProjectOpenState);
+			}
+
+			// Open project
+			if (m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection)) {
+				userManager.addRecentProject(selectedProjectName);
+				m_state |= AppState::ProjectOpenState;
+				m_welcomeScreen->refreshProjectList();
 			}
 		}
 		else {
@@ -2968,12 +2963,11 @@ void AppBase::slotRenameProject(void) {
 	userManager.removeRecentProject(selectedProjectName.toStdString());
 
 	// Reopen the project if needed
-	if (reopenProject) {
-		m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName));
+	if (reopenProject && m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName))) {
 		m_state |= AppState::ProjectOpenState;
 	}
 
-	// And refresh the view
+	// Refresh the view
 	m_welcomeScreen->refreshProjectList();
 }
 
