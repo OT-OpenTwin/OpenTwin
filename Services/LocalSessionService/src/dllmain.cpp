@@ -93,7 +93,7 @@ extern "C"
 			gssDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(ownUrl, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 			
 			ot::JsonArray sessionArr;
-			gssDoc.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionArr, gssDoc.GetAllocator());
+			gssDoc.AddMember(OT_ACTION_PARAM_Sessions, sessionArr, gssDoc.GetAllocator());
 
 			// Send request to GSS
 			std::string gssResponse;

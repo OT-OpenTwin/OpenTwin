@@ -20,11 +20,11 @@ LocalSessionService::LocalSessionService() : m_id(ot::invalidServiceID) {
 }
 
 LocalSessionService::LocalSessionService(const LocalSessionService& _other) :
-	m_url(_other.m_url), m_sessions(_other.m_sessions), m_iniSessions(_other.m_iniSessions), m_id(_other.m_id)
+	m_url(_other.m_url), m_activeSessions(_other.m_activeSessions), m_iniSessions(_other.m_iniSessions), m_id(_other.m_id)
 {}
 
 LocalSessionService::LocalSessionService(LocalSessionService&& _other) noexcept :
-	m_url(std::move(_other.m_url)), m_sessions(std::move(_other.m_sessions)), m_iniSessions(std::move(_other.m_iniSessions)), m_id(_other.m_id)
+	m_url(std::move(_other.m_url)), m_activeSessions(std::move(_other.m_activeSessions)), m_iniSessions(std::move(_other.m_iniSessions)), m_id(_other.m_id)
 {
 
 }
@@ -36,7 +36,7 @@ LocalSessionService::~LocalSessionService() {
 LocalSessionService& LocalSessionService::operator = (const LocalSessionService& _other) {
 	if (this != &_other) {
 		m_url = _other.m_url;
-		m_sessions = _other.m_sessions;
+		m_activeSessions = _other.m_activeSessions;
 		m_iniSessions = _other.m_iniSessions;
 		m_id = _other.m_id;
 	}
@@ -47,7 +47,7 @@ LocalSessionService& LocalSessionService::operator = (const LocalSessionService&
 LocalSessionService& LocalSessionService::operator=(LocalSessionService&& _other) noexcept {
 	if (this != &_other) {
 		m_url = std::move(_other.m_url);
-		m_sessions = std::move(_other.m_sessions);
+		m_activeSessions = std::move(_other.m_activeSessions);
 		m_iniSessions = std::move(_other.m_iniSessions);
 		m_id = _other.m_id;
 	}
@@ -55,12 +55,16 @@ LocalSessionService& LocalSessionService::operator=(LocalSessionService&& _other
 	return *this;
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Management
+
 void LocalSessionService::addIniSession(Session&& _session) {
 	IniSessionType data(std::chrono::steady_clock::now(), std::move(_session));
 	m_iniSessions.push_back(std::move(data));
 }
 
-std::list<Session> LocalSessionService::checkTimedOutIniSessions(int _timeout) {
+std::list<Session> LocalSessionService::checkTimedOutIniSessions(int _timeoutMs) {
 	std::list<Session> timedOut;
 
 	// Move the ini list to tmp and clear
@@ -72,7 +76,7 @@ std::list<Session> LocalSessionService::checkTimedOutIniSessions(int _timeout) {
 
 	for (IniSessionType& session : tmp) {
 		long long dur = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - session.first).count();
-		if (dur > _timeout) {
+		if (dur > _timeoutMs) {
 			// Session timed out
 			OT_LOG_D("Session inintialize timeout. Session id: \"" + session.second.getId() + "\"");
 			timedOut.push_back(std::move(session.second));
@@ -90,7 +94,7 @@ bool LocalSessionService::confirmSession(const std::string& _sessionId) {
 	for (auto it = m_iniSessions.begin(); it != m_iniSessions.end(); it++) {
 		if (it->second.getId() == _sessionId) {
 			OT_LOG_D("Session confirmed. Id: \"" + _sessionId + "\"");
-			m_sessions.push_back(std::move(it->second));
+			m_activeSessions.push_back(std::move(it->second));
 			m_iniSessions.erase(it);
 			return true;
 		}
@@ -108,16 +112,16 @@ void LocalSessionService::closeSession(const std::string& _sessionId) {
 		}
 	}
 
-	for (auto it = m_sessions.begin(); it != m_sessions.end(); it++) {
+	for (auto it = m_activeSessions.begin(); it != m_activeSessions.end(); it++) {
 		if (it->getId() == _sessionId) {
-			m_sessions.erase(it);
+			m_activeSessions.erase(it);
 			break;
 		}
 	}
 }
 
 bool LocalSessionService::hasSession(const std::string& _sessionId) const {
-	for (const Session& session : m_sessions) {
+	for (const Session& session : m_activeSessions) {
 		if (session.getId() == _sessionId) {
 			return true;
 		}
@@ -149,7 +153,7 @@ std::list<std::string> LocalSessionService::getSessionIds(void) const {
 	for (const IniSessionType& s : m_iniSessions) {
 		result.push_back(s.second.getId());
 	}
-	for (const Session& s : m_sessions) {
+	for (const Session& s : m_activeSessions) {
 		result.push_back(s.getId());
 	}
 
@@ -158,31 +162,73 @@ std::list<std::string> LocalSessionService::getSessionIds(void) const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Data manipulation
+// Setter / Getter
+
+size_t LocalSessionService::getTotalSessionCount(void) const {
+	return m_iniSessions.size() + m_activeSessions.size();
+}
+
+void LocalSessionService::clearSessions(void) {
+	m_activeSessions.clear();
+	m_iniSessions.clear();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
 
 void LocalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	std::list<std::string> sessionArr;
-	for (const Session& s : m_sessions) {
-		sessionArr.push_back(s.getId());
+	// Create active session array
+	ot::JsonArray activeArr;
+	for (const Session& session : m_activeSessions) {
+		ot::JsonObject sessionObj;
+		session.addToJsonObject(sessionObj, _allocator);
 	}
+
+	// Create initialize session array
+	ot::JsonArray iniArr;
+	for (const IniSessionType& session : m_iniSessions) {
+		ot::JsonObject sessionObj;
+		session.second.addToJsonObject(sessionObj, _allocator);
+
+		ot::JsonObject pairObj;
+		pairObj.AddMember("T", ot::JsonValue(std::chrono::duration_cast<std::chrono::nanoseconds>(session.first.time_since_epoch()).count()), _allocator);
+		pairObj.AddMember("S", sessionObj, _allocator);
+
+		iniArr.PushBack(pairObj, _allocator);
+	}
+
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, _allocator);
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SESSION_LIST, ot::JsonArray(sessionArr, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_Sessions, activeArr, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_IniList, iniArr, _allocator);
 }
 
 void LocalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	this->clearSessions();
+
 	// Get information
+	m_id = ot::json::getUInt(_object, OT_ACTION_PARAM_SERVICE_ID);
 	m_url = ot::json::getString(_object, OT_ACTION_PARAM_SERVICE_URL);
-	std::list<std::string> sessionIds = ot::json::getStringList(_object, OT_ACTION_PARAM_SESSION_LIST);
 
-	this->clear();
-
-	for (const std::string& id : sessionIds) {
-		m_sessions.push_back(Session(id));
+	// Get active sessions
+	for (const ot::ConstJsonObject& sessionObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_Sessions)) {
+		Session session;
+		session.setFromJsonObject(sessionObj);
+		m_activeSessions.push_back(std::move(session));
 	}
-}
 
-void LocalSessionService::clear(void) {
-	m_sessions.clear();
+	// Get initialize sessions
+	for (const ot::ConstJsonObject& pairObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_IniList)) {
+		// Get time
+		auto time = std::chrono::steady_clock::time_point(std::chrono::nanoseconds(ot::json::getInt(pairObj, "T")));
+
+		// Get session
+		Session session;
+		session.setFromJsonObject(ot::json::getObject(pairObj, "S"));
+		m_iniSessions.push_back(std::make_pair(time, std::move(session)));
+	}
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -196,7 +242,7 @@ Session* LocalSessionService::getSession(const std::string& _sessionId) {
 		}
 	}
 
-	for (Session& session : m_sessions) {
+	for (Session& session : m_activeSessions) {
 		if (session.getId() == _sessionId) {
 			return &session;
 		}
@@ -212,7 +258,7 @@ const Session* LocalSessionService::getSession(const std::string& _sessionId) co
 		}
 	}
 
-	for (const Session& session : m_sessions) {
+	for (const Session& session : m_activeSessions) {
 		if (session.getId() == _sessionId) {
 			return &session;
 		}

@@ -6,6 +6,10 @@
 // GSS header
 #include "Session.h"
 
+// OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
+
 Session::Session() : m_state(NoStateFlags) {}
 
 Session::Session(const std::string& _id) : m_state(NoStateFlags), m_id(_id) {}
@@ -42,4 +46,27 @@ bool Session::operator==(const Session& _other) const {
 
 bool Session::operator!=(const Session& _other) const {
 	return m_id != _other.m_id || m_userName != _other.m_userName;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
+void Session::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	ot::JsonArray stateArr;
+	if (m_state & SessionStateFlag::LssConfirmed) { stateArr.PushBack(ot::JsonString("LssConfirmed", _allocator), _allocator); }
+
+	_object.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SESSION_USER, ot::JsonString(m_userName, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_State, stateArr, _allocator);
+}
+
+void Session::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	m_state = NoStateFlags;
+	for (const std::string& state : ot::json::getStringList(_object, OT_ACTION_PARAM_State)) {
+		if (state == "LssConfirmed") { m_state.setFlag(SessionStateFlag::LssConfirmed); }
+		else {
+			OT_LOG_EAS("Unknown state flag \"" + state + "\"");
+		}
+	}
 }

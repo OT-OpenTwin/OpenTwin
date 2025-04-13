@@ -18,6 +18,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "DataBase.h"
 
@@ -45,6 +46,52 @@ GlobalSessionService& GlobalSessionService::instance(void) {
 // ###################################################################################################
 
 // Service handling
+
+void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	// General info
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(this->getServiceName(), _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, _allocator), _allocator);
+
+	// Runtime info
+	bool workerRunning = m_workerRunning;
+	bool forceHealth = m_forceHealthCheck;
+	_object.AddMember("WorkerRunning", workerRunning, _allocator);
+	_object.AddMember("ForceHealthcheck", forceHealth, _allocator);
+
+	ot::JsonArray sessionArr;
+	for (const auto& it : m_sessionMap) {
+		ot::JsonObject pairObj;
+		pairObj.AddMember("Key.Session.ID", ot::JsonString(it.first, _allocator), _allocator);
+		pairObj.AddMember("Value.LSS.ID", it.second, _allocator);
+		sessionArr.PushBack(pairObj, _allocator);
+	}
+	_object.AddMember("SessionMap", sessionArr, _allocator);
+
+	ot::JsonArray lssArr;
+	for (const auto& it : m_lssMap) {
+		ot::JsonObject pairObj;
+		pairObj.AddMember("Key.LSS.ID", it.first, _allocator);
+
+		ot::JsonObject lssObj;
+		it.second.addToJsonObject(lssObj, _allocator);
+		pairObj.AddMember("Value.LSS.Obj", lssObj, _allocator);
+		lssArr.PushBack(pairObj, _allocator);
+	}
+	_object.AddMember("LSSMap", lssArr, _allocator);
+
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, _allocator);
+	_object.AddMember("GlobalLogFlags", flagsArr, _allocator);
+	_object.AddMember("GlobalLogFlagsSet", m_logModeManager.getGlobalLogFlagsSet(), _allocator);
+	
+	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
+}
+
+void GlobalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	OT_LOG_E("The GSS is currently not supposed be deserialized");
+}
 
 bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId) {
 	// Check URL duplicate
@@ -410,6 +457,12 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 	return tmp;
 }
 
+std::string GlobalSessionService::handleGetDebugInformation(ot::JsonDocument& _doc) {
+	ot::JsonDocument dbg;
+	this->addToJsonObject(dbg, dbg.GetAllocator());
+	return dbg.toJson();
+}
+
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
@@ -642,9 +695,9 @@ LocalSessionService* GlobalSessionService::determineLeastLoadedLSS(void) {
 	LocalSessionService* leastLoadedSessionService{ nullptr };
 	size_t minLoad{ UINT64_MAX };
 	for (auto& it : m_lssMap) {
-		if (it.second.getSessionCount() < minLoad) {
+		if (it.second.getTotalSessionCount() < minLoad) {
 			leastLoadedSessionService = &it.second;
-			minLoad = leastLoadedSessionService->getSessionCount();
+			minLoad = leastLoadedSessionService->getTotalSessionCount();
 		}
 	}
 	return leastLoadedSessionService;
@@ -755,6 +808,8 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 // Installer
 
 void GlobalSessionService::readFileContent(const std::string& fileName, std::string& fileContent) {
+	OT_LOG_D("Reading content of file: \"" + fileName + "\"");
+
 	fileContent.clear();
 
 	// Read the file content
@@ -781,32 +836,57 @@ void GlobalSessionService::readFileContent(const std::string& fileName, std::str
 }
 
 void GlobalSessionService::loadFrontendInstallerFile() {
-	std::string installerPath;
+	std::string relPath;
 
 #ifdef OT_OS_WINDOWS
 	char path[MAX_PATH] = { 0 };
 	GetModuleFileNameA(NULL, path, MAX_PATH);
-	installerPath = path;
+	relPath = path;
 #else
-	char result[PATH_MAX];
-	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-	installerPath = std::string(result, (count > 0) ? count : 0);
+	char path[PATH_MAX];
+	ssize_t pathSize = readlink("/proc/self/exe", path, PATH_MAX);
+	relPath = std::string(path, (pathSize > 0) ? pathSize : 0);
 #endif
 
-	installerPath = installerPath.substr(0, installerPath.rfind('\\'));
-	installerPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+	// First check if the installer can be found relative to the current path
+	size_t ix = relPath.rfind('\\');
+	
+	if (ix != std::string::npos) {
+		// Create path relative to the current path
+		relPath = relPath.substr(0, ix);
+		relPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+	}
+	else {
+		// Failed to find path separator
+		OT_LOG_W("Could not find path separator in current path: \"" + relPath + "\"");
+	}
 
-	if (!std::filesystem::exists(installerPath)) {
+	if (std::filesystem::exists(relPath)) {
+		// Installer found relative to the current path
+		this->readFileContent(relPath, m_frontendInstallerFileContent);
+	}
+	else {
+		// Could not find relative, try to find installer from dev env
+		OT_LOG_D("Could not find installer relative to current path. Trying environment... Tested path: \"" + relPath + "\"");
+
 		// Get the development root environment variable and build the path to the deployment cert file
 		char buffer[4096];
 		size_t environmentVariableValueStringLength;
 		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
 
-		std::string dev_root(buffer);
-		installerPath = dev_root + "\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
-	}
+		std::string devPath(buffer);
+		devPath.append("\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe");
 
-	readFileContent(installerPath, m_frontendInstallerFileContent);
+		if (std::filesystem::exists(devPath)) {
+			// Installer found, read it
+			this->readFileContent(devPath, m_frontendInstallerFileContent);
+		}
+		else {
+			// Installer not found relative and env
+			OT_LOG_E("Could not find installer file. Tried relative and env paths... Tested: "
+				"{ \"Rel-Path\": \"" + relPath + "\", \"Env-Path\": \"" + devPath + "\" }");
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -842,7 +922,7 @@ void GlobalSessionService::workerHealthCheck(void) {
 					try {
 						std::string response;
 						// Try to ping
-						if (!ot::msg::send(m_url, it.second.getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+						if (!ot::msg::send(this->getServiceURL(), it.second.getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second.getUrl() + ")");
 							removeSessionService(it.second);
 							running = true;

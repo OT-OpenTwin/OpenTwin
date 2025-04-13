@@ -114,7 +114,7 @@ void GlobalSessionService::healthCheck(void) {
 			for (auto s : lss.sessions()) {
 				sessionList.PushBack(ot::JsonString(s->getId(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 			}
-			doc.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionList, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_Sessions, sessionList, doc.GetAllocator());
 
 			response.clear();
 			// Send registration

@@ -560,7 +560,7 @@ std::string SessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 		sessionInfo.PushBack(info, reply.GetAllocator());
 	}
 
-	reply.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionInfo, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_Sessions, sessionInfo, reply.GetAllocator());
 
 	return reply.toJson();
 }

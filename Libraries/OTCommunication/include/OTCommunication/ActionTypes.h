@@ -320,16 +320,19 @@
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Size "Size"
-#define OT_ACTION_PARAM_Color "Color"
+#define OT_ACTION_PARAM_State "State"
 #define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Index "Index"
 #define OT_ACTION_PARAM_Range "Range"
+#define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Visible "Visible"
+#define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
@@ -459,7 +462,6 @@
 #define OT_ACTION_PARAM_SESSION_TYPE_LIST "Session.TypeList"
 #define OT_ACTION_PARAM_SESSION_SERVICES "Session.Services"
 #define OT_ACTION_PARAM_SESSION_EXISTS "Session.Exists"
-#define OT_ACTION_PARAM_SESSION_LIST "Session.List"
 
 #define OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "Development"
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
@@ -676,8 +678,6 @@
 
 #define OT_ACTION_PARAM_RegisterForModelEvents "ModelEvents.Register"
 #define OT_ACTION_PARAM_ElementLockTypes "UI.Element.LockTypes"
-
-#define OT_ACTION_PARAM_SESSION_LIST "Session.List"
 
 #define OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory "System.PhysicalMemory.Total"
 #define OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory "System.PhysicalMemory.Available"

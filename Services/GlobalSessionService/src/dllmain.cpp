@@ -73,11 +73,11 @@ extern "C"
 		// Create session service and add data to session service
 		GlobalSessionService& gss = GlobalSessionService::instance();
 		gss.setDatabaseUrl(_databaseIP);
-		gss.setUrl(_ownIP);
+		gss.setServiceURL(_ownIP);
 		gss.setAuthorizationUrl(_authURL);
 
 		// Ensure data is somewhat valid
-		if (gss.getUrl().empty()) {
+		if (gss.getServiceURL().empty()) {
 			OT_LOG_EA("Empty Service URL provided");
 			exit(ot::AppExitCode::ServiceUrlInvalid);
 		}
@@ -113,7 +113,7 @@ extern "C"
 	{
 		char * returnValue = nullptr;
 
-		std::string serviceURL = GlobalSessionService::instance().getUrl();
+		std::string serviceURL = GlobalSessionService::instance().getServiceURL();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());

@@ -200,7 +200,7 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	// Now we add information about the sessions and their services
 	ot::JsonArray sessionInfo;
 	m_serviceManager.GetSessionInformation(sessionInfo, reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionInfo, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_Sessions, sessionInfo, reply.GetAllocator());
 
 	return reply.toJson();
 }
