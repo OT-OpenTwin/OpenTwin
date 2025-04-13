@@ -9,6 +9,7 @@ See here for more details:
    coding_standards
    opentwin_layers
    service_information
+   app_exit_codes
    user_interface
    Model_Entities
    datamodel
