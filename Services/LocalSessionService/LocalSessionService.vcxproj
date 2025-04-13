@@ -184,7 +184,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\Exception.cpp" />
     <ClCompile Include="src\GlobalDirectoryService.cpp" />
     <ClCompile Include="src\GlobalSessionService.cpp" />
     <ClCompile Include="src\PortManager.cpp" />
@@ -197,8 +196,6 @@
   <ItemGroup>
     <ClInclude Include="include\GlobalDirectoryService.h" />
     <ClInclude Include="include\GlobalSessionService.h" />
-    <ClInclude Include="include\Exception.h" />
-    <ClInclude Include="include\globalDatatypes.h" />
     <ClInclude Include="include\PortManager.h" />
     <ClInclude Include="include\RelayService.h" />
     <ClInclude Include="include\Service.h" />

@@ -5,6 +5,7 @@
 
 #pragma once
 
+// Qt Meta Types header
 #include "QtMetaTypes.h"
 
 // Frontend header
@@ -30,7 +31,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/MessageBoxHandler.h"
 
-// AK header
+// uiCore header
 #include <akCore/aException.h>
 #include <akCore/globalDataTypes.h>
 #include <akWidgets/aWindow.h>
@@ -43,7 +44,7 @@
 #include <qicon.h>
 #include <QtCore/qsettings.h>
 
-// C++ header
+// std header
 #include <map>
 #include <vector>
 

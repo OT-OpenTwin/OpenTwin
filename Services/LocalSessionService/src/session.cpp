@@ -1,42 +1,35 @@
-/*
- * session.cpp
- *
- *  Created on: December 03, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file Session.cpp
+//! @authors Alexander Kuester (alexk95)
+//! @date December 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Session service header
-#include <Session.h>		// Corresponding header
-#include <Service.h>		// service
-#include <SessionService.h>
-#include <RelayService.h>	// relayService
-#include <Exception.h>		// Error handling
+// Service header
+#include "Session.h"
+#include "Service.h"
+#include "relayService.h"
+#include "SessionService.h"
 
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
 #define OT_BROADCASTMESSAGE_CREATE(___doc) ot::JsonDocument ___doc; ___doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Message, ___doc.GetAllocator()), ___doc.GetAllocator());
-#define OT_BROADCASTMESSAGE_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->id(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->url(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->name(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->type(), ___doc.GetAllocator()), ___doc.GetAllocator());
-#define OT_BROADCASTACTION_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->id(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->url(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->name(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->type(), ___doc.GetAllocator()), ___doc.GetAllocator());
+#define OT_BROADCASTMESSAGE_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->getId(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->getUrl(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->getName(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->getType(), ___doc.GetAllocator()), ___doc.GetAllocator());
+#define OT_BROADCASTACTION_ADDSENDERDATA(___doc, ___sender) ___doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, ___sender->getId(), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(___sender->getUrl(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(___sender->getName(), ___doc.GetAllocator()), ___doc.GetAllocator()); ___doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(___sender->getType(), ___doc.GetAllocator()), ___doc.GetAllocator());
 
-Session::Session(
-	const std::string &						_ID,
-	const std::string &						_userName,
-	const std::string &						_projectName,
-	const std::string &						_collectionName,
-	const std::string &						_type
-) : m_id(_ID), m_userName(_userName), m_projectName(_projectName), m_collectionName(_collectionName),
-	m_type(_type)
+Session::Session(const std::string& _ID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _type) :
+	m_id(_ID), m_userName(_userName), m_projectName(_projectName), m_collectionName(_collectionName), m_type(_type)
 {
 	OT_LOG_D("New session created with (ID = \"" + m_id + "\", User.Name = \"" + m_userName + "\", Project.Name = \"" + 
 		m_projectName + "\", Collection.Name = \"" + m_collectionName + "\", Session.Type = \"" + m_type + "\")");
 }
 
 Session::~Session() {
-	for (auto p : m_debugPorts) ot::PortManager::instance().setPortNotInUse(p);
+	for (auto p : m_debugPorts) {
+		ot::PortManager::instance().setPortNotInUse(p);
+	}
 }
 
 void Session::addRequestedService(const std::string& _serviceName, const std::string& _serviceType) {
@@ -50,7 +43,7 @@ void Session::addRequestedService(const std::string& _serviceName, const std::st
 
 	// Check if the requested service is already alive
 	for (auto s : m_serviceMap) {
-		if (s.second->name() == _serviceName && s.second->type() == _serviceType) {
+		if (s.second->getName() == _serviceName && s.second->getType() == _serviceType) {
 			OT_LOG_W("Requested service: " + _serviceName + " (type = " + _serviceType + ") is already alive at session (id = " + m_id + ")");
 			return;
 		}
@@ -80,7 +73,7 @@ Service * Session::registerService(const std::string & _serviceIP, const std::st
 		std::string errorMessage("A service with the ID \"");
 		errorMessage.append(std::to_string(_serviceID));
 		errorMessage.append("\" was already registered");
-		throw ErrorException(errorMessage.c_str());
+		throw std::out_of_range(errorMessage.c_str());
 	}
 	Service * newService = new Service(_serviceIP, _serviceName, _serviceID, _serviceType, this, true);
 	m_serviceMap.insert_or_assign(_serviceID, newService);
@@ -93,17 +86,17 @@ Service * Session::registerService(const std::string & _serviceIP, const std::st
 Service * Session::registerService(Service * _service) {
 	assert(_service != nullptr);
 
-	auto itm = m_serviceMap.find(_service->id());
+	auto itm = m_serviceMap.find(_service->getId());
 	if (itm != m_serviceMap.end()) {
 		std::string errorMessage("A service with the ID \"");
-		errorMessage.append(std::to_string(_service->id()));
+		errorMessage.append(std::to_string(_service->getId()));
 		errorMessage.append("\" was already registered");
-		throw ErrorException(errorMessage.c_str());
+		throw std::out_of_range(errorMessage.c_str());
 	}
 
-	m_serviceMap.insert_or_assign(_service->id(), _service);
+	m_serviceMap.insert_or_assign(_service->getId(), _service);
 
-	OT_LOG_D("The service (name = \"" + _service->name() + "\"; type = \"" + _service->type() + "\"; id = \"" + std::to_string(_service->id()) + "\") was registered at the session (id = \"" + m_id + "\")");
+	OT_LOG_D("The service (name = \"" + _service->getName() + "\"; type = \"" + _service->getType() + "\"; id = \"" + std::to_string(_service->getId()) + "\") was registered at the session (id = \"" + m_id + "\")");
 
 	return _service;
 }
@@ -122,7 +115,7 @@ void Session::removeService(ot::serviceID_t _serviceID, bool _notifyOthers) {
 		broadcastAction(theService, OT_ACTION_CMD_ServiceDisconnected);
 	}
 
-	OT_LOG_D("The service " + theService->toJSON() + " was deregistered from the session " + infoToJSON());
+	//OT_LOG_D("The service " + theService->toJSON() + " was deregistered from the session " + infoToJSON());
 
 	delete theService;
 }
@@ -133,51 +126,41 @@ Service * Session::getService(ot::serviceID_t _serviceID) {
 		std::string errorMessage("A service with the ID \"");
 		errorMessage.append(std::to_string(_serviceID));
 		errorMessage.append("\" was not registered");
-		throw ErrorException(errorMessage.c_str());
+		throw std::out_of_range(errorMessage.c_str());
 	}
 	return itm->second;
 }
 
 Service * Session::getServiceFromURL(const std::string& _serviceURL) {
 	for (auto s : m_serviceMap) {
-		if (s.second->url() == _serviceURL) return s.second;
+		if (s.second->getUrl() == _serviceURL) return s.second;
 	}
 	std::string errorMessage("A service with the URL \"");
 	errorMessage.append(_serviceURL);
 	errorMessage.append("\" was not registered");
-	throw ErrorException(errorMessage.c_str());
+	throw std::out_of_range(errorMessage.c_str());
 }
 
 std::list<Service *> Session::getServicesByName(const std::string& _serviceName) {
 	std::list<Service *> ret;
 	for (auto s : m_serviceMap) {
-		if (s.second->name() == _serviceName) ret.push_back(s.second);
-	}
-	return ret;
-}
-
-std::string Session::getServiceListJSON(void) {
-	std::string ret;
-	if (m_serviceMap.size() > 0) {
-		bool first = true;
-		ret = "{\"" OT_ACTION_PARAM_SESSION_SERVICES "\":[";
-		for (auto itm : m_serviceMap) {
-			if (itm.second->isVisible()) {
-				if (first) { first = false; }
-				else { ret.append(","); }
-				ret.append(itm.second->toJSON());
-			}
+		if (s.second->getName() == _serviceName) {
+			ret.push_back(s.second);
 		}
-		ret.append("]}");
 	}
 	return ret;
 }
 
-std::string Session::infoToJSON(void) const {
-	ot::JsonDocument infoDoc;
-	infoDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, infoDoc.GetAllocator()), infoDoc.GetAllocator());
-	infoDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_type, infoDoc.GetAllocator()), infoDoc.GetAllocator());
-	return infoDoc.toJson();
+void Session::addServiceListToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	ot::JsonArray arr;
+	for (const auto& s : m_serviceMap) {
+		if (s.second->getIsVisible()) {
+			ot::JsonObject obj;
+			s.second->addToJsonObject(obj, _allocator);
+			arr.PushBack(obj, _allocator);
+		}
+	}
+	_object.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, arr, _allocator);
 }
 
 void Session::servicesInformation(ot::JsonArray &servicesInfo, ot::JsonAllocator& allocator) const
@@ -187,27 +170,14 @@ void Session::servicesInformation(ot::JsonArray &servicesInfo, ot::JsonAllocator
 		ot::JsonValue infoDoc;
 		infoDoc.SetObject();
 
-		std::string serviceType = s.second->type();
+		std::string serviceType = s.second->getType();
 		if (serviceType == "UI") serviceType = "RelayService";
 
 		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(serviceType, allocator), allocator);
-		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(s.second->url(), allocator), allocator);
+		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(s.second->getUrl(), allocator), allocator);
 
 		servicesInfo.PushBack(infoDoc, allocator);
 	}
-}
-
-void Session::addServiceListToDocument(ot::JsonDocument& _doc) {
-	ot::JsonArray serviceList;
-	for (auto s : m_serviceMap)
-	{
-		if (s.second->isVisible()) {
-			ot::JsonObject serviceObj;
-			s.second->writeDataToValue(serviceObj, _doc.GetAllocator());
-			serviceList.PushBack(serviceObj, _doc.GetAllocator());
-		}
-	}
-	_doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, serviceList, _doc.GetAllocator());
 }
 
 void Session::broadcastMessage(Service * _sender, const std::string& _message, bool _async) {
@@ -238,24 +208,24 @@ void Session::broadcast(Service * _sender, const ot::JsonDocument& _message, boo
 	
 	std::string response;
 	std::string senderIP;
-	if (_sender != nullptr) { senderIP = _sender->url(); }
+	if (_sender != nullptr) { senderIP = _sender->getUrl(); }
 
 	for (auto itm : m_serviceMap) {
 		// todo: check service visibility upon session start -> service start -> service.new action
-		if (itm.second->receiveBroadcastMessages() && itm.second->isVisible()) {
-			if (senderIP != itm.second->url()) {
+		if (itm.second->getReceiveBroadcastMessages() && itm.second->getIsVisible()) {
+			if (senderIP != itm.second->getUrl()) {
 				// Send the message to the current reciever
 				response.clear();
 				ot::msg::RequestFlags reqFlags = ot::msg::DefaultFlagsNoExit;
 				if (_async) {
-					ot::msg::sendAsync(senderIP, itm.second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout, reqFlags);
+					ot::msg::sendAsync(senderIP, itm.second->getUrl(), ot::QUEUE, msg, ot::msg::defaultTimeout, reqFlags);
 				} else {
 					if (_shutdown) {
 						reqFlags |= ot::msg::IsShutdownMessage;
 					}
 
-					if (!ot::msg::send(senderIP, itm.second->url(), ot::QUEUE, msg, response, ot::msg::defaultTimeout, reqFlags)) {
-						OT_LOG_E("Failed to send broadcast message to: " + itm.second->url());
+					if (!ot::msg::send(senderIP, itm.second->getUrl(), ot::QUEUE, msg, response, ot::msg::defaultTimeout, reqFlags)) {
+						OT_LOG_E("Failed to send broadcast message to: " + itm.second->getUrl());
 					}
 				}
 			}
@@ -278,7 +248,7 @@ void Session::shutdown(Service * _sender) {
 			SessionService::instance().serviceClosing(itm->second, false, false);
 		}
 		else {
-			m_serviceMap.erase(_sender->id());
+			m_serviceMap.erase(_sender->getId());
 		}
 		itm = m_serviceMap.begin();
 	}
@@ -286,8 +256,8 @@ void Session::shutdown(Service * _sender) {
 
 void Session::serviceFailure(Service * _failedService) {
 	if (_failedService != nullptr) {
-		OT_LOG_W("Handling service failure (name = \"" + _failedService->name() + "\"; type = \"" + _failedService->type() + 
-			"\"; id = \"" + std::to_string(_failedService->id()) + "\"");
+		OT_LOG_W("Handling service failure (name = \"" + _failedService->getName() + "\"; type = \"" + _failedService->getType() + 
+			"\"; id = \"" + std::to_string(_failedService->getId()) + "\"");
 		SessionService::instance().serviceClosing(_failedService, false, false);
 	}
 
@@ -300,7 +270,7 @@ void Session::serviceFailure(Service * _failedService) {
 		auto s = m_serviceMap.begin();
 		
 		// Fire message
-		ot::msg::sendAsync("", s->second->url(), ot::QUEUE, msg, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+		ot::msg::sendAsync("", s->second->getUrl(), ot::QUEUE, msg, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 
 		oldCt = m_serviceMap.size();
 		SessionService::instance().serviceClosing(s->second, false, false);
@@ -310,7 +280,7 @@ void Session::serviceFailure(Service * _failedService) {
 	}
 }
 
-std::list<std::string> Session::toolBarTabOrder(void) {
+std::list<std::string> Session::getToolBarTabOrder(void) {
 	std::list<std::string> tabOrder;
 	tabOrder.push_back("File");
 	tabOrder.push_back("View");

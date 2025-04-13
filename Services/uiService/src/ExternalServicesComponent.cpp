@@ -1,29 +1,20 @@
-/*
- * ExternalServicesComponent.cpp
- *
- *  Created on: September 21, 2020
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
+//! @file ExternalServicesComponent.cpp
+//! @authors Alexander Kuester, Peter Thoma
+//! @date September 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// wrapper header
-#include "ExternalServicesComponent.h"	// Corresponding header
-#include "ViewerComponent.h"			// Viewer component
-#include "ControlsManager.h"
+// Frontend header
 #include "AppBase.h"
 #include "ToolBar.h"
-#include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "SelectEntitiesDialog.h"
 #include "ServiceDataUi.h"
 #include "UserManagement.h"
-
-// Qt header
-#include <QtCore/qdir.h>						// QDir
-#include <QtCore/qeventloop.h>
-#include <QtWidgets/qfiledialog.h>
-#include <QtWidgets/qmessagebox.h>
-#include <QtWidgets/qapplication.h>
+#include "ViewerComponent.h"			// Viewer component
+#include "ControlsManager.h"
+#include "ShortcutManager.h"
+#include "WebsocketClient.h"
+#include "SelectEntitiesDialog.h"
+#include "ExternalServicesComponent.h"	// Corresponding header
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
@@ -85,20 +76,27 @@
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 
-// AK header
+// uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
 
+// Qt header
+#include <QtCore/qdir.h>						// QDir
+#include <QtCore/qeventloop.h>
+#include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qapplication.h>
+
+// ThirdParty header
 #include "base64.h"
 #include "zlib.h"
 
-#include "WebsocketClient.h"
-
-#include <fstream>
-#include <iostream>
+// std header
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <fstream>
+#include <iostream>
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 

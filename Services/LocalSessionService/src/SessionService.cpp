@@ -6,14 +6,12 @@
  *  Copyright (c) 2020 openTwin
  */
 
-// SessionService header
+// Service header
 #include "SessionService.h"		// Corresponding header
 #include "GlobalSessionService.h"
 #include "Session.h"
-#include "Exception.h"
 #include "Service.h"
 #include "RelayService.h"
-#include "globalDatatypes.h"
 #include "ServiceRunStarter.h"
 
 // Open Twin header
@@ -23,11 +21,11 @@
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
 
-// C++ header
+// std header
 #include <cassert>
-#include <stdlib.h>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
 #include <algorithm>
 
 SessionService::SessionService() 
@@ -154,7 +152,7 @@ Session * SessionService::createSession(
 	const std::string &						_sessionType
 ) {
 	if (_sessionID.length() == 0) {
-		throw ErrorException("Session ID must not be empty");
+		throw std::out_of_range("Session ID must not be empty");
 	}
 
 	auto itm = m_sessionMap.find(_sessionID);
@@ -188,7 +186,7 @@ bool SessionService::runMandatoryServices(
 		std::string ex("A session with the ID \"");
 		ex.append(_sessionID);
 		ex.append("\" could not be found");
-		throw ErrorException(ex.c_str());
+		throw std::out_of_range(ex.c_str());
 	}
 	return runMandatoryServices(s->second);
 }
@@ -197,13 +195,13 @@ bool SessionService::runMandatoryServices(
 	Session *								_session
 ) {
 	if (_session == nullptr) { throw std::exception("A nullptr was provided as session"); }
-	auto it = m_mandatoryServicesMap.find(_session->type());
+	auto it = m_mandatoryServicesMap.find(_session->getType());
 	if (it == m_mandatoryServicesMap.end()) {
-		OT_LOG_E("No mandatory services registered for the session (Type = \"" + _session->type() + "\")");
+		OT_LOG_E("No mandatory services registered for the session (Type = \"" + _session->getType() + "\")");
 		std::string ex("No mandatory services registered for the session type \"");
-		ex.append(_session->type());
+		ex.append(_session->getType());
 		ex.append("\" found");
-		throw WarningException(ex.c_str());
+		throw std::out_of_range(ex.c_str());
 	}
 
 	// Collect all services to run in debug and release mode
@@ -235,7 +233,7 @@ bool SessionService::runMandatoryServices(
 		}
 
 		OT_LOG_D("Starting services via DirectoryService (Service.Count = \"" + std::to_string(releaseServices.size()) + "\")");
-		if (!m_gds->requestToStartServices(releaseServices, _session->id())) {
+		if (!m_gds->requestToStartServices(releaseServices, _session->getId())) {
 			assert(0);
 			// todo: clean up requested services
 			return false;
@@ -262,16 +260,14 @@ void SessionService::serviceClosing(
 	}
 
 	// Remove the service from the session, after this call the pointer is invalid
-	actualSession->removeService(_service->id(), _notifyOthers);
+	actualSession->removeService(_service->getId(), _notifyOthers);
 
 	// Check if the session is still alive
-	if (actualSession->serviceCount() == 0 && _autoCloseSessionIfMandatory) {
-
-#ifdef OT_USE_GSS
+	if (actualSession->getServiceCount() == 0 && _autoCloseSessionIfMandatory) {
 		// Notify GSS
 		ot::JsonDocument gssShutdownDoc;
 		gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-		gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+		gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->getId(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 		
 		std::string response;
 		if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -281,10 +277,8 @@ void SessionService::serviceClosing(
 			OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 		}
 
-#endif // OT_USE_GSS
-
-		removeSession(actualSession);
-		OT_LOG_D("The session with the ID \"" + actualSession->id() + "\" was closed automatically. Reason: No more services running");
+		this->removeSession(actualSession);
+		OT_LOG_D("The session with the ID \"" + actualSession->getId() + "\" was closed automatically. Reason: No more services running");
 	}
 }
 
@@ -294,8 +288,8 @@ void SessionService::removeSession(Session* _session) {
 }
 
 void SessionService::forgetSession(Session* _session) {
-	ServiceRunStarter::instance().sessionClosing(_session->id());
-	m_sessionMap.erase(_session->id());
+	ServiceRunStarter::instance().sessionClosing(_session->getId());
+	m_sessionMap.erase(_session->getId());
 }
 
 std::list<const Session *> SessionService::sessions(void) {
@@ -329,14 +323,14 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 	ot::port_t portNumber = ot::PortManager::instance().determineAndBlockAvailablePort();
 	_serviceURL.append(":").append(std::to_string(portNumber));
 
-	std::list<std::string> arguments = { "1", _serviceURL, this->getUrl(),  _session->id() };
+	std::list<std::string> arguments = { "1", _serviceURL, this->getUrl(),  _session->getId() };
 
 	ot::JsonDocument statupParams;
 	statupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(this->getUrl(), statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->getId(), statupParams.GetAllocator()), statupParams.GetAllocator());
 
 	std::ofstream stream(path);
 	stream << statupParams.toJson();
@@ -391,7 +385,7 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 	{
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
 		_serviceURL = "";
-		if (!m_gds->requestToStartRelayService(_session->id(), _websocketURL, _serviceURL)) {
+		if (!m_gds->requestToStartRelayService(_session->getId(), _websocketURL, _serviceURL)) {
 			return false;
 		}
 	}
@@ -422,14 +416,12 @@ std::string SessionService::handleGetAuthURL(ot::JsonDocument& _commandDoc) {
 }
 
 std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc) {
-#ifdef OT_USE_GSS
 	// The info message is only present if the request is done by the UI frontend upon startup
 	if (_commandDoc.HasMember(OT_ACTION_PARAM_MESSAGE)) {
 		if (ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE) == OT_INFO_MESSAGE_LogIn) {
 			return OT_ACTION_RETURN_INDICATOR_Error "Invalid global session service URL";
 		}
 	}
-#endif // OT_USE_GSS
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_dataBaseURL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(getServiceAuthorisationURL(), doc.GetAllocator()), doc.GetAllocator());
@@ -486,7 +478,7 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	Session * theSession = getSession(sessionID);
 
 	if (theSession == nullptr) {
-		throw ErrorException(("A session with the id \"" + sessionID + "\" could not be found").c_str());
+		throw std::out_of_range(("A session with the id \"" + sessionID + "\" could not be found").c_str());
 	}
 
 	// Create response document
@@ -516,7 +508,7 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	response.AddMember(OT_ACTION_PARAM_SERVICE_ID, newID, response.GetAllocator());
 
 	if (serviceType == OT_INFO_SERVICE_TYPE_UI) {
-		response.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->toolBarTabOrder(), response.GetAllocator()), response.GetAllocator());
+		response.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->getToolBarTabOrder(), response.GetAllocator()), response.GetAllocator());
 	}
 	if (m_logModeManager.getGlobalLogFlagsSet()) {
 		ot::JsonArray logArr;
@@ -555,10 +547,10 @@ std::string SessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 		ot::JsonValue info;
 		info.SetObject();
 
-		info.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session->id(), reply.GetAllocator()), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_SESSION_PROJECT, ot::JsonString(session->projectName(), reply.GetAllocator()), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_SESSION_USER, ot::JsonString(session->userName(), reply.GetAllocator()), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(session->type(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session->getId(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_PROJECT, ot::JsonString(session->getProjectName(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_USER, ot::JsonString(session->getUserName(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(session->getType(), reply.GetAllocator()), reply.GetAllocator());
 
 		ot::JsonArray servicesInformation;
 		session->servicesInformation(servicesInformation, reply.GetAllocator());
@@ -677,7 +669,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	if (serviceType == OT_INFO_SERVICE_TYPE_UI) {
 		OT_LOG_D("Adding ToolBar Tab order to the response document");
-		responseDoc.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->toolBarTabOrder(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->getToolBarTabOrder(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
 
 	if (m_logModeManager.getGlobalLogFlagsSet()) {
@@ -697,9 +689,9 @@ std::string SessionService::handleCheckProjectOpen(ot::JsonDocument& _commandDoc
 	// Check session
 	for (auto session : m_sessionMap)
 	{
-		if (session.second->projectName() == projectName)
+		if (session.second->getProjectName() == projectName)
 		{
-			return session.second->userName();
+			return session.second->getUserName();
 		}
 	}
 
@@ -718,7 +710,7 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 		if (theService == nullptr) {
 			std::string errorMessage("A service with the ID \"");
 			errorMessage.append(std::to_string(serviceID)).append("\" was not registered");
-			throw ErrorException(errorMessage.c_str());
+			throw std::out_of_range(errorMessage.c_str());
 		}
 		theSession->broadcastMessage(theService, message);
 	}
@@ -727,18 +719,6 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 	}
 
 	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-std::string SessionService::handleGetServicesInSession(ot::JsonDocument& _commandDoc) {
-	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
-
-	auto s = m_sessionMap.find(sessionID);
-	if (s == m_sessionMap.end()) {
-		std::string errorMessage("A session with the ID \"");
-		errorMessage.append(sessionID).append("\" does not exist");
-		throw ErrorException(errorMessage.c_str());
-	}
-	return s->second->getServiceListJSON();
 }
 
 std::string SessionService::handleGetSessionExists(ot::JsonDocument& _commandDoc) {
@@ -805,22 +785,25 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	std::string serviceName(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME));
 	try {
 		auto services = actualSession->getServicesByName(serviceName);
-		if (!services.empty()) actualService = services.front();
+		if (!services.empty()) {
+			actualService = services.front();
+		}
 	}
-	catch (ErrorException) {}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
 
 	OT_LOG_D("Service failure: Cleaning up session (ID = \"" + sessionID + ")");
 
 	// Clean up the session
 	actualSession->serviceFailure(actualService);
 
-#ifdef OT_USE_GSS
 	OT_LOG_D("Service failure: Notify GSS..");
 
 	// Notify GSS
 	ot::JsonDocument gssShutdownDoc;
 	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->getId(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -829,13 +812,12 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
 		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
-#endif // OT_USE_GSS
 
 	// Display log information
-	OT_LOG_I("The session with the ID \"" + actualSession->id() + "\" was closed automatically. Reason: Session emergency shutdown");
+	OT_LOG_I("The session with the ID \"" + actualSession->getId() + "\" was closed automatically. Reason: Session emergency shutdown");
 
 	// Finally delete the session
-	removeSession(actualSession);
+	this->removeSession(actualSession);
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -885,19 +867,7 @@ std::string SessionService::handleReset(ot::JsonDocument& _commandDoc) {
 }
 
 std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _commandDoc) {
-	// todo: switch to json export (all classes should be derived from Serializable before)
-	OT_LOG_D("***** Debug information [Start] *****");
-	if (m_sessionMap.size() == 0) {
-		OT_LOG_D("Current sessions: None");
-	}
-	else {
-		OT_LOG_D("Current sessions:");
-		for (auto itm : m_sessionMap) {
-			OT_LOG_D("\tsession " + itm.second->infoToJSON());
-			OT_LOG_D("\t\twith " + itm.second->getServiceListJSON());
-		}
-	}
-	OT_LOG_D("***** Debug information [End] *****");
+	//! @todo: implement this function
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -946,14 +916,14 @@ std::string SessionService::handleServiceShow(ot::JsonDocument& _commandDoc)
 		return OT_ACTION_RETURN_INDICATOR_Error "Invalid service id";
 	}
 
-	theSession->removeRequestedService(theService->name(), theService->type());
+	theSession->removeRequestedService(theService->getName(), theService->getType());
 
 	theService->setVisible();
 
 	ot::JsonDocument responseDoc;
-	theSession->addServiceListToDocument(responseDoc);
-	responseDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(theSession->userName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(theSession->projectName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	theSession->addServiceListToJsonObject(responseDoc, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(theSession->getUserName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(theSession->getProjectName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	return responseDoc.toJson();
 }
 
@@ -1023,7 +993,7 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	auto services = actualSession->getServicesByName(serviceName);
 	Service * actualService = nullptr;
 	for (auto s : services) {
-		if (!s->isVisible()) {
+		if (!s->getIsVisible()) {
 			actualService = s;
 			break;
 		}
@@ -1034,12 +1004,10 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	// Clean up the session
 	actualSession->serviceFailure(actualService);
 
-#ifdef OT_USE_GSS
 	// Notify GSS
-
 	ot::JsonDocument gssShutdownDoc;
 	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->getId(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -1048,10 +1016,9 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
 		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
-#endif // OT_USE_GSS
 
 	// Display log information
-	OT_LOG_W("The session with the ID \"" + actualSession->id() + 
+	OT_LOG_W("The session with the ID \"" + actualSession->getId() + 
 		"\" was closed automatically. Reason: Session emergency shutdown after service startup failed");
 
 	// Finally delete the session
@@ -1082,17 +1049,16 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 
 	std::string senderServiceName("<No service name>");
 	if (theService) {
-		senderServiceName = theService->name();
+		senderServiceName = theService->getName();
 		theService->setReceiveBroadcastMessages(false);
 	}
 	// Notify GDS
-	m_gds->notifySessionClosed(_session->id());
+	m_gds->notifySessionClosed(_session->getId());
 
-#ifdef OT_USE_GSS
 	// Notify GSS
 	ot::JsonDocument gssShutdownDoc;
 	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->getId(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -1102,7 +1068,6 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 
-#endif
 	// Remove service that requested shutdown
 	_session->removeService(_serviceId, false);
 
@@ -1110,7 +1075,7 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 	_session->shutdown(nullptr);
 
 	// Show info log
-	OT_LOG_D("The session with the ID \"" + _session->id() + "\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
+	OT_LOG_D("The session with the ID \"" + _session->getId() + "\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
 
 	// Finally delete the session
 	delete _session;

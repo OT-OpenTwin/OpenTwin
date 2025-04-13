@@ -20,12 +20,12 @@ void ServiceRunStarter::addService(Session * _session, Service * _service) {
 
 	StartupInformation info;
 	
-	info.sessionId = _session->id();
+	info.sessionId = _session->getId();
 
-	info.serviceId = _service->id();
-	info.serviceName = _service->name();
-	info.serviceType = _service->type();
-	info.serviceUrl = _service->url();
+	info.serviceId = _service->getId();
+	info.serviceName = _service->getName();
+	info.serviceType = _service->getType();
+	info.serviceUrl = _service->getUrl();
 
 	info.credentialsUserName = _session->getCredentialsUsername();
 	info.credentialsUserPassword = _session->getCredentialsPassword();
@@ -109,7 +109,7 @@ void ServiceRunStarter::worker(void) {
 				continue;
 			}
 			else {
-				session->addServiceListToDocument(doc);
+				session->addServiceListToJsonObject(doc, doc.GetAllocator());
 
 				// Unlock must happen after the addServiceListToDocument() call, since it may happen that the
 				// Session Service is deleting the sessing while document is built (racing condition)

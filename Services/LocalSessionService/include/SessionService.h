@@ -8,20 +8,19 @@
 
 #pragma once
 
-// SessionService header
-#include "globalDatatypes.h"
-#include "PortManager.h"
+// Service header
 #include "Service.h"
+#include "PortManager.h"
 #include "GlobalDirectoryService.h"
 
+// OpenTwin header
+#include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
-#include "OTSystem/SystemInformation.h"
-
-// C++ header
+// std header
 #include <map>
 #include <vector>
 #include <string>
@@ -142,7 +141,6 @@ private:
 
 	OT_HANDLER(handleCheckProjectOpen, SessionService, OT_ACTION_CMD_IsProjectOpen, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSendBroadcastMessage, SessionService, OT_ACTION_CMD_SendBroadcastMessage, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetServicesInSession, SessionService, OT_ACTION_CMD_GetSessionServices, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetSessionExists, SessionService, OT_ACTION_CMD_GetSessionExists, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceClosing, SessionService, OT_ACTION_CMD_ServiceClosing, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleMessage, SessionService, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)

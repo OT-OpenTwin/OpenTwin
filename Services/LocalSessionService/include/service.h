@@ -1,111 +1,88 @@
-/*
- * service.h
- *
- *  Created on: November 30, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file Service.h
+//! @authors Alexander Kuester (alexk95)
+//! @date November 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-// SessionService header
-#include <globalDatatypes.h>
-
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/Serializable.h"
 
-// C++ header
-#include <string>
+// std header
 #include <list>
+#include <string>
 
 class Session;
 
-class Service {
+class Service : public ot::Serializable {
 public:
 
-	//! @brief Constructor
-	//! @param _url The URL of this service
-	//! @param _name The name of this service
-	//! @param _id The ID of this service
-	//! @param _session The session this service belongs to
-	Service(
-		const std::string &			_url,
-		const std::string &			_name,
-		ot::serviceID_t				_id,
-		const std::string &			_type,
-		Session *					_session,
-		bool						_showDebugInfo
-	);
+	//! @brief Constructor.
+	Service(const std::string& _url, const std::string& _name, ot::serviceID_t _id, const std::string& _type, Session* _session, bool _showDebugInfo);
 
-	//! @brief Deconstructor
-	virtual ~Service() {}
+	//! @brief Destructor.
+	virtual ~Service();
 
-	// ######################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Setter
+	// Management
 
-	//! @brief Will set the ip of this service
-	//! @param _ip The IP to set
-	void setURL(
-		const std::string &			_url
-	) { m_url = _url; }
-
-	//! @brief Will set the name of this service
-	//! @param _name The name to set
-	void setName(
-		const std::string &			_name
-	) { m_name = _name; }
-
-	//! @brief Will set the ID for this service
-	//! @param _id The ID to set
-	void setID(
-		ot::serviceID_t					_id
-	) { m_id = _id; }
-
-	//! @brief Will set the receive broadcast messages flag
-	void setReceiveBroadcastMessages(
-		bool						_receive
-	) { m_receiveBroadcastMessages = _receive; }
-
-	//! @brief Will set the visible state of the service
-	//! @param _isVisible if true the service will appear as visible
+	//! @brief Set the visible state of the service to true.
+	//! Setting a service to visible will notify all other services in the same session.
 	void setVisible(void);
 
-	//! @brief Will set the visible state of the service to false and notify all other services in the same session
+	//! @brief Set the visible state of the service to false.
+	//! Setting a service to hidden will notify all other services in the same session.
 	void setHidden(void);
 
-	// ######################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
+	void setURL(const std::string& _url) { m_url = _url; };
+	std::string getUrl(void) const { return m_url; };
+
+	void setName(const std::string& _name) { m_name = _name; };
+	std::string getName(void) const { return m_name; };
+
+	void setID(ot::serviceID_t _id) { m_id = _id; };
+	ot::serviceID_t getId(void) const { return m_id; };
+
+	void setReceiveBroadcastMessages(bool _receive) { m_receiveBroadcastMessages = _receive; };
+	bool getReceiveBroadcastMessages(void) const { return m_receiveBroadcastMessages; };
+
+	std::string getType(void) const { return m_type; }
+
+	Session* getSession(void) const { return m_session; };
+
+	bool getIsVisible(void) const { return m_isVisible; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Getter
 
-	//! @brief Will return the ip of this service
-	std::string url(void) const { return m_url; }
-
 	//! @brief Will return the port numbers of this service
-	virtual std::list<unsigned long long> portNumbers(void) const;
+	virtual std::list<unsigned long long> getPortNumbers(void) const;
 
-	//! @brief Will return the name of this service
-	std::string name(void) const { return m_name; }
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//! @brief Will return the ID of this service
-	ot::serviceID_t id(void) const { return m_id; }
+	// Serialization
 
-	//! @brief Will return the type of this service
-	std::string type(void) const { return m_type; }
+	//! @brief Serialize the object data into the provided object by using the provided allocator.
+	//! @param _object Json object value reference to write the data to.
+	//! @param _allocator Allocator to use when writing data.
+	//! @ref Serializable::addToJsonObject
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
-	//! @brief Will return the session this service belongs to
-	Session * getSession(void) const { return m_session; }
+	void addDebugInfoToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
-	//! @brief Will return true if this service wants to receive broadcast messages
-	bool receiveBroadcastMessages(void) const { return m_receiveBroadcastMessages; }
-
-	//! @brief Will return true if this service is visible
-	bool isVisible(void) const { return m_isVisible; }
-
-	//! @brief Will return a JSON string representing this service
-	virtual std::string toJSON(void) const;
-
-	void writeDataToValue(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
+	//! @brief Set the data by deserializing the object.
+	//! Set the object contents from the provided JSON object.
+	//! @param _object The JSON object containing the information.
+	//! @ref Serializable::setFromJsonObject
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 protected:
 

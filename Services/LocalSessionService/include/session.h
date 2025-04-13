@@ -1,10 +1,7 @@
-/*
- * session.h
- *
- *  Created on: December 03, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file Session.h
+//! @authors Alexander Kuester (alexk95)
+//! @date December 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
@@ -16,10 +13,10 @@
 #include <mutex>
 
 // SessionService header
-#include <globalDatatypes.h>
+#include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
-#include "OTSystem/PortManager.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTServiceFoundation/IdManager.h"
 
@@ -29,8 +26,9 @@ class RelayService;
 namespace std { class thread; }
 
 class Session {
+	OT_DECL_NOCOPY(Session)
+	OT_DECL_NODEFAULT(Session)
 public:
-
 	//! @brief Constructor
 	//! @param _id The ID of the session
 	//! @param _name The name of the session
@@ -40,25 +38,14 @@ public:
 
 	// ####################################################################################################
 
-	// Information getter
+	// Setter/Getter
 
-	//! @brief Will return the sessions ID
-	std::string id(void) const { return m_id; }
-
-	//! @brief Will return the user name
-	std::string userName(void) const { return m_userName; }
-
-	//! @brief Will return the project name
-	std::string projectName(void) const { return m_projectName; }
-
-	//! @brief WIll return the collection name
-	std::string collectionName(void) const { return m_collectionName; }
-
-	//! @brief Will return the type
-	std::string type(void) const { return m_type; }
-
-	//! @brief Will return the count of the services registered in this session
-	size_t serviceCount() const { return m_serviceMap.size(); }
+	std::string getId(void) const { return m_id; };
+	std::string getUserName(void) const { return m_userName; };
+	std::string getProjectName(void) const { return m_projectName; };
+	std::string getCollectionName(void) const { return m_collectionName; };
+	std::string getType(void) const { return m_type; };
+	size_t getServiceCount(void) const { return m_serviceMap.size(); };
 
 	// ####################################################################################################
 
@@ -103,14 +90,7 @@ public:
 	//! @brief Will return all services with the given name in this session
 	std::list<Service *> getServicesByName(const std::string& _serviceName);
 
-	//! @brief Will return a JSON string containing all services in this session
-	std::string getServiceListJSON(void);
-
-	//! @brief Will return a JSON string representing the main information about this session
-	std::string infoToJSON(void) const;
-
-	//! @brief Will add all services to the provided document
-	void addServiceListToDocument(ot::JsonDocument& _doc);
+	void addServiceListToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 	//! @brief Will return a list of JSON objects containing information about each service
 	void servicesInformation(ot::JsonArray& servicesInfo, ot::JsonAllocator &allocator) const;
@@ -147,7 +127,7 @@ public:
 		Service *					_failedService
 	);
 
-	std::list<std::string> toolBarTabOrder(void);
+	std::list<std::string> getToolBarTabOrder(void);
 
 	void setCredentialsUsername(const std::string &username) { m_userCredentials.setUserName(username); };
 	void setCredentialsPassword(const std::string &password) { m_userCredentials.setEncryptedPassword(password); };
@@ -167,7 +147,6 @@ public:
 	ot::serviceID_t generateNextServiceId(void);
 
 private:
-
 	std::mutex											m_mutex;
 
 	std::string											m_id;
@@ -184,9 +163,4 @@ private:
 	ot::IDManager<ot::serviceID_t>						m_serviceIdManager;
 	std::vector<std::pair<std::string, std::string>>	m_requestedServices; //! first = name, second = type
 	std::list<ot::port_t>								m_debugPorts;
-
-	Session() = delete;
-	Session(Session &) = delete;
-	Session & operator = (Session &) = delete;
-
 };

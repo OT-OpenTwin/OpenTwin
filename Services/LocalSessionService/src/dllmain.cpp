@@ -4,7 +4,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // SessionService header
-#include "globalDatatypes.h"
 #include "SessionService.h"
 #include "GlobalSessionService.h"
 
@@ -88,8 +87,6 @@ extern "C"
 			std::string ip = ownUrl.substr(0, colonIndex);
 			std::string port = ownUrl.substr(colonIndex + 1);
 			
-#ifdef OT_USE_GSS
-
 			// Register at GSS
 			ot::JsonDocument gssDoc;
 			gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
@@ -157,17 +154,6 @@ extern "C"
 			if (!gdsURL.empty()) {
 				lss.setGlobalDirectoryServiceURL(gdsURL);
 			}
-#else
-			// Create session service and add data to session service
-			SessionService * sessionService = SessionService::instance();
-			sessionService->setDataBaseIP(_globalSessionServiceURL);
-			sessionService->setURL(_ownIP);
-#endif
-
-#ifndef OT_USE_GSS
-			std::string authorizationServiceIP = sessionService->globalServiceIP() + ":" + _authPort;
-			sessionService->setAuthorisationServiceIP(authorizationServiceIP);
-#endif // !OT_USE_GSS
 
 			initDone = true;
 			OT_LOG_D("Initialization finished");

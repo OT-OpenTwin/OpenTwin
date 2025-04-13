@@ -48,10 +48,8 @@ public:
 	//! @brief Will return the IP address of the websocket
 	std::string websocketIP(void) const { return m_websocketIP; }
 
-	virtual std::string toJSON(void) const override;
-
 	//! @brief Will return the port numbers of this service
-	virtual std::list<unsigned long long> portNumbers(void) const override;
+	virtual std::list<unsigned long long> getPortNumbers(void) const override;
 
 private:
 

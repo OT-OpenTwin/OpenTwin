@@ -1,41 +1,15 @@
-/*
- * ExternalServicesComponent.h
- *
- *  Created on: September 21, 2020
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
+//! @file ExternalServicesComponent.h
+//! @authors Alexander Kuester, Peter Thoma
+//! @date September 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-// Wrapper header
-#include <uiServiceTypes.h>				// Model and View types
-
-// Viewer header
-#include "ViewerAPI.h"
+// Frontend header
 #include "QtMetaTypes.h"
+#include "uiServiceTypes.h"				// Model and View types
 
-// C++ header
-#include <iostream>
-#include <string>					// string
-#include <vector>					// vector<T>
-#include <list>						// list<T>
-#include <array>					// array
-#include <map>
-
-// AK header
-#include <akCore/aNotifier.h>
-
-// Qt header
-#include <qobject.h>				// QObject
-#include <qtimer.h>
-#include <qmetatype.h>
-#include <qmetaobject.h>				// QMetaObject
-
-// Model header
-#include <Geometry.h>
-
-// Rapid JSON
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
@@ -47,6 +21,29 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "ResultDataStorageAPI.h"
+
+// Model header
+#include "Geometry.h"
+
+// Viewer header
+#include "ViewerAPI.h"
+
+// uiCore header
+#include "akCore/aNotifier.h"
+
+// Qt header
+#include <QtCore/qtimer.h>
+#include <QtCore/qobject.h>
+#include <QtCore/qmetatype.h>
+#include <QtCore/qmetaobject.h>
+
+// std header
+#include <map>
+#include <list>						// list<T>
+#include <array>					// array
+#include <string>					// string
+#include <vector>					// vector<T>
+#include <iostream>
 
 class AppBase;
 class LockManager;

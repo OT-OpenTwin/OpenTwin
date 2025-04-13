@@ -112,7 +112,7 @@ void GlobalSessionService::healthCheck(void) {
 
 			ot::JsonArray sessionList;
 			for (auto s : lss.sessions()) {
-				sessionList.PushBack(ot::JsonString(s->id(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+				sessionList.PushBack(ot::JsonString(s->getId(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 			}
 			doc.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionList, doc.GetAllocator());
 

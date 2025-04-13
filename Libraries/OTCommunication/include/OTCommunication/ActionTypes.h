@@ -46,7 +46,6 @@
 #define OT_ACTION_CMD_GetSystemInformation "System.GetInformation"
 
 #define OT_ACTION_CMD_GetSessionExists "Session.GetExists"
-#define OT_ACTION_CMD_GetSessionServices "Session.GetServices"
 #define OT_ACTION_CMD_ShutdownSession "Session.Shutdown"
 #define OT_ACTION_CMD_ShutdownSessionCompleted "Session.ShutdownCompleted"
 #define OT_ACTION_CMD_ServiceFailure "Session.ServiceFailure"
@@ -329,12 +328,14 @@
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"
+#define OT_ACTION_PARAM_Visible "Visible"
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
+#define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
