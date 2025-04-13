@@ -14,7 +14,7 @@ public:
 	GlobalSessionService(const std::string& _url);
 	virtual ~GlobalSessionService();
 
-	bool confirmSession(const std::string& _sessionId);
+	bool confirmSession(const std::string& _sessionId, const std::string& _userName);
 
 	void startHealthCheck(void);
 

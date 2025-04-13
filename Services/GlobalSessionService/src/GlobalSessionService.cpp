@@ -46,7 +46,7 @@ GlobalSessionService& GlobalSessionService::instance(void) {
 
 // Service handling
 
-bool GlobalSessionService::addSessionService(LocalSessionService&& _service) {
+bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId) {
 	// Check URL duplicate
 	for (auto& it : m_lssMap) {
 		if (it.second.getUrl() == _service.getUrl()) {
@@ -56,8 +56,8 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service) {
 	}
 
 	// Create copy and assign uid
-	ot::serviceID_t newID = m_lssIdManager.grabNextID();
-	_service.setId(newID);
+	_newId = m_lssIdManager.grabNextID();
+	_service.setId(_newId);
 
 	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(_service.getId()) + ", \"URL\": \"" + _service.getUrl() + "\" }");
 
@@ -66,7 +66,7 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service) {
 		m_sessionMap.insert_or_assign(session, _service.getId());
 		OT_LOG_D("Adding already running session: \"" + session + "\"");
 	}
-	m_lssMap.insert_or_assign(newID, std::move(_service));
+	m_lssMap.insert_or_assign(_newId, std::move(_service));
 
 	// Check if the health check is aready running, otherwise start it
 	if (!m_workerRunning) {
@@ -165,13 +165,57 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 
 std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
 	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
+	std::string userName = ot::json::getString(_doc, OT_ACTION_PARAM_USER_NAME);
+	ot::serviceID_t lssId = ot::json::getUInt(_doc, OT_ACTION_PARAM_SERVICE_ID);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	LocalSessionService& lss = this->getLssFromSessionId(sessionID);
-	lss.confirmSession(sessionID);
+	auto id = m_sessionMap.find(sessionID);
+	auto lss = m_lssMap.end();
 
-	ot::ReturnMessage response(ot::ReturnMessage::Ok);
+	ot::ReturnMessage response(ot::ReturnMessage::Failed);
+	OT_LOG_D("Confirming session... { \"Session\": \"" + sessionID + "\", \"User\": \"" + userName + "\", \"LSS\": " + std::to_string(lssId) + " }");
+
+	// Ensure session is registered
+	if (id == m_sessionMap.end()) {
+		response = "Session was not registered before.";
+		OT_LOG_E(response.getWhat());
+	}
+
+	// Ensure registered LSS is the same as the one in the request
+	else if (id->second != lssId) {
+		response = "Session registered at different LSS.";
+		OT_LOG_E(response.getWhat() + " Registered at (" + std::to_string(id->second) + "), confirmation requested by (" + std::to_string(lssId) + ").");
+	}
+
+	// Ensure LSS is stored
+	else if ((lss = m_lssMap.find(lssId)) == m_lssMap.end()) {
+		response = "[FATAL] LSS data mismatch.";
+		OT_LOG_E(response.getWhat());
+	}
+
+	// Ensure session is in the LSS
+	else if (!lss->second.hasSession(sessionID)) {
+		// It appears that the LSS was restarted and the session was lost or something strange happened..
+		response = "Session not found in LSS.";
+		OT_LOG_E(response.getWhat());
+	}
+
+	// Ensure user is the same
+	else if (lss->second.getSessionUser(sessionID) != userName) {
+		response = "Session user mismatch.";
+		OT_LOG_E(response.getWhat() + " Registered for \"" + lss->second.getSessionUser(sessionID) + "\", confirmation requested by \"" + userName + "\".");
+	}
+
+	// Confirm session
+	else if (!lss->second.confirmSession(sessionID)) {
+		response = "Session confirmation failed.";
+		OT_LOG_E(response.getWhat());
+	}
+	else {
+		response = ot::ReturnMessage::Ok;
+	}
+
 	return response.toJson();
 }
 
@@ -404,15 +448,15 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	ot::JsonDocument reply;
-	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, nService.getId(), reply.GetAllocator());
-
 	// Add to GSS
-	if (!this->addSessionService(std::move(nService))) { 
+	ot::serviceID_t newId = ot::invalidServiceID;
+	if (!this->addSessionService(std::move(nService), newId)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information";
 	}
 
-	// Finish creating reply message
+	// Create reply
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, newId, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, reply.GetAllocator()), reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
 	if (!m_globalDirectoryUrl.empty()) {

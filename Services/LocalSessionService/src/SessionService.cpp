@@ -610,7 +610,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
 
 	// Notify GSS that the session request was received (confirm session)
-	if (!m_globalSessionService->confirmSession(sessionID)) {
+	if (!m_globalSessionService->confirmSession(sessionID, userName)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to confirm session at GSS";
 	}
 

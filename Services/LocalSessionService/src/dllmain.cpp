@@ -127,7 +127,7 @@ extern "C"
 			ot::JsonDocument gssResponseDoc;
 			gssResponseDoc.fromJson(gssResponse);
 
-			ot::serviceID_t ssID = ot::json::getUInt(gssResponseDoc, OT_ACTION_PARAM_SERVICE_ID);
+			ot::serviceID_t lssID = ot::json::getUInt(gssResponseDoc, OT_ACTION_PARAM_SERVICE_ID);
 			std::string databaseURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_DATABASE_URL);
 			std::string authURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL);
 			std::string gdsURL;
@@ -145,7 +145,7 @@ extern "C"
 			lss.setDataBaseURL(databaseURL);
 			lss.setIp(ip);
 			lss.setPort(port);
-			lss.setId(ssID);
+			lss.setId(lssID);
 			lss.setAuthorisationServiceURL(authURL);
 			lss.updateLogMode(logManager);
 

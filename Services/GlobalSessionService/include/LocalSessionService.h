@@ -44,7 +44,7 @@ public:
 	//! @brief Confirm the session with the given id.
 	//! It will be assumed that the session is in the initialize list.
 	//! The confirmed session will be moved to the active session list.
-	void confirmSession(const std::string& _sessionId);
+	bool confirmSession(const std::string& _sessionId);
 
 	//const std::list<Session>& getSessions(void) const { return m_sessions; };
 	size_t getSessionCount(void) const { return m_sessions.size(); };

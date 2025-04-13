@@ -23,12 +23,14 @@ GlobalSessionService::~GlobalSessionService() {
 
 }
 
-bool GlobalSessionService::confirmSession(const std::string& _sessionId) {
+bool GlobalSessionService::confirmSession(const std::string& _sessionId, const std::string& _userName) {
+	SessionService& lss = SessionService::instance();
+
 	ot::JsonDocument confirmDoc;
 	confirmDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ConfirmSession, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionId, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
-
-	SessionService& lss = SessionService::instance();
+	confirmDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(_userName, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, lss.id(), confirmDoc.GetAllocator());
 
 	// Send ping
 	std::string responseStr;

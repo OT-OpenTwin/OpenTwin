@@ -86,17 +86,18 @@ std::list<Session> LocalSessionService::checkTimedOutIniSessions(int _timeout) {
 	return timedOut;
 }
 
-void LocalSessionService::confirmSession(const std::string& _sessionId) {
+bool LocalSessionService::confirmSession(const std::string& _sessionId) {
 	for (auto it = m_iniSessions.begin(); it != m_iniSessions.end(); it++) {
 		if (it->second.getId() == _sessionId) {
 			OT_LOG_D("Session confirmed. Id: \"" + _sessionId + "\"");
 			m_sessions.push_back(std::move(it->second));
 			m_iniSessions.erase(it);
-			return;
+			return true;
 		}
 	}
 
 	OT_LOG_EAS("Session not found in initialize list. Session id: \"" + _sessionId + "\"");
+	return false;
 }
 
 void LocalSessionService::closeSession(const std::string& _sessionId) {
@@ -122,13 +123,19 @@ bool LocalSessionService::hasSession(const std::string& _sessionId) const {
 		}
 	}
 
+	for (const IniSessionType& session : m_iniSessions) {
+		if (session.second.getId() == _sessionId) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
 std::string LocalSessionService::getSessionUser(const std::string& _sessionId) const {
 	auto session = this->getSession(_sessionId);
 	if (session) {
-		return session->getId();
+		return session->getUserName();
 	}
 	else {
 		OT_LOG_E("Session not found. Session Id: \"" + _sessionId + "\"");
