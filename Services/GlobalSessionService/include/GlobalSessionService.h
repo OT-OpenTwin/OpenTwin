@@ -32,7 +32,7 @@ class GlobalSessionService : public ot::ServiceBase {
 public:
 	static GlobalSessionService& instance(void);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Service handling
 
@@ -56,13 +56,14 @@ public:
 
 private:
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action handler
 
 	OT_HANDLER(handleGetDBUrl, GlobalSessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetGlobalServicesURL, GlobalSessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCreateSession, GlobalSessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleConfirmSession, GlobalSessionService, OT_ACTION_CMD_ConfirmSession, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCheckProjectOpen, GlobalSessionService, OT_ACTION_CMD_IsProjectOpen, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetProjectTemplatesList, GlobalSessionService, OT_ACTION_CMD_GetListOfProjectTemplates, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetBuildInformation, GlobalSessionService, OT_ACTION_CMD_GetBuildInformation, ot::ALL_MESSAGE_TYPES)
@@ -76,11 +77,12 @@ private:
 	OT_HANDLER(handleNewGlobalDirectoryService, GlobalSessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSetGlobalLogFlags, GlobalSessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private functions
-
-	void healthCheck(void);
+	// Private
+	
+	GlobalSessionService();
+	~GlobalSessionService();
 
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
 	void removeSessionService(LocalSessionService* _service);
@@ -89,26 +91,32 @@ private:
 
 	void getCustomProjectTemplates(ot::JsonDocument& _resultArray, const std::string& _user, const std::string& _password);
 
-	GlobalSessionService();
-	virtual ~GlobalSessionService();
-
 	// ###################################################################################################
 
-	void setHealthCheckRunning(bool _isRunning) { m_healthCheckRunning = _isRunning; };
+	// Installer
+
 	void readFileContent(const std::string& fileName, std::string& fileContent);
 	void loadFrontendInstallerFile(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Worker
+
+	void workerHealthCheck(void);
+	void workerSessionIni(void);
 
 	std::string m_url;
 	std::string m_databaseUrl;
 	std::string m_authorizationUrl;
 	std::string m_globalDirectoryUrl;
-	bool m_healthCheckRunning;
+	
+	std::atomic_bool m_workerRunning;
+	std::atomic_bool m_forceHealthCheck;
 
 	std::mutex									m_mutex;
 	std::map<std::string, LocalSessionService*>		m_sessionToServiceMap;
 	std::map<ot::serviceID_t, LocalSessionService*>	m_sessionServiceIdMap;
 	ot::IDManager<ot::serviceID_t>				m_sessionServiceIdManager;
-	bool										m_forceHealthCheck;
 	ot::SystemInformation						m_SystemLoadInformation;
 
 	ot::LogModeManager m_logModeManager;

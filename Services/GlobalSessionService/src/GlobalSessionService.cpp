@@ -16,6 +16,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "DataBase.h"
@@ -51,9 +52,7 @@ bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 	// Check URL duplicate
 	for (auto it : m_sessionServiceIdMap) {
 		if (it.second->getUrl() == _service.getUrl()) {
-			OT_LOG_W("Session with the url (" + _service.getUrl() + ") is already registered");
-			OTAssert(0, "Session url already registered");
-			_service.setId(it.second->getId());
+			OT_LOG_WAS("LSS with given url already registered. Url: \"" + _service.getUrl() + "\"");
 			return true;
 		}
 	}
@@ -64,20 +63,24 @@ bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 	_service.setId(newID);
 	newEntry->setId(newID);
 
-	OT_LOG_D("New session service registered @ " + newEntry->getUrl() + " with id=" + std::to_string(newEntry->getId()));
+	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(newEntry->getId()) + ", \"URL\": \"" + newEntry->getUrl() + "\" }");
 
 	// Register already opened sessions
-	for (auto session : newEntry->getSessions()) {
-		m_sessionToServiceMap.insert_or_assign(session->getId(), newEntry);
-		OT_LOG_D("Session service contains already running session with id=" + session->getId());
+	for (const std::string& session : newEntry->getSessionIds()) {
+		m_sessionToServiceMap.insert_or_assign(session, newEntry);
+		OT_LOG_D("Adding already running session: \"" + session + "\"");
 	}
 	m_sessionServiceIdMap.insert_or_assign(newID, newEntry);
 
 	// Check if the health check is aready running, otherwise start it
-	if (!m_healthCheckRunning) {
-		m_healthCheckRunning = true;
-		std::thread worker(&GlobalSessionService::healthCheck, this);
-		worker.detach();
+	if (!m_workerRunning) {
+		m_workerRunning = true;
+
+		std::thread healthWorker(&GlobalSessionService::workerHealthCheck, this);
+		healthWorker.detach();
+
+		std::thread iniWorker(&GlobalSessionService::workerSessionIni, this);
+		iniWorker.detach();
 	}
 
 	return true;
@@ -123,43 +126,53 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	// Check if the session already exists
 	auto it = m_sessionToServiceMap.find(newSession.getId());
 	if (it != m_sessionToServiceMap.end()) {
-		const Session* session = it->second->getSessionById(newSession.getId());
-		OTAssertNullptr(session);
+		// Session already open
 
-		// Check if the username differs
-		if (session->getUserName() != newSession.getUserName()) {
-			OT_LOG_WAS("Session opened by other user");
-			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session open by other user");
+		if (newSession.getUserName() == it->second->getSessionUser(newSession.getId())) {
+			// Session open by same user in a different instance
+			OT_LOG_WAS("Session already opened by same user. Session: \"" + newSession.getId() + "\"");
+			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session already open in another instance");
 			return response.toJson();
 		}
 		else {
-			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session already open in another frontend instance or from another device.");
+			// Session open by different user
+			OT_LOG_WAS("Session already opened by other user. Session: \"" + newSession.getId() + "\"");
+			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session open by other user");
 			return response.toJson();
 		}
 	}
 	else {
-		LocalSessionService* ss = determineLeastLoadedLSS();
-		if (ss) {
-			// Register set session as open for the specified LSS.
-			ss->addSession(newSession);
+		// New session
 
-			// This may be only problematic if the user/service requesting to create a new session will crash after receiving
-			// the response and won't continue with the create session request to the provided LSS.
-			m_sessionToServiceMap.insert_or_assign(newSession.getId(), ss);
-
-			OT_LOG_D("Session service @ " + ss->getUrl() + " with id=" + std::to_string(ss->getId()) + " provided for session with id=" + newSession.getId());
-			ot::ReturnMessage response(ot::ReturnMessage::Ok, ss->getUrl());
-			return response.toJson();
-		}
-		else {
+		// Determine LSS
+		LocalSessionService* lss = determineLeastLoadedLSS();
+		if (!lss) {
 			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Failed to determine least loaded LSS");
 			OT_LOG_EAS(response.getWhat());
 			return response.toJson();
 		}
+
+		// Store session for the given LSS
+		OT_LOG_D("LSS determined { \"URL\": \"" + lss->getUrl() + "\", \"ID\": " + std::to_string(lss->getId()) + ", \"Session\": \"" + newSession.getId() + "\" }");
+		m_sessionToServiceMap.insert_or_assign(newSession.getId(), lss);
+
+		// Add session to the LSS ini list
+		lss->addIniSession(std::move(newSession));
+
+		ot::ReturnMessage response(ot::ReturnMessage::Ok, lss->getUrl());
+		return response.toJson();
 	}
+}
+
+std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
+	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
+
+
+
+	ot::ReturnMessage response(ot::ReturnMessage::Ok);
+	return response.toJson();
 }
 
 std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc) {
@@ -167,18 +180,18 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	//todo: replace response by a document
 	auto it = m_sessionToServiceMap.find(projectName);
 	if (it == m_sessionToServiceMap.end()) {
+		// Session does not exist
 		return std::string();
 	}
 	else {
-		Session* session = it->second->getSessionById(projectName);
-		if (session) {
-			return session->getUserName();
+		try {
+			// Get user (may throw if not found...)
+			return it->second->getSessionUser(projectName);
 		}
-		else {
-			OT_LOG_E("Session \"" + projectName + "\" does not exist in the LSS at \"" + it->second->getUrl() + "\"");
+		catch (const std::exception& _e) {
+			OT_LOG_E(_e.what());
 			return std::string("<error while searching for user>");
 		}
 	}
@@ -355,63 +368,6 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 	return tmp;
 }
 
-void GlobalSessionService::loadFrontendInstallerFile()
-{
-	std::string installerPath;
-
-#ifdef OT_OS_WINDOWS
-	char path[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, path, MAX_PATH);
-	installerPath = path;
-#else
-	char result[PATH_MAX];
-	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-	installerPath = std::string(result, (count > 0) ? count : 0);
-#endif
-
-	installerPath = installerPath.substr(0, installerPath.rfind('\\'));
-	installerPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
-
-	if (!std::filesystem::exists(installerPath)) {
-		// Get the development root environment variable and build the path to the deployment cert file
-		char buffer[4096];
-		size_t environmentVariableValueStringLength;
-		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
-
-		std::string dev_root(buffer);
-		installerPath = dev_root + "\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
-	}
-
-	readFileContent(installerPath, m_frontendInstallerFileContent);
-}
-
-void GlobalSessionService::readFileContent(const std::string& fileName, std::string& fileContent)
-{
-	fileContent.clear();
-
-	// Read the file content
-	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
-	int data_length = (int)file.tellg();
-	file.seekg(0, std::ios::beg);
-
-	char* data = new char[data_length];
-	if (!file.read(data, data_length)) return;
-
-	// Convert the binary to an encoded string
-	int encoded_data_length = Base64encode_len(data_length);
-	char* base64_string = new char[encoded_data_length];
-
-	Base64encode(base64_string, data, data_length); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-	fileContent = std::string(base64_string);
-
-	delete[] base64_string;
-	base64_string = nullptr;
-
-	delete[] data;
-	data = nullptr;
-}
-
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
@@ -475,8 +431,10 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 
 	auto it = m_sessionToServiceMap.find(sessionID);
 	if (it != m_sessionToServiceMap.end()) {
-		LocalSessionService* ss = it->second;
-		ss->removeSession(ss->getSessionById(sessionID));
+		LocalSessionService* lss = it->second;
+		OTAssertNullptr(lss);
+		lss->closeSession(sessionID);
+
 		m_sessionToServiceMap.erase(sessionID);
 	}
 
@@ -486,7 +444,7 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 }
 
 std::string GlobalSessionService::handleForceHealthcheck(ot::JsonDocument& _doc) {
-	if (m_healthCheckRunning) {
+	if (m_workerRunning) {
 		m_forceHealthCheck = true;
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
@@ -575,68 +533,17 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 
 // ###################################################################################################
 
-// Private functions
+// Private
 
-void GlobalSessionService::healthCheck(void) {
-	const static int limit{ 60 }; // 1 min
-	int counter{ 0 };
+GlobalSessionService::GlobalSessionService() :
+	ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
+	m_workerRunning(false), m_forceHealthCheck(false)
+{
+	m_SystemLoadInformation.initialize();
+}
 
-	ot::JsonDocument pingDoc;
-	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-	std::string pingMessage = pingDoc.toJson();
+GlobalSessionService::~GlobalSessionService() {
 
-	while (m_healthCheckRunning) {
-		counter = 0;
-		while (counter++ < limit && m_healthCheckRunning && !m_forceHealthCheck)
-		{
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1s);
-		}
-		m_forceHealthCheck = false;
-		if (m_healthCheckRunning) {
-			std::lock_guard<std::mutex> lock(m_mutex);
-
-			bool running{ true };
-			// Use running in case of a disconnected service
-			while (running) {
-				running = false;
-				for (auto it : m_sessionServiceIdMap) {
-					
-					OT_LOG_D("Performing health check for LSS (url = " + it.second->getUrl() + ")");
-
-					try {
-						std::string response;
-						// Try to ping
-						if (!ot::msg::send(m_url, it.second->getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second->getUrl() + ")");
-							removeSessionService(it.second);
-							running = true;
-							break;
-						}
-						// Check ping response
-						if (response != OT_ACTION_CMD_Ping) {
-							OT_LOG_W("Invalid ping response from LSS (url = " + it.second->getUrl() + ")");
-							removeSessionService(it.second);
-							running = true;
-							break;
-						}
-					}
-					catch (const std::exception& e) {
-						OT_LOG_E("Health check for LSS (url = " + it.second->getUrl() + ") failed: " + e.what());
-						removeSessionService(it.second);
-						running = true;
-						break;
-					}
-					catch (...) {
-						OT_LOG_E("[FATAL] Health check for LSS (url = " + it.second->getUrl() + ") failed: Unknown error");
-						removeSessionService(it.second);
-						running = true;
-						break;
-					}
-				}
-			}
-		}
-	}
 }
 
 void GlobalSessionService::removeSessionService(LocalSessionService * _service) {
@@ -772,13 +679,156 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 	}
 }
 
-GlobalSessionService::GlobalSessionService() :
-	ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
-	m_healthCheckRunning(false), m_forceHealthCheck(false)
-{
-	m_SystemLoadInformation.initialize();
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Installer
+
+void GlobalSessionService::readFileContent(const std::string& fileName, std::string& fileContent) {
+	fileContent.clear();
+
+	// Read the file content
+	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
+	int data_length = (int)file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	char* data = new char[data_length];
+	if (!file.read(data, data_length)) return;
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(data_length);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, data, data_length); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	fileContent = std::string(base64_string);
+
+	delete[] base64_string;
+	base64_string = nullptr;
+
+	delete[] data;
+	data = nullptr;
 }
 
-GlobalSessionService::~GlobalSessionService() {
+void GlobalSessionService::loadFrontendInstallerFile() {
+	std::string installerPath;
 
+#ifdef OT_OS_WINDOWS
+	char path[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+	installerPath = path;
+#else
+	char result[PATH_MAX];
+	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+	installerPath = std::string(result, (count > 0) ? count : 0);
+#endif
+
+	installerPath = installerPath.substr(0, installerPath.rfind('\\'));
+	installerPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+
+	if (!std::filesystem::exists(installerPath)) {
+		// Get the development root environment variable and build the path to the deployment cert file
+		char buffer[4096];
+		size_t environmentVariableValueStringLength;
+		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
+
+		std::string dev_root(buffer);
+		installerPath = dev_root + "\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
+	}
+
+	readFileContent(installerPath, m_frontendInstallerFileContent);
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Worker
+
+void GlobalSessionService::workerHealthCheck(void) {
+	const static int limit{ 60 }; // 1 min
+	int counter{ 0 };
+
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string pingMessage = pingDoc.toJson();
+
+	while (m_workerRunning) {
+		counter = 0;
+		while (counter++ < limit && m_workerRunning && !m_forceHealthCheck) {
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(1s);
+		}
+		m_forceHealthCheck = false;
+		if (m_workerRunning) {
+			std::lock_guard<std::mutex> lock(m_mutex);
+
+			bool running{ true };
+			// Use running in case of a disconnected service
+			while (running) {
+				running = false;
+				for (auto it : m_sessionServiceIdMap) {
+
+					OT_LOG_D("Performing health check for LSS (url = " + it.second->getUrl() + ")");
+
+					try {
+						std::string response;
+						// Try to ping
+						if (!ot::msg::send(m_url, it.second->getUrl(), ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+							OT_LOG_W("Ping could not be delivered to LSS (url = " + it.second->getUrl() + ")");
+							removeSessionService(it.second);
+							running = true;
+							break;
+						}
+						// Check ping response
+						if (response != OT_ACTION_CMD_Ping) {
+							OT_LOG_W("Invalid ping response from LSS (url = " + it.second->getUrl() + ")");
+							removeSessionService(it.second);
+							running = true;
+							break;
+						}
+					}
+					catch (const std::exception& e) {
+						OT_LOG_E("Health check for LSS (url = " + it.second->getUrl() + ") failed: " + e.what());
+						removeSessionService(it.second);
+						running = true;
+						break;
+					}
+					catch (...) {
+						OT_LOG_E("[FATAL] Health check for LSS (url = " + it.second->getUrl() + ") failed: Unknown error");
+						removeSessionService(it.second);
+						running = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+void GlobalSessionService::workerSessionIni(void) {
+	while (m_workerRunning) {
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			
+			std::list<Session> timedOut;
+
+			std::list<LocalSessionService*> lssList = ot::ContainerHelper::listFromMapValues(m_sessionToServiceMap);
+			lssList.unique();
+
+			// Check all sessions
+			for (LocalSessionService* lss : lssList) {
+				timedOut.splice(timedOut.end(), lss->checkTimedOutIniSessions(5 * ot::msg::defaultTimeout));
+			}
+
+			// Remove all sessions that timed out
+			for (Session& session : timedOut) {
+				OT_LOG_E("Session timed out while wating for LSS confirmation. Session: \"" + session.getId() + "\"");
+
+
+			}
+
+
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+}
+

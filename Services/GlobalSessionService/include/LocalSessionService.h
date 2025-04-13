@@ -32,15 +32,32 @@ public:
 	void setUrl(const std::string& _url) { m_url = _url; };
 	const std::string& getUrl(void) const { return m_url; };
 
-	const std::list<Session*>& getSessions(void) const { return m_sessions; };
-
 	void setId(ot::serviceID_t _id) { m_id = _id; };
 	ot::serviceID_t getId(void) const { return m_id; };
 
-	void addSession(const Session& _session);
-	void removeSession(Session * _session);
+	void addIniSession(Session&& _session);
+	
+	std::list<Session> checkTimedOutIniSessions(int _timeout);
+
+	//! @brief Confirm the session with the given id.
+	//! It will be assumed that the session is in the initialize list.
+	//! The confirmed session will be moved to the active session list.
+	void confirmSession(const std::string& _sessionId);
+
+	//const std::list<Session>& getSessions(void) const { return m_sessions; };
 	size_t getSessionCount(void) const { return m_sessions.size(); };
-	Session* getSessionById(const std::string& _sessionId);
+
+	//! @brief Removes the session from the memory.
+	//! The session will be searched in all containers.
+	void closeSession(const std::string& _sessionId);
+
+	bool hasSession(const std::string& _sessionId) const;
+
+	//! @brief Returns the user of the specified session.
+	//! Will throw an exception if the session does not exist.
+	std::string getSessionUser(const std::string& _sessionId) const;
+
+	std::list<std::string> getSessionIds(void) const;
 
 	// ###################################################################
 
@@ -58,9 +75,21 @@ public:
 
 	void clear();
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private
+
 private:
+	//! @brief Returns a pointer to the session with the specified id.
+	Session* getSession(const std::string& _sessionId);
+
+	//! @brief Returns a pointer to the session with the specified id.
+	const Session* getSession(const std::string& _sessionId) const;
+
+
 	std::string m_url;
-	std::list<Session*> m_sessions;
-	std::list<std::pair<std::chrono::steady_clock::time_point, Session*>> m_iniSessions;
+	std::list<Session> m_sessions;
+	typedef std::pair<std::chrono::steady_clock::time_point, Session> IniSessionType;
+	std::list<IniSessionType> m_iniSessions;
 	ot::serviceID_t m_id;
 };
