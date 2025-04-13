@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AppExitCodes.cpp" />
     <ClCompile Include="src\DateTime.cpp" />
     <ClCompile Include="src\SystemProcess.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="src\UrlEncoding.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTSystem\AppExitCodes.h" />
     <ClInclude Include="include\OTSystem\DateTime.h" />
     <ClInclude Include="include\OTSystem\SystemProcess.h" />
     <ClInclude Include="include\OTSystem\ArchitectureInfo.h" />

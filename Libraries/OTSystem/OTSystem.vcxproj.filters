@@ -39,6 +39,9 @@
     <ClCompile Include="src\DateTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AppExitCodes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTSystem\SystemProcess.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTSystem\DateTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTSystem\AppExitCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
