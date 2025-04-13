@@ -30,11 +30,11 @@ bool GlobalSessionService::confirmSession(const std::string& _sessionId, const s
 	confirmDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ConfirmSession, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionId, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(_userName, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
-	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, lss.id(), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, lss.getId(), confirmDoc.GetAllocator());
 
 	// Send ping
 	std::string responseStr;
-	if (!ot::msg::send(lss.url(), m_serviceURL, ot::EXECUTE, confirmDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, confirmDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Global session service can not be reached");
 		return false;
 	}
@@ -94,7 +94,7 @@ void GlobalSessionService::healthCheck(void) {
 		SessionService& lss = SessionService::instance();
 
 		// Send ping
-		if (!ot::msg::send(lss.url(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_W("Global session service can not be reached");
 			m_connectionStatus = ConnectionFailed;
 		}
@@ -108,7 +108,7 @@ void GlobalSessionService::healthCheck(void) {
 			// Register again at the session service
 			ot::JsonDocument registerDoc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lss.url(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lss.getUrl(), doc.GetAllocator()), doc.GetAllocator());
 
 			ot::JsonArray sessionList;
 			for (auto s : lss.sessions()) {
@@ -118,7 +118,7 @@ void GlobalSessionService::healthCheck(void) {
 
 			response.clear();
 			// Send registration
-			if (!ot::msg::send(lss.url(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 				OT_LOG_E("Failed to send register message to global session service");
 			}
 			else OT_ACTION_IF_RESPONSE_ERROR(response) {

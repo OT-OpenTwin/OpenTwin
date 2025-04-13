@@ -43,41 +43,28 @@ public:
 	// Setter / Getter
 
 	void setIp(const std::string& _ip) { m_ip = _ip; };
-	const std::string& ip(void) const { return m_ip; };
+	const std::string& getIp(void) const { return m_ip; };
 
 	void setPort(const std::string& _port);
-	const std::string& port(void) const { return m_port; };
+	const std::string& getPort(void) const { return m_port; };
 
 	void setId(ot::serviceID_t _id) { m_id = _id; };
-	ot::serviceID_t id(void) const { return m_id; };
+	ot::serviceID_t getId(void) const { return m_id; };
 
-	std::string url(void) const { return m_ip + ":" + m_port; };
+	std::string getUrl(void) const { return m_ip + ":" + m_port; };
 
-	//! @brief Will set the database IP
-	//! @param _ip The IP to set
 	void setDataBaseURL(const std::string& _url) { m_dataBaseURL = _url; }
+	const std::string& getDataBaseURL(void) const { return m_dataBaseURL; }
 
-	//! @brief Will return the database IP
-	const std::string& dataBaseURL(void) const { return m_dataBaseURL; }
-
-	//! @brief Will set the site ID
-	//! @param _ID The ID to set
 	void setSiteID(std::string _ID) { m_siteID = _ID; }
+	const std::string& getSiteID(void) const { return m_siteID; }
 
-	//! @brief Will return the session service site ID
-	const std::string& siteID(void) const { return m_siteID; }
-
-	//! @brief Will set the authorisation service IP
-	//! @param _ip The IP to set
 	void setAuthorisationServiceURL(const std::string& _url) { m_serviceAuthorisationURL = _url; }
-
-	//! @brief Will return the session service service directory IP
-	const std::string& serviceAuthorisationURL(void) const { return m_serviceAuthorisationURL; }
+	const std::string& getServiceAuthorisationURL(void) const { return m_serviceAuthorisationURL; }
 
 	void setGlobalDirectoryServiceURL(const std::string& _url);
 
-	//! @brief Will return true if the provided service is in debug mode
-	bool isServiceInDebugMode(const std::string& _serviceName);
+	bool getIsServiceInDebugMode(const std::string& _serviceName);
 
 	// ######################################################################################
 
@@ -95,13 +82,7 @@ public:
 	//! @param _collectionName The name of the collection used in this session
 	//! @param _sessionType The type of the session
 	//! @param _runMandatoryServices If true, all mandatory services for the specified session type will be started
-	Session * createSession(
-		const std::string &						_sessionID,
-		const std::string &						_userName,
-		const std::string &						_projectName,
-		const std::string &						_collectionName,
-		const std::string &						_sessionType
-	);
+	Session* createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType);
 
 	//! @brief Returns the session with the specified id
 	//! @param _sessionID The ID of the session to get
@@ -111,22 +92,14 @@ public:
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
 	//! @param _sessionID The ID of the session
-	bool runMandatoryServices(
-		const std::string &						_sessionID
-	);
+	bool runMandatoryServices(const std::string& _sessionID);
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
 	//! @return false if a debug or release service could not be handled
-	bool runMandatoryServices(
-		Session *								_session
-	);
+	bool runMandatoryServices(Session* _session);
 
 	//! @brief Will close the service and deregister it from its session
-	void serviceClosing(
-		Service *								_service,
-		bool									_notifyOthers,
-		bool									_autoCloseSessionIfMandatory = true
-	);
+	void serviceClosing(Service* _service, bool _notifyOthers, bool _autoCloseSessionIfMandatory = true);
 
 	//! @brief Will remove the session and close its logger.
 	//! Will NOT perform the session shutdown().
@@ -145,7 +118,7 @@ public:
 	
 	bool runRelayService(Session * _session, std::string& _websocketURL, std::string& _serviceURL);
 
-	void setGlobalSessionService(GlobalSessionService * _gss) { m_globalSessionService = _gss; }
+	void setGlobalSessionService(GlobalSessionService * _gss) { m_gss = _gss; }
 
 	Service * getServiceFromURL(const std::string& _url);
 
@@ -190,9 +163,9 @@ private:
 
 	void workerShutdownSession(ot::serviceID_t _serviceId, Session* _session);
 
-	std::string									m_dataBaseURL;						//! The database IP address
-	std::string									m_siteID;							//! The site ID
-	std::string									m_serviceAuthorisationURL;			//! The authorization service IP address
+	std::string									m_dataBaseURL;						//! @brief Database IP address
+	std::string									m_siteID;							//! @brief Site ID
+	std::string									m_serviceAuthorisationURL;			//! @brief Authorization service IP address
 
 	std::string									m_ip;
 	std::string									m_port;
@@ -202,12 +175,11 @@ private:
 	//NOTE, debug only this variable contains the IP address that is used for the services 
 	
 	std::map<std::string, bool>					m_serviceDebugList;
-	std::map<std::string,
-		std::vector<ot::ServiceBase> *>			m_mandatoryServicesMap;				//! Map containing all names of mandatory services for each session type
-	std::map<std::string, Session *>			m_sessionMap;						//! Map containing all sessions	
+	std::map<std::string, std::vector<ot::ServiceBase> *> m_mandatoryServicesMap;	//! @brief Map containing all names of mandatory services for each session type
+	std::map<std::string, Session *>			m_sessionMap;						//! @brief Map containing all sessions	
 
-	GlobalSessionService *						m_globalSessionService;
-	GlobalDirectoryService *					m_globalDirectoryService;
+	GlobalSessionService *						m_gss;
+	GlobalDirectoryService *					m_gds;
 
 	std::list<std::string> m_sessionShutdownQueue;
 

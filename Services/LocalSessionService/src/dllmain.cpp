@@ -201,7 +201,7 @@ extern "C"
 
 	_declspec(dllexport) const char *getServiceURL(void) {
 		assert(initDone);	// Init function not called
-		std::string serviceURL = SessionService::instance().url();
+		std::string serviceURL = SessionService::instance().getUrl();
 
 		char * retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());

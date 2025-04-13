@@ -31,9 +31,9 @@
 #include <algorithm>
 
 SessionService::SessionService() 
-	: m_globalSessionService(nullptr), m_globalDirectoryService(nullptr), m_id(ot::invalidServiceID)
+	: m_gss(nullptr), m_gds(nullptr), m_id(ot::invalidServiceID)
 {
-	m_globalDirectoryService = new GlobalDirectoryService(this);
+	m_gds = new GlobalDirectoryService(this);
 
 	//
 	// Development services list (this contains all services together (potentially even including experimental ones) for testing purposes)
@@ -117,7 +117,7 @@ SessionService::SessionService()
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, CircuitSimulationSessionServices);
 }
 
-bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {
+bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
 	return (m_serviceDebugList.count(_serviceName) > 0);
 }
 
@@ -139,7 +139,7 @@ void SessionService::setPort(const std::string& _port) {
 }
 
 void SessionService::setGlobalDirectoryServiceURL(const std::string& _url) {
-	m_globalDirectoryService->connect(_url);
+	m_gds->connect(_url);
 }
 
 // ######################################################################################
@@ -211,7 +211,7 @@ bool SessionService::runMandatoryServices(
 	std::list<ot::ServiceBase> releaseServices;
 
 	for (auto s : *it->second) {
-		if (isServiceInDebugMode(s.getServiceName())) {
+		if (getIsServiceInDebugMode(s.getServiceName())) {
 			debugServices.push_back(s);
 		}
 		else {
@@ -235,7 +235,7 @@ bool SessionService::runMandatoryServices(
 		}
 
 		OT_LOG_D("Starting services via DirectoryService (Service.Count = \"" + std::to_string(releaseServices.size()) + "\")");
-		if (!m_globalDirectoryService->requestToStartServices(releaseServices, _session->id())) {
+		if (!m_gds->requestToStartServices(releaseServices, _session->id())) {
 			assert(0);
 			// todo: clean up requested services
 			return false;
@@ -274,11 +274,11 @@ void SessionService::serviceClosing(
 		gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 		
 		std::string response;
-		if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+		if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_gss->getServiceURL() + "\"");
 		}
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+			OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 		}
 
 #endif // OT_USE_GSS
@@ -329,12 +329,12 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 	ot::port_t portNumber = ot::PortManager::instance().determineAndBlockAvailablePort();
 	_serviceURL.append(":").append(std::to_string(portNumber));
 
-	std::list<std::string> arguments = { "1", _serviceURL, url(),  _session->id() };
+	std::list<std::string> arguments = { "1", _serviceURL, this->getUrl(),  _session->id() };
 
 	ot::JsonDocument statupParams;
 	statupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(url(), statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(this->getUrl(), statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), statupParams.GetAllocator()), statupParams.GetAllocator());
 
@@ -351,7 +351,7 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 }
 
 bool SessionService::runRelayService(Session * _session, std::string & _websocketURL, std::string& _serviceURL) {
-	if (isServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
+	if (getIsServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" in debug mode");
 		char * buffer = nullptr;
 		size_t bufferSize = 0;
@@ -377,7 +377,7 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 		startupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", startupParams.GetAllocator()), startupParams.GetAllocator());
 		startupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, startupParams.GetAllocator()), startupParams.GetAllocator());
 		startupParams.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(_websocketURL, startupParams.GetAllocator()), startupParams.GetAllocator());
-		startupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(url(), startupParams.GetAllocator()), startupParams.GetAllocator());
+		startupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(getUrl(), startupParams.GetAllocator()), startupParams.GetAllocator());
 		startupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", startupParams.GetAllocator()), startupParams.GetAllocator());
 
 		std::ofstream stream(path);
@@ -391,7 +391,7 @@ bool SessionService::runRelayService(Session * _session, std::string & _websocke
 	{
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
 		_serviceURL = "";
-		if (!m_globalDirectoryService->requestToStartRelayService(_session->id(), _websocketURL, _serviceURL)) {
+		if (!m_gds->requestToStartRelayService(_session->id(), _websocketURL, _serviceURL)) {
 			return false;
 		}
 	}
@@ -418,7 +418,7 @@ std::string SessionService::handleGetDBURL(ot::JsonDocument& _commandDoc) {
 }
 
 std::string SessionService::handleGetAuthURL(ot::JsonDocument& _commandDoc) {
-	return serviceAuthorisationURL();
+	return getServiceAuthorisationURL();
 }
 
 std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc) {
@@ -432,8 +432,8 @@ std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _comman
 #endif // OT_USE_GSS
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_dataBaseURL, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(serviceAuthorisationURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryService->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(getServiceAuthorisationURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_gds->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	return doc.toJson();
 }
@@ -579,7 +579,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Example: {...; 'Session.ID':'The new sessions ID'; 'User.Name':'New user name'; 'Project.Name': 'The projects name'; 'Collection.Name':'The collections name'; 'Session.Type':'The session type'}
 
-	if (!m_globalDirectoryService->isConnected()) {
+	if (!m_gds->isConnected()) {
 		return OT_ACTION_RETURN_INDICATOR_Error "No global directory service connected";
 	}
 
@@ -610,7 +610,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
 
 	// Notify GSS that the session request was received (confirm session)
-	if (!m_globalSessionService->confirmSession(sessionID, userName)) {
+	if (!m_gss->confirmSession(sessionID, userName)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to confirm session at GSS";
 	}
 
@@ -823,11 +823,11 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 #endif // OT_USE_GSS
 
@@ -1004,7 +1004,7 @@ std::string SessionService::handleAddMandatoryService(ot::JsonDocument& _command
 
 std::string SessionService::handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc) {
 	std::string serviceURL(ot::json::getString(_commandDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
-	m_globalDirectoryService->connect(serviceURL);
+	m_gds->connect(serviceURL);
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -1042,11 +1042,11 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(actualSession->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 #endif // OT_USE_GSS
 
@@ -1086,7 +1086,7 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 		theService->setReceiveBroadcastMessages(false);
 	}
 	// Notify GDS
-	m_globalDirectoryService->notifySessionClosed(_session->id());
+	m_gds->notifySessionClosed(_session->id());
 
 #ifdef OT_USE_GSS
 	// Notify GSS
@@ -1095,11 +1095,11 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* 
 	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_globalSessionService->getServiceURL() + "\"");
+		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
 	}
 
 #endif

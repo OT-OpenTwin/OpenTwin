@@ -43,11 +43,11 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInformation.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(m_sessionService->getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -72,7 +72,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewServices, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
 	for (auto s : _serviceInformation) {
@@ -85,7 +85,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(m_sessionService->getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -110,11 +110,11 @@ bool GlobalDirectoryService::requestToStartRelayService(const std::string& _sess
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	// Send request
 	std::string response;
-	if (!ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(m_sessionService->getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		return false;
 	}
 	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos) {
@@ -146,10 +146,10 @@ void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) 
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(SessionService::instance().url(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(SessionService::instance().getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send session shutdown notification to GDS at " + m_serviceURL);
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -171,7 +171,7 @@ void GlobalDirectoryService::healthCheck(void) {
 		std::string response;
 		// todo: scr: code rm line !current 1
 		OT_LOG_D("!!!! ######################################################################################");
-		if (ot::msg::send(m_sessionService->url(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		if (ot::msg::send(m_sessionService->getUrl(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				if (m_connectionStatus == CheckingNewConnection) {
 					m_connectionStatus = Connected;
