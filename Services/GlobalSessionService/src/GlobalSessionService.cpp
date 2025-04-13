@@ -168,6 +168,8 @@ std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	LocalSessionService& lss = this->getLssFromSessionId(sessionID);
+	lss.confirmSession(sessionID);
 
 	ot::ReturnMessage response(ot::ReturnMessage::Ok);
 	return response.toJson();
@@ -851,7 +853,7 @@ void GlobalSessionService::workerSessionIni(void) {
 
 			// Check all sessions
 			for (LocalSessionService* lss : lssList) {
-				timedOut.splice(timedOut.end(), lss->checkTimedOutIniSessions(1 * ot::msg::defaultTimeout));
+				timedOut.splice(timedOut.end(), lss->checkTimedOutIniSessions(5 * ot::msg::defaultTimeout));
 			}
 
 			// Remove all sessions that timed out
