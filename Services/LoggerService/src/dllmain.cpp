@@ -3,8 +3,11 @@
 //! \date January 2021
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin header
+// Service header
 #include "AppBase.h"
+
+// OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
@@ -14,8 +17,8 @@
 #include "OTCommunication/ActionDispatcher.h"
 
 // std header
-#include <Windows.h>
 #include <string>
+#include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -49,10 +52,10 @@ namespace ot {
 						return OT_ACTION_CMD_Ping;
 					}
 					else if (action == OT_ACTION_CMD_ServiceShutdown) {
-						exit(0);
+						exit(ot::AppExitCode::Success);
 					}
 					else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
-						exit(-100);
+						exit(ot::AppExitCode::EmergencyShutdown);
 					}
 					else {
 						bool handlerFound = false;
@@ -95,7 +98,7 @@ extern "C"
 		try {
 			if (_serviceURL == nullptr) {
 				OTAssert(0, "Service URL not set");
-				return -1;
+				exit(ot::AppExitCode::ServiceUrlMissing);
 			}
 
 			// Initialize log dispatcher
@@ -124,13 +127,13 @@ extern "C"
 			OutputDebugStringA("ERROR: ");
 			OutputDebugStringA(_e.what());
 			OutputDebugStringA("\n");
-			return 1;
+			exit(ot::AppExitCode::GeneralError);
 		}
 		catch (...) {
 			OutputDebugStringA("ERROR: Unknown error");
-			return 2;
+			exit(ot::AppExitCode::UnknownError);
 		}
-		return 0;
+		return ot::AppExitCode::Success;
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void) {

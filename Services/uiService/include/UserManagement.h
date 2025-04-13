@@ -55,11 +55,11 @@ private:
 	bool ensureSettingsCollectionCanBeAccessed(void);
 	bool storeListOfRecentProjects(std::list<std::string> &recentProjectList);
 
-	const int maxNumberRecentProjects;
+	const int m_maxNumberRecentProjects;
 
-	bool isConnected;
-	std::string authServerURL;
-	std::string databaseURL;
-	const std::string settingsDataBaseName;
-	static std::string userSettingsCollection;
+	bool m_isConnected;
+	std::string m_authServerURL;
+	std::string m_databaseURL;
+	const std::string m_settingsDataBaseName;
+	static std::string m_userSettingsCollection;
 };

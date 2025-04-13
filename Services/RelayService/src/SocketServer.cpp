@@ -2,6 +2,7 @@
 #include "SocketServer.h"
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"						// rapidjson wrapper
 #include "OTCore/Logger.h"						// Logger
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
@@ -299,7 +300,7 @@ void SocketServer::socketDisconnected(void) {
 	{
 		OT_LOG_D("No more clients, shutting down relay service");
 
-		exit(0);
+		exit(ot::AppExitCode::Success);
 	}
 }
 
@@ -333,7 +334,7 @@ void SocketServer::keepAlive()
 		
 		OT_LOG_E("No data received from frontend for more than 120 seconds. Assuming connection is lost");
 
-		exit(0);
+		exit(ot::AppExitCode::KeepAliveFailed);
 	}
 }
 
@@ -373,7 +374,7 @@ void SocketServer::processMessages(void) {
 
 void SocketServer::shutdown(void) {
 	// Exit the application
-	exit(0);
+	exit(ot::AppExitCode::Success);
 }
 
 void SocketServer::sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData) {

@@ -7,6 +7,8 @@
  */
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
+
 #include "OTCore/otAssert.h"
 #include "OTCore/JSON.h"
 #include "OTCore/ThisService.h"
@@ -76,7 +78,7 @@ namespace ot {
 
 			OT_LOG_E("Session service has died unexpectedly. Shutting down...");
 
-			exit(0);
+			exit(ot::AppExitCode::LSSNotRunning);
 		}
 
 		void exitWorker(int _exitCode) {
@@ -97,7 +99,7 @@ void initChecker(void) {
 	std::this_thread::sleep_for(30s);
 	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready) {
 		OT_LOG_E("The component was not initialized after 30 seconds. Shutting down service");
-		exit(0);
+		exit(ot::AppExitCode::InitializationTimeout);
 	}
 }
 
@@ -450,7 +452,7 @@ void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
 		}
 	}
 
-	std::thread t(ot::intern::exitWorker, 0);
+	std::thread t(ot::intern::exitWorker, ot::AppExitCode::Success);
 	t.detach();
 }
 
@@ -604,7 +606,7 @@ std::string ot::intern::ExternalServicesComponent::handlePreShutdown(JsonDocumen
 }
 
 std::string ot::intern::ExternalServicesComponent::handleEmergencyShutdown(JsonDocument& _document) {
-	std::thread t(ot::intern::exitWorker, -100);
+	std::thread t(ot::intern::exitWorker, ot::AppExitCode::EmergencyShutdown);
 	t.detach();
 	return OT_ACTION_RETURN_VALUE_OK;
 }

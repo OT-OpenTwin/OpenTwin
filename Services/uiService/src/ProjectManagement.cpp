@@ -12,6 +12,7 @@
 #include "DataBase.h"
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -84,9 +85,9 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -120,9 +121,9 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -144,9 +145,9 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -167,9 +168,9 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 		
@@ -238,9 +239,9 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return "";
 	}
 
@@ -280,9 +281,9 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return "";
 	}
 
@@ -328,9 +329,9 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -436,9 +437,9 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 

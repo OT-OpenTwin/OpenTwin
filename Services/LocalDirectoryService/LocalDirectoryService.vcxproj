@@ -197,7 +197,6 @@
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\Configuration.h" />
-    <ClInclude Include="include\ExitCodes.h" />
     <ClInclude Include="include\GlobalDirectoryService.h" />
     <ClInclude Include="include\Service.h" />
     <ClInclude Include="include\ServiceInformation.h" />

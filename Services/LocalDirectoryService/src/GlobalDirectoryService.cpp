@@ -3,6 +3,7 @@
 #include "GlobalDirectoryService.h"
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
@@ -71,7 +72,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 
 	if (!ok) {
 		OT_LOG_E("Registration at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed after " + std::to_string(maxCt) + " attempts. Exiting...");
-		exit(1);
+		exit(ot::AppExitCode::GDSRegistrationFailed);
 	}
 
 	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos ||

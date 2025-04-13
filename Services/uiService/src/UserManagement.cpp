@@ -24,27 +24,28 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
-std::string UserManagement::userSettingsCollection;
+std::string UserManagement::m_userSettingsCollection;
 
 UserManagement::UserManagement() :
-	maxNumberRecentProjects(10),
-	isConnected(false),
-	settingsDataBaseName("UserSettings")
+	m_maxNumberRecentProjects(10),
+	m_isConnected(false),
+	m_settingsDataBaseName("UserSettings")
 {
 
 }
 
 UserManagement::UserManagement(const LoginData& _loginData)
-	: maxNumberRecentProjects(10),
-	isConnected(false),
-	settingsDataBaseName("UserSettings"),
-	authServerURL(_loginData.getAuthorizationUrl()),
-	databaseURL(_loginData.getDatabaseUrl())
+	: m_maxNumberRecentProjects(10),
+	m_isConnected(false),
+	m_settingsDataBaseName("UserSettings"),
+	m_authServerURL(_loginData.getAuthorizationUrl()),
+	m_databaseURL(_loginData.getDatabaseUrl())
 {
 
 }
@@ -56,12 +57,12 @@ UserManagement::~UserManagement()
 
 void UserManagement::setAuthServerURL(const std::string &url)
 {
-	authServerURL = url;
+	m_authServerURL = url;
 }
 
 void UserManagement::setDatabaseURL(const std::string &url)
 {
-	databaseURL = url;
+	m_databaseURL = url;
 }
 
 bool UserManagement::checkConnection(void) const {
@@ -74,17 +75,17 @@ bool UserManagement::checkConnection(void) const {
 }
 
 bool UserManagement::checkConnectionAuthorizationService(void) const {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here send a ping to the authorization service to check whether the server is up and running
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -92,13 +93,13 @@ bool UserManagement::checkConnectionAuthorizationService(void) const {
 }
 
 bool UserManagement::checkConnectionDataBase(const std::string &userName, const std::string &password) const {
-	assert(!databaseURL.empty());
+	assert(!m_databaseURL.empty());
 
-	if (!isConnected)
+	if (!m_isConnected)
 	{
 		try
 		{
-			DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", userName, password);
+			DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", userName, password);
 		}
 		catch (std::exception e)
 		{
@@ -117,11 +118,11 @@ bool UserManagement::checkConnectionDataBase(const std::string &userName, const 
 }
 void UserManagement::initializeNewSession(void)
 {
-	userSettingsCollection.clear();
+	m_userSettingsCollection.clear();
 }
 
 bool UserManagement::addUser(const std::string &userName, const std::string &password) const {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here we register a new user by sending a message to the authorization service
 
@@ -132,10 +133,10 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -144,7 +145,7 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 }
 
 bool UserManagement::deleteUser(const std::string &userName) const {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here we delete a user by sending a message to the authorization service
 
@@ -165,10 +166,10 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -203,9 +204,9 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 //
 //	std::string response;
 //	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-//		OT_LOG_E("Failed to send request");
-//		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-//		exit(0);
+//		OT_LOG_E("Failed to send request to authorization service");
+//		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+//		exit(ot::AppExitCode::SendFailed);
 //		return false;
 //	}
 //
@@ -216,7 +217,7 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 
 
 bool UserManagement::checkUserName(const std::string &userName) const {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
 
@@ -229,10 +230,10 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -241,7 +242,7 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 }
 
 bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
 
@@ -252,10 +253,10 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, isEncryptedPassword, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
 
@@ -302,16 +303,16 @@ bool UserManagement::hasSuccessful(const std::string& _response) const {
 
 bool UserManagement::initializeDatabaseConnection(void)
 {
-	if (isConnected) return true;
+	if (m_isConnected) return true;
 
 	try
 	{
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
 
-		isConnected = true;
+		m_isConnected = true;
 
-		return isConnected; 
+		return m_isConnected;
 	}
 	catch (std::exception&)
 	{
@@ -324,7 +325,7 @@ bool UserManagement::storeSetting(const std::string &settingName, const std::str
 	if (!ensureSettingsCollectionCanBeAccessed()) return false;
 
 	// First, check whether the settings is already there 
-	DataStorageAPI::DocumentAccess docManager(settingsDataBaseName, userSettingsCollection);
+	DataStorageAPI::DocumentAccess docManager(m_settingsDataBaseName, m_userSettingsCollection);
 
 	// Now we search for the document with the given name
 
@@ -358,7 +359,7 @@ bool UserManagement::storeSetting(const std::string &settingName, const std::str
 				<< "Data" << settingString
 				<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
-			mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(settingsDataBaseName, userSettingsCollection);
+			mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_settingsDataBaseName, m_userSettingsCollection);
 
 			bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
 		}
@@ -375,7 +376,7 @@ std::string UserManagement::restoreSetting(const std::string &settingName)
 {
 	if (!ensureSettingsCollectionCanBeAccessed()) return "";
 
-	DataStorageAPI::DocumentAccess docManager(settingsDataBaseName, userSettingsCollection);
+	DataStorageAPI::DocumentAccess docManager(m_settingsDataBaseName, m_userSettingsCollection);
 
 	// Now we search for the document with the given name
 
@@ -408,10 +409,10 @@ std::string UserManagement::restoreSetting(const std::string &settingName)
 
 bool UserManagement::ensureSettingsCollectionCanBeAccessed(void)
 {
-	if (userSettingsCollection.empty())
+	if (m_userSettingsCollection.empty())
 	{
-		userSettingsCollection = getUserSettingsCollection();
-		if (userSettingsCollection.empty()) return false;
+		m_userSettingsCollection = getUserSettingsCollection();
+		if (m_userSettingsCollection.empty()) return false;
 	}
 
 	if (!initializeDatabaseConnection()) return false;
@@ -421,12 +422,12 @@ bool UserManagement::ensureSettingsCollectionCanBeAccessed(void)
 	try
 	{
 		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
-		collectionExists = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(settingsDataBaseName, userSettingsCollection);
+		collectionExists = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_settingsDataBaseName, m_userSettingsCollection);
 
 		if (!collectionExists)
 		{
-			DataStorageAPI::ConnectionAPI::getInstance().createCollection(settingsDataBaseName, userSettingsCollection);
-			collectionExists = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(settingsDataBaseName, userSettingsCollection);
+			DataStorageAPI::ConnectionAPI::getInstance().createCollection(m_settingsDataBaseName, m_userSettingsCollection);
+			collectionExists = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_settingsDataBaseName, m_userSettingsCollection);
 		}
 	}
 	catch (std::exception&)
@@ -439,7 +440,7 @@ bool UserManagement::ensureSettingsCollectionCanBeAccessed(void)
 
 std::string UserManagement::getUserSettingsCollection(void)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
 
@@ -452,10 +453,10 @@ std::string UserManagement::getUserSettingsCollection(void)
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + authServerURL + ").", "Network Error");
-		exit(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		exit(ot::AppExitCode::SendFailed);
 		return "ERROR: Failed to request user data from Authorization Serivce";
 	}
 
@@ -494,7 +495,7 @@ bool UserManagement::addRecentProject(const std::string &projectName)
 	recentProjects.push_front(projectName);
 
 	// Now the list may be to long, so we need to delete the last entries
-	while (recentProjects.size() > maxNumberRecentProjects)
+	while (recentProjects.size() > m_maxNumberRecentProjects)
 	{
 		recentProjects.pop_back();
 	}

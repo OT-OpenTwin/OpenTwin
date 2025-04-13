@@ -1,8 +1,8 @@
 // Project header
 #include "Configuration.h"
-#include "ExitCodes.h"
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 #include "OTCore/otAssert.h"
@@ -135,30 +135,30 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
-int Configuration::importFromEnvironment(void) {
-	if (m_configurationImported) return LDS_EXIT_Ok;
+void Configuration::importFromEnvironment(void) {
+	if (m_configurationImported) {
+		return;
+	}
 
 	// Clean up current data
 	m_supportedServices.clear();
 
 	// Read configuration from env
 	const char * configurationEnv = ot::OperatingSystem::getEnvironmentVariable(LDS_CFG_ENV);
-	if (configurationEnv == nullptr) return LDS_EXIT_CfgNoEnv;
+	if (configurationEnv == nullptr) {
+		exit(ot::AppExitCode::EnvironmentError);
+	}
 
 	ot::JsonDocument configurationDoc;
 	configurationDoc.fromJson(configurationEnv);
 
-	if (!configurationDoc.IsObject()) return LDS_EXIT_CfgBroken;
+	if (!configurationDoc.IsObject()) {
+		exit(ot::AppExitCode::ConfigurationBroken);
+	}
 
-	try {
-		this->setFromJsonObject(configurationDoc.GetConstObject());
-	}
-	catch (...) {
-		return LDS_EXIT_CfgBroken;
-	}
+	this->setFromJsonObject(configurationDoc.GetConstObject());
 
 	m_configurationImported = true;
-	return LDS_EXIT_Ok;
 }
 
 bool Configuration::supportsService(const std::string& _serviceName) const {

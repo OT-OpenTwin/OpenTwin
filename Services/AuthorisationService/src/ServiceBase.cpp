@@ -1,18 +1,21 @@
+// Service header
 #include "ServiceBase.h"
 #include "MongoURL.h"
 #include "MongoSessionFunctions.h"
 
-#include <iostream>
-#include <random>
-
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/Msg.h"
-#include "OTServiceFoundation/UserCredentials.h"
+// OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
-//#include "OpenTwinCore/TypeConversion.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UserCredentials.h"
 #include "Connection/ConnectionAPI.h"
+
+// std header
+#include <random>
+#include <iostream>
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
@@ -57,7 +60,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	catch (std::exception err)
 	{
 		OT_LOG_E("Cannot establish MongoDB connection: " + std::string(err.what())); // todo: should retry or exit?
-		return -1;
+		exit(ot::AppExitCode::DataBaseConnectionFailed);
 	}
 
 	// Add indexes for all 
@@ -255,7 +258,7 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 	std::thread workerThread(&ServiceBase::removeOldSessionsWorker, this);
 	workerThread.detach();
 
-	return 0;
+	return ot::AppExitCode::Success;
 }
 
 bool ServiceBase::removeOldSessionsWorker()

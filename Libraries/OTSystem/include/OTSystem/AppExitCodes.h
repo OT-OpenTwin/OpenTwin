@@ -121,7 +121,8 @@ namespace ot {
 
 			LogInError                 = 7800,
 			FailedToConvertPort        = 7801,
-			KeepAliveFailed            = 7802
+			KeepAliveFailed            = 7802,
+			InitializationTimeout      = 7803
 		};
 
 		//! @brief Returns a humanly readable string representation of the given exit code.

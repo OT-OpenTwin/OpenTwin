@@ -1,14 +1,13 @@
-/*
- * dllmain.h
- *
- *	Author: Peter Thoma
- *  Copyright (c) 2020 openTwin
- */
+//! @file dllmain.cpp
+//! @author Peter Thoma
+//! @date April 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Relay Service header
 #include "SocketServer.h"
 
 // Open Twin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"					// rapidjson wrapper
 #include "OTCore/Logger.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
@@ -73,7 +72,7 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	}
 
 	OT_LOG_E("Session service \"" + _sessionServiceURL + "\" has died unexpectedly. Shutting down...");
-	exit(0);
+	exit(ot::AppExitCode::LSSNotRunning);
 }
 
 void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort, std::string _relayUrl)
@@ -183,7 +182,7 @@ extern "C"
 				g_appStartMutex.lock();
 				needWait = !g_appStartCompleted;
 				if (g_appStartFailed) {
-					exit(0);
+					exit(ot::AppExitCode::GeneralError);
 				}
 				g_appStartMutex.unlock();
 			}
@@ -194,9 +193,11 @@ extern "C"
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS(e.what());
+			exit(ot::AppExitCode::GeneralError);
 		}
 		catch (...) {
 			OT_LOG_EA("[FATAL] Unknown error");
+			exit(ot::AppExitCode::UnknownError);
 		}
 		return 0;
 	}

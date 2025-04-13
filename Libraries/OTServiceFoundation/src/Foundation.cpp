@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -32,8 +33,8 @@ namespace ot {
 				response.append(_e.what());
 			}
 			catch (...) {
-				OT_LOG_EAS("[FATAL] Unknown error occured. Shutting down");
-				exit(1);
+				OT_LOG_EAS("[FATAL] Unknown error occured. Shutting down...");
+				exit(ot::AppExitCode::UnknownError);
 			}
 
 			// Copy the return value.The memory of this value will be deallocated in the deallocateData function
@@ -71,7 +72,7 @@ const char* ot::foundation::getServiceURL(void)
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-		exit(-1);
+		exit(ot::AppExitCode::GeneralError);
 	}
 	char* retVal = new char[1] { 0 };
 	return retVal;
@@ -155,13 +156,11 @@ int ot::foundation::init(
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-		exit(-1);
-		return -1;
+		exit(ot::AppExitCode::GeneralError);
 	}
 	catch (...) {
 		OT_LOG_EA("Unknown error");
-		exit(-2);
-		return -2;
+		exit(ot::AppExitCode::UnknownError);
 	}
 }
 
@@ -232,12 +231,10 @@ int ot::foundation::initDebugExplicit(
 	}
 	catch (const std::exception& e) {
 		OT_LOG_EAS(e.what());
-		exit(-1);
-		return -1;
+		exit(ot::AppExitCode::GeneralError);
 	}
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error occured");
-		exit(-2);
-		return -2;
+		exit(ot::AppExitCode::UnknownError);
 	}
 }

@@ -12,6 +12,7 @@
 #include "ServiceStartupInformation.h"
 
 // Open twin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -378,7 +379,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 
 	if (!ok) {
 		OT_LOG_E("Registration at Global Session Service (" + gssURL + ") failed after " + std::to_string(maxCt) + " attemts. Exiting...");
-		exit(1);
+		exit(ot::AppExitCode::GSSRegistrationFailed);
 	}
 
 	return 0;

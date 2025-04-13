@@ -3,6 +3,7 @@
 #include "AppBase.h"
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -269,9 +270,9 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
 
@@ -319,9 +320,9 @@ void ManageAccess::fillGroupsList(void)
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
@@ -425,9 +426,9 @@ void ManageAccess::readGroupsList(void)
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request");
+		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
-		exit(0);
+		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
 

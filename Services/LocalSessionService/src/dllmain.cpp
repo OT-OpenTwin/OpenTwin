@@ -1,31 +1,30 @@
-/*
- * dllmain.cpp
- *
- *  Created on: November 26, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
-
-// C++ header
-#include <Windows.h>
-#include <thread>
-#include <cassert>
-#include <exception>
-#include <iostream>
-#include <fstream>
-#include <mutex>
-#include <chrono>
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date November 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // SessionService header
 #include "globalDatatypes.h"
 #include "SessionService.h"
 #include "GlobalSessionService.h"
 
+// OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+
+// std header
+#include <mutex>
+#include <chrono>
+#include <thread>
+#include <fstream>
+#include <cassert>
+#include <iostream>
+#include <exception>
+#include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -68,13 +67,13 @@ extern "C"
 
 			// Now store the command line arguments and perform the initialization
 			if (_ownUrl == nullptr) {
-				return -1;
+				exit(ot::AppExitCode::ServiceUrlInvalid);
 			}
 			if (_globalSessionServiceURL == nullptr) {
-				return -2;
+				exit(ot::AppExitCode::GSSUrlMissing);
 			}
 			if (_authPort == nullptr) {
-				return -3;
+				exit(ot::AppExitCode::AuthUrlMissing);
 			}
 
 			std::string ownUrl(_ownUrl);
@@ -82,9 +81,8 @@ extern "C"
 			// Determine a good starting port for the services based on our own port number 
 			size_t colonIndex = ownUrl.rfind(':');
 			if (colonIndex == std::string::npos) {
-				OT_LOG_E("Unable to determine own port");
-				assert(0);
-				return 1;
+				OT_LOG_EA("Unable to determine own port");
+				exit(ot::AppExitCode::FailedToConvertPort);
 			}
 
 			std::string ip = ownUrl.substr(0, colonIndex);
@@ -121,7 +119,7 @@ extern "C"
 
 			if (!ok) {
 				OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attemts. Exiting...");
-				exit(1);
+				exit(ot::AppExitCode::GSSRegistrationFailed);
 			}
 
 			ot::JsonDocument gssResponseDoc;
@@ -173,16 +171,15 @@ extern "C"
 
 			initDone = true;
 			OT_LOG_D("Initialization finished");
-			return 0;
+			return ot::AppExitCode::Success;
 		}
 		catch (std::exception& e) {
-			OT_LOG_E(std::string{"Uncaught exception: "}.append(e.what()));
-			assert(0);
-			return 1;
+			OT_LOG_EAS(std::string{"Uncaught exception: "}.append(e.what()));
+			exit(ot::AppExitCode::GeneralError);
 		}
 		catch (...) {
 			assert(0);
-			return 1;
+			exit(ot::AppExitCode::UnknownError);
 		}
 	};
 

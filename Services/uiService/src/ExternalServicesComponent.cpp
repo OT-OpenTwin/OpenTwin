@@ -26,6 +26,8 @@
 #include <QtWidgets/qapplication.h>
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
+
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Color.h"
@@ -118,7 +120,7 @@ extern "C"
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(-1);
+			exit(ot::AppExitCode::GeneralError);
 		}
 		return retval;
 	};
@@ -140,7 +142,7 @@ extern "C"
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(-1);
+			exit(ot::AppExitCode::GeneralError);
 		}
 		return retval;
 	};
@@ -156,7 +158,7 @@ extern "C"
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(-1);
+			exit(ot::AppExitCode::GeneralError);
 		}
 	};
 }
@@ -1580,7 +1582,7 @@ void ExternalServicesComponent::deallocateData(const char *data)
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
 	AppBase::instance()->showErrorPrompt("The session service has died unexpectedly. The application will be closed now.", "Error");
-	std::thread exitThread(&ot::intern::exitAsync, 0);
+	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
 }
 
@@ -1930,7 +1932,7 @@ std::string ExternalServicesComponent::handleShutdown(ot::JsonDocument& _documen
 	OT_LOG_D("Showdown received");
 	AppBase::instance()->showErrorPrompt("Shutdown requested by session service.", "Error");
 	
-	std::thread exitThread(&ot::intern::exitAsync, 0);
+	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::Success);
 	exitThread.detach();
 
 	return "";
@@ -1945,7 +1947,7 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
 	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
 	
-	std::thread exitThread(&ot::intern::exitAsync, 1);
+	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::EmergencyShutdown);
 	exitThread.detach();
 
 	return "";
@@ -1954,7 +1956,7 @@ std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument&
 std::string ExternalServicesComponent::handleConnectionLoss(ot::JsonDocument& _document) {
 	AppBase::instance()->showErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "Error");
 
-	std::thread exitThread(&ot::intern::exitAsync, 1);
+	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
 
 	return "";

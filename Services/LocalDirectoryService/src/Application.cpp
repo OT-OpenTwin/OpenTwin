@@ -9,14 +9,14 @@
 // Service header
 #include "Application.h"
 #include "Configuration.h"
-#include "ExitCodes.h"
 
 // OpenTwin header
+#include "OTSystem/PortManager.h"
+#include "OTSystem/AppExitCodes.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
-#include "OTSystem/PortManager.h"
-#include "OTSystem/OperatingSystem.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
@@ -59,27 +59,33 @@ Application::~Application()
 int Application::initialize(const char * _ownURL, const char * _globalDirectoryServiceURL)
 {
 	// Read supported services from environment
-	int cfgResult = LDS_CFG.importFromEnvironment();
-	if (cfgResult != LDS_EXIT_Ok) return cfgResult;
+	LDS_CFG.importFromEnvironment();
 
 	m_serviceURL = _ownURL;
 	
 	// Filter ip and port from own url
 	size_t ix = m_serviceURL.find(':');
-	if (ix == std::string::npos) return LDS_EXIT_InvalidURLSyntax;
+	if (ix == std::string::npos) {
+		exit(ot::AppExitCode::ServiceUrlInvalid);
+	}
 	std::string ip = m_serviceURL.substr(0, ix);
 	std::string port = m_serviceURL.substr(ix + 1);
-	if (port.find(':') != std::string::npos) return LDS_EXIT_InvalidURLSyntax;
+	if (port.find(':') != std::string::npos) {
+		exit(ot::AppExitCode::ServiceUrlInvalid);
+	}
 	bool convertFailed = false;
 	ot::port_t portNr = ot::String::toNumber<ot::port_t>(port, convertFailed);
-	if (convertFailed) return LDS_EXIT_InvalidURLSyntax;
+	if (convertFailed) {
+		exit(ot::AppExitCode::ServiceUrlInvalid);
+	}
 	
 	m_serviceManager.setServiceIP(ip);
 
 	ot::PortManager::instance().addPortRange(portNr + 1, 49151);
 
 	m_globalDirectoryService.connect(_globalDirectoryServiceURL);
-	return LDS_EXIT_Ok;
+
+	return ot::AppExitCode::Success;
 }
 
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {

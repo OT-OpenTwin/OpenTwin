@@ -10,6 +10,7 @@
 #include "ExternalServicesComponent.h"
 
 // OT header
+#include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -224,29 +225,28 @@ int main(int _argc, char *_argv[])
 		initializeAppBase();
 
 		if (!initializeOpenGL(checkGraphics)) {
-			return -1;
+			return ot::AppExitCode::OpenGLError;
 		}
 
-		if (checkGraphics)
-		{
-			return 0;
+		if (checkGraphics) {
+			return ot::AppExitCode::Success;
 		}
 
 		if (!initializeAssets()) {
-			return -2;
+			return ot::AppExitCode::AssetError;
 		}
 
 		if (!initializeComponents()) {
-			return -3;
+			return ot::AppExitCode::ComponentError;
 		}
 
 		if (!AppBase::instance()->initialize()) {
-			return -4;
+			return ot::AppExitCode::GeneralError;
 		}
 
 		// LogIn
 		if (!AppBase::instance()->logIn()) {
-			return 0;
+			return ot::AppExitCode::Success;
 		}
 
 		// Run Main Event Loop
@@ -263,10 +263,10 @@ int main(int _argc, char *_argv[])
 	catch (const std::exception & e) {
 		std::string errorText = e.what();
 		OT_LOG_EAS(errorText);
-		return -601;
+		return ot::AppExitCode::GeneralError;
 	}
 	catch (...) {
 		OT_LOG_EAS("[FATAL] Unknown error");
-		return -602;
+		return ot::AppExitCode::UnknownError;
 	}
 }

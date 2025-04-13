@@ -14,7 +14,6 @@
 
 // Service header
 #include "Application.h"
-#include "ExitCodes.h"
 
 static std::mutex g_performActionMutex;
 
@@ -79,8 +78,6 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, false);
 #endif
-		int result = LDS_APP->initialize(_ownURL, _globalDirectoryServiceURL);
-		if (result != LDS_EXIT_Ok) exit(result);
-		return result;
+		return LDS_APP->initialize(_ownURL, _globalDirectoryServiceURL);
 	};
 }

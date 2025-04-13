@@ -37,6 +37,7 @@
 #include "DataBase.h"
 #include "PlotManagerView.h"
 
+#include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 
 #include "OTCore/Flags.h"
@@ -553,7 +554,7 @@ void AppBase::downloadInstaller(QString gssUrl)
 		std::string commandLine = "\"" + applicationPath + "\" /S";
 		OT_PROCESS_HANDLE processHandle;
 		ot::SystemProcess::runApplication(applicationPath, commandLine, processHandle);
-		exit(0);
+		exit(ot::AppExitCode::Success);
 	}
 	else
 	{

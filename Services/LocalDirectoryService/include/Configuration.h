@@ -28,10 +28,9 @@ public:
 	//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-	//! @brief Will load the confiuguration from the environment
-	//! Returns an exit code (use LDS_EXIT_... macros to determine error: ExitCodes.h)
-	//! LDS_EXIT_Ok will be returned if no error occured
-	int importFromEnvironment(void);
+	//! @brief Will load the confiuguration from the environment.
+	//! Will exit on error.
+	void importFromEnvironment(void);
 
 	//! @brief Returns true if the provided service is supported by this LDS
 	bool supportsService(const std::string& _serviceName) const;

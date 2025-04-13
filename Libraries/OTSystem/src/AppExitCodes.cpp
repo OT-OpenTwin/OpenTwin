@@ -93,6 +93,7 @@ std::string ot::AppExitCode::toString(int _exitCode) {
 	case GeneralExitCode::LogInError: return "Log in error";
 	case GeneralExitCode::FailedToConvertPort: return "Failed to convert port";
 	case GeneralExitCode::KeepAliveFailed: return "Keep alive failed";
+	case GeneralExitCode::InitializationTimeout: return "Initialization timeout";
 
 	default:
 		assert(0);

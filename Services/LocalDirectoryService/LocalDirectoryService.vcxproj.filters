@@ -56,9 +56,6 @@
     <ClInclude Include="include\ServiceInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ExitCodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\SessionInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
