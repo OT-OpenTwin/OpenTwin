@@ -10,6 +10,7 @@ public:
 
 	bool hasGeometryRoot(void)				{ return _hasGeometryRoot; }
 	bool hasCircuitsRoot(void)				{ return _hasCircuitsRoot; }
+	bool hasCircuit(void)					{ return _hasCircuit; }
 	bool hasMaterialRoot(void)				{ return _hasMaterialRoot; }
 	bool hasMeshRoot(void)					{ return _hasMeshRoot; }
 	bool hasSolverRoot(void)				{ return _hasSolverRoot; }
@@ -25,7 +26,8 @@ public:
 	std::string getDatasetRootName()                { return _datasetRootName; };
 	std::string getRMDCategorizationName()          { return _RMDCategorizationName; };
 	std::string getDatasetRMD()                     { return _datasetRMD; }
-
+	std::string getCircuitRootName()				{ return _circuitRootName; }
+	std::string getCircuitName()						{ return _circuitName; }
 	std::string getViews(void);
 
 private:
@@ -38,6 +40,7 @@ private:
 
 	bool _hasGeometryRoot				= true;
 	bool _hasCircuitsRoot				= true;
+	bool _hasCircuit					= true;
 	bool _hasMaterialRoot				= true;
 	bool _hasMeshRoot					= true;
 	bool _hasSolverRoot					= true;
@@ -48,7 +51,7 @@ private:
 	bool _hasRMDCategorizationPreview	= true;
 	bool _hasDatasetRoot				= true;
 	bool _hasDatasetRMD					= true;
-
+	
 	bool _has3DView						= true;
 	bool _has1DView						= true;
 	bool _hasBlockPicker				= true;
@@ -57,6 +60,8 @@ private:
 	std::string _datasetRootName;
 	std::string _RMDCategorizationName;
 	std::string _datasetRMD;
+	std::string _circuitRootName;
+	std::string _circuitName;
 };
 
 

@@ -17,6 +17,8 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 		_datasetRootName = ot::FolderNames::DatasetFolder;
 		_RMDCategorizationName = getDataCategorizationRootName() + "/Campaign Metadata";
 		_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
+		_circuitRootName = "Circuits";
+		_circuitName = getCircuitRootName() + "/Circuit 1";
 	}
 	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_3DSIM)
 	{
@@ -179,6 +181,9 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 	_has3DView = false;
 	_has1DView = true;
 	_hasBlockPicker = true;
+
+	_circuitRootName = "Circuits";
+	_circuitName = getCircuitRootName() + "/Circuit 1";
 }
 
 std::string ProjectTypeManager::getViews(void)
