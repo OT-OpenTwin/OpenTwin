@@ -606,7 +606,6 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
-	OT_LOG_E("UI");
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
@@ -632,7 +631,6 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 
 
 void Application::modelConnected(ot::components::ModelComponent * _model) {
-OT_LOG_E("Model");
 	m_blockEntityHandler.setModelComponent(_model);
 	SimulationResults::getInstance()->setModelComponent(_model);
 }
