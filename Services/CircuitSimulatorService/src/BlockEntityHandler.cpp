@@ -97,40 +97,61 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	
+
+	bool _rotationChanged = false;
+	bool _flipChanged = false;
+
 	//Here I will update the rotation
 	auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
-	if(propertyBase != nullptr) { 
+	if (propertyBase != nullptr) {
 		auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
-		propertyRotation->setValue(transform.getRotation());
+		if (propertyRotation->getValue() != transform.getRotation()) {
+			propertyRotation->setValue(transform.getRotation());
+			_rotationChanged = true;
+		}
 	}
 
 	//Here I update the Flip
 	std::map<ot::Transform::FlipState, std::string > stringFlipMap;
 	stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
-	stringFlipMap.insert_or_assign(ot::Transform::FlipVertically,"FlipVertically" );
-	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally,"FlipHorizontally" );
+	stringFlipMap.insert_or_assign(ot::Transform::FlipVertically, "FlipVertically");
+	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally, "FlipHorizontally");
 
 	auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
 	if (propertyBaseFlip != nullptr) {
 		auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
-		propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
-	}
+		if (propertyFlip->getValue() != stringFlipMap[transform.getFlipStateFlags()]) {
+			propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
+			_flipChanged = true;
+		}
 
-	ot::UID positionID = blockEnt->getCoordinateEntityID();
-	entityInfos.clear();
-	entityIDList = { positionID };
-	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
-	entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
-	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
-	coordinateEnt->setCoordinates(position);
-	coordinateEnt->StoreToDataBase();
-	blockEnt->StoreToDataBase();
+	}
 	
-	ot::ModelServiceAPI::addEntitiesToModel({}, {}, {}, {coordinateEnt->getEntityID()}, {coordinateEnt->getEntityStorageVersion()}, {blockID}, "Update BlockItem position");
-	const std::string comment = "Property Updated";
-	ot::UIDList topoList{blockEnt->getEntityID()};
-	ot::UIDList versionList{blockEnt->getEntityStorageVersion()};
-	ot::ModelServiceAPI::updateTopologyEntities(topoList, versionList, comment);
+
+
+	// If the rotation or flip is changed then we update the block but do not add new coordinate entity
+	// because dragging and flipping/rotating at same time is not possible
+
+	if (_rotationChanged || _flipChanged) {
+		blockEnt->StoreToDataBase();
+		const std::string comment = "Property Updated";
+		ot::UIDList topoList{blockEnt->getEntityID()};
+		ot::UIDList versionList{blockEnt->getEntityStorageVersion()};
+		ot::ModelServiceAPI::updateTopologyEntities(topoList, versionList, comment);
+	}
+	else {  // block was dragged
+
+		ot::UID positionID = blockEnt->getCoordinateEntityID();
+		entityInfos.clear();
+		entityIDList = { positionID };
+		ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
+		entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
+		std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
+		coordinateEnt->setCoordinates(position);
+		coordinateEnt->StoreToDataBase();
+		ot::ModelServiceAPI::addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
+	}
+	
 }
 
 void BlockEntityHandler::OrderUIToCreateBlockPicker() {
