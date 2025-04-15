@@ -27,7 +27,6 @@ public:
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
 	void AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos);
-
 	//Function for resultCurves of Simulation
 	void createResultCurves(std::string solverName,std::string simulationType,std::string circuitName);
 
@@ -36,13 +35,14 @@ public:
 	
 	//Getter
 	const std::string getPackageName() const;
+	const std::string getInitialCircuitName() const;
 private:
 	const std::string _blockFolder = "Circuits";
 	std::string _packageName = "Circuit Simulator";
-	
+	const std::string m_initialCircuitName = "Circuit 1";
 
 	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
-	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
+	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 };
 
 

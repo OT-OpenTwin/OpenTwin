@@ -139,7 +139,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 	ot::JsonObject pckgObj;
 	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
@@ -426,9 +426,8 @@ std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_
 
 
 
-ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
-	//ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
-	ot::GraphicsPickerCollectionPackage* pckg = new ot::GraphicsPickerCollectionPackage();
+ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker() {
+	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(this->getInitialCircuitName(), this->getInitialCircuitName());
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	ot::GraphicsPickerCollectionCfg* a2 = new ot::GraphicsPickerCollectionCfg("Meter Elements", "Meter Elements");
@@ -467,6 +466,8 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	pckg->addCollection(a);
 	return pckg;
 }
+
+
 
 
 
@@ -817,4 +818,8 @@ void BlockEntityHandler::setPackageName(std::string name) {
 //Getter
 const std::string BlockEntityHandler::getPackageName() const {
 	return this->_packageName;
+}
+
+const std::string BlockEntityHandler::getInitialCircuitName() const {
+	return this->m_initialCircuitName;
 }

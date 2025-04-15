@@ -169,6 +169,31 @@ void Application::createNewCircuit() {
 	m_uiComponent->sendMessage(true, doc, tmp);
 }
 
+void Application::createInitialCircuit() {
+	//// We check first if we already added the voltage source to the circuit as initial element
+	//std::list<std::string> initialCircuitElements = ot::ModelServiceAPI::getListOfFolderItems("Circuits/Circuit 1");
+
+	//if (initialCircuitElements.empty()) {
+	//	// If not then we add it
+	//	ot::Point2DD position = ot::Point2DD::Point2DD(5.5813953488372094, -14.883720930232558);
+	//	auto temp = m_blockEntityHandler.CreateBlockEntity(m_blockEntityHandler.getInitialCircuitName(), "EntityBlockCircuitVoltageSource", position);
+	//}
+
+	//// Else we do nothing
+	/*std::this_thread::sleep_for(std::chrono::seconds(3));*/
+
+	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
+	if (circuits.empty()) {
+	
+		EntityContainer* entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		entityCircuitRoot->setName(getCircuitRootName() + m_blockEntityHandler.getInitialCircuitName());
+
+		entityCircuitRoot->StoreToDataBase();
+		ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
+	}
+	
+}
+
 std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
 	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
 	modelSelectionChangedNotification();
@@ -395,6 +420,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 #endif // !_DEBUG
 
 
+
 	// Now i set the netlist to the ConnectionManager and afterwards it is being send
 	sendNetlistToSubService(_netlist);
 
@@ -580,6 +606,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
+	OT_LOG_E("UI");
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
@@ -589,7 +616,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
+	
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
+	m_blockEntityHandler.setPackageName("Circuit 1");
+	//createInitialCircuit();
 	SimulationResults::getInstance()->setUIComponent(_ui);
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
@@ -602,6 +632,7 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 
 
 void Application::modelConnected(ot::components::ModelComponent * _model) {
+OT_LOG_E("Model");
 	m_blockEntityHandler.setModelComponent(_model);
 	SimulationResults::getInstance()->setModelComponent(_model);
 }

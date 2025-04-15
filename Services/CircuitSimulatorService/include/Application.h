@@ -67,6 +67,7 @@ public:
 	OT_HANDLER(handleItemChanged, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleConnectionToConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, ot::SECURE_MESSAGE_TYPES);
 	void createNewCircuit();
+	void createInitialCircuit();
 
 	void modelSelectionChangedNotification(void);
 
