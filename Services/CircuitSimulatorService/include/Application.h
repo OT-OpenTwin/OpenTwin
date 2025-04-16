@@ -44,7 +44,8 @@ private:
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
 	std::string m_serverName;
-
+	bool m_SimulationRunning;
+	std::mutex m_mutex;
 	
 public:
 
@@ -77,6 +78,8 @@ public:
 	void sendNetlistToSubService(std::list<std::string>& _netlist);
 
 	std::string extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence);
+
+	void finishSimulation();
 
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
@@ -155,4 +158,5 @@ public:
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
 	QtWrapper* m_qtWrapper = nullptr;
+	
 };

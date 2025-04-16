@@ -179,6 +179,8 @@ void ConnectionManager::handleDisconnected() {
     waitForHealthcheck = false;
     delete m_socket;
     m_socket = nullptr;
+
+    Application::instance()->finishSimulation();
 }
 
 
@@ -230,6 +232,7 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
 
                 // If we get an error we need to shut down the subservice
                 send(toString(ConnectionManager::RequestType::Disconnect).toStdString(), "Disconnect");
+
             }
             else {
                 OT_LOG_E("JSON array entry is not a string");

@@ -270,6 +270,11 @@ void Application::addSolver()
 }
 
 void Application::runCircuitSimulation() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_uiComponent->lockUI(ot::LockTypeFlag::LockModelWrite);
+	m_SimulationRunning = true;
+
 	if (!EnsureDataBaseConnection()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base. \n");
@@ -472,6 +477,13 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 	{
 		return "failed";
 	}
+}
+
+void Application::finishSimulation() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	m_SimulationRunning = false;
+
 }
 
 SubprocessHandler* Application::getSubProcessHandler() {
