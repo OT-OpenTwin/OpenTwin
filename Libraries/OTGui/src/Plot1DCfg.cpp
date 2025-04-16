@@ -119,6 +119,8 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	JsonObject yAxisObject;
 	m_yAxis.addToJsonObject(yAxisObject, _allocator);
 	_object.AddMember("YAxis", yAxisObject, _allocator);
+
+	_object.AddMember("XAxisParameter", ot::JsonString(m_xAxisParameter, _allocator), _allocator);
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -139,6 +141,8 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
+
+	m_xAxisParameter = ot::json::getString(_object, "XAxisParameter");
 }
 
 bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {

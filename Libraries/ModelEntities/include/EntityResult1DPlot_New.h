@@ -18,6 +18,9 @@ public:
 	
 	void createProperties(void);
 
+	void setFamilyOfCurveProperties(std::list<std::string>& _parameterNames);
+	
+
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
 	void setPlot(const ot::Plot1DCfg& _config) override;

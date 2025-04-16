@@ -252,59 +252,59 @@ void testPlot()
 	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
 
 	// Family of curves
-	//MetadataParameter parameter;
-	//parameter.parameterName = "SomeParameter";
-	//parameter.typeName = ot::TypeNames::getFloatTypeName();
-	//parameter.unit = "[kOlf]";
+	MetadataParameter parameter;
+	parameter.parameterName = "SomeParameter";
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
+	parameter.unit = "[kOlf]";
 
-	//
-	//
-	//ot::Plot1DCurveCfg curveCfg;
-	//curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
-	//curveCfg.setXAxisTitle("SomeParameter");
-	//curveCfg.setYAxisTitle("SomeQuantity");
-	//const std::string plotName = "Test/A_plot2";
-	//curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
+	
+	
+	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
+	curveCfg.setXAxisTitle("SomeParameter");
+	curveCfg.setYAxisTitle("SomeQuantity");
+	const std::string plotName = "Test/A_plot2";
+	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
 
-	//std::vector<float> offsets{ 3.5f,7.2f,13.f };
-	//std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
-	//std::list<DatasetDescription> descriptions;
-	//for (int runID = 0; runID < 3; runID++)
-	//{
-	//	DatasetDescription description;
-	//	
-	//	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-	//	quantDesc->setName("SomeQuantity");
-	//	quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
-	//	
-	//	for (float i = 0.; i <= 50.; i++)
-	//	{
-	//		float value = i * (runID+1);
-	//		quantDesc->addDatapoint(ot::Variable(value));
-	//		parameter.values.push_back(ot::Variable(i));
-	//	}
-	//	if (parameterDesc == nullptr)
-	//	{
-	//		parameterDesc.reset(new ParameterDescription(parameter, false));
-	//	}
+	std::vector<float> offsets{ 3.5f,7.2f,13.f };
+	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
+	std::list<DatasetDescription> descriptions;
+	for (int runID = 0; runID < 3; runID++)
+	{
+		DatasetDescription description;
+		
+		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+		quantDesc->setName("SomeQuantity");
+		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
+		
+		for (float i = 0.; i <= 50.; i++)
+		{
+			float value = i * (runID+1);
+			quantDesc->addDatapoint(ot::Variable(value));
+			parameter.values.push_back(ot::Variable(i));
+		}
+		if (parameterDesc == nullptr)
+		{
+			parameterDesc.reset(new ParameterDescription(parameter, false));
+		}
 
-	//	MetadataParameter additionalParameter;
-	//	additionalParameter.parameterName = "Offset";
-	//	additionalParameter.values.push_back(offsets[runID]);
-	//	additionalParameter.typeName = ot::TypeNames::getFloatTypeName();
-	//	additionalParameter.unit = "mm";
-	//	std::shared_ptr<ParameterDescription> additionalParameterDescription(new ParameterDescription(additionalParameter, true));
-	//	
-	//	description.setQuantityDescription(quantDesc.release());
-	//	description.addParameterDescription(parameterDesc);
-	//	description.addParameterDescription(additionalParameterDescription);
-	//	descriptions.push_back(std::move(description));
-	//}
-	//
-	//builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
+		MetadataParameter additionalParameter;
+		additionalParameter.parameterName = "Offset";
+		additionalParameter.values.push_back(offsets[runID]);
+		additionalParameter.typeName = ot::TypeNames::getFloatTypeName();
+		additionalParameter.unit = "mm";
+		std::shared_ptr<ParameterDescription> additionalParameterDescription(new ParameterDescription(additionalParameter, true));
+		
+		description.setQuantityDescription(quantDesc.release());
+		description.addParameterDescription(parameterDesc);
+		description.addParameterDescription(additionalParameterDescription);
+		descriptions.push_back(std::move(description));
+	}
+	
+	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
 
 	// Family of curves 3 parameter
-	MetadataParameter parameter;
+	/*MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "[kOlf]";
@@ -363,7 +363,7 @@ void testPlot()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
+	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");*/
 
 
 	//Here the shared part

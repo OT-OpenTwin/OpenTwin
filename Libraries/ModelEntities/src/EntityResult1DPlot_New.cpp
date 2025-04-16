@@ -48,18 +48,18 @@ bool EntityResult1DPlot_New::updateFromProperties(void)
 	// Since there is a change now, we need to set the modified flag
 	setModified();
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::Plot1DCfg config = getPlot();
-	ot::JsonObject configObj;
-	config.addToJsonObject(configObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
-	getObserver()->sendMessageToViewer(doc);
-
-	// We now reset the update flag for all properties, since we took care of this above
-	getProperties().forceResetUpdateForAllProperties();
+	//ot::JsonDocument doc;
+	//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
+	//
+	//ot::Plot1DCfg config = getPlot();
+	//ot::JsonObject configObj;
+	//config.addToJsonObject(configObj, doc.GetAllocator());
+	//doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+	//
+	//getObserver()->sendMessageToViewer(doc);
+	//
+	//// We now reset the update flag for all properties, since we took care of this above
+	//getProperties().forceResetUpdateForAllProperties();
 
 	return updatePropertyVisibilities();
 }
@@ -136,7 +136,19 @@ void EntityResult1DPlot_New::createProperties(void)
 	EntityPropertiesDouble::createProperty("Y axis", "Y min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Y max", 0.0, "", getProperties());
 
+	EntityPropertiesSelection::createProperty("Family of curves", "X axis parameter", {}, "", "default", getProperties());
+
+
 	updatePropertyVisibilities();
+
+	getProperties().forceResetUpdateForAllProperties();
+}
+
+void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames)
+{
+	auto xAxisParameterSelection = PropertyHelper::getSelectionProperty(this, "X axis parameter");
+	xAxisParameterSelection->resetOptions(_parameterNames);
+	xAxisParameterSelection->setValue(*_parameterNames.begin());
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -163,12 +175,16 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	const double minY = PropertyHelper::getDoublePropertyValue(this, "Y min");
 	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Y max");
 
+	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Family of curves");
+
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
 	config.setTitle(title);
 	config.setProjectName(DataBase::GetDataBase()->getProjectName());
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
+
+	config.setXAxisParameter(xAxisParameter);
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
 	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));

@@ -3582,6 +3582,7 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 	return "";
 }
 
+
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
 	// Get view info from document
 	ot::BasicServiceInformation info;
@@ -3593,10 +3594,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	}
 
 	// Get plot
-	ot::Plot1DCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::Plot1DCfg plotConfig;
+	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(config, info, insertFlags);
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags);
 	ot::Plot* plot = plotView->getPlot();
 
 	// Clear plot if exists
@@ -3608,17 +3609,42 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 	ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
 	std::list<ot::PlotDataset*> dataSets;
+
+	const std::string xAxisParameter = plotConfig.getXAxisParameter();
 	for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
 		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
 		const std::string t = ot::json::toJson(curveCfgs);
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setFromJsonObject(curveCfgSerialised);
-		std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg);
-		for (const std::string& message : curveFactory.getRunIDDescriptions())
+		
+		const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
+		bool curveHasDataToVisualise = false;
+		if (xAxisParameter != "")
 		{
-			AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+			for (auto parameter : queryInformation.m_parameterDescriptions)
+			{
+				if (parameter.m_label == xAxisParameter)
+				{
+					curveHasDataToVisualise = true;
+				}
+			}
 		}
-		dataSets.splice(dataSets.begin(), newCurveDatasets);
+		else
+		{
+			curveHasDataToVisualise = true;
+		}
+		
+		if (curveHasDataToVisualise)
+		{
+			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg,xAxisParameter);
+			for (const std::string& message : curveFactory.getRunIDDescriptions())
+			{
+				AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+			}
+
+			dataSets.splice(dataSets.begin(), newCurveDatasets);
+		}
+
 	}
 
 	//Now we add the data sets to the plot and visualise them

@@ -120,10 +120,16 @@ namespace ot {
 		void setYAxisIsAutoScale(bool _autoScaleEnabled) { m_yAxis.setIsAutoScale(_autoScaleEnabled); };
 		bool getYAxisIsAutoScale(void) const { return m_yAxis.getIsAutoScale(); };
 
+		std::string getXAxisParameter() const { return m_xAxisParameter; }
+		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; }
+
+
 	private:
 		std::string m_projectName;
 		PlotType m_type;
 		AxisQuantity m_axisQuantity;
+
+		std::string m_xAxisParameter;
 
 		bool m_gridVisible;
 		ot::Color m_gridColor;

@@ -15,11 +15,11 @@ void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DC
 {
 	std::list<DatasetDescription> datasets;
 	datasets.push_back(std::move(_dataSetDescription));
- 	addCurveFamily(std::move(datasets), _config, _seriesName);
+	addCurve(std::move(datasets), _config, _seriesName);
 }
 
 
-void PlotBuilder::addCurveFamily(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 {
 	const bool valid = validityCheck(_dataSetDescriptions, _config);
 	assert(valid);
@@ -30,6 +30,12 @@ void PlotBuilder::addCurveFamily(std::list<DatasetDescription>&& _dataSetDescrip
 	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
+
+	
+	for (auto& parameterDescription : _config.getQueryInformation().m_parameterDescriptions)
+	{
+		m_parameterNames.push_back(parameterDescription.m_label);
+	}
 	curveEntity.setCurve(_config);
 	curveEntity.StoreToDataBase();
 
@@ -125,6 +131,8 @@ void PlotBuilder::createPlot(const ot::Plot1DCfg& _plotCfg)
 	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
 	plotEntity.setName(_plotCfg.getEntityName());
 	plotEntity.createProperties();
+	m_parameterNames.unique();
+	plotEntity.setFamilyOfCurveProperties(m_parameterNames);
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
 
