@@ -232,7 +232,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		}
 
 		newCurveCfg.setTitle(singleCurve.first);
-		
+		newCurveCfg.setXAxisUnit(xAxisParameter->m_unit);
+		newCurveCfg.setXAxisTitle(xAxisParameter->m_label);
 		//singleCurveCfg.setXAxisTitle();
 		//singleCurveCfg.setXAxisUnit();
 

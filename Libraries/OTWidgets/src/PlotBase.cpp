@@ -228,16 +228,18 @@ void ot::PlotBase::applyConfig(void) {
 
 	std::list<PlotDataset*> cache = this->getAllDatasets();
 	if (!cache.empty()) {
-		axisTitleX = cache.front()->getConfig().getXAxisTitle();
-		axisTitleY = cache.front()->getConfig().getYAxisTitle();
+		const ot::Plot1DCurveCfg& firstCfg = cache.front()->getConfig();
+		axisTitleX = createAxisLabel(firstCfg.getXAxisTitle(), firstCfg.getXAxisUnit());
+		axisTitleY = createAxisLabel(firstCfg.getYAxisTitle(), firstCfg.getYAxisUnit());
 		cache.pop_front();
 
 		for (const PlotDataset* itm : cache) {
-			if (axisTitleX != itm->getConfig().getXAxisTitle()) {
+			const ot::Plot1DCurveCfg& currentCfg = itm->getConfig();
+			if (axisTitleX != createAxisLabel(currentCfg.getXAxisTitle(), currentCfg.getXAxisUnit())) {
 				compatible = false;
 				break;
 			}
-			if (axisTitleY != itm->getConfig().getYAxisTitle()) {
+			if (axisTitleY != createAxisLabel(currentCfg.getYAxisTitle(), currentCfg.getYAxisUnit())) {
 				compatible = false;
 				break;
 			}
@@ -304,4 +306,14 @@ void ot::PlotBase::applyConfig(void) {
 	m_polarPlot->updateLegend();
 
 	m_polarPlot->updateWholePlot();
+}
+
+std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit)
+{
+	_unit.erase(std::remove_if(_unit.begin(), _unit.end(), isspace), _unit.end());	
+	if (!_unit.empty())
+	{
+		return _axisTitle + " [" + _unit + "]";
+	}
+	return _axisTitle;
 }

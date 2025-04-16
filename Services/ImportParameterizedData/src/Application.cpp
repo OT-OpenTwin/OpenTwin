@@ -252,7 +252,7 @@ void testPlot()
 	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
 
 	// Family of curves
-	MetadataParameter parameter;
+	/*MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "[kOlf]";
@@ -301,10 +301,10 @@ void testPlot()
 		descriptions.push_back(std::move(description));
 	}
 	
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
+	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");*/
 
 	// Family of curves 3 parameter
-	/*MetadataParameter parameter;
+	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "[kOlf]";
@@ -363,7 +363,7 @@ void testPlot()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurveFamily(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");*/
+	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
 
 
 	//Here the shared part

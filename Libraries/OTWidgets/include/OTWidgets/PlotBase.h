@@ -125,6 +125,8 @@ namespace ot {
 
 		bool m_isError;
 		
+
+		std::string createAxisLabel(const std::string& _axisTitle, std::string _unit);
 	};
 
 }
