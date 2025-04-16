@@ -360,6 +360,9 @@
     <ClInclude Include="include\OTCore\ComplexNumberContainer.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\ComparisionSymbols.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

@@ -415,6 +415,9 @@
     <ClInclude Include="include\EntitySolverPyrit.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\PropertyBundleQuerySettings.h">
+      <Filter>Header Files\PropertyBundle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -704,6 +707,9 @@
     </ClCompile>
     <ClCompile Include="src\EntitySolverPyrit.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleQuerySettings.cpp">
+      <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

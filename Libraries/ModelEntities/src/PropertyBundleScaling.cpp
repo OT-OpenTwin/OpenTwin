@@ -1,33 +1,33 @@
 #include "PropertyBundleScaling.h"
 
-void PropertyBundleScaling::SetProperties(EntityBase * thisObject)
+void PropertyBundleScaling::setProperties(EntityBase * _thisObject)
 {
-	EntityPropertiesSelection::createProperty(groupName, properties.GetPropertyNameScalingMethod(), 
+	EntityPropertiesSelection::createProperty(m_groupName, m_properties.GetPropertyNameScalingMethod(), 
 		{ 
-			properties.GetPropertyValueAutoscaling(), 
-			properties.GetPropertyValueRangeScaling() 
-		}, properties.GetPropertyValueAutoscaling(), defaultCategory, thisObject->getProperties());
-	EntityPropertiesSelection::createProperty(groupName, properties.GetPropertyNameScalingFunction(),
+			m_properties.GetPropertyValueAutoscaling(), 
+			m_properties.GetPropertyValueRangeScaling() 
+		}, m_properties.GetPropertyValueAutoscaling(), m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesSelection::createProperty(m_groupName, m_properties.GetPropertyNameScalingFunction(),
 		{
-			properties.GetPropertyValueLinScaling(),
-			properties.GetPropertyValueLogscaling()
-		}, properties.GetPropertyValueLinScaling(), defaultCategory, thisObject->getProperties());
+			m_properties.GetPropertyValueLinScaling(),
+			m_properties.GetPropertyValueLogscaling()
+		}, m_properties.GetPropertyValueLinScaling(), m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesDouble::createProperty(groupName, properties.GetPropertyNameRangeMin(), 0.0, defaultCategory, thisObject->getProperties());
-	EntityPropertiesDouble::createProperty(groupName, properties.GetPropertyNameRangeMax(), 0.0, defaultCategory, thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyNameRangeMin(), 0.0, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupName, m_properties.GetPropertyNameRangeMax(), 0.0, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesInteger::createProperty(groupName, properties.GetPropertyNameColourResolution(), 30., defaultCategory, thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupName, m_properties.GetPropertyNameColourResolution(), 30., m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleScaling::UpdatePropertyVisibility(EntityBase * thisObject)
+bool PropertyBundleScaling::updatePropertyVisibility(EntityBase * _thisObject)
 {
-	auto scalingMethod = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetPropertyNameScalingMethod()));
+	auto scalingMethod = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyNameScalingMethod()));
 
-	auto minScale = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameRangeMin()));
-	auto maxScale = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameRangeMax()));
+	auto minScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyNameRangeMin()));
+	auto maxScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetPropertyNameRangeMax()));
 
 	bool updatePropertiesGrid = false;
-	if (scalingMethod->getValue() == properties.GetPropertyValueRangeScaling())
+	if (scalingMethod->getValue() == m_properties.GetPropertyValueRangeScaling())
 	{
 		if (!minScale->getVisible())
 		{

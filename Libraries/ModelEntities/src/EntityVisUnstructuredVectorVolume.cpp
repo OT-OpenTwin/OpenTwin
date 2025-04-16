@@ -38,9 +38,9 @@ void EntityVisUnstructuredVectorVolume::createProperties(void)
 {
 	assert(resultType != EntityResultBase::UNKNOWN);
 
-	propertyBundleVisUnstructuredVector.SetProperties(this);
-	propertyBundlePlane.SetProperties(this);
-	propertyBundleScaling.SetProperties(this);
+	propertyBundleVisUnstructuredVector.setProperties(this);
+	propertyBundlePlane.setProperties(this);
+	propertyBundleScaling.setProperties(this);
 
 	updatePropertyVisibilities();
 
@@ -52,18 +52,18 @@ bool EntityVisUnstructuredVectorVolume::updatePropertyVisibilities(void)
 	bool updatePropertiesGrid = false;
 	bool is2dType = false;
 
-	updatePropertiesGrid |= propertyBundleVisUnstructuredVector.UpdatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleVisUnstructuredVector.updatePropertyVisibility(this);
 
 	if (propertyBundleVisUnstructuredVector.is2dType(this))
 	{
-		updatePropertiesGrid |= propertyBundlePlane.UpdatePropertyVisibility(this);
+		updatePropertiesGrid |= propertyBundlePlane.updatePropertyVisibility(this);
 	}
 	else
 	{
-		updatePropertiesGrid |= propertyBundlePlane.HidePlane(this);
+		updatePropertiesGrid |= propertyBundlePlane.hidePlane(this);
 	}
 
-	updatePropertiesGrid |= propertyBundleScaling.UpdatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleScaling.updatePropertyVisibility(this);
 
 	return updatePropertiesGrid;
 }

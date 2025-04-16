@@ -1,6 +1,8 @@
 #pragma once
 #include "EntityContainer.h"
 #include "IVisualisationPlot1D.h"
+#include "PropertyBundleQuerySettings.h"
+
 class __declspec(dllexport) EntityResult1DPlot_New : public EntityContainer, public IVisualisationPlot1D
 {
 public:
@@ -19,7 +21,6 @@ public:
 	void createProperties(void);
 
 	void setFamilyOfCurveProperties(std::list<std::string>& _parameterNames);
-	
 
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
@@ -28,6 +29,8 @@ public:
 	bool visualisePlot() override;
 
 private:
+	PropertyBundleQuerySettings m_querySettings;
+
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 

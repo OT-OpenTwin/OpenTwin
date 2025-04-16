@@ -86,9 +86,9 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 		updatePropertiesGrid = true;
 	}
 
-	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale X");
-	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "X min");
-	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "X max");
+	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", "X axis");
+	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", "X axis");
+	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", "X axis");
 	assert(minX->getValue() == maxX->getValue());
 
 	if (autoscaleX->getValue() == minX->getVisible())
@@ -100,9 +100,9 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 		updatePropertiesGrid = true;
 	}
 
-	EntityPropertiesBoolean* autoscaleY = PropertyHelper::getBoolProperty(this,"Autoscale Y");
-	EntityPropertiesDouble* minY = PropertyHelper::getDoubleProperty(this, "Y min");
-	EntityPropertiesDouble* maxY = PropertyHelper::getDoubleProperty(this, "Y max");
+	EntityPropertiesBoolean* autoscaleY = PropertyHelper::getBoolProperty(this,"Autoscale", "Y axis");
+	EntityPropertiesDouble* minY = PropertyHelper::getDoubleProperty(this, "Min","Y axis");
+	EntityPropertiesDouble* maxY = PropertyHelper::getDoubleProperty(this, "Max","Y axis");
 	assert(minY->getValue() == maxY->getValue());
 
 	if (autoscaleY->getValue() == minY->getVisible())
@@ -113,6 +113,8 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 		maxY->resetNeedsUpdate();
 		updatePropertiesGrid = true;
 	}
+
+	updatePropertiesGrid |= m_querySettings.updatePropertyVisibility(this);
 
 	return updatePropertiesGrid;
 }
@@ -126,18 +128,21 @@ void EntityResult1DPlot_New::createProperties(void)
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
 
-	EntityPropertiesBoolean::createProperty("X axis", "Logscale X", false, "", getProperties());
-	EntityPropertiesBoolean::createProperty("X axis", "Autoscale X", true, "", getProperties());
-	EntityPropertiesDouble::createProperty("X axis", "X min", 0.0, "", getProperties());
-	EntityPropertiesDouble::createProperty("X axis", "X max", 0.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Logscale", false, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Autoscale", true, "", getProperties());
+	EntityPropertiesDouble::createProperty("X axis", "Min", 0.0, "", getProperties());
+	EntityPropertiesDouble::createProperty("X axis", "Max", 0.0, "", getProperties());
 
-	EntityPropertiesBoolean::createProperty("Y axis", "Logscale Y", false, "", getProperties());
-	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale Y", true, "", getProperties());
-	EntityPropertiesDouble::createProperty("Y axis", "Y min", 0.0, "", getProperties());
-	EntityPropertiesDouble::createProperty("Y axis", "Y max", 0.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Logscale", false, "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale", true, "", getProperties());
+	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
+	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
 
-	EntityPropertiesSelection::createProperty("Family of curves", "X axis parameter", {}, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
+	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
 
+	m_querySettings.setProperties(this);
 
 	updatePropertyVisibilities();
 
@@ -165,17 +170,17 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
 	
-	const bool logScaleX = PropertyHelper::getBoolPropertyValue(this, "Logscale X");
-	const bool autoScaleX = PropertyHelper::getBoolPropertyValue(this, "Autoscale X");
-	const double minX = PropertyHelper::getDoublePropertyValue(this, "X min");
-	const double maxX = PropertyHelper::getDoublePropertyValue(this, "X max");
+	const bool logScaleX = PropertyHelper::getBoolPropertyValue(this, "Logscale", "X axis");
+	const bool autoScaleX = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "X axis");
+	const double minX = PropertyHelper::getDoublePropertyValue(this, "Min", "X axis");
+	const double maxX = PropertyHelper::getDoublePropertyValue(this, "Max", "X axis");
 
-	const bool logScaleY = PropertyHelper::getBoolPropertyValue(this, "Logscale Y");
-	const bool autoScaleY = PropertyHelper::getBoolPropertyValue(this, "Autoscale Y");
-	const double minY = PropertyHelper::getDoublePropertyValue(this, "Y min");
-	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Y max");
+	const bool logScaleY = PropertyHelper::getBoolPropertyValue(this, "Logscale", "Y axis");
+	const bool autoScaleY = PropertyHelper::getBoolPropertyValue(this, "Autoscale", "Y axis");
+	const double minY = PropertyHelper::getDoublePropertyValue(this, "Min", "Y axis");
+	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Max", "Y axis");
 
-	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Family of curves");
+	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
 
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
@@ -233,15 +238,15 @@ void EntityResult1DPlot_New::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
 	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
 
-	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale X");
-	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale X");
-	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "X min");
-	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "X max");
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", "X axis");
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", "X axis");
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", "X axis");
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", "X axis");
 
-	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale Y");
-	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale Y");
-	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Y min");
-	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Y max");
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", "Y axis");
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", "Y axis");
 }
 
 

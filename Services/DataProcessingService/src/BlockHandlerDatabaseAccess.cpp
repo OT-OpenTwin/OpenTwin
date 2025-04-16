@@ -482,10 +482,10 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 	if (comparator == BlockEntityHandler::getQueryForRangeSelection()) {
 		this->buildRangeQuery(_definition, builder, converter);
 	}
-	else if (comparator == AdvancedQueryBuilder::getAnyOfComparator()) {
+	else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator) {
 		this->buildContainsQuery(_definition, builder, converter, true);
 	}
-	else if (comparator == AdvancedQueryBuilder::getNoneOfComparator()) {
+	else if (comparator == ot::ComparisionSymbols::g_noneOfComparator) {
 		this->buildContainsQuery(_definition, builder, converter, false);
 	}
 	else if (comparator != " ") {

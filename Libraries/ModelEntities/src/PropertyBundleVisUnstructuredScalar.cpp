@@ -1,40 +1,40 @@
 #include "PropertyBundleVisUnstructuredScalar.h"
 
-void PropertyBundleVisUnstructuredScalar:: SetProperties(EntityBase * thisObject)
+void PropertyBundleVisUnstructuredScalar:: setProperties(EntityBase * _thisObject)
 {
-	EntityPropertiesSelection::createProperty(groupNameGeneral, properties.GetNameVisType(),
+	EntityPropertiesSelection::createProperty(m_groupNameGeneral, m_properties.GetNameVisType(),
 		{
-			properties.GetValueIsosurface(),
-			properties.GetValuePoints(),
-			properties.GetValueContour2D()
-		}, properties.GetValueContour2D(), defaultCategory, thisObject->getProperties());
+			m_properties.GetValueIsosurface(),
+			m_properties.GetValuePoints(),
+			m_properties.GetValueContour2D()
+		}, m_properties.GetValueContour2D(), m_defaultCategory, _thisObject->getProperties());
 	
-	EntityPropertiesInteger::createProperty(groupNameIsosurfaces, properties.GetNameNumberIsosurfaces(), 1, defaultCategory, thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupNameIsosurfaces, m_properties.GetNameNumberIsosurfaces(), 1, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesBoolean::createProperty(groupNameGeneral, properties.GetNameShow2DMesh(), false, defaultCategory, thisObject->getProperties());
-	EntityPropertiesColor::createProperty(groupNameGeneral, properties.GetName2DMeshColor(), { 255, 255, 255 }, defaultCategory, thisObject->getProperties());
+	EntityPropertiesBoolean::createProperty(m_groupNameGeneral, m_properties.GetNameShow2DMesh(), false, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesColor::createProperty(m_groupNameGeneral, m_properties.GetName2DMeshColor(), { 255, 255, 255 }, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesBoolean::createProperty(groupNameContour, properties.GetNameShow2DIsolines(), true, defaultCategory, thisObject->getProperties());
-	EntityPropertiesColor::createProperty(groupNameContour, properties.GetName2DIsolineColor(), { 0, 0, 0 }, defaultCategory, thisObject->getProperties());
+	EntityPropertiesBoolean::createProperty(m_groupNameContour, m_properties.GetNameShow2DIsolines(), true, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesColor::createProperty(m_groupNameContour, m_properties.GetName2DIsolineColor(), { 0, 0, 0 }, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesDouble::createProperty(groupNamePoints, properties.GetNamePointScale(), 1., defaultCategory, thisObject->getProperties());
-	EntityPropertiesInteger::createProperty(groupNamePoints, properties.GetNameMaxPoints(), 1000, defaultCategory, thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupNamePoints, m_properties.GetNamePointScale(), 1., m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupNamePoints, m_properties.GetNameMaxPoints(), 1000, m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * thisObject)
+bool PropertyBundleVisUnstructuredScalar::updatePropertyVisibility(EntityBase * _thisObject)
 {
-	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisType()));
-	EntityPropertiesDouble* pointScale = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetNamePointScale()));
-	EntityPropertiesInteger* numberIsosurfaces = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameNumberIsosurfaces()));
-	EntityPropertiesBoolean* show2dMesh = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DMesh()));
-	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DMeshColor()));
-	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DIsolines()));
-	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DIsolineColor()));
-	EntityPropertiesInteger* maxPoints = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxPoints()));
+	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
+	EntityPropertiesDouble* pointScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetNamePointScale()));
+	EntityPropertiesInteger* numberIsosurfaces = dynamic_cast<EntityPropertiesInteger*>(_thisObject->getProperties().getProperty(m_properties.GetNameNumberIsosurfaces()));
+	EntityPropertiesBoolean* show2dMesh = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DMesh()));
+	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(_thisObject->getProperties().getProperty(m_properties.GetName2DMeshColor()));
+	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DIsolines()));
+	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(_thisObject->getProperties().getProperty(m_properties.GetName2DIsolineColor()));
+	EntityPropertiesInteger* maxPoints = dynamic_cast<EntityPropertiesInteger*>(_thisObject->getProperties().getProperty(m_properties.GetNameMaxPoints()));
 
 	assert(visType != nullptr);
 
-	PropertiesVisUnstructuredScalar::VisualizationType type = properties.GetVisualizationType(visType->getValue());
+	PropertiesVisUnstructuredScalar::VisualizationType type = m_properties.GetVisualizationType(visType->getValue());
 	assert(type != PropertiesVisUnstructuredScalar::VisualizationType::UNKNOWN);
 
 	if (type == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface)
@@ -165,12 +165,12 @@ bool PropertyBundleVisUnstructuredScalar::UpdatePropertyVisibility(EntityBase * 
 	return false;
 }
 
-bool PropertyBundleVisUnstructuredScalar::is2dType(EntityBase* thisObject)
+bool PropertyBundleVisUnstructuredScalar::is2dType(EntityBase* _thisObject)
 {
-	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisType()));
+	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	assert(visType != nullptr);
 
-	PropertiesVisUnstructuredScalar::VisualizationType type = properties.GetVisualizationType(visType->getValue());
+	PropertiesVisUnstructuredScalar::VisualizationType type = m_properties.GetVisualizationType(visType->getValue());
 	assert(type != PropertiesVisUnstructuredScalar::VisualizationType::UNKNOWN);
 
 	if (type == PropertiesVisUnstructuredScalar::VisualizationType::Isosurface)

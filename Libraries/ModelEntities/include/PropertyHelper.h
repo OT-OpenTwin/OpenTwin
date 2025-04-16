@@ -9,6 +9,7 @@ namespace PropertyHelper
 	std::string getSelectionPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	bool getBoolPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	ot::Color getColourPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	int32_t getIntegerPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	EntityPropertiesDouble* getDoubleProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName ="");
 	EntityPropertiesString* getStringProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");

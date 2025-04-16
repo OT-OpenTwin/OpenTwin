@@ -127,6 +127,7 @@
     <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVector.h" />
     <ClInclude Include="include\PropertyBundleDataHandleVis2D3D.h" />
     <ClInclude Include="include\PropertyBundlePlane.h" />
+    <ClInclude Include="include\PropertyBundleQuerySettings.h" />
     <ClInclude Include="include\PropertyBundleScaling.h" />
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalar.h" />
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalarSurface.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVector.cpp" />
     <ClCompile Include="src\PropertyBundlePlane.cpp" />
+    <ClCompile Include="src\PropertyBundleQuerySettings.cpp" />
     <ClCompile Include="src\PropertyBundleScaling.cpp" />
     <ClCompile Include="src\PropertyBundleVis2D3D.cpp" />
     <ClCompile Include="src\PropertyBundleVisUnstructuredScalar.cpp" />

@@ -19,6 +19,8 @@
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
 #include "SharedResources.h"
+#include "OTCore/ComparisionSymbols.h"
+
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -177,7 +179,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
 	if (dbaBlock != nullptr)
 	{
-		auto comparators = AdvancedQueryBuilder::getComparators();
+		auto comparators = ot::ComparisionSymbols::g_comparators;
 		comparators.push_back(getQueryForRangeSelection());
 		comparators.push_back(" ");
 		dbaBlock->createProperties(comparators);

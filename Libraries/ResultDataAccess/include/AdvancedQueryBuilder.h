@@ -3,14 +3,10 @@
 #include <list>
 #include "OTCore/Variable.h"
 #include "Helper/QueryBuilder.h"
-
+#include "OTCore/ComparisionSymbols.h"
 class __declspec(dllexport) AdvancedQueryBuilder : public DataStorageAPI::QueryBuilder
 {
-public:
-	static const std::list<std::string>& getComparators() { return m_comparators; }
-	static std::string getAnyOfComparator() { return m_anyOfComparator; }
-	static std::string getNoneOfComparator() { return m_noneOfComparator; }
-	
+public:	
 	BsonViewOrValue CreateComparison(const std::string& comparator, const ot::Variable& variable);
 
 	/// <summary>
@@ -24,8 +20,5 @@ public:
 	BsonViewOrValue ConnectWithOR (std::list<BsonViewOrValue>&& values);
 
 private:
-	inline static const std::string m_anyOfComparator = "any of";
-	inline static const std::string m_noneOfComparator = "not any of";
-	inline static const std::list<std::string> m_comparators = { "<", "<=", "=", ">", ">=", "!=", m_anyOfComparator, m_noneOfComparator };;
-	inline static const std::map<std::string, std::string> m_mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"=","$eq"}, {"!=", "$ne"}, {m_anyOfComparator,"$in"}, {m_noneOfComparator,"$nin"} };
+	inline static const std::map<std::string, std::string> m_mongoDBComparators = { {"<","$lt"},{"<=","$lte"},{">=","$gte"},{">","$gt"},{"=","$eq"}, {"!=", "$ne"}, {ot::ComparisionSymbols::g_anyOneOfComparator,"$in"}, {ot::ComparisionSymbols::g_noneOfComparator,"$nin"} };
 };

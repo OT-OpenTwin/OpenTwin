@@ -37,9 +37,25 @@ ot::Color PropertyHelper::getColourPropertyValue(EntityBase* _base, const std::s
 	return colour;
 }
 
+int32_t PropertyHelper::getIntegerPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name,_groupName);
+	if (propertyBase == nullptr)
+	{
+		throw std::exception(("Failed to access property " + _name).c_str());
+	}
+
+	EntityPropertiesInteger* intProperty= dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	if (intProperty == nullptr)
+	{
+		throw std::exception(("Tried to cast property " + _name + " to wrong type: double").c_str());
+	}
+	return intProperty->getValue();
+}
+
 EntityPropertiesDouble* PropertyHelper::getDoubleProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name);
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
 	if (propertyBase == nullptr)
 	{
 		throw std::exception(("Failed to access property " + _name).c_str());
@@ -55,7 +71,7 @@ EntityPropertiesDouble* PropertyHelper::getDoubleProperty(EntityBase* _base, con
 
 EntityPropertiesString* PropertyHelper::getStringProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name);
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
 	if (propertyBase == nullptr)
 	{
 		throw std::exception(("Failed to access property " + _name).c_str());
@@ -71,7 +87,7 @@ EntityPropertiesString* PropertyHelper::getStringProperty(EntityBase* _base, con
 
 EntityPropertiesSelection* PropertyHelper::getSelectionProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name);
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
 	if (propertyBase == nullptr)
 	{
 		throw std::exception(("Failed to access property " + _name).c_str());
@@ -86,7 +102,7 @@ EntityPropertiesSelection* PropertyHelper::getSelectionProperty(EntityBase* _bas
 
 EntityPropertiesBoolean* PropertyHelper::getBoolProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name);
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
 	if (propertyBase == nullptr)
 	{
 		throw std::exception(("Failed to access property " + _name).c_str());
@@ -102,7 +118,7 @@ EntityPropertiesBoolean* PropertyHelper::getBoolProperty(EntityBase* _base, cons
 
 EntityPropertiesColor* PropertyHelper::getColourProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
-	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name);
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
 	if (propertyBase == nullptr)
 	{
 		throw std::exception(("Failed to access property " + _name).c_str());

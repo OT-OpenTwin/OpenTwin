@@ -38,8 +38,8 @@ void EntityVisUnstructuredScalarSurface::createProperties(void)
 {
 	assert(resultType != EntityResultBase::UNKNOWN);
 
-	propertyBundleVisUnstructuredScalarSurface.SetProperties(this);
-	propertyBundleScaling.SetProperties(this);
+	propertyBundleVisUnstructuredScalarSurface.setProperties(this);
+	propertyBundleScaling.setProperties(this);
 
 	updatePropertyVisibilities();
 
@@ -51,8 +51,8 @@ bool EntityVisUnstructuredScalarSurface::updatePropertyVisibilities(void)
 	bool updatePropertiesGrid = false;
 	bool is2dType = false;
 
-	updatePropertiesGrid |= propertyBundleVisUnstructuredScalarSurface.UpdatePropertyVisibility(this);
-	updatePropertiesGrid |= propertyBundleScaling.UpdatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleVisUnstructuredScalarSurface.updatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleScaling.updatePropertyVisibility(this);
 
 	return updatePropertiesGrid;
 }

@@ -7,9 +7,9 @@ void EntityResult3D::createProperties(void)
 {
 	assert(resultType != EntityResultBase::UNKNOWN);
 
-	propertyBundlePlane.SetProperties(this);
-	propertyBundleScaling.SetProperties(this);
-	propertyBundleVis2D3D.SetProperties(this);
+	propertyBundlePlane.setProperties(this);
+	propertyBundleScaling.setProperties(this);
+	propertyBundleVis2D3D.setProperties(this);
 
 	updatePropertyVisibilities();
 
@@ -20,9 +20,9 @@ bool EntityResult3D::updatePropertyVisibilities(void)
 {
 	bool updatePropertiesGrid = false;
 
-	updatePropertiesGrid = propertyBundlePlane.UpdatePropertyVisibility(this);
-	updatePropertiesGrid |= propertyBundleScaling.UpdatePropertyVisibility(this);
-	updatePropertiesGrid |= propertyBundleVis2D3D.UpdatePropertyVisibility(this);
+	updatePropertiesGrid = propertyBundlePlane.updatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleScaling.updatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleVis2D3D.updatePropertyVisibility(this);
 
 	return updatePropertiesGrid;
 }

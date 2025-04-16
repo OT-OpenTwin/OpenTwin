@@ -6,13 +6,13 @@
 class __declspec(dllexport) PropertyBundleVisUnstructuredScalarSurface : public PropertyBundle
 {
 public:
-	virtual void SetProperties(EntityBase * thisObject) override;
-	virtual bool UpdatePropertyVisibility(EntityBase * thisObject) override;
+	virtual void setProperties(EntityBase * _thisObject) override;
+	virtual bool updatePropertyVisibility(EntityBase * _thisObject) override;
 
 private:
-	PropertiesVisUnstructuredScalarSurface properties;
-	const std::string defaultCategory = "3D Visualization";
-	const std::string groupNameGeneral = "General";
-	const std::string groupNamePoints = "Points";
-	const std::string groupNameContour = "Contour";
+	PropertiesVisUnstructuredScalarSurface m_properties;
+	const std::string m_defaultCategory = "3D Visualization";
+	const std::string m_groupNameGeneral = "General";
+	const std::string m_groupNamePoints = "Points";
+	const std::string m_groupNameContour = "Contour";
 };

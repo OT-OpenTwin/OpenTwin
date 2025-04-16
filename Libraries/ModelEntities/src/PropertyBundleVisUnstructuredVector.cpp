@@ -1,57 +1,57 @@
 #include "PropertyBundleVisUnstructuredVector.h"
 
-void PropertyBundleVisUnstructuredVector:: SetProperties(EntityBase * thisObject)
+void PropertyBundleVisUnstructuredVector:: setProperties(EntityBase * _thisObject)
 {
-	EntityPropertiesSelection::createProperty(groupNameGeneral, properties.GetNameVisType(),
+	EntityPropertiesSelection::createProperty(m_groupNameGeneral, m_properties.GetNameVisType(),
 		{
-			properties.GetValueArrows3D(),
-			properties.GetValueArrows2D(),
-			properties.GetValueContour2D()
-		}, properties.GetValueArrows3D(), defaultCategory, thisObject->getProperties());
+			m_properties.GetValueArrows3D(),
+			m_properties.GetValueArrows2D(),
+			m_properties.GetValueContour2D()
+		}, m_properties.GetValueArrows3D(), m_defaultCategory, _thisObject->getProperties());
 	
-	EntityPropertiesSelection::createProperty(groupNameContour, properties.GetNameVisComponent(),
+	EntityPropertiesSelection::createProperty(m_groupNameContour, m_properties.GetNameVisComponent(),
 		{
-			properties.GetValueComponentX(),
-			properties.GetValueComponentY(),
-			properties.GetValueComponentZ(),
-			properties.GetValueAbsolute()
-		}, properties.GetValueAbsolute(), defaultCategory, thisObject->getProperties());
+			m_properties.GetValueComponentX(),
+			m_properties.GetValueComponentY(),
+			m_properties.GetValueComponentZ(),
+			m_properties.GetValueAbsolute()
+		}, m_properties.GetValueAbsolute(), m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesSelection::createProperty(groupNameArrows, properties.GetNameArrowType(),
+	EntityPropertiesSelection::createProperty(m_groupNameArrows, m_properties.GetNameArrowType(),
 		{
-			properties.GetValueArrowTypeShaded(),
-			properties.GetValueArrowTypeFlat(),
-			properties.GetValueArrowTypeHedgehog(),
-		}, properties.GetValueArrowTypeShaded(), defaultCategory, thisObject->getProperties());
+			m_properties.GetValueArrowTypeShaded(),
+			m_properties.GetValueArrowTypeFlat(),
+			m_properties.GetValueArrowTypeHedgehog(),
+		}, m_properties.GetValueArrowTypeShaded(), m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesDouble::createProperty(groupNameArrows, properties.GetNameArrowScale(), 1., defaultCategory, thisObject->getProperties());
+	EntityPropertiesDouble::createProperty(m_groupNameArrows, m_properties.GetNameArrowScale(), 1., m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesBoolean::createProperty(groupNameGeneral, properties.GetNameShow2DMesh(), false, defaultCategory, thisObject->getProperties());
-	EntityPropertiesColor::createProperty(groupNameGeneral, properties.GetName2DMeshColor(), { 255, 255, 255 }, defaultCategory, thisObject->getProperties());
+	EntityPropertiesBoolean::createProperty(m_groupNameGeneral, m_properties.GetNameShow2DMesh(), false, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesColor::createProperty(m_groupNameGeneral, m_properties.GetName2DMeshColor(), { 255, 255, 255 }, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesBoolean::createProperty(groupNameContour, properties.GetNameShow2DIsolines(), true, defaultCategory, thisObject->getProperties());
-	EntityPropertiesColor::createProperty(groupNameContour, properties.GetName2DIsolineColor(), { 0, 0, 0 }, defaultCategory, thisObject->getProperties());
+	EntityPropertiesBoolean::createProperty(m_groupNameContour, m_properties.GetNameShow2DIsolines(), true, m_defaultCategory, _thisObject->getProperties());
+	EntityPropertiesColor::createProperty(m_groupNameContour, m_properties.GetName2DIsolineColor(), { 0, 0, 0 }, m_defaultCategory, _thisObject->getProperties());
 
-	EntityPropertiesInteger::createProperty(groupNameArrows, properties.GetNameMaxArrows(), 1000, defaultCategory, thisObject->getProperties());
+	EntityPropertiesInteger::createProperty(m_groupNameArrows, m_properties.GetNameMaxArrows(), 1000, m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * thisObject)
+bool PropertyBundleVisUnstructuredVector::updatePropertyVisibility(EntityBase * _thisObject)
 {
-	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisType()));
-	EntityPropertiesSelection* visComp = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisComponent()));
-	EntityPropertiesSelection* arrowType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameArrowType()));
-	EntityPropertiesDouble* arrowScale = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetNameArrowScale()));
-	EntityPropertiesBoolean* show2dMesh = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DMesh()));
-	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DMeshColor()));
-	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(thisObject->getProperties().getProperty(properties.GetNameShow2DIsolines()));
-	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(thisObject->getProperties().getProperty(properties.GetName2DIsolineColor()));
-	EntityPropertiesInteger* maxArrows = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxArrows()));
+	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
+	EntityPropertiesSelection* visComp = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisComponent()));
+	EntityPropertiesSelection* arrowType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameArrowType()));
+	EntityPropertiesDouble* arrowScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetNameArrowScale()));
+	EntityPropertiesBoolean* show2dMesh = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DMesh()));
+	EntityPropertiesColor* color2dMesh = dynamic_cast<EntityPropertiesColor*>(_thisObject->getProperties().getProperty(m_properties.GetName2DMeshColor()));
+	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DIsolines()));
+	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(_thisObject->getProperties().getProperty(m_properties.GetName2DIsolineColor()));
+	EntityPropertiesInteger* maxArrows = dynamic_cast<EntityPropertiesInteger*>(_thisObject->getProperties().getProperty(m_properties.GetNameMaxArrows()));
 
 	assert(visType != nullptr);
 	assert(visComp != nullptr);
 	assert(maxArrows != nullptr);
 
-	PropertiesVisUnstructuredVector::VisualizationType type = properties.GetVisualizationType(visType->getValue());
+	PropertiesVisUnstructuredVector::VisualizationType type = m_properties.GetVisualizationType(visType->getValue());
 	assert(type != PropertiesVisUnstructuredVector::VisualizationType::UNKNOWN);
 
 	if (type == PropertiesVisUnstructuredVector::VisualizationType::Arrows3D)
@@ -197,12 +197,12 @@ bool PropertyBundleVisUnstructuredVector::UpdatePropertyVisibility(EntityBase * 
 	return false;
 }
 
-bool PropertyBundleVisUnstructuredVector::is2dType(EntityBase* thisObject)
+bool PropertyBundleVisUnstructuredVector::is2dType(EntityBase* _thisObject)
 {
-	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisType()));
+	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	assert(visType != nullptr);
 
-	PropertiesVisUnstructuredVector::VisualizationType type = properties.GetVisualizationType(visType->getValue());
+	PropertiesVisUnstructuredVector::VisualizationType type = m_properties.GetVisualizationType(visType->getValue());
 	assert(type != PropertiesVisUnstructuredVector::VisualizationType::UNKNOWN);
 
 	if (type == PropertiesVisUnstructuredVector::VisualizationType::Arrows3D)

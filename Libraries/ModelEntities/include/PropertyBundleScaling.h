@@ -5,11 +5,11 @@
 class __declspec(dllexport) PropertyBundleScaling : public PropertyBundle
 {
 public:
-	void SetProperties(EntityBase * thisObject) override;
-	bool UpdatePropertyVisibility(EntityBase * thisObject) override;
+	void setProperties(EntityBase * _thisObject) override;
+	bool updatePropertyVisibility(EntityBase * _thisObject) override;
 	
 private:
-	const std::string groupName = "Scaling";
-	const std::string defaultCategory = "Scaling";
-	ScalingProperties properties;
+	const std::string m_groupName = "Scaling";
+	const std::string m_defaultCategory = "Scaling";
+	ScalingProperties m_properties;
 };
