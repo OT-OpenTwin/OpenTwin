@@ -48,9 +48,6 @@
     <ClInclude Include="include\EntityBlockCircuitResistor.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\ValueComparisionDefinition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityBlockDataDimensionReducer.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>

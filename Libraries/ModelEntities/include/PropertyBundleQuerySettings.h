@@ -1,6 +1,6 @@
 #pragma once
 #include "PropertyBundle.h"
-
+#include "OTCore/ValueComparisionDefinition.h"
 
 class __declspec(dllexport) PropertyBundleQuerySettings : public PropertyBundle
 {
@@ -9,6 +9,9 @@ public:
 	virtual bool updatePropertyVisibility(EntityBase* _thisObject) override;
 	void setQueryDefinitions(const std::list<std::string>& _queryOptions);
 	void reload(EntityBase* _thisObject);
+
+	std::list<ValueComparisionDefinition> getValueComparisionDefinitions(EntityBase* _thisObject);
+
 private:
 	const std::string m_groupQuerySettings = "Query settings";
 	const std::string m_propertyNbOfComparisions = "Number of queries";

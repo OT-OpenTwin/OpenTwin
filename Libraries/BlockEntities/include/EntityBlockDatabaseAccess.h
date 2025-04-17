@@ -1,6 +1,6 @@
 #pragma once
 #include "EntityBlock.h"
-#include "ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisionDefinition.h"
 
 struct __declspec(dllexport) ValueCharacteristicProperties
 {

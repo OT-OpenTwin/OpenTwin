@@ -3611,6 +3611,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	std::list<ot::PlotDataset*> dataSets;
 
 	const std::string xAxisParameter = plotConfig.getXAxisParameter();
+	const std::list<ValueComparisionDefinition>& queries =	plotConfig.getQueries();
+	bool useLimitedNbOfCurves =	plotConfig.getUseLimitNbOfCurves();
+	int32_t limitOfCurves =	plotConfig.getLimitOfCurves();
+	
 	for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
 		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
 		const std::string t = ot::json::toJson(curveCfgs);
@@ -3636,23 +3640,39 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		
 		if (curveHasDataToVisualise)
 		{
-			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg,xAxisParameter);
+			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg,xAxisParameter, queries);
 			for (const std::string& message : curveFactory.getRunIDDescriptions())
 			{
 				AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 			}
 
 			dataSets.splice(dataSets.begin(), newCurveDatasets);
+			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
+			{
+				break;
+			}
 		}
 
 	}
 
 	//Now we add the data sets to the plot and visualise them
+	int32_t curveCounter(1);
 	for (ot::PlotDataset* dataSet : dataSets) {
-		dataSet->setOwnerPlot(plot);
-		dataSet->updateCurveVisualization();
-		plot->addDatasetToCache(dataSet);
-		dataSet->attach();
+		
+		
+		if (!useLimitedNbOfCurves || (useLimitedNbOfCurves && curveCounter <= limitOfCurves))
+		{
+			dataSet->setOwnerPlot(plot);
+			dataSet->updateCurveVisualization();
+			plot->addDatasetToCache(dataSet);
+			dataSet->attach();
+		}
+		else
+		{
+			delete dataSet;
+			dataSet = nullptr;
+		}
+		curveCounter++;
 	}
 
 	plot->refresh();

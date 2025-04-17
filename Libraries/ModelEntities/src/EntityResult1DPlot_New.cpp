@@ -91,7 +91,6 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 	EntityPropertiesBoolean* autoscaleX = PropertyHelper::getBoolProperty(this, "Autoscale", "X axis");
 	EntityPropertiesDouble* minX = PropertyHelper::getDoubleProperty(this, "Min", "X axis");
 	EntityPropertiesDouble* maxX = PropertyHelper::getDoubleProperty(this, "Max", "X axis");
-	assert(minX->getValue() == maxX->getValue());
 
 	if (autoscaleX->getValue() == minX->getVisible())
 	{
@@ -105,7 +104,6 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 	EntityPropertiesBoolean* autoscaleY = PropertyHelper::getBoolProperty(this,"Autoscale", "Y axis");
 	EntityPropertiesDouble* minY = PropertyHelper::getDoubleProperty(this, "Min","Y axis");
 	EntityPropertiesDouble* maxY = PropertyHelper::getDoubleProperty(this, "Max","Y axis");
-	assert(minY->getValue() == maxY->getValue());
 
 	if (autoscaleY->getValue() == minY->getVisible())
 	{
@@ -183,7 +181,12 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	const double minY = PropertyHelper::getDoublePropertyValue(this, "Min", "Y axis");
 	const double maxY = PropertyHelper::getDoublePropertyValue(this, "Max", "Y axis");
 
+	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
+	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
+
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
+
+	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
@@ -210,6 +213,11 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	config.setYAxisIsAutoScale(autoScaleY);
 	config.setYAxisMin(minY);
 	config.setYAxisMax(maxY);
+
+	config.setQueries(queries);
+
+	config.setLimitOfCurves(maxNbOfCurves);
+	config.setUseLimitNbOfCurves(useCurveLimit);
 
 	return config;
 }

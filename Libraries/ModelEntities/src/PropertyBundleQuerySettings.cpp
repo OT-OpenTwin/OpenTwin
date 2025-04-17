@@ -36,7 +36,6 @@ bool PropertyBundleQuerySettings::updatePropertyVisibility(EntityBase* _thisObje
 			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(visible);
 			PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(visible);
 			refresh = true;
-			break;
 		}
 	}
 	return refresh;
@@ -54,5 +53,25 @@ void PropertyBundleQuerySettings::reload(EntityBase* _thisObject)
 	const std::vector<std::string>& options =	PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->getOptions();
 	m_selectionOptions = { options.begin(), options.end() };
 	m_maxNumberOfQueryDefinitions =	m_selectionOptions.size();
+}
+
+std::list<ValueComparisionDefinition> PropertyBundleQuerySettings::getValueComparisionDefinitions(EntityBase* _thisObject)
+{
+	std::list<ValueComparisionDefinition> valueDefinitions;
+	for (int32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
+	{
+		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
+		if (PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->getVisible() == true)
+		{
+			std::string comparator = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyComparator, groupName);
+			std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, groupName);
+			std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, groupName);
+			
+			ValueComparisionDefinition definition(name, comparator, value, "", "");
+			valueDefinitions.push_back(definition);
+		}
+	}
+
+	return valueDefinitions;
 }
 

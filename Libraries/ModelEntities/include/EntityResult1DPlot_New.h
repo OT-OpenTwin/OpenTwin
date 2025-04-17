@@ -2,6 +2,7 @@
 #include "EntityContainer.h"
 #include "IVisualisationPlot1D.h"
 #include "PropertyBundleQuerySettings.h"
+#include "OTCore/ValueComparisionDefinition.h"
 
 class __declspec(dllexport) EntityResult1DPlot_New : public EntityContainer, public IVisualisationPlot1D
 {

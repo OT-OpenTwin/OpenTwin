@@ -11,6 +11,7 @@
 #include "OTGui/Plot1DAxisCfg.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/NavigationTreeItemIcon.h"
+#include "OTCore/ValueComparisionDefinition.h"
 
 // std header
 #include <list>
@@ -44,7 +45,7 @@ namespace ot {
 		Plot1DCfg(const Plot1DCfg& _other);
 		virtual ~Plot1DCfg();
 		
-		Plot1DCfg& operator = (const Plot1DCfg& _other);
+		Plot1DCfg& operator = (const Plot1DCfg& _other) = default;
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -123,6 +124,14 @@ namespace ot {
 		std::string getXAxisParameter() const { return m_xAxisParameter; }
 		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; }
 
+		const std::list<ValueComparisionDefinition>& getQueries() { return m_queries; }
+		void setQueries(std::list<ValueComparisionDefinition>& _queries);
+
+		void setUseLimitNbOfCurves(bool _useLimit) { m_useLimit = _useLimit; }
+		bool getUseLimitNbOfCurves() const{ return m_useLimit; }
+
+		void setLimitOfCurves(int32_t _curveLimit) { m_curveLimit = _curveLimit; }
+		int32_t getLimitOfCurves() const { return m_curveLimit; }
 
 	private:
 		std::string m_projectName;
@@ -137,8 +146,11 @@ namespace ot {
 
 		bool m_isHidden;
 		bool m_legendVisible;
+		bool m_useLimit;
+		int32_t m_curveLimit;
 
 		NavigationTreeItemIcon m_treeIcons;
+		std::list<ValueComparisionDefinition> m_queries;
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;

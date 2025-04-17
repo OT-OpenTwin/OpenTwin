@@ -2,13 +2,14 @@
 #include "ContainerFlexibleOwnership.h"
 #include "OTCore/TypeNames.h"
 #include "OTGui/StyleRefPainter2D.h"
+//#include "ResultDataAccess/AdvancedQueryBuilder.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _queries)
 {
 	m_runIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
-	ot::JsonDocument entireResult = queryCurveData(queryInformation);
+	ot::JsonDocument entireResult = queryCurveData(queryInformation, _queries);
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
 	
 	CurveType curveType = determineCurveType(queryInformation);
@@ -27,8 +28,23 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg
 	return dataSets;
 }
 
-ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation)
+ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _queries)
 {
+	for (const ValueComparisionDefinition& queryDefinition : _queries)
+	{
+		for (auto& parameterDescription : _queryInformation.m_parameterDescriptions)
+		{
+			if (parameterDescription.m_label == queryDefinition.getName())
+			{
+				const std::string fieldName = parameterDescription.m_fieldName;
+				const std::string comparator = queryDefinition.getComparator();
+				const std::string value = queryDefinition.getValue();
+
+				break;
+			}
+		}
+	}
+
 	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.SearchInResultCollection(_queryInformation.m_query, _queryInformation.m_projection, 0);
 	if (dbResponse.getSuccess()) 
 	{

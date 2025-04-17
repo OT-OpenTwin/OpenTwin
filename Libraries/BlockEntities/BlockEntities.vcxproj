@@ -189,7 +189,6 @@
     <ClInclude Include="include\EntityBlockCircuitVoltageMeter.h" />
     <ClInclude Include="include\PythonHeaderInterpreter.h" />
     <ClInclude Include="include\SharedResources.h" />
-    <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityBlockCircuitCapacitor.cpp" />

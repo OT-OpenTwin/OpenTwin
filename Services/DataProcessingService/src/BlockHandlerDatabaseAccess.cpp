@@ -8,7 +8,7 @@
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
 
-#include "ValueComparisionDefinition.h"
+#include "OTCore/ValueComparisionDefinition.h"
 
 #include "ResultDataStorageAPI.h"
 #include "QuantityContainer.h"

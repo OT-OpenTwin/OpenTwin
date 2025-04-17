@@ -68,30 +68,6 @@ ot::Plot1DCfg::Plot1DCfg(const Plot1DCfg& _other)
 
 ot::Plot1DCfg::~Plot1DCfg() {}
 
-ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
-	WidgetViewBase::operator=(_other);
-
-	if (this != &_other) {
-		m_projectName = _other.m_projectName;
-		m_type = _other.m_type;
-		m_axisQuantity = _other.m_axisQuantity;
-
-		m_gridVisible = _other.m_gridVisible;
-		m_gridColor = _other.m_gridColor;
-		m_gridWidth = _other.m_gridWidth;
-
-		m_isHidden = _other.m_isHidden;
-		m_legendVisible = _other.m_legendVisible;
-
-		m_treeIcons = _other.m_treeIcons;
-
-		m_xAxis = _other.m_xAxis;
-		m_yAxis = _other.m_yAxis;
-	}
-
-	return *this;
-}
-
 void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
@@ -121,6 +97,19 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("YAxis", yAxisObject, _allocator);
 
 	_object.AddMember("XAxisParameter", ot::JsonString(m_xAxisParameter, _allocator), _allocator);
+
+	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
+	_object.AddMember("NbCurveLimit", m_curveLimit, _allocator);
+
+	JsonArray allQueries;
+	for(const ValueComparisionDefinition& query : m_queries)
+	{
+		JsonObject querySerialised;
+		query.addToJsonObject(querySerialised, _allocator);
+		allQueries.PushBack(querySerialised, _allocator);
+	}
+	_object.AddMember("Queries", allQueries, _allocator);
+
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -143,6 +132,18 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
 
 	m_xAxisParameter = ot::json::getString(_object, "XAxisParameter");
+
+	const auto& allQueries = ot::json::getArray(_object, "Queries");
+	for (uint32_t i = 0; i < allQueries.Size(); i++)
+	{
+		const auto& query = ot::json::getObject(allQueries, i);
+		ValueComparisionDefinition valueDescription;
+		valueDescription.setFromJsonObject(query);
+		m_queries.push_back(valueDescription);
+	}
+
+	m_useLimit = ot::json::getBool(_object,"UseLimitOfCurves");
+	m_curveLimit = ot::json::getInt(_object, "NbCurveLimit");
 }
 
 bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
@@ -166,4 +167,10 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
 	return !Plot1DCfg::operator==(_other);
+}
+
+
+void ot::Plot1DCfg::setQueries(std::list<ValueComparisionDefinition>& _queries)
+{
+	m_queries = _queries;
 }
