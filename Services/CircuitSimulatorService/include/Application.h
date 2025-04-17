@@ -46,6 +46,10 @@ private:
 	std::string m_serverName;
 	bool m_SimulationRunning;
 	std::mutex m_mutex;
+	std::string m_modelVersion;
+	std::list<ot::EntityInformation> m_solverInfo;
+	std::map<std::string, EntityBase*> m_solverMap;
+	
 	
 public:
 
@@ -74,6 +78,7 @@ public:
 
 	void addSolver();
 	void runCircuitSimulation();
+	void runNextSolvers();
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
 	void sendNetlistToSubService(std::list<std::string>& _netlist);
 

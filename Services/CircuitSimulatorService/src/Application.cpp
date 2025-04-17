@@ -98,6 +98,7 @@ Application::~Application() {
 
 }
 
+
 // ##################################################################################################################################################################################################################
 
 // Custom functions
@@ -272,8 +273,6 @@ void Application::addSolver()
 void Application::runCircuitSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	m_uiComponent->lockUI(ot::LockTypeFlag::LockModelWrite);
-	m_SimulationRunning = true;
 
 	if (!EnsureDataBaseConnection()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
@@ -320,38 +319,61 @@ void Application::runCircuitSimulation() {
 	}
 
 	//Now we retrieve information about the solver items
-	std::list<ot::EntityInformation> solverInfo;
-	ot::ModelServiceAPI::getEntityInformation(solverRunList, solverInfo);
+	ot::ModelServiceAPI::getEntityInformation(solverRunList, m_solverInfo);
 
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
 
-	for (auto info : solverInfo) {
+	for (auto info : m_solverInfo) {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	//Now read the solver objects for each solver
-	std::map<std::string, EntityBase*> solverMap;
-	for (auto info : solverInfo) {
+	for (auto info : m_solverInfo) {
 		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
-		solverMap[info.getEntityName()] = entity;
+		m_solverMap[info.getEntityName()] = entity;
 	}
 
 	// Get the current model version
-	std::string modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
+	m_modelVersion = ot::ModelServiceAPI::getCurrentModelVersion();
 
-	// run all selected solver
-	for (auto solver : solverInfo) {
-		runSingleSolver(solver, modelVersion, solverMap[solver.getEntityName()]);
+	if (!m_solverInfo.empty()) {
+		auto solver = m_solverInfo.front();
+		m_solverInfo.pop_front();
+		runSingleSolver(solver, m_modelVersion, m_solverMap[solver.getEntityName()]);
+		m_solverMap.erase(solver.getEntityName());
+	}
+	
+
+
+
+
+}
+
+void Application::runNextSolvers() {
+	// run next solver
+
+	if (!m_solverInfo.empty()) {
+		auto solver = m_solverInfo.front();
+		m_solverInfo.pop_front();
+		runSingleSolver(solver, m_modelVersion, m_solverMap[solver.getEntityName()]);
+		m_solverMap.erase(solver.getEntityName());
 	}
 
+	m_uiComponent->displayMessage("No next solver, simulation completed");
+
+	return;
 }
 
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
+
+	m_uiComponent->lockUI(ot::LockTypeFlag::LockModelWrite);
+	m_SimulationRunning = true;
+
 	// Enusre that subprocessHandler is null before starting
 	m_subprocessHandler = nullptr;
 	
@@ -483,6 +505,8 @@ void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
+
+	runNextSolvers();
 
 }
 
