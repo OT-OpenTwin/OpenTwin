@@ -19,7 +19,9 @@ private:
 	ot::NewModelStateInformation m_newModelStateInformation;
 	const std::string m_owner;
 	ResultCollectionExtender& m_extender;
-	std::list<std::string> m_parameterNames;
+	std::list<std::string> m_parameterLabels;
+	std::list<std::string> m_quantityLabel;
+
 	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
 
 	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);

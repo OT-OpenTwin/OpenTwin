@@ -3,6 +3,7 @@
 #include "DataBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
+#include <algorithm>
 
 EntityResult1DPlot_New::EntityResult1DPlot_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -58,8 +59,9 @@ bool EntityResult1DPlot_New::updateFromProperties(void)
 	//
 	//getObserver()->sendMessageToViewer(doc);
 	//
-	//// We now reset the update flag for all properties, since we took care of this above
-	//getProperties().forceResetUpdateForAllProperties();
+	
+	// We now reset the update flag for all properties, since we took care of this above
+	getProperties().forceResetUpdateForAllProperties();
 
 	return updatePropertyVisibilities();
 }
@@ -138,22 +140,23 @@ void EntityResult1DPlot_New::createProperties(void)
 	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
 
-	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
-
-	m_querySettings.setProperties(this);
 
 	updatePropertyVisibilities();
 
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames)
+void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
 {
-	auto xAxisParameterSelection = PropertyHelper::getSelectionProperty(this, "X axis parameter");
-	xAxisParameterSelection->resetOptions(_parameterNames);
-	xAxisParameterSelection->setValue(*_parameterNames.begin());
+	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", _parameterNames, *_parameterNames.begin(), "default", getProperties());
+	
+	std::list<std::string> allQueryOptions{""};
+	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
+	
+	m_querySettings.setQueryDefinitions(allQueryOptions);
+	m_querySettings.setProperties(this);
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -224,7 +227,7 @@ void EntityResult1DPlot_New::AddStorageData(bsoncxx::builder::basic::document& s
 void EntityResult1DPlot_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
-	
+	m_querySettings.reload(this);
 	resetModified();
 }
 

@@ -31,10 +31,11 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
-	
+	m_quantityLabel.push_back(_config.getQueryInformation().m_quantityDescription.m_label);
+
 	for (auto& parameterDescription : _config.getQueryInformation().m_parameterDescriptions)
 	{
-		m_parameterNames.push_back(parameterDescription.m_label);
+		m_parameterLabels.push_back(parameterDescription.m_label);
 	}
 	curveEntity.setCurve(_config);
 	curveEntity.StoreToDataBase();
@@ -91,6 +92,7 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 	
 	ot::QuantityContainerEntryDescription quantityInformation;
 	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
+	quantityInformation.m_label = quantities.begin()->quantityName;
 	quantityInformation.m_unit = quantity->unit;
 	quantityInformation.m_dataType = quantity->dataTypeName;
 	queryInformation.m_quantityDescription = quantityInformation;
@@ -130,9 +132,10 @@ void PlotBuilder::createPlot(const ot::Plot1DCfg& _plotCfg)
 
 	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
 	plotEntity.setName(_plotCfg.getEntityName());
+	m_parameterLabels.unique();
+	m_quantityLabel.unique();
+	plotEntity.setFamilyOfCurveProperties(m_parameterLabels,m_quantityLabel);
 	plotEntity.createProperties();
-	m_parameterNames.unique();
-	plotEntity.setFamilyOfCurveProperties(m_parameterNames);
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
 

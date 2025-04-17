@@ -227,10 +227,10 @@ void testPlot()
 	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getInt32TypeName();
-	parameter.unit = "[kOlf]";
+	parameter.unit = "kOlf";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("SomeQuantity");
-	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "[Olf]");
+	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "Olf");
 
 	for (int i = 0; i <= 50; i++)
 	{
@@ -255,7 +255,7 @@ void testPlot()
 	/*MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
-	parameter.unit = "[kOlf]";
+	parameter.unit = "kOlf";
 
 	
 	
@@ -275,7 +275,7 @@ void testPlot()
 		
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 		quantDesc->setName("SomeQuantity");
-		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
+		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "Olf");
 		
 		for (float i = 0.; i <= 50.; i++)
 		{
@@ -307,7 +307,7 @@ void testPlot()
 	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
-	parameter.unit = "[kOlf]";
+	parameter.unit = "kOlf";
 
 
 
@@ -329,7 +329,7 @@ void testPlot()
 
 			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 			quantDesc->setName("SomeQuantity");
-			quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "[Olf]");
+			quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "Olf");
 
 			for (float i = 0.; i <= 50.; i++)
 			{

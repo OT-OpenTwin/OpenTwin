@@ -19,8 +19,9 @@ public:
 	bool updatePropertyVisibilities(void);
 	
 	void createProperties(void);
-
-	void setFamilyOfCurveProperties(std::list<std::string>& _parameterNames);
+	
+	//! @brief Needs to be called before createProperties
+	void setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames);
 
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
