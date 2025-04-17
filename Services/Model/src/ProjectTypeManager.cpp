@@ -55,6 +55,7 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 {
 	_hasGeometryRoot				= true;
 	_hasCircuitsRoot				= false;
+	_hasCircuit						= false;
 	_hasMaterialRoot				= true;
 	_hasMeshRoot					= true;
 	_hasSolverRoot					= true;
@@ -75,6 +76,7 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 {
 	_hasGeometryRoot				= false;
 	_hasCircuitsRoot				= false;
+	_hasCircuit						= false;
 	_hasMaterialRoot				= false;
 	_hasMeshRoot					= false;
 	_hasSolverRoot					= false;
@@ -101,6 +103,7 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 {
 	_hasGeometryRoot = true;
 	_hasCircuitsRoot = false;
+	_hasCircuit	= false;
 	_hasMaterialRoot = true;
 	_hasMeshRoot = false;
 	_hasSolverRoot = false;
@@ -124,6 +127,7 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 {
 	_hasGeometryRoot = false;
 	_hasCircuitsRoot = false;
+	_hasCircuit = false;
 	_hasMaterialRoot = false;
 	_hasMeshRoot = false;
 	_hasSolverRoot = false;
@@ -147,6 +151,7 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 {
 	_hasGeometryRoot = true;
 	_hasCircuitsRoot = false;
+	_hasCircuit = false;
 	_hasMaterialRoot = true;
 	_hasMeshRoot = true;
 	_hasSolverRoot = true;
@@ -167,6 +172,7 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 {
 	_hasGeometryRoot = false;
 	_hasCircuitsRoot = true;
+	_hasCircuit = true;
 	_hasMaterialRoot = false;
 	_hasMeshRoot = false;
 	_hasSolverRoot = true;
