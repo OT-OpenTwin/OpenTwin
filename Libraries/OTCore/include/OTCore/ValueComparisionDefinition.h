@@ -16,7 +16,7 @@ public:
 	const std::string& getUnit() const { return m_unit; }
 
 	void setName(const std::string& name) { m_name = name; }
-
+	void setType(const std::string& _type) { m_type = _type; }
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 	void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
