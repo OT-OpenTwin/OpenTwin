@@ -160,6 +160,8 @@ namespace MongoProjectFunctions
 
 	std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient)
 	{
+		OT_LOG_D("Searching projects of user: " + loggedInUser.username);
+
 		std::vector<Group> userGroups = MongoGroupFunctions::getAllUserGroups(loggedInUser, userClient);
 
 		auto array_builder = bsoncxx::builder::basic::array{};
