@@ -3641,7 +3641,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		if (curveHasDataToVisualise)
 		{
 			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg,xAxisParameter, queries);
-			for (const std::string& message : curveFactory.getRunIDDescriptions())
+			for (const std::string& message : curveFactory.getCurveIDDescriptions())
 			{
 				AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 			}

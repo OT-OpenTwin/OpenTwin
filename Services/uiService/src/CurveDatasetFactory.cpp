@@ -3,10 +3,10 @@
 #include "OTCore/TypeNames.h"
 #include "OTGui/StyleRefPainter2D.h"
 //#include "ResultDataAccess/AdvancedQueryBuilder.h"
-
+#include "OTCore/String.h"
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _queries)
 {
-	m_runIDDescriptions.clear();
+	m_curveIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
 	ot::JsonDocument entireResult = queryCurveData(queryInformation, _queries);
@@ -211,19 +211,23 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
 		std::list <std::string> runIDDescriptions;
 
-		int counter(0);
+		int counter(1);
+		uint32_t numberOfDigits = static_cast<uint32_t>(std::floor(familyOfCurves.size() % 10));
 		for (auto& curve : familyOfCurves) {
-			const std::string simpleName = "RunID_" + std::to_string(counter);
+
+			std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
+			const std::string simpleName = "Curve_" + curveNumber;
+			counter++;
+
 			familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
 			curve.second = Datapoints();
-			counter++;
 			std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
 			std::string message =
 				simpleName + ":\n";
 			for (auto entry : additionalParameterDescription) {
 				message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
 			}
-			m_runIDDescriptions.push_back(message);
+			m_curveIDDescriptions.push_back(message);
 		}
 
 		familyOfCurves = std::move(familyOfCurvesSimplerNames);

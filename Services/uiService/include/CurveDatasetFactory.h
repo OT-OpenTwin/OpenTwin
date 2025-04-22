@@ -12,7 +12,7 @@ public:
 	
 	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _queries);
 
-	const std::vector<std::string>& getRunIDDescriptions() { return m_runIDDescriptions; }
+	const std::vector<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
 private:
 	struct AdditionalParameterDescription {
 		std::string m_label = "";
@@ -26,7 +26,7 @@ private:
 		m_familyCurve = 1
 	};
 
-	std::vector<std::string> m_runIDDescriptions;
+	std::vector<std::string> m_curveIDDescriptions;
 
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 
