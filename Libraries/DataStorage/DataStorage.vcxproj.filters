@@ -84,6 +84,9 @@
     <ClInclude Include="include\Unittest\UnittestDocumentAccessBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AdvancedQueryBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DataStorageAPI.cpp">
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UnittestDocumentAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdvancedQueryBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

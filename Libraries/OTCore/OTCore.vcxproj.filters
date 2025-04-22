@@ -130,6 +130,9 @@
     <ClCompile Include="src\ValueComparisionDefinition.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ExplicitStringValueConverter.cpp">
+      <Filter>src\Variable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -368,6 +371,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ValueComparisionDefinition.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ExplicitStringValueConverter.h">
+      <Filter>include\VariableType</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

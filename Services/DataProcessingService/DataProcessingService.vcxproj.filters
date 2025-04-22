@@ -163,9 +163,6 @@
     <ClInclude Include="include\DataDocument.h">
       <Filter>Header Files\Pipeline Data</Filter>
     </ClInclude>
-    <ClInclude Include="include\ExplicitStringValueConverter.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
     <ClInclude Include="include\StringConverter.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>

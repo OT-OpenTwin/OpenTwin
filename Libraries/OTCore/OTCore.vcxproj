@@ -26,6 +26,7 @@
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
     <ClCompile Include="src\EncodingGuesser.cpp" />
     <ClCompile Include="src\BasicEntityInformation.cpp" />
+    <ClCompile Include="src\ExplicitStringValueConverter.cpp" />
     <ClCompile Include="src\GenericDataStruct.cpp" />
     <ClCompile Include="src\GenericDataStructFactory.cpp" />
     <ClCompile Include="src\GenericDataStructMatrix.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="include\OTCore\ContainerHelper.hpp" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
+    <ClInclude Include="include\OTCore\ExplicitStringValueConverter.h" />
     <ClInclude Include="include\OTCore\MatrixVectorizedXAlign.h" />
     <ClInclude Include="include\OTCore\LocalStateStack.h" />
     <ClInclude Include="include\OTCore\LocalStateStack.hpp" />

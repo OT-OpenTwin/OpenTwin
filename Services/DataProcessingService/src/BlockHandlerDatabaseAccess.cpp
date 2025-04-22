@@ -14,7 +14,7 @@
 #include "QuantityContainer.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
 
-#include "ExplicitStringValueConverter.h"
+#include "OTCore/ExplicitStringValueConverter.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
@@ -134,7 +134,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
 	addParameterQueries(_blockEntity);
 
-	m_query = builder.ConnectWithAND(std::move(m_comparisons));
+	m_query = builder.connectWithAND(std::move(m_comparisons));
 
 	std::vector<std::string> projectionNamesForExclusion{ "SchemaVersion", "SchemaType"};
 	for (QueryDescription& queryDescription : m_queryDescriptions)
@@ -259,58 +259,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	addComparision(quantityDef);
 }
 
-void BlockHandlerDatabaseAccess::buildRangeQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter) {
-	const std::string& name = _definition.getName();
-	std::string valueStr = _definition.getValue();
-	const std::string& type = _definition.getType();
-	valueStr.erase(std::remove(valueStr.begin(), valueStr.end(), ' '), valueStr.end());
-	char openingBracket = valueStr[0];
-	char closingBracket = valueStr[valueStr.size() - 1];
-	valueStr.erase(valueStr.begin());
-	valueStr.erase(valueStr.end() - 1);
-	size_t posDelimiter = valueStr.find(",");
-	const bool notationIsCorrect = (openingBracket == '(' || openingBracket == '[') && (closingBracket == ')' || closingBracket == ']') && posDelimiter != std::string::npos;
-	if (notationIsCorrect) {
-		const bool dataTypeCompatible = type == ot::TypeNames::getInt32TypeName() || type == ot::TypeNames::getInt64TypeName() || type == ot::TypeNames::getDoubleTypeName() || type == ot::TypeNames::getFloatTypeName();
-		if (dataTypeCompatible) {
-			const std::string firstValue = valueStr.substr(0, posDelimiter);
-			const std::string secondValue = valueStr.substr(posDelimiter + 1);
-			
-			ot::Variable vFirstValue= ExplicitStringValueConverter::setValueFromString(firstValue, type);
-			ot::Variable vSecondValue= ExplicitStringValueConverter::setValueFromString(secondValue, type);
-
-			std::string correspondingComparator;
-			if (openingBracket == '(') {
-				correspondingComparator = ">";
-			}
-			else {
-				correspondingComparator = ">=";
-			}
-
-			auto firstCompare = _builder.CreateComparison(correspondingComparator, vFirstValue);
-			auto firstCompareQuery = _builder.GenerateFilterQuery(name, std::move(firstCompare));
-
-			if (closingBracket == ')') {
-				correspondingComparator = "<";
-			}
-			else {
-				correspondingComparator = "<=";
-			}
-			auto secondCompare = _builder.CreateComparison(correspondingComparator, vSecondValue);
-			auto secondCompareQuery = _builder.GenerateFilterQuery(name, std::move(secondCompare));
-			
-			m_comparisons.push_back(_builder.ConnectWithAND({ firstCompareQuery,secondCompareQuery}));
-		}
-		else {
-			throw std::invalid_argument("Query for interval incorrect. The datatype of the selected field helds no numerical value.");
-		}
-
-
-	}
-	else {
-		throw std::invalid_argument("Query for interval incorrect. The interval to follow the english notation, e.g.: (2,3.5].");
-	}
-}
 
 void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains) {
 	const std::string& name = _definition.getName();
@@ -329,7 +277,7 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 	std::list<ot::Variable> values;
 	
 	for (const std::string& valueStr : valueStrings) {
-		ot::Variable value = ExplicitStringValueConverter::setValueFromString(valueStr, _definition.getType());
+		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(valueStr, _definition.getType());
 		values.push_back(value);
 	}
 	if (values.empty()) {
@@ -337,13 +285,13 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 	}
 
 	if (_contains) {
-		auto compare = _builder.CreateComparisionEqualToAnyOf(values);
+		auto compare = _builder.createComparisionEqualToAnyOf(values);
 		auto containsQuery = _builder.GenerateFilterQuery(name, std::move(compare));
 		const std::string temp = bsoncxx::to_json(containsQuery.view());
 		m_comparisons.push_back(containsQuery);
 	}
 	else {
-		auto compare = _builder.CreateComparisionEqualNoneOf(values);
+		auto compare = _builder.createComparisionEqualNoneOf(values);
 		m_comparisons.push_back(_builder.GenerateFilterQuery(name, std::move(compare)));
 	}
 }
@@ -379,7 +327,7 @@ void BlockHandlerDatabaseAccess::extractQuantity(QueryDescription& _queryDescrip
 		std::list<ot::Variable> values;
 		for (auto& jsValue : jsValues)
 		{			
-			values.push_back(ExplicitStringValueConverter::setValueFromString(jsValue, typeName));
+			values.push_back(ot::ExplicitStringValueConverter::setValueFromString(jsValue, typeName));
 		}
 		
 		ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(mantrixEntry));
@@ -452,7 +400,7 @@ void BlockHandlerDatabaseAccess::addNotFixedParameter(PipelineDataDocument& _doc
 		if (_databaseDocument.HasMember(freeParameter.first.c_str()))
 		{
 			auto& entry =	_databaseDocument[freeParameter.first.c_str()];
-			_document.m_parameter[freeParameter.second->parameterLabel] = ExplicitStringValueConverter::setValueFromString(entry, freeParameter.second->typeName);
+			_document.m_parameter[freeParameter.second->parameterLabel] = ot::ExplicitStringValueConverter::setValueFromString(entry, freeParameter.second->typeName);
 		}
 		else
 		{
@@ -470,7 +418,7 @@ void BlockHandlerDatabaseAccess::extractParameter(QueryDescription& _queryDescri
 	const std::string& typeName =	_queryDescription.m_pipelineData.m_parameter->typeName;
 	
 	PipelineDataDocument document;
-	document.m_parameter[_queryDescription.m_projectionName] = ExplicitStringValueConverter::setValueFromString(entry, typeName);
+	document.m_parameter[_queryDescription.m_projectionName] = ot::ExplicitStringValueConverter::setValueFromString(entry, typeName);
 	_dataPerPort[_queryDescription.m_connectorName].m_data.push_back(document);
 }
 
@@ -480,7 +428,7 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 	AdvancedQueryBuilder builder;
 	ot::StringToVariableConverter converter;
 	if (comparator == BlockEntityHandler::getQueryForRangeSelection()) {
-		this->buildRangeQuery(_definition, builder, converter);
+		builder.buildRangeQuery(_definition);
 	}
 	else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator) {
 		this->buildContainsQuery(_definition, builder, converter, true);
@@ -494,15 +442,15 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 		const std::string& type = _definition.getType();
 
 		std::unique_ptr<ot::Variable> value;
-		ExplicitStringValueConverter::setValueFromString(value, valueStr, type);
+		ot::ExplicitStringValueConverter::setValueFromString(value, valueStr, type);
 
-		auto compare = builder.CreateComparison(comparator, *value);
+		auto compare = builder.createComparison(comparator, *value);
 		m_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
 
 		//&& name != QuantityContainer::getFieldName()
 		if (comparator == "=" )
 		{
-			m_fixedParameter[name] = ExplicitStringValueConverter::setValueFromString(valueStr, type);
+			m_fixedParameter[name] = ot::ExplicitStringValueConverter::setValueFromString(valueStr, type);
 		}
 	}
 }

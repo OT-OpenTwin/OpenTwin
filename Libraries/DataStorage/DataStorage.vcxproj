@@ -318,6 +318,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AdvancedQueryBuilder.h" />
     <ClInclude Include="include\ArrayBinaryConverter.h" />
     <ClInclude Include="include\Connection\ConnectionAPI.h" />
     <ClInclude Include="include\DataStorageAPI.h" />
@@ -343,6 +344,7 @@
     <ClInclude Include="include\Enums\InsertTypeEnum.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
     <ClCompile Include="src\BsonValuesHelper.cpp" />
     <ClCompile Include="src\DataStorageResponse.cpp" />
     <ClCompile Include="src\ConnectionAPI.cpp" />

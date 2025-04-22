@@ -224,7 +224,6 @@
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BlockHandlerStorage.h" />
     <ClInclude Include="include\DataDocument.h" />
-    <ClInclude Include="include\ExplicitStringValueConverter.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />

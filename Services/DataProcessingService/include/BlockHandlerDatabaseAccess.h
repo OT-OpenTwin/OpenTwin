@@ -41,7 +41,6 @@ private:
 	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
 	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
 	
-	void buildRangeQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter);
 	void buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains);
 	
 	void addComparision(const ValueComparisionDefinition& _definition);

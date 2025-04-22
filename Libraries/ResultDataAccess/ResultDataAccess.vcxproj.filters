@@ -77,9 +77,6 @@
     <ClInclude Include="include\MetadataEntryComperator.h">
       <Filter>include\MetadataEntries</Filter>
     </ClInclude>
-    <ClInclude Include="include\AdvancedQueryBuilder.h">
-      <Filter>include\CollectionAccess</Filter>
-    </ClInclude>
     <ClInclude Include="include\ProjectToCollectionConverter.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
@@ -155,9 +152,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\MetadataEntryComperator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AdvancedQueryBuilder.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ProjectToCollectionConverter.cpp">
