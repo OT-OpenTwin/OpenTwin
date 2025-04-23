@@ -26,7 +26,7 @@ private:
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 
 	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions);
-	const std::list<ValueComparisionDefinition>& extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions);
+	const std::list<ValueComparisionDefinition> extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions);
 	CurveType determineCurveType(const ot::QueryInformation& _curveCfg);
 	ot::PlotDataset* createSingleCurve(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
 	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments);

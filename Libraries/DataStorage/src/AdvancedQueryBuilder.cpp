@@ -34,7 +34,7 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDef
 	else
 	{
 		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparision.getValue(), _valueComparision.getType());
-		auto comparision = GenerateFilterQuery(_valueComparision.getComparator(), value);
+		auto comparision = GenerateFilterQuery(mongoComparator->second, value);
 		return GenerateFilterQuery(_valueComparision.getName(), std::move(comparision));
 	}
 }

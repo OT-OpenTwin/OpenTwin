@@ -43,7 +43,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, curveEntity);
 }
 
-void PlotBuilder::buildPlot(const ot::Plot1DCfg& _plotCfg, bool _saveModelState)
+void PlotBuilder::buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 {
 	createPlot(_plotCfg);
 	m_extender.setSaveModel(false);
@@ -126,12 +126,19 @@ const std::string PlotBuilder::createProjection()
 	return projection;
 }
 
-void PlotBuilder::createPlot(const ot::Plot1DCfg& _plotCfg)
+void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 {
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 
 	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
-	plotEntity.setName(_plotCfg.getEntityName());
+	const std::string entityName = _plotCfg.getEntityName();
+	plotEntity.setName(entityName);
+
+	if (_plotCfg.getTitle().empty())
+	{
+		const std::string shortName =  entityName.substr(entityName.find_last_of("/") + 1);
+		_plotCfg.setTitle(shortName);
+	}
 	m_parameterLabels.unique();
 	m_quantityLabel.unique();
 	plotEntity.setFamilyOfCurveProperties(m_parameterLabels,m_quantityLabel);

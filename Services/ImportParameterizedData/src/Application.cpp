@@ -369,7 +369,7 @@ void testPlot()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setTitle("Some title");
+	//plotCfg.setTitle("Some title");
 	plotCfg.setGridColor(ot::Color(ot::DefaultColor::Black));
 	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
 	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);

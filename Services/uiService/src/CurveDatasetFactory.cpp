@@ -47,7 +47,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 		const std::string type = valueComparision.getType();
 		const std::string value = valueComparision.getValue();
 		BsonViewOrValue comparision = queryBuilder.createComparison(valueComparision);
-		additionalComparisions.push_back(queryBuilder.GenerateFilterQuery(valueComparision.getName(), std::move(comparision)));
+		additionalComparisions.push_back(std::move(comparision));
 	}
 
 	//Now we assemble the final query
@@ -61,7 +61,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 		additionalComparisions.push_back(query);
 		query = queryBuilder.connectWithAND(std::move(additionalComparisions));
 	}
-	//const std::string temp = bsoncxx::to_json(query);
+	const std::string temp = bsoncxx::to_json(query);
 
 	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.SearchInResultCollection(query, projection, 0);
 	if (dbResponse.getSuccess()) 
@@ -77,7 +77,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	}
 }
 
-const std::list<ValueComparisionDefinition>& CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
+const std::list<ValueComparisionDefinition> CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	std::list<ValueComparisionDefinition> validValueDescriptions;
 	for (const ValueComparisionDefinition& queryDefinition : _valueComparisions)
@@ -276,7 +276,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 		//The simpler name is build as Curve + ID
 		int counter(1);
-		uint32_t numberOfDigits = static_cast<uint32_t>(std::floor(familyOfCurves.size() % 10));
+		double temp = std::log10(familyOfCurves.size());
+		uint32_t numberOfDigits = static_cast<uint32_t>(std::ceil(temp));
 		for (auto& curve : familyOfCurves) {
 
 			std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');

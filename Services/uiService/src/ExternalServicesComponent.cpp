@@ -3599,7 +3599,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags);
 	ot::Plot* plot = plotView->getPlot();
-
+	plot->setConfig(plotConfig);
 	// Clear plot if exists
 	plot->clear(true);
 
