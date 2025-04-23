@@ -202,6 +202,12 @@
     <ClInclude Include="include\ViewStateCfg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Datapoints.h">
+      <Filter>Header Files\CurveHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ShortParameterDescription.h">
+      <Filter>Header Files\CurveHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\ExternalServicesComponent.h">

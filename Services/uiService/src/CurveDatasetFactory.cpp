@@ -6,13 +6,15 @@
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "OTCore/String.h"
 #include "bsoncxx/json.hpp"
+#include "Datapoints.h"
+#include "ShortParameterDescription.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _queries)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	m_curveIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
-	ot::JsonDocument entireResult = queryCurveData(queryInformation, _queries);
+	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisions);
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
 	
 	CurveType curveType = determineCurveType(queryInformation);
@@ -31,49 +33,22 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg
 	return dataSets;
 }
 
-ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _queries)
+ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	
-	//First we check the properties for valid, additional queries
-	std::list<ValueComparisionDefinition> validQueries;
-	for (const ValueComparisionDefinition& queryDefinition : _queries)
-	{
-		if (_queryInformation.m_quantityDescription.m_label == queryDefinition.getName())
-		{
-			auto& quantityDescription =	_queryInformation.m_quantityDescription;
-			auto validValueComparision = createValidValueComparision(quantityDescription, queryDefinition);
-			if (validValueComparision.has_value())
-			{
-				validQueries.push_back(validValueComparision.value());
-			}
-		}
-		else
-		{
-			for (auto& parameterDescription : _queryInformation.m_parameterDescriptions)
-			{
-				if (parameterDescription.m_label == queryDefinition.getName())
-				{
-					auto validValueComparision = createValidValueComparision(parameterDescription, queryDefinition);
-					if (validValueComparision.has_value())
-					{
-						validQueries.push_back(validValueComparision.value());
-					}
-					break;
-				}
-			}
-		}
-	}
+	//First we find the valid value comparisions give them additional information from the query information
+	std::list<ValueComparisionDefinition> validQueries = extractValidValueDescriptions(_queryInformation, _valueComparisions);
 
 	//Now we build the queries from the set properties
 	AdvancedQueryBuilder queryBuilder;
-	std::list<BsonViewOrValue> additionalQueries;
+	std::list<BsonViewOrValue> additionalComparisions;
 	for (ValueComparisionDefinition& valueComparision : validQueries)
 	{
 		const std::string type = valueComparision.getType();
 		const std::string value = valueComparision.getValue();
 		ot::Variable convertedValue = ot::ExplicitStringValueConverter::setValueFromString(value, type);
 		BsonViewOrValue comparision = queryBuilder.createComparison(valueComparision.getComparator(), convertedValue);
-		additionalQueries.push_back(queryBuilder.GenerateFilterQuery(valueComparision.getName(), std::move(comparision)));
+		additionalComparisions.push_back(queryBuilder.GenerateFilterQuery(valueComparision.getName(), std::move(comparision)));
 	}
 
 	//Now we assemble the final query
@@ -82,10 +57,10 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 
 	bsoncxx::document::value  docQuery = bsoncxx::from_json(_queryInformation.m_query);
 	bsoncxx::document::view_or_value query (docQuery);
-	if (additionalQueries.size() > 0) 
+	if (additionalComparisions.size() > 0)
 	{
-		additionalQueries.push_back(query);
-		query = queryBuilder.connectWithAND(std::move(additionalQueries));
+		additionalComparisions.push_back(query);
+		query = queryBuilder.connectWithAND(std::move(additionalComparisions));
 	}
 	//const std::string temp = bsoncxx::to_json(query);
 
@@ -102,6 +77,41 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 		throw std::exception(("Failed to query data with DB message: " + dbResponse.getMessage()).c_str());
 	}
 }
+
+const std::list<ValueComparisionDefinition>& CurveDatasetFactory::extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
+{
+	std::list<ValueComparisionDefinition> validValueDescriptions;
+	for (const ValueComparisionDefinition& queryDefinition : _valueComparisions)
+	{
+		if (_queryInformation.m_quantityDescription.m_label == queryDefinition.getName())
+		{
+			auto& quantityDescription = _queryInformation.m_quantityDescription;
+			auto validValueComparision = createValidValueComparision(quantityDescription, queryDefinition);
+			if (validValueComparision.has_value())
+			{
+				validValueDescriptions.push_back(validValueComparision.value());
+			}
+		}
+		else
+		{
+			for (auto& parameterDescription : _queryInformation.m_parameterDescriptions)
+			{
+				if (parameterDescription.m_label == queryDefinition.getName())
+				{
+					auto validValueComparision = createValidValueComparision(parameterDescription, queryDefinition);
+					if (validValueComparision.has_value())
+					{
+						validValueDescriptions.push_back(validValueComparision.value());
+					}
+					break;
+				}
+			}
+		}
+	}
+	return validValueDescriptions;
+}
+
+
 
 CurveDatasetFactory::CurveType CurveDatasetFactory::determineCurveType(const ot::QueryInformation& _queryInformation)
 {
@@ -155,22 +165,6 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 	return singleCurve;
 }
 
-struct Datapoints
-{
-	std::vector<double> m_xData;
-	std::vector<double> m_yData;
-	void reserve(size_t numberOfDataPoints)
-	{
-		m_xData.reserve(numberOfDataPoints);
-		m_yData.reserve(numberOfDataPoints);
-	}
-	void shrinkToFit()
-	{
-		m_xData.shrink_to_fit();
-		m_yData.shrink_to_fit();
-	}
-};
-
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	std::list<ot::PlotDataset*> dataSets;
@@ -181,13 +175,13 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
 	
-
 	std::string xAxisParameterLabel = _xAxisParameter;
 	//Auto selection
 	if (xAxisParameterLabel == "")
 	{
 		xAxisParameterLabel = queryInformation.m_parameterDescriptions.begin()->m_label;
 	}
+
 	const ot::QuantityContainerEntryDescription* xAxisParameter = nullptr;
 	for (auto& parameterDescription : queryInformation.m_parameterDescriptions)
 	{
@@ -196,36 +190,41 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			xAxisParameter = &parameterDescription;
 		}
 	}
-
 	assert(xAxisParameter != nullptr); 
 
 
 	//Should be selected via a property ToDo
 	std::map<std::string, Datapoints> familyOfCurves;
-	std::map<std::string, std::list<AdditionalParameterDescription>> additionalParameterDescByCurveName;
+	std::map<std::string, std::list<ShortParameterDescription>> additionalParameterDescByCurveName;
+	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
+
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
 
 		//First build a unique name of the additional parameter values
 		std::string curveName("");
-		std::list<AdditionalParameterDescription> additionalParameterInfos;
+		std::list<ShortParameterDescription> additionalParameterInfos;
 		
-		//Currently the first parameter is considered for the x-axis
-		for (auto additionalParameter = queryInformation.m_parameterDescriptions.begin(); additionalParameter != queryInformation.m_parameterDescriptions.end(); additionalParameter++) {
-			if (&(*additionalParameter) != xAxisParameter)
+		//Get values for the additional parameter and store their information
+		for (auto& additionalParameter :queryInformation.m_parameterDescriptions) 
+		{
+			if (&additionalParameter != xAxisParameter)
 			{
-				auto& additionalParameterEntry = singleMongoDocument[additionalParameter->m_fieldName.c_str()];
-				curveName += additionalParameter->m_label + "_" + ot::json::toJson(additionalParameterEntry) + "_" + additionalParameter->m_unit + "; ";
-
-				AdditionalParameterDescription additionalParameterInfo;
-				additionalParameterInfo.m_label = additionalParameter->m_label;
-				additionalParameterInfo.m_value = ot::json::toJson(additionalParameterEntry);
-				additionalParameterInfo.m_unit = additionalParameter->m_unit;
+				auto& additionalParameterEntry = singleMongoDocument[additionalParameter.m_fieldName.c_str()];
+				const std::string value =	ot::json::toJson(additionalParameterEntry);
+				curveName += additionalParameter.m_label + "_" + value + "_" + additionalParameter.m_unit + "; ";
+				parameterValuesByParameterName[additionalParameter.m_label].push_back(value);
+				
+				ShortParameterDescription additionalParameterInfo;
+				additionalParameterInfo.m_label = additionalParameter.m_label;
+				additionalParameterInfo.m_value = value;
+				additionalParameterInfo.m_unit = additionalParameter.m_unit;
 				additionalParameterInfos.push_back(additionalParameterInfo);
 			}
 		}
 		curveName = curveName.substr(0, curveName.size() - 2);
 
+		//With a unique name, depending on the values of the additional parameter we now look if there is already data stored for this curve
 		auto curve = familyOfCurves.find(curveName);
 		if (curve == familyOfCurves.end()) 
 		{
@@ -239,6 +238,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		//Get quantity value
 		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
 		(curve->second).m_yData.push_back(quantityValue);
+		
+		//Get x-axis value
 		const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
 		(curve->second).m_xData.push_back(xAxisParameterValue);
 	}
@@ -249,12 +250,32 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		curve.second.shrinkToFit();
 	}
 
+	//Cases for additional parameter (x-axis parameter excluded):
+	//1) Only 1 additional Parameter -> Family of Curves (FoC): name of each curve shows the value of the additional parameter 
+	// 1b) The additional parameter is constant -> Single curve: name of curve shows the value of the additional parameter
+	//2) More then 2 parameter -> FoC: name of each curve is abstracted to make it easier to read. The parameter values of each curve are communicated
+	// 2b) All parameter are constant -> Single curve: name of curve is abstracted to make it easier to read. The parameter values of each curve are communicated
+	// 2c) All but one parameter are constant -> FoC: name of each curve shows the value of the not-constant parameter. The other parameter values of each curve are communicated
+
 	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
-	if (numberOfParameter > 2) {
+	if (numberOfParameter > 2) 
+	{
+		bool additionalParameterAreConstant = true;
+		for (auto& parameterValues : parameterValuesByParameterName)
+		{
+			parameterValues.second.unique();
+			if (parameterValues.second.size() != 1)
+			{
+				additionalParameterAreConstant = false;
+				break;
+			}
+		}
+
 		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
 		std::list <std::string> runIDDescriptions;
 
+		//The simpler name is build as Curve + ID
 		int counter(1);
 		uint32_t numberOfDigits = static_cast<uint32_t>(std::floor(familyOfCurves.size() % 10));
 		for (auto& curve : familyOfCurves) {
@@ -265,7 +286,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 			familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
 			curve.second = Datapoints();
-			std::list<AdditionalParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
+			std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
 			std::string message =
 				simpleName + ":\n";
 			for (auto entry : additionalParameterDescription) {
@@ -328,6 +349,22 @@ std::optional<ValueComparisionDefinition> CurveDatasetFactory::createValidValueC
 	}
 	else
 	{
+		std::string reason("");
+		if (fieldName.empty())
+		{
+			reason = "No name set.";
+		}
+		else if (comparator.empty() || comparator == " ")
+		{
+			reason = "No comparator selected.";
+		}
+		else
+		{
+			assert(value.empty());
+			reason = "No value entered.";
+		}
+		const std::string skippedComparision = "Name: " + fieldName + " comparator: " + comparator + "value: " + value + " reason: " + reason;
+		m_skippedValueComparisions.push_back(skippedComparision);
 		return {};
 	}
 }

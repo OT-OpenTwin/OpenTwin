@@ -65,8 +65,10 @@
     <QtMoc Include="include\NavigationSelectionManager.h" />
     <ClInclude Include="include\ContainerFlexibleOwnership.h" />
     <ClInclude Include="include\CurveDatasetFactory.h" />
+    <ClInclude Include="include\Datapoints.h" />
     <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProjectInformation.h" />
+    <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\ViewStateCfg.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="include\CopyProjectDialog.h" />
