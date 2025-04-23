@@ -260,41 +260,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 }
 
 
-void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains) {
-	const std::string& name = _definition.getName();
-	std::string valueStr = _definition.getValue();
-	const std::string& type = _definition.getType();
-	valueStr.erase(std::remove(valueStr.begin(), valueStr.end(), ' '), valueStr.end());
-	
-	// Determine delimiter
-	char delimiter = ',';
-	if (valueStr.find(';') != std::string::npos) {
-		delimiter = ';';
-	}
-	
-	// Get values
-	std::list<std::string> valueStrings = ot::String::split(valueStr, delimiter);
-	std::list<ot::Variable> values;
-	
-	for (const std::string& valueStr : valueStrings) {
-		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(valueStr, _definition.getType());
-		values.push_back(value);
-	}
-	if (values.empty()) {
-		throw std::invalid_argument("Query for contains incorrect. No values provided.");
-	}
 
-	if (_contains) {
-		auto compare = _builder.createComparisionEqualToAnyOf(values);
-		auto containsQuery = _builder.GenerateFilterQuery(name, std::move(compare));
-		const std::string temp = bsoncxx::to_json(containsQuery.view());
-		m_comparisons.push_back(containsQuery);
-	}
-	else {
-		auto compare = _builder.createComparisionEqualNoneOf(values);
-		m_comparisons.push_back(_builder.GenerateFilterQuery(name, std::move(compare)));
-	}
-}
 
 void BlockHandlerDatabaseAccess::extractQuantity(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument)
 {
@@ -426,33 +392,8 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 {
 	const std::string& comparator = _definition.getComparator();
 	AdvancedQueryBuilder builder;
-	ot::StringToVariableConverter converter;
-	if (comparator == BlockEntityHandler::getQueryForRangeSelection()) {
-		builder.buildRangeQuery(_definition);
-	}
-	else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator) {
-		this->buildContainsQuery(_definition, builder, converter, true);
-	}
-	else if (comparator == ot::ComparisionSymbols::g_noneOfComparator) {
-		this->buildContainsQuery(_definition, builder, converter, false);
-	}
-	else if (comparator != " ") {
-		const std::string& name = _definition.getName();
-		const std::string& valueStr = _definition.getValue(); //What should I do if the string is empty ?
-		const std::string& type = _definition.getType();
-
-		std::unique_ptr<ot::Variable> value;
-		ot::ExplicitStringValueConverter::setValueFromString(value, valueStr, type);
-
-		auto compare = builder.createComparison(comparator, *value);
-		m_comparisons.push_back(builder.GenerateFilterQuery(name, std::move(compare)));
-
-		//&& name != QuantityContainer::getFieldName()
-		if (comparator == "=" )
-		{
-			m_fixedParameter[name] = ot::ExplicitStringValueConverter::setValueFromString(valueStr, type);
-		}
-	}
+	BsonViewOrValue query =	builder.createComparison(_definition);
+	m_comparisons.push_back(query);
 }
 
 void BlockHandlerDatabaseAccess::addParameterQueryDescription(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)

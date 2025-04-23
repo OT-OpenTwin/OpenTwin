@@ -34,15 +34,11 @@ private:
 	std::list< QueryDescription> m_queryDescriptions;
 	std::map<std::string, ot::Variable> m_fixedParameter;
 
-
-
 	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
 	const MetadataSeries* addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity);
 	void addQuantityQuery(EntityBlockDatabaseAccess* _blockEntity);
 	void addParameterQueries(EntityBlockDatabaseAccess* _blockEntity);
-	
-	void buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains);
-	
+		
 	void addComparision(const ValueComparisionDefinition& _definition);
 	void addParameterQueryDescription(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
 

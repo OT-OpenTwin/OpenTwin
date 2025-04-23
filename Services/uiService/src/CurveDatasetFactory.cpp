@@ -46,8 +46,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	{
 		const std::string type = valueComparision.getType();
 		const std::string value = valueComparision.getValue();
-		ot::Variable convertedValue = ot::ExplicitStringValueConverter::setValueFromString(value, type);
-		BsonViewOrValue comparision = queryBuilder.createComparison(valueComparision.getComparator(), convertedValue);
+		BsonViewOrValue comparision = queryBuilder.createComparison(valueComparision);
 		additionalComparisions.push_back(queryBuilder.GenerateFilterQuery(valueComparision.getName(), std::move(comparision)));
 	}
 

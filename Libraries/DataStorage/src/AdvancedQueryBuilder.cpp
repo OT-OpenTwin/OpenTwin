@@ -4,18 +4,38 @@
 #include "OTCore/ExplicitStringValueConverter.h"
 #include <cassert>
 #include <stdarg.h>
+#include "OTCore/String.h"
 
-BsonViewOrValue AdvancedQueryBuilder::createComparison(const std::string& comparator, const ot::Variable& variable)
+BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDefinition& _valueComparision)
 {
+	const std::string comparator = _valueComparision.getComparator();
 	auto mongoComparator = m_mongoDBComparators.find(comparator);
-	if (mongoComparator == m_mongoDBComparators.end() || mongoComparator->second == "$in" || mongoComparator->second == "$nin")
+	if (mongoComparator == m_mongoDBComparators.end())
 	{
 		assert(0);
 		throw std::exception("Not supported comparator selected for comparison query.");
 	}
+	else if (comparator == ot::ComparisionSymbols::g_anyOneOfComparator)
+	{
+		std::list<ot::Variable> values = getVariableListFromValue(_valueComparision);
+		auto compare = createComparisionEqualToAnyOf(values);
+		return GenerateFilterQuery(_valueComparision.getName(), std::move(compare));
+	}
+	else if (comparator == ot::ComparisionSymbols::g_noneOfComparator)
+	{
+		std::list<ot::Variable> values = getVariableListFromValue(_valueComparision);
+		auto compare = createComparisionEqualNoneOf(values);
+		return GenerateFilterQuery(_valueComparision.getName(), std::move(compare));
+	}
+	else if (comparator == ot::ComparisionSymbols::g_rangeComparator)
+	{
+		return buildRangeQuery(_valueComparision);
+	}
 	else
 	{
-		return GenerateFilterQuery(mongoComparator->second, variable);
+		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(_valueComparision.getValue(), _valueComparision.getType());
+		auto comparision = GenerateFilterQuery(_valueComparision.getComparator(), value);
+		return GenerateFilterQuery(_valueComparision.getName(), std::move(comparision));
 	}
 }
 
@@ -61,8 +81,9 @@ BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ValueComparisionDefi
 			else {
 				correspondingComparator = ">=";
 			}
-
-			auto firstCompare = createComparison(correspondingComparator, vFirstValue);
+			auto mongoComparator = m_mongoDBComparators.find(correspondingComparator);
+			assert(mongoComparator != m_mongoDBComparators.end());
+			auto firstCompare = GenerateFilterQuery(mongoComparator->second, vFirstValue);
 			auto firstCompareQuery = GenerateFilterQuery(name, std::move(firstCompare));
 
 			if (closingBracket == ')') {
@@ -71,7 +92,9 @@ BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ValueComparisionDefi
 			else {
 				correspondingComparator = "<=";
 			}
-			auto secondCompare = createComparison(correspondingComparator, vSecondValue);
+			mongoComparator = m_mongoDBComparators.find(correspondingComparator);
+			assert(mongoComparator != m_mongoDBComparators.end());
+			auto secondCompare = GenerateFilterQuery(mongoComparator->second, vSecondValue);
 			auto secondCompareQuery = GenerateFilterQuery(name, std::move(secondCompare));
 
 			return connectWithAND({ firstCompareQuery,secondCompareQuery });
@@ -85,6 +108,32 @@ BsonViewOrValue AdvancedQueryBuilder::buildRangeQuery(const ValueComparisionDefi
 	}
 }
 
+std::list<ot::Variable> AdvancedQueryBuilder::getVariableListFromValue(const ValueComparisionDefinition& _definition)
+{
+	std::string valueStr = _definition.getValue();
+	const std::string& type = _definition.getType();
+	valueStr.erase(std::remove(valueStr.begin(), valueStr.end(), ' '), valueStr.end());
+
+	// Determine delimiter
+	char delimiter = ',';
+	if (valueStr.find(';') != std::string::npos) {
+		delimiter = ';';
+	}
+
+	// Get values
+	std::list<std::string> valueStrings = ot::String::split(valueStr, delimiter);
+	std::list<ot::Variable> values;
+
+	for (const std::string& valueStr : valueStrings) {
+		ot::Variable value = ot::ExplicitStringValueConverter::setValueFromString(valueStr, _definition.getType());
+		values.push_back(value);
+	}
+	if (values.empty()) {
+		throw std::invalid_argument("Query for contains incorrect. No values provided.");
+	}
+
+	return values;
+}
 
 BsonViewOrValue AdvancedQueryBuilder::createComparisionEqualToAnyOf(const std::list<ot::Variable>& values)
 {

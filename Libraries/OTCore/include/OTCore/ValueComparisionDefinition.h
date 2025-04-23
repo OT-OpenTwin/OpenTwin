@@ -6,7 +6,7 @@ class __declspec(dllexport) ValueComparisionDefinition : public ot::Serializable
 {
 public:
 	ValueComparisionDefinition(const std::string& _name, const std::string& _comparator, const std::string& _value, const std::string& _type, const std::string& _unit)
-		: m_name(_name), m_comparator(_comparator), m_value(_value), m_type(_type) {
+		: m_name(_name), m_comparator(_comparator), m_value(_value), m_type(_type), m_unit(_unit) {
 	}
 	ValueComparisionDefinition() = default;
 	const std::string& getName() const { return m_name; }
