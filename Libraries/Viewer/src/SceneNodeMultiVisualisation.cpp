@@ -28,10 +28,13 @@ SceneNodeMultiVisualisation::~SceneNodeMultiVisualisation()
 
 void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
+
+	// Here we switch the view state changes
 	if (_state == ot::ViewChangedStates::changesSaved)
 	{
 		const std::list< Visualiser*>& allVisualiser = getVisualiser();
-		// Update every other visualiser if open 
+		// We initiated a model state change from the ui. Now we request a new visualisation for every visualiser which is not the one that initiated the 
+		// Model state change under the condition that the view is open.
 		for (Visualiser* visualiser : allVisualiser)
 		{
 			if (visualiser->getViewType() != _viewType && visualiser->viewIsCurrentlyOpen()) {
@@ -41,6 +44,7 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 	}
 	else
 	{
+		//Here we set/unset the viewer state isOpen for the opened visualisation.
 		const std::list< Visualiser*>& allVisualiser = getVisualiser();
 		bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
 		bool thisIsTheView = false;
@@ -71,11 +75,18 @@ ot::SelectionHandlingResult SceneNodeMultiVisualisation::setSelected(bool _selec
 
 	if (getModel() != nullptr)
 	{
+		// First we check if there is a change from not selected to selected. Multi selections don't trigger a visualisation since it could 
+		// require too much computational power
 		if (!isSelected() && _selection && getModel()->isSingleItemSelected())
 		{
 			const std::list<Visualiser*> visualisers = getVisualiser();
 			for (Visualiser* visualiser : visualisers)
 			{
+				// We have a valid state switch, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
+				// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
+				// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
+				// open or not.
+				// Other selection origins are neglected because ... (@Alex ?)
 				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					visualiser->visualise();
@@ -83,6 +94,7 @@ ot::SelectionHandlingResult SceneNodeMultiVisualisation::setSelected(bool _selec
 				}
 				else if (visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
+					// Here we just want to focus an already opened view.
 					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
 					result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 				}
