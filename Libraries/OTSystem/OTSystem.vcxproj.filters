@@ -80,5 +80,8 @@
     <ClInclude Include="include\OTSystem\AppExitCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTSystem\Exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
