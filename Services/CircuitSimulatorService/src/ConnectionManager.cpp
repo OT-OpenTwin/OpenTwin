@@ -217,7 +217,12 @@ void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue
             // ot::StyledTextBuilder textBuilder;
 
             if (data.isString()){
+                std::string temp = data.toString().toStdString();
+                if (temp == " Note: can't find the initialization file spinit.") {
 
+                    //Here we supress the missing initialization file message
+                    return;
+                }
                 SimulationResults::getInstance()->displayError(data.toString().toStdString());
             }
             else {
