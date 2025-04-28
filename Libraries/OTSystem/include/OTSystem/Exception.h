@@ -32,6 +32,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::ObjectNotFoundException ObjectNotFound; }
 
+    //! @brief Basic object already exists exception.
+    class ObjectAlreadyExistsException : public Exception {
+    public:
+        explicit ObjectAlreadyExistsException() : Exception("Object already exists") {};
+        explicit ObjectAlreadyExistsException(const std::string& _message) : Exception(_message.c_str()) {};
+        explicit ObjectAlreadyExistsException(const char* _message) : Exception(_message) {};
+    };
+    namespace Exception { typedef ot::ObjectAlreadyExistsException ObjectAlreadyExists; }
+
     // ###########################################################################################################################################################################################################################################################################################################################
 
     // Network

@@ -32,13 +32,7 @@ std::list<unsigned long long> RelayService::getPortNumbers(void) const {
 
 	std::list<unsigned long long> ports = Service::getPortNumbers();
 
-	size_t colonIndex = m_websocketIP.rfind(':');
-	if (colonIndex != std::string::npos)
-	{
-		std::string port = m_websocketIP.substr(colonIndex + 1);
-
-		ports.push_back(std::stol(port));
-	}
+	
 
 	assert(!ports.empty()); // The port number could not be extracted from the ip address
 	return ports;

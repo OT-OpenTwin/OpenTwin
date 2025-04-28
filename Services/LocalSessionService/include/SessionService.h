@@ -81,13 +81,15 @@ public:
 	//! @param _collectionName The name of the collection used in this session
 	//! @param _sessionType The type of the session
 	//! @param _runMandatoryServices If true, all mandatory services for the specified session type will be started
-	Session* createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType);
+	Session& createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType);
+
+	bool hasSession(const std::string& _sessionID) const;
 
 	//! @brief Returns the session with the specified id
 	//! @param _sessionID The ID of the session to get
 	//! @param _throwException If true, exceptions will be thrown, otherwise a nullptr will be returned
 	//! @throw std::exception if the specified session ID is invalid
-	Session * getSession(const std::string& _sessionID);
+	Session& getSession(const std::string& _sessionID);
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
 	//! @param _sessionID The ID of the session
@@ -95,31 +97,23 @@ public:
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
 	//! @return false if a debug or release service could not be handled
-	bool runMandatoryServices(Session* _session);
+	bool runMandatoryServices(Session& _session);
 
 	//! @brief Will close the service and deregister it from its session
-	void serviceClosing(Service* _service, bool _notifyOthers, bool _autoCloseSessionIfMandatory = true);
-
-	//! @brief Will remove the session and close its logger.
-	//! Will NOT perform the session shutdown().
-	//! Will clear the memory of the provided pointer.
-	//! @param _session The session to remove
-	void removeSession(Session* _session);
+	void serviceClosing(const Service& _service, bool _notifyOthers, bool _autoCloseSessionIfMandatory = true);
 
 	//! \brief Removes the session from the service run starter and all maps.
-	void forgetSession(Session* _session);
+	void forgetSession(const Session& _session);
 
 	std::list<const Session *> sessions(void);
 	
 	//! @brief Create a config for the service that shall be started in Debug mode
 	//! @return false if the OPENTWIN_DEV_ROOT is not set since it is needed for the config path, otherwise true
-	bool runServiceInDebug(const std::string& _serviceName, const std::string& _serviceType, Session* _session, std::string& _serviceURL);
+	bool runServiceInDebug(const std::string& _serviceName, const std::string& _serviceType, Session& _session, std::string& _serviceURL);
 	
-	bool runRelayService(Session * _session, std::string& _websocketURL, std::string& _serviceURL);
+	bool runRelayService(Session& _session, std::string& _websocketURL, std::string& _serviceURL);
 
 	void setGlobalSessionService(GlobalSessionService * _gss) { m_gss = _gss; }
-
-	Service * getServiceFromURL(const std::string& _url);
 
 	//! @brief Initialize the collection of system information (e.g. CPU time and memory).
 	void initializeSystemInformation();
@@ -159,7 +153,7 @@ private:
 
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
-	void workerShutdownSession(ot::serviceID_t _serviceId, Session* _session);
+	void workerShutdownSession(ot::serviceID_t _serviceId, Session&& _session);
 
 	std::string									m_dataBaseURL;						//! @brief Database IP address
 	std::string									m_siteID;							//! @brief Site ID
@@ -174,7 +168,7 @@ private:
 	
 	std::map<std::string, bool>					m_serviceDebugList;
 	std::map<std::string, std::vector<ot::ServiceBase> *> m_mandatoryServicesMap;	//! @brief Map containing all names of mandatory services for each session type
-	std::map<std::string, Session *>			m_sessionMap;						//! @brief Map containing all sessions	
+	std::map<std::string, Session>			m_sessionMap;						//! @brief Map containing all sessions	
 
 	GlobalSessionService *						m_gss;
 	GlobalDirectoryService *					m_gds;

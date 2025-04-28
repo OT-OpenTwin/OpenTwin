@@ -7,8 +7,10 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
 
 // std header
 #include <list>
@@ -17,13 +19,28 @@
 class Session;
 
 class Service : public ot::Serializable {
+	OT_DECL_NOCOPY(Service)
+	OT_DECL_NODEFAULT(Service)
 public:
+	//! @brief Service flags.
+	enum ServiceFlag {
+		NoServiceFlags           = 0 << 0, //! @brief No service flags.
+		IsVisible                = 1 << 0, //! @brief The service is visible and known to other services.
+		IsShuttingDown           = 1 << 1, //! @brief The service is in a shutdown state and is expected to disconnect soon.
+		UseRelay                 = 1 << 2, //! @brief The services uses a relay service for communication (e.g. UI).
+		ReceiveBroadcastMessages = 1 << 3  //! @brief The service will receive broadcast messages.
+	};
+	typedef ot::Flags<ServiceFlag> ServiceFlags;
 
 	//! @brief Constructor.
-	Service(const std::string& _url, const std::string& _name, ot::serviceID_t _id, const std::string& _type, Session* _session, bool _showDebugInfo);
+	Service(const std::string& _url, const std::string& _name, ot::serviceID_t _id, const std::string& _type, const std::string& _sessionId, const ServiceFlags& _flags = ServiceFlag::NoServiceFlags);
+
+	Service(Service&& _other) noexcept;
 
 	//! @brief Destructor.
 	virtual ~Service();
+
+	Service& operator = (Service&& _other) noexcept;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -41,30 +58,35 @@ public:
 
 	// Setter / Getter
 
-	void setURL(const std::string& _url) { m_url = _url; };
-	std::string getUrl(void) const { return m_url; };
+	void setServiceURL(const std::string& _url) { m_url = _url; };
+	std::string getServiceUrl(void) const { return m_url; };
 
-	void setName(const std::string& _name) { m_name = _name; };
-	std::string getName(void) const { return m_name; };
+	void setServiceName(const std::string& _name) { m_name = _name; };
+	std::string getServiceName(void) const { return m_name; };
 
-	void setID(ot::serviceID_t _id) { m_id = _id; };
-	ot::serviceID_t getId(void) const { return m_id; };
+	void setServiceID(ot::serviceID_t _id) { m_id = _id; };
+	ot::serviceID_t getServiceId(void) const { return m_id; };
 
-	void setReceiveBroadcastMessages(bool _receive) { m_receiveBroadcastMessages = _receive; };
-	bool getReceiveBroadcastMessages(void) const { return m_receiveBroadcastMessages; };
+	std::string getServiceType(void) const { return m_type; };
 
-	std::string getType(void) const { return m_type; }
+	void setRelayUrl(const std::string& _url) { m_relayUrl = _url; };
+	const std::string& getRelayUrl(void) const { return m_relayUrl; };
 
-	Session* getSession(void) const { return m_session; };
+	void setWebsocketUrl(const std::string& _url) { m_websocketUrl = _url; };
+	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
 
-	bool getIsVisible(void) const { return m_isVisible; };
+	std::string getSessionId(void) const { return m_sessionId; };
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+	bool getIsVisible(void) const { return m_flags.flagIsSet(ServiceFlag::IsVisible); };
 
-	// Getter
+	void setUseRelay(bool _useRelay) { m_flags.setFlag(ServiceFlag::UseRelay, _useRelay); };
+	bool getUseRelay(void) const { return m_flags.flagIsSet(ServiceFlag::UseRelay); };
+
+	void setReceiveBroadcastMessages(bool _receive) { m_flags.setFlag(ServiceFlag::ReceiveBroadcastMessages, _receive); };
+	bool getReceiveBroadcastMessages(void) const { return m_flags.flagIsSet(ServiceFlag::ReceiveBroadcastMessages); };
 
 	//! @brief Will return the port numbers of this service
-	virtual std::list<unsigned long long> getPortNumbers(void) const;
+	std::list<unsigned long long> getPortNumbers(void) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -76,6 +98,10 @@ public:
 	//! @ref Serializable::addToJsonObject
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
+	//! @brief Adds the full service information to the provided json object.
+	//! @ref Service::addToJsonObject
+	//! @param _object Json object value reference to write the data to.
+	//! @param _allocator Allocator to use when writing data.
 	void addDebugInfoToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 	//! @brief Set the data by deserializing the object.
@@ -84,18 +110,16 @@ public:
 	//! @ref Serializable::setFromJsonObject
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-protected:
-
-	std::string				m_url;			//! This services IP address
-	std::string				m_name;			//! This services name
-	ot::serviceID_t			m_id;			//! This services ID
-	std::string				m_type;			//! This services type
-	Session *				m_session;		//! The session this service belongs to
-	bool					m_receiveBroadcastMessages;
-	bool					m_isVisible;
-
 private:
+	std::string	    m_url;          //! @brief Service url.
+	std::string	    m_name;         //! @brief Service name.
+	ot::serviceID_t	m_id;           //! @brief Service ID.
+	std::string	    m_type;         //! @brief Service type
+	std::string     m_relayUrl;     //! @brief Websocket url.
+	std::string     m_websocketUrl; //! @brief Websocket url.
+	std::string     m_sessionId;    //! @brief ID of session this services is running in.
 
-	Service() = delete;
-	Service(const Service &) = delete;
+	ServiceFlags    m_flags;        //! @brief Flags.
 };
+
+OT_ADD_FLAG_FUNCTIONS(Service::ServiceFlag)

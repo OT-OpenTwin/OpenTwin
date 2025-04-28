@@ -197,7 +197,6 @@
     <ClInclude Include="include\GlobalDirectoryService.h" />
     <ClInclude Include="include\GlobalSessionService.h" />
     <ClInclude Include="include\PortManager.h" />
-    <ClInclude Include="include\RelayService.h" />
     <ClInclude Include="include\Service.h" />
     <ClInclude Include="include\ServiceRunStarter.h" />
     <ClInclude Include="include\Session.h" />

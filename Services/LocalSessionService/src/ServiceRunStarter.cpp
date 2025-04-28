@@ -15,26 +15,26 @@ ServiceRunStarter& ServiceRunStarter::instance() {
 	return g_instance;
 }
 
-void ServiceRunStarter::addService(Session * _session, Service * _service) {
+void ServiceRunStarter::addService(const Session& _session, const Service& _service) {
 	m_mutex.lock();
 
 	StartupInformation info;
 	
-	info.sessionId = _session->getId();
+	info.sessionId = _session.getId();
 
-	info.serviceId = _service->getId();
-	info.serviceName = _service->getName();
-	info.serviceType = _service->getType();
-	info.serviceUrl = _service->getUrl();
+	info.serviceId = _service.getServiceId();
+	info.serviceName = _service.getServiceName();
+	info.serviceType = _service.getServiceType();
+	info.serviceUrl = _service.getServiceUrl();
 
-	info.credentialsUserName = _session->getCredentialsUsername();
-	info.credentialsUserPassword = _session->getCredentialsPassword();
+	info.credentialsUserName = _session.getCredentialsUsername();
+	info.credentialsUserPassword = _session.getCredentialsPassword();
 
-	info.databaseUserName = _session->getDatabaseUsername();
-	info.databaseUserPassword = _session->getDatabasePassword();
+	info.databaseUserName = _session.getDatabaseUsername();
+	info.databaseUserPassword = _session.getDatabasePassword();
 
-	info.userCollection = _session->getUserCollection();
-	info.sessionType    = _session->getType();
+	info.userCollection = _session.getUserCollection();
+	info.sessionType    = _session.getType();
 
 	m_queue.push_back(info);
 
@@ -99,21 +99,21 @@ void ServiceRunStarter::worker(void) {
 			doc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(info.sessionType, doc.GetAllocator()), doc.GetAllocator());
 
 			// Get session
-			Session* session = SessionService::instance().getSession(info.sessionId);
-			if (session == nullptr) {
+			if (SessionService::instance().hasSession(info.sessionId)) {
+				Session& session = SessionService::instance().getSession(info.sessionId);
+				session.addServiceListToJsonObject(doc, doc.GetAllocator());
+
+				// Unlock must happen after the addServiceListToDocument() call, since it may happen that the
+				// Session Service is deleting the sessing while document is built (racing condition)
+				m_mutex.unlock();																// Unlock
+			}
+			else {
 				m_mutex.unlock();																// Unlock
 
 				OT_LOG_W("Session not found. Cleaning up");
 				// Clean up session information
 				this->sessionClosing(info.sessionId);
 				continue;
-			}
-			else {
-				session->addServiceListToJsonObject(doc, doc.GetAllocator());
-
-				// Unlock must happen after the addServiceListToDocument() call, since it may happen that the
-				// Session Service is deleting the sessing while document is built (racing condition)
-				m_mutex.unlock();																// Unlock
 			}
 
 			if (!this->sendRunMessageToService(info, doc.toJson())) {

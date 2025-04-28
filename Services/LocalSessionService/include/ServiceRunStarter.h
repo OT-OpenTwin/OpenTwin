@@ -1,5 +1,9 @@
 #pragma once
 
+// Service header
+#include "Service.h"
+#include "Session.h"
+
 // OT header
 #include "OTCore/CoreTypes.h"
 
@@ -7,14 +11,11 @@
 #include <mutex>
 #include <list>
 
-class Service;
-class Session;
-
 class ServiceRunStarter {
 public:
 	static ServiceRunStarter& instance();
 
-	void addService(Session * _session, Service * _service);
+	void addService(const Session& _session, const Service& _service);
 	void sessionClosing(const std::string& _sessionId);
 
 private:
