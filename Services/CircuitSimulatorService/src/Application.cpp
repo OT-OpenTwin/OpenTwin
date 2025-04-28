@@ -395,6 +395,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	if (name == "failed")
 	{
 		OT_LOG_E("No Circuit found or selected!");
+		m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+		m_SimulationRunning = false;
 		return;
 	}
 
