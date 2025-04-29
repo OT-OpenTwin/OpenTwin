@@ -49,6 +49,9 @@ public:
 
 	std::string CreateBlockHeadline();
 
+	virtual std::string serialiseAsJSON() override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
+
 protected:
 	std::string m_blockTitle = "";
 	ot::UID m_coordinate2DEntityID = 0;

@@ -75,6 +75,53 @@ std::string EntityBlock::CreateBlockHeadline()
 	else return nameWithoutRootDirectory;
 }
 
+std::string EntityBlock::serialiseAsJSON()
+{
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	std::map<ot::UID, EntityBase*> entityMap;
+	EntityCoordinates2D* position = dynamic_cast<EntityCoordinates2D*>(readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap));
+	auto docPosition = position->serialiseAsJSON();
+	ot::JsonDocument serialisedPosition;
+	serialisedPosition.fromJson(docPosition);
+
+	entireDoc.AddMember("SerialisationOfPosition", serialisedPosition, entireDoc.GetAllocator());
+
+	return entireDoc.toJson();
+}
+
+bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		ot::ConstJsonObject positionObjJson = ot::json::getObject(_serialisation, "SerialisationOfPosition");
+		std::unique_ptr<EntityCoordinates2D> position(new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr, nullptr, getOwningService()));
+		position->deserialiseFromJSON(positionObjJson, _copyInformation, _entityMap);
+		position->setParent(this);
+		m_coordinateEntity = position.release();
+		m_coordinate2DEntityID = m_coordinateEntity->getEntityID();
+		_entityMap[getEntityID()] = this;
+		_entityMap[m_coordinateEntity->getEntityID()] = m_coordinateEntity;
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise "+  getClassName() +" because: " + std::string(_e.what()));
+		return false;
+	}
+}
+
 
 void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 {

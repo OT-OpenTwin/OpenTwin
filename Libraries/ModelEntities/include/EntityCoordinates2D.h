@@ -13,7 +13,7 @@ public:
 	virtual std::string getClassName(void) { return "EntityCoordinates2D"; };
 
 	virtual std::string serialiseAsJSON() override;
-	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
 
 private:

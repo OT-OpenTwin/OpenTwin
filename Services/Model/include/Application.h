@@ -11,7 +11,7 @@
 #include "SelectionHandler.h"
 #include "FileHandler.h"
 #include "ViewVisualisationHandler.h"
-#include "BlockHandler.h"
+#include "CopyPasteHandler.h"
 
 // std header
 #include <list>
@@ -198,7 +198,7 @@ private:
 	ActionAndFunctionHandler m_baseHandler;
 	FileHandler m_fileHandler;
 	ViewVisualisationHandler m_visualisationHandler;
-	BlockHandler m_blockHandler;
+	CopyPasteHandler m_copyPasteHandler;
 	Application();
 	~Application();
 };

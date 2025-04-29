@@ -87,7 +87,7 @@
     <ClCompile Include="src\ActionAndFunctionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockHandler.cpp">
+    <ClCompile Include="src\CopyPasteHandler.cpp">
       <Filter>Source Files\Handler</Filter>
     </ClCompile>
     <ClCompile Include="src\SelectionHandler.cpp">
@@ -167,7 +167,7 @@
     <ClInclude Include="include\ViewVisualisationHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
-    <ClInclude Include="include\BlockHandler.h">
+    <ClInclude Include="include\CopyPasteHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
   </ItemGroup>

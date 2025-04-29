@@ -12,7 +12,7 @@
 #include "ModelState.h"
 #include "OldTreeIcon.h"
 #include "OTGui/CopyInformation.h"
-
+#include "OTCore/Logger.h"
 
 class EntityBase;
 class ClassFactoryHandler;
@@ -126,8 +126,22 @@ public:
 	//! @return 
 	virtual EntityBase* clone() { return nullptr; }
 
-	virtual std::string serialiseAsJSON() { return "";	}
-	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) { return false; };
+	//! @brief 
+	//! @return Empty string if entity does not support copy. 
+	virtual std::string serialiseAsJSON() 
+	{ 
+		return "";	
+	}
+
+	//! @brief Entity specific (optional) implementation of a deserialisation fro a string (copy/paste functionality). 
+	//! In this function, it is necessary to create new IDs. Don't store the entity. Storing and unique name creation are taken care of by the model service.
+	//! @param _copyInformation Additional information from the ui are located here. E.g. the cursor position.
+	//! @param _entityMap Any entity that is deserialised in the process needs to be added to the map. This will be used for storing and adding to model state
+	//! @return true if the serialisation was successfull
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+	{ 
+		return false; 
+	}
 
 protected:
 	virtual int getSchemaVersion(void) { return 1; };

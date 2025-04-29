@@ -19,7 +19,7 @@ std::string EntityCoordinates2D::serialiseAsJSON()
 	return jsonDoc;
 }
 
-bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap)
+bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
 {
 	try
 	{
@@ -35,8 +35,9 @@ bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serial
 		setCoordinates(newPosition);
 		return true;
 	}
-	catch (std::exception _e)
+	catch (std::exception& _e)
 	{
+		OT_LOG_E("Failed to deserialise EntityCoordinates2D because: " + std::string(_e.what()));
 		return false;
 	}
 }
