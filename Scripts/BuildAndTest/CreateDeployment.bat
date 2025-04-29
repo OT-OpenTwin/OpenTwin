@@ -226,8 +226,8 @@ MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
 COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
 
 REM Documentation
-MKDIR "%OT_DEPLOYMENT_DIR%\Documentation"
-XCOPY /S "%OT_DOCUMENTATION_ROOT%\_build\html\*.*" "%OT_DEPLOYMENT_DIR%\Documentation"
+MKDIR "%OPENTWIN_DEV_ROOT%\DeploymentDocumentation"
+XCOPY /S "%OT_DOCUMENTATION_ROOT%\_build\html\*.*" "%OPENTWIN_DEV_ROOT%\DeploymentDocumentation"
 
 REM Shutdown Script
 COPY "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat" "%OT_DEPLOYMENT_DIR%"

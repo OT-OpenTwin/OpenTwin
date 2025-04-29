@@ -10,6 +10,7 @@
 !include LogicLib.nsh
 !include nsDialogs.nsh
 !include FileFunc.nsh
+!include HelperFunctions.nsh
 
 #=================================================================
 #							VARIABLES
@@ -260,7 +261,7 @@ Function RestartRequired
 	Exch $R1         ;Original Variable
 	Push $R2
 	Push $R3         ;Counter Variable
- 
+	
 	StrCpy $R1 "0" 1     ;initialize variable with 0
 	StrCpy $R3 "0" 0    ;Counter Variable
  
@@ -998,7 +999,7 @@ Section "OpenTwin Main Files (Required)" SEC02
 		#    ".\" 	 = the script location itself
 		#    "..\" 	 = one directory up
 		#    "..\..\"  = two directories up etc.
-
+	
 	${If} $PublicIpSet <> 0 #public IP was set
 		ExpandEnvStrings $0 %COMSPEC%
 		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
@@ -1033,6 +1034,23 @@ Section "OpenTwin Main Files (Required)" SEC02
 	Push $0
 	Call DumpLog
 SectionEnd
+
+Section /o "OpenTwin Documentation" SEC_Documentation
+		
+	SectionIn RO ;read only section
+	SetOutPath "$INSTDIR\Documentation"
+	SetOverwrite ifnewer
+	
+	LogText "OpenTwin Documentation"
+	
+	DetailPrint "Extracting documentation..."
+	
+	File /r "..\..\..\DeploymentDocumentation\*.*"
+	
+	Call DumpLog
+		
+SectionEnd
+
 
 ####### Checking if a MongoDB upgrade or a first installation is required ######
 
@@ -1078,6 +1096,7 @@ SectionEnd
 #Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Install all required OpenTwin files"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC_Documentation} "Install the code documentation of the installed OpenTwin version"
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec_Upgr} "Upgrade of the existing data storage. !WARNING! Once you have upgraded to version 7.0, you will not be able to downgrade the FCV and binary version without support assistance."
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec_Inst} "Install MongoDB 7.0. The configuration from the current installation will be used for the new installation."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -1151,6 +1170,15 @@ Function .onInit
 		
 	ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
 	
+	StrCpy $9 ${SEC_Documentation}	
+	MessageBox MB_OK "set documentation not ro"
+	
+	StrCpy $8 ${SF_RO}
+	Call UnsetSectionFlag
+	
+	StrCpy $8 ${SF_SELECTED}
+	Call SetSectionFlag
+
 	${If} $0 != ""
 	    MessageBox MB_YESNO|MB_ICONQUESTION "An OpenTwin installation was found. If you continue, the previous version will be removed.$\n$\nDo you really want to proceed?" /SD IDYES IDYES +2
 			Abort
@@ -1165,6 +1193,22 @@ Function .onInit
 		SetOutPath "$1"
 						
 		ExecWait '"$3"'
+
+		#Check if documentation was installed last time
+		GetFullPathName $4 "$1\Documentation" 
+		MessageBox MB_OK "Now check for documentation. File: $4 .Base: $1"
+		StrCpy $9 ${SEC_Documentation}
+		StrCpy $8 ${SF_SELECTED}
+
+		IfFileExists "$4\*.*" 0 +5
+			MessageBox MB_OK "documentation found"			
+			Call SetSectionFlag
+			Goto FileCheckEnd
+		# Else
+			MessageBox MB_OK "documentation not found"
+			Call UnsetSectionFlag
+		FileCheckEnd:
+		MessageBox MB_OK "documentation check complete"
 
 	    !insertmacro UninstallExisting $0 $0
 	    ${If} $0 <> 0

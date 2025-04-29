@@ -86,7 +86,8 @@ ot::SelectionHandlingResult SceneNodeMultiVisualisation::setSelected(bool _selec
 				// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
 				// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
 				// open or not.
-				// Other selection origins are neglected because ... (@Alex ?)
+				// Other selection origins are neglected. View origin is triggered if a view is selected in UI, which triggers the selection of the corresponding entity.
+				// Custom selection changes come from somewhere within the code.
 				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionOrigin == ot::SelectionOrigin::User)
 				{
 					visualiser->visualise();
