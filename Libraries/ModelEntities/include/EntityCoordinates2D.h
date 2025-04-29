@@ -12,9 +12,12 @@ public:
 	const ot::Point2DD& getCoordinates() { return m_location; };
 	virtual std::string getClassName(void) { return "EntityCoordinates2D"; };
 
-	virtual EntityBase* clone() override;
+	virtual std::string serialiseAsJSON() override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
 
 private:
+	
 	ot::Point2DD m_location;
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

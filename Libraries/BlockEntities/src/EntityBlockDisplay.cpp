@@ -5,10 +5,10 @@ EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObs
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 	_inputConnector = { ot::ConnectorType::In, "Input", "Input"};
-	_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "Display";
+	m_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "Display";
 }
 
 void EntityBlockDisplay::createProperties()

@@ -11,6 +11,8 @@
 #include "EntityProperties.h"
 #include "ModelState.h"
 #include "OldTreeIcon.h"
+#include "OTGui/CopyInformation.h"
+
 
 class EntityBase;
 class ClassFactoryHandler;
@@ -119,11 +121,14 @@ public:
 	void setDeletable(bool deletable) { m_isDeletable = deletable; };
 	const bool deletable() const { return m_isDeletable; }
 
-	//! @brief Creates a copy of the entity. The override from instantiable classes need to set the observer=nullptr and the parent=nullptr.
+	//! @brief Creates a copy of the entity. The override from instantiable classes need to set the observer=nullptr and the parent=nullptr. 
+	//! Otherwise the originals are deleted from the modelstate, if the clone happens in the model service
 	//! @return 
 	virtual EntityBase* clone() { return nullptr; }
 
-	std::string serialiseAsJSON();
+	virtual std::string serialiseAsJSON() { return "";	}
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) { return false; };
+
 protected:
 	virtual int getSchemaVersion(void) { return 1; };
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) {};
@@ -134,7 +139,8 @@ protected:
 	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory = nullptr);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
 	void entityIsStored(void);
-	
+	bsoncxx::builder::basic::document serialiseAsMongoDocument();
+
 private:
 	// Persistent attributes
 	std::string		     m_name;
@@ -156,6 +162,5 @@ private:
 	ModelState*          m_modelState;
 	ClassFactoryHandler* m_classFactory;
 	
-	bsoncxx::builder::basic::document serialiseAsMongoDocument();
 };
 

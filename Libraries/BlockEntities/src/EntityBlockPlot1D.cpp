@@ -5,19 +5,19 @@
 EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "Plot 1D";
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "Plot 1D";
 
 	const std::string index = "1";
 	const std::string connectorNameYAxis = _connectorYAxisNameBase + index;
 	const std::string connectorTitleYAxis = _connectorYAxisTitleBase + index;
-	_connectorsByName[connectorNameYAxis] = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
+	m_connectorsByName[connectorNameYAxis] = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
 
 	const std::string connectorNameXAxis = "XAxis";
 	const std::string connectorTitleXAxis = "X-Axis";
 	_xAxisConnector = { ot::ConnectorType::In ,connectorNameXAxis, connectorTitleXAxis };
-	_connectorsByName[connectorNameXAxis] = _xAxisConnector;
+	m_connectorsByName[connectorNameXAxis] = _xAxisConnector;
 }
 
 bool EntityBlockPlot1D::updateFromProperties()
@@ -27,20 +27,20 @@ bool EntityBlockPlot1D::updateFromProperties()
 
 	bool refresh = false;
 
-	if (_connectorsByName.size() > selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves) //Number of Curve connectors + one connector for the x - axis
+	if (m_connectorsByName.size() > selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves) //Number of Curve connectors + one connector for the x - axis
 	{
 		//Remove curves connectors
-		for (size_t i = _connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i > selectedNumberOfCurves ; i--)
+		for (size_t i = m_connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i > selectedNumberOfCurves ; i--)
 		{
 			std::string index = std::to_string(i);
 			const std::string connectorName = _connectorYAxisNameBase +index;
-			_connectorsByName.erase(connectorName);
+			m_connectorsByName.erase(connectorName);
 			const std::string propertyName = _propertyCurveNameBase + index;
 			getProperties().deleteProperty(propertyName);
 		}
 		refresh = true;
 	}
-	else if (_connectorsByName.size() < selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves)
+	else if (m_connectorsByName.size() < selectedNumberOfCurves + _numberOfConnectorsUnrelatedToCurves)
 	{
 		//Add curve connectors
 		AddDynamicNumberOfCurves(selectedNumberOfCurves);
@@ -105,13 +105,13 @@ std::string EntityBlockPlot1D::getYUnit()
 
 void EntityBlockPlot1D::AddDynamicNumberOfCurves(int numberOfCurves)
 {
-	for (size_t i = _connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i <= numberOfCurves; i++)
+	for (size_t i = m_connectorsByName.size() - _numberOfConnectorsUnrelatedToCurves; i <= numberOfCurves; i++)
 	{
 		const std::string index = std::to_string(i);
 		const std::string connectorNameYAxis = _connectorYAxisNameBase + index;
 		const std::string connectorTitleYAxis = _connectorYAxisTitleBase + index;
 		ot::Connector newCurveConnector = { ot::ConnectorType::In ,connectorNameYAxis,connectorTitleYAxis };
-		_connectorsByName[connectorNameYAxis] = newCurveConnector;
+		m_connectorsByName[connectorNameYAxis] = newCurveConnector;
 		EntityPropertiesString::createProperty(_propertyGroupYAxisDefinition, _propertyCurveNameBase + index, "", "default", getProperties());
 	}
 }
@@ -147,7 +147,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 const std::list<const ot::Connector*> EntityBlockPlot1D::getConnectorsYAxis()
 {
 	std::list<const ot::Connector*> allYAxisConnectors;
-	for (const auto& connector : _connectorsByName)
+	for (const auto& connector : m_connectorsByName)
 	{
 		if (connector.first.find(_connectorYAxisNameBase) != std::string::npos)
 		{

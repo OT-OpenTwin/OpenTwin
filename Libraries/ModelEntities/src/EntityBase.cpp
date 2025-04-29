@@ -120,13 +120,6 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	entityMap[getEntityID()] = this;
 }
 
-std::string EntityBase::serialiseAsJSON()
-{
-	auto doc = serialiseAsMongoDocument();
-	const std::string jsonDoc = bsoncxx::to_json(doc);
-	return jsonDoc;
-}
-
 void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
 	try {
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();

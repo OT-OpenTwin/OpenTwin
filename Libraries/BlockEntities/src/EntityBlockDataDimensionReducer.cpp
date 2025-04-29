@@ -4,17 +4,17 @@
 EntityBlockDataDimensionReducer::EntityBlockDataDimensionReducer(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID,parent,obs,ms,factory,owner)
 {
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "Matrix Element Selection";
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "Matrix Element Selection";
 
 	const std::string inputConnectorName = "In";
 	_inputConnector = { ot::ConnectorType::In,inputConnectorName, inputConnectorName };
 	const std::string outputConnectorName = "Out";
 	_outputConnector = { ot::ConnectorType::Out,outputConnectorName, outputConnectorName};
 
-	_connectorsByName[outputConnectorName] = _outputConnector;
-	_connectorsByName[inputConnectorName] = _inputConnector;
+	m_connectorsByName[outputConnectorName] = _outputConnector;
+	m_connectorsByName[inputConnectorName] = _inputConnector;
 }
 
 ot::GraphicsItemCfg* EntityBlockDataDimensionReducer::CreateBlockCfg()

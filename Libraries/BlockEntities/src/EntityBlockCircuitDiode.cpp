@@ -13,16 +13,16 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 
-	_navigationOldTreeIconName = "Diod2";
-	_navigationOldTreeIconNameHidden = "Diod2";
-	_blockTitle = "Diode";
+	m_navigationOldTreeIconName = "Diod2";
+	m_navigationOldTreeIconNameHidden = "Diod2";
+	m_blockTitle = "Diode";
 	const std::string connectorNameLeft = "Left2";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 	const std::string connectorNameRight = "Right2";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	_connectorsByName[connectorNameRight] = m_RightConnector;
+	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
 void EntityBlockCircuitDiode::createProperties()

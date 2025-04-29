@@ -33,25 +33,49 @@ void BlockHandler::updateIdentifier(std::list<std::unique_ptr<EntityBase>>& _new
 		//Important! These are set later when the entity is added to the state. If they are set here, it causes issues when the object is destroyed.
 		newEntity->setObserver(nullptr);
 		newEntity->setParent(nullptr);
-
 	}
 }
 
-void BlockHandler::storeEntities(std::list<std::unique_ptr<EntityBase>>& _newEntities)
+void BlockHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName)
 {
 	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 	std::list<bool> forceVis;
 
-	for (auto& newEntity : _newEntities)
+	Model* model = Application::instance()->getModel();
+	auto entityNames = model->getListOfEntityNames();
+	const uint32_t safetyLimit = 100000;
+	for (auto& newEntityByName : _newEntitiesByName)
 	{
+		EntityBase* newEntity = newEntityByName.second;
+		const std::string oldName = newEntity->getName();
+		uint32_t counter(0);
+		std::string newName = oldName +"_" +std::to_string(counter);
+		while (entityNames.find(newName) != entityNames.end() && counter < safetyLimit)
+		{
+			counter++;
+			newName = oldName + "_" + std::to_string(counter);
+		}
+		entityNames[newName] = true;
+		newEntity->setName(newName);
+		
 		newEntity->StoreToDataBase();
-		topoEntID.push_back(newEntity->getEntityID());
-		topoEntVers.push_back(newEntity->getEntityStorageVersion());
-		forceVis.push_back(false);
+
+		if (newEntity->getEntityType() == EntityBase::entityType::TOPOLOGY)
+		{
+			topoEntID.push_back(newEntity->getEntityID());
+			topoEntVers.push_back(newEntity->getEntityStorageVersion());
+			forceVis.push_back(false);
+		}
+		else
+		{
+			dataEntID.push_back(newEntity->getEntityID());
+			dataEntVers.push_back(newEntity->getEntityStorageVersion());
+			EntityBase* parent = newEntity->getParent();
+			assert(parent != nullptr);
+			dataEntParent.push_back(parent->getEntityID());
+		}
 	}
 	
-	Model* model = Application::instance()->getModel();
-	OTAssertNullptr(model);
 	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true,false);
 }
 
@@ -71,17 +95,13 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 	for (ot::UID uid : selectedEntities) {
 		// Find entity
 		EntityBase* entity = model->getEntityByID(uid);
-		EntityBase* base = entity->clone(); //besser die serialisierung zurückgeben.
-		if (entity) {
-			// Serialize entity
-
-			// #########################################################################################################################################
-
-			// !!!!!    Here the serializeAsJSON would include the coordinate entity ID of a block but we need the coordinate serialized aswell   !!!!!
+		const std::string serialisedEntity = entity->serialiseAsJSON();
+		if (!serialisedEntity.empty()) 
+		{	
 			ot::CopyEntityInformation entityInfo;
 			entityInfo.setName(entity->getName());
 			entityInfo.setUid(entity->getEntityID());
-			entityInfo.setRawData(entity->serialiseAsJSON());
+			entityInfo.setRawData(serialisedEntity);
 			info.addEntity(entityInfo);
 		}
 		else {
@@ -96,7 +116,7 @@ std::string BlockHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _doc
 }
 
 std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
-	const ot::CopyInformation info(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::CopyInformation info(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	// Get class factory
 	Model* model = Application::instance()->getModel();
@@ -104,35 +124,21 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	ClassFactoryModel& classFactory = model->getClassFactory();
 	std::map<ot::UID, EntityBase*> entityMap;
 
-
-	std::list<std::unique_ptr<EntityBase>> newEntities;
 	// Deserialize entities
 	for (const ot::CopyEntityInformation& entityInfo : info.getEntities()) {
-		if (!entityInfo.getRawData().empty())
+		const std::string serialisedEntities = entityInfo.getRawData();
+		if (!serialisedEntities.empty())
 		{
-
-			// Create bson view from json
-			std::string_view serialisedEntityJSONView(entityInfo.getRawData());
-			auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
-			auto serialisedEntityBSONView = serialisedEntityBSON.view();
-
-			std::string entityType = serialisedEntityBSON["SchemaType"].get_utf8().value.data();
-				
-			std::unique_ptr<EntityBase>entity(classFactory.CreateEntity(entityType));
+			ot::JsonDocument document;
+			document.fromJson(serialisedEntities);
+			std::string entityType = ot::json::getString(document, "SchemaType");
+			std::unique_ptr<EntityBase> entity (classFactory.CreateEntity(entityType));
+					
 			if (entity != nullptr)
 			{
 				// ########################################################################################################################
-				try
-				{
-					entity->restoreFromDataBase(nullptr, model, model->getStateManager(), serialisedEntityBSONView, entityMap);
-					newEntities.push_back(std::move(entity));
-					//Positions anpassung
-					//Selektion der neuen Entities.
-				}
-				catch (std::exception& e)
-				{
-					OT_LOG_E("Failed to build entity from paste information. " + std::string(e.what()));
-				}
+				bool serialisedSuccessfully = entity->deserialiseFromJSON(document.GetConstObject(),info, entityMap);
+				entity.release();
 			}
 			else
 			{
@@ -145,7 +151,6 @@ std::string BlockHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 		}
 	}
 
-	updateIdentifier(newEntities);
-	storeEntities(newEntities);
+	storeEntities(entityMap);
 	return ot::ReturnMessage().toJson();
 }

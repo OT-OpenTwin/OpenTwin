@@ -66,23 +66,39 @@ namespace ot {
 		Point2D minPoint(const Point2D& _other) { return ot::Point2D(std::min<int>(m_x, _other.m_x), std::min<int>(m_y, _other.m_y)); }
 
 		//! @brief Returns a new Point with the greatest coordinates.
-		Point2D maxPoint(const Point2D& _other) { return ot::Point2D(std::max<int>(m_x, _other.m_x), std::max<int>(m_y, _other.m_y)); };
+		Point2D maxPoint(const Point2D& _other) { return ot::Point2D(std::max<int>(m_x, _other.m_x), std::max<int>(m_y, _other.m_y)); }
 
 		//! @brief Moves the x value towards negative infinity bound to the value specified.
 		//! If the current value is lower than the bound it will be ignored.
-		Point2D& moveLeft(int _leftBound) { m_x = std::min<int>(m_x, _leftBound); return *this; };
+		Point2D& moveLeft(int _leftBound) 
+		{ 
+			m_x = std::min<int>(m_x, _leftBound); 
+			return *this; 
+		}
 
 		//! @brief Moves the y value towards negative infinity bound to the value specified.
 		//! If the current value is lower than the bound it will be ignored.
-		Point2D& moveTop(int _topBound) { m_y = std::min<int>(m_y, _topBound); return *this; };
+		Point2D& moveTop(int _topBound) 
+		{ 
+			m_y = std::min<int>(m_y, _topBound); 
+			return *this; 
+		}
 
 		//! @brief Moves the x value towards positive infinity bound to the value specified.
 		//! If the current value is greater than the bound it will be ignored.
-		Point2D& moveRight(int _rightBound) { m_x = std::max<int>(m_x, _rightBound); return *this; };
+		Point2D& moveRight(int _rightBound) 
+		{ 
+			m_x = std::max<int>(m_x, _rightBound); 
+			return *this; 
+		}
 
 		//! @brief Moves the y value towards positive infinity bound to the value specified.
 		//! If the current value is greater than the bound it will be ignored.
-		Point2D& moveBottom(int _bottomBount) { m_y = std::max<int>(m_y, _bottomBount); return *this; };
+		Point2D& moveBottom(int _bottomBount) 
+		{ 
+			m_y = std::max<int>(m_y, _bottomBount); 
+			return *this; 
+		}
 
 		Point2DF toPoint2DF(void) const;
 

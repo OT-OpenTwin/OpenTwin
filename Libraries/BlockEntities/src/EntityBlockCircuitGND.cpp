@@ -13,13 +13,13 @@
 
 EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
-	_navigationOldTreeIconName = "GND";
-	_navigationOldTreeIconNameHidden = "GND";
-	_blockTitle = "GND";
+	m_navigationOldTreeIconName = "GND";
+	m_navigationOldTreeIconNameHidden = "GND";
+	m_blockTitle = "GND";
 
 	const std::string connectorNameLeft = "GND";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 }
 

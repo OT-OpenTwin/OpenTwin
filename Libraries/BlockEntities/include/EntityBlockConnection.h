@@ -14,21 +14,21 @@ public:
 
 	ot::GraphicsConnectionCfg getConnectionCfg();
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
-	void SetGraphicsScenePackageName(const std::string& name) { _graphicsScenePackage = name; }
-	void SetServiceInformation(const ot::BasicServiceInformation& info) { _info = info; }
+	void SetGraphicsScenePackageName(const std::string& name) { m_graphicsScenePackage = name; }
+	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	
 	void createProperties();
 	virtual bool updateFromProperties() override;
 	virtual void addVisualizationNodes(void) override;
 	virtual int getSchemaVersion(void) override { return 1; };
 private:
-	std::string _navigationOldTreeIconName = "";
-	std::string _navigationOldTreeIconNameHidden = "";
+	std::string m_navigationOldTreeIconName = "";
+	std::string m_navigationOldTreeIconNameHidden = "";
 	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::PenFCfg m_lineStyle;
 
-	ot::BasicServiceInformation _info;
-	std::string	_graphicsScenePackage;
+	ot::BasicServiceInformation m_info;
+	std::string	m_graphicsScenePackage;
 	ot::UID _blockIDOrigin;
 	ot::UID _blockIDDestination;
 	std::string _connectorNameOrigin;

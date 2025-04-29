@@ -12,17 +12,17 @@
 EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = "Inductor";
-	_navigationOldTreeIconNameHidden = "Inductor";
-	_blockTitle = "Inductor";
+	m_navigationOldTreeIconName = "Inductor";
+	m_navigationOldTreeIconNameHidden = "Inductor";
+	m_blockTitle = "Inductor";
 
 	const std::string connectorNameLeft = "Left8";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 	const std::string connectorNameRight = "Right8";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	_connectorsByName[connectorNameRight] = m_RightConnector;
+	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
 void EntityBlockCircuitInductor::createProperties()

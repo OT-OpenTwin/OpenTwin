@@ -6,9 +6,9 @@
 EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = "Diod2";
-	_navigationOldTreeIconNameHidden = "Diod2";
-	_blockTitle = "Connector";
+	m_navigationOldTreeIconName = "Diod2";
+	m_navigationOldTreeIconNameHidden = "Diod2";
+	m_blockTitle = "Connector";
 }
 
 

@@ -11,13 +11,36 @@ bool EntityCoordinates2D::getEntityBox(double& xmin, double& xmax, double& ymin,
 	return false;
 }
 
-EntityBase* EntityCoordinates2D::clone()
+
+std::string EntityCoordinates2D::serialiseAsJSON()
 {
-	auto clonedEntity = std::make_unique<EntityCoordinates2D>(*this);
-	clonedEntity->setObserver(nullptr);
-	clonedEntity->setParent(nullptr);
-	return clonedEntity.release();
+	auto doc = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDoc = bsoncxx::to_json(doc);
+	return jsonDoc;
 }
+
+bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap)
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+	
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+		
+		ot::Point2DD newPosition = _copyInformation.getDestinationScenePos();
+		setCoordinates(newPosition);
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		return false;
+	}
+}
+
 
 void EntityCoordinates2D::AddStorageData(bsoncxx::builder::basic::document& storage)
 {

@@ -45,7 +45,8 @@ public:
 	const ot::Connector getConnectorParameter2() const { return m_connectorParameter2; }
 	const ot::Connector getConnectorParameter3() const { return m_connectorParameter3; }
 
-	virtual EntityBase* clone() override;
+	virtual std::string serialiseAsJSON() override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 	virtual bool updateFromProperties() override;
 

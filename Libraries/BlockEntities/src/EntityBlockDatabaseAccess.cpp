@@ -7,14 +7,14 @@
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "Database Access";
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "Database Access";
 
 
 	const std::string connectorNameQuantity = "Quantity";
 	m_connectorQuantity = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
-	_connectorsByName[connectorNameQuantity] = m_connectorQuantity;
+	m_connectorsByName[connectorNameQuantity] = m_connectorQuantity;
 
 	const std::string connectorNameParameter1 = "Parameter1";
 	const std::string connectorTitleParameter1 = "Parameter 1";
@@ -28,7 +28,7 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 	const std::string connectorTitleParameter3 = "Parameter 3";
 	m_connectorParameter3 = { ot::ConnectorType::Out,connectorNameParameter3, connectorTitleParameter3 };
 
-	_connectorsByName[connectorNameParameter1] = m_connectorParameter1;
+	m_connectorsByName[connectorNameParameter1] = m_connectorParameter1;
 }
 
 void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& comparators)
@@ -157,38 +157,38 @@ void EntityBlockDatabaseAccess::updateBlockConfig()
 		std::list<std::string> connectorsForRemoval;
 		if (m_propertyValueDimension2 == queryDimension)
 		{
-			if (_connectorsByName.find(m_connectorParameter3.getConnectorName()) != _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) != m_connectorsByName.end())
 			{
-				_connectorsByName.erase(m_connectorParameter3.getConnectorName());
+				m_connectorsByName.erase(m_connectorParameter3.getConnectorName());
 				connectorsForRemoval.push_back(m_connectorParameter3.getConnectorName());
 			}
-			if (_connectorsByName.find(m_connectorParameter2.getConnectorName()) == _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) == m_connectorsByName.end())
 			{
-				_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
+				m_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
 			}
 		}
 		else if (m_propertyValueDimension3 == queryDimension)
 		{
-			if (_connectorsByName.find(m_connectorParameter2.getConnectorName()) == _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) == m_connectorsByName.end())
 			{
-				_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
+				m_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
 			}
-			if (_connectorsByName.find(m_connectorParameter3.getConnectorName()) == _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) == m_connectorsByName.end())
 			{
-				_connectorsByName[m_connectorParameter3.getConnectorName()] = m_connectorParameter3;
+				m_connectorsByName[m_connectorParameter3.getConnectorName()] = m_connectorParameter3;
 			}
 		}
 		else
 		{
 			assert(m_propertyValueDimension1 == queryDimension);
-			if (_connectorsByName.find(m_connectorParameter3.getConnectorName()) != _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) != m_connectorsByName.end())
 			{
-				_connectorsByName.erase(m_connectorParameter3.getConnectorName());
+				m_connectorsByName.erase(m_connectorParameter3.getConnectorName());
 				connectorsForRemoval.push_back(m_connectorParameter3.getConnectorName());
 			}
-			if (_connectorsByName.find(m_connectorParameter2.getConnectorName()) != _connectorsByName.end())
+			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) != m_connectorsByName.end())
 			{
-				_connectorsByName.erase(m_connectorParameter2.getConnectorName());
+				m_connectorsByName.erase(m_connectorParameter2.getConnectorName());
 				connectorsForRemoval.push_back(m_connectorParameter2.getConnectorName());
 			}
 		}
@@ -204,7 +204,7 @@ void EntityBlockDatabaseAccess::updateConnections(std::list<std::string>& connec
 	std::list<ot::UID> connectionsForRemoval;
 	std::list<ot::UID> remainingConnections;
 	std::map<ot::UID, EntityBase*> entityMap;
-	for (auto& connectionID : _connectionIDs)
+	for (auto& connectionID : m_connectionIDs)
 	{
 		EntityBase* entityBase = readEntityFromEntityID(this, connectionID, entityMap);
 		EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityBase);
@@ -239,7 +239,7 @@ void EntityBlockDatabaseAccess::updateConnections(std::list<std::string>& connec
 		}
 
 	}
-	_connectionIDs = std::move(remainingConnections);
+	m_connectionIDs = std::move(remainingConnections);
 	removeConnectionsAtConnectedEntities(connectionsForRemoval);
 }
 
@@ -303,12 +303,51 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	return graphicsItemConfig;
 }
 
-EntityBase* EntityBlockDatabaseAccess::clone()
+
+std::string EntityBlockDatabaseAccess::serialiseAsJSON()
 {
-	auto clonedEntity = std::make_unique<EntityBlockDatabaseAccess>(*this);
-	clonedEntity->setObserver(nullptr);
-	clonedEntity->setParent(nullptr);
-	return clonedEntity.release();
+	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocBlock);
+
+	std::map<ot::UID, EntityBase*> entityMap;
+	EntityCoordinates2D* position = dynamic_cast<EntityCoordinates2D*>(readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap));
+	auto docPosition =	position->serialiseAsJSON();
+	ot::JsonDocument serialisedPosition;
+	serialisedPosition.fromJson(docPosition);
+
+	entireDoc.AddMember("SerialisationOfPosition", serialisedPosition, entireDoc.GetAllocator());
+	
+	return entireDoc.toJson();
+}
+
+bool EntityBlockDatabaseAccess::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap)
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		ot::ConstJsonObject positionObjJson = ot::json::getObject(_serialisation, "SerialisationOfPosition");
+		std::unique_ptr<EntityCoordinates2D> position (new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr, nullptr, getOwningService()));
+		position->deserialiseFromJSON(positionObjJson, _copyInformation ,_entityMap);
+		position->setParent(this);
+		m_coordinateEntity = position.release();
+		m_coordinate2DEntityID = m_coordinateEntity->getEntityID();
+		_entityMap[getEntityID()] = this;
+		_entityMap[m_coordinateEntity->getEntityID()] = m_coordinateEntity;
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		return false;
+	}
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()

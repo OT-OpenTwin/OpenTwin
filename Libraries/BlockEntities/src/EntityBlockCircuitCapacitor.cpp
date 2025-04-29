@@ -12,17 +12,17 @@
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = "Capacitor";
-	_navigationOldTreeIconNameHidden = "Capacitor";
-	_blockTitle = "Capacitor";
+	m_navigationOldTreeIconName = "Capacitor";
+	m_navigationOldTreeIconNameHidden = "Capacitor";
+	m_blockTitle = "Capacitor";
 
 	const std::string connectorNameLeft = "Left7";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
 	const std::string connectorNameRight = "Right7";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	_connectorsByName[connectorNameRight] = m_RightConnector;
+	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
 void EntityBlockCircuitCapacitor::createProperties()

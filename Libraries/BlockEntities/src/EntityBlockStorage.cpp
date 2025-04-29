@@ -4,9 +4,9 @@
 EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "Store in Database";
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "Store in Database";
 }
 
 ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
@@ -217,7 +217,7 @@ int32_t EntityBlockStorage::getNumberOfMetaData()
 const std::list<ot::Connector> EntityBlockStorage::getConnectorsQuantity()
 {
 	std::list<ot::Connector> allQuantityConnectors;
-	for (auto connectorByName : _connectorsByName)
+	for (auto connectorByName : m_connectorsByName)
 	{
 		const std::string connectorName = connectorByName.first;
 		if (connectorName.find(m_quantityInputNameBase) != std::string::npos)
@@ -231,7 +231,7 @@ const std::list<ot::Connector> EntityBlockStorage::getConnectorsQuantity()
 const std::list<ot::Connector> EntityBlockStorage::getConnectorsParameter()
 {
 	std::list<ot::Connector> allParameterConnectors;
-	for (auto connectorByName : _connectorsByName)
+	for (auto connectorByName : m_connectorsByName)
 	{
 		const std::string connectorName = connectorByName.first;
 		if (connectorName.find(m_parameterInputNameBase) != std::string::npos)
@@ -245,7 +245,7 @@ const std::list<ot::Connector> EntityBlockStorage::getConnectorsParameter()
 const std::list<ot::Connector> EntityBlockStorage::getConnectorsMetadata()
 {
 	std::list<ot::Connector> allMetadataConnectors;
-	for (auto connectorByName : _connectorsByName)
+	for (auto connectorByName : m_connectorsByName)
 	{
 		const std::string connectorName = connectorByName.first;
 		if (connectorName.find(m_metaDataInputNameBase) != std::string::npos)
@@ -332,8 +332,8 @@ void EntityBlockStorage::createConnectors()
 			name += std::to_string(i - 1);
 		}
 		ot::Connector newConnector(type, name, title);
-		_connectorsByName[name] = newConnector;
-		m_quantityInputs.push_back(&_connectorsByName.find(name)->second);
+		m_connectorsByName[name] = newConnector;
+		m_quantityInputs.push_back(&m_connectorsByName.find(name)->second);
 	}
 	
 	int32_t numberOfParameter = getNumberOfParameters();
@@ -347,8 +347,8 @@ void EntityBlockStorage::createConnectors()
 			name += std::to_string(i - 1);
 		}
 		ot::Connector newConnector(type, name, title);
-		_connectorsByName[name] = newConnector;
-		m_parameterInputs.push_back(&_connectorsByName.find(name)->second);
+		m_connectorsByName[name] = newConnector;
+		m_parameterInputs.push_back(&m_connectorsByName.find(name)->second);
 	}
 	
 	int32_t numberOfMetaData = getNumberOfMetaData();
@@ -360,8 +360,8 @@ void EntityBlockStorage::createConnectors()
 		name += std::to_string(i);
 		
 		ot::Connector newConnector(type, name, title);
-		_connectorsByName[name] = newConnector;
-		m_metaDataInputs.push_back(&_connectorsByName.find(name)->second);
+		m_connectorsByName[name] = newConnector;
+		m_metaDataInputs.push_back(&m_connectorsByName.find(name)->second);
 	}
 
 }
@@ -371,5 +371,5 @@ void EntityBlockStorage::clearConnectors()
 	m_metaDataInputs.clear();
 	m_parameterInputs.clear();
 	m_quantityInputs.clear();
-	_connectorsByName.clear();
+	m_connectorsByName.clear();
 }

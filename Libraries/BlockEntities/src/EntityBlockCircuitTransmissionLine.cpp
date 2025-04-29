@@ -12,26 +12,26 @@
 
 EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
-	_navigationOldTreeIconName = "TranLine";
-	_navigationOldTreeIconNameHidden = "TranLine";
-	_blockTitle = "Transmission Line";
+	m_navigationOldTreeIconName = "TranLine";
+	m_navigationOldTreeIconNameHidden = "TranLine";
+	m_blockTitle = "Transmission Line";
 
 
 	const std::string connectorNameLeftPos1 = "PositivePole1";
 	m_LeftConnectorPos1 = { ot::ConnectorType::Out,connectorNameLeftPos1,connectorNameLeftPos1 };
-	_connectorsByName[connectorNameLeftPos1] = m_LeftConnectorPos1;
+	m_connectorsByName[connectorNameLeftPos1] = m_LeftConnectorPos1;
 
 	const std::string connectorNameRightNeg1 = "NegativePole1";
 	m_RightConnectorNeg1 = { ot::ConnectorType::In,connectorNameRightNeg1,connectorNameRightNeg1 };
-	_connectorsByName[connectorNameRightNeg1] = m_RightConnectorNeg1;
+	m_connectorsByName[connectorNameRightNeg1] = m_RightConnectorNeg1;
 
 	const std::string connectorNameLeftPos2 = "PositivePole2";
 	m_LeftConnectorPos2 = { ot::ConnectorType::Out,connectorNameLeftPos2,connectorNameLeftPos2 };
-	_connectorsByName[connectorNameLeftPos2] = m_LeftConnectorPos2;
+	m_connectorsByName[connectorNameLeftPos2] = m_LeftConnectorPos2;
 
 	const std::string connectorNameRightNeg2 = "NegativePole2";
 	m_RightConnectorNeg2 = { ot::ConnectorType::In,connectorNameRightNeg2,connectorNameRightNeg2 };
-	_connectorsByName[connectorNameRightNeg2] = m_RightConnectorNeg2;
+	m_connectorsByName[connectorNameRightNeg2] = m_RightConnectorNeg2;
 
 }
 

@@ -11,19 +11,19 @@
 
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
-	_navigationOldTreeIconName = "VoltageSource";
-	_navigationOldTreeIconNameHidden = "VoltageSource";
-	_blockTitle = "Voltage Source";
+	m_navigationOldTreeIconName = "VoltageSource";
+	m_navigationOldTreeIconNameHidden = "VoltageSource";
+	m_blockTitle = "Voltage Source";
 
 	
 
 	const std::string connectorPositive = "positivePole";
 	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
-	_connectorsByName[connectorPositive] = m_positiveConnector;
+	m_connectorsByName[connectorPositive] = m_positiveConnector;
 
 	const std::string connectorNegative = "negativePole";
 	m_negativeConnector = { ot::ConnectorType::Out,connectorNegative,connectorNegative };
-	_connectorsByName[connectorNegative] = m_negativeConnector;
+	m_connectorsByName[connectorNegative] = m_negativeConnector;
 	
 
 }

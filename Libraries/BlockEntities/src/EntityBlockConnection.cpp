@@ -7,8 +7,8 @@
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder))
 {
-	_navigationOldTreeIconName = "connection";
-	_navigationOldTreeIconNameHidden = "connection";
+	m_navigationOldTreeIconName = "connection";
+	m_navigationOldTreeIconNameHidden = "connection";
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -62,7 +62,7 @@ void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& co
 void EntityBlockConnection::CreateConnections()
 {
 	
-	ot::GraphicsConnectionPackage connectionPckg(_graphicsScenePackage);
+	ot::GraphicsConnectionPackage connectionPckg(m_graphicsScenePackage);
 	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
 
 
@@ -70,7 +70,7 @@ void EntityBlockConnection::CreateConnections()
 
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
@@ -112,13 +112,13 @@ void EntityBlockConnection::addVisualizationNodes(void)
 
 void EntityBlockConnection::CreateNavigationTreeEntry()
 {
-	if (_navigationOldTreeIconName != "" && _navigationOldTreeIconNameHidden != "")
+	if (m_navigationOldTreeIconName != "" && m_navigationOldTreeIconNameHidden != "")
 	{
 		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 
-		treeIcons.visibleIcon = _navigationOldTreeIconName;
-		treeIcons.hiddenIcon = _navigationOldTreeIconNameHidden;
+		treeIcons.visibleIcon = m_navigationOldTreeIconName;
+		treeIcons.hiddenIcon = m_navigationOldTreeIconNameHidden;
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
@@ -146,9 +146,9 @@ void EntityBlockConnection::AddStorageData(bsoncxx::builder::basic::document& st
 	
 	storage.append(
 		
-	   bsoncxx::builder::basic::kvp("GraphicPackageName", _graphicsScenePackage),
-	   bsoncxx::builder::basic::kvp("ServiceName", _info.serviceName()),
-	   bsoncxx::builder::basic::kvp("ServiceType", _info.serviceType()),
+	   bsoncxx::builder::basic::kvp("GraphicPackageName", m_graphicsScenePackage),
+	   bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
+	   bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
 
 		bsoncxx::builder::basic::kvp("FromConnectable", _connectorNameOrigin),
 		bsoncxx::builder::basic::kvp("ToConnectable", _connectorNameDestination),
@@ -163,9 +163,9 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	//Now we read the information about the ConnectionCfg
-	_graphicsScenePackage = std::string(doc_view["GraphicPackageName"].get_utf8().value.data());
-	_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
-	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
+	m_graphicsScenePackage = std::string(doc_view["GraphicPackageName"].get_utf8().value.data());
+	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
+	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	
 	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_utf8().value.data());
 	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_utf8().value.data());

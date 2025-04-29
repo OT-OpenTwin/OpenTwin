@@ -14,7 +14,11 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 
 EntityBlock::~EntityBlock()
 {
-	
+	if (m_coordinateEntity != nullptr)
+	{
+		delete m_coordinateEntity;
+		m_coordinateEntity = nullptr;
+	}
 }
 
 
@@ -27,9 +31,9 @@ void EntityBlock::addVisualizationNodes(void)
 
 void EntityBlock::AddConnector(const ot::Connector& connector)
 {
-	if (_connectorsByName.find(connector.getConnectorName()) != _connectorsByName.end())
+	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
 	{
-		_connectorsByName[connector.getConnectorName()] = connector;
+		m_connectorsByName[connector.getConnectorName()] = connector;
 		setModified();
 	}
 	else
@@ -40,9 +44,9 @@ void EntityBlock::AddConnector(const ot::Connector& connector)
 
 void EntityBlock::RemoveConnector(const ot::Connector& connector)
 {
-	if (_connectorsByName.find(connector.getConnectorName()) != _connectorsByName.end())
+	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
 	{
-		_connectorsByName.erase(connector.getConnectorName());
+		m_connectorsByName.erase(connector.getConnectorName());
 		setModified();
 	}
 	else
@@ -53,21 +57,21 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 
 void EntityBlock::AddConnection(const ot::UID id)
 {
-	_connectionIDs.push_back(id);
+	m_connectionIDs.push_back(id);
 	setModified();
 }
 
 void EntityBlock::RemoveConnection(const ot::UID idForRemoval)
 {
-	_connectionIDs.remove(idForRemoval);
+	m_connectionIDs.remove(idForRemoval);
 	setModified();
 }
 
 std::string EntityBlock::CreateBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
-	//const std::string blockTitel = _blockTitle + ": " + nameWithoutRootDirectory;
-	if (nameWithoutRootDirectory.empty()) return _blockTitle;
+	//const std::string blockTitel = m_blockTitle + ": " + nameWithoutRootDirectory;
+	if (nameWithoutRootDirectory.empty()) return m_blockTitle;
 	else return nameWithoutRootDirectory;
 }
 
@@ -77,14 +81,14 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	EntityBase::AddStorageData(storage);
 	
 	storage.append(
-		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(_coordinate2DEntityID)),
-		bsoncxx::builder::basic::kvp("ServiceName", _info.serviceName()),
-		bsoncxx::builder::basic::kvp("ServiceType", _info.serviceType()),
-		bsoncxx::builder::basic::kvp("GraphicPackageName", _graphicsScenePackage)
+		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
+		bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
+		bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
+		bsoncxx::builder::basic::kvp("GraphicPackageName", m_graphicsScenePackage)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
-	for (auto& connector : _connectorsByName)
+	for (auto& connector : m_connectorsByName)
 	{
 		auto subDocument = connector.second.SerializeBSON();
 		connectorsArray.append(subDocument);
@@ -94,7 +98,7 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 	auto connectionIDArray = bsoncxx::builder::basic::array();
 	std::map<ot::UID, EntityBase*> entityMap;
 
-	for (auto& connection : _connectionIDs)
+	for (auto& connection : m_connectionIDs)
 	{
 		//Here i add the ConnectionIDs
 		auto subDocument = connection;
@@ -107,10 +111,10 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
-	_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
-	_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
-	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
-	_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
+	m_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
+	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
+	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
+	m_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
 
 	auto allConnectors = doc_view["Connectors"].get_array();
 	for (auto& element : allConnectors.value)
@@ -118,14 +122,14 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		auto subDocument = element.get_value().get_document();
 		ot::Connector connector;
 		connector.DeserializeBSON(subDocument);
-		_connectorsByName[connector.getConnectorName()]=(connector);
+		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
 	auto connections = doc_view["ConnectionIDs"].get_array();
 	for (auto& element : connections.value)
 	{
 		auto subDocument = element.get_value().get_int64();
-		_connectionIDs.push_back(subDocument);
+		m_connectionIDs.push_back(subDocument);
 	}
 
 	
@@ -133,13 +137,13 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 
 void EntityBlock::CreateNavigationTreeEntry()
 {
-	if (_navigationOldTreeIconName != "" && _navigationOldTreeIconNameHidden != "")
+	if (m_navigationOldTreeIconName != "" && m_navigationOldTreeIconNameHidden != "")
 	{
 		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 
-		treeIcons.visibleIcon = _navigationOldTreeIconName;
-		treeIcons.hiddenIcon = _navigationOldTreeIconNameHidden;
+		treeIcons.visibleIcon = m_navigationOldTreeIconName;
+		treeIcons.hiddenIcon = m_navigationOldTreeIconNameHidden;
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
@@ -155,7 +159,7 @@ void EntityBlock::CreateNavigationTreeEntry()
 void EntityBlock::CreateBlockItem()
 {
 	std::map<ot::UID, EntityBase*> entityMap;
-	EntityBase* entBase = readEntityFromEntityID(this, _coordinate2DEntityID, entityMap);
+	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
 	if (entBase == nullptr) { throw std::exception("EntityBlock failed to load coordinate entity."); }
 	if (entBase->getObserver() != nullptr) { entBase->setObserver(nullptr); }
 	std::unique_ptr<EntityCoordinates2D> entCoordinate(dynamic_cast<EntityCoordinates2D*>(entBase));
@@ -164,13 +168,13 @@ void EntityBlock::CreateBlockItem()
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
-	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
+	ot::GraphicsScenePackage pckg(m_graphicsScenePackage);
 	pckg.addItem(blockCfg);
 
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
@@ -182,7 +186,7 @@ void EntityBlock::CreateBlockItem()
 
 void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {
-	for (auto connectorByName : _connectorsByName)
+	for (auto connectorByName : m_connectorsByName)
 	{
 		const ot::Connector& connector = connectorByName.second;
 		ot::ConnectorType connectorType = connector.getConnectorType();

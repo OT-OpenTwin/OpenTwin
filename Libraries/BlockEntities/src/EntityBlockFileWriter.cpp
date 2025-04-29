@@ -5,10 +5,10 @@ EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, Ent
 	:EntityBlock(ID,parent,obs,ms,factory,owner)
 {
 	m_inputConnector = { ot::ConnectorType::In, "Input", "Input" };
-	_connectorsByName[m_inputConnector.getConnectorName()] = m_inputConnector;
-	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_blockTitle = "File Writer";
+	m_connectorsByName[m_inputConnector.getConnectorName()] = m_inputConnector;
+	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	m_blockTitle = "File Writer";
 }
 
 void EntityBlockFileWriter::createProperties()
