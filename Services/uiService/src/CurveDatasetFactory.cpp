@@ -160,6 +160,14 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 	{
 		_curveCfg.setXAxisUnit(entryDescription->m_unit); //Could be overwritten be the calling code, the default is the parameter unit.
 	}
+
+	if (_curveCfg.getTitle().empty())
+	{
+		const std::string entityName = _curveCfg.getEntityName();
+		const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
+		_curveCfg.setTitle(shortName);
+	}
+
 	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(std::move(dataX),dataY.release()));
 	return singleCurve;
 }
@@ -192,7 +200,6 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	assert(xAxisParameter != nullptr); 
 
 
-	//Should be selected via a property ToDo
 	std::map<std::string, Datapoints> familyOfCurves;
 	std::map<std::string, std::list<ShortParameterDescription>> additionalParameterDescByCurveName;
 	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
@@ -243,12 +250,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		(curve->second).m_xData.push_back(xAxisParameterValue);
 	}
 
-
 	for (auto& curve : familyOfCurves)
 	{
 		curve.second.shrinkToFit();
 	}
-
+	
+	
 	//Cases for additional parameter (x-axis parameter excluded):
 	//1) Only 1 additional Parameter -> Family of Curves (FoC): name of each curve shows the value of the additional parameter 
 	// 1b) The additional parameter is constant -> Single curve: name of curve shows the value of the additional parameter
@@ -256,49 +263,93 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	// 2b) All parameter are constant -> Single curve: name of curve is abstracted to make it easier to read. The parameter values of each curve are communicated
 	// 2c) All but one parameter are constant -> FoC: name of each curve shows the value of the not-constant parameter. The other parameter values of each curve are communicated
 
+	
 	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
+
+	const std::string entityName = _curveCfg.getEntityName();
+	const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
+
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
-	if (numberOfParameter > 2) 
-	{
-		bool additionalParameterAreConstant = true;
+	if (numberOfParameter > 2)
+	{	
+		//Naming case 1b and 2c
+		std::list<std::string> nonConstParameter;
 		for (auto& parameterValues : parameterValuesByParameterName)
 		{
 			parameterValues.second.unique();
 			if (parameterValues.second.size() != 1)
 			{
-				additionalParameterAreConstant = false;
-				break;
+				nonConstParameter.push_back(parameterValues.first) ;
 			}
 		}
-
 		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
-		std::list <std::string> runIDDescriptions;
 
-		//The simpler name is build as Curve + ID
-		int counter(1);
-		double temp = std::log10(familyOfCurves.size());
-		uint32_t numberOfDigits = static_cast<uint32_t>(std::ceil(temp));
-		for (auto& curve : familyOfCurves) {
+		if (nonConstParameter.size() == 1)
+		{
+			const std::string notConstParameterName = *nonConstParameter.begin();
+			for (auto& curve : familyOfCurves) {
+				std::string complexName = curve.first;
+				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
+				std::string simpleName = shortName + "_" + notConstParameterName;
+				for (const ShortParameterDescription& description : additionalParameterDescription)
+				{
+					if (description.m_label == notConstParameterName)
+					{
+						simpleName += "_" + description.m_value + "_" + description.m_unit;
+					}
+				}
 
-			std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
-			const std::string simpleName = "Curve_" + curveNumber;
-			counter++;
+				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
+				curve.second = Datapoints();
+			}
+		}
+		else if (nonConstParameter.size() == 0)
+		{
+			//If all but the x-axis parameter are constant, we are having a single curve
+			assert(familyOfCurves.size() == 1); 
+			auto singleCurve = familyOfCurves.begin();
 
-			familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
-			curve.second = Datapoints();
-			std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-			std::string message =
-				simpleName + ":\n";
-			for (auto entry : additionalParameterDescription) {
+			familyOfCurvesSimplerNames.insert({ shortName,std::move(singleCurve->second)});
+			
+			std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[singleCurve->first];
+			std::string message = shortName +":\n";
+			for (auto entry : additionalParameterDescription) 
+			{
 				message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
 			}
 			m_curveIDDescriptions.push_back(message);
 		}
+		else
+		{
+			std::list <std::string> runIDDescriptions;
 
+			//The simpler name is build as Curve + ID
+			int counter(1);
+			double temp = std::log10(familyOfCurves.size());
+			uint32_t numberOfDigits = static_cast<uint32_t>(std::ceil(temp));
+			for (auto& curve : familyOfCurves) {
+
+				std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
+				const std::string simpleName = shortName + "_curve_" + curveNumber;
+				counter++;
+
+				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
+				curve.second = Datapoints();
+				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
+				std::string message =
+					simpleName + ":\n";
+				for (auto entry : additionalParameterDescription) {
+					message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
+				}
+				m_curveIDDescriptions.push_back(message);
+			}
+		}
+		
 		familyOfCurves = std::move(familyOfCurvesSimplerNames);
 	}
-
+	
 	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
+	
 	for (auto& singleCurve : familyOfCurves) {
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
 		auto pen = newCurveCfg.getLinePen();
@@ -316,14 +367,17 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst); //Restart the rainbow
 		}
 
-		newCurveCfg.setTitle(singleCurve.first);
+		if (numberOfParameter == 1)
+		{
+			newCurveCfg.setTitle(shortName + "_" + singleCurve.first);
+		}
+		else
+		{
+			newCurveCfg.setTitle(singleCurve.first);
+		}
 		newCurveCfg.setXAxisUnit(xAxisParameter->m_unit);
 		newCurveCfg.setXAxisTitle(xAxisParameter->m_label);
-		//singleCurveCfg.setXAxisTitle();
-		//singleCurveCfg.setXAxisUnit();
-
-		// Probably iterate the colour of each curve here
-		
+				
 		std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
 		yData->m_real = std::move(singleCurve.second.m_yData);
 
