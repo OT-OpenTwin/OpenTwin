@@ -7,6 +7,7 @@
 #include "Connection.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTGui/StyleRefPainter2D.h"
 
 //#include "ExternalDependencies.h"
 #include "Application.h"
@@ -268,7 +269,8 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionCfg.setOriginConnectable(connection.getOriginConnectable());
 		connectionCfg.setDestConnectable(connection.getDestConnectable());
 		connectionCfg.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
-		
+		connectionCfg.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
 		connectionEntity->setName(connectionName);
