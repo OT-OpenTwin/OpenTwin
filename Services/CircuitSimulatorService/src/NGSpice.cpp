@@ -950,6 +950,15 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				}
 			}
 
+			if (connections.find("PositivePole2") != connections.end()) {
+				auto& positiveConn = connections.at("PositivePole2");
+
+				if (positiveConn.getNodeNumber() != "voltageMeterConnection") {
+					netlistNodeNumbers += positiveConn.getNodeNumber() + " ";
+					temp.insert(positiveConn.getNodeNumber());
+				}
+			}
+
 			if (connections.find("NegativePole1") != connections.end()) {
 				auto& negativeConn = connections.at("NegativePole1");
 
@@ -959,16 +968,6 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				}
 			}
 			
-			if (connections.find("PositivePole2") != connections.end()) {
-				auto& positiveConn = connections.at("PositivePole2");
-
-				if (positiveConn.getNodeNumber() != "voltageMeterConnection") {
-					netlistNodeNumbers += positiveConn.getNodeNumber() + " ";
-					temp.insert(positiveConn.getNodeNumber());
-				}
-			}
-			
-
 			if (connections.find("NegativePole2") != connections.end()) {
 				auto& negativeConn = connections.at("NegativePole2");
 
