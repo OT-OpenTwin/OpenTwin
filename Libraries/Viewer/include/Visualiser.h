@@ -1,6 +1,7 @@
 #pragma once
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
+#include "VisualiserState.h"
 
 class SceneNodeBase;
 
@@ -10,13 +11,13 @@ public:
 	Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _viewType);
 	virtual ~Visualiser();
 
-	virtual void visualise(bool _setFocus = true) = 0;
-	bool isVisible() { return m_visible; }
+	virtual void visualise(const VisualiserState& _state) = 0;
+	bool mayVisualise() { return m_mayVisualise; }
 	//! @brief Switch to turn a visualisation type off
-	void setVisible(bool _visible) { m_visible = _visible;}
+	void setMayVisualise(bool _visible) { m_mayVisualise = _visible;}
 	
 	//! @brief Switch for deciding if a data pull is necessary or if a lookup is necessary, if the displayed data may still be up-to date
-	void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; }
+	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; }
 	bool viewIsCurrentlyOpen() { return m_viewIsOpen; }
 
 	SceneNodeBase* getSceneNode(void) const { return m_node; };
@@ -25,7 +26,7 @@ public:
 
 protected:
 	SceneNodeBase* m_node = nullptr;
-	bool m_visible = true;
+	bool m_mayVisualise = true;
 	bool m_viewIsOpen = false;
 	ot::WidgetViewBase::ViewType m_viewType;
 };

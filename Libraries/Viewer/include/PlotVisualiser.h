@@ -5,6 +5,11 @@ class PlotVisualiser : public Visualiser
 {
 public:
 	PlotVisualiser(SceneNodeBase* _sceneNode);
-	void visualise(bool _setFocus = true) override;
+	void visualise(const VisualiserState& _state) override;
+	bool alreadyRequestedVisualisation() {}
+	void setViewIsOpen(bool _viewIsOpen) override;
+
+private:
+	bool m_alreadyRequestedVisualisation = false;
 };
 

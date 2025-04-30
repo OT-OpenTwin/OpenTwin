@@ -7,5 +7,5 @@ class TextVisualiser : public Visualiser {
 public:
 
 	TextVisualiser(SceneNodeBase* _sceneNode);
-	void visualise(bool _setFocus = true) override;
+	void visualise(const VisualiserState& _state) override;
 };

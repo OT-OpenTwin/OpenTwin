@@ -4,6 +4,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
 #include "SceneNodeBase.h"
+#include "OTCore/Logger.h"
 
 TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode) 
 	: Visualiser(_sceneNode, ot::WidgetViewBase::ViewTable)
@@ -11,14 +12,24 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 
 }
 
-void TableVisualiser::visualise(bool _setFocus)
+void TableVisualiser::visualise(const VisualiserState& _state)
 {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator());
+	if (_state.m_singleSelection)
+	{
+		if (_state.m_selected)
+		{
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setFocus, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 
-	FrontendAPI::instance()->messageModelService(doc.toJson());
+			FrontendAPI::instance()->messageModelService(doc.toJson());
+		}
+	}
+	else
+	{
+		OT_LOG_I("Visualisation of a multiselection of tables is turned off for performance reasons.");
+	}
 }

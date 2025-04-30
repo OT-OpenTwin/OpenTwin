@@ -5,5 +5,5 @@ class CurveVisualiser : public Visualiser
 {
 public:
 	CurveVisualiser(SceneNodeBase* _sceneNode);
-	void visualise(bool _setFocus = true) override;
+	void visualise(const VisualiserState& _state) override;
 };

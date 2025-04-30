@@ -324,6 +324,9 @@
     <ClInclude Include="include\PlotVisualiser.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
+    <ClInclude Include="include\VisualiserState.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\Viewer.h">

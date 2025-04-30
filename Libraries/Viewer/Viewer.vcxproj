@@ -143,6 +143,7 @@
     <ClInclude Include="include\TransformManipulator.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />
+    <ClInclude Include="include\VisualiserState.h" />
     <ClInclude Include="include\WorkingPlane.h" />
     <QtMoc Include="include\Viewer.h" />
     <ClInclude Include="include\ViewerAPI.h" />

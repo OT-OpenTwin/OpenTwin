@@ -80,23 +80,37 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 		IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
 		if (plotEntity != nullptr && plotEntity->visualisePlot())
 		{
-			setupPlot(baseEntity,_setAsActiveView);
+			EntityContainer* containerEntity = dynamic_cast<EntityContainer*>(plotEntity);
+			std::list<EntityBase*> curveEntities = containerEntity->getChildrenList();
+
+			ot::JsonDocument document;
+			info.addToJsonObject(document, document.GetAllocator());
+			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+
+			const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
+			ot::JsonObject cfgObj;
+			plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+
+			ot::JsonArray curveCfgs;
+			for (EntityBase* curveEntity : curveEntities)
+			{
+				IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
+				ot::Plot1DCurveCfg curveCfg = curve->getCurve();
+				ot::JsonObject curveCfgSerialised;
+				curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
+				curveCfgs.PushBack(curveCfgSerialised, document.GetAllocator());
+			}
+
+			document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
+
+			std::string response;
+			Application::instance()->queuedRequestToFrontend(document);
 		}
 		else
 		{
-			IVisualisationCurve* curveEntity = dynamic_cast<IVisualisationCurve*>(baseEntity);
-			if (curveEntity != nullptr)
-			{
-				if (curveEntity->visualiseCurve())
-				{
-					EntityBase* plotEntityBase = baseEntity->getParent();
-					setupPlot(plotEntityBase, _setAsActiveView);
-				}
-			}
-			else
-			{
-				OT_LOG_D("Something tried to visualise as 1D but was neither a curve nor a plot");
-			}
+			OT_LOG_E("Tried visualising an entity as plot which is not a plot.");
 		}
 	}
 	else
@@ -109,38 +123,5 @@ void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setA
 {
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(_plotEntityBase);
-	if (plotEntity != nullptr)
-	{
-		EntityContainer* containerEntity = dynamic_cast<EntityContainer*>(_plotEntityBase);
-		std::list<EntityBase*> curveEntities = containerEntity->getChildrenList();
 
-		ot::JsonDocument document;
-		info.addToJsonObject(document, document.GetAllocator());
-		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
-		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
-
-		const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
-		ot::JsonObject cfgObj;
-		plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
-		document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
-
-		ot::JsonArray curveCfgs;
-		for (EntityBase* curveEntity : curveEntities)
-		{
-			IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
-			ot::Plot1DCurveCfg curveCfg = curve->getCurve();
-			ot::JsonObject curveCfgSerialised;
-			curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
-			curveCfgs.PushBack(curveCfgSerialised, document.GetAllocator());
-		}
-
-		document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
-
-		std::string response;
-		Application::instance()->queuedRequestToFrontend(document);
-	}
-	else
-	{
-		OT_LOG_E("Tried visualising an entity as plot which is not a plot.");
-	}
 }

@@ -10,13 +10,25 @@ CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
 
 }
 
-void CurveVisualiser::visualise(bool _setFocus) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_PARAM_VIEW1D_Setup, doc.GetAllocator());
+void CurveVisualiser::visualise(const VisualiserState& _state)
+{
+	if (!m_viewIsOpen)
+	{
+		SceneNodeBase* plot = m_node->getParent();
+		const std::list<Visualiser*>& visualiser = plot->getVisualiser();
+		assert(visualiser.size() == 1); //Currently, the plot has only a single visualiser
+		auto plotVisualiser = *visualiser.begin();
+	
+		VisualiserState plotState;
+		plotState.m_selected = true;
+		plotState.m_setFocus = true;
+		plotState.m_singleSelection = true;
+		plotVisualiser->visualise(plotState);
+	}
+	else
+	{
 
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setFocus, doc.GetAllocator());
+	}
 
-	FrontendAPI::instance()->messageModelService(doc.toJson());
+	//Set gray = false
 }
