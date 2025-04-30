@@ -1171,8 +1171,6 @@ Function .onInit
 	ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
 	
 	StrCpy $9 ${SEC_Documentation}	
-	MessageBox MB_OK "set documentation not ro"
-	
 	StrCpy $8 ${SF_RO}
 	Call UnsetSectionFlag
 	
@@ -1195,21 +1193,18 @@ Function .onInit
 		ExecWait '"$3"'
 
 		#Check if documentation was installed last time
-		GetFullPathName $4 "$1\Documentation" 
-		MessageBox MB_OK "Now check for documentation. File: $4 .Base: $1"
+		StrCpy $4 "$1\Documentation" 
+		;MessageBox MB_OK "Now check for documentation. File: $4 .Base: $1"
 		StrCpy $9 ${SEC_Documentation}
 		StrCpy $8 ${SF_SELECTED}
 
-		IfFileExists "$4\*.*" 0 +5
-			MessageBox MB_OK "documentation found"			
+		IfFileExists "$4\*.*" 0 +3
 			Call SetSectionFlag
 			Goto FileCheckEnd
 		# Else
-			MessageBox MB_OK "documentation not found"
 			Call UnsetSectionFlag
 		FileCheckEnd:
-		MessageBox MB_OK "documentation check complete"
-
+		
 	    !insertmacro UninstallExisting $0 $0
 	    ${If} $0 <> 0
 			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
