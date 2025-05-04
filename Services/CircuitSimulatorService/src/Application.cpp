@@ -514,6 +514,7 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 
 void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
+	m_uiComponent->setProgress(100);
 	m_uiComponent->closeProgressInformation();
 	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
