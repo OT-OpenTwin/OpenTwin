@@ -273,6 +273,7 @@ void Application::addSolver()
 void Application::runCircuitSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	m_uiComponent->setProgressInformation("Simulating", true);
 
 	if (!EnsureDataBaseConnection()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
@@ -505,6 +506,7 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 
 void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
+	m_uiComponent->closeProgressInformation();
 	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
 
