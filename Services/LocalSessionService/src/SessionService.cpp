@@ -234,8 +234,7 @@ bool SessionService::runMandatoryServices(
 
 		OT_LOG_D("Starting services via DirectoryService (Service.Count = \"" + std::to_string(releaseServices.size()) + "\")");
 		if (!m_gds->requestToStartServices(releaseServices, _session->getId())) {
-			assert(0);
-			// todo: clean up requested services
+			OT_LOG_E("Failed to request service start");
 			return false;
 		}
 	}

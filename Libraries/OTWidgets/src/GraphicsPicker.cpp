@@ -45,6 +45,7 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) :
 
 	m_viewLayoutW = new QWidget;
 	m_viewLayout = new QGridLayout(m_viewLayoutW);
+	m_viewLayoutW->installEventFilter(this);
 
 	m_splitter->addWidget(m_navigation->getQWidget());
 	m_splitter->addWidget(m_viewLayoutW);
@@ -62,6 +63,14 @@ QWidget* ot::GraphicsPicker::getQWidget(void) {
 
 const QWidget* ot::GraphicsPicker::getQWidget(void) const {
 	return m_splitter;
+}
+
+bool ot::GraphicsPicker::eventFilter(QObject* _watched, QEvent* _event) {
+	if (_event->type() == QEvent::Resize) {
+		this->rebuildPreview();
+	}
+
+	return false;
 }
 
 // ##############################################################################################################################
@@ -140,12 +149,12 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				box.layout->addWidget(box.view, 0, Qt::AlignCenter);
 				box.layout->addWidget(box.label, 1, Qt::AlignTop | Qt::AlignHCenter);
 
-				m_viewLayout->addWidget(box.layoutWidget);
-
 				m_previews.push_back(box);
 			}
 		}
 	}
+
+	this->rebuildPreview();
 }
 
 // ##############################################################################################################################
@@ -240,6 +249,37 @@ void ot::GraphicsPicker::storePreviewData(QTreeWidgetItem* _item, const Graphics
 		auto lst = new std::list<GraphicsPickerItemInformation>;
 		lst->push_back(_info);
 		m_previewData.insert_or_assign(_item, lst);
+	}
+}
+
+void ot::GraphicsPicker::rebuildPreview(void) {
+	// Remove current previews
+	for (PreviewBox& v : m_previews) {
+		v.layoutWidget->setHidden(true);
+		m_viewLayout->removeWidget(v.layoutWidget);
+	}
+
+	// Determine max preview width
+	int maxWidth = m_previewSize.width() + 5;
+	for (const PreviewBox& v : m_previews) {
+		QFontMetrics fm(v.label->font());
+		maxWidth = std::max(maxWidth, fm.horizontalAdvance(v.label->text()) + 5);
+	}
+
+	// Rebuild previews
+	int row = 0;
+	int col = 0;
+	int cols = m_splitter->visibleRegion().boundingRect().width() / maxWidth;
+
+	for (PreviewBox& v : m_previews) {
+		m_viewLayout->addWidget(v.layoutWidget, row, col);
+		v.layoutWidget->setHidden(false);
+
+		col++;
+		if (col >= cols) {
+			col = 0;
+			row++;
+		}
 	}
 }
 

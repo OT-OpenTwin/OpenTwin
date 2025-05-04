@@ -13,8 +13,7 @@
 #include <stdint.h>
 class ServiceManager;
 
-class Service
-{
+class Service {
 public:
 	Service(ServiceManager * _owner, const ServiceInformation& _info);
 	virtual ~Service();
@@ -36,7 +35,6 @@ public:
 	ot::port_t port(void) const { return m_port; };
 	const std::string& websocketUrl(void) const { return m_websocketUrl; };
 	ot::port_t websocketPort(void) const { return m_websocketPort; };
-
 
 private:
 	ServiceInformation	m_info;

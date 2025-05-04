@@ -701,6 +701,10 @@ void ServiceManager::workerHealthCheck(void) {
 						// Check if service crashed
 						ot::RunResult result = service->checkAlive();
 						if (!result.isOk()) {
+							// Application is not running, check if the shutdown was intended
+
+
+
 							OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
 							ot::RunResult result = service->shutdown();

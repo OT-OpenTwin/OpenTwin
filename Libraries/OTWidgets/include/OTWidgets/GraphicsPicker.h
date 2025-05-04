@@ -42,6 +42,8 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual const QWidget* getQWidget(void) const override;
 
+		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
+
 		void setOrientation(Qt::Orientation _orientation);
 		Qt::Orientation orientation(void) const;
 
@@ -71,6 +73,8 @@ namespace ot {
 		void addItems(const std::list<GraphicsPickerItemInformation>& _info, QTreeWidgetItem* _parentNavigationItem);
 
 		void storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerItemInformation& _info);
+
+		void rebuildPreview(void);
 
 		struct PreviewBox {
 			QWidget* layoutWidget;
