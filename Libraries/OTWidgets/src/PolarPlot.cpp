@@ -17,10 +17,9 @@
 #include <QtGui/qevent.h>
 
 ot::PolarPlot::PolarPlot(PlotBase* _owner)
-	: AbstractPlot(_owner)
+	: AbstractPlot(_owner), m_legend(nullptr)
 {
 	m_grid = new PolarPlotGrid(this);
-	m_legend = new PolarPlotLegend(this);
 	m_magnifier = new PolarPlotMagnifier(this);
 	m_panner = new PolarPlotPanner(this);
 
@@ -36,7 +35,19 @@ ot::PolarPlot::~PolarPlot() {
 // Plot
 
 void ot::PolarPlot::updateLegend(void) {
-	
+	if (this->getConfiguration().getLegendVisible()) {
+		if (!m_legend) {
+			m_legend = new PolarPlotLegend(this);
+			this->insertLegend(m_legend);
+		}
+	}
+	else {
+		if (m_legend) {
+			// This destroys the legend
+			this->insertLegend(nullptr);
+			m_legend = nullptr;
+		}
+	}
 }
 
 void ot::PolarPlot::updateWholePlot(void) {

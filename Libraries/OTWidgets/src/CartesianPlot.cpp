@@ -27,14 +27,12 @@
 #include <QtGui/qevent.h>
 
 ot::CartesianPlot::CartesianPlot(PlotBase* _owner)
-	: AbstractPlot(_owner)
+	: AbstractPlot(_owner), m_legend(nullptr)
 {
 	setPlotAxis(new CartesianPlotAxis(AbstractPlotAxis::xBottom, this), nullptr, new CartesianPlotAxis(AbstractPlotAxis::yLeft, this), nullptr);
 
 	m_canvas = new CartesianPlotWidgetCanvas(this);
 	setCanvas(m_canvas);
-
-	m_legend = new CartesianPlotLegend(this);
 
 	m_plotPanner = new CartesianPlotPanner(this);
 	m_plotPanner->setMouseButton(Qt::MouseButton::MiddleButton);
@@ -58,7 +56,19 @@ ot::CartesianPlot::~CartesianPlot() {
 // Plot
 
 void ot::CartesianPlot::updateLegend(void) {
-	m_legend->setVisible(this->getConfiguration().getLegendVisible());
+	if (this->getConfiguration().getLegendVisible()) {
+		if (!m_legend) {
+			m_legend = new CartesianPlotLegend(this);
+			this->insertLegend(m_legend);
+		}
+	}
+	else {
+		if (m_legend) {
+			// This destroys the legend
+			this->insertLegend(nullptr);
+			m_legend = nullptr;
+		}
+	}
 }
 
 void ot::CartesianPlot::updateWholePlot(void) {

@@ -10,7 +10,7 @@
 ot::CartesianPlotLegend::CartesianPlotLegend(CartesianPlot* _owner) :
 	m_owner(_owner) 
 {
-	m_owner->insertLegend(this);
+
 }
 
 ot::CartesianPlotLegend::~CartesianPlotLegend() {
