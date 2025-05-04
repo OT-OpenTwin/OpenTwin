@@ -32,6 +32,7 @@ public:
 	// Button callbacks
 
 	void testHello(void);
+	void testKill(void);
 
 	void testTableSmall(void);
 	void testTableMedium(void);

@@ -28,7 +28,8 @@ Application::Application() :
 	m_nameCounter(0)
 {
 	// Add buttons here
-	m_testButtons.push_back(ButtonInfo("Test", "Hello", "SmileyGlasses", std::bind(&Application::testHello, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Info", "Information", std::bind(&Application::testHello, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Kill", "Kill", std::bind(&Application::testKill, this)));
 	
 	m_testButtons.push_back(ButtonInfo("Table", "Small (100k)", "GreenCircle", std::bind(&Application::testTableSmall, this)));
 	m_testButtons.push_back(ButtonInfo("Table", "Medium (1M)", "YellowCircle", std::bind(&Application::testTableMedium, this)));
@@ -66,6 +67,15 @@ void Application::testHello(void) {
 	}
 
 	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
+}
+
+void Application::testKill(void) {
+	std::thread t([]() {
+		OT_LOG_T("Bye :-)");
+		exit(0);
+		}
+	);
+	t.detach();
 }
 
 void Application::testTableSmall(void) {
