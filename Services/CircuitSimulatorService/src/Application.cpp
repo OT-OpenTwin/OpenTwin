@@ -273,7 +273,7 @@ void Application::addSolver()
 void Application::runCircuitSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	m_uiComponent->setProgressInformation("Simulating", true);
+	
 
 	if (!EnsureDataBaseConnection()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
@@ -386,6 +386,14 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
+	if (simulationTypeProperty->getValue() == ".TRAN" || simulationTypeProperty->getValue() == ".dc") {
+		m_uiComponent->setProgressInformation("Simulating", false);
+		m_uiComponent->setProgress(0);
+	}
+	else {
+		m_uiComponent->setProgressInformation("Simulating", true);
+	}
+	
 
 	// Get only circuit name
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);

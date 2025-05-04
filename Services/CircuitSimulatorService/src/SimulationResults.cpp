@@ -1,6 +1,10 @@
 #include "SimulationResults.h"
 // Open Twin Header
 #include "OTModelAPI/ModelServiceAPI.h"
+
+// C++ Header
+#include <regex>
+
 SimulationResults* SimulationResults::instance = nullptr;
 
 SimulationResults* SimulationResults::getInstance()
@@ -62,6 +66,12 @@ void SimulationResults::setSolverInformation(std::string _solverName, std::strin
 
 void SimulationResults::displayMessage(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
+    std::vector<int> percentages = findPercentage(_message);
+
+    for (auto value : percentages) {
+        _uiComponent->setProgress(value);
+    }
+
     this->getInstance()->_uiComponent->displayMessage(_message);
     this->logData.append(_message + "\n");
 }
@@ -132,6 +142,22 @@ void SimulationResults::handleCircuitExecutionTiming(const QDateTime& _timePoint
     
 
     this->getInstance()->_uiComponent->displayStyledMessage(timeMessage);
+}
+
+std::vector<int> SimulationResults::findPercentage(const std::string& input) {
+    
+    std::vector<int> values;
+    std::regex prozentRegex(R"((\d+(\.\d+)?)%)"); // z.B. 10% oder 10.0%
+    std::smatch match;
+
+    auto start = input.cbegin();
+    while (std::regex_search(start, input.cend(), match, prozentRegex)) {
+        int wert = static_cast<int>(std::stod(match[1]));
+        values.push_back(wert);
+        start = match.suffix().first; // nächster Suchbereich
+    }
+
+    return values;
 }
 
 

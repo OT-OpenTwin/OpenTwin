@@ -63,6 +63,7 @@ private:
     std::mutex m_mutex;
     std::string logData;
 
+    std::vector<int> findPercentage(const std::string& input);
 
 };
 
