@@ -8,7 +8,8 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 {
 	m_selected = _selected;
 	
-	ot::SelectionHandlingResult result;
+	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
+
 	//getModel() != nullptr;
 	if (true)
 	{
@@ -46,8 +47,6 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 			}
 		}
 	}
-
-	result |= SceneNodeBase::setSelected(_selected, _selectionOrigin);
 
 	return result;
 

@@ -19,8 +19,6 @@ namespace osg { class Switch; };
 class SceneNodeBase
 {
 public:
-	SceneNodeBase() : m_shapeNode(nullptr), m_treeItemID(0), m_modelEntityID(0), m_editable(false), m_visible(true), m_selected(false), m_transparent(false), 
-					  m_wireframe(false), m_highlighted(false), m_offset(1.0), m_selectChildren(true), m_manageVisibilityOfParent(true), m_manageVisibilityOfChildren(true), m_parent(nullptr) {};
 	virtual ~SceneNodeBase() 
 	{ 
 		for (Visualiser* visualiser : m_visualiser)
@@ -110,26 +108,26 @@ public:
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 protected:
-	osg::Switch* m_shapeNode;
+	osg::Switch* m_shapeNode = nullptr;
 	const float m_transparency = 0.15;
 
 private:
-	std::string        m_name;
-	ot::UID			   m_treeItemID;
-	unsigned long long m_modelEntityID;
-	bool			   m_editable;
-	bool               m_visible;
-	bool               m_selected;
-	bool               m_selectionFromNavigationTree;
-	bool               m_transparent;
-	bool               m_wireframe;
-	bool			   m_highlighted;
-	double			   m_offset;
-	bool			   m_selectChildren;
-	bool			   m_manageVisibilityOfParent;
-	bool			   m_manageVisibilityOfChildren;
-	std::string        m_errors;
-	SceneNodeBase *    m_parent;
+	std::string        m_name = "";
+	ot::UID			   m_treeItemID = 0;
+	unsigned long long m_modelEntityID = 0;
+	bool			   m_editable = false;
+	bool               m_visible = true;
+	bool               m_selected = false;
+	bool               m_selectionFromNavigationTree = false;
+	bool               m_transparent = false;
+	bool               m_wireframe = false;
+	bool			   m_highlighted = false;
+	double			   m_offset = 1.0;
+	bool			   m_selectChildren = true;
+	bool			   m_manageVisibilityOfParent = true;
+	bool			   m_manageVisibilityOfChildren = true;
+	std::string        m_errors = "";
+	SceneNodeBase *    m_parent = nullptr;
 	std::list<SceneNodeBase*> m_children;
 	OldTreeIcon		   m_treeIcons;
 	
