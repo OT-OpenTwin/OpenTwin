@@ -77,10 +77,11 @@ void ot::CartesianPlot::updateWholePlot(void) {
 
 	this->replot();
 
-	m_plotZoomer->setZoomBase();
+	m_plotZoomer->setZoomBase(false);
 }
 
 void ot::CartesianPlot::clearPlot(void) {
+
 }
 
 void ot::CartesianPlot::setZoomerPen(const QPen & _pen) {
@@ -112,12 +113,23 @@ void ot::CartesianPlot::resetPlotView(void) {
 		}
 	}
 
-	if (xMin < xMax && yMin < yMax) {
-		const Plot1DCfg& cfg = this->getConfiguration();
+	const Plot1DCfg& cfg = this->getConfiguration();
 
+	// If auto scale is disabled use the specified min max values for the axis
+	if (!cfg.getXAxisIsAutoScale()) {
+		xMin = cfg.getXAxisMin();
+		xMax = cfg.getXAxisMax();
+	}
+	if (!cfg.getYAxisIsAutoScale()) {
+		yMin = cfg.getYAxisMin();
+		yMax = cfg.getYAxisMax();
+	}
+
+	// Apply scale if valid
+	if (xMin < xMax && yMin < yMax) {
 		this->setAxisScale(QwtPlot::xBottom, std::max(xMin, cfg.getXAxisMin()), std::min(xMax, cfg.getXAxisMax()));
 		this->setAxisScale(QwtPlot::yLeft, std::max(yMin, cfg.getYAxisMin()), std::min(yMax, cfg.getYAxisMax()));
-		this->replot();
+		this->updateWholePlot();
 	}
 }
 

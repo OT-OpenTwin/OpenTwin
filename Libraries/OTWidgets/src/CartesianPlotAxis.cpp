@@ -11,8 +11,8 @@
 // Qwt header
 #include <qwt_scale_engine.h>
 
-ot::CartesianPlotAxis::CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot)
-	: AbstractPlotAxis(_axisID), m_plot(_plot)
+ot::CartesianPlotAxis::CartesianPlotAxis(AxisID _axisID, CartesianPlot* _plot) :
+	AbstractPlotAxis(_axisID), m_plot(_plot)
 {
 	OTAssertNullptr(m_plot);
 	m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
@@ -34,11 +34,12 @@ void ot::CartesianPlotAxis::updateAxis(void) {
 		this->setIsLogScaleSet(true);
 		m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
 	}
-
-	m_plot->setAxisAutoScale(this->getCartesianAxisID(), this->getIsAutoScale());
-
-	if (!this->getIsAutoScale()) {
-		m_plot->setAxisScale(this->getCartesianAxisID(), this->getMin(), this->getMax());
+	
+	if (this->getIsAutoScale()) {
+		m_plot->setAxisAutoScale(this->getCartesianAxisID(), this->getIsAutoScale());
 	}
+	else {
+		m_plot->setAxisScale(this->getCartesianAxisID(), this->getMin(), this->getMax());
+	}	
 
 }
