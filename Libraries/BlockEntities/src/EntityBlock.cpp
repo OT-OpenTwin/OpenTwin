@@ -111,6 +111,8 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 		position->setParent(this);
 		m_coordinateEntity = position.release();
 		m_coordinate2DEntityID = m_coordinateEntity->getEntityID();
+		m_connectionIDs.clear();
+
 		_entityMap[getEntityID()] = this;
 		_entityMap[m_coordinateEntity->getEntityID()] = m_coordinateEntity;
 		return true;
