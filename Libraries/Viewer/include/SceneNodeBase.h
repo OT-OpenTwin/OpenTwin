@@ -42,7 +42,7 @@ public:
 	bool isSelected(void) { return m_selected; };
 
 	//! \return Returns true if the selection has requested a new view.
-	virtual ot::SelectionHandlingResult setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin);
+	virtual ot::SelectionHandlingResult setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool singleSelection);
 	
 
 	bool isTransparent(void) { return m_transparent; };

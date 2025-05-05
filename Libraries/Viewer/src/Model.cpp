@@ -729,11 +729,11 @@ void Model::addNodeFromFacetDataBase(const std::string &treeName, double surface
 
 void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const OldTreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes)
 {
-	// Check whether we already have a container node
+	// Check whether we already have a node with this name
 	auto existingSceneNode = m_nameToSceneNodesMap.find(_treeName);
 	if (existingSceneNode != m_nameToSceneNodesMap.end())
 	{
-		if (dynamic_cast<SceneNodeMultiVisualisation*>(existingSceneNode->second) != nullptr) 
+		if (dynamic_cast<SceneNodeMultiVisualisation*>(existingSceneNode->second) != nullptr)
 		{
 			return;
 		}
@@ -741,13 +741,12 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	}
 
 	// Create the new container node
-	SceneNodeMultiVisualisation* sceneNode = new SceneNodeMultiVisualisation();
+	SceneNodeBase* sceneNode = new SceneNodeMultiVisualisation();
 
 	sceneNode->setName(_treeName);
 	sceneNode->setEditable(_editable);
 	sceneNode->setModelEntityID(_modelEntityID);
 	sceneNode->setOldTreeIcons(_treeIcons);
-	//sceneNode->setModel(this);
 	
 	if (_visualisationTypes.visualiseAsTable())
 	{
@@ -1043,7 +1042,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, ot::SelectionOrigin::Custom);
+	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected());
 
 	for (auto child : root->getChildren())
 	{
@@ -1109,7 +1108,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 			isItem3DSelected |= sceneNode->isItem3D();
 
 			assert(sceneNode != nullptr);
-			result |= sceneNode->setSelected(true, _selectionOrigin);
+			result |= sceneNode->setSelected(true, _selectionOrigin, isSingleItemSelected());
 			_selectedModelItems.push_back(sceneNode->getModelEntityID());
 
 			if (sceneNode->isVisible()) {

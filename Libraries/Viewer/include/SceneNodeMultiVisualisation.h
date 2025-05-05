@@ -22,8 +22,6 @@ public:
 	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return false; };
 
-private:
-	std::string m_projectName;
-	
+private:	
 };
 
