@@ -246,13 +246,13 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot";
+	const std::string plotName = "Test/A_plot_Single";
 	curveCfg.setEntityName(plotName + "/A_Curve");
 
 	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
 
 	// Family of curves
-	/*MetadataParameter parameter;
+	MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kOlf";
@@ -263,8 +263,7 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot2";
-	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
+	const std::string plotName = "Test/A_plot_MultipleCurves";
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -301,10 +300,16 @@ void testPlot()
 		descriptions.push_back(std::move(description));
 	}
 	
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");*/
+	int counter = 0;
+	for (auto& description : descriptions)
+	{
+		curveCfg.setEntityName(plotName + "/A_OfCurve" + std::to_string(counter));
+		counter++;
+		builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
+	}
 
 	// Family of curves 3 parameter
-	MetadataParameter parameter;
+	/*MetadataParameter parameter;
 	parameter.parameterName = "SomeParameter";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kOlf";
@@ -315,15 +320,15 @@ void testPlot()
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	curveCfg.setXAxisTitle("SomeParameter");
 	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot3";
+	const std::string plotName = "Test/A_plot3_ConstParameter";
 	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
 	std::list<DatasetDescription> descriptions;
-	for (int material = 0; material < 2; material++)
+	for (int material = 0; material < 3; material++)
 	{
-		for (int runID = 0; runID < 3; runID++)
+		for (int runID = 0; runID < 1; runID++)
 		{
 			DatasetDescription description;
 
@@ -363,7 +368,7 @@ void testPlot()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
+	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");*/
 
 
 	//Here the shared part

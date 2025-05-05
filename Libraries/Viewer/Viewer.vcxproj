@@ -52,6 +52,7 @@
     <ClCompile Include="src\PlotVisualiser.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
+    <ClCompile Include="src\SceneNodeBase.cpp" />
     <ClCompile Include="src\SceneNodeCartesianMesh.cpp" />
     <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp" />
     <ClCompile Include="src\SceneNodeContainer.cpp" />

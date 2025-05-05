@@ -62,7 +62,7 @@ SceneNodeMeshItem::~SceneNodeMeshItem()
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
+		m_shapeNode = nullptr;
 	}
 
 	getMesh()->removeOwner(this, faceID);
@@ -363,14 +363,14 @@ void SceneNodeMeshItem::loadEdgeData(void)
 	ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
 	ss->setAttribute(new osg::LineWidth(1.0), osg::StateAttribute::ON);
 
-	assert(shapeNode == nullptr);
-	shapeNode = new osg::Switch;
+	assert(m_shapeNode == nullptr);
+	m_shapeNode = new osg::Switch;
 
 	// Now add the current nodes osg node to the parent's osg node
 	getParent()->getShapeNode()->addChild(getShapeNode());
 	getModel()->addSceneNode(this);
 
-	shapeNode->addChild(edgesNode);
+	m_shapeNode->addChild(edgesNode);
 
 	tetEdges = edgesNode;
 }

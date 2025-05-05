@@ -11,7 +11,7 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 
 void PlotVisualiser::visualise(const VisualiserState& _state)
 {
-	if (_state.m_selected)
+	if (_state.m_selected && ! m_alreadyRequestedVisualisation)
 	{
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;

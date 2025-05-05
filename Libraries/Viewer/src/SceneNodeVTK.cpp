@@ -63,7 +63,7 @@ void SceneNodeVTK::deleteShapeNode(void)
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
+		m_shapeNode = nullptr;
 	}
 }
 
@@ -177,7 +177,7 @@ void SceneNodeVTK::setVisible(bool v)
 			}
 			else
 			{
-				shapeNode->addChild(vtkNode);
+				m_shapeNode->addChild(vtkNode);
 				initialized = true;
 			}
 		}
@@ -214,10 +214,10 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 	projectName = projName;
 
 	// Add a switch (group) node for the shape
-	if (shapeNode == nullptr)
+	if (m_shapeNode == nullptr)
 	{
 		// Create an new shapeNode
-		shapeNode = new osg::Switch;
+		m_shapeNode = new osg::Switch;
 
 		// Now add the current nodes osg node to the parent's osg node
 		getParent()->getShapeNode()->addChild(getShapeNode());
@@ -227,7 +227,7 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 	else
 	{
 		// Delete the children of the shape node
-		while (shapeNode->removeChild((unsigned int)0));
+		while (m_shapeNode->removeChild((unsigned int)0));
 	}
 
 	initialized = false;
@@ -244,7 +244,7 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 		}
 		else
 		{
-			shapeNode->addChild(vtkNode);
+			m_shapeNode->addChild(vtkNode);
 			initialized = true;
 		}
 	}

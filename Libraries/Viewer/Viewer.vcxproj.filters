@@ -157,6 +157,9 @@
     <ClCompile Include="src\CurveVisualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\SceneNodeBase.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">

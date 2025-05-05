@@ -3619,6 +3619,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
 		const std::string t = ot::json::toJson(curveCfgs);
 		ot::Plot1DCurveCfg curveCfg;
+		
 		curveCfg.setFromJsonObject(curveCfgSerialised);
 		
 		const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
@@ -3677,6 +3678,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 	plot->refresh();
 	plot->resetView();
+	
+	const auto& viewerType = plotView->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, plotConfig.getEntityName(), ot::ViewChangedStates::viewOpened, viewerType);
 
 	return "";
 }

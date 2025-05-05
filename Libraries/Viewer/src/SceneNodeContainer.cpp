@@ -8,9 +8,9 @@
 SceneNodeContainer::SceneNodeContainer()
 {
 	// Create a group osg node
-	shapeNode = new osg::Switch;
+	m_shapeNode = new osg::Switch;
 
-	shapeNode->setAllChildrenOn();
+	m_shapeNode->setAllChildrenOn();
 }
 
 SceneNodeContainer::~SceneNodeContainer()
@@ -39,6 +39,6 @@ SceneNodeContainer::~SceneNodeContainer()
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
+		m_shapeNode = nullptr;
 	}
 }

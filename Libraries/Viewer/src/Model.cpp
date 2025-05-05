@@ -750,7 +750,7 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	sceneNode->setEditable(_editable);
 	sceneNode->setModelEntityID(_modelEntityID);
 	sceneNode->setOldTreeIcons(_treeIcons);
-	sceneNode->setModel(this);
+	//sceneNode->setModel(this);
 	
 	if (_visualisationTypes.visualiseAsTable())
 	{
@@ -3003,9 +3003,8 @@ void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, co
 		OT_LOG_EAS("Scene node \"" + _sceneNodeName + "\" not found");
 		return;
 	}
-	SceneNodeMultiVisualisation* sceneNodeMultiVisualisation =  dynamic_cast<SceneNodeMultiVisualisation*>(sceneNodeIt->second);
-	assert(sceneNodeMultiVisualisation != nullptr);
-	sceneNodeMultiVisualisation->setViewChange(_state, _viewType);
+	
+	sceneNodeIt->second->setViewChange(_state, _viewType);
 }
 
 void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)

@@ -28,6 +28,8 @@
 #include "OTWidgets/TableView.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/PlotView.h"
+#include "OTWidgets/PlotDataset.h"
 
 // C++ header
 #include <exception>
@@ -260,6 +262,18 @@ void ViewerComponent::removeViewer(ot::UID viewerID) {
 			m_viewers.erase(pos);
 			return;
 		}
+	}
+}
+
+void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed)
+{
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName);
+	ot::Plot* plot = plotView->getPlot();
+	auto allCurves = plot->findDatasets(_entityID);
+
+	for (auto curve : allCurves)
+	{
+		curve->setDimmed(_setDimmed,true);
 	}
 }
 

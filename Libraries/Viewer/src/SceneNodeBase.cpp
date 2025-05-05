@@ -1,0 +1,117 @@
+#include "stdafx.h"
+#include "SceneNodeBase.h"
+#include "TextVisualiser.h"
+#include "TableVisualiser.h"
+#include "FrontendAPI.h"
+
+ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin)
+{
+	m_selected = _selected;
+	
+	ot::SelectionHandlingResult result;
+	//getModel() != nullptr;
+	if (true)
+	{
+		// First we check if there is a state change
+		if (!isSelected() && _selected || isSelected() && !_selected)
+		{
+			const std::list<Visualiser*> visualisers = getVisualiser();
+			for (Visualiser* visualiser : visualisers)
+			{
+				if (_selectionOrigin == ot::SelectionOrigin::User)
+				{
+					// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
+					// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
+					// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
+					// open or not.
+
+					if (visualiser->mayVisualise() && !visualiser->viewIsCurrentlyOpen())
+					{
+						VisualiserState state;
+						state.m_selected = _selected;
+						//state.m_singleSelection = getModel()->isSingleItemSelected();
+						visualiser->visualise(state);
+						result |= ot::SelectionHandlingEvent::NewViewRequested;
+					}
+					else if (visualiser->viewIsCurrentlyOpen())
+					{
+						// Here we just want to focus an already opened view.
+						FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+					}
+				}
+
+				// Other selection origins are neglected. View origin is triggered if a view is selected in UI, which triggers the selection of the corresponding entity.
+				// Custom selection changes come from somewhere within the code.		
+			}
+		}
+	}
+
+	result |= SceneNodeBase::setSelected(_selected, _selectionOrigin);
+
+	return result;
+
+}
+void SceneNodeBase::setHighlighted(bool _highlight)
+{
+	if (m_highlighted != _highlight) 
+	{
+		m_highlighted = _highlight;
+		if (m_selectChildren) 
+		{ 
+			for (auto child : m_children)
+			{
+				child->setHighlighted(_highlight);
+			}
+		} 
+	}
+}
+
+void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+
+	// Here we switch the view state changes
+	if (_state == ot::ViewChangedStates::changesSaved)
+	{
+		const std::list< Visualiser*>& allVisualiser = getVisualiser();
+		// We initiated a model state change from the ui. Now we request a new visualisation for every visualiser which is not the one that initiated the 
+		// Model state change under the condition that the view is open.
+		VisualiserState state;
+		state.m_setFocus = false;
+		state.m_selected = true;
+		state.m_singleSelection = true;
+		for (Visualiser* visualiser : allVisualiser)
+		{
+			if (visualiser->getViewType() != _viewType && visualiser->viewIsCurrentlyOpen()) {
+				visualiser->visualise(state);
+			}
+		}
+	}
+	else
+	{
+		//Here we set/unset the viewer state isOpen for the opened visualisation.
+		const std::list< Visualiser*>& allVisualiser = getVisualiser();
+		bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
+		bool thisIsTheView = false;
+		for (Visualiser* visualiser : allVisualiser)
+		{
+			if (_viewType == ot::WidgetViewBase::ViewType::ViewText)
+			{
+				TextVisualiser* textVisualiser = dynamic_cast<TextVisualiser*>(visualiser);
+				thisIsTheView = textVisualiser != nullptr;
+			}
+			else if (_viewType == ot::WidgetViewBase::ViewType::ViewTable)
+			{
+				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
+				thisIsTheView = tableVisualiser != nullptr;
+			}
+
+			if (thisIsTheView)
+			{
+				visualiser->setViewIsOpen(viewIsOpen);
+				break;
+			}
+		}
+	}
+}
+

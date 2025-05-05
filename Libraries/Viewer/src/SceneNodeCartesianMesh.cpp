@@ -67,7 +67,7 @@ SceneNodeCartesianMesh::~SceneNodeCartesianMesh()
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;	
+		m_shapeNode = nullptr;	
 	}
 
 	// Remove all face scene nodes
@@ -96,7 +96,7 @@ void SceneNodeCartesianMesh::setMeshLines(const std::vector<double> &x, const st
 	if (meshLines != nullptr)
 	{
 		meshLines->setNodeMask(meshLines->getNodeMask() & ~3); // Reset the first and second bit of the node mask to exclude the mesh lines from picking
-		shapeNode->addChild(meshLines);
+		m_shapeNode->addChild(meshLines);
 	}
 }
 
@@ -394,14 +394,14 @@ void SceneNodeCartesianMesh::loadFaces(unsigned long long meshFacesID, unsigned 
 
 		if (faceNode != nullptr)
 		{
-			shapeNode->addChild(faceNode);
-			shapeNode->setChildValue(faceNode, false);
+			m_shapeNode->addChild(faceNode);
+			m_shapeNode->setChildValue(faceNode, false);
 		}
 
 		if (edgeNode != nullptr)
 		{
-			shapeNode->addChild(edgeNode);
-			shapeNode->setChildValue(edgeNode, false);
+			m_shapeNode->addChild(edgeNode);
+			m_shapeNode->setChildValue(edgeNode, false);
 		}
 
 		findex++;
@@ -813,7 +813,7 @@ osg::Node *SceneNodeCartesianMesh::createFaceNode(osg::ref_ptr<osg::Vec3Array> &
 
 	// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, transparency));
+	colors->push_back(osg::Vec4(0.5, 0.5, 0.5, m_transparency));
 
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f, 2.0f));
 
@@ -1040,8 +1040,8 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 	bool showFaces = visible && (!wireframe || transparent);
 	bool showEdges = visible && (!transparent);
 
-	shapeNode->setChildValue(faceNode, showFaces);
-	shapeNode->setChildValue(edgeNode, showEdges);
+	m_shapeNode->setChildValue(faceNode, showFaces);
+	m_shapeNode->setChildValue(edgeNode, showEdges);
 
 	// Now get the face geometry node for modification
 	osg::Geode *faceGeode = dynamic_cast<osg::Geode *>(faceNode);
@@ -1063,7 +1063,7 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 		osg::ref_ptr<osg::Material> material = new osg::Material;
 
 		SceneNodeMaterial sceneNodeMaterial;
-		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, transparency);
+		sceneNodeMaterial.setMaterial(material, "Rough", r, g, b, m_transparency);
 
 		faceGeometry->getOrCreateStateSet()->setAttribute(material.get());
 
@@ -1081,7 +1081,7 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 
 	if (transparentChanged)
 	{
-		// Set the transparency state of the face 
+		// Set the m_transparency state of the face 
 		setTransparent(faceGeometry, transparent);
 		faceRefreshNeeded = true;
 	}

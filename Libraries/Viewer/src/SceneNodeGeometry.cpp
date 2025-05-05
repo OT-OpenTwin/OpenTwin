@@ -83,7 +83,7 @@ void SceneNodeGeometry::deleteShapeNode(void)
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode				= nullptr;
+		m_shapeNode				= nullptr;
 		triangles				= nullptr;
 		edges                   = nullptr;
 		edgesHighlighted		= nullptr;
@@ -450,10 +450,10 @@ void SceneNodeGeometry::applyTransform(osg::Matrix matrix)
 void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap)
 {
 	// Add a switch (group) node for the shape
-	if (shapeNode == nullptr)
+	if (m_shapeNode == nullptr)
 	{
-		// Create an new shapeNode
-		shapeNode = new osg::Switch;
+		// Create an new m_shapeNode
+		m_shapeNode = new osg::Switch;
 
 		// Now add the current nodes osg node to the parent's osg node
 		getParent()->getShapeNode()->addChild(getShapeNode());
@@ -463,10 +463,10 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	else
 	{
 		// Delete the children of the shape node
-		if (getTriangles() != nullptr) shapeNode->removeChild(getTriangles());
-		if (getEdges() != nullptr) shapeNode->removeChild(getEdges());
-		if (getEdgesHighlighted() != nullptr) shapeNode->removeChild(getEdgesHighlighted());
-		if (getFaceEdgesHighlight() != nullptr) shapeNode->removeChild(getFaceEdgesHighlight());
+		if (getTriangles() != nullptr) m_shapeNode->removeChild(getTriangles());
+		if (getEdges() != nullptr) m_shapeNode->removeChild(getEdges());
+		if (getEdgesHighlighted() != nullptr) m_shapeNode->removeChild(getEdgesHighlighted());
+		if (getFaceEdgesHighlight() != nullptr) m_shapeNode->removeChild(getFaceEdgesHighlight());
 
 		triangleToFaceId.clear();
 		faceEdgesHighlight.clear();
@@ -498,10 +498,10 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	setFaceEdgesHighlighted(faceEdgesHighlightNode);
 
 	// Add the triangle and edge nodes to the group node and add the group node to the root
-	shapeNode->addChild(triangleNode);
-	shapeNode->addChild(edgeNode);
-	shapeNode->addChild(edgeHighlightedNode);
-	shapeNode->addChild(faceEdgesHighlightNode);
+	m_shapeNode->addChild(triangleNode);
+	m_shapeNode->addChild(edgeNode);
+	m_shapeNode->addChild(edgeHighlightedNode);
+	m_shapeNode->addChild(faceEdgesHighlightNode);
 
 	// Apply the parent transformation (if any)
 	applyParentTransform();
@@ -510,7 +510,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	setTransparent(false);
 
 	// Turn off highlighting
-	shapeNode->setChildValue(edgeHighlightedNode, false);
+	m_shapeNode->setChildValue(edgeHighlightedNode, false);
 	((osg::Switch *) faceEdgesHighlightNode)->setAllChildrenOff();
 
 	if (!isVisible())
@@ -535,7 +535,7 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 	osg::ref_ptr<osg::Material> material = new osg::Material;
 
 	SceneNodeMaterial sceneNodeMaterial;
-	auto materialSet = sceneNodeMaterial.setMaterial(material, materialType, colorRGB[0], colorRGB[1], colorRGB[2], transparency);
+	auto materialSet = sceneNodeMaterial.setMaterial(material, materialType, colorRGB[0], colorRGB[1], colorRGB[2], m_transparency);
 
 	bool applyTexture = (textureType != "None");
 
@@ -578,7 +578,7 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 
 	// Store the color in a color array (the color will be shared among all nodes, so only one entry is needed)
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(colorRGB[0], colorRGB[1], colorRGB[2], transparency));
+	colors->push_back(osg::Vec4(colorRGB[0], colorRGB[1], colorRGB[2], m_transparency));
 
 	// Create the geometry object to store the data
 	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
@@ -1025,7 +1025,7 @@ void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edge
 				osg::ref_ptr<osg::Material> material = new osg::Material;
 
 				SceneNodeMaterial sceneNodeMaterial;
-				sceneNodeMaterial.setMaterial(material, materialType, surfaceColorRGB[0], surfaceColorRGB[1], surfaceColorRGB[2], transparency);
+				sceneNodeMaterial.setMaterial(material, materialType, surfaceColorRGB[0], surfaceColorRGB[1], surfaceColorRGB[2], m_transparency);
 
 				geometry->getOrCreateStateSet()->setAttribute(material.get());
 

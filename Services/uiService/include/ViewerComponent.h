@@ -62,6 +62,8 @@ public:
 	virtual void lockSelectionAndModification(bool flag) override;
 	virtual void removeViewer(ot::UID viewerID) override;
 
+	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) override;
+
 	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 
 	virtual ot::WidgetView* getCurrentView(void) override;

@@ -6,7 +6,7 @@ class PlotVisualiser : public Visualiser
 public:
 	PlotVisualiser(SceneNodeBase* _sceneNode);
 	void visualise(const VisualiserState& _state) override;
-	bool alreadyRequestedVisualisation() {}
+	bool alreadyRequestedVisualisation() { return m_alreadyRequestedVisualisation; }
 	void setViewIsOpen(bool _viewIsOpen) override;
 
 private:

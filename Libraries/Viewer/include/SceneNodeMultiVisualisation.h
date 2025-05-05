@@ -8,7 +8,6 @@ namespace osg
 
 #include "SceneNodeBase.h"
 #include "TextVisualiser.h"
-#include "Model.h"
 
 #include <string>
 #include <map>
@@ -20,23 +19,15 @@ public:
 	SceneNodeMultiVisualisation() = default;
 	virtual ~SceneNodeMultiVisualisation();
 
-	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
+	void setStorage(const std::string& _projectName) { m_projectName = _projectName; }
 
-	//! \return Returns true if the selection has requested a new view.
-	virtual ot::SelectionHandlingResult setSelected(bool _selection, ot::SelectionOrigin _selectionOrigin) override;
-
-	void setStorage(const std::string& _projectName) { projectName = _projectName; }
-
-	std::string getProjectName(void) { return projectName; }
-
-	Model* getModel(void) { return model; };
-	void setModel(Model* _model) { model = _model; };
+	std::string getProjectName(void) { return m_projectName; }
 
 	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return false; };
 
 private:
-	std::string projectName;
-	Model* model = nullptr;
+	std::string m_projectName;
+	
 };
 

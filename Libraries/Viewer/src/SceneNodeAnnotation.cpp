@@ -36,7 +36,7 @@ SceneNodeAnnotation::~SceneNodeAnnotation()
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
+		m_shapeNode = nullptr;
 	}
 }
 
@@ -168,15 +168,15 @@ void SceneNodeAnnotation::initializeFromData(const double edgeColorRGB[3],
 											 const std::vector<std::array<double, 3>> &triangle_rgb)
 {
 	// Add a switch (group) node for the shape
-	if (shapeNode == nullptr)
+	if (m_shapeNode == nullptr)
 	{
-		// Create an new shapeNode
-		shapeNode = new osg::Switch;
+		// Create an new m_shapeNode
+		m_shapeNode = new osg::Switch;
 	}
 	else
 	{
 		// Delete the children of the shape node
-		while (shapeNode->removeChild((unsigned int)0));
+		while (m_shapeNode->removeChild((unsigned int)0));
 	}
 
 	// Create the triangle node
@@ -201,18 +201,18 @@ void SceneNodeAnnotation::initializeFromData(const double edgeColorRGB[3],
 	verticesHighlighted = vertexHighlightedNode;
 
 	// Add the triangle and edge nodes to the group node and add the group node to the root
-	if (triangleNode          != nullptr) shapeNode->addChild(triangleNode);
-	if (edgeNode              != nullptr) shapeNode->addChild(edgeNode);
-	if (edgeHighlightedNode   != nullptr) shapeNode->addChild(edgeHighlightedNode);
-	if (vertexNode            != nullptr) shapeNode->addChild(vertexNode);
-	if (vertexHighlightedNode != nullptr) shapeNode->addChild(vertexHighlightedNode);
+	if (triangleNode          != nullptr) m_shapeNode->addChild(triangleNode);
+	if (edgeNode              != nullptr) m_shapeNode->addChild(edgeNode);
+	if (edgeHighlightedNode   != nullptr) m_shapeNode->addChild(edgeHighlightedNode);
+	if (vertexNode            != nullptr) m_shapeNode->addChild(vertexNode);
+	if (vertexHighlightedNode != nullptr) m_shapeNode->addChild(vertexHighlightedNode);
 
 	// Ensure that the triangles are drawn opaquely
 	setTransparent(false);
 
 	// Turn off highlighting
-	if (edgeHighlightedNode   != nullptr) shapeNode->setChildValue(edgeHighlightedNode, false);
-	if (vertexHighlightedNode != nullptr) shapeNode->setChildValue(vertexHighlightedNode, false);
+	if (edgeHighlightedNode   != nullptr) m_shapeNode->setChildValue(edgeHighlightedNode, false);
+	if (vertexHighlightedNode != nullptr) m_shapeNode->setChildValue(vertexHighlightedNode, false);
 }
 
 osg::Node * SceneNodeAnnotation::createOSGNodeFromTriangles(const std::vector<std::array<double, 3>> &triangle_p1,
@@ -269,9 +269,9 @@ osg::Node * SceneNodeAnnotation::createOSGNodeFromTriangles(const std::vector<st
 		nNormal += 3;
 
 		// Store the color in a color array (the color will be set per vertex, so we need to store the same color three times)
-		colors->at(nColor    ).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], transparency);
-		colors->at(nColor + 1).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], transparency);
-		colors->at(nColor + 2).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], transparency);
+		colors->at(nColor    ).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
+		colors->at(nColor + 1).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
+		colors->at(nColor + 2).set(triangle_rgb[nT][0], triangle_rgb[nT][1], triangle_rgb[nT][2], m_transparency);
 
 		nColor += 3;
 	}

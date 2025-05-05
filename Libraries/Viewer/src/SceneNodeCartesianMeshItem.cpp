@@ -47,7 +47,7 @@ SceneNodeCartesianMeshItem::~SceneNodeCartesianMeshItem()
 		}
 
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
+		m_shapeNode = nullptr;
 	}
 
 	getMesh()->removeOwner(this, faceID);
