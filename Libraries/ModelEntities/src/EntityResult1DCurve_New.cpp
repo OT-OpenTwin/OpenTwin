@@ -58,7 +58,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	ot::Plot1DCurveCfg curveCfg;
 
 	curveCfg.setEntityName(this->getName());
-
+	curveCfg.setEntityID(getEntityID());
+	curveCfg.setEntityVersion(getEntityStorageVersion());
 	const ot::Color colour = PropertyHelper::getColourPropertyValue(this, "Color");
 
 	const std::string xAxisLabel =PropertyHelper::getStringPropertyValue(this, "X axis label");

@@ -191,6 +191,8 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
+	config.setEntityVersion(getEntityStorageVersion());
+
 	config.setTitle(title);
 	config.setProjectName(DataBase::GetDataBase()->getProjectName());
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));

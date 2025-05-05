@@ -12,24 +12,29 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 
 }
 
-void TableVisualiser::visualise(const VisualiserState& _state)
+bool TableVisualiser::visualise(const VisualiserState& _state)
 {
-	if (_state.m_singleSelection)
+	if(!m_viewIsOpen && _state.m_selectionOrigin == ot::SelectionOrigin::User)
 	{
-		if (_state.m_selected)
+		if (_state.m_singleSelection)
 		{
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator());
+			if (_state.m_selected)
+			{
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator());
 
-			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 
-			FrontendAPI::instance()->messageModelService(doc.toJson());
+				FrontendAPI::instance()->messageModelService(doc.toJson());
+				return true;
+			}
+		}
+		else
+		{
+			OT_LOG_I("Visualisation of a multiselection of tables is turned off for performance reasons.");
 		}
 	}
-	else
-	{
-		OT_LOG_I("Visualisation of a multiselection of tables is turned off for performance reasons.");
-	}
+	return false;
 }

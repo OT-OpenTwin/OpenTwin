@@ -11,8 +11,9 @@ CurveVisualiser::CurveVisualiser(SceneNodeBase * _sceneNode)
 
 }
 
-void CurveVisualiser::visualise(const VisualiserState& _state)
+bool CurveVisualiser::visualise(const VisualiserState& _state)
 {
+	bool newVisualisation = false;
 	if (!m_viewIsOpen)
 	{
 		SceneNodeBase* plot = m_node->getParent();
@@ -27,10 +28,13 @@ void CurveVisualiser::visualise(const VisualiserState& _state)
 			plotState.m_setFocus = true;
 			plotState.m_singleSelection = true;
 			plotVisualiser->visualise(plotState);
+			newVisualisation = true;
 		}
 	}
 	else
 	{
-		FrontendAPI::instance()->setCurveDimmed(m_node->getName(), m_node->getModelEntityID(), !_state.m_selected);
+		SceneNodeBase* plot = m_node->getParent();
+		FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), !_state.m_selected);
 	}
+	return newVisualisation;
 }

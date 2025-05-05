@@ -7,5 +7,8 @@ class TextVisualiser : public Visualiser {
 public:
 
 	TextVisualiser(SceneNodeBase* _sceneNode);
-	void visualise(const VisualiserState& _state) override;
+	
+	//! @brief Visualisation logic for different types of visualisation. Mostly requests to the model service which actually has the needed data.
+	//! @return true, if a new visualisation was requested
+	bool visualise(const VisualiserState& _state) override;
 };

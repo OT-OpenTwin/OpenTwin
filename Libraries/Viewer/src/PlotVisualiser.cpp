@@ -9,9 +9,9 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 {
 }
 
-void PlotVisualiser::visualise(const VisualiserState& _state)
+bool PlotVisualiser::visualise(const VisualiserState& _state)
 {
-	if (_state.m_selected && ! m_alreadyRequestedVisualisation)
+	if(!m_viewIsOpen && _state.m_selected && ! m_alreadyRequestedVisualisation)
 	{
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
@@ -22,11 +22,23 @@ void PlotVisualiser::visualise(const VisualiserState& _state)
 		doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 
 		FrontendAPI::instance()->messageModelService(doc.toJson());
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
 void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)
 {
-	m_viewIsOpen = _viewIsOpen;
 	m_alreadyRequestedVisualisation = false;
+	m_viewIsOpen = _viewIsOpen;
+
+	for (SceneNodeBase* curve : m_node->getChildren())
+	{
+		assert(curve->getVisualiser().size() == 1);
+		Visualiser* curveVisualiser = *curve->getVisualiser().begin();
+		curveVisualiser->setViewIsOpen(_viewIsOpen);
+	}
 }

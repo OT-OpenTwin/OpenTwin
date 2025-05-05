@@ -2,6 +2,9 @@
 #include "SceneNodeBase.h"
 #include "TextVisualiser.h"
 #include "TableVisualiser.h"
+#include "PlotVisualiser.h"
+#include "CurveVisualiser.h"
+
 #include "FrontendAPI.h"
 
 SceneNodeBase::~SceneNodeBase()
@@ -34,31 +37,26 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 		const std::list<Visualiser*>& visualisers = getVisualiser();
 		for (Visualiser* visualiser : visualisers)
 		{
-			if (_selectionOrigin == ot::SelectionOrigin::User)
+			// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
+			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
+			// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
+			// open or not.
+
+			if (visualiser->mayVisualise())
 			{
-				// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
-				// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
-				// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
-				// open or not.
-
-				if (visualiser->mayVisualise() && !visualiser->viewIsCurrentlyOpen())
-				{
-					VisualiserState state;
-					state.m_selected = _selected;
-					state.m_singleSelection = _singleSelection;
-					visualiser->visualise(state);
-					result |= ot::SelectionHandlingEvent::NewViewRequested;
-				}
-				else if (visualiser->viewIsCurrentlyOpen())
-				{
-					// Here we just want to focus an already opened view.
-					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-					result |= ot::SelectionHandlingEvent::ActiveViewChanged;
-				}
+				VisualiserState state;
+				state.m_selected = _selected;
+				state.m_singleSelection = _singleSelection;
+				state.m_selectionOrigin = _selectionOrigin;
+				visualiser->visualise(state);
+				result |= ot::SelectionHandlingEvent::NewViewRequested;
 			}
-
-			// Other selection origins are neglected. View origin is triggered if a view is selected in UI, which triggers the selection of the corresponding entity.
-			// Custom selection changes come from somewhere within the code.		
+			else if (visualiser->viewIsCurrentlyOpen())
+			{
+				// Here we just want to focus an already opened view.
+				FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+				result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+			}
 		}
 	}
 
@@ -118,7 +116,14 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
 				thisIsTheView = tableVisualiser != nullptr;
 			}
+			else if (_viewType == ot::WidgetViewBase::ViewType::View1D)
+			{
+				PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
+				thisIsTheView |= plotVisualiser != nullptr;
+				CurveVisualiser* curveVisualiser = dynamic_cast<CurveVisualiser*>(visualiser);
+				thisIsTheView |= curveVisualiser != nullptr;
 
+			}
 			if (thisIsTheView)
 			{
 				visualiser->setViewIsOpen(viewIsOpen);
