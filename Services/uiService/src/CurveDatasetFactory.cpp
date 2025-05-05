@@ -367,7 +367,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst); //Restart the rainbow
 		}
 
-		if (numberOfParameter == 1)
+		if (numberOfParameter == 2)
 		{
 			newCurveCfg.setTitle(shortName + "_" + singleCurve.first);
 		}
