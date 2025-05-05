@@ -4,6 +4,25 @@
 #include "TableVisualiser.h"
 #include "FrontendAPI.h"
 
+SceneNodeBase::~SceneNodeBase()
+{
+	for (Visualiser* visualiser : m_visualiser)
+	{
+		delete visualiser;
+		visualiser = nullptr;
+	}
+
+	if (m_parent != nullptr)
+	{
+		m_parent->removeChild(this);
+	}
+	std::list<SceneNodeBase*> currentChilds = m_children;
+	for (auto child : currentChilds)
+	{
+		delete child;
+	}
+}
+
 ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin)
 {
 	m_selected = _selected;

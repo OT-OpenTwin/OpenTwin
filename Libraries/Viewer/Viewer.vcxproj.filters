@@ -160,6 +160,9 @@
     <ClCompile Include="src\SceneNodeBase.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\FaceSelection.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -329,6 +332,12 @@
     </ClInclude>
     <ClInclude Include="include\VisualiserState.h">
       <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FaceSelection.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EdgeSelection.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

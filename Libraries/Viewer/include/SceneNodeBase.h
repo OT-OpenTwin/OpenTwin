@@ -19,24 +19,7 @@ namespace osg { class Switch; };
 class SceneNodeBase
 {
 public:
-	virtual ~SceneNodeBase() 
-	{ 
-		for (Visualiser* visualiser : m_visualiser)
-		{
-			delete visualiser;
-			visualiser = nullptr;
-		}
-
-		if (m_parent != nullptr)
-		{
-			m_parent->removeChild(this);
-		}
-		std::list<SceneNodeBase*> currentChilds = m_children;  
-		for (auto child : currentChilds)
-		{
-			delete child;
-		}
-	};
+	virtual ~SceneNodeBase();
 
 	void setName(const std::string &n) { m_name = n; };
 	const std::string& getName(void) { return m_name; };

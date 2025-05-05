@@ -29,6 +29,7 @@
     <ClCompile Include="src\ClipPlaneManipulator.cpp" />
     <ClCompile Include="src\CurveVisualiser.cpp" />
     <ClCompile Include="src\EntityHandler.cpp" />
+    <ClCompile Include="src\FaceSelection.cpp" />
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
     <ClCompile Include="src\GlobalModel.cpp" />
@@ -99,7 +100,9 @@
     <ClInclude Include="include\CappingEffect.h" />
     <ClInclude Include="include\ClipPlaneManipulator.h" />
     <ClInclude Include="include\CurveVisualiser.h" />
+    <ClInclude Include="include\EdgeSelection.h" />
     <ClInclude Include="include\EntityHandler.h" />
+    <ClInclude Include="include\FaceSelection.h" />
     <ClInclude Include="include\Factory.h" />
     <ClInclude Include="include\FrontendAPI.h" />
     <ClInclude Include="include\GlobalFontPath.h" />

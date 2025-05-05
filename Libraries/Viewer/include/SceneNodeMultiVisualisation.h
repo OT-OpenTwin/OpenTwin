@@ -19,10 +19,6 @@ public:
 	SceneNodeMultiVisualisation() = default;
 	virtual ~SceneNodeMultiVisualisation();
 
-	void setStorage(const std::string& _projectName) { m_projectName = _projectName; }
-
-	std::string getProjectName(void) { return m_projectName; }
-
 	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return false; };
 
