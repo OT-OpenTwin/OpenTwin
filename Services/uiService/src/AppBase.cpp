@@ -1314,6 +1314,9 @@ void AppBase::closeAllViewerTabs(void) {
 	for (auto element : m_tables) {
 		manager->uiViewDestroyed(element.second);
 	}
+	for (auto element : m_plots) {
+		manager->uiViewDestroyed(element.second);
+	}
 	if (m_versionGraph) {
 		manager->uiElementDestroyed(m_versionGraph->getVersionGraphManager()->getGraph());
 	}
@@ -1322,6 +1325,7 @@ void AppBase::closeAllViewerTabs(void) {
 	m_graphicsViews.clear();
 	m_textEditors.clear();
 	m_tables.clear();
+	m_plots.clear();
 	m_versionGraph = nullptr;
 	m_lastFocusedCentralView = nullptr;
 	ot::WidgetViewManager::instance().closeViews();

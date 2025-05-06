@@ -268,13 +268,18 @@ void ViewerComponent::removeViewer(ot::UID viewerID) {
 void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed)
 {
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName);
+	if (!plotView) {
+		OT_LOG_E("Plot not found \"" + _plotName + "\"");
+		return;
+	}
 	ot::Plot* plot = plotView->getPlot();
 	auto allCurves = plot->findDatasets(_entityID);
 
-	for (auto curve : allCurves)
-	{
-		curve->setDimmed(_setDimmed,true);
+	for (auto curve : allCurves) {
+		curve->setDimmed(_setDimmed, true);
 	}
+
+	plot->refresh();
 }
 
 void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {

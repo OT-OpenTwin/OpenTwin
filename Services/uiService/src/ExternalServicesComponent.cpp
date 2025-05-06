@@ -3582,9 +3582,7 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 	return "";
 }
 
-
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
-	
 	// Get infos from message document
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());

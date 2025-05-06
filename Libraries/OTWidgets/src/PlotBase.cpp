@@ -295,7 +295,6 @@ void ot::PlotBase::applyConfig(void) {
 	} // compatible
 
 	else {
-		OT_LOG_T("Plot data incompatible");
 		this->setIncompatibleData();
 
 	} // !compatible
@@ -307,8 +306,6 @@ void ot::PlotBase::applyConfig(void) {
 	m_polarPlot->updateGrid();
 	m_polarPlot->updateLegend();
 	m_polarPlot->updateWholePlot();
-
-	OT_LOG_T("Update whole plot completed");
 }
 
 std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit)
