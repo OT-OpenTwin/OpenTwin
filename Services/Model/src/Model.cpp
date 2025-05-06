@@ -4058,6 +4058,11 @@ void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::U
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
 }
 
+void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
+{
+	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationType, _setAsActiveView, _overrideContent);
+}
+
 EntityBase *Model::findEntityFromName(const std::string &name)
 {
 	if (entityRoot == nullptr) return nullptr;

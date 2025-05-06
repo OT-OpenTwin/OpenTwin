@@ -173,6 +173,8 @@ public:
 
 	void addButtons();
 
+	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
+
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 

@@ -28,6 +28,7 @@ public:
 
 	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
+	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) {};
 
 };
 

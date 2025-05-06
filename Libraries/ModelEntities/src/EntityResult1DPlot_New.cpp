@@ -49,18 +49,16 @@ bool EntityResult1DPlot_New::updateFromProperties(void)
 	// Since there is a change now, we need to set the modified flag
 	setModified();
 
-	//ot::JsonDocument doc;
-	//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-	//
-	//ot::Plot1DCfg config = getPlot();
-	//ot::JsonObject configObj;
-	//config.addToJsonObject(configObj, doc.GetAllocator());
-	//doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-	//
-	//getObserver()->sendMessageToViewer(doc);
-	//
+	//Properties that require the curve data to be fetched again
+	bool requiresDataToBeFetched = false;
+	auto numberOfCurves = PropertyHelper::getBoolProperty(this, "Number of curves", "Curve limit");
+	requiresDataToBeFetched |=	numberOfCurves->needsUpdate();
+	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
+	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
+	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
 	
-	// We now reset the update flag for all properties, since we took care of this above
+	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_PARAM_VIEW1D_Setup, true, requiresDataToBeFetched);
+
 	getProperties().forceResetUpdateForAllProperties();
 
 	return updatePropertyVisibilities();

@@ -132,6 +132,22 @@ EntityPropertiesColor* PropertyHelper::getColourProperty(EntityBase* _base, cons
 	return colourProperty;
 }
 
+EntityPropertiesInteger* PropertyHelper::getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		throw std::exception(("Failed to access property " + _name).c_str());
+	}
+
+	EntityPropertiesInteger* intProperty = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	if (intProperty == nullptr)
+	{
+		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
+	}
+	return intProperty;
+}
+
 void PropertyHelper::setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesDouble* doubleProperty = getDoubleProperty(_base, _name, _groupName);

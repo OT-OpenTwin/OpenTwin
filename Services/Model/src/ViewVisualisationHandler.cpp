@@ -65,6 +65,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 
 			ot::TextEditorCfg configuration = textEntity->createConfig();
 			ot::JsonObject cfgObj;
@@ -87,6 +88,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 
 			const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
 			ot::JsonObject cfgObj;

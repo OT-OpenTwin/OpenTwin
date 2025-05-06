@@ -75,3 +75,22 @@ std::list<ValueComparisionDefinition> PropertyBundleQuerySettings::getValueCompa
 	return valueDefinitions;
 }
 
+bool PropertyBundleQuerySettings::requiresUpdate(EntityBase* _thisObject)
+{
+	const int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyNbOfComparisions, m_groupQuerySettings);
+	bool updateRequired = false;
+	for (int32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
+	{
+		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
+		const bool visible = i <= numberOfQueries;
+		if (PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->getVisible() != visible)
+		{
+			updateRequired |= 
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->needsUpdate() |
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate() |
+			PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->needsUpdate() ;
+		}
+	}
+	return updateRequired;
+}
+

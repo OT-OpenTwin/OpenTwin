@@ -12,6 +12,8 @@ public:
 
 	std::list<ValueComparisionDefinition> getValueComparisionDefinitions(EntityBase* _thisObject);
 
+	bool requiresUpdate(EntityBase* _thisObject);
+
 private:
 	const std::string m_groupQuerySettings = "Query settings";
 	const std::string m_propertyNbOfComparisions = "Number of queries";
