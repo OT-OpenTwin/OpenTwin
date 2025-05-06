@@ -6,12 +6,6 @@
 // OpenTwin header
 #include "OTGui/Plot1DAxisCfg.h"
 
-ot::Plot1DAxisCfg::Plot1DAxisCfg() 
-	: m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_isLogScale(false), m_isAutoScale(false)
-{
-
-}
-
 ot::Plot1DAxisCfg::Plot1DAxisCfg(const Plot1DAxisCfg& _other) {
 	*this = _other;
 }

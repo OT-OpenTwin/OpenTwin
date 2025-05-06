@@ -707,8 +707,6 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 	
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
-	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
 	plotBuilder.buildPlot(plotCfg,false);
 }
 

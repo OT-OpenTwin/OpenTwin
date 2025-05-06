@@ -135,19 +135,19 @@ namespace ot {
 
 	private:
 		std::string m_projectName;
-		PlotType m_type;
-		AxisQuantity m_axisQuantity;
+		PlotType m_type = Plot1DCfg::Cartesian;
+		AxisQuantity m_axisQuantity = Plot1DCfg::Real;
 
 		std::string m_xAxisParameter;
 
-		bool m_gridVisible;
+		bool m_gridVisible = true;
 		ot::Color m_gridColor;
-		double m_gridWidth;
+		double m_gridWidth = 1.;
 
-		bool m_isHidden;
-		bool m_legendVisible;
-		bool m_useLimit;
-		int32_t m_curveLimit;
+		bool m_isHidden = false;
+		bool m_legendVisible = true;
+		bool m_useLimit = true;
+		int32_t m_curveLimit = 25;
 
 		NavigationTreeItemIcon m_treeIcons;
 		std::list<ValueComparisionDefinition> m_queries;
@@ -155,5 +155,4 @@ namespace ot {
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;
 	};
-
 }
