@@ -3584,7 +3584,8 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 
 
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
-	// Get view info from document
+	
+	// Get infos from message document
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
@@ -3594,7 +3595,8 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	}
 
 	bool refreshData = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
-	// Get plot
+	
+	// Get/create plot view that matches the plot config 
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
@@ -3602,6 +3604,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	ot::Plot* plot = plotView->getPlot();
 	plot->setConfig(plotConfig);
 
+	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
 	if (refreshData)
 	{
 		// Clear plot if exists
@@ -3681,9 +3684,11 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		}
 	}
 
+	// Now we refresh the plot visualisation.
 	plot->refresh();
 	plot->resetView();
 	
+	// Lastly we notify the scene nodes that they have a state change to view opened.
 	const auto& viewerType = plotView->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, plotConfig.getEntityName(), ot::ViewChangedStates::viewOpened, viewerType);
