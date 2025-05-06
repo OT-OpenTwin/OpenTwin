@@ -617,7 +617,8 @@
 
 //Needed in new API
 #define OT_ACTION_PARAM_VIEW1D_CurveConfigs "View1D.CurveConfigs"
-#define OT_ACTION_PARAM_VIEW1D_Setup "View1D.Setup"
+#define OT_ACTION_CMD_VIEW1D_Setup "View1D.Setup"
+#define OT_ACTION_CMD_UpdateCurvesOfPlot "View1D.UpdateCurves"
 
 
 #define OT_ACTION_PARAM_VIEW_SetActiveView "View.ActiveView.Set"

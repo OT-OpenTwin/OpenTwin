@@ -76,7 +76,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			Application::instance()->queuedRequestToFrontend(document);
 		}
 	}
-	else if (_visualisationType == OT_ACTION_PARAM_VIEW1D_Setup)
+	else if (_visualisationType == OT_ACTION_CMD_VIEW1D_Setup)
 	{
 		IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
 		if (plotEntity != nullptr && plotEntity->visualisePlot())
@@ -86,7 +86,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 
 			ot::JsonDocument document;
 			info.addToJsonObject(document, document.GetAllocator());
-			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_PARAM_VIEW1D_Setup, document.GetAllocator());
+			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_VIEW1D_Setup, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 

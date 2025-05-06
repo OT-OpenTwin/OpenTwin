@@ -56,8 +56,16 @@ bool EntityResult1DPlot_New::updateFromProperties(void)
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
-	
-	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_PARAM_VIEW1D_Setup, true, requiresDataToBeFetched);
+
+	auto titleProperty = PropertyHelper::getStringProperty(this, "Title", "General");
+	if (titleProperty->needsUpdate())
+	{
+		const std::string newTitle = titleProperty->getValue();
+		const std::string fullEntityName =	getName();
+		const std::string entityNameTrunk = fullEntityName.substr(0, fullEntityName.find_last_of("/"));
+		setName(entityNameTrunk + newTitle);
+	}
+	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, true, requiresDataToBeFetched);
 
 	getProperties().forceResetUpdateForAllProperties();
 
@@ -159,8 +167,7 @@ void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& 
 
 const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 {
-	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
-
+	
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
 	const std::string title = PropertyHelper::getStringPropertyValue(this, "Title");
 	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type");
@@ -200,7 +207,7 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
 	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));
 
-	config.setGridColor(ot::Color(gridColorR, gridColorG, gridColorB));
+	config.setGridColor(gridColour);
 	config.setGridVisible(gridVisible);
 	config.setLegendVisible(legendVisible);
 

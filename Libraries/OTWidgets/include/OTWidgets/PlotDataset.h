@@ -82,6 +82,11 @@ namespace ot {
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
+		void setConfig(ot::Plot1DCurveCfg& _config) 
+		{
+			m_config = _config;
+		}
+
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 

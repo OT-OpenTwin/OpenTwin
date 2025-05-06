@@ -33,6 +33,18 @@ void EntityResult1DCurve_New::addVisualizationNodes(void)
 
 bool EntityResult1DCurve_New::updateFromProperties(void)
 {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
+	
+	const std::string plotName = getParent()->getName();
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(plotName, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject curveCfgSerialised;
+	ot::Plot1DCurveCfg curveCfg = getCurve();
+	curveCfg.addToJsonObject(curveCfgSerialised, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised,doc.GetAllocator());
+
+	getObserver()->sendMessageToViewer(doc);
 	return false;
 }
 

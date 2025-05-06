@@ -3696,23 +3696,34 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	return "";
 }
 
-std::string ExternalServicesComponent::handleAddCurve(ot::JsonDocument& _document) {
+std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
-	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
-	}
-
-	ot::Plot1DCurveCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	const std::string curveName = config.getEntityName();
-	std::string plotName = curveName.substr(0, curveName.find_last_of('/'));
-	plotName = "Test/A_plot";
-
+	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
+	if (plotView != nullptr)
+	{
+		ot::Plot1DCurveCfg config;
+		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
+		ot::Plot* plot = plotView->getPlot();
+		std::list<ot::PlotDataset*> allDatasets = plot->getAllDatasets();
+		for (ot::PlotDataset* dataSet : allDatasets)
+		{
+			if (dataSet->getEntityName() == config.getEntityName())
+			{
+				dataSet->setConfig(config);
+				dataSet->updateCurveVisualization();
+				break;
+			}
+		}
+		
+		plot->refresh();
+	}
+	else
+	{
+		OT_LOG_E("Requested curve update could not identify the corresponding plot");
+	}
 
 	return "";
 }

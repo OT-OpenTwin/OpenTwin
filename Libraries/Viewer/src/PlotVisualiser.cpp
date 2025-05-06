@@ -16,7 +16,7 @@ bool PlotVisualiser::visualise(const VisualiserState& _state)
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_PARAM_VIEW1D_Setup, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_VIEW1D_Setup, doc.GetAllocator());
 	
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());

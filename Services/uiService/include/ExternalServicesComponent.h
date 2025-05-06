@@ -284,8 +284,8 @@ public:
 	OT_HANDLER(handlePlot1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleResult1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
 	
-	OT_HANDLER(handleAddPlot1D_New, ExternalServicesComponent, OT_ACTION_PARAM_VIEW1D_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddCurve, ExternalServicesComponent, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddPlot1D_New, ExternalServicesComponent, OT_ACTION_CMD_VIEW1D_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateCurve, ExternalServicesComponent, OT_ACTION_CMD_UpdateCurvesOfPlot, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Graphics Editor	
 	OT_HANDLER(handleFillGraphicsPicker, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, ot::MessageType::ALL_MESSAGE_TYPES)
