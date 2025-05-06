@@ -218,7 +218,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			{
 				auto& additionalParameterEntry = singleMongoDocument[additionalParameter.m_fieldName.c_str()];
 				const std::string value =	ot::json::toJson(additionalParameterEntry);
-				curveName += additionalParameter.m_label + "_" + value + "_" + additionalParameter.m_unit + "; ";
+				curveName += " (" + additionalParameter.m_label + "=" + value + " " + additionalParameter.m_unit + "); ";
 				parameterValuesByParameterName[additionalParameter.m_label].push_back(value);
 				
 				ShortParameterDescription additionalParameterInfo;
@@ -290,12 +290,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			for (auto& curve : familyOfCurves) {
 				std::string complexName = curve.first;
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-				std::string simpleName = shortName + "_" + notConstParameterName;
+				std::string simpleName = shortName + " (" + notConstParameterName;
 				for (const ShortParameterDescription& description : additionalParameterDescription)
 				{
 					if (description.m_label == notConstParameterName)
 					{
-						simpleName += "_" + description.m_value + "_" + description.m_unit;
+						simpleName += "=" + description.m_value + " " + description.m_unit + ")";
 					}
 				}
 
@@ -330,7 +330,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			for (auto& curve : familyOfCurves) {
 
 				std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
-				const std::string simpleName = shortName + "_curve_" + curveNumber;
+				const std::string simpleName = shortName + " (curve " + curveNumber + ")";
 				counter++;
 
 				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
@@ -369,7 +369,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 
 		if (numberOfParameter == 2)
 		{
-			newCurveCfg.setTitle(shortName + "_" + singleCurve.first);
+			newCurveCfg.setTitle(shortName + " " + singleCurve.first);
 		}
 		else
 		{
