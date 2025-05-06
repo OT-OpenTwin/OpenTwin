@@ -282,19 +282,25 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 	case ot::WidgetViewBase::ViewText:
 		AppBase::instance()->closeTextEditor(_entityName);
 		break;
+
 	case ot::WidgetViewBase::ViewTable:
 		AppBase::instance()->closeTable(_entityName);
 		break;
+
+	case ot::WidgetViewBase::View1D:
+		AppBase::instance()->closePlot(_entityName);
+		break;
+
 	case ot::WidgetViewBase::ViewVersion:
 	case ot::WidgetViewBase::ViewGraphics:
 	case ot::WidgetViewBase::ViewGraphicsPicker:
 	case ot::WidgetViewBase::ViewProperties:
 	case ot::WidgetViewBase::ViewNavigation:	
 	case ot::WidgetViewBase::View3D:
-	case ot::WidgetViewBase::View1D:
 	case ot::WidgetViewBase::CustomView:
 		OT_LOG_EAS("The view type (" + std::to_string((int)_viewType) + ") is not supported for internal close request");
 		break;
+
 	default:
 		OT_LOG_EAS("Unknown view type (" + std::to_string((int)_viewType) + ")");
 		break;

@@ -438,6 +438,8 @@ public:
 
 	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
+	void closePlot(const std::string& _name);
+
 	// ######################################################################################################################
 
 	// Prompt

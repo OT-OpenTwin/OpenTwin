@@ -1961,6 +1961,16 @@ ot::PlotView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::
 	return this->createNewPlot(_config, _serviceInfo, _viewInsertFlags);
 }
 
+void AppBase::closePlot(const std::string& _name) {
+	ot::PlotView* view = this->findPlot(_name);
+	if (!view) {
+		OT_LOG_EAS("Plot \"" + _name + "\" not found");
+		return;
+	}
+	this->cleanupWidgetViewInfo(view);
+	ot::WidgetViewManager::instance().closeView(view);
+}
+
 // ######################################################################################################################
 
 // Slots
@@ -2562,7 +2572,9 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
-	if (!(_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCloseable)) return;
+	if (!(_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCloseable)) {
+		return;
+	}
 
 	if (_view->getViewContentModified()) {
 		ot::MessageDialogCfg msgCfg;
@@ -2570,7 +2582,9 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		msgCfg.setTitle("Data Changed");
 		msgCfg.setText("You have unsaved changes in \"" + _view->getViewData().getTitle() + "\". If you continue unsaved changes will be lost. Continue?");
 		msgCfg.setIcon(ot::MessageDialogCfg::Warning);
-		if (ot::MessageDialog::showDialog(msgCfg) != ot::MessageDialogCfg::Yes) return;
+		if (ot::MessageDialog::showDialog(msgCfg) != ot::MessageDialogCfg::Yes) {
+			return;
+		}
 	}
 
 	// Cleanup data
@@ -2581,17 +2595,14 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
 	// Deselect navigation item if exists
-	auto itm = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(viewName), '/');
-	if (itm) {
-		bool blocked = m_projectNavigation->getTree()->signalsBlocked();
-		m_projectNavigation->getTree()->blockSignals(true);
-		m_projectNavigation->getTree()->setItemSelected(itm->id(), false);
-		m_projectNavigation->getTree()->blockSignals(blocked);
+	const ot::SelectionInformation& viewSelectionInfo = _view->getSelectionInformation();
+	{
+		ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+		for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
+			m_projectNavigation->getTree()->setItemSelected(uid, false);
+		}
 	}
-	else {
-		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
-	}
-
+	
 	// Now close the view
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 }
@@ -3181,6 +3192,7 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::GraphicsViewView* graphics = dynamic_cast<ot::GraphicsViewView*>(_view);
 	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
+	ot::PlotView* plot = dynamic_cast<ot::PlotView*>(_view);
 	if (graphics) {
 		ot::ContainerHelper::removeFromMapByValue(m_graphicsViews, graphics);
 		this->lockManager()->uiElementDestroyed(graphics->getGraphicsView());
@@ -3192,6 +3204,10 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	if (table) {
 		ot::ContainerHelper::removeFromMapByValue(m_tables, table);
 		this->lockManager()->uiViewDestroyed(table);
+	}
+	if (plot) {
+		ot::ContainerHelper::removeFromMapByValue(m_plots, plot);
+		this->lockManager()->uiViewDestroyed(plot);
 	}
 
 	if (m_lastFocusedCentralView == _view) {
