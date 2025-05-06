@@ -613,7 +613,7 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 	curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
 
 	curveConfig.setEntityName(plotName + "/" + pipeline->GetResultLegendLabel());
-	plotBuilder.addCurve(std::move(dataset), curveConfig, ot::FolderNames::DatasetFolder + "/" + pipeline->GetResultLegendLabel());
+	plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel());
 
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);

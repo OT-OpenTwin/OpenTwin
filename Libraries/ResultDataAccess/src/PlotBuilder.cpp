@@ -6,6 +6,7 @@
 #include "MetadataSeries.h"
 #include "AdvancedQueryBuilder.h"
 #include "OTGui/QueryInformation.h"
+#include "OTCore/FolderNames.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string& _owner)
 	:m_extender(_extender), m_owner(_owner)
@@ -24,7 +25,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	const bool valid = validityCheck(_dataSetDescriptions, _config);
 	assert(valid);
 	
-	storeCurve(std::move(_dataSetDescriptions), _config, _seriesName);
+	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
