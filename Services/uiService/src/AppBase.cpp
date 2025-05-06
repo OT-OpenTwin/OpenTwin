@@ -1830,7 +1830,6 @@ ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _co
 void AppBase::closeTextEditor(const std::string& _entityName) {
 	ot::TextEditorView* view = this->findTextEditor(_entityName);
 	if (!view) {
-		OT_LOG_EAS("Text editor \"" + _entityName + "\" not found");
 		return;
 	}
 
@@ -1903,7 +1902,6 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 void AppBase::closeTable(const std::string& _entityName) {
 	ot::TableView* view = this->findTable(_entityName);
 	if (!view) {
-		OT_LOG_EAS("Table \"" + _entityName + "\" not found");
 		return;
 	}
 
@@ -1964,7 +1962,6 @@ ot::PlotView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::
 void AppBase::closePlot(const std::string& _name) {
 	ot::PlotView* view = this->findPlot(_name);
 	if (!view) {
-		OT_LOG_EAS("Plot \"" + _name + "\" not found");
 		return;
 	}
 	this->cleanupWidgetViewInfo(view);
