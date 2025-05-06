@@ -10,8 +10,10 @@ Visualiser::Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _
 	OTAssertNullptr(m_node);
 }
 
-Visualiser::~Visualiser() {
-	if (m_viewIsOpen) {
+Visualiser::~Visualiser() 
+{
+	if (m_viewIsOpen) 
+	{
 		FrontendAPI::instance()->closeView(m_node->getName(), m_viewType);
 	}
 }

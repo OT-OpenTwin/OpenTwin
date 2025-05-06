@@ -52,6 +52,12 @@ Application::~Application()
 
 }
 
+Application& Application::instance(void)
+{
+	static Application INSTANCE;
+	return INSTANCE;
+}
+
 // ##################################################################################################################################
 
 // Required functions

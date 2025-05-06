@@ -37,11 +37,7 @@ public:
 	void closeProgressInformation(void);
 
 	void RemoveOldResults(void);
-
-	std::pair<ot::UID, std::string> addResultCurve(const std::string &name,
-									           std::vector<double> xdata, std::vector<double> ydataRe, std::vector<double> ydataIm,
-									           std::string xlabel, std::string xunit, std::string ylabel, std::string yunit, int colorID, bool visualize);
-	void addPlot1D(std::string name, std::string title, const std::list<std::pair<ot::UID, std::string>> &curves);
+	
 	void addResultFD(std::string name, std::string title, double * xComponent, double * yComponent, double * zComponent, size_t size);
 
 	void StoreLogDataInResultItem(std::string logData);

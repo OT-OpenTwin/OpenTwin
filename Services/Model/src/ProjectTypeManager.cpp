@@ -64,12 +64,16 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	_hasDataCategorizationRoot		= false;
 	_hasRMDCategorization			= false;
 	_hasRMDCategorizationPreview	= false;
-	_hasDatasetRoot					= false;
-	_hasDatasetRMD					= false;
+	_hasDatasetRoot					= true;
+	_hasDatasetRMD					= true;
 
 	_has3DView						= true;
 	_has1DView						= true;
 	_hasBlockPicker					= false;
+
+	_datasetRootName = ot::FolderNames::DatasetFolder;
+	_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
+
 }
 
 void ProjectTypeManager::initializeProjectTypeDataPipeline(void)

@@ -33,8 +33,9 @@ namespace ot {
 
 class Application : public ot::ApplicationBase {
 public:
-	Application();
 	virtual ~Application();
+
+	static Application& instance(void);
 
 	// ##################################################################################################################################
 
@@ -119,13 +120,15 @@ public:
 	void EnsureVisualizationModelIDKnown(void);
 
 private:
-	ot::UID					visualizationModelID;
+	ot::UID					visualizationModelID = 1;
 
 	ot::MenuButtonDescription _buttonCreateSolver;
 	ot::MenuButtonDescription _buttonRunSolver;
 	ot::MenuButtonDescription _buttonAddPort;
 	ot::MenuButtonDescription _buttonAddMonitor;
 	ot::MenuButtonDescription _buttonCreateSignal;
+
+	Application();
 
 	void SolverThread(std::list<std::string> solverRunList);
 	void SetupSolverService(MicroServiceInterfaceFITTDSolver & newSolver);

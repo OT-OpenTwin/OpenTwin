@@ -31,7 +31,8 @@
 #include "ResultHandling/ResultSinkFilePrinter.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-
+#include "PlotBuilder.h"
+#include "Application.h"
 #include "FolderNames.h"
 
 #include <chrono>
@@ -39,6 +40,8 @@
 #include <sstream>
 #include <chrono>
 
+#include "QuantityDescriptionCurve.h"
+#include "OTCore/FolderNames.h"
 MicroServiceInterfaceFITTDSolver::~MicroServiceInterfaceFITTDSolver()
 {
 	if (_resultPipelineSettings != nullptr)
@@ -400,7 +403,7 @@ void MicroServiceInterfaceFITTDSolver::InitializeSolver()
 				newSource = new ResultSourceScalar<type>(executionBarrier, volume, *doF, GetterDoF);
 				if (setting.GetMonitorVolume() == full)
 				{
-					//Visualization not supported yet!
+					throw std::exception("Visualisation not supported yet");
 					newSink = new ResultSinkScalarComplexSum(samplingFrequency, totalSimSteps);
 				}
 				else
@@ -562,18 +565,61 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 
 void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScalarAccumalating * resultSink, ResultPipeline * pipeline)
 {
-	std::list<std::pair<ot::UID, std::string>> curvesList;
+	const std::string collectionName = Application::instance().getCollectionName();
+	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
+	ClassFactory& classFactory = Application::instance().getClassFactory();
+	const std::string serviceName = Application::instance().getServiceName();
+
+	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
+	PlotBuilder plotBuilder(resultCollectionExtender, serviceName);
+
 	const double * timeVector = resultSink->GetTimesteps();
-
 	int timeVectorSize = resultSink->GetNbOfExectutions();
-	std::vector<double> xdata(timeVector, timeVector + timeVectorSize);
 
-	const double* resultVector = resultSink->GetResult();
+	MetadataParameter parameter;
+	parameter.typeName = ot::TypeNames::getDoubleTypeName();
+	parameter.parameterName = pipeline->GetLabelXAxis();
+	parameter.unit = pipeline->GetUnitXAxis();
+
+
+	for (int i = 0; i < timeVectorSize; i++)
+	{
+		const ot::Variable value = ot::Variable(timeVector[i]);
+		parameter.values.push_back(value);
+	}
+	std::shared_ptr<ParameterDescription> parameterDescription(new ParameterDescription(parameter, false));
+	DatasetDescription dataset;
+	dataset.addParameterDescription(parameterDescription);
+
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+	quantDesc->setName(pipeline->GetLabelYAxis());
+	quantDesc->addValueDescription("", ot::TypeNames::getDoubleTypeName(), pipeline->GetUnitYAxis());
+
 	index_t collectionSize = resultSink->GetResultContainerSize();
-	std::vector<double> ydataRe(resultVector, resultVector + collectionSize);
+	const double* resultVector = resultSink->GetResult();
+	for (int i = 0; i < collectionSize; i++)
+	{
+		quantDesc->addDatapoint(ot::Variable(resultVector[i]));
+	}
 
-	curvesList.push_back(CreateCurve(xdata, ydataRe, pipeline->GetResultLegendLabel(), pipeline));
-	addPlot1D(pipeline->GetResultName() + "/Plot", pipeline->GetResultTitle(), curvesList);
+	dataset.setQuantityDescription(quantDesc.release());
+	std::string plotName = pipeline->GetResultName() + "/Plot";
+	if (!pipeline->GetResultTitle().empty())
+	{
+		plotName += "/" + pipeline->GetResultTitle();
+	}
+	ot::Plot1DCurveCfg curveConfig;
+	curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
+	curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
+
+	curveConfig.setEntityName(plotName + "/" + pipeline->GetResultLegendLabel());
+	plotBuilder.addCurve(std::move(dataset), curveConfig, ot::FolderNames::DatasetFolder + "/" + pipeline->GetResultLegendLabel());
+
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
+	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
+	plotBuilder.buildPlot(plotCfg,false);
 }
 
 void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVector3DAccumalating * resultSink, ResultPipeline * pipeline)
@@ -582,50 +628,91 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 	const double * timeVector = resultSink->GetTimesteps();
 
 	int timeVectorSize = resultSink->GetNbOfExectutions();
-	std::vector<double> xdata(timeVector, timeVector + timeVectorSize);
+	
+	MetadataParameter parameter;
+	parameter.typeName = ot::TypeNames::getDoubleTypeName();
+	parameter.parameterName = pipeline->GetLabelXAxis();
+	parameter.unit = pipeline->GetUnitXAxis();
+	
+	for (int i = 0; i < timeVectorSize; i++)
+	{
+		const ot::Variable value = ot::Variable(timeVector[i]);
+		parameter.values.push_back(value);
+	}
+	std::shared_ptr<ParameterDescription> parameterDescription(new ParameterDescription(parameter,false));
+	
+	const std::string collectionName = Application::instance().getCollectionName();
+	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
+	ClassFactory& classFactory =	Application::instance().getClassFactory();
+	const std::string serviceName =	Application::instance().getServiceName();
+	
+	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
+	PlotBuilder plotBuilder(resultCollectionExtender, serviceName);
+
+	ot::Plot1DCurveCfg curveConfig;
+	std::string plotName = pipeline->GetResultName() + "/Plot";
+	if (!pipeline->GetResultTitle().empty())
+	{
+		plotName += "/" + pipeline->GetResultTitle();
+	}
 	
 	for (int i = 0; i < 3; i++)
 	{
-		const double* resultVector;
+		DatasetDescription dataset;
+		dataset.addParameterDescription(parameterDescription);
+		const double* resultVector = nullptr;
 
 		std::string curveName;
+		ot::Color curveColour;
 		if (i == 0)
 		{
 			resultVector = resultSink->GetResultX();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "x");
+			curveColour = ot::Color(ot::DefaultColor::Blue);
 		}
 		else if (i == 1)
 		{
 			resultVector = resultSink->GetResultY();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "y");
+			curveColour = ot::Color(ot::DefaultColor::Red);
 		}
 		else
 		{
 			resultVector = resultSink->GetResultZ();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "z");
+			curveColour = ot::Color(ot::DefaultColor::Green);
 		}
 
+
+		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+		quantDesc->setName(pipeline->GetLabelYAxis());
+		quantDesc->addValueDescription("", ot::TypeNames::getDoubleTypeName(), pipeline->GetUnitYAxis());
+
 		index_t collectionSize = resultSink->GetResultContainerSize();
-		std::vector<double> ydataRe(resultVector, resultVector + collectionSize);
-		curvesList.push_back(CreateCurve(xdata, ydataRe, curveName, pipeline));
+		for (int i = 0; i < collectionSize; i++)
+		{
+			quantDesc->addDatapoint(ot::Variable(resultVector[i]));
+		}
+
+		dataset.setQuantityDescription(quantDesc.release());
+		curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
+		curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
+		curveConfig.setEntityName(plotName + "/" + curveName);
+		curveConfig.setLinePenColor(curveColour);
+		plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
 	}
 	
-	addPlot1D(pipeline->GetResultName() + "/Plot", pipeline->GetResultTitle(), curvesList);
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
+	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
+	plotBuilder.buildPlot(plotCfg,false);
 }
 
-std::pair<ot::UID, std::string> MicroServiceInterfaceFITTDSolver::CreateCurve(std::vector<double> & timeLine, std::vector<double> & measuredValues, std::string curveName, ResultPipeline * pipeline)
-{
-	std::vector<double>  ydataIm;
-	std::string physicalQuantity = pipeline->GetLabelYAxis();
-	std::string unit = pipeline->GetUnitYAxis();
-	std::string temporalQuantity = pipeline->GetLabelXAxis();
-	std::string temporalUnit = pipeline->GetUnitXAxis();
 
-	return addResultCurve(curveName, timeLine, measuredValues, ydataIm, temporalQuantity, temporalUnit, physicalQuantity, unit, 0, _solverSettings.GetDebug());
-}
 
 void MicroServiceInterfaceFITTDSolver::SaveVectorFieldResult(const ResultSinkVector3DComplexSum *resultSink, ResultPipeline * pipeline)
 {

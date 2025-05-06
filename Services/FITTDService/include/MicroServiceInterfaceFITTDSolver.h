@@ -45,7 +45,7 @@ public:
 private:
 	PerformanceTracker _performanceTracker;
 
-	bool debugOption;
+	bool debugOption = false;
 
 	SolverSettings _solverSettings;
 	std::vector<PortSettings> _portSettings;
@@ -54,7 +54,7 @@ private:
 
 	ResultPipelineSettings * _resultPipelineSettings = nullptr;
 
-	EntityMeshCartesianData * _mesh;
+	EntityMeshCartesianData * _mesh = nullptr;
 	Solver * _solver = nullptr;
 
 	void LoadEntityInformation(std::string solverName);
@@ -64,7 +64,6 @@ private:
 	void HandleTimelinePlots(const ResultSinkScalarAccumalating *resultSink, ResultPipeline * pipeline);
 	void HandleTimelinePlots(const ResultSinkVector3DAccumalating *resultSink, ResultPipeline * pipeline);
 
-	std::pair<ot::UID, std::string> CreateCurve(std::vector<double> & timeLine, std::vector<double> & measuredValues, std::string curveName, ResultPipeline * pipeline);
 	void SaveVectorFieldResult(const ResultSinkVector3DComplexSum *resultSink, ResultPipeline * pipeline);
 	std::string CreateSolverRunDescription();
 };

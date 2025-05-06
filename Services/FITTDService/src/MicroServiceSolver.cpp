@@ -320,36 +320,6 @@ void MicroServiceSolver::UpdateModel(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added FIT-TD results");
 }
 
-std::pair<ot::UID, std::string> MicroServiceSolver::addResultCurve(const std::string &name,
-												   std::vector<double> xdata, std::vector<double> ydataRe, std::vector<double> ydataIm,
-												   std::string xlabel, std::string xunit, std::string ylabel, std::string yunit, int colorID, bool visualize)
-{
-	std::string resultDataFolder = solverName + "/" + FolderNames::GetFolderNameRawResultBase() +"/";
-
-	EntityResult1DCurve *curve = modelComponent->addResult1DCurveEntity(resultDataFolder + name, xdata, ydataRe, ydataIm, xlabel, xunit, ylabel, yunit, colorID, visualize);
-
-
-	dataEntityIDList.push_back(curve->getCurveDataStorageId());
-	dataEntityIDList.push_back(curve->getEntityID());
-
-	dataEntityVersionList.push_back(curve->getCurveDataStorageVersion());
-	dataEntityVersionList.push_back(curve->getEntityStorageVersion());
-	
-
-	return std::pair<ot::UID, std::string>(curve->getEntityID(), name);
-}
-
-void MicroServiceSolver::addPlot1D(std::string name, std::string title, const std::list<std::pair<ot::UID, std::string>> &curves)
-{
-	EntityResult1DPlot *plotID = modelComponent->addResult1DPlotEntity(name, title, curves);
-
-	topologyEntityIDList.push_back(plotID->getEntityID());
-	topologyEntityVersionList.push_back(plotID->getEntityStorageVersion());
-	topologyEntityForceVisibleList.push_back(false);
-
-	dataEntityParentList.push_back(plotID->getEntityID());
-	dataEntityParentList.push_back(plotID->getEntityID());
-}
 
 void MicroServiceSolver::addResultFD(std::string name, std::string title, double * xComponent, double * yComponent, double * zComponent, size_t size)
 {
