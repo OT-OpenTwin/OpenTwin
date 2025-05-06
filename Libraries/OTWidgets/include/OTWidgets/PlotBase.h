@@ -51,7 +51,6 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override { return m_centralWidget; };
 		virtual const QWidget* getQWidget(void) const override { return m_centralWidget; };
 
-
 		AbstractPlot* getPlot();
 		
 		// ###########################################################################################################################################################################################################################################################################################################################

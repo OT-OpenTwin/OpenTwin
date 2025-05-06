@@ -213,7 +213,6 @@ void ot::PlotBase::datasetSelectionChanged(PlotDataset * _selectedDataset) {
 	}
 }
 
-
 void ot::PlotBase::applyConfig(void) {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
@@ -246,66 +245,70 @@ void ot::PlotBase::applyConfig(void) {
 		}
 	}
 
-	if (!compatible) {
+	if (compatible) {
+		// Setup plot XY
+		m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
+		m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
+		m_cartesianPlot->setPlotGridLineWidth(0.5, true);
+
+		m_cartesianPlot->setPlotLegendVisible(m_config.getLegendVisible());
+
+		m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
+		m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
+
+		// Setup axis
+		m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
+		m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
+
+		m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
+		m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
+
+		m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
+		m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
+
+		m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
+		m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
+
+		// Setup plot XY
+		m_polarPlot->setPlotGridVisible(m_config.getGridVisible(), false);
+		m_polarPlot->setPlotGridColor(m_config.getGridColor(), false);
+		m_polarPlot->setPlotGridLineWidth(0.5, true);
+
+		m_polarPlot->setPlotLegendVisible(m_config.getLegendVisible());
+
+		m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
+		m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
+
+		// Setup axis
+		m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
+		m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
+
+		m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
+		m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
+
+		m_polarPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
+		m_polarPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
+
+		m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
+		m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
+
+	} // compatible
+
+	else {
+		OT_LOG_T("Plot data incompatible");
 		this->setIncompatibleData();
-		return;
-	}
 
-	// Setup plot XY
-	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
-	m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
-	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
-
-	m_cartesianPlot->setPlotLegendVisible(m_config.getLegendVisible());
-
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
-
-	// Setup axis
-	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
-	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
-
-	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
-	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
-
-	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
-	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
-
-	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
-	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
+	} // !compatible
 
 	m_cartesianPlot->updateGrid();
 	m_cartesianPlot->updateLegend();
-
 	m_cartesianPlot->updateWholePlot();
-
-	// Setup plot XY
-	m_polarPlot->setPlotGridVisible(m_config.getGridVisible(), false);
-	m_polarPlot->setPlotGridColor(m_config.getGridColor(), false);
-	m_polarPlot->setPlotGridLineWidth(0.5, true);
-
-	m_polarPlot->setPlotLegendVisible(m_config.getLegendVisible());
-
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
-
-	// Setup axis
-	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
-	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
-
-	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
-	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
-
-	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
-	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
-
-	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
-	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
 
 	m_polarPlot->updateGrid();
 	m_polarPlot->updateLegend();
-
 	m_polarPlot->updateWholePlot();
+
+	OT_LOG_T("Update whole plot completed");
 }
 
 std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit)

@@ -486,6 +486,12 @@ bool AppBase::closeEvent() {
 		uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
 	}
 
+	// Close all views to avoid dangling pointers in viewer
+	m_versionGraph = nullptr;
+	this->closeAllViewerTabs();
+	ot::WidgetViewManager::instance().closeViews();
+
+	// Close the project
 	m_ExternalServicesComponent->closeProject(false);
 	m_state &= (~AppState::ProjectOpenState);
 

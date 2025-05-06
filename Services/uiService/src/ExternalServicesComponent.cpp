@@ -3631,32 +3631,27 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
 			bool curveHasDataToVisualise = false;
-			if (xAxisParameter != "")
-			{
-				for (auto parameter : queryInformation.m_parameterDescriptions)
-				{
-					if (parameter.m_label == xAxisParameter)
-					{
+			if (xAxisParameter != "") {
+				for (auto parameter : queryInformation.m_parameterDescriptions) {
+					if (parameter.m_label == xAxisParameter) {
 						curveHasDataToVisualise = true;
 					}
 				}
 			}
-			else
-			{
+			else {
 				curveHasDataToVisualise = true;
 			}
 
-			if (curveHasDataToVisualise)
-			{
+			if (curveHasDataToVisualise) {
 				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg, xAxisParameter, queries);
-				for (const std::string& message : curveFactory.getCurveIDDescriptions())
-				{
+
+				for (const std::string& message : curveFactory.getCurveIDDescriptions()) {
 					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 				}
 
 				dataSets.splice(dataSets.begin(), newCurveDatasets);
-				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
-				{
+
+				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
 					break;
 				}
 			}

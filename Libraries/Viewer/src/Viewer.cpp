@@ -273,9 +273,6 @@ Viewer::~Viewer()
 	workingPlane = nullptr;
 	if (axisCross != nullptr) delete axisCross;
 	axisCross = nullptr;
-
-	if (m_plot != nullptr) delete m_plot;
-	m_plot = nullptr;
 }
 
 void Viewer::freeze3DView(bool flag)
