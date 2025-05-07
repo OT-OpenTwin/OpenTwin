@@ -386,14 +386,10 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	if (simulationTypeProperty->getValue() == ".TRAN" || simulationTypeProperty->getValue() == ".dc") {
-		m_uiComponent->setProgressInformation("Simulating", false);
-		m_uiComponent->setProgress(0);
-	}
-	else {
-		m_uiComponent->setProgressInformation("Simulating", true);
-	}
 	
+	m_uiComponent->setProgressInformation("Simulating", false);
+	m_uiComponent->setProgress(0);
+
 
 	// Get only circuit name
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);

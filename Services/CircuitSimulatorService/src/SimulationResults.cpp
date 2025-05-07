@@ -68,12 +68,17 @@ void SimulationResults::displayMessage(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
     std::vector<int> percentages = findPercentage(_message);
 
-    for (auto value : percentages) {
-        _uiComponent->setProgress(value);
+    if (!percentages.empty()) {
+        for (auto value : percentages) {
+            _uiComponent->setProgress(value);
+        }
     }
-
-    this->getInstance()->_uiComponent->displayMessage(_message);
-    this->logData.append(_message + "\n");
+    else {
+        this->getInstance()->_uiComponent->displayMessage(_message);
+        this->logData.append(_message + "\n");
+    }
+ 
+    
 }
 
 void SimulationResults::displayError(std::string _message) {
