@@ -15,6 +15,10 @@ ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectio
 	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
 {}
 
+ResultCollectionExtender::ResultCollectionExtender(ot::ApplicationBase* _applicationBase)
+	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->modelComponent(), &_applicationBase->getClassFactory(),_applicationBase->getServiceName())
+{}
+
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
 	m_logger.log("Creating new series with " + std::to_string(_datasetDescriptions.size()) + " datasets.");

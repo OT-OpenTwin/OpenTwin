@@ -33,6 +33,8 @@ public:
 	//! @param _saveModelState 
 	void buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState = true);
 
+	uint64_t getNumberOfCurves() { return m_curves.size(); }
+
 private:
 	ot::NewModelStateInformation m_newModelStateInformation;
 	ResultCollectionExtender& m_extender;
