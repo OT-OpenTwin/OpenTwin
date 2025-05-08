@@ -514,7 +514,8 @@ void Application::finishSimulation() {
 	m_uiComponent->closeProgressInformation();
 	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
-
+	SimulationResults::getInstance()->storeLogDataInResultText();
+	SimulationResults::getInstance()->clearUp();
 	runNextSolvers();
 
 }

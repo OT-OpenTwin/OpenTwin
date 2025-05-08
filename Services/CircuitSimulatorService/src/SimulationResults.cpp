@@ -74,8 +74,9 @@ void SimulationResults::displayMessage(std::string _message) {
         }
     }
     else {
-        this->getInstance()->_uiComponent->displayMessage(_message);
         this->logData.append(_message + "\n");
+        this->getInstance()->_uiComponent->displayMessage(_message);
+        
     }
  
     
@@ -85,8 +86,9 @@ void SimulationResults::displayError(std::string _message) {
     std::lock_guard<std::mutex> lock(m_mutex);
     ot::StyledTextBuilder errorMessage;
     errorMessage << "[" << ot::StyledText::Bold << ot::StyledText::Error << "Error" << ot::StyledText::ClearStyle << "] " << _message;
-    this->getInstance()->_uiComponent->displayStyledMessage(errorMessage);
     this->logData.append(_message + "\n");
+    this->getInstance()->_uiComponent->displayStyledMessage(errorMessage);
+    
 }
 
 void SimulationResults::handleResults(const QJsonValue& _result) {
@@ -94,7 +96,7 @@ void SimulationResults::handleResults(const QJsonValue& _result) {
 
     addResults(_result);
     OT_LOG_D("Added Results to Curves");
-    storeLogDataInResultText();
+    
 }
 
 void SimulationResults::handleUnknownMessageType(std::string _message) {
@@ -103,6 +105,7 @@ void SimulationResults::handleUnknownMessageType(std::string _message) {
 }
 
 void SimulationResults::storeLogDataInResultText() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     EntityResultText* output = _modelComponent->addResultTextEntity(solverName + "/Output", logData);
 
     std::list<ot::UID> topologyEntityIDList;
@@ -147,6 +150,11 @@ void SimulationResults::handleCircuitExecutionTiming(const QDateTime& _timePoint
     
 
     this->getInstance()->_uiComponent->displayStyledMessage(timeMessage);
+}
+
+void SimulationResults::clearUp() {
+    this->logData.clear();
+    this->resultMap.clear();
 }
 
 std::vector<int> SimulationResults::findPercentage(const std::string& input) {

@@ -50,6 +50,8 @@ public:
     {
         return this->vecAmount;
     }
+
+    void clearUp();
 private:
 
     SimulationResults() { this->vecAmount = 0; }
