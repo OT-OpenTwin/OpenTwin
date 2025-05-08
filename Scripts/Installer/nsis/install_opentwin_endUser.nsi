@@ -1045,7 +1045,7 @@ Section /o "OpenTwin Documentation" SEC_Documentation
 	
 	DetailPrint "Extracting documentation..."
 	
-	File /r "..\..\..\DeploymentDocumentation\*.*"
+	File /r "..\..\..\Deployment_Documentation\*.*"
 	
 	Call DumpLog
 		

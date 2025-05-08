@@ -42,6 +42,8 @@ taskkill /IM "httpd.exe" /F 2> nul
 
 REM Clean up the Deployment directory
 RMDIR /S /Q "%OT_DEPLOYMENT_DIR%"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Deployment_Documentation"
+
 MKDIR "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%\Certificates"
 MKDIR "%OT_DEPLOYMENT_DIR%\Python"
@@ -226,8 +228,8 @@ MKDIR "%OT_DEPLOYMENT_DIR%\VC_Redist"
 COPY "%VC_REDIST_ROOT%\*.exe" "%OT_DEPLOYMENT_DIR%\VC_Redist"
 
 REM Documentation
-MKDIR "%OPENTWIN_DEV_ROOT%\DeploymentDocumentation"
-XCOPY /S "%OT_DOCUMENTATION_ROOT%\_build\html\*.*" "%OPENTWIN_DEV_ROOT%\DeploymentDocumentation"
+MKDIR "%OPENTWIN_DEV_ROOT%\Deployment_Documentation"
+XCOPY /S "%OT_DOCUMENTATION_ROOT%\_build\html\*.*" "%OPENTWIN_DEV_ROOT%\Deployment_Documentation"
 
 REM Shutdown Script
 COPY "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat" "%OT_DEPLOYMENT_DIR%"
