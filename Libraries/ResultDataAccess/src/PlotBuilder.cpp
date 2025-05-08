@@ -1,15 +1,15 @@
 #include "PlotBuilder.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityResult1DPlot_New.h"
-#include "EntityResult1DCurve_New.h"
+
 #include "OTModelAPI/ModelStateInformationHelper.h"
 #include "MetadataSeries.h"
 #include "AdvancedQueryBuilder.h"
 #include "OTGui/QueryInformation.h"
 #include "OTCore/FolderNames.h"
 
-PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, const std::string& _owner)
-	:m_extender(_extender), m_owner(_owner)
+PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender)
+	:m_extender(_extender)
 {}
 
 void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
@@ -28,7 +28,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
-	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
+	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
@@ -39,32 +39,50 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 		m_parameterLabels.push_back(parameterDescription.m_label);
 	}
 	curveEntity.setCurve(_config);
-	curveEntity.StoreToDataBase();
-
-	ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, curveEntity);
+	m_curves.push_back(curveEntity);
 }
 
 void PlotBuilder::buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 {
+	assert(!_plotCfg.getEntityName().empty());
+	assert(m_curves.size() > 0);
+
 	createPlot(_plotCfg);
 	m_extender.setSaveModel(false);
 	m_extender.storeCampaignChanges();
 	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot", _saveModelState);
+	clearBuffer();
 }
 
 bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config)
 {
-	bool valid = true;
-	const std::string labelY = _config.getYAxisTitle();
+	//We need at least some data sets to create curves with
+	if (_dataSetDescriptions.size() == 0)
+	{
+		return false;
+	}
 	
+	//Next we check if every dataset has the necessary components
+	bool valid = true;
+	for (DatasetDescription& datasetDescription : _dataSetDescriptions)
+	{	
+		valid &= (datasetDescription.getParameters().size() != 0) && 
+			(datasetDescription.getQuantityDescription() != nullptr) && 
+			(datasetDescription.getQuantityDescription()->getMetadataQuantity().valueDescriptions.size() > 0 );
+	}
+	
+	if (!valid)
+	{
+		return valid;
+	}
+	
+	//Only for now with a single y-axis
+	const std::string labelY = _config.getYAxisTitle();
+
 	for (auto& datasetDescription : _dataSetDescriptions)
 	{
-		valid &= (labelY == datasetDescription.getQuantityDescription()->getName());
-		auto parameters = datasetDescription.getParameters();
-
-		std::shared_ptr<ParameterDescription> xAxis = *parameters.begin();
-		const std::string labelX = _config.getXAxisTitle();
-		valid &= (labelX == xAxis->getMetadataParameter().parameterName);
+		valid &= (labelY == datasetDescription.getQuantityDescription()->getName());		
+		//The x label is flexible, multiple options may exist, thus a comparision does not make sense
 	}
 
 	return valid;
@@ -113,6 +131,14 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 	_config.setQueryInformation(queryInformation);
 }
 
+void PlotBuilder::clearBuffer()
+{
+	m_curves.clear();
+	m_parameterLabels.clear();
+	m_quantityLabel.clear();
+}
+
+
 const std::string PlotBuilder::createQuery(ot::UID _seriesID)
 {
 	const std::string query = "{\"" + MetadataSeries::getFieldName() + "\":" + std::to_string(_seriesID) + "}";
@@ -131,7 +157,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 {
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 
-	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_owner);
+	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
 	const std::string entityName = _plotCfg.getEntityName();
 	plotEntity.setName(entityName);
 
@@ -147,6 +173,20 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
 
+
+	for (EntityResult1DCurve_New& curve : m_curves)
+	{
+		if (curve.getName().empty())
+		{
+			const std::string curveTitle = curve.getCurve().getTitle();
+			const std::string curveEntityName =	entityName + "/" + curveTitle;
+			curve.setName(curveEntityName);
+		}
+
+		curve.StoreToDataBase();
+		ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, curve);
+	}
+	
 	m_newModelStateInformation.m_topologyEntityIDs.insert(m_newModelStateInformation.m_topologyEntityIDs.begin(), plotEntity.getEntityID());
 	m_newModelStateInformation.m_topologyEntityVersions.insert(m_newModelStateInformation.m_topologyEntityVersions.begin(), plotEntity.getEntityStorageVersion());
 	m_newModelStateInformation.m_forceVisible.push_back(false);

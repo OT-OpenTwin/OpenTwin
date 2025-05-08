@@ -220,7 +220,7 @@ void testPlot()
 	const std::string collName = Application::instance()->getCollectionName();
 
 	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-	PlotBuilder builder(extender, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	PlotBuilder builder(extender);
 
 	//Single curve
 	/*DatasetDescription description;

@@ -28,6 +28,7 @@
 #include "Simulation/FITTD3DLoop.h"
 
 #include <string>
+#include "PlotBuilder.h"
 
 class ClassFactory;
 
@@ -61,8 +62,8 @@ private:
 	void InitializeSolver(void);
 	void HandleResultPipelines(void);
 	
-	void HandleTimelinePlots(const ResultSinkScalarAccumalating *resultSink, ResultPipeline * pipeline);
-	void HandleTimelinePlots(const ResultSinkVector3DAccumalating *resultSink, ResultPipeline * pipeline);
+	void HandleTimelinePlots(const ResultSinkScalarAccumalating *resultSink, ResultPipeline * pipeline, PlotBuilder& _plotBuilder);
+	void HandleTimelinePlots(const ResultSinkVector3DAccumalating *resultSink, ResultPipeline * pipeline, PlotBuilder& _plotBuilder);
 
 	void SaveVectorFieldResult(const ResultSinkVector3DComplexSum *resultSink, ResultPipeline * pipeline);
 	std::string CreateSolverRunDescription();

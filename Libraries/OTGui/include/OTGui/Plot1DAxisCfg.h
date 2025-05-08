@@ -16,6 +16,8 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT Plot1DAxisCfg : public Serializable {
 	public:
+		Plot1DAxisCfg();
+
 		Plot1DAxisCfg(const Plot1DAxisCfg& _other);
 		virtual ~Plot1DAxisCfg();
 
@@ -47,8 +49,8 @@ namespace ot {
 		bool getIsAutoScale(void) const { return m_isAutoScale; };
 
 	private:
-		double m_min = std::numeric_limits<double>::lowest();
-		double m_max= std::numeric_limits<double>::max();
+		double m_min;
+		double m_max;
 		bool m_isLogScale = false;
 		bool m_isAutoScale = true;
 	};

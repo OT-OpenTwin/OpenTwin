@@ -31,7 +31,7 @@
 #include "ResultHandling/ResultSinkFilePrinter.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "PlotBuilder.h"
+
 #include "Application.h"
 #include "FolderNames.h"
 
@@ -537,6 +537,15 @@ void MicroServiceInterfaceFITTDSolver::Run(void)
 void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 {
 	auto pipelines = _solver->GetResultPipelines();
+
+	const std::string collectionName = Application::instance().getCollectionName();
+	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
+	ClassFactory& classFactory = Application::instance().getClassFactory();
+	const std::string serviceName = Application::instance().getServiceName();
+
+	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
+	PlotBuilder plotBuilder(resultCollectionExtender);
+
 	for (auto pipeLine : pipelines)
 	{
 		auto resultSink = pipeLine->GetSink();
@@ -545,13 +554,13 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 		auto result2D = dynamic_cast<const ResultSinkScalarAccumalating*>(resultSink);
 		if (result2D != nullptr)
 		{
-			HandleTimelinePlots(result2D,pipeLine);
+			HandleTimelinePlots(result2D,pipeLine, plotBuilder);
 			continue;
 		}
 		auto multiple2DPlots = dynamic_cast<const ResultSinkVector3DAccumalating*>(resultSink);
 		if(multiple2DPlots != nullptr)
 		{
-			HandleTimelinePlots(multiple2DPlots, pipeLine);
+			HandleTimelinePlots(multiple2DPlots, pipeLine, plotBuilder);
 			continue;
 		}
 		auto result3DVector = dynamic_cast<const ResultSinkVector3DComplexSum*>(resultSink);
@@ -563,16 +572,8 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 	}
 }
 
-void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScalarAccumalating * resultSink, ResultPipeline * pipeline)
+void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScalarAccumalating * resultSink, ResultPipeline * pipeline, PlotBuilder& _plotBuilder)
 {
-	const std::string collectionName = Application::instance().getCollectionName();
-	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
-	ClassFactory& classFactory = Application::instance().getClassFactory();
-	const std::string serviceName = Application::instance().getServiceName();
-
-	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
-	PlotBuilder plotBuilder(resultCollectionExtender, serviceName);
-
 	const double * timeVector = resultSink->GetTimesteps();
 	int timeVectorSize = resultSink->GetNbOfExectutions();
 
@@ -603,26 +604,26 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 	}
 
 	dataset.setQuantityDescription(quantDesc.release());
+
+	ot::Plot1DCurveCfg curveConfig;
+	curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
+	curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
+	curveConfig.setTitle(pipeline->GetResultLegendLabel());
+
+	_plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel());
+
+	ot::Plot1DCfg plotCfg;
 	std::string plotName = pipeline->GetResultName() + "/Plot";
 	if (!pipeline->GetResultTitle().empty())
 	{
 		plotName += "/" + pipeline->GetResultTitle();
 	}
-	ot::Plot1DCurveCfg curveConfig;
-	curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
-	curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
-
-	curveConfig.setEntityName(plotName + "/" + pipeline->GetResultLegendLabel());
-	plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel());
-
-	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
-	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
-	plotBuilder.buildPlot(plotCfg,false);
+
+	_plotBuilder.buildPlot(plotCfg,false);
 }
 
-void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVector3DAccumalating * resultSink, ResultPipeline * pipeline)
+void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVector3DAccumalating * resultSink, ResultPipeline * pipeline, PlotBuilder& _plotBuilder)
 {
 	std::list<std::pair<ot::UID, std::string>> curvesList;
 	const double * timeVector = resultSink->GetTimesteps();
@@ -640,21 +641,6 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 		parameter.values.push_back(value);
 	}
 	std::shared_ptr<ParameterDescription> parameterDescription(new ParameterDescription(parameter,false));
-	
-	const std::string collectionName = Application::instance().getCollectionName();
-	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
-	ClassFactory& classFactory =	Application::instance().getClassFactory();
-	const std::string serviceName =	Application::instance().getServiceName();
-	
-	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
-	PlotBuilder plotBuilder(resultCollectionExtender, serviceName);
-
-	ot::Plot1DCurveCfg curveConfig;
-	std::string plotName = pipeline->GetResultName() + "/Plot";
-	if (!pipeline->GetResultTitle().empty())
-	{
-		plotName += "/" + pipeline->GetResultTitle();
-	}
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -698,16 +684,23 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 		}
 
 		dataset.setQuantityDescription(quantDesc.release());
+		ot::Plot1DCurveCfg curveConfig;
 		curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
 		curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
-		curveConfig.setEntityName(plotName + "/" + curveName);
+		curveConfig.setTitle(curveName);
 		curveConfig.setLinePenColor(curveColour);
-		plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
+		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
 	}
 	
 	ot::Plot1DCfg plotCfg;
+	std::string plotName = pipeline->GetResultName() + "/Plot";
+	if (!pipeline->GetResultTitle().empty())
+	{
+		plotName += "/" + pipeline->GetResultTitle();
+	}
 	plotCfg.setEntityName(plotName);
-	plotBuilder.buildPlot(plotCfg,false);
+
+	_plotBuilder.buildPlot(plotCfg,false);
 }
 
 

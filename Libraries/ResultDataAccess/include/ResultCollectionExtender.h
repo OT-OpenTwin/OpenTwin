@@ -45,6 +45,7 @@ public:
 
 	ResultImportLogger& getLogger() { return m_logger; }
 
+	const std::string getOwner() { return m_ownerServiceName; }
 protected:
 	inline bool invariant() { return true; }
 
