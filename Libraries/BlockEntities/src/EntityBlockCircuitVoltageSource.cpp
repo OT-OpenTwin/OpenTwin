@@ -361,14 +361,6 @@ std::string EntityBlockCircuitVoltageSource::getVoltage()
 	return elementType->getValue();
 }
 
-std::string EntityBlockCircuitVoltageSource::getType()
-{
-	auto propertyBase = getProperties().getProperty("Type");
-	auto elementType = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	assert(elementType != nullptr);
-
-	return elementType->getValue();
-}
 
 std::string EntityBlockCircuitVoltageSource::getFunction()
 {

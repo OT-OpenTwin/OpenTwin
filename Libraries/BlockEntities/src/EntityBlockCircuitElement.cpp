@@ -11,7 +11,6 @@ void EntityBlockCircuitElement::createProperties()
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-	EntityPropertiesString::createProperty("General", "Name", "Element", "default", getProperties());
 }
 
 
