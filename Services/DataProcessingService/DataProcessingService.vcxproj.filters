@@ -47,9 +47,6 @@
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockHandlerPlot1D.cpp">
-      <Filter>Source Files\BlockFunctionality</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,9 +110,6 @@
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerDatabaseAccess.h">
-      <Filter>Header Files\BlockFunctionality</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BlockHandlerPlot1D.h">
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockEntityHandler.h">

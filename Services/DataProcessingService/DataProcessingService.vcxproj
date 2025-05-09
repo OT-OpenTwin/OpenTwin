@@ -200,7 +200,6 @@
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
     <ClCompile Include="src\BlockHandlerDatabaseAccess.cpp" />
-    <ClCompile Include="src\BlockHandlerPlot1D.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ExternalDependencies.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
@@ -220,7 +219,6 @@
     <ClInclude Include="include\BlockHandlerDataDimensionReducer.h" />
     <ClInclude Include="include\BlockHandlerDisplay.h" />
     <ClInclude Include="include\BlockHandlerFileWriter.h" />
-    <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockHandlerPython.h" />
     <ClInclude Include="include\BlockHandlerStorage.h" />
     <ClInclude Include="include\DataDocument.h" />

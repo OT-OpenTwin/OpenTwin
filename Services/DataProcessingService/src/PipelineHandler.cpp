@@ -1,6 +1,5 @@
 #include "PipelineHandler.h"
 #include "EntityBlockDatabaseAccess.h"
-#include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockDisplay.h"
@@ -8,7 +7,6 @@
 #include "EntityBlockStorage.h"
 
 #include "BlockHandlerDatabaseAccess.h"
-#include "BlockHandlerPlot1D.h"
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDataDimensionReducer.h"
 #include "BlockHandlerDisplay.h"
@@ -55,12 +53,6 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 		return std::make_shared<BlockHandlerDatabaseAccess>(dbAccessEntity, _blockHandlerByGraphNode);
 	}
 	
-	EntityBlockPlot1D* plot1DEntity = dynamic_cast<EntityBlockPlot1D*>(blockEntity.get());
-	if (plot1DEntity != nullptr)
-	{
-		return std::make_shared <BlockHandlerPlot1D>(plot1DEntity, _blockHandlerByGraphNode);
-	}
-
 	EntityBlockPython* pythonEntity = dynamic_cast<EntityBlockPython*>(blockEntity.get());
 	if (pythonEntity != nullptr)
 	{

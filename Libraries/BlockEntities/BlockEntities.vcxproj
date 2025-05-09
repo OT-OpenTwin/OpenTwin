@@ -183,7 +183,6 @@
     <ClInclude Include="include\EntityBlockDataDimensionReducer.h" />
     <ClInclude Include="include\EntityBlockDisplay.h" />
     <ClInclude Include="include\EntityBlockFileWriter.h" />
-    <ClInclude Include="include\EntityBlockPlot1D.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityBlockStorage.h" />
     <ClInclude Include="include\EntityBlockCircuitVoltageMeter.h" />
@@ -209,7 +208,6 @@
     <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp" />
     <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockFileWriter.cpp" />
-    <ClCompile Include="src\EntityBlockPlot1D.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />
     <ClCompile Include="src\EntityBlockStorage.cpp" />
     <ClCompile Include="src\EntityBlockCircuitVoltageMeter.cpp" />

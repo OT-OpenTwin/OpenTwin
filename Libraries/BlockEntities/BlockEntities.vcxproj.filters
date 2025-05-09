@@ -27,9 +27,6 @@
     <ClInclude Include="include\EntityBlockDatabaseAccess.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityBlockPlot1D.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityBlockPython.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -99,9 +96,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityBlockPlot1D.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockPython.cpp">

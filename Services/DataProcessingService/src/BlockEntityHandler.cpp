@@ -9,8 +9,6 @@
 #include "Application.h"
 #include "ClassFactoryBlock.h"
 #include "ClassFactory.h"
-#include "EntityBlockDatabaseAccess.h"
-#include "EntityBlockPlot1D.h"
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
 #include "EntityBlockDataDimensionReducer.h"
@@ -170,12 +168,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 		pythonBlock->createProperties(ot::FolderNames::PythonScriptFolder, dependency.getPythonScriptFolderID());
 		return;
 	}
-	EntityBlockPlot1D* plotBlock = dynamic_cast<EntityBlockPlot1D*>(blockEntity.get());
-	if (plotBlock != nullptr)
-	{
-		plotBlock->createProperties();
-	}
-
+	
 	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
 	if (dbaBlock != nullptr)
 	{
@@ -230,9 +223,6 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
-
-	EntityBlockPlot1D plotBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(plotBlock.getClassName(), plotBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPlot1D::getIconName());
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
