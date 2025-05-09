@@ -16,10 +16,10 @@ namespace ot {
 	//! It provides the default virtual addToJsonObject and setFromJsonObject methods.
 	class OT_CORE_API_EXPORTONLY Serializable {
 	public:
-		Serializable() {};
-		Serializable(const Serializable&) {};
-		Serializable(Serializable&&) noexcept {};
-		virtual ~Serializable() {};
+		Serializable() = default;
+		Serializable(const Serializable&) = default;
+		Serializable(Serializable&&) noexcept = default;
+		virtual ~Serializable() = default;
 
 		Serializable& operator = (const Serializable&) { return *this; };
 		Serializable& operator = (Serializable&&) noexcept { return *this; };

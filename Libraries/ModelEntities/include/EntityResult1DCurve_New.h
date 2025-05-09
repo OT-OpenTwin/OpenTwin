@@ -8,6 +8,11 @@ class __declspec(dllexport) EntityResult1DCurve_New : public EntityBase, public 
 public:
 
 	EntityResult1DCurve_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	EntityResult1DCurve_New(const EntityResult1DCurve_New& _other) = default;
+	EntityResult1DCurve_New(EntityResult1DCurve_New&& _other) noexcept = default;
+	~EntityResult1DCurve_New() = default;
+	EntityResult1DCurve_New& operator=(const EntityResult1DCurve_New& _other) = default;
+	EntityResult1DCurve_New& operator=(EntityResult1DCurve_New&& _other) = default;
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
@@ -28,6 +33,7 @@ public:
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 
 private:
+	std::string m_curveLabel;
 	ot::QueryInformation m_queryInformation;
 	
 	virtual void AddStorageData(bsoncxx::builder::basic::document& storage);

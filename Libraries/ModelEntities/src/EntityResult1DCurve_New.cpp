@@ -57,7 +57,6 @@ void EntityResult1DCurve_New::createProperties(void)
 	auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
 
 	EntityPropertiesGuiPainter::createProperty("General", "Color", stylePainter, "", getProperties());
-	EntityPropertiesString::createProperty("General", "Curve title", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis label", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis unit", "", "", getProperties());
 	EntityPropertiesString::createProperty("Y axis", "Y axis label", "", "", getProperties());
@@ -75,7 +74,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 {
 	ot::Plot1DCurveCfg curveCfg;
 
-	curveCfg.setEntityName(this->getName());
+	const std::string entityName = getName();
+	curveCfg.setEntityName(entityName);
 	curveCfg.setEntityID(getEntityID());
 	curveCfg.setEntityVersion(getEntityStorageVersion());
 
@@ -85,7 +85,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	const std::string yAxisLabel =PropertyHelper::getStringPropertyValue(this, "Y axis label");
 	const std::string yAxisUnit =PropertyHelper::getStringPropertyValue(this, "Y axis unit");
 	
-	const std::string curveTitle = PropertyHelper::getStringPropertyValue(this, "Curve title");
+	
 
 	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
 	ot::PenFCfg penCfg(painter->createCopy());
@@ -97,7 +97,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	curveCfg.setYAxisTitle(yAxisLabel);
 	curveCfg.setYAxisUnit(yAxisUnit);
 
-	curveCfg.setTitle(curveTitle);
+	curveCfg.setTitle(m_curveLabel);
 
 	curveCfg.setQueryInformation(m_queryInformation);
 	return curveCfg;
@@ -111,8 +111,8 @@ void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisTitle(), this, "Y axis label");
 	PropertyHelper::setStringPropertyValue(_curve.getYAxisUnit(), this, "Y axis unit");
-	
-	PropertyHelper::setStringPropertyValue(_curve.getTitle(), this, "Curve title");
+
+	m_curveLabel = _curve.getTitle();
 
 	m_queryInformation = _curve.getQueryInformation();
 }
@@ -167,6 +167,10 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve_New::deserialise(bsonc
 void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
+	
+	const std::string entityName = getName();
+	m_curveLabel = entityName.substr(entityName.find_last_of("/") + 1);
+
 	m_queryInformation.m_query = doc_view["Query"].get_string();
 	m_queryInformation.m_projection = doc_view["Projection"].get_string();
 
