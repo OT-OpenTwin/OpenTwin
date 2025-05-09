@@ -42,8 +42,6 @@ public:
 		OT_HANDLER(handleQueueMessages, Application, OT_ACTION_CMD_MODEL_QueueMessages, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetListOfFolderItems, Application, OT_ACTION_CMD_MODEL_GetListOfFolderItems, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetIDsOfFolderItemsByType, Application, OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleDeleteCurvesFromPlots, Application, OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdateCurvesOfPlot, Application, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleUpdateVisualizationEntity, Application, OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleUpdateGeometryEntity, Application, OT_ACTION_CMD_MODEL_UpdateGeometryEntity, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleModelChangeOperationCompleted, Application, OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, ot::SECURE_MESSAGE_TYPES)

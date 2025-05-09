@@ -62,10 +62,7 @@ public:
 	ot::PlotManagerView* get1DPlot(void) const { return m_plot; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
-
-	void set1DPlotItemSelected(unsigned long long treeItemID, bool controlPressed);
-	void reset1DPlotItemSelection(void);
-
+	
 	Rubberband * getRubberband(void) { return rubberband; }
 
 	void createRubberband(ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson);

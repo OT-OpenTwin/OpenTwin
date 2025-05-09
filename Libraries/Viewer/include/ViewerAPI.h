@@ -87,15 +87,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
 	
 	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
-
-	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
-	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);
-
-	__declspec(dllexport) void addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1DDataBaseCfg& _config);
-
-	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version);
-	__declspec(dllexport) void visualizationPlot1DPropertiesChanged(ot::UID osgModelID, const ot::Plot1DCfg& _config);
-
+	
 	__declspec(dllexport) void setEntityName(ot::UID modelEntityID, const std::string &newName);
 	__declspec(dllexport) void renameEntityPath(const std::string &oldPath, const std::string &newPath);
 

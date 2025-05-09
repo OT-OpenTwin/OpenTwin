@@ -1,8 +1,6 @@
 #include "MicroServiceSolver.h"
 
 #include "EntitySolverFITTD.h"
-#include "EntityResult1DPlot.h"
-#include "EntityResult1DCurve.h"
 #include "EntityResult3D.h"
 #include "EntityResult3DData.h"
 #include "EntitySignalType.h"

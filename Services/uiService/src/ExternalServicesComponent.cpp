@@ -2932,29 +2932,6 @@ std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _doc
 	
 	AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
 	
-	std::list<std::string> curveNames = ViewerAPI::getSelectedCurves(visualizationModelID);
-	ViewerAPI::removeSelectedCurveNodes(visualizationModelID);
-
-	ot::JsonDocument requestDoc;
-	ot::JsonArray jCurveNames;
-	for (auto& curveName : curveNames)
-	{
-		jCurveNames.PushBack(ot::JsonString(curveName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	}
-	requestDoc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, jCurveNames, requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	
-	std::string response;
-	sendHttpRequest(QUEUE, m_modelServiceURL, requestDoc, response);
-
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_EAS(response);
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response)
-	{
-		OT_LOG_WAS(response);
-	}
-
 	return "";
 }
 
@@ -3550,42 +3527,6 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 
 // Plot
 
-std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
-	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-
-	ot::Plot1DDataBaseCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	ViewerAPI::addVisualizationPlot1DNode(visualizationUID, config);
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handlePlot1DPropertiesChanged(ot::JsonDocument& _document) {
-	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-
-	ot::Plot1DCfg config;
-	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	ViewerAPI::visualizationPlot1DPropertiesChanged(visualizationUID, config);
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonDocument& _document) {
-	ot::UID visualizationUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-
-	ot::ConstJsonObjectList entities = ot::json::getObjectList(_document, OT_ACTION_PARAM_List);
-	for (const ot::ConstJsonObject& entity : entities) {
-		ot::Plot1DCurveCfg curve;
-		curve.setFromJsonObject(entity);
-
-		ViewerAPI::visualizationResult1DPropertiesChanged(visualizationUID, curve.getEntityID(), curve.getEntityVersion());
-	}
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
 	// Get infos from message document
 	ot::BasicServiceInformation info;
@@ -4153,38 +4094,6 @@ std::string ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _do
 }
 
 // Dialogs
-
-std::string ExternalServicesComponent::handleEntitySelectionDialog(ot::JsonDocument& _document) {
-	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
-	const ot::UID entityToBeExtended = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-
-	ot::SelectEntitiesDialogCfg pckg;
-	pckg.setFromJsonObject(cfgObj);
-
-	SelectEntitiesDialog dia(pckg, nullptr);
-	dia.showDialog();
-
-	if (dia.dialogResult() == ot::Dialog::Ok && dia.selectionHasChanged()) {
-		std::list<std::string> selectedItems = dia.selectedItemPaths();
-		if (selectedItems.size() != 0)
-		{
-			ot::JsonDocument responseDoc;
-			ot::JsonArray jSelectedItemsNames;
-			for (const std::string& selectedItem : selectedItems)
-			{
-				jSelectedItemsNames.PushBack(ot::JsonString(selectedItem, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-			}
-			responseDoc.AddMember(OT_ACTION_PARAM_UI_TREE_SelectedItems, jSelectedItemsNames, responseDoc.GetAllocator());
-			responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityToBeExtended, responseDoc.GetAllocator());
-			responseDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, responseDoc.GetAllocator());
-			std::string response;
-			sendHttpRequest(QUEUE, m_modelServiceURL, responseDoc, response);
-		}
-	}
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document) {
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 

@@ -412,22 +412,6 @@ void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::st
 	}
 }
 
-std::list<std::string> ViewerAPI::getSelectedCurves(ot::UID osgModelID)
-{
-	Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
-	
-	std::list<std::string> curveDescriptions = model->getSelectedCurves();
-	
-	return curveDescriptions;
-}
-
-void ViewerAPI::removeSelectedCurveNodes(ot::UID osgModelID)
-{
-	Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
-
-	model->removedSelectedCurveNodes();
-}
-
 void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
 {
 	try
@@ -449,49 +433,6 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID
 		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->addVisualizationMeshItemNodeFromFacetDataBase(name, modelEntityID, treeIcons, isHidden, projectName, entityID, version, tetEdgesID, tetEdgesVersion);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-void ViewerAPI::addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1DDataBaseCfg& _config)
-{
-	try
-	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
-		model->addVisualizationPlot1DNode(_config);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-
-
-void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version)
-{
-	try
-	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
-
-		model->visualizationResult1DPropertiesChanged(_entityID, _version);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-void ViewerAPI::visualizationPlot1DPropertiesChanged(ot::UID osgModelID, const ot::Plot1DCfg& _config)
-{
-	try
-	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
-
-		model->visualizationPlot1DPropertiesChanged(_config);
 	}
 	catch (std::out_of_range)
 	{

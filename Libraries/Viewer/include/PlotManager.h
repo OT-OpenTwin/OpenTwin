@@ -33,8 +33,6 @@ namespace ot {
 
 		// Data handling
 
-		void setFromDataBaseConfig(const Plot1DDataBaseCfg& _config);
-
 		void removeFromCache(unsigned long long _entityID);
 
 		bool hasCachedEntity(UID _entityID) const;
@@ -58,7 +56,6 @@ namespace ot {
 	private:
 		std::map<UID, std::pair<UID, PlotDataset*>> m_cache;
 
-		void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport);
 	};
 
 }

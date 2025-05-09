@@ -18,9 +18,6 @@
 
 #include "UniqueUIDGenerator.h"
 
-#include "EntityResult1DPlot.h"
-#include "EntityResult1DCurve.h"
-
 // C++ header
 #include <string>
 #include <list>
@@ -53,11 +50,6 @@ namespace ot {
 			UID createEntityUID(void);
 
 			// Convenience wrapper
-			EntityResult1DPlot * addResult1DPlotEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID, std::string>> &curves);
-			EntityResult1DCurve * addResult1DCurveEntity(const std::string &name, const std::vector<double> &xdata,
-											  const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
-											  const std::string &xlabel, const std::string &xunit,
-											  const std::string &ylabel, const std::string &yunit, int colorID, bool visible);
 			EntityResultText *addResultTextEntity(const std::string &name, const std::string &text);
 			void facetAndStoreGeometryEntity(EntityGeometry *entityGeom, bool forceVisible);
 

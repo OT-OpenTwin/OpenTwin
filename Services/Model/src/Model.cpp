@@ -12,15 +12,12 @@
 #include "EntityMaterial.h"
 #include "EntityParameter.h"
 #include "EntityMeshTetItem.h"
-#include "EntityResult1DCurve.h"
-#include "EntityResult1DCurveData.h"
 #include "EntityFaceAnnotation.h"
 #include "EntityVis2D3D.h"
 #include "EntityUnits.h"
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityMetadataCampaign.h"
 #include "EntityParameterizedDataPreviewTable.h"
-#include "EntityResult1DPlot.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 #include "EntityBlockConnection.h"
 
@@ -412,8 +409,6 @@ void Model::setupUIControls()
 	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Y));
 	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::KeySequence(ot::Key_Delete));
 	
-	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
-
 	
 	Application::instance()->addButtons();
 
@@ -429,113 +424,46 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 {
 	// Now process actions for all modal commands
 
-	if (action == "Model:Material:Create Material")					createNewMaterial();
-	else if (action == "Model:Edit:Undo")							undoLastOperation();
-	else if (action == "Model:Edit:Redo")							redoNextOperation();
-	else if (action == "Model:Edit:Delete")							deleteSelectedShapes();
-	else if (action == "Model:Geometry:Info")						showSelectedShapeInformation();
-	else if (action == "Model:Database:Save")						projectSave("", false);
-	else if (action == "Model:Material:Show By Material")			showByMaterial();
-	else if (action == "Model:Material:Material Missing")			showMaterialMissing();
-	else if (action == "Model:Parameters:Create Parameter")			createNewParameter();
-	else if (action == "Model:Plots:Add Curves")
+	if (action == "Model:Material:Create Material")
 	{
-		
-		//Für container: ot::RemoveItemWhenEmpty
-		//Für curves: ot::ItemMayBeAdded
-		
-		std::list<ot::NavigationTreeItem> alreadyContained;
-		ot::SelectEntitiesDialogCfg configuration;
-
-		ot::UIDList selectedEntityIDs = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
-		if (selectedEntityIDs.size() == 0)
-		{
-			return;
-		}
-		std::set<ot::UID> selectedCurves;
-		
-		if (selectedEntityIDs.size() != 1) return;
-		EntityBase* selectedEntity	= entityMap[*selectedEntityIDs.begin()];
-		EntityResult1DPlot* selectedPlot =	dynamic_cast<EntityResult1DPlot*>(selectedEntity);
-		if (selectedPlot != nullptr)
-		{
-			ot::UIDList curveIDs = selectedPlot->getCurveIDs();
-			selectedCurves = { curveIDs.begin(),curveIDs.end() };
-		}
-		else
-		{
-			return;
-		}
-		
-		
-		for (auto& entityByUID : entityMap)
-		{
-			EntityBase* baseEntity = entityByUID.second;
-			EntityResult1DCurve* curveEntity = dynamic_cast<EntityResult1DCurve*>(baseEntity);
-			if (curveEntity != nullptr)
-			{
-				ot::NavigationTreeItem* item = new ot::NavigationTreeItem();
-				item->setIconPath("Default/Plot1DVisible.png");
-				const std::string fullName = curveEntity->getName();
-				const std::string curveText = fullName.substr(fullName.find_last_of("/")+1, fullName.size());
-				item->setText(curveText);
-				
-				bool isAlreadyPartOfPlot = selectedCurves.find(curveEntity->getEntityID()) != selectedCurves.end();
-				if (isAlreadyPartOfPlot)
-				{
-					item->setFlags(ot::ItemIsSelected);
-				}
-				else
-				{
-					item->setFlags(ot::ItemMayBeAdded);
-				}
-				
-				EntityBase* parent = curveEntity->getParent();
-				std::string parentName = parent->getName();
-				ot::NavigationTreeItem* child = item;
-				ot::NavigationTreeItem* parentItem = nullptr;
-				while (parent != nullptr && parentName != "")
-				{
-
-					parentItem = new ot::NavigationTreeItem();
-					if (parentName.find("/") != std::string::npos)
-					{
-						const std::string text = parentName.substr(parentName.find_last_of("/")+1, parentName.size());
-						parentItem->setText(text);
-					}
-					else
-					{
-						parentItem->setText(parentName);
-					}
-					parentItem->setIconPath("Default/ContainerVisible.png");
-					parentItem->setFlags(ot::RemoveItemWhenEmpty);
-					parentItem->addChildItem(*child);
-					delete child;
-					child = parentItem;
-					parentItem = nullptr;
-					parent = parent->getParent();
-					parentName = parent->getName();
-				}
-				configuration.addRootItem(*child);				
-			}
-		}
-		
-		configuration.mergeItems();
-		configuration.setTitle("Add curves to plot: "+ selectedPlot->getName());
-		configuration.setFlags(ot::NavigationTreePackage::ItemsDefaultExpanded);
-		ot::JsonDocument request;
-		
-		ot::JsonObject jConfig;
-		configuration.addToJsonObject(jConfig,request.GetAllocator());
-				
-		request.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_EntitySelectionDialog,request.GetAllocator()), request.GetAllocator());
-		request.AddMember(OT_ACTION_PARAM_Config, jConfig,request.GetAllocator());
-		request.AddMember(OT_ACTION_PARAM_MODEL_EntityID, selectedPlot->getEntityID(),request.GetAllocator());
-		std::list<std::pair<ot::UID, ot::UID>> prefetchedIds;
-		Application::instance()->getNotifier()->queuedHttpRequestToUI(request, prefetchedIds);
+		createNewMaterial();
 	}
-	
-	else assert(0); // Unhandled button action
+	else if (action == "Model:Edit:Undo")							
+	{
+		undoLastOperation();
+	}
+	else if (action == "Model:Edit:Redo")							
+	{
+		redoNextOperation();
+	}
+	else if (action == "Model:Edit:Delete")
+	{
+		deleteSelectedShapes();
+	}
+	else if (action == "Model:Geometry:Info")						
+	{
+		showSelectedShapeInformation();
+	}
+	else if (action == "Model:Database:Save")						
+	{
+		projectSave("", false);
+	}
+	else if (action == "Model:Material:Show By Material")
+	{
+		showByMaterial();
+	}
+	else if (action == "Model:Material:Material Missing")			
+	{
+		showMaterialMissing();
+	}
+	else if (action == "Model:Parameters:Create Parameter")			
+	{
+		createNewParameter();
+	}
+	else 
+	{
+		assert(0); // Unhandled button action
+	}
 }
 
 void Model::updateUndoRedoStatus(void)
@@ -1664,31 +1592,6 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 
 void Model::keySequenceActivated(const std::string &keySequence) {
 
-}
-
-void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID)
-{
-
-	auto baseEntity = entityMap.find(plotID);
-	assert(baseEntity != entityMap.end());
-	EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
-	ot::UIDNamePairList curves;
-	for (const std::string& curveName : curveNames)
-	{
-		EntityBase* baseEnt = findEntityFromName(curveName);
-		curves.push_back(ot::UIDNamePair(baseEnt->getEntityID(), curveName.substr(curveName.find_last_of("/") + 1, curveName.size())));
-	}
-	plotEntity->overrideReferencedCurves(curves);
-	plotEntity->StoreToDataBase();
-
-	setModified();
-	modelChangeOperationCompleted("Updated curve reference in plot");
-	if (visualizationModelID != 0) {
-		OT_LOG_EA("Visualization model ID must be 0");
-		//ot::UIDList plotIDs{ plotID };
-		//ot::UIDList plotVersions{ plotEntity->getEntityStorageVersion() };
-		//Application::instance()->getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
-	}
 }
 
 void Model::updatePropertyGrid(void)
@@ -3327,38 +3230,6 @@ size_t Model::getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geom
 	return numberTriangles;
 }
 
-void Model::addResult1DEntity(const std::string &name, const std::vector<double> &xdata, const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
-							  const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
-							  const std::string &ylabel, const std::string &yunit)
-{
-	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
-
-	curve->setName(name);
-	curve->setEditable(true);
-	curve->createProperties();
-
-	curve->setXLabel(xlabel);
-	curve->setYLabel(ylabel);
-	curve->setXUnit(xunit);
-	curve->setYUnit(yunit);
-
-	curve->setCreateVisualizationItem(true);
-
-	// Now we store the data in the entity
-	curve->setCurveXData(xdata);
-	curve->setCurveYData(ydataRe, ydataIm);
-
-	// Release the data from memory (this will write it to the data base)
-	curve->releaseCurveData();
-
-	// Finally, add the new entity to the model 
-	GeometryOperations::EntityList allNewEntities;
-	addEntityToModel(curve->getName(), curve, entityRoot, true, allNewEntities);
-
-	// and create the visualization item
-	curve->addVisualizationNodes();
-}
-
 void Model::addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotations)
 {
 	GeometryOperations::EntityList allNewEntities;
@@ -4511,45 +4382,6 @@ void Model::deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool
 	{
 		modelChangeOperationCompleted("delete objects");
 	}
-}
-
-void Model::deleteCurves(std::list<std::string>& entityNameList)
-{
-	if (entityNameList.size() == 0) return;
-	ot::UIDList plotIDs, plotVersions;
-	std::map<std::string,EntityResult1DPlot*> plotEntitiesByName;
-
-	for (const std::string curveName : entityNameList)
-	{
-		//It is expected to have one plot entity above the curve reference in the navigationtree item. The parent of the curve is NOT the plot!
-		const std::string plotEntName =	curveName.substr(0, curveName.find_last_of("/"));
-		const std::string curveNameWithoutPath = curveName.substr(curveName.find_last_of("/") + 1, curveName.size());
-		auto plotEntityByName =	plotEntitiesByName.find(plotEntName);
-		if (plotEntityByName == plotEntitiesByName.end())
-		{
-			EntityBase* entityBase = findEntityFromName(plotEntName);
-			if (entityBase == nullptr) { continue; }
-			auto plotEntity = dynamic_cast<EntityResult1DPlot*>(entityBase);
-			assert(plotEntity != nullptr);
-			plotEntitiesByName[plotEntName] = plotEntity;
-			plotEntityByName = plotEntitiesByName.find(plotEntName);
-		}
-		
-		//The curve name cannot be mapped via the model state since the name belongs only to the navigationtree item and not to the entity itself.
-		EntityResult1DPlot* plotEntity = plotEntityByName->second;
-		bool deletionCompleted = plotEntity->deleteCurve(curveNameWithoutPath);
-		assert(deletionCompleted);
-		plotIDs.push_back(plotEntity->getEntityID());
-		plotVersions.push_back(plotEntity->getEntityStorageVersion());
-		setModified();
-	}
-	
-	if (visualizationModelID != 0) {
-		OT_LOG_EA("Visualization model ID must be 0");
-		//Application::instance()->getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
-	}
-
-	modelChangeOperationCompleted("Removed curves from plot");
 }
 
 void Model::setMeshingActive(ot::UID meshEntityID, bool flag)

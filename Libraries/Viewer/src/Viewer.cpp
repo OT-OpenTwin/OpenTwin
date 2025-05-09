@@ -832,22 +832,6 @@ void Viewer::setTabNames(const std::string & _osgViewTabName, const std::string 
 	m_versionGraphTabName = _versionGraphTabName;
 }
 
-void Viewer::set1DPlotItemSelected(unsigned long long treeItemID, bool controlPressed)
-{
-	if (model != nullptr)
-	{
-		model->set1DPlotItemSelected(treeItemID, controlPressed);
-	}
-}
-
-void Viewer::reset1DPlotItemSelection(void)
-{
-	if (model != nullptr)
-	{
-		model->reset1DPlotItemSelection();
-	}
-}
-
 void Viewer::createRubberband(ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson)
 {
 	if (rubberband) 

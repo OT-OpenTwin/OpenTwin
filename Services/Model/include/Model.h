@@ -105,9 +105,6 @@ public:
 									    const std::vector<std::array<double, 3>> &triangle_p2,
 									    const std::vector<std::array<double, 3>> &triangle_p3,
 									    const std::vector<std::array<double, 3>> &triangle_rgb);
-	void addResult1DEntity(const std::string &name, const std::vector<double> &xdata, const std::vector<double> &ydata, const std::vector<double> &ydataIm,
-						   const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
-						   const std::string &ylabel, const std::string &yunit);
 
 	void updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entityID);
 
@@ -165,7 +162,6 @@ public:
 	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
 	void addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion, const std::string &geomEntityName, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, std::list<std::string> &childrenList, const std::string &description);
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
-	void deleteCurves(std::list<std::string> &entityNameList);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion, const std::string& comment);

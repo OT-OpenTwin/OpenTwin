@@ -225,32 +225,6 @@ std::string Application::handleGetIDsOfFolderItemsByType(ot::JsonDocument& _docu
 	return newDoc.toJson();
 }
 
-std::string Application::handleDeleteCurvesFromPlots(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<std::string> curveNames = ot::json::getStringList(_document, OT_ACTION_PARAM_VIEW1D_CurveNames);
-	m_model->deleteCurves(curveNames);
-
-	return "";
-}
-
-std::string Application::handleUpdateCurvesOfPlot(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<std::string> curveNames = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_TREE_SelectedItems);
-	ot::UID plotID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-
-	m_model->updateCurvesInPlot(curveNames, plotID);
-
-	return "";
-}
-
 std::string Application::handleUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");

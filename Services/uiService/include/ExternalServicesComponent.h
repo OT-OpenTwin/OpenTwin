@@ -280,10 +280,6 @@ public:
 	OT_HANDLER(handleAddAndActivateVersionGraphVersion, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, ot::MessageType::ALL_MESSAGE_TYPES)
 		
 	// 1D Plot
-	OT_HANDLER(handleAddPlot1D, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handlePlot1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleResult1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
-	
 	OT_HANDLER(handleAddPlot1D_New, ExternalServicesComponent, OT_ACTION_CMD_VIEW1D_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateCurve, ExternalServicesComponent, OT_ACTION_CMD_UpdateCurvesOfPlot, ot::MessageType::ALL_MESSAGE_TYPES)
 
@@ -342,7 +338,6 @@ public:
 	), ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Dialogs
-	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)

@@ -94,12 +94,6 @@
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodePlot1D.cpp">
-      <Filter>src\SceneNodes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodePlot1DCurve.cpp">
-      <Filter>src\SceneNodes</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneNodeAnnotation.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
@@ -277,12 +271,6 @@
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeMeshItem.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodePlot1D.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodePlot1DCurve.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeVTK.h">

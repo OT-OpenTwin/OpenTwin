@@ -78,12 +78,6 @@ public:
 	void addVisualizationCartesianMeshItemNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config);
-	void addVisualizationResult1DNode(const ot::Plot1DCurveCfg& _curveInfo, const OldTreeIcon& _treeIcons, bool _isHidden);
-	
-	void visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _version);
-	void visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config);
-
 	void addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 	void updateVTKNode(unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
@@ -137,9 +131,6 @@ public:
 
 	void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);
 
-	void set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPressed);
-	void reset1DPlotItemSelection(void);
-
 	void hideEntities(std::list<unsigned long long> hiddenID);
 
 	void showBranch(const std::string &branchName);
@@ -169,9 +160,7 @@ public:
 	void lockSelectionAndModification(bool flag);
 
 	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
-	std::list<std::string> getSelectedCurves();
-	void removedSelectedCurveNodes();
-
+	
 	void setCursorText(const std::string& text);
 
 private:
@@ -247,12 +236,7 @@ private:
 	void	   clear1DPlot(void);
 	void	   set1DPlotIncompatibleData(void);
 	void       remove1DPlotErrorState(void);
-	void	   update1DPlot(SceneNodeBase* root);
-	void	   add1DPlotItems(SceneNodeBase* _root, bool& _isFirstCurve, SceneNodePlot1D*& _commonPlot, bool& _isCompatible, ot::Plot1DDataBaseCfg& _config);
-	SceneNodePlot1D* getPlotFromCurve(SceneNodePlot1DCurve* curve);
-	bool	   updateCurveEntityVersion(SceneNodeBase* _root, ot::UID _entityID, ot::UID _version);
-	void	   addCompatibleDimmedPlotItems(SceneNodeBase* _root, ot::Plot1DDataBaseCfg& _config);
-	
+		
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 

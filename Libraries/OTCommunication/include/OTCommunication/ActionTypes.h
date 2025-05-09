@@ -128,8 +128,7 @@
 #define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
-#define OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot "Model.Plot.UpdateCurves"
-#define OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots "Model.Plot.DeleteCurves"
+
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
 #define OT_ACTION_CMD_UI_ServiceSetupCompleted "UI.Service.SetupCompleted"
@@ -175,7 +174,6 @@
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialog "UI.OnePropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialogValue "UI.OnePropertyDialogValue"
-#define OT_ACTION_CMD_UI_EntitySelectionDialog "UI.EntitySelectionDialog"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraph "UI.SetVersionGraph"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive "UI.SetVersionGraph.Active"
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"
@@ -253,9 +251,7 @@
 #define OT_ACTION_CMD_UI_VIEW_SetModifiedState "UI.View.SetModifiedState"
 #define OT_ACTION_CMD_UI_VIEW_SetEntityName "UI.VIEW.Entity.Name.Set"
 #define OT_ACTION_CMD_UI_VIEW_RenameEntityName "UI.VIEW.Entity.Name.Rename"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged "UI.VIEW.OBJ.Result1DPropertiesChanged"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D "UI.VIEW.OBJ.AddPlot1D"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged "UI.VIEW.OBJ.Plot1DPropertiesChanged"
+
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 
@@ -593,27 +589,6 @@
 #define OT_ACTION_PARAM_MESH_ITEM_COLOR_B "Mesh.Item.Color.B"
 #define OT_ACTION_PARAM_MESH_NODE_ID "Mesh.Node.ID"
 #define OT_ACTION_PARAM_MESH_NODE_VERSION "Mesh.Node.Version"
-
-#define OT_ACTION_PARAM_VIEW1D_Title "View1D.Title"
-#define OT_ACTION_PARAM_VIEW1D_PlotType "View1D.PlotType"
-#define OT_ACTION_PARAM_VIEW1D_PlotQuantity "View1D.PlotQuantity"
-#define OT_ACTION_PARAM_VIEW1D_PlotIDs "View1D.PlotIDs"
-#define OT_ACTION_PARAM_VIEW1D_CurveIDs "View1D.CurveIDs"
-#define OT_ACTION_PARAM_VIEW1D_CurveVersions "View1D.CurveVersions"
-#define OT_ACTION_PARAM_VIEW1D_CurveNames "View1D.CurveNames"
-#define OT_ACTION_PARAM_VIEW1D_Legend "View1D.Legend"
-#define OT_ACTION_PARAM_VIEW1D_Grid "View1D.Grid"
-#define OT_ACTION_PARAM_VIEW1D_GridColorR "View1D.GridColorR"
-#define OT_ACTION_PARAM_VIEW1D_GridColorG "View1D.GridColorG"
-#define OT_ACTION_PARAM_VIEW1D_GridColorB "View1D.GridColorB"
-#define OT_ACTION_PARAM_VIEW1D_LogscaleX "View1D.LogscaleX"
-#define OT_ACTION_PARAM_VIEW1D_LogscaleY "View1D.LogscaleY"
-#define OT_ACTION_PARAM_VIEW1D_AutoscaleX "View1D.AutoscaleX"
-#define OT_ACTION_PARAM_VIEW1D_AutoscaleY "View1D.AutoscaleY"
-#define OT_ACTION_PARAM_VIEW1D_Xmin "View1D.Xmin"
-#define OT_ACTION_PARAM_VIEW1D_Xmax "View1D.Xmax"
-#define OT_ACTION_PARAM_VIEW1D_Ymin "View1D.Ymin"
-#define OT_ACTION_PARAM_VIEW1D_Ymax "View1D.Ymax"
 
 //Needed in new API
 #define OT_ACTION_PARAM_VIEW1D_CurveConfigs "View1D.CurveConfigs"

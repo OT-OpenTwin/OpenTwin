@@ -13,9 +13,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"
 
 #include "EntityBase.h"
-#include "EntityResult1DPlot.h"
-#include "EntityResult1DCurve.h"
-#include "EntityResult1DCurveData.h"
 #include "EntityResultText.h"
 #include "EntityGeometry.h"
 
@@ -50,61 +47,6 @@ ot::components::ModelComponent::~ModelComponent()
 	uniqueUIDGenerator = nullptr;
 
 	EntityBase::setUidGenerator(nullptr);
-}
-
-EntityResult1DPlot*ot::components::ModelComponent::addResult1DPlotEntity(const std::string &name, const std::string &title, const std::list<std::pair<UID,std::string>> &curves)
-{
-	EntityResult1DPlot*plot = new EntityResult1DPlot(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
-
-	plot->setName(name);
-	plot->setEditable(true);
-	plot->createProperties();
-
-	plot->setTitle(title);
-	
-	for (auto curve : curves)
-	{
-		plot->addCurve(curve.first, curve.second);
-	}
-
-	// Store the entity in the data base as well.
-	plot->StoreToDataBase();
-
-	// Return the entity ID of the newly created entity
-	return plot;
-}
-
-EntityResult1DCurve *ot::components::ModelComponent::addResult1DCurveEntity(const std::string &name, const std::vector<double> &xdata, 
-	const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
-	const std::string &xlabel, const std::string &xunit,
-	const std::string &ylabel, const std::string &yunit, int colorID, bool visible)
-{
-	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
-
-	curve->setName(name);
-	curve->setEditable(true);
-	curve->createProperties();
-	
-	curve->setCreateVisualizationItem(visible);
-
-	curve->setXLabel(xlabel);
-	curve->setYLabel(ylabel);
-	curve->setXUnit(xunit);
-	curve->setYUnit(yunit);
-	curve->setColorFromID(colorID);
-
-	// Now we store the data in the entity
-	curve->setCurveXData(xdata);
-	curve->setCurveYData(ydataRe, ydataIm);
-
-	// Release the data from memory (this will write it to the data base)
-	curve->releaseCurveData();
-
-	// Store the entity in the data base as well.
-	curve->StoreToDataBase();
-
-	// Return the entity ID of the newly created entity
-	return curve;
 }
 
 EntityResultText *ot::components::ModelComponent::addResultTextEntity(const std::string &name, const std::string &text)

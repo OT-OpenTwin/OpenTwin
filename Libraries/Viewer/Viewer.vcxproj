@@ -63,8 +63,6 @@
     <ClCompile Include="src\SceneNodeMesh.cpp" />
     <ClCompile Include="src\SceneNodeMeshItem.cpp" />
     <ClCompile Include="src\SceneNodeMultiVisualisation.cpp" />
-    <ClCompile Include="src\SceneNodePlot1D.cpp" />
-    <ClCompile Include="src\SceneNodePlot1DCurve.cpp" />
     <ClCompile Include="src\SceneNodeVTK.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -137,8 +135,6 @@
     <ClInclude Include="include\SceneNodeMesh.h" />
     <ClInclude Include="include\SceneNodeMeshItem.h" />
     <ClInclude Include="include\SceneNodeMultiVisualisation.h" />
-    <ClInclude Include="include\SceneNodePlot1D.h" />
-    <ClInclude Include="include\SceneNodePlot1DCurve.h" />
     <ClInclude Include="include\SceneNodeVTK.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\TableVisualiser.h" />
