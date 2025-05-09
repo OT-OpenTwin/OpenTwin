@@ -29,6 +29,8 @@
 #include "PlotBuilder.h"
 #include "ResultCollectionExtender.h"
 #include "QuantityDescriptionCurve.h"
+#include "OTGui/PainterRainbowIterator.h"
+
 // Third Party Header
 
 //C++
@@ -589,6 +591,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 	std::string _curveFolderPath = solverName + "/" + "Results" + "/" + "1D/Curves";
 
+	ot::PainterRainbowIterator rainbowPainterIt;
 	// No i want to get the node vectors of voltage and for each of them i create a curve
 	for (auto& it : resultVectors) {
 		std::string curveName;
@@ -653,10 +656,9 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		curveCfg.setXAxisUnit(parameter.unit);
 
 
-		uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
-		ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
-		auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
-		curveCfg.setLinePen(stylePainter);
+		
+		auto stylePainter = rainbowPainterIt.getNextPainter();
+		curveCfg.setLinePen(stylePainter.release());
 
 		std::string yLabel = it.first;
 		if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
@@ -664,7 +666,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			yLabel = "Voltage";
 			curveCfg.setYAxisTitle(yLabel);
 			curveCfg.setYAxisUnit(yUnit);
-			quantity->addValueDescription(yLabel, ot::TypeNames::getDoubleTypeName(), yUnit);
+			quantity->setName(yLabel);
+			quantity->addValueDescription("", ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());
 			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, curveName);				
 		}
@@ -674,8 +677,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			yUnit = "I";
 			curveCfg.setYAxisTitle(yLabel);
 			curveCfg.setYAxisUnit(yUnit);
-
-			quantity->addValueDescription(yLabel, ot::TypeNames::getDoubleTypeName(), yUnit);
+			quantity->setName(yLabel);
+			quantity->addValueDescription("", ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());
 
 			plotBuilderCurrent.addCurve(std::move(dataset), curveCfg, curveName);

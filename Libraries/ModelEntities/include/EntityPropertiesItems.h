@@ -490,7 +490,7 @@ public:
 	virtual eType getType(void) const override { return GUIPAINTER; };
 	virtual std::string getTypeString(void) const override { return EntityPropertiesGuiPainter::typeString(); };
 
-	void setValue(ot::Painter2D* _painter);
+	void setValue(const ot::Painter2D* _painter);
 
 	//! \brief Returns the current painter.
 	//! The entity keeps ownership of the painter

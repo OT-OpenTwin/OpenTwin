@@ -437,6 +437,9 @@
     <ClInclude Include="include\OTGui\QuantityContainerEntryDescription.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\PainterRainbowIterator.h">
+      <Filter>Header Files\Painter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -771,6 +774,9 @@
     </ClCompile>
     <ClCompile Include="src\QuantityContainerEntryDescription.cpp">
       <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PainterRainbowIterator.cpp">
+      <Filter>Source Files\Painter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

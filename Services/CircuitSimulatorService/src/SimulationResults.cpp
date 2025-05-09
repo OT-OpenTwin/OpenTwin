@@ -167,7 +167,7 @@ std::vector<int> SimulationResults::findPercentage(const std::string& input) {
     while (std::regex_search(start, input.cend(), match, prozentRegex)) {
         int wert = static_cast<int>(std::stod(match[1]));
         values.push_back(wert);
-        start = match.suffix().first; // nächster Suchbereich
+        start = match.suffix().first; // next search area
     }
 
     return values;

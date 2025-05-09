@@ -116,6 +116,7 @@
     <ClInclude Include="include\OTGui\QuantityContainerEntryDescription.h" />
     <ClInclude Include="include\OTGui\QueryInformation.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
+    <ClInclude Include="include\OTGui\PainterRainbowIterator.h" />
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
     <ClInclude Include="include\OTGui\StyledText.h" />
     <ClInclude Include="include\OTGui\StyledTextBuilder.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="src\QuantityContainerEntryDescription.cpp" />
     <ClCompile Include="src\QueryInformation.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
+    <ClCompile Include="src\PainterRainbowIterator.cpp" />
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
     <ClCompile Include="src\StyledText.cpp" />
     <ClCompile Include="src\StyledTextBuilder.cpp" />

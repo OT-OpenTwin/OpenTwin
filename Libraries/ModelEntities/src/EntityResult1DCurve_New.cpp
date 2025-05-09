@@ -3,6 +3,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/VisualisationTypes.h"
+#include "OTGui/ColorStyleTypes.h"
+#include "OTGui/StyleRefPainter2D.h"
 
 EntityResult1DCurve_New::EntityResult1DCurve_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
@@ -50,7 +52,11 @@ bool EntityResult1DCurve_New::updateFromProperties(void)
 
 void EntityResult1DCurve_New::createProperties(void)
 {
-	EntityPropertiesColor::createProperty("General", "Color", { 255, 0, 0 }, "", getProperties());
+	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
+	ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
+	auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
+
+	EntityPropertiesGuiPainter::createProperty("General", "Color", stylePainter, "", getProperties());
 	EntityPropertiesString::createProperty("General", "Curve title", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis label", "", "", getProperties());
 	EntityPropertiesString::createProperty("X axis", "X axis unit", "", "", getProperties());
@@ -72,7 +78,6 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	curveCfg.setEntityName(this->getName());
 	curveCfg.setEntityID(getEntityID());
 	curveCfg.setEntityVersion(getEntityStorageVersion());
-	const ot::Color colour = PropertyHelper::getColourPropertyValue(this, "Color");
 
 	const std::string xAxisLabel =PropertyHelper::getStringPropertyValue(this, "X axis label");
 	const std::string xAxisUnit =PropertyHelper::getStringPropertyValue(this, "X axis unit");
@@ -82,7 +87,10 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	
 	const std::string curveTitle = PropertyHelper::getStringPropertyValue(this, "Curve title");
 
-	curveCfg.setLinePenColor(colour);
+	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
+	ot::PenFCfg penCfg(painter->createCopy());
+	curveCfg.setLinePen(penCfg);
+
 	curveCfg.setXAxisTitle(xAxisLabel);
 	curveCfg.setXAxisUnit(xAxisUnit);
 
@@ -97,8 +105,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 
 void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 {
-	PropertyHelper::setColourPropertyValue(_curve.getLinePen().painter()->getDefaultColor(), this, "Color");
-
+	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().painter(), this, "Color");
 	PropertyHelper::setStringPropertyValue(_curve.getXAxisTitle(), this, "X axis label");
 	PropertyHelper::setStringPropertyValue(_curve.getXAxisUnit(), this, "X axis unit");
 

@@ -1331,11 +1331,17 @@ EntityPropertiesGuiPainter& EntityPropertiesGuiPainter::operator=(const EntityPr
 	return *this;
 }
 
-void EntityPropertiesGuiPainter::setValue(ot::Painter2D* _painter) {
-	if (m_painter == _painter) return;
+void EntityPropertiesGuiPainter::setValue(const ot::Painter2D* _painter) {
+	if (m_painter == _painter) 
+	{
+		return;
+	}
 	OTAssertNullptr(_painter);
 	OTAssertNullptr(m_painter);
-	if (m_painter->isEqualTo(_painter)) return;
+	if (m_painter->isEqualTo(_painter)) 
+	{
+		return;
+	}
 
 	delete m_painter;
 	m_painter = _painter->createCopy();

@@ -116,7 +116,10 @@ ot::PenCfg::PenCfg(const PenCfg& _other)
 }
 
 ot::PenCfg::~PenCfg() {
-	if (m_painter) delete m_painter;
+	if (m_painter) 
+	{
+		delete m_painter;
+	}
 	m_painter = nullptr;
 }
 

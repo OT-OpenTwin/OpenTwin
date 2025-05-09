@@ -37,6 +37,12 @@ ot::Color PropertyHelper::getColourPropertyValue(EntityBase* _base, const std::s
 	return colour;
 }
 
+const ot::Painter2D* PropertyHelper::getPainterPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesGuiPainter* painterProperty = getPainterProperty(_base, _name, _groupName);
+	return painterProperty->getValue();
+}
+
 int32_t PropertyHelper::getIntegerPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name,_groupName);
@@ -148,6 +154,22 @@ EntityPropertiesInteger* PropertyHelper::getIntegerProperty(EntityBase* _base, c
 	return intProperty;
 }
 
+EntityPropertiesGuiPainter* PropertyHelper::getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		throw std::exception(("Failed to access property " + _name).c_str());
+	}
+
+	EntityPropertiesGuiPainter* painter = dynamic_cast<EntityPropertiesGuiPainter*>(propertyBase);
+	if (painter== nullptr)
+	{
+		throw std::exception(("Tried to cast property " + _name + " to wrong type: integer").c_str());
+	}
+	return painter;
+}
+
 void PropertyHelper::setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesDouble* doubleProperty = getDoubleProperty(_base, _name, _groupName);
@@ -189,5 +211,10 @@ void PropertyHelper::setColourPropertyValue(ot::Color _value, EntityBase* _base,
 	const double gridColorA = (static_cast<double>(_value.a()) - 0.5) / 255.0;
 	
 	colourProperty->setColorRGB(gridColorR, gridColorG, gridColorB);	
+}
 
+void PropertyHelper::setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesGuiPainter* painterProperty = getPainterProperty(_base, _name, _groupName);
+	painterProperty->setValue(_painter);
 }

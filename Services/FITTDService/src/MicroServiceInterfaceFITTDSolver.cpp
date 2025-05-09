@@ -42,6 +42,8 @@
 
 #include "QuantityDescriptionCurve.h"
 #include "OTCore/FolderNames.h"
+#include "OTGui/PainterRainbowIterator.h"
+
 MicroServiceInterfaceFITTDSolver::~MicroServiceInterfaceFITTDSolver()
 {
 	if (_resultPipelineSettings != nullptr)
@@ -641,7 +643,7 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 		parameter.values.push_back(value);
 	}
 	std::shared_ptr<ParameterDescription> parameterDescription(new ParameterDescription(parameter,false));
-	
+	ot::PainterRainbowIterator painterIt;
 	for (int i = 0; i < 3; i++)
 	{
 		DatasetDescription dataset;
@@ -649,29 +651,26 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 		const double* resultVector = nullptr;
 
 		std::string curveName;
-		ot::Color curveColour;
+		std::unique_ptr<ot::Painter2D> painter;
 		if (i == 0)
 		{
 			resultVector = resultSink->GetResultX();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "x");
-			curveColour = ot::Color(ot::DefaultColor::Blue);
 		}
 		else if (i == 1)
 		{
 			resultVector = resultSink->GetResultY();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "y");
-			curveColour = ot::Color(ot::DefaultColor::Red);
 		}
 		else
 		{
 			resultVector = resultSink->GetResultZ();
 			curveName = pipeline->GetResultLegendLabel();
 			curveName.insert(1, "z");
-			curveColour = ot::Color(ot::DefaultColor::Green);
 		}
-
+		painter = painterIt.getNextPainter();
 
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 		quantDesc->setName(pipeline->GetLabelYAxis());
@@ -688,7 +687,7 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 		curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
 		curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
 		curveConfig.setTitle(curveName);
-		curveConfig.setLinePenColor(curveColour);
+		curveConfig.setLinePen(painter.release());
 		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
 	}
 	
