@@ -9,16 +9,14 @@
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
+	m_RMDCategorizationName = getDataCategorizationRootName() + "/Campaign Metadata";
+	m_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
+	m_circuitName = ot::FolderNames::CircuitsFolder + "/Circuit 1";
+
 	if (projectType == OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT)
 	{
 		// Here we don't need to do anything, since all switches are activated by default
 
-		_dataCategorizationRootName = "Data Categorization";
-		_datasetRootName = ot::FolderNames::DatasetFolder;
-		_RMDCategorizationName = getDataCategorizationRootName() + "/Campaign Metadata";
-		_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
-		_circuitRootName = "Circuits";
-		_circuitName = getCircuitRootName() + "/Circuit 1";
 	}
 	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_3DSIM)
 	{
@@ -53,155 +51,137 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 
 void ProjectTypeManager::initializeProjectType3DSimulation(void)
 {
-	_hasGeometryRoot				= true;
-	_hasCircuitsRoot				= false;
-	_hasCircuit						= false;
-	_hasMaterialRoot				= true;
-	_hasMeshRoot					= true;
-	_hasSolverRoot					= true;
-	_hasScriptsRoot					= false;
-	_hasUnitRoot					= true;
-	_hasDataCategorizationRoot		= false;
-	_hasRMDCategorization			= false;
-	_hasRMDCategorizationPreview	= false;
-	_hasDatasetRoot					= true;
-	_hasDatasetRMD					= true;
-
-	_has3DView						= true;
-	_has1DView						= true;
-	_hasBlockPicker					= false;
-
-	_datasetRootName = ot::FolderNames::DatasetFolder;
-	_datasetRMD = getDatasetRootName() + "/Campaign Metadata";
-
+	m_hasGeometryRoot				= true;
+	m_hasCircuitsRoot				= false;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= true;
+	m_hasMeshRoot					= true;
+	m_hasSolverRoot					= true;
+	m_hasScriptsRoot				= false;
+	m_hasUnitRoot					= true;
+	m_hasDataCategorizationRoot		= false;
+	m_hasRMDCategorization			= false;
+	m_hasRMDCategorizationPreview	= false;
+	
+	m_has3DView						= true;
+	m_has1DView						= true;
+	m_hasBlockPicker				= false;
 }
 
 void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 {
-	_hasGeometryRoot				= false;
-	_hasCircuitsRoot				= false;
-	_hasCircuit						= false;
-	_hasMaterialRoot				= false;
-	_hasMeshRoot					= false;
-	_hasSolverRoot					= false;
-	_hasScriptsRoot					= true;
-	_hasUnitRoot					= true;
-	_hasDataCategorizationRoot		= true;
-	_hasRMDCategorization			= true;
-	_hasRMDCategorizationPreview	= true;
-	_hasDatasetRoot					= true;
-	_hasDatasetRMD					= true;
-
-	_has3DView						= false;
-	_has1DView						= true;
-	_hasBlockPicker					= true;
-
-	_dataCategorizationRootName = "Data Categorization";
-	_datasetRootName            = ot::FolderNames::DatasetFolder;
-	_RMDCategorizationName      = getDataCategorizationRootName() + "/Campaign Metadata";
-	_datasetRMD                 = getDatasetRootName() + "/Campaign Metadata";
-
+	m_hasGeometryRoot				= false;
+	m_hasCircuitsRoot				= false;
+	m_hasCircuit					= false;
+	m_hasMaterialRoot				= false;
+	m_hasMeshRoot					= false;
+	m_hasSolverRoot					= false;
+	m_hasScriptsRoot				= true;
+	m_hasUnitRoot					= true;
+	m_hasDataCategorizationRoot		= true;
+	m_hasRMDCategorization			= true;
+	m_hasRMDCategorizationPreview	= true;
+	
+	m_has3DView						= false;
+	m_has1DView						= true;
+	m_hasBlockPicker				= true;
 }
 
 void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 {
-	_hasGeometryRoot = true;
-	_hasCircuitsRoot = false;
-	_hasCircuit	= false;
-	_hasMaterialRoot = true;
-	_hasMeshRoot = false;
-	_hasSolverRoot = false;
-	_hasScriptsRoot = false;
-	_hasUnitRoot = true;
-	_hasDataCategorizationRoot = false;
-	_hasRMDCategorization = false;
-	_hasRMDCategorizationPreview = false;
-	_hasDatasetRoot = true;
-	_hasDatasetRMD = true;
-
-	_has3DView = true;
-	_has1DView = true;
-	_hasBlockPicker = false;
-
-	_datasetRootName = ot::FolderNames::DatasetFolder;
-	_datasetRMD      = getDatasetRootName() + "/Information";
+	m_hasGeometryRoot = true;
+	m_hasCircuitsRoot = false;
+	m_hasCircuit	= false;
+	m_hasMaterialRoot = true;
+	m_hasMeshRoot = false;
+	m_hasSolverRoot = false;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = true;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
+	
+	m_has3DView = true;
+	m_has1DView = true;
+	m_hasBlockPicker = false;
 }
 
 void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 {
-	_hasGeometryRoot = false;
-	_hasCircuitsRoot = false;
-	_hasCircuit = false;
-	_hasMaterialRoot = false;
-	_hasMeshRoot = false;
-	_hasSolverRoot = false;
-	_hasScriptsRoot = false;
-	_hasUnitRoot = false;
-	_hasDataCategorizationRoot = false;
-	_hasRMDCategorization = false;
-	_hasRMDCategorizationPreview = false;
-	_hasDatasetRoot = true;
-	_hasDatasetRMD = true;
+	m_hasGeometryRoot = false;
+	m_hasCircuitsRoot = false;
+	m_hasCircuit = false;
+	m_hasMaterialRoot = false;
+	m_hasMeshRoot = false;
+	m_hasSolverRoot = false;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = false;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
 
-	_has3DView = false;
-	_has1DView = true;
-	_hasBlockPicker = true;
+	m_has3DView = false;
+	m_has1DView = true;
+	m_hasBlockPicker = true;
 
-	_datasetRootName = ot::FolderNames::DatasetFolder;
-	_datasetRMD = getDatasetRootName() + "/Information";
+	m_datasetRMD = ot::FolderNames::DatasetFolder + "/Information";
 }
 
 void ProjectTypeManager::initializeProjectTypePyrit(void)
 {
-	_hasGeometryRoot = true;
-	_hasCircuitsRoot = false;
-	_hasCircuit = false;
-	_hasMaterialRoot = true;
-	_hasMeshRoot = true;
-	_hasSolverRoot = true;
-	_hasScriptsRoot = false;
-	_hasUnitRoot = true;
-	_hasDataCategorizationRoot = false;
-	_hasRMDCategorization = false;
-	_hasRMDCategorizationPreview = false;
-	_hasDatasetRoot = false;
-	_hasDatasetRMD = false;
-
-	_has3DView = true;
-	_has1DView = true;
-	_hasBlockPicker = false;
+	m_hasGeometryRoot = true;
+	m_hasCircuitsRoot = false;
+	m_hasCircuit = false;
+	m_hasMaterialRoot = true;
+	m_hasMeshRoot = true;
+	m_hasSolverRoot = true;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = true;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
+	
+	m_has3DView = true;
+	m_has1DView = true;
+	m_hasBlockPicker = false;
 }
 
 void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 {
-	_hasGeometryRoot = false;
-	_hasCircuitsRoot = true;
-	_hasCircuit = true;
-	_hasMaterialRoot = false;
-	_hasMeshRoot = false;
-	_hasSolverRoot = true;
-	_hasScriptsRoot = false;
-	_hasUnitRoot = true;
-	_hasDataCategorizationRoot = false;
-	_hasRMDCategorization = false;
-	_hasRMDCategorizationPreview = false;
-	_hasDatasetRoot = false;
-	_hasDatasetRMD = false;
+	m_hasGeometryRoot = false;
+	m_hasCircuitsRoot = true;
+	m_hasCircuit = true;
+	m_hasMaterialRoot = false;
+	m_hasMeshRoot = false;
+	m_hasSolverRoot = true;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = true;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
+	
 
-	_has3DView = false;
-	_has1DView = true;
-	_hasBlockPicker = true;
-
-	_circuitRootName = "Circuits";
-	_circuitName = getCircuitRootName() + "/Circuit 1";
+	m_has3DView = false;
+	m_has1DView = true;
+	m_hasBlockPicker = true;
 }
 
 std::string ProjectTypeManager::getViews(void)
 {
 	ot::JsonDocument newDoc;
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, _has3DView, newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, _has1DView, newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, _hasBlockPicker, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, m_has3DView, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, m_has1DView, newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, m_hasBlockPicker, newDoc.GetAllocator());
 
 	return newDoc.toJson();
+}
+
+std::string ProjectTypeManager::getDatasetRootName()
+{
+	return ot::FolderNames::DatasetFolder;
+}
+
+std::string ProjectTypeManager::getDataCategorizationRootName()
+{
+	return ot::FolderNames::DataCategorisationFolder;
 }

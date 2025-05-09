@@ -3653,7 +3653,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 					break;
 				}
 			}
-
+			else
+			{
+				OT_LOG_W("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter);
+			}
 		}
 
 		//Now we add the data sets to the plot and visualise them

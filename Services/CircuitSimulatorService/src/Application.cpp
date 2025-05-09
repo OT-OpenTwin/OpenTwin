@@ -459,7 +459,6 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	sendNetlistToSubService(_netlist);
 
 	m_ngSpice.clearBufferStructure(name);
-	
 }
 
 void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {

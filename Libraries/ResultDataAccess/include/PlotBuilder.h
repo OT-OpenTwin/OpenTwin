@@ -43,6 +43,8 @@ private:
 	std::list<EntityResult1DCurve_New> m_curves;
 
 	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
+	//Maybe an option, but the properties for the curves are not very secure. Multiple options exist for x-axis label and unit if multiple datasets are used
+	void setDefaults(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
 
 	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
 	

@@ -630,8 +630,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			yUnit = "V";
 		}
 
-		std::string yLabel = it.first;
-		
 		parameter.unit = xUnit;
 		parameter.parameterName = xLabel;
 		parameter.typeName = ot::TypeNames::getDoubleTypeName();
@@ -651,27 +649,33 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setTitle(curveName);
+		curveCfg.setXAxisTitle(parameter.parameterName);
+		curveCfg.setXAxisUnit(parameter.unit);
+
 
 		uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
 		ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
 		auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
 		curveCfg.setLinePen(stylePainter);
 
-
+		std::string yLabel = it.first;
 		if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 		{
 			yLabel = "Voltage";
+			curveCfg.setYAxisTitle(yLabel);
+			curveCfg.setYAxisUnit(yUnit);
 			quantity->addValueDescription(yLabel, ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());
-
 			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, curveName);				
 		}
 		else
 		{
 			yLabel = "Current";
 			yUnit = "I";
-			quantity->addValueDescription(yLabel, ot::TypeNames::getDoubleTypeName(), yUnit);
+			curveCfg.setYAxisTitle(yLabel);
+			curveCfg.setYAxisUnit(yUnit);
 
+			quantity->addValueDescription(yLabel, ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());
 
 			plotBuilderCurrent.addCurve(std::move(dataset), curveCfg, curveName);

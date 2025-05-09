@@ -8,27 +8,27 @@ public:
 	ProjectTypeManager(const std::string& projectType);
 	ProjectTypeManager() = delete;
 
-	bool hasGeometryRoot(void)				{ return _hasGeometryRoot; }
-	bool hasCircuitsRoot(void)				{ return _hasCircuitsRoot; }
-	bool hasCircuit(void)					{ return _hasCircuit; }
-	bool hasMaterialRoot(void)				{ return _hasMaterialRoot; }
-	bool hasMeshRoot(void)					{ return _hasMeshRoot; }
-	bool hasSolverRoot(void)				{ return _hasSolverRoot; }
-	bool hasScriptsRoot(void)				{ return _hasScriptsRoot; }
-	bool hasUnitRoot(void)					{ return _hasUnitRoot; }
-	bool hasDataCategorizationRoot(void)	{ return _hasDataCategorizationRoot; }
-	bool hasRMDCategorization(void)			{ return _hasRMDCategorization; }
-	bool hasRMDCategorizationPreview(void)	{ return _hasRMDCategorizationPreview; }
-	bool hasDatasetRoot(void)				{ return _hasDatasetRoot; }
-	bool hasDatasetRMD(void)				{ return _hasDatasetRMD; }
+	bool hasGeometryRoot(void)				{ return m_hasGeometryRoot; }
+	bool hasCircuitsRoot(void)				{ return m_hasCircuitsRoot; }
+	bool hasCircuit(void)					{ return m_hasCircuit; }
+	bool hasMaterialRoot(void)				{ return m_hasMaterialRoot; }
+	bool hasMeshRoot(void)					{ return m_hasMeshRoot; }
+	bool hasSolverRoot(void)				{ return m_hasSolverRoot; }
+	bool hasScriptsRoot(void)				{ return m_hasScriptsRoot; }
+	bool hasUnitRoot(void)					{ return m_hasUnitRoot; }
+	bool hasDataCategorizationRoot(void)	{ return m_hasDataCategorizationRoot; }
+	bool hasRMDCategorization(void)			{ return m_hasRMDCategorization; }
+	bool hasRMDCategorizationPreview(void)	{ return m_hasRMDCategorizationPreview; }
+	bool hasDatasetRoot(void)				{ return m_hasDatasetRoot; }
+	bool hasDatasetRMD(void)				{ return m_hasDatasetRMD; }
 
-	std::string getDataCategorizationRootName(void) { return _dataCategorizationRootName; };
-	std::string getDatasetRootName()                { return _datasetRootName; };
-	std::string getRMDCategorizationName()          { return _RMDCategorizationName; };
-	std::string getDatasetRMD()                     { return _datasetRMD; }
-	std::string getCircuitRootName()				{ return _circuitRootName; }
-	std::string getCircuitName()						{ return _circuitName; }
+	std::string getRMDCategorizationName()          { return m_RMDCategorizationName; }
+	std::string getDatasetRMD()                     { return m_datasetRMD; }
+	std::string getCircuitName()						{ return m_circuitName; }
 	std::string getViews(void);
+
+	std::string getDatasetRootName();
+	std::string getDataCategorizationRootName();
 
 private:
 	void initializeProjectType3DSimulation(void);
@@ -38,30 +38,29 @@ private:
 	void initializeProjectTypePyrit(void);
 	void initializeProjectTypeCircuitSimulation(void);
 
-	bool _hasGeometryRoot				= true;
-	bool _hasCircuitsRoot				= true;
-	bool _hasCircuit					= true;
-	bool _hasMaterialRoot				= true;
-	bool _hasMeshRoot					= true;
-	bool _hasSolverRoot					= true;
-	bool _hasScriptsRoot				= true;
-	bool _hasUnitRoot					= true;
-	bool _hasDataCategorizationRoot		= true;
-	bool _hasRMDCategorization			= true;
-	bool _hasRMDCategorizationPreview	= true;
-	bool _hasDatasetRoot				= true;
-	bool _hasDatasetRMD					= true;
+	bool m_hasGeometryRoot				= true;
+	bool m_hasCircuitsRoot				= true;
+	bool m_hasCircuit					= true;
+	bool m_hasMaterialRoot				= true;
+	bool m_hasMeshRoot					= true;
+	bool m_hasSolverRoot				= true;
+	bool m_hasScriptsRoot				= true;
+	bool m_hasUnitRoot					= true;
+	bool m_hasDataCategorizationRoot	= true;
+	bool m_hasRMDCategorization			= true;
+	bool m_hasRMDCategorizationPreview	= true;
 	
-	bool _has3DView						= true;
-	bool _has1DView						= true;
-	bool _hasBlockPicker				= true;
+	//Became now mandatory since plot data and solver results in general are also stored in the result data base.
+	const bool m_hasDatasetRoot				= true;
+	const bool m_hasDatasetRMD				= true;
+	
+	bool m_has3DView					= true;
+	bool m_has1DView					= true;
+	bool m_hasBlockPicker				= true;
 
-	std::string _dataCategorizationRootName;
-	std::string _datasetRootName;
-	std::string _RMDCategorizationName;
-	std::string _datasetRMD;
-	std::string _circuitRootName;
-	std::string _circuitName;
+	std::string m_RMDCategorizationName;
+	std::string m_datasetRMD;
+	std::string m_circuitName;
 };
 
 

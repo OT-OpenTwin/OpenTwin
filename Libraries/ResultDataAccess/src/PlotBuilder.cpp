@@ -75,7 +75,7 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 	{
 		return valid;
 	}
-	
+
 	//Only for now with a single y-axis
 	const std::string labelY = _config.getYAxisTitle();
 
@@ -86,6 +86,25 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 	}
 
 	return valid;
+}
+
+void PlotBuilder::setDefaults(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config)
+{
+	for (auto& datasetDescription : _dataSetDescriptions)
+	{
+		if (datasetDescription.getParameters().size() == 1)
+		{
+			const MetadataParameter& parameter = (*datasetDescription.getParameters().begin())->getMetadataParameter();
+			if (_config.getXAxisTitle().empty())
+			{
+				_config.setXAxisTitle(parameter.parameterLabel);
+			}
+			if (_config.getXAxisUnit().empty())
+			{
+				_config.setXAxisUnit(parameter.unit);
+			}
+		}
+	}
 }
 
 void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)

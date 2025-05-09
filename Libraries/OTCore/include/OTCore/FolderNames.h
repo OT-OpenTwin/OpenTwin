@@ -10,6 +10,9 @@ namespace ot
 		const std::string DatasetFolder = "Dataset";
 		const std::string BlockFolder = "Blocks";
 		const std::string ResultFolder = "Results";
+		const std::string DataCategorisationFolder = "Data Categorization";
+		const std::string CircuitsFolder = "Circuits";
+
 	}
 }
 
