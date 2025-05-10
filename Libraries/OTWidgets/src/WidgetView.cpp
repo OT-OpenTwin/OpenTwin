@@ -30,7 +30,7 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType) :
 	m_dockWidget = new WidgetViewDock(this);
 
 	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
-	this->connect(m_dockWidget, &WidgetViewDock::dockLockedChanged, this, &WidgetView::slotLockedChanged);
+	this->connect(m_dockWidget, &WidgetViewDock::dockPinnedChanged, this, &WidgetView::slotPinnedChanged);
 }
 
 ot::WidgetView::~WidgetView() {
@@ -69,7 +69,7 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_dockWidget->toggleViewAction()->setVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
 
 	m_dockWidget->setCloseButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
-	m_dockWidget->setLockButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
+	m_dockWidget->setPinButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
 }
@@ -126,6 +126,6 @@ void ot::WidgetView::slotToggleVisible(void) {
 	m_dockWidget->toggleView(!m_dockWidget->isVisible());
 }
 
-void ot::WidgetView::slotLockedChanged(bool _isLocked) {
+void ot::WidgetView::slotPinnedChanged(bool _isPinned) {
 
 }

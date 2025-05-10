@@ -9,15 +9,15 @@
 #include "OTWidgets/WidgetViewDock.h"
 
 ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
-	ads::CDockWidget(QString()), m_view(_view)
+	ads::CDockWidget(QString()), m_view(_view), m_tab(nullptr)
 {
-	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
-	if (actualTab) {
-		this->connect(actualTab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
-		this->connect(actualTab, &WidgetViewTab::viewLockedChanged, this, &WidgetViewDock::slotLockedChanged);
+	m_tab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
+	if (m_tab) {
+		this->connect(m_tab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
+		this->connect(m_tab, &WidgetViewTab::viewPinnedChanged, this, &WidgetViewDock::slotPinnedChanged);
 	}
 	else {
-		OT_LOG_E("Unexpected tab");
+		OT_LOG_EA("Unexpected tab");
 	}
 
 	this->setFeature(ads::CDockWidget::CustomCloseHandling, true);
@@ -39,17 +39,23 @@ void ot::WidgetViewDock::closeView(void) {
 }
 
 void ot::WidgetViewDock::setCloseButtonVisible(bool _vis) {
-	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
-	if (actualTab) {
-		actualTab->setCloseButtonVisible(_vis);
-	}
+	OTAssertNullptr(m_tab);
+	m_tab->setCloseButtonVisible(_vis);
 }
 
-void ot::WidgetViewDock::setLockButtonVisible(bool _vis) {
-	WidgetViewTab* actualTab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
-	if (actualTab) {
-		actualTab->setLockButtonVisible(_vis);
-	}
+void ot::WidgetViewDock::setPinButtonVisible(bool _vis) {
+	OTAssertNullptr(m_tab);
+	m_tab->setPinButtonVisible(_vis);
+}
+
+void ot::WidgetViewDock::setIsPinned(bool _isPinned) {
+	OTAssertNullptr(m_tab);
+	m_tab->setIsPinned(_isPinned);
+}
+
+bool ot::WidgetViewDock::getIsPinned(void) const {
+	OTAssertNullptr(m_tab);
+	return m_tab->getIsPinned();
 }
 
 void ot::WidgetViewDock::resizeEvent(QResizeEvent* _event) {
@@ -61,6 +67,6 @@ void ot::WidgetViewDock::slotCloseRequested(void) {
 	Q_EMIT dockCloseRequested();
 }
 
-void ot::WidgetViewDock::slotLockedChanged(bool _isLocked) {
-	Q_EMIT dockLockedChanged(_isLocked);
+void ot::WidgetViewDock::slotPinnedChanged(bool _isPinned) {
+	Q_EMIT dockPinnedChanged(_isPinned);
 }

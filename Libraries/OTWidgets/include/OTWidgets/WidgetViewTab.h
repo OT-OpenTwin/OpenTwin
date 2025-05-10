@@ -26,22 +26,22 @@ namespace ot {
 		WidgetViewTab(ads::CDockWidget* _dockWidget);
 		virtual ~WidgetViewTab();
 
-		void setLocked(bool _locked) { m_isLocked = _locked; };
-		bool isLocked(void) const { return m_isLocked; };
+		void setIsPinned(bool _pinned);
+		bool getIsPinned(void) const { return m_isPinned; };
 
 		void setCloseButtonVisible(bool _vis);
-		void setLockButtonVisible(bool _vis);
+		void setPinButtonVisible(bool _vis);
 
 	Q_SIGNALS:
 		void viewCloseRequested(void);
-		void viewLockedChanged(bool _isLocked);
+		void viewPinnedChanged(bool _isPinned);
 
 	private Q_SLOTS:
 		void slotClose(void);
-		void slotToggleLocked(void);
+		void slotTogglePinned(void);
 
 	private:
-		bool m_isLocked;
+		bool m_isPinned;
 
 		ToolButton* m_closeButton;
 		ToolButton* m_lockButton;

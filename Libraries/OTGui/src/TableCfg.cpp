@@ -57,7 +57,7 @@ ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
 }
 
 ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode)
-	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns()),
+	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns()),
 	m_sortingEnabled(false), m_sortingClearable(false)
 {
 	OT_TEST_TABLECFG_Interval("GenericDataStructMatrix constructor");

@@ -15,6 +15,7 @@
 namespace ot {
 
 	class WidgetView;
+	class WidgetViewTab;
 
 	class OT_WIDGETS_API_EXPORT WidgetViewDock : public ads::CDockWidget {
 		Q_OBJECT
@@ -28,24 +29,28 @@ namespace ot {
 		void closeView(void);
 		
 		void setCloseButtonVisible(bool _vis);
-		void setLockButtonVisible(bool _vis);
+		void setPinButtonVisible(bool _vis);
 
 		WidgetView* getWidgetView(void) const { return m_view; };
+
+		void setIsPinned(bool _isPinned);
+		bool getIsPinned(void) const;
 
 	Q_SIGNALS:
 		void dockResized(const QSize& _newSize);
 		void dockCloseRequested(void);
-		void dockLockedChanged(bool _isLocked);
+		void dockPinnedChanged(bool _isPinned);
 
 	protected:
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
 	private Q_SLOTS:
 		void slotCloseRequested(void);
-		void slotLockedChanged(bool _isLocked);
+		void slotPinnedChanged(bool _isPinned);
 
 	private:
 		WidgetView* m_view;
+		WidgetViewTab* m_tab;
 	};
 
 }

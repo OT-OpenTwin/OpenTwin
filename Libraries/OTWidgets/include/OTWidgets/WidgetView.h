@@ -112,7 +112,7 @@ namespace ot {
 	private Q_SLOTS:
 		void slotCloseRequested(void);
 		void slotToggleVisible(void);
-		void slotLockedChanged(bool _isLocked);
+		void slotPinnedChanged(bool _isPinned);
 
 	private:
 		friend class WidgetViewManager;
