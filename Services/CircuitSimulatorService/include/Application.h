@@ -11,11 +11,13 @@
 #include "Circuit.h"
 #include "BlockEntityHandler.h"
 #include "NGSpice.h"
+#include "SubprocessHandler.h"
+#include "ConnectionManager.h"
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
-#include "SubprocessHandler.h"
-#include "ConnectionManager.h"
+#include "OTServiceFoundation/MenuButtonDescription.h"
+
 // C++ header
 #include <string>
 #include <map>
@@ -164,5 +166,8 @@ public:
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
 	QtWrapper* m_qtWrapper = nullptr;
+	ot::MenuButtonDescription m_buttonRunSimulation;
+	ot::MenuButtonDescription m_buttonAddCircuit;
+	ot::MenuButtonDescription m_buttonAddSolver;
 	
 };

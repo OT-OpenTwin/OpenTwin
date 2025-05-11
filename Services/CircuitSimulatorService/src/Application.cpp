@@ -107,19 +107,15 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	
 
 
-	if (action == "Circuit Simulator:Edit:Add Solver") {
+	if (action == m_buttonAddSolver.GetFullDescription()) {
 		addSolver();
 	}
-	else if (action == "Circuit Simulator:Simulate:Run Simulation") {
+	else if (action == m_buttonRunSimulation.GetFullDescription()) {
 
-		runCircuitSimulation();
-
-		
-
-
+		runCircuitSimulation();	
 		
 	}
-	else if (action == "Circuit Simulator:Edit:Add Circuit") {
+	else if (action == m_buttonAddCircuit.GetFullDescription()) {
 		createNewCircuit();
 	}
 	else {
@@ -667,9 +663,15 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
-	_ui->addMenuButton("Circuit Simulator", "Edit","Add Solver", "Add Solver", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
-	_ui->addMenuButton("Circuit Simulator","Simulate","Run Simulation","Run Simulation", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Kriging", "Default");
-	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
+
+	m_buttonAddSolver.SetDescription("Circuit Simulator", "Edit", "Add Solver");
+	_ui->addMenuButton(m_buttonAddSolver,ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
+
+	m_buttonRunSimulation.SetDescription("Circuit Simulator", "Simulate", "Run Simulation");
+	_ui->addMenuButton(m_buttonRunSimulation, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Kriging", "Default");
+
+	m_buttonAddCircuit.SetDescription("Circuit Simulator", "Edit", "Add Circuit");
+	_ui->addMenuButton(m_buttonAddCircuit, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	
