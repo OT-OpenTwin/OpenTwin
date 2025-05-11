@@ -22,14 +22,14 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
 	m_closeButton->setObjectName("OT_ViewTabCloseButton");
 	m_closeButton->setFixedSize(14, 14);
 	
-	m_lockButton = new ToolButton;
-	m_lockButton->setHidden(true);
-	m_lockButton->setObjectName("OT_ViewTabPinButton");
-	m_lockButton->setFixedSize(14, 14);
-	m_lockButton->setProperty("IsPinned", m_isPinned);
+	m_pinButton = new ToolButton;
+	m_pinButton->setHidden(true);
+	m_pinButton->setObjectName("OT_ViewTabPinButton");
+	m_pinButton->setFixedSize(14, 14);
+	m_pinButton->setProperty("IsPinned", m_isPinned);
 
 	this->connect(m_closeButton, &ToolButton::clicked, this, &WidgetViewTab::slotClose);
-	this->connect(m_lockButton, &ToolButton::clicked, this, &WidgetViewTab::slotTogglePinned);
+	this->connect(m_pinButton, &ToolButton::clicked, this, &WidgetViewTab::slotTogglePinned);
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
@@ -44,12 +44,12 @@ void ot::WidgetViewTab::setIsPinned(bool _pinned) {
 
 	// Update pinned state
 	m_isPinned = _pinned;
-	m_lockButton->setProperty("IsPinned", m_isPinned);
+	m_pinButton->setProperty("IsPinned", m_isPinned);
 
 	// Reapply style
-	m_lockButton->style()->unpolish(m_lockButton);
-	m_lockButton->style()->polish(m_lockButton);
-	m_lockButton->update();
+	m_pinButton->style()->unpolish(m_pinButton);
+	m_pinButton->style()->polish(m_pinButton);
+	m_pinButton->update();
 
 	// Emit signal
 	Q_EMIT viewPinnedChanged(m_isPinned);
@@ -74,7 +74,7 @@ void ot::WidgetViewTab::setCloseButtonVisible(bool _vis) {
 }
 
 void ot::WidgetViewTab::setPinButtonVisible(bool _vis) {
-	if (_vis == !m_lockButton->isHidden()) {
+	if (_vis == !m_pinButton->isHidden()) {
 		return;
 	}
 
@@ -85,13 +85,13 @@ void ot::WidgetViewTab::setPinButtonVisible(bool _vis) {
 	}
 
 	int ix = std::max(layout->count(), layout->count() - 2);
-	if (!m_lockButton->isHidden()) {
+	if (!m_closeButton->isHidden()) {
 		ix -= 2;
 	}
-	layout->insertWidget(ix++, m_lockButton, Qt::AlignVCenter);
+	layout->insertWidget(ix++, m_pinButton, Qt::AlignVCenter);
 	layout->insertSpacing(ix++, qRound(1.5 * layout->contentsMargins().left() / 2.0));
 
-	m_lockButton->setVisible(_vis);
+	m_pinButton->setVisible(_vis);
 }
 
 void ot::WidgetViewTab::slotClose(void) {

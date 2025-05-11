@@ -2545,37 +2545,37 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 #OT_ViewTabPinButton[IsPinned="true"] {
     background: transparent;
     border: none;
-    image: url('%root%/icons/window_pin.png');
+    image: url('%root%/icons/window_unpin.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:hover:!pressed {
-    image: url('%root%/icons/window_pin_focus.png');
+    image: url('%root%/icons/window_unpin_focus.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:pressed {
-    image: url('%root%/icons/window_pin_pressed.png');
+    image: url('%root%/icons/window_unpin_pressed.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:disabled {
-    image: url('%root%/icons/window_pin_disabled.png');
+    image: url('%root%/icons/window_unpin_disbaled.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"] {
     background: transparent;
     border: none;
-    image: url('%root%/icons/window_unpin.png');
+    image: url('%root%/icons/window_pin.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:hover:!pressed {
-    image: url('%root%/icons/window_unpin_focus.png');
+    image: url('%root%/icons/window_pin_focus.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:pressed {
-    image: url('%root%/icons/window_unpin_pressed.png');
+    image: url('%root%/icons/window_pin_pressed.png');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:disabled {
-    image: url('%root%/icons/window_unpin_disbaled.png');
+    image: url('%root%/icons/window_pin_disabled.png');
 }
 
 /* ##################################################################################### */

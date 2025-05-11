@@ -2539,37 +2539,37 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 #OT_ViewTabPinButton[IsPinned="true"] {
     background: transparent;
     border: none;
-    image: url('%file:Window Pin Icon%');
+    image: url('%file:Window Unpin Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:hover:!pressed {
-    image: url('%file:Window Pin Focus Icon%');
+    image: url('%file:Window Unpin Focus Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:pressed {
-    image: url('%file:Window Pin Pressed Icon%');
+    image: url('%file:Window Unpin Pressed Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="true"]:disabled {
-    image: url('%file:Window Pin Disabled Icon%');
+    image: url('%file:Window Unpin Disabled Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"] {
     background: transparent;
     border: none;
-    image: url('%file:Window Unpin Icon%');
+    image: url('%file:Window Pin Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:hover:!pressed {
-    image: url('%file:Window Unpin Focus Icon%');
+    image: url('%file:Window Pin Focus Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:pressed {
-    image: url('%file:Window Unpin Pressed Icon%');
+    image: url('%file:Window Pin Pressed Icon%');
 }
 
 #OT_ViewTabPinButton[IsPinned="false"]:disabled {
-    image: url('%file:Window Unpin Disabled Icon%');
+    image: url('%file:Window Pin Disabled Icon%');
 }
 
 /* ##################################################################################### */

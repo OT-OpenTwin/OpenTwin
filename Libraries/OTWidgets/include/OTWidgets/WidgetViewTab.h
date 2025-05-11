@@ -44,7 +44,7 @@ namespace ot {
 		bool m_isPinned;
 
 		ToolButton* m_closeButton;
-		ToolButton* m_lockButton;
+		ToolButton* m_pinButton;
 		
 	};
 
