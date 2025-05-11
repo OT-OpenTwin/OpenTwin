@@ -85,6 +85,7 @@ public:
 	std::string extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence);
 
 	void finishSimulation();
+	void finishFailedSimulation();
 
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }

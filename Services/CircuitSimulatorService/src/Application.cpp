@@ -400,7 +400,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	if (name == "failed")
 	{
 		OT_LOG_E("No Circuit found or selected!");
-		m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+		finishFailedSimulation();
 		m_SimulationRunning = false;
 		return;
 	}
@@ -424,6 +424,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	{
 		OT_LOG_E("NGSpice Initialize function failed!");
 		m_ngSpice.clearBufferStructure(name);
+		finishFailedSimulation();
 		return;
 	}
 
@@ -440,6 +441,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 	else {
 		OT_LOG_E("Initialization of subprocess failed!");
+		finishFailedSimulation();
 	}
 
 #ifndef _DEBUG
@@ -517,6 +519,16 @@ void Application::finishSimulation() {
 	SimulationResults::getInstance()->clearUp();
 	runNextSolvers();
 
+}
+
+void Application::finishFailedSimulation() {
+	OT_LOG_E("Simulation Failed! Shutting down!");
+
+	m_uiComponent->closeProgressInformation();
+	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	m_SimulationRunning = false;
+	SimulationResults::getInstance()->storeLogDataInResultText();
+	SimulationResults::getInstance()->clearUp();
 }
 
 SubprocessHandler* Application::getSubProcessHandler() {
