@@ -7,7 +7,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitResistor"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties() override;
-	std::string getElementType();
+	std::string getResistance();
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 

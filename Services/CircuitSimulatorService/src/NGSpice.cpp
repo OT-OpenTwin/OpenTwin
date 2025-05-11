@@ -585,7 +585,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		else if (blockEntity->getClassName() == "EntityBlockCircuitResistor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-			auto resistor = std::make_unique<Resistor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+			auto resistor = std::make_unique<Resistor>(myElement->getResistance(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
 			resistor->setCustomName(myElement->getNameOnly());
 			resistor->setNetlistName(assignElementID("R"));

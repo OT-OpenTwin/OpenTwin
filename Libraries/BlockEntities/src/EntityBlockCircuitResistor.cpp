@@ -28,7 +28,7 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 }
 
 void EntityBlockCircuitResistor::createProperties() {
-	EntityPropertiesString::createProperty("Element Property", "ElementType", "200", "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "Resistance", "200", "default", getProperties());
 }
 
 double EntityBlockCircuitResistor::getRotation() {
@@ -47,8 +47,8 @@ std::string EntityBlockCircuitResistor::getFlip() {
 	return value;
 }
 
-std::string EntityBlockCircuitResistor::getElementType() {
-	auto propertyBase = getProperties().getProperty("ElementType");
+std::string EntityBlockCircuitResistor::getResistance() {
+	auto propertyBase = getProperties().getProperty("Resistance");
 	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
 	assert(elementType != nullptr);
 
