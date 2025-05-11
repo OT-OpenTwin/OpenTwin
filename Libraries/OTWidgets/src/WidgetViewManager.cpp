@@ -190,6 +190,31 @@ void ot::WidgetViewManager::closeViews(void) {
 	m_state = bck;
 }
 
+void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, bool _ignoreCurrent) {
+	std::list<WidgetView*> views;
+	for (const ViewEntry& view : m_views) {
+		const WidgetViewDock* dock = view.second->getViewDockWidget();
+		OTAssertNullptr(dock);
+		if ((view.second->getViewData().getViewFlags() & _flags) == _flags && !dock->getIsPinned()) {
+			
+			if (!_ignoreCurrent || 
+				(
+					view.second != m_focusInfo.last && 
+					view.second != m_focusInfo.lastCentral && 
+					view.second != m_focusInfo.lastSide && 
+					view.second != m_focusInfo.lastTool)
+				) 
+			{
+				views.push_back(view.second);
+			}
+		}
+	}
+
+	for (WidgetView* view : views) {
+		this->handleViewCloseRequest(view);
+	}
+}
+
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
@@ -442,16 +467,11 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 	}
 
 	WidgetView* view = dynamic_cast<WidgetView*>(sender());
-	if (!view) {
-		OT_LOG_E("View not found");
-		return;
-	}
-
-	if (view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
-		view->getViewDockWidget()->toggleView(view->getViewDockWidget()->isClosed());
+	if (view) {
+		this->handleViewCloseRequest(view);
 	}
 	else {
-		Q_EMIT viewCloseRequested(view);
+		OT_LOG_E("View not found");
 	}
 }
 
@@ -686,4 +706,13 @@ ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findOrCreateView
 		m_viewOwnerMap.insert_or_assign(_owner, ret);
 	}
 	return ret;
+}
+
+void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view) {
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
+		_view->getViewDockWidget()->toggleView(_view->getViewDockWidget()->isClosed());
+	}
+	else {
+		Q_EMIT viewCloseRequested(_view);
+	}
 }

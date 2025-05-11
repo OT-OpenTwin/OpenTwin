@@ -121,6 +121,11 @@ namespace ot {
 		//! Widget views that are protected will be ignored.
 		void closeViews(void);
 
+		//! @brief Emits a close request for all unpinned views with the given flags set.
+		//! @param _flags Flags that must be set at the view.
+		//! @param _ignoreCurrent If true the current view will be ignored.
+		void requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, bool _ignoreCurrent);
+
 		//! @brief Removes the provided widget view from the manager.
 		//! The caller takes ownership.
 		//! @param _view View to forget.
@@ -247,6 +252,8 @@ namespace ot {
 
 		ViewNameTypeList* findViewNameTypeList(const BasicServiceInformation& _owner);
 		ViewNameTypeList* findOrCreateViewNameTypeList(const BasicServiceInformation& _owner);
+
+		void handleViewCloseRequest(WidgetView* _view);
 
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions

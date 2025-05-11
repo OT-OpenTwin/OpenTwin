@@ -368,6 +368,8 @@ public:
 
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 
+	void autoCloseUnpinnedViews(void);
+
 	// ##############################################################################################
 
 	// Property grid

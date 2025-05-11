@@ -1647,6 +1647,10 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	}
 }
 
+void AppBase::autoCloseUnpinnedViews(void) {
+	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable, true);
+}
+
 // ##############################################################################################
 
 // Property grid
