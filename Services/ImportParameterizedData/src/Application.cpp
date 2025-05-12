@@ -128,8 +128,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
 	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
-	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "icon");
-	//_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
+	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
@@ -209,182 +208,6 @@ void Application::modelSelectionChanged(void)
 	handler.detach();
 }
 
-// ##################################################################################################################################
-
-#include "ResultCollectionExtender.h"
-#include "PlotBuilder.h"
-#include "DatasetDescription.h"
-#include "QuantityDescriptionCurve.h"
-
-void testPlot()
-{
-	const std::string collName = Application::instance()->getCollectionName();
-
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-	PlotBuilder builder(extender);
-
-	//Single curve
-	/*DatasetDescription description;
-	MetadataParameter parameter;
-	parameter.parameterName = "SomeParameter";
-	parameter.typeName = ot::TypeNames::getInt32TypeName();
-	parameter.unit = "kOlf";
-	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-	quantDesc->setName("SomeQuantity");
-	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "Olf");
-
-	for (int i = 0; i <= 50; i++)
-	{
-		quantDesc->addDatapoint(ot::Variable(i));
-		parameter.values.push_back(ot::Variable(i));
-	}
-	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
-
-	description.setQuantityDescription(quantDesc.release());
-	description.addParameterDescription(parameterDesc);
-
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
-	curveCfg.setXAxisTitle("SomeParameter");
-	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot_Single";
-	curveCfg.setEntityName(plotName + "/A_Curve");
-
-	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");*/
-
-	// Family of curves
-	MetadataParameter parameter;
-	parameter.parameterName = "Frequency";
-	parameter.typeName = ot::TypeNames::getFloatTypeName();
-	parameter.unit = "kHz";
-
-	
-	
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setXAxisTitle("Frequency");
-	curveCfg.setXAxisUnit("kHz");
-	curveCfg.setYAxisTitle("Magnitude");
-	curveCfg.setYAxisUnit("db");
-
-	const std::string plotName = "Test/S-Parameter";
-
-	std::vector<float> offsets{ 3.5f,7.2f,13.f };
-	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
-	std::list<DatasetDescription> descriptions;
-	for (int runID = 0; runID < 3; runID++)
-	{
-		DatasetDescription description;
-		
-		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-		quantDesc->setName("S_11 (Magnitude)");
-		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "dB");
-		
-		for (float i = 0.; i <= 50.; i++)
-		{
-			float value = i * (runID+1);
-			quantDesc->addDatapoint(ot::Variable(value));
-			parameter.values.push_back(ot::Variable(i));
-		}
-		if (parameterDesc == nullptr)
-		{
-			parameterDesc.reset(new ParameterDescription(parameter, false));
-		}
-
-		MetadataParameter additionalParameter;
-		additionalParameter.parameterName = "Offset";
-		additionalParameter.values.push_back(offsets[runID]);
-		additionalParameter.typeName = ot::TypeNames::getFloatTypeName();
-		additionalParameter.unit = "mm";
-		std::shared_ptr<ParameterDescription> additionalParameterDescription(new ParameterDescription(additionalParameter, true));
-		
-		description.setQuantityDescription(quantDesc.release());
-		description.addParameterDescription(parameterDesc);
-		description.addParameterDescription(additionalParameterDescription);
-		descriptions.push_back(std::move(description));
-	}
-	
-	int counter = 0;
-	ot::PainterRainbowIterator rainbowPainterIt;
-	for (auto& description : descriptions)
-	{
-		curveCfg.setTitle("S_11 (Run ID = " + std::to_string(counter) + ")");
-		auto stylePainter = rainbowPainterIt.getNextPainter();
-		curveCfg.setLinePen(stylePainter.release());
-		counter++;
-		builder.addCurve(std::move(description), curveCfg, "Run_ID_" + std::to_string(counter));
-	}
-
-	// Family of curves 3 parameter
-	/*MetadataParameter parameter;
-	parameter.parameterName = "SomeParameter";
-	parameter.typeName = ot::TypeNames::getFloatTypeName();
-	parameter.unit = "kOlf";
-
-
-
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
-	curveCfg.setXAxisTitle("SomeParameter");
-	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot3_ConstParameter";
-	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
-
-	std::vector<float> offsets{ 3.5f,7.2f,13.f };
-	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
-	std::list<DatasetDescription> descriptions;
-	for (int material = 0; material < 3; material++)
-	{
-		for (int runID = 0; runID < 1; runID++)
-		{
-			DatasetDescription description;
-
-			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-			quantDesc->setName("SomeQuantity");
-			quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "Olf");
-
-			for (float i = 0.; i <= 50.; i++)
-			{
-				float value = i * (runID + 1) * pow(-1,material);
-				quantDesc->addDatapoint(ot::Variable(value));
-				parameter.values.push_back(ot::Variable(i));
-			}
-			if (parameterDesc == nullptr)
-			{
-				parameterDesc.reset(new ParameterDescription(parameter, false));
-			}
-
-			MetadataParameter additionalParameter;
-			additionalParameter.parameterName = "Offset";
-			additionalParameter.values.push_back(offsets[runID]);
-			additionalParameter.typeName = ot::TypeNames::getFloatTypeName();
-			additionalParameter.unit = "Attoparsec";
-			std::shared_ptr<ParameterDescription> additionalParameterDescription(new ParameterDescription(additionalParameter, true));
-
-			MetadataParameter additionalParameter2;
-			additionalParameter2.parameterName = "Beauty";
-			additionalParameter2.values.push_back(material);
-			additionalParameter2.typeName = ot::TypeNames::getInt32TypeName();
-			additionalParameter2.unit = "mHelen";
-			std::shared_ptr<ParameterDescription> additionalParameterDescription2(new ParameterDescription(additionalParameter2, true));
-
-			description.setQuantityDescription(quantDesc.release());
-			description.addParameterDescription(parameterDesc);
-			description.addParameterDescription(additionalParameterDescription);
-			description.addParameterDescription(additionalParameterDescription2);
-			descriptions.push_back(std::move(description));
-		}
-	}
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");*/
-
-
-	//Here the shared part
-	ot::Plot1DCfg plotCfg;
-	plotCfg.setEntityName(plotName);
-	builder.buildPlot(plotCfg);
-
-}
-
-
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
 {
 	std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
@@ -410,17 +233,15 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
-
-				testPlot();
-				/*m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
-				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
 				 bool success =_parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
 				 if (!success)
 				 {
 					 delete m_twoPartsAction;
 					 m_twoPartsAction = nullptr;
-				 }*/
+				 }
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
