@@ -1134,16 +1134,6 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	return result;
 }
 
-bool Model::ensure1DView(void) {
-	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions") {
-		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("1D");
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
 bool Model::ensure3DView(void) {
 	if (FrontendAPI::instance()->getCurrentVisualizationTabTitle() != "Versions") {
 		FrontendAPI::instance()->setCurrentVisualizationTabFromTitle("3D");

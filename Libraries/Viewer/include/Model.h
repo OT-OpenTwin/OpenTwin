@@ -139,9 +139,6 @@ public:
 	void freeze3DView(bool flag);
 
 	//! @return Return true if a view change was requested.
-	bool ensure1DView(void);
-
-	//! @return Return true if a view change was requested.
 	bool ensure3DView(void);
 
 	bool isSingleItemSelected(void) { return singleItemSelected; }
