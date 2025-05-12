@@ -1117,13 +1117,6 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
 	
 
-	if (!isItem3DSelected) {
-		// Ensure that we have the 1D view active
-		if (ensure1DView()) {
-			result |= ot::SelectionHandlingEvent::ActiveViewChanged;
-		}
-	}
-
 	if (isItem3DSelected) {
 		// Ensure that we have the 3D view active
 		if (ensure3DView()) {

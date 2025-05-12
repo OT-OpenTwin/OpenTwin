@@ -82,7 +82,6 @@ public:
 
 	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) {};
 
-	virtual bool isItem1D(void) = 0;
 	virtual bool isItem3D(void) = 0;
 
 	void addVisualiser(Visualiser* _visualiser) { m_visualiser.push_back(_visualiser); }

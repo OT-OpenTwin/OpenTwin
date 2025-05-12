@@ -90,7 +90,6 @@ public:
 	Model *getModel(void) { return model; };
 	void setModel(Model *m) { model = m; };
 
-	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
 	osg::Node* addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2);

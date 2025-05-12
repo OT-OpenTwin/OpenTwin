@@ -33,7 +33,6 @@ public:
 							const std::vector<std::array<double, 3>> &triangle_p3,
 							const std::vector<std::array<double, 3>> &triangle_rgb);
 
-	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
 private:
