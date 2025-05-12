@@ -50,7 +50,7 @@ void PlotBuilder::buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 	createPlot(_plotCfg);
 	m_extender.setSaveModel(false);
 	m_extender.storeCampaignChanges();
-	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot", _saveModelState);
+	ot::ModelServiceAPI::addEntitiesToModel(m_newModelStateInformation, "Created new plot",false, _saveModelState);
 	clearBuffer();
 }
 
