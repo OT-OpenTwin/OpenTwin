@@ -22,12 +22,12 @@ The action handling is performed by the OTCommunication api.
 .. image:: images/default_action_handler.png
     :scale: 50%
 
-The following sequence diagram displays the default setup sequence when following the default :ref:`action handler syntax <action_handler_example>`.
+The following sequence diagram displays the default setup sequence when following the default 
 
 .. image:: images/default_action_handler_sequence.png
     :scale: 50%
 
-.. _action_handler_example::
+.. _action_handler_example:
 
 Default Action Handling Example
 ===============================

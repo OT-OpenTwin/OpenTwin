@@ -11,3 +11,4 @@ These sections cover the basics of getting started with OpenTwin, including sett
    managing_certificates
    architecture_overview
    package_overview
+   deploy_scheduled_task
