@@ -20,4 +20,5 @@ See here for more details:
    service_api_structure
    entity_copy_request
    managed_properties
+   creating_1d_plots
    

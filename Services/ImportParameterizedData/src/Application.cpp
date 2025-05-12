@@ -33,6 +33,7 @@
 #include "DatasetOverviewVisualiser.h"
 #include "EntityMetadataSeries.h"
 #include "OTServiceFoundation/UILockWrapper.h"
+#include "OTGui/PainterRainbowIterator.h"
 
 Application * g_instance{ nullptr };
 
@@ -253,17 +254,19 @@ void testPlot()
 
 	// Family of curves
 	MetadataParameter parameter;
-	parameter.parameterName = "SomeParameter";
+	parameter.parameterName = "Frequency";
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
-	parameter.unit = "kOlf";
+	parameter.unit = "kHz";
 
 	
 	
 	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
-	curveCfg.setXAxisTitle("SomeParameter");
-	curveCfg.setYAxisTitle("SomeQuantity");
-	const std::string plotName = "Test/A_plot_MultipleCurves";
+	curveCfg.setXAxisTitle("Frequency");
+	curveCfg.setXAxisUnit("kHz");
+	curveCfg.setYAxisTitle("Magnitude");
+	curveCfg.setYAxisUnit("db");
+
+	const std::string plotName = "Test/S-Parameter";
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -273,8 +276,8 @@ void testPlot()
 		DatasetDescription description;
 		
 		std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
-		quantDesc->setName("SomeQuantity");
-		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "Olf");
+		quantDesc->setName("S_11 (Magnitude)");
+		quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "dB");
 		
 		for (float i = 0.; i <= 50.; i++)
 		{
@@ -301,11 +304,14 @@ void testPlot()
 	}
 	
 	int counter = 0;
+	ot::PainterRainbowIterator rainbowPainterIt;
 	for (auto& description : descriptions)
 	{
-		curveCfg.setEntityName(plotName + "/A_OfCurve" + std::to_string(counter));
+		curveCfg.setTitle("S_11 (Run ID = " + std::to_string(counter) + ")");
+		auto stylePainter = rainbowPainterIt.getNextPainter();
+		curveCfg.setLinePen(stylePainter.release());
 		counter++;
-		builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves");
+		builder.addCurve(std::move(description), curveCfg, "Run_ID_" + std::to_string(counter));
 	}
 
 	// Family of curves 3 parameter
@@ -374,22 +380,6 @@ void testPlot()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	//plotCfg.setTitle("Some title");
-	plotCfg.setGridColor(ot::Color(ot::DefaultColor::Black));
-	plotCfg.setPlotType(ot::Plot1DCfg::PlotType::Cartesian);
-	plotCfg.setAxisQuantity(ot::Plot1DCfg::AxisQuantity::Real);
-
-	plotCfg.setGridVisible(true);
-	plotCfg.setLegendVisible(false);
-	plotCfg.setXAxisIsLogScale(false);
-	plotCfg.setXAxisIsAutoScale(true);
-	plotCfg.setYAxisIsLogScale(false);
-	plotCfg.setYAxisIsAutoScale(true);
-	plotCfg.setXAxisMin(0);
-	plotCfg.setXAxisMax(50);
-	plotCfg.setYAxisMin(0);
-	plotCfg.setYAxisMax(50);
-
 	builder.buildPlot(plotCfg);
 
 }
