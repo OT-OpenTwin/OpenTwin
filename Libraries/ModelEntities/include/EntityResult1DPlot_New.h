@@ -30,6 +30,7 @@ public:
 
 	bool visualisePlot() override;
 
+	void updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames);
 private:
 	PropertyBundleQuerySettings m_querySettings;
 

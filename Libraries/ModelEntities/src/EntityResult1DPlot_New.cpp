@@ -234,6 +234,21 @@ bool EntityResult1DPlot_New::visualisePlot()
 	return true;
 }
 
+void EntityResult1DPlot_New::updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
+{
+	EntityPropertiesSelection* xAxisProp = PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set");
+	std::list<std::string> allQueryOptions, selectionOptions = { xAxisProp->getOptions().begin(),xAxisProp->getOptions().end() };
+	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
+	allQueryOptions.unique();
+	if (allQueryOptions != selectionOptions)
+	{
+		m_querySettings.setQueryDefinitions(allQueryOptions);
+		m_querySettings.setProperties(this);
+
+		getProperties().forceResetUpdateForAllProperties();
+	}
+}
+
 void EntityResult1DPlot_New::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityContainer::AddStorageData(storage);
