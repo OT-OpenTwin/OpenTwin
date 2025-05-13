@@ -11,6 +11,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/SelectionInformation.h"
 #include "OTWidgets/WidgetViewDockManager.h"
 
 // Qt ADS header
@@ -121,10 +122,11 @@ namespace ot {
 		//! Widget views that are protected will be ignored.
 		void closeViews(void);
 
-		//! @brief Emits a close request for all unpinned views with the given flags set.
+		//! @brief Emits a close request for all unpinned views that match the criteria.
 		//! @param _flags Flags that must be set at the view.
+		//! @param _activeSelection The current selection. Views that don't have at least one matching selection will be considered.
 		//! @param _ignoreCurrent If true the current view will be ignored.
-		void requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, bool _ignoreCurrent);
+		void requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent);
 
 		//! @brief Removes the provided widget view from the manager.
 		//! The caller takes ownership.

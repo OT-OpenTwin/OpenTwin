@@ -190,23 +190,42 @@ void ot::WidgetViewManager::closeViews(void) {
 	m_state = bck;
 }
 
-void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, bool _ignoreCurrent) {
+void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
 	std::list<WidgetView*> views;
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
 		OTAssertNullptr(dock);
 		if ((view.second->getViewData().getViewFlags() & _flags) == _flags && !dock->getIsPinned()) {
-			
-			if (!_ignoreCurrent || 
-				(
-					view.second != m_focusInfo.last && 
-					view.second != m_focusInfo.lastCentral && 
-					view.second != m_focusInfo.lastSide && 
-					view.second != m_focusInfo.lastTool)
-				) 
-			{
+			bool concider = true;
+			if (!_ignoreCurrent) {
+				concider = view.second != m_focusInfo.last &&
+					view.second != m_focusInfo.lastCentral &&
+					view.second != m_focusInfo.lastSide &&
+					view.second != m_focusInfo.lastTool;
+
+				
+			}
+
+			if (concider && !_activeSelection.getSelectedNavigationItems().empty()) {
+				concider = false;
+				for (const UID& active : _activeSelection.getSelectedNavigationItems()) {
+					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
+						if (active == viewSelection) {
+							concider = true;
+							break;
+						}
+					}
+
+					if (concider) {
+						break;
+					}
+				}
+			}
+
+			if (concider) {
 				views.push_back(view.second);
 			}
+			
 		}
 	}
 
