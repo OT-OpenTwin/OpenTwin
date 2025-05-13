@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "OTCore/CoreTypes.h"
-
+#include "SelectionChangedObserver.h"
 
 class SelectionHandler
 {
@@ -29,7 +29,10 @@ public:
 	const std::list<ot::UID>& getSelectedEntityIDs();
 	const std::list<ot::UID>& getSelectedVisibleEntityIDs();
 
+	void subscribe(SelectionChangedObserver* _observer);
 private:
+
+	std::list<SelectionChangedObserver*> m_observer;
 	std::atomic_bool m_modelSelectionChangedNotificationInProgress = false;
 	std::mutex m_changeSelectedEntitiesBuffer;
 
@@ -38,7 +41,8 @@ private:
 	std::list<ot::UID> m_selectedVisibleEntityIDs;
 
 	void toggleButtonEnabledState();
-	bool anyMaterialItemSelected();
+	
+	void notifyObservers(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons);
 	void notifyOwners();
 	void notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap);
 

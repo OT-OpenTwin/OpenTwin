@@ -12,6 +12,8 @@
 #include "FileHandler.h"
 #include "ViewVisualisationHandler.h"
 #include "CopyPasteHandler.h"
+#include "PlotHandler.h"
+#include "MaterialHandler.h"
 
 // std header
 #include <list>
@@ -197,6 +199,8 @@ private:
 	
 	ActionAndFunctionHandler m_baseHandler;
 	FileHandler m_fileHandler;
+	PlotHandler m_plotHandler;
+	MaterialHandler m_materialHandler;
 	ViewVisualisationHandler m_visualisationHandler;
 	CopyPasteHandler m_copyPasteHandler;
 	Application();

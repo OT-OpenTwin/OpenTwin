@@ -21,7 +21,6 @@ ActionAndFunctionHandler::~ActionAndFunctionHandler() {
 bool ActionAndFunctionHandler::tryToHandleAction(const std::string& _action, ot::JsonDocument& _doc) {
 	try
 	{
-
 		if (this->handleAction(_action, _doc)) {
 			return true;
 		}

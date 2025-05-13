@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Handler">
       <UniqueIdentifier>{20c80464-607f-4443-bf6f-e1fbefcb6d3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Observer">
+      <UniqueIdentifier>{860fb9f6-59a1-48a3-81a6-ebd8d3b7619d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -99,6 +102,12 @@
     <ClCompile Include="src\ViewVisualisationHandler.cpp">
       <Filter>Source Files\Handler</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlotHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -168,6 +177,15 @@
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\CopyPasteHandler.h">
+      <Filter>Header Files\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotHandler.h">
+      <Filter>Header Files\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SelectionChangedObserver.h">
+      <Filter>Header Files\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
   </ItemGroup>

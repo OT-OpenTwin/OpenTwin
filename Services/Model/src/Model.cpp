@@ -238,7 +238,7 @@ void Model::resetToNew(void)
 
 	if (typeManager.hasRMDCategorization())
 	{
-		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		auto newDataCatEntity = (new EntityParameterizedDataCategorization(createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName()));
 		newDataCatEntity->CreateProperties(EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
 		newDataCatEntity->setName(typeManager.getRMDCategorizationName());
 		newDataCatEntity->setEditable(false);
@@ -424,11 +424,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 {
 	// Now process actions for all modal commands
 
-	if (action == "Model:Material:Create Material")
-	{
-		createNewMaterial();
-	}
-	else if (action == "Model:Edit:Undo")							
+	if (action == "Model:Edit:Undo")							
 	{
 		undoLastOperation();
 	}
@@ -448,15 +444,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	{
 		projectSave("", false);
 	}
-	else if (action == "Model:Material:Show By Material")
-	{
-		showByMaterial();
-	}
-	else if (action == "Model:Material:Material Missing")			
-	{
-		showMaterialMissing();
-	}
-	else if (action == "Model:Parameters:Create Parameter")			
+	else if (action == "Model:Parameters:Create Parameter")
 	{
 		createNewParameter();
 	}
@@ -937,40 +925,6 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 	}
 }
 
-void Model::createNewMaterial()
-{
-	enableQueuingHttpRequests(true);
-
-	std::map<std::string, bool> allEntities = getListOfEntityNames();
-	int count = 1;
-
-	std::string materialName;
-
-	do
-	{
-		materialName = getMaterialRootName() + "/material" + std::to_string(count);
-		count++;
-
-	} while (allEntities.find(materialName) != allEntities.end());
-
-	EntityMaterial *materialItem = createNewMaterial(materialName);
-
-	// Here we also need to add a new visualitation container item to the visualization model
-	OldTreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "MaterialVisible";
-	treeIcons.hiddenIcon = "MaterialHidden";
-	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, materialName, materialItem->getEntityID(), treeIcons, materialItem->getEditable());
-
-	setModified();
-
-	updatePropertyGrid(); // We need to update the property grid to make sure that the new material will become visible in the material selection
-
-	modelChangeOperationCompleted("create new material");
-
-	enableQueuingHttpRequests(false);
-}
-
 void Model::createNewParameter()
 {
 	enableQueuingHttpRequests(true);
@@ -1108,34 +1062,6 @@ void Model::removeParameterDependency(ot::UID entityID)
 		// Now we need to replace the parameter by its value in all depending expressions
 		replaceParameterByString(parameterEntity, "(" + parameterEntity->getValue() + ")");
 	}
-}
-
-EntityMaterial* Model::createNewMaterial(const std::string &materialName)
-{
-	EntityContainer *entityMaterialRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getMaterialRootName()));
-	if (entityMaterialRoot == nullptr)
-	{
-		entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
-		entityMaterialRoot->setName(getMaterialRootName());
-
-		GeometryOperations::EntityList allNewEntities;
-		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
-
-		addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getEditable());
-	}
-
-	EntityMaterial *materialItem = new EntityMaterial(createEntityUID(), entityMaterialRoot, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
-
-	materialItem->setName(materialName);
-	materialItem->setEditable(true);
-	entityMaterialRoot->addChild(materialItem);
-
-	addEntityToMap(materialItem);
-
-	// Now we create properties for the mesh
-	materialItem->createProperties();
-
-	return materialItem;
 }
 
 void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden, bool notifyViewer)
@@ -1901,6 +1827,15 @@ void Model::getEntityProperties(EntityBase* entity, bool recursive, const std::s
 				}
 			}
 		}
+	}
+}
+
+
+void Model::setShapeVisibility(std::list<ot::UID>& visibleEntityIDs, std::list<ot::UID>& hiddenEntityIDs)
+{
+	if (visualizationModelID != 0)
+	{
+		Application::instance()->getNotifier()->setShapeVisibility(visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
 	}
 }
 
@@ -4874,189 +4809,6 @@ void Model::updateModelStateForUndoRedo(void)
 	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, false);
 }
 
-void Model::showByMaterial(void)
-{
-	// Get a list of all selected materials
-	std::map<std::string, ot::UID> materialNameToIDMap;
-	std::map<ot::UID, std::string> materialIdToNameMap;
-
-	for (auto selEntityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
-	{
-		EntityMaterial* entityMaterial = dynamic_cast<EntityMaterial*>(getEntityByID(selEntityID));
-
-		if (entityMaterial != nullptr)
-		{
-			materialNameToIDMap[entityMaterial->getName()] = entityMaterial->getEntityID();
-			materialIdToNameMap[entityMaterial->getEntityID()] = entityMaterial->getName();
-		}
-	}
-
-	// Loop through all geometry objects and put them in the visible / unvisible lists according to their material
-	std::list<ot::UID> visible, hidden;
-
-	for (auto entity : entityMap)
-	{
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(entity.second);
-
-		// Now we filter out all geometry entities which have a geometry entity as parent (e.g. children of boolean operations)
-		if (geometryEntity != nullptr)
-		{
-			if (geometryEntity->getParent() != nullptr)
-			{
-				EntityGeometry *geometryParent = dynamic_cast<EntityGeometry*>(geometryEntity->getParent());
-				if (geometryParent != nullptr)
-				{
-					hidden.push_back(geometryEntity->getEntityID());
-					geometryEntity = nullptr; // We discard this child entity
-				}
-			}
-		}
-
-		if (geometryEntity != nullptr)
-		{
-			EntityPropertiesEntityList *material = dynamic_cast<EntityPropertiesEntityList*>(geometryEntity->getProperties().getProperty("Material"));
-
-			if (material != nullptr)
-			{
-				// This entity has a material property assigned
-				if (materialNameToIDMap.empty())
-				{
-					// This entity will be visible, if the material is still undefined
-					if (material->getValueName().empty())
-					{
-						visible.push_back(geometryEntity->getEntityID());
-					}
-					else
-					{
-						hidden.push_back(geometryEntity->getEntityID());
-					}
-				}
-				else
-				{
-					// This entity will be visible, if its material matches any one of the selected materials
-					ot::UID materialID = 0;
-
-					if (materialIdToNameMap.count(material->getValueID()) != 0)
-					{
-						materialID = material->getValueID();
-					}
-					else
-					{
-						if (materialNameToIDMap.count(material->getValueName()) != 0)
-						{
-							materialID = materialNameToIDMap[material->getValueName()];
-						}
-					}
-
-					if (materialID != 0)
-					{
-						visible.push_back(geometryEntity->getEntityID());
-					}
-					else
-					{
-						hidden.push_back(geometryEntity->getEntityID());
-					}
-				}
-			}
-			else
-			{
-				hidden.push_back(geometryEntity->getEntityID());
-			}
-		}
-	}
-
-	// Now we need to send the list of the visible entities (all others will be hidden) to the UI
-	setShapeVisibility(visible, hidden);
-}
-
-void Model::setShapeVisibility(std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs)
-{
-	if (visualizationModelID != 0)
-	{
-		Application::instance()->getNotifier()->setShapeVisibility(visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
-	}
-}
-
-void Model::showMaterialMissing(void)
-{
-	// Get a list of all materials materials
-	std::map<std::string, ot::UID> materialNameToIDMap;
-	std::map<ot::UID, std::string> materialIdToNameMap;
-
-	for (auto entity : entityMap)
-	{
-		EntityMaterial *entityMaterial = dynamic_cast<EntityMaterial*>(getEntityByID(entity.first));
-
-		if (entityMaterial != nullptr)
-		{
-			materialNameToIDMap[entity.second->getName()] = entity.second->getEntityID();
-			materialIdToNameMap[entity.second->getEntityID()] = entity.second->getName();
-		}
-	}
-
-	// Loop through all geometry objects and put them in the visible / unvisible lists according to their material
-	std::list<ot::UID> visible, hidden;
-
-	for (auto entity : entityMap)
-	{
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(entity.second);
-
-		// Now we filter out all geometry entities which have a geometry entity as parent (e.g. children of boolean operations)
-		if (geometryEntity != nullptr)
-		{
-			if (geometryEntity->getParent() != nullptr)
-			{
-				EntityGeometry *geometryParent = dynamic_cast<EntityGeometry*>(geometryEntity->getParent());
-				if (geometryParent != nullptr)
-				{
-					hidden.push_back(geometryEntity->getEntityID());
-					geometryEntity = nullptr; // We discard this child entity
-				}
-			}
-		}
-
-		if (geometryEntity != nullptr)
-		{
-			EntityPropertiesEntityList *material = dynamic_cast<EntityPropertiesEntityList*>(geometryEntity->getProperties().getProperty("Material"));
-
-			if (material != nullptr)
-			{
-				bool materialExists = false;
-
-				if (materialIdToNameMap.count(material->getValueID()) != 0)
-				{
-					materialExists = true;
-				}
-				else
-				{
-					if (materialNameToIDMap.count(material->getValueName()) != 0)
-					{
-						materialExists = true;
-					}
-				}
-
-				if (materialExists)
-				{
-					hidden.push_back(geometryEntity->getEntityID());
-				}
-				else
-				{
-					visible.push_back(geometryEntity->getEntityID());
-				}
-			}
-		}
-		else
-		{
-			if (entity.second != nullptr)
-			{
-				hidden.push_back(entity.second->getEntityID());
-			}
-		}
-	}
-
-	// Now we need to send the list of the visible entities (all others will be hidden) to the UI	
-	setShapeVisibility(visible, hidden);
-}
 
 void Model::hideEntities(std::list<ot::UID> &hiddenEntityIDs)
 {
@@ -5079,7 +4831,8 @@ void Model::loadDefaultMaterials(void)
 	{
 		std::string materialName = getMaterialRootName() + "/" + material.first;
 
-		EntityMaterial *materialItem = createNewMaterial(materialName);
+		
+		EntityMaterial *materialItem =  MaterialHandler::createNewMaterial(materialName);
 
 		for (auto prop : material.second)
 		{

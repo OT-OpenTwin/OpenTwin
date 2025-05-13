@@ -204,15 +204,16 @@ public:
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 	ClassFactoryModel& getClassFactory() { return m_classFactory; }
+
+	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return entityMap; }
 private:
 	// Methods
 	void clearAll(void);
 	void setupUIControls();
 	void removeUIControls();
 	void createVisualizationItems(void);
-	void createNewMaterial(void);
+	
 	void createNewParameter(void);
-	EntityMaterial* createNewMaterial(const std::string &materialName);
 	EntityParameter* createNewParameterItem(const std::string &parameterName);
 	void deleteSelectedShapes(void);
 	void addEntityNamesToList(EntityBase *entity, std::map<std::string, bool> &list);
@@ -251,8 +252,7 @@ private:
 	void removeAllNonTemplateEntities(void);
 	void updateUndoRedoStatus(void);
 	void updateModelStateForUndoRedo(void);
-	void showByMaterial(void);
-	void showMaterialMissing(void);
+
 	void importTableFile(const std::string &fileName, bool removeFile);
 	void loadDefaultMaterials(void);
 	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);

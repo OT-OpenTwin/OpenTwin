@@ -52,6 +52,11 @@ const std::list<ot::UID>& SelectionHandler::getSelectedVisibleEntityIDs()
 	 return m_selectedVisibleEntityIDs; 
 }
 
+void SelectionHandler::subscribe(SelectionChangedObserver* _observer)
+{
+	m_observer.push_back(_observer);
+}
+
 void SelectionHandler::toggleButtonEnabledState()
 {
 	std::list<std::string> enabled;
@@ -66,33 +71,29 @@ void SelectionHandler::toggleButtonEnabledState()
 		disabled.push_back("Model:Edit:Delete");
 	}
 
-	if (anyMaterialItemSelected())
-	{
-		enabled.push_back("Model:Material:Show By Material");
-	}
-	else
-	{
-		disabled.push_back("Model:Material:Show By Material");
-	}
-	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
-}
-
-bool SelectionHandler::anyMaterialItemSelected()
-{
 	Model* model = Application::instance()->getModel();
+	std::list<EntityBase*> selectedEntities;
 	for (auto entityID : m_selectedEntityIDs)
 	{
 		EntityBase* baseEntity = model->getEntityByID(entityID);
+
 		if (baseEntity != nullptr)
 		{
-			EntityMaterial* materialEntity = dynamic_cast<EntityMaterial*>(baseEntity);
-			if (materialEntity != nullptr)
-			{
-				return true;
-			}
+			selectedEntities.push_back(baseEntity);
 		}
 	}
-	return false;
+	
+	notifyObservers(selectedEntities,enabled,disabled);
+	
+	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
+}
+
+void SelectionHandler::notifyObservers(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons)
+{
+	for (SelectionChangedObserver* observer : m_observer)
+	{
+		observer->updatedSelection(_selectedEntities,_enabledButtons,_disabledButtons);
+	}
 }
 
 void SelectionHandler::notifyOwners()
@@ -136,8 +137,6 @@ void SelectionHandler::notifyOwners()
 		workerThread.detach();
 	}
 }
-
-
 
 void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap)
 {

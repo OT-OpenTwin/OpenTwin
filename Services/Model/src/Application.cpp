@@ -705,7 +705,7 @@ std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 	}
 
 	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	bool alreadyHandled = 	m_baseHandler.tryToHandleAction(function, _document);
+	bool alreadyHandled = m_baseHandler.tryToHandleAction(function, _document);
 	if (!alreadyHandled)
 	{
 		std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
@@ -1173,7 +1173,14 @@ bool Application::settingChanged(const ot::Property* _item) {
 
 void Application::addButtons()
 {
-	m_fileHandler.addButtons(uiComponent(), "Model");
+	const std::string pageName = "Model";
+	m_fileHandler.addButtons(uiComponent(), pageName);
+	
+	m_plotHandler.addButtons(uiComponent(), pageName);
+	m_selectionHandler.subscribe(&m_plotHandler);
+
+	m_materialHandler.addButtons(uiComponent(), pageName);
+	m_selectionHandler.subscribe(&m_materialHandler);
 }
 
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
@@ -1291,6 +1298,12 @@ Application::Application()
 	asyncActionThread.detach();
 	m_fileHandler.setDontDeleteHandler();
 	m_baseHandler.setNextHandler(&m_fileHandler);
+
+	m_materialHandler.setDontDeleteHandler();
+	m_fileHandler.setNextHandler(&m_materialHandler);
+
+	m_plotHandler.setDontDeleteHandler();
+	m_materialHandler.setNextHandler(&m_plotHandler);
 }
 
 Application::~Application() {
