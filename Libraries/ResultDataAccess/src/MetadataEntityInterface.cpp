@@ -28,6 +28,11 @@ MetadataCampaign MetadataEntityInterface::createCampaign(std::shared_ptr<EntityM
 
 MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity)
 {
+	return createSeries(_seriesMetadataEntity.get());
+}
+
+MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seriesMetadataEntity)
+{
 	std::string entityName = _seriesMetadataEntity->getName();
 	//const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
 	//MetadataSeries seriesMetadata(name);
@@ -35,12 +40,12 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 	seriesMetadata.setIndex(_seriesMetadataEntity->getEntityID());
 
 	std::vector<std::string> allTopLevelDocumentNames = _seriesMetadataEntity->getDocumentsNames();
-	
+
 	//First we extract the series meta data
 	for (const std::string& documentName : allTopLevelDocumentNames)
 	{
-		bool isParameterDocument =	documentName.find(_seriesMetadataEntity->getParameterDocumentName()) != std::string::npos;
-		bool isQuantityDocument =	documentName.find(_seriesMetadataEntity->getQuantityDocumentName()) != std::string::npos;
+		bool isParameterDocument = documentName.find(_seriesMetadataEntity->getParameterDocumentName()) != std::string::npos;
+		bool isQuantityDocument = documentName.find(_seriesMetadataEntity->getQuantityDocumentName()) != std::string::npos;
 		bool isRootDocument = documentName == "/";
 		if (!(isParameterDocument || isQuantityDocument || isRootDocument))
 		{
@@ -73,7 +78,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			{
 				parameter.parameterName = convertToString(entry.get());
 			}
-			else if(currentEntryName == m_labelField)
+			else if (currentEntryName == m_labelField)
 			{
 				parameter.parameterLabel = convertToString(entry.get());
 			}
@@ -109,7 +114,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 	for (const GenericDocument* quantityDocument : allQuantityDocuments)
 	{
 		MetadataQuantity quantity;
-		
+
 		// First the regular fields
 		auto quantityFields = extractMetadataFields(*quantityDocument);
 		for (std::shared_ptr<MetadataEntry> entry : quantityFields)
@@ -117,7 +122,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			const std::string entryName = entry->getEntryName();
 			if (entryName == m_nameField)
 			{
-				quantity.quantityName =	convertToString(entry.get());
+				quantity.quantityName = convertToString(entry.get());
 			}
 			else if (entryName == m_labelField)
 			{
@@ -146,14 +151,14 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			bool isValueDescriptionObject = entryName.find(m_valueDescriptionsField) != std::string::npos;
 			if (isValueDescriptionObject)
 			{
-				MetadataEntry* entry =	object.get();
+				MetadataEntry* entry = object.get();
 				auto objectEntry = dynamic_cast<MetadataEntryObject*>(entry);
 				assert(objectEntry != nullptr);
 
-				auto allValueDescriptionEntries= objectEntry->getEntries();
+				auto allValueDescriptionEntries = objectEntry->getEntries();
 				for (const auto valueDescriptionEntry : allValueDescriptionEntries)
 				{
-					auto valueDescriptionObjectEntry =	dynamic_cast<MetadataEntryObject*>(valueDescriptionEntry.get());
+					auto valueDescriptionObjectEntry = dynamic_cast<MetadataEntryObject*>(valueDescriptionEntry.get());
 					assert(valueDescriptionObjectEntry != nullptr);
 
 					MetadataQuantityValueDescription valueDescription;
@@ -163,7 +168,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 					auto allFields = valueDescriptionObjectEntry->getEntries();
 					for (auto field : allFields)
 					{
-						auto fieldEntry	= dynamic_cast<MetadataEntrySingle*>(field.get());
+						auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(field.get());
 						assert(fieldEntry != nullptr);
 						if (fieldEntry->getEntryName() == m_nameField)
 						{
@@ -194,7 +199,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 				quantity.metaData[object->getEntryName()] = object;
 			}
 		}
-		
+
 		//By now everything should be set, except of the quantity index of the quantity. This is not an own identifier but is contained in the value descriptions (Currently)
 		if (!quantity.valueDescriptions.empty())
 		{

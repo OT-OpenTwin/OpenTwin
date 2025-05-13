@@ -14,6 +14,7 @@ public:
 	MetadataEntityInterface();
 	MetadataCampaign createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
 	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
+	MetadataSeries createSeries(EntityMetadataSeries* _seriesMetadataEntity);
 	void storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign);
 	void storeCampaign(ot::components::ModelComponent& _modelComponent, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 	void storeCampaign(ot::components::ModelComponent& _modelComponent,  MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);

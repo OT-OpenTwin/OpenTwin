@@ -50,8 +50,5 @@ private:
 	
 	void clearBuffer();
 
-	const std::string createQuery(ot::UID _seriesID);
-	const std::string createProjection();
-
 	void createPlot(ot::Plot1DCfg& _plotCfg);
 };

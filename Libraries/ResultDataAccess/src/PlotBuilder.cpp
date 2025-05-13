@@ -7,6 +7,7 @@
 #include "AdvancedQueryBuilder.h"
 #include "OTGui/QueryInformation.h"
 #include "OTCore/FolderNames.h"
+#include "CurveFactory.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender)
 	:m_extender(_extender)
@@ -115,39 +116,8 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 		m_extender.processDataPoints(&dataset, seriesID);
 	}
 	
-	ot::QueryInformation queryInformation;
-	queryInformation.m_query= createQuery(seriesID);
-	queryInformation.m_projection = createProjection();
-	
 	const MetadataSeries* series =	m_extender.findMetadataSeries(seriesID);
-	const std::list<MetadataQuantity>& quantities = series->getQuantities();
-	assert(quantities.size() == 1);
-	if (quantities.size() != 1)
-	{
-		throw std::invalid_argument("Creating a curve is only possible with a single quantity");
-	}
-	auto quantity =	quantities.begin()->valueDescriptions.begin();
-	
-	ot::QuantityContainerEntryDescription quantityInformation;
-	quantityInformation.m_fieldName = QuantityContainer::getFieldName();
-	quantityInformation.m_label = quantities.begin()->quantityName;
-	quantityInformation.m_unit = quantity->unit;
-	quantityInformation.m_dataType = quantity->dataTypeName;
-	queryInformation.m_quantityDescription = quantityInformation;
-
-	const std::list<MetadataParameter>& parameters = series->getParameter();
-
-	for (const auto& parameter : parameters)
-	{	
-		ot::QuantityContainerEntryDescription qcDescription;
-		qcDescription.m_label =  parameter.parameterLabel;
-		qcDescription.m_dataType=  parameter.typeName;
-		qcDescription.m_fieldName=  std::to_string(parameter.parameterUID);
-		qcDescription.m_unit =  parameter.unit;
-		queryInformation.m_parameterDescriptions.push_back(qcDescription);
-	}
-
-	_config.setQueryInformation(queryInformation);
+	CurveFactory::addToConfig(*series, _config);
 }
 
 void PlotBuilder::clearBuffer()
@@ -155,21 +125,6 @@ void PlotBuilder::clearBuffer()
 	m_curves.clear();
 	m_parameterLabels.clear();
 	m_quantityLabel.clear();
-}
-
-
-const std::string PlotBuilder::createQuery(ot::UID _seriesID)
-{
-	const std::string query = "{\"" + MetadataSeries::getFieldName() + "\":" + std::to_string(_seriesID) + "}";
-	return query;
-}
-
-const std::string PlotBuilder::createProjection()
-{
-	AdvancedQueryBuilder builder;
-	std::vector<std::string> projectionNamesForExclusion{ "SchemaVersion", "SchemaType", MetadataSeries::getFieldName()};
-	const std::string projection = bsoncxx::to_json(builder.GenerateSelectQuery(projectionNamesForExclusion, false, false));
-	return projection;
 }
 
 void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
@@ -191,7 +146,6 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
-
 
 	for (EntityResult1DCurve_New& curve : m_curves)
 	{
