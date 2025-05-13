@@ -6,7 +6,7 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTModelAPI/NewModelStateInformation.h"
 #include "ResultCollectionExtender.h"
-#include "EntityResult1DCurve_New.h"
+#include "EntityResult1DCurve.h"
 
 class __declspec(dllexport) PlotBuilder
 {
@@ -40,7 +40,7 @@ private:
 	ResultCollectionExtender& m_extender;
 	std::list<std::string> m_parameterLabels;
 	std::list<std::string> m_quantityLabel;
-	std::list<EntityResult1DCurve_New> m_curves;
+	std::list<EntityResult1DCurve> m_curves;
 
 	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
 	//Maybe an option, but the properties for the curves are not very secure. Multiple options exist for x-axis label and unit if multiple datasets are used

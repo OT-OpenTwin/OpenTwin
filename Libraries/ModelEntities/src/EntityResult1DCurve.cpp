@@ -1,4 +1,4 @@
-#include "EntityResult1DCurve_New.h"
+#include "EntityResult1DCurve.h"
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/Painter2D.h"
@@ -6,12 +6,12 @@
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/StyleRefPainter2D.h"
 
-EntityResult1DCurve_New::EntityResult1DCurve_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
+EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
 {
 }
 
-void EntityResult1DCurve_New::addVisualizationNodes(void)
+void EntityResult1DCurve::addVisualizationNodes(void)
 {
 	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
@@ -33,7 +33,7 @@ void EntityResult1DCurve_New::addVisualizationNodes(void)
 	getObserver()->sendMessageToViewer(doc);
 }
 
-bool EntityResult1DCurve_New::updateFromProperties(void)
+bool EntityResult1DCurve::updateFromProperties(void)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
@@ -50,7 +50,7 @@ bool EntityResult1DCurve_New::updateFromProperties(void)
 	return false;
 }
 
-void EntityResult1DCurve_New::createProperties(void)
+void EntityResult1DCurve::createProperties(void)
 {
 	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
 	ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
@@ -70,7 +70,7 @@ void EntityResult1DCurve_New::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
+ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 {
 	ot::Plot1DCurveCfg curveCfg;
 
@@ -103,7 +103,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve_New::getCurve()
 	return curveCfg;
 }
 
-void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
+void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 {
 	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().painter(), this, "Color");
 	PropertyHelper::setStringPropertyValue(_curve.getXAxisTitle(), this, "X axis label");
@@ -117,7 +117,7 @@ void EntityResult1DCurve_New::setCurve(const ot::Plot1DCurveCfg& _curve)
 	m_queryInformation = _curve.getQueryInformation();
 }
 
-void EntityResult1DCurve_New::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::AddStorageData(storage);
 
@@ -141,7 +141,7 @@ void EntityResult1DCurve_New::AddStorageData(bsoncxx::builder::basic::document& 
 	
 }
 
-bsoncxx::builder::basic::document EntityResult1DCurve_New::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription)
+bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription)
 {
 	bsoncxx::builder::basic::document subDocument;
 	subDocument.append(
@@ -154,7 +154,7 @@ bsoncxx::builder::basic::document EntityResult1DCurve_New::serialise(ot::Quantit
 }
 
 
-ot::QuantityContainerEntryDescription EntityResult1DCurve_New::deserialise(bsoncxx::v_noabi::document::view _subDocument)
+ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument)
 {
 	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
 	quantityContainerEntryDescription.m_dataType = _subDocument["DataType"].get_string();
@@ -164,7 +164,7 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve_New::deserialise(bsonc
 	return quantityContainerEntryDescription;
 }
 
-void EntityResult1DCurve_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	

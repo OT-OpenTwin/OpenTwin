@@ -3,16 +3,16 @@
 #include "IVisualisationCurve.h"
 #include "OTGui/QueryInformation.h"
 
-class __declspec(dllexport) EntityResult1DCurve_New : public EntityBase, public IVisualisationCurve
+class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public IVisualisationCurve
 {
 public:
 
-	EntityResult1DCurve_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
-	EntityResult1DCurve_New(const EntityResult1DCurve_New& _other) = default;
-	EntityResult1DCurve_New(EntityResult1DCurve_New&& _other) noexcept = default;
-	~EntityResult1DCurve_New() = default;
-	EntityResult1DCurve_New& operator=(const EntityResult1DCurve_New& _other) = default;
-	EntityResult1DCurve_New& operator=(EntityResult1DCurve_New&& _other) = default;
+	EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	EntityResult1DCurve(const EntityResult1DCurve& _other) = default;
+	EntityResult1DCurve(EntityResult1DCurve&& _other) noexcept = default;
+	~EntityResult1DCurve() = default;
+	EntityResult1DCurve& operator=(const EntityResult1DCurve& _other) = default;
+	EntityResult1DCurve& operator=(EntityResult1DCurve&& _other) = default;
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 

@@ -1,6 +1,6 @@
 #include "PlotBuilder.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "EntityResult1DPlot_New.h"
+#include "EntityResult1DPlot.h"
 
 #include "OTModelAPI/ModelStateInformationHelper.h"
 #include "MetadataSeries.h"
@@ -29,7 +29,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
-	EntityResult1DCurve_New curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
+	EntityResult1DCurve curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
@@ -131,7 +131,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 {
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 
-	EntityResult1DPlot_New plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
+	EntityResult1DPlot plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
 	const std::string entityName = _plotCfg.getEntityName();
 	plotEntity.setName(entityName);
 
@@ -147,7 +147,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.StoreToDataBase();
 
-	for (EntityResult1DCurve_New& curve : m_curves)
+	for (EntityResult1DCurve& curve : m_curves)
 	{
 		if (curve.getName().empty())
 		{

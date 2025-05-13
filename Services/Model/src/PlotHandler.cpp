@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "PlotHandler.h"
 #include "Model.h"
-#include "EntityResult1DPlot_New.h"
-#include "EntityResult1DCurve_New.h"
+#include "EntityResult1DPlot.h"
+#include "EntityResult1DCurve.h"
 #include "EntityMetadataSeries.h"
 #include "Application.h"
 #include "OTCore/Logger.h"
@@ -63,7 +63,7 @@ std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
 
 	//Finally we create the plot entity
 	Model* model = Application::instance()->getModel();
-	EntityResult1DPlot_New newPlot(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
+	EntityResult1DPlot newPlot(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
 	newPlot.setName(plotName);
 
 	ot::Plot1DCfg plotCfg;
@@ -101,7 +101,7 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 	
 	ot::NewModelStateInformation newModelStateInformation, plotsForUpdate;
 	bool storeSecond = false;
-	for (EntityResult1DPlot_New* selectedPlot : selectedPlots)
+	for (EntityResult1DPlot* selectedPlot : selectedPlots)
 	{
 		const std::string plotName = selectedPlot->getName();
 		std::list<ot::Plot1DCurveCfg> curveConfigs = createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
@@ -145,7 +145,7 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 	}
 	
 	const bool overrideContent = true;
-	for (EntityResult1DPlot_New* selectedPlot : selectedPlots)
+	for (EntityResult1DPlot* selectedPlot : selectedPlots)
 	{	
 		Application::instance()->getVisualisationHandler().handleVisualisationRequest(selectedPlot->getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, overrideContent);
 	}
@@ -196,20 +196,20 @@ std::list<EntityMetadataSeries*> PlotHandler::getSelectedSeriesMetadata()
 	return selectedSeriesMetadata;
 }
 
-std::list<EntityResult1DPlot_New*> PlotHandler::getSelectedPlots()
+std::list<EntityResult1DPlot*> PlotHandler::getSelectedPlots()
 {
 	SelectionHandler& selectionHandler = Application::instance()->getSelectionHandler();
 	std::list<ot::UID> selectedEntityIDs = selectionHandler.getSelectedEntityIDs();
 
 	Model* model = Application::instance()->getModel();
 
-	std::list<EntityResult1DPlot_New*> selectedPlots;
+	std::list<EntityResult1DPlot*> selectedPlots;
 	for (ot::UID entityID : selectedEntityIDs)
 	{
 		EntityBase* entityBase = model->getEntityByID(entityID);
 		if (entityBase != nullptr)
 		{
-			EntityResult1DPlot_New* selectedPlot = dynamic_cast<EntityResult1DPlot_New*>(entityBase);
+			EntityResult1DPlot* selectedPlot = dynamic_cast<EntityResult1DPlot*>(entityBase);
 			if (selectedPlot != nullptr)
 			{
 				selectedPlots.push_back(selectedPlot);
@@ -275,7 +275,7 @@ std::list<ot::Plot1DCurveCfg> PlotHandler::createCurves(std::list<EntityMetadata
 
 		CurveFactory::addToConfig(series, curveConfig);
 
-		EntityResult1DCurve_New newCurve(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
+		EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
 		newCurve.setName(_nameBase + "/" + shortName);
 		newCurve.createProperties();
 		newCurve.setCurve(curveConfig);
@@ -303,7 +303,7 @@ void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, st
 		}
 		else
 		{
-			EntityResult1DPlot_New* plot = dynamic_cast<EntityResult1DPlot_New*>(selectedEntity);
+			EntityResult1DPlot* plot = dynamic_cast<EntityResult1DPlot*>(selectedEntity);
 			if (plot != nullptr)
 			{
 				plotSelected = true;

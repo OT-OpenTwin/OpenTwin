@@ -4,7 +4,7 @@
 #include "ActionAndFunctionHandler.h"
 #include "SelectionChangedObserver.h"
 #include "EntityMetadataSeries.h"
-#include "EntityResult1DPlot_New.h"
+#include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTModelAPI/NewModelStateInformation.h"
 
@@ -24,7 +24,7 @@ private:
 	
 	void updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons) override;
 	std::list<EntityMetadataSeries*> getSelectedSeriesMetadata();
-	std::list<EntityResult1DPlot_New*> getSelectedPlots();
+	std::list<EntityResult1DPlot*> getSelectedPlots();
 	std::string getFreePlotName();
 
 	std::list<ot::Plot1DCurveCfg> createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase);

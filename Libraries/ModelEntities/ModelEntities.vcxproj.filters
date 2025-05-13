@@ -394,13 +394,13 @@
     <ClInclude Include="include\IVisualisationCurve.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityResult1DPlot_New.h">
+    <ClInclude Include="include\EntityResult1DPlot.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\PropertyHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityResult1DCurve_New.h">
+    <ClInclude Include="include\EntityResult1DCurve.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="include\EntitySolverPyrit.h">
@@ -678,13 +678,10 @@
     <ClCompile Include="src\EntityAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityResult1DPlot_New.cpp">
+    <ClCompile Include="src\EntityResult1DPlot.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityResult1DCurve_New.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntitySolverPyrit.cpp">
@@ -692,6 +689,9 @@
     </ClCompile>
     <ClCompile Include="src\PropertyBundleQuerySettings.cpp">
       <Filter>Source Files\PropertyBundle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResult1DCurve.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

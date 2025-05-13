@@ -1,20 +1,20 @@
-#include "EntityResult1DPlot_New.h"
+#include "EntityResult1DPlot.h"
 #include "PropertyHelper.h"
 #include "DataBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include <algorithm>
 
-EntityResult1DPlot_New::EntityResult1DPlot_New(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
+EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
 {}
 
-void EntityResult1DPlot_New::StoreToDataBase(void)
+void EntityResult1DPlot::StoreToDataBase(void)
 {
 	EntityContainer::StoreToDataBase();
 }
 
-void EntityResult1DPlot_New::addVisualizationNodes(void)
+void EntityResult1DPlot::addVisualizationNodes(void)
 {
 
 	OldTreeIcon treeIcons;
@@ -42,7 +42,7 @@ void EntityResult1DPlot_New::addVisualizationNodes(void)
 	}
 }
 
-bool EntityResult1DPlot_New::updateFromProperties(void)
+bool EntityResult1DPlot::updateFromProperties(void)
 {
 	assert(getProperties().anyPropertyNeedsUpdate());
 
@@ -72,7 +72,7 @@ bool EntityResult1DPlot_New::updateFromProperties(void)
 	return updatePropertyVisibilities();
 }
 
-bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
+bool EntityResult1DPlot::updatePropertyVisibilities(void)
 {
 	bool updatePropertiesGrid = false;
 	
@@ -125,7 +125,7 @@ bool EntityResult1DPlot_New::updatePropertyVisibilities(void)
 	return updatePropertiesGrid;
 }
 
-void EntityResult1DPlot_New::createProperties(void)
+void EntityResult1DPlot::createProperties(void)
 {
 	EntityPropertiesString::createProperty("General", "Title", "", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
@@ -152,7 +152,7 @@ void EntityResult1DPlot_New::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
+void EntityResult1DPlot::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
 {
 	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", _parameterNames, *_parameterNames.begin(), "default", getProperties());
 	
@@ -165,7 +165,7 @@ void EntityResult1DPlot_New::setFamilyOfCurveProperties(std::list<std::string>& 
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
+const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
 	
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
@@ -229,12 +229,12 @@ const ot::Plot1DCfg EntityResult1DPlot_New::getPlot()
 	return config;
 }
 
-bool EntityResult1DPlot_New::visualisePlot()
+bool EntityResult1DPlot::visualisePlot()
 {
 	return true;
 }
 
-void EntityResult1DPlot_New::updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
+void EntityResult1DPlot::updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
 {
 	EntityPropertiesSelection* xAxisProp = PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set");
 	std::list<std::string> allQueryOptions, selectionOptions = { xAxisProp->getOptions().begin(),xAxisProp->getOptions().end() };
@@ -249,19 +249,19 @@ void EntityResult1DPlot_New::updateFamilyOfCurveProperties(std::list<std::string
 	}
 }
 
-void EntityResult1DPlot_New::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityContainer::AddStorageData(storage);
 }
 
-void EntityResult1DPlot_New::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 	m_querySettings.reload(this);
 	resetModified();
 }
 
-void EntityResult1DPlot_New::setPlot(const ot::Plot1DCfg& _config)
+void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
 	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
 	PropertyHelper::setStringPropertyValue(_config.getTitle(), this, "Title");

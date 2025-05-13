@@ -31,8 +31,8 @@
     <ClInclude Include="include\EntityAPI.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityInformation.h" />
-    <ClInclude Include="include\EntityResult1DCurve_New.h" />
-    <ClInclude Include="include\EntityResult1DPlot_New.h" />
+    <ClInclude Include="include\EntityResult1DCurve.h" />
+    <ClInclude Include="include\EntityResult1DPlot.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\EntitySolverPyrit.h" />
@@ -178,8 +178,8 @@
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
-    <ClCompile Include="src\EntityResult1DCurve_New.cpp" />
-    <ClCompile Include="src\EntityResult1DPlot_New.cpp" />
+    <ClCompile Include="src\EntityResult1DCurve.cpp" />
+    <ClCompile Include="src\EntityResult1DPlot.cpp" />
     <ClCompile Include="src\EntityResultText.cpp" />
     <ClCompile Include="src\EntityResultTextData.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
