@@ -69,9 +69,15 @@ enum tableColumns {
 };
 
 Logging::Logging()
-	: m_warningCount(0), m_errorCount(0), m_filterView(nullptr) 
+	: m_warningCount(0), m_errorCount(0), m_filterView(nullptr), m_columnWidthTimer(nullptr), m_autoConnect(nullptr),
+	m_autoScrollToBottom(nullptr), m_connectButton(nullptr), m_errorCountLabel(nullptr), m_exportButton(nullptr),
+	m_ignoreNewMessages(nullptr), m_importButton(nullptr), m_messageCountLabel(nullptr), m_table(nullptr),
+	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr)
 {
-
+	m_columnWidthTimer = new QTimer(this);
+	m_columnWidthTimer->setInterval(0);
+	m_columnWidthTimer->setSingleShot(true);
+	this->connect(m_columnWidthTimer, &QTimer::timeout, this, &Logging::slotUpdateColumnWidth);
 }
 
 Logging::~Logging() {
@@ -555,10 +561,15 @@ void Logging::connectToLogger(bool _isAutoConnect) {
 	m_connectButton->setText("Disconnect");
 	m_connectButton->setIcon(QIcon(":/images/Connected.png"));
 	this->slotClear();
-	this->appendLogMessages(dia.messageBuffer());
+
+	const std::list<ot::LogMessage>& buffer = dia.messageBuffer();
+
+	if (!buffer.empty()) {
+		this->appendLogMessages(buffer);
+	}
 	
 	if (!m_columnWidthTmp.isEmpty()) {
-		QMetaObject::invokeMethod(this, &Logging::slotUpdateColumnWidth, Qt::QueuedConnection);
+		m_columnWidthTimer->start();
 	}
 	
 	LOGVIS_LOG("Done.");

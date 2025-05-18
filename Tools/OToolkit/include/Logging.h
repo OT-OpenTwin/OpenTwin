@@ -22,20 +22,21 @@
 class LogModeSetter;
 class LoggingFilterView;
 
+class QTimer;
+class QLabel;
+class QAction;
 class QWidget;
+class QShortcut;
+class QGroupBox;
+class QCheckBox;
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
-class QGroupBox;
-class QCheckBox;
 class QPushButton;
-class QPlainTextEdit;
 class QTableWidget;
+class QPlainTextEdit;
 class QTableWidgetItem;
-class QLabel;
 
-class QAction;
-class QShortcut;
 
 class Logging : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -108,6 +109,7 @@ private:
 	std::string                 m_loggerUrl;
 
 	QString m_columnWidthTmp;
+	QTimer* m_columnWidthTimer;
 
 	ot::WidgetView* m_root;
 
