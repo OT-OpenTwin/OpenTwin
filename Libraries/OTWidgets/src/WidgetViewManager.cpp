@@ -377,7 +377,7 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 
 	std::string dbg ("View state restored\n");
 	for (ViewEntry& entry : m_views) {
-		dbg += "  - " + entry.second->getViewData().getEntityName() + ". Closed: " + (entry.second->getViewDockWidget()->isClosed() ? "True" : "False");
+		dbg += "  - " + entry.second->getViewData().getEntityName() + ". Closed: " + (entry.second->getViewDockWidget()->isClosed() ? "True" : "False") + "\"";
 	}
 	OT_LOG_T(dbg);
 
@@ -519,7 +519,9 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 			!entry.second->getViewDockWidget()->dockAreaWidget()) 
 		{
 			OT_LOG_W("View visibility restored: \"" + entry.second->getViewData().getEntityName() + "\"");
-			m_dockManager->addView(entry.second, nullptr, ot::WidgetView::NoInsertFlags);
+
+			// Determine area
+			m_dockManager->addView(entry.second, this->getBestDockArea(entry.second), ot::WidgetView::NoInsertFlags);
 		}
 	}
 }

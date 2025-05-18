@@ -25,15 +25,39 @@ ot::WidgetViewDockManager::~WidgetViewDockManager() {
 
 void ot::WidgetViewDockManager::addView(WidgetView* _view, ads::CDockAreaWidget* _areaWidget, const WidgetView::InsertFlags& _insertFlags) {
 	ads::DockWidgetArea area = this->getDockWidgetArea(_view);
+	
+	std::string areaString;
+
+	switch (area) {
+	case ads::NoDockWidgetArea: areaString = "None"; break;
+	case ads::LeftDockWidgetArea: areaString = "Left"; break;
+	case ads::RightDockWidgetArea: areaString = "Right"; break;
+	case ads::TopDockWidgetArea: areaString = "Top"; break;
+	case ads::BottomDockWidgetArea: areaString = "Bottom"; break;
+	case ads::CenterDockWidgetArea: areaString = "Center"; break;
+	case ads::LeftAutoHideArea: areaString = "Left Auto Hide"; break;
+	case ads::RightAutoHideArea: areaString = "Right Auto Hide"; break;
+	case ads::TopAutoHideArea: areaString = "Top Auto Hide"; break;
+	case ads::BottomAutoHideArea: areaString = "Bottom Auto Hide"; break;
+	case ads::OuterDockAreas: areaString = "Outer"; break;
+	case ads::AutoHideDockAreas: areaString = "Auto Hide"; break;
+	case ads::AllDockAreas: areaString = "All"; break;
+	default:
+		areaString = "Unknown"; break;
+		break;
+	}
 
 	if (!_areaWidget) {
+		OT_LOG_T("Determining last added dock area for area \"" + areaString + "\"");
 		_areaWidget = this->lastAddedDockAreaWidget(area);
 	}
 	
 	if (_areaWidget) {
+		OT_LOG_T("Adding view \"" + _view->getViewData().getEntityName() + "\" to existing area");
 		this->addDockWidget(ads::CenterDockWidgetArea, _view->getViewDockWidget(), _areaWidget);
 	}
 	else {
+		OT_LOG_T("Adding view \"" + _view->getViewData().getEntityName() + "\" to area \"" + areaString + "\"");
 		this->addDockWidget(area, _view->getViewDockWidget(), nullptr);
 	}
 
