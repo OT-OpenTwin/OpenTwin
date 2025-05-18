@@ -11,13 +11,15 @@
 #include <QtCore/qtimer.h>
 #include <QtGui/qevent.h>
 
-ot::DoubleSpinBox::DoubleSpinBox(QWidget* _parent) 
-	: QDoubleSpinBox(_parent) 
+ot::DoubleSpinBox::DoubleSpinBox(QWidget* _parent) :
+	QDoubleSpinBox(_parent), m_requireSignal(false), m_timer(nullptr)
 {
 	this->ini();
 }
 
-ot::DoubleSpinBox::DoubleSpinBox(double _min, double _max, double _value, int _precision, QWidget* _parent) : QDoubleSpinBox(_parent) {
+ot::DoubleSpinBox::DoubleSpinBox(double _min, double _max, double _value, int _precision, QWidget* _parent) :
+	QDoubleSpinBox(_parent), m_requireSignal(false), m_timer(nullptr)
+{
 	this->ini();
 	
 	OTAssert(_value >= _min && _value <= _max && _max >= _min, "Invalid setup");
