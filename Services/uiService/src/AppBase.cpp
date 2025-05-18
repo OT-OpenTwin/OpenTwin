@@ -486,14 +486,14 @@ bool AppBase::closeEvent() {
 		uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
 	}
 
+	// Close the project
+	m_ExternalServicesComponent->closeProject(false);
+	m_state &= (~AppState::ProjectOpenState);
+
 	// Close all views to avoid dangling pointers in viewer
 	m_versionGraph = nullptr;
 	this->closeAllViewerTabs();
 	ot::WidgetViewManager::instance().closeViews();
-
-	// Close the project
-	m_ExternalServicesComponent->closeProject(false);
-	m_state &= (~AppState::ProjectOpenState);
 
 	return true;
 }
@@ -1364,6 +1364,7 @@ void AppBase::restoreSessionState(void) {
 
 	ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
 	if (!viewStateCfg.getViewConfig().empty()) {
+		OT_LOG_T("Restoring session state: \"" + m_currentProjectType + "\"");
 		ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
 	}
 
@@ -1384,14 +1385,18 @@ void AppBase::restoreSessionState(void) {
 }
 
 void AppBase::storeSessionState(void) {
-	if (!m_currentStateWindow.viewShown) return;
+	if (!m_currentStateWindow.viewShown) {
+		return;
+	}
 
 	if (m_currentProjectType.empty()) {
-		OT_LOG_W("No project type set. Ignoring");
+		OT_LOG_D("No project type set. Ignoring");
 		return;
 	}
 
 	UserManagement uM(m_loginData);
+
+	OT_LOG_T("Saving session state: \"" + m_currentProjectType + "\"");
 
 	ViewStateCfg viewStateCfg;
 	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());
@@ -1648,6 +1653,8 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
+	return;
+
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
