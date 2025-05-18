@@ -1364,7 +1364,6 @@ void AppBase::restoreSessionState(void) {
 
 	ViewStateCfg viewStateCfg = ViewStateCfg::fromJson(m_currentStateWindow.view);
 	if (!viewStateCfg.getViewConfig().empty()) {
-		OT_LOG_T("Restoring session state: \"" + m_currentProjectType + "\"");
 		ot::WidgetViewManager::instance().restoreState(viewStateCfg.getViewConfig());
 	}
 
@@ -1395,8 +1394,6 @@ void AppBase::storeSessionState(void) {
 	}
 
 	UserManagement uM(m_loginData);
-
-	OT_LOG_T("Saving session state: \"" + m_currentProjectType + "\"");
 
 	ViewStateCfg viewStateCfg;
 	viewStateCfg.setViewConfig(ot::WidgetViewManager::instance().saveState());

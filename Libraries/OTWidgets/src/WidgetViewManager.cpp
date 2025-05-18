@@ -333,12 +333,6 @@ std::string ot::WidgetViewManager::saveState(int _version) {
 		m_initialStateVersion = _version;
 	}
 
-	std::string dbg("View state saved\n");
-	for (ViewEntry& entry : m_views) {
-		dbg += "  - " + entry.second->getViewData().getEntityName() + ". Closed: " + (entry.second->getViewDockWidget()->isClosed() ? "True" : "False");
-	}
-	OT_LOG_T(dbg);
-
 	return ret;
 }
 
@@ -374,12 +368,6 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	}
 
 	bool result = m_dockManager->restoreState(tmp, _version);
-
-	std::string dbg ("View state restored\n");
-	for (ViewEntry& entry : m_views) {
-		dbg += "  - " + entry.second->getViewData().getEntityName() + ". Closed: " + (entry.second->getViewDockWidget()->isClosed() ? "True" : "False") + "\"";
-	}
-	OT_LOG_T(dbg);
 
 	this->slotUpdateViewVisibility();
 	
@@ -518,7 +506,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 		if (!(entry.second->getViewData().getViewFlags() & WidgetViewBase::ViewFlag::ViewIsCloseable) && 
 			!entry.second->getViewDockWidget()->dockAreaWidget()) 
 		{
-			OT_LOG_W("View visibility restored: \"" + entry.second->getViewData().getEntityName() + "\"");
+			OT_LOG_D("View visibility restored: \"" + entry.second->getViewData().getEntityName() + "\"");
 
 			// Determine area
 			m_dockManager->addView(entry.second, this->getBestDockArea(entry.second), ot::WidgetView::NoInsertFlags);
@@ -597,8 +585,6 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	ViewNameTypeListEntry nameTypeEntry;
 	nameTypeEntry.first = _view->getViewData().getEntityName();
 	nameTypeEntry.second = _view->getViewData().getViewType();
-
-	OT_LOG_T("Adding view \"" + _view->getViewData().getEntityName() + "\"");
 
 	if (this->getViewExists(nameTypeEntry)) {
 		OT_LOG_W("WidgetView already exists { \"EntityName\": \"" + nameTypeEntry.first + "\", \"ViewType\": \"" + WidgetViewBase::toString(nameTypeEntry.second) + "\" }");
