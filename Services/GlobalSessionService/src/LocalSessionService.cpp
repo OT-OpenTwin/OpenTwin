@@ -208,7 +208,13 @@ void LocalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	this->clearSessions();
 
 	// Get information
-	m_id = ot::json::getUInt(_object, OT_ACTION_PARAM_SERVICE_ID);
+	if (_object.HasMember(OT_ACTION_ADD_GROUP_TO_PROJECT)) {
+		m_id = ot::json::getUInt(_object, OT_ACTION_PARAM_SERVICE_ID);
+	}
+	else {
+		m_id = ot::invalidServiceID;
+	}
+	
 	m_url = ot::json::getString(_object, OT_ACTION_PARAM_SERVICE_URL);
 
 	// Get active sessions
