@@ -409,7 +409,7 @@ void AppBase::log(const ot::LogMessage& _message) {
 		}
 		message << "] [Frontend] " << _message.getText();
 
-		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message, true));
 	}
 }
 

@@ -16,7 +16,7 @@
 // std header
 #include <sstream>
 
-QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
+QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder, bool _silent) {
 	QString result("<p>");
 
 	bool evalTokens = _builder.getFlags() & StyledTextBuilder::EvaluateSubstitutionTokens;
@@ -31,14 +31,14 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 
 			QString finalText;
 			if (evalTokens) {
-				finalText = StyledTextConverter::evaluateSubstitutionTokens(text);
+				finalText = StyledTextConverter::evaluateSubstitutionTokens(text, _silent);
 			}
 			else {
 				finalText = QString::fromStdString(text);
 			}
 
 			if (entry.getStyle().hasStyleSet()) {
-				StyledTextConverter::addHtmlSpan(entry.getStyle(), result, finalText);
+				StyledTextConverter::addHtmlSpan(entry.getStyle(), result, finalText, _silent);
 			}
 			else {
 				result = result % finalText;
@@ -51,7 +51,7 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 	return result;
 }
 
-void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString& _destination, const QString& _text) {
+void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString& _destination, const QString& _text, bool _silent) {
 	// Add custom closing tags for text size
 	QString customClose;
 	switch (_style.getTextSize()) {
@@ -72,7 +72,10 @@ void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown TextSize (" + std::to_string((int)_style.getTextSize()) + ")");
+		OTAssert(0, "Unknown text size");
+		if (!_silent) {
+			OT_LOG_E("Unknown TextSize (" + std::to_string((int)_style.getTextSize()) + ")");
+		}
 		break;
 	}
 
@@ -89,7 +92,7 @@ void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString
 	// Add span if needed
 	if (_style.getColorReference() != StyledText::Default || _style.getBold() || _style.getItalic()) {
 		_destination = _destination % "<span style=\"";
-		_destination = _destination % StyledTextConverter::getColorFromReference(_style.getColorReference());
+		_destination = _destination % StyledTextConverter::getColorFromReference(_style.getColorReference(), _silent);
 		if (_style.getBold()) {
 			_destination = _destination % "font-weight:bold;";
 		}
@@ -103,7 +106,7 @@ void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString
 	_destination = _destination % _text % customClose;
 }
 
-QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReference _colorReference) {
+QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReference _colorReference, bool _silent) {
 	ColorStyleValueEntry colorStyleValue = ColorStyleValueEntry::Transparent;
 
 	switch (_colorReference) {
@@ -131,12 +134,18 @@ QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReferenc
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown ColorReference (" + std::to_string((int)_colorReference) + ")");
+		OTAssert(0, "Unknown color reference");
+		if (!_silent) {
+			OT_LOG_E("Unknown ColorReference (" + std::to_string((int)_colorReference) + ")");
+		}
 		return QString();
 	}
 
 	if (!GlobalColorStyle::instance().getCurrentStyle().hasValue(colorStyleValue)) {
-		OT_LOG_EAS("ColorStyleValue \"" + toString(colorStyleValue) + "\" is not set in the current color style \"" + GlobalColorStyle::instance().getCurrentStyleName() + "\"");
+		OTAssert(0, "Unknown color style value");
+		if (!_silent) {
+			OT_LOG_E("ColorStyleValue \"" + toString(colorStyleValue) + "\" is not set in the current color style \"" + GlobalColorStyle::instance().getCurrentStyleName() + "\"");
+		}
 		return QString();
 	}
 	else {
@@ -152,7 +161,7 @@ QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReferenc
 	}
 }
 
-QString ot::StyledTextConverter::evaluateSubstitutionTokens(const std::string& _text) {
+QString ot::StyledTextConverter::evaluateSubstitutionTokens(const std::string& _text, bool _silent) {
 	QString result;
 	size_t ix = 0;
 	size_t startIx = _text.find("$(", ix);
@@ -200,7 +209,10 @@ QString ot::StyledTextConverter::evaluateSubstitutionTokens(const std::string& _
 		}
 		default:
 			// Unknown token, keep it as-is
-			OT_LOG_EAS("Unknown text token (" + std::to_string(static_cast<int>(token)) + ")");
+			OTAssert(0, "Unknown substitution token");
+			if (!_silent) {
+				OT_LOG_E("Unknown text token (" + std::to_string(static_cast<int>(token)) + ")");
+			}
 			replacement = QString::fromStdString(_text.substr(startIx, endIx - startIx + 1));
 			break;
 		}
