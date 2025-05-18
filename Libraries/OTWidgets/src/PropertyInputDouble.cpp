@@ -25,9 +25,15 @@ ot::PropertyInputDouble::PropertyInputDouble() :
 }
 
 ot::PropertyInputDouble::~PropertyInputDouble() {
-	if (m_spinBox) delete m_spinBox;
+	if (m_spinBox) {
+		delete m_spinBox;
+	}
 	m_spinBox = nullptr;
-	if (m_lineEdit) delete m_lineEdit;
+	
+	if (m_lineEdit) {
+		delete m_lineEdit;
+	}
+	
 	m_lineEdit = nullptr;
 }
 
@@ -112,8 +118,12 @@ double ot::PropertyInputDouble::getValue(void) const {
 
 bool ot::PropertyInputDouble::hasInputError(void) const {
 	if (m_spinBox) {
-		if (m_spinBox->text() == OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT) return true;
-		else return false;
+		if (m_spinBox->text() == OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	else {
 		OTAssertNullptr(m_lineEdit);
@@ -136,10 +146,16 @@ void ot::PropertyInputDouble::lclTextChanged(void) {
 		QString str = m_lineEdit->text();
 
 		// Check for no changes and still multiple values
-		if (str == OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT) return;
+		if (str == OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT) {
+			return;
+		}
 
 		str.remove(OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR);
-		if (str.isEmpty()) str = OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR;
+		
+		if (str.isEmpty()) {
+			str = OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR;
+		}
+		
 		this->data().setPropertyFlag(Property::HasMultipleValues, false);
 
 		m_lineEdit->blockSignals(true);
@@ -159,9 +175,12 @@ void ot::PropertyInputDouble::lclTextChanged(void) {
 
 void ot::PropertyInputDouble::lclEditingFinishedChanged(void) {
 	OTAssertNullptr(m_lineEdit);
-	if (this->hasInputError()) return;
+	if (this->hasInputError()) {
+		return;
+	}
 
 	double val = this->getValue();
+
 	if (val < m_min) {
 		m_lineEdit->blockSignals(true);
 		m_lineEdit->setText(QString::number(m_min));
@@ -173,7 +192,7 @@ void ot::PropertyInputDouble::lclEditingFinishedChanged(void) {
 		m_lineEdit->blockSignals(false);
 	}
 
-	PropertyInput::slotValueChanged();
+	this->slotValueChanged();
 }
 
 ot::Property* ot::PropertyInputDouble::createPropertyConfiguration(void) const {
@@ -186,7 +205,10 @@ ot::Property* ot::PropertyInputDouble::createPropertyConfiguration(void) const {
 }
 
 bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configuration) {
-	if (!PropertyInput::setupFromConfiguration(_configuration)) return false;
+	if (!PropertyInput::setupFromConfiguration(_configuration)) {
+		return false;
+	}
+
 	const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_configuration);
 	if (!actualProperty) {
 		OT_LOG_E("Property cast failed");
@@ -197,11 +219,28 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 	m_max = actualProperty->getMax();
 
 	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
-		if (m_spinBox) delete m_spinBox;
-		m_spinBox = nullptr;
-		if (!m_lineEdit) m_lineEdit = new LineEdit;
+		if (m_spinBox) {
+			delete m_spinBox;
+			m_spinBox = nullptr;
+		}
+		
+		if (!m_lineEdit) {
+			m_lineEdit = new LineEdit;
+			m_lineEdit->setFocusPolicy(Qt::NoFocus);
+		}
 		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputDouble::lclTextChanged);
 		this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputDouble::lclEditingFinishedChanged);
+	}
+	else {
+		if (m_lineEdit) {
+			delete m_lineEdit;
+			m_lineEdit = nullptr;
+		}
+
+		if (!m_spinBox) {
+			m_spinBox = new DoubleSpinBox;
+			this->connect(m_spinBox, &DoubleSpinBox::valueChangeCompleted, this, &PropertyInputDouble::lclValueChanged);
+		}
 	}
 
 	if (m_spinBox) {
