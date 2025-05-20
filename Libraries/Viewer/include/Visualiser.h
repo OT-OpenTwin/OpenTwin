@@ -13,6 +13,7 @@ public:
 
 	virtual bool visualise(const VisualiserState& _state) = 0;
 	bool mayVisualise() { return m_mayVisualise; }
+
 	//! @brief Switch to turn a visualisation type off
 	void setMayVisualise(bool _visible) { m_mayVisualise = _visible;}
 	

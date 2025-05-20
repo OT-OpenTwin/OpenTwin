@@ -41,21 +41,22 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
 			// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
 			// open or not.
-
-			if (visualiser->mayVisualise())
-			{
+			if (visualiser->viewIsCurrentlyOpen()) {
+				if (m_selected) {
+					// Here we just want to focus an already opened view.
+					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+					result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+				}
+			}
+			else if (visualiser->mayVisualise()) {
 				VisualiserState state;
 				state.m_selected = _selected;
 				state.m_singleSelection = _singleSelection;
 				state.m_selectionOrigin = _selectionOrigin;
-				visualiser->visualise(state);
-				result |= ot::SelectionHandlingEvent::NewViewRequested;
-			}
-			else if (visualiser->viewIsCurrentlyOpen())
-			{
-				// Here we just want to focus an already opened view.
-				FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-				result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+				
+				if (visualiser->visualise(state)) {
+					result |= ot::SelectionHandlingEvent::NewViewRequested;
+				}
 			}
 		}
 	}

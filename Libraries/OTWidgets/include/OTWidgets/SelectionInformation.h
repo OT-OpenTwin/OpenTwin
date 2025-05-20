@@ -14,13 +14,13 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT SelectionInformation : public Serializable {
 	public:
-		SelectionInformation() = default;
-		SelectionInformation(const SelectionInformation&) = default;
-		SelectionInformation(SelectionInformation&&) = default;
-		virtual ~SelectionInformation() = default;
+		SelectionInformation();
+		SelectionInformation(const SelectionInformation& _other);
+		SelectionInformation(SelectionInformation&& _other) noexcept;
+		virtual ~SelectionInformation();
 
-		SelectionInformation& operator = (const SelectionInformation&) = default;
-		SelectionInformation& operator = (SelectionInformation&&) = default;
+		SelectionInformation& operator = (const SelectionInformation& _other);
+		SelectionInformation& operator = (SelectionInformation&& _other) noexcept;
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;

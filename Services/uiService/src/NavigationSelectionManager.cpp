@@ -36,6 +36,18 @@ ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling
 	return lclState.getCurrent();
 }
 
+void ot::NavigationSelectionManager::addSelectedItem(UID _itemId) {
+	m_selectionInfo.addSelectedNavigationItem(_itemId);
+}
+
+void ot::NavigationSelectionManager::setSelectedItems(const UIDList& _itemIds) {
+	m_selectionInfo.setSelectedNavigationItems(_itemIds);
+}
+
+void ot::NavigationSelectionManager::setSelectionInformation(const SelectionInformation& _info) {
+	m_selectionInfo = _info;
+}
+
 void ot::NavigationSelectionManager::slotViewSelected(void) {
 	m_stateStack->setFlag(SelectionHandlingEvent::ActiveViewChanged);
 }

@@ -26,9 +26,9 @@ namespace ot {
 
 		SelectionHandlingResult runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection);
 
-		void addSelectedItem(UID _itemId) { m_selectionInfo.addSelectedNavigationItem(_itemId); };
-		void setSelectedItems(const UIDList& _itemIds) { m_selectionInfo.setSelectedNavigationItems(_itemIds); };
-		void setSelectionInformation(const SelectionInformation& _info) { m_selectionInfo = _info; };
+		void addSelectedItem(UID _itemId);
+		void setSelectedItems(const UIDList& _itemIds);
+		void setSelectionInformation(const SelectionInformation& _info);
 		const SelectionInformation& getSelectionInformation(void) { return m_selectionInfo; };
 		const UIDList& getSelectedItems(void) const { return m_selectionInfo.getSelectedNavigationItems(); };
 		const SelectionInformation& getPreviousSelectionInformation(void) { return m_previousSelectionInfo; };

@@ -3245,9 +3245,11 @@ void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
 	if (selectionResult & ot::SelectionHandlingEvent::NewViewRequested) {
+		// A new view was requested while handling the selection, ignore selection update
 		return;
 	}
 	else if ((selectionResult | ot::SelectionHandlingEvent::NoViewChangeRequestedMask) == ot::SelectionHandlingEvent::NoViewChangeRequestedMask) {
+		// No view change requested, but selection changed, update selection information stored for the view
 		if (m_lastFocusedCentralView) {
 			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 		}
