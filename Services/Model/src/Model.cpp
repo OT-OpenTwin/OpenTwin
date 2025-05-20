@@ -399,9 +399,9 @@ void Model::setupUIControls()
 
 	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", ot::KeySequence(ot::Key_Control, ot::Key_I));
 
-	addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
-	addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
-	addMenuAction("Model", "Material", "Material Missing", "Material Missing", modelRead, "ShowMaterialMissing");
+	//addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
+	//addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
+	//addMenuAction("Model", "Material", "Material Missing", "Material Missing", modelRead, "ShowMaterialMissing");
 	
 	addMenuAction("Model", "Parameters", "Create Parameter", "Create Parameter", modelRead, "CreateParameter");
 
