@@ -440,6 +440,9 @@
     <ClInclude Include="include\OTGui\PainterRainbowIterator.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2DEditDialogWhitelist.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -777,6 +780,9 @@
     </ClCompile>
     <ClCompile Include="src\PainterRainbowIterator.cpp">
       <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogWhitelist.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
