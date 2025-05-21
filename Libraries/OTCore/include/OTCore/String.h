@@ -12,6 +12,7 @@
 // std header
 #include <list>
 #include <string>
+#include <optional>
 
 namespace ot {
 
@@ -33,6 +34,11 @@ namespace ot {
 
 		//! @brief Evaluates any escape characters in this string.
 		static std::string evaluateEscapeCharacters(const std::string& _string);
+
+		//! @brief Extract a name from the full topology entity name
+		//! @param _topologyLvl 0 = root folder, 1 = next level container .... n = short name of entity (default)
+		//! @return 
+		static std::optional<std::string> getEntitySubName(const std::string& _fullEntityName, int32_t _topologyLvl = -1);
 
 		//! @brief Split the provided string
 		//! @param _str String to split
@@ -143,6 +149,8 @@ namespace ot {
 		//! \param _fill Fill character.
 		//! \param _length Output string length.
 		template <class T> static inline std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
+
+
 
 	};
 }

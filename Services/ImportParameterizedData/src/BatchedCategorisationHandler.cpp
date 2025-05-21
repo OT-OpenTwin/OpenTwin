@@ -5,6 +5,7 @@
 
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCore/String.h"
 
 void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 {
@@ -18,9 +19,17 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 		for (const auto& tableSelection : allRelevantTableSelections)
 		{
 			std::string tableSelectionName = tableSelection->getName();
-			tableSelectionName = tableSelectionName.substr(tableSelectionName.find(CategorisationFolderNames::getSeriesMetadataFolderName()), tableSelectionName.size());
-			std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
-			allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
+
+
+			std::optional<std::string> msmdName = ot::String::getEntitySubName(tableSelectionName, 2);
+			if (msmdName.has_value())
+			{
+				allRelevantTableSelectionsByMSMD[msmdName.value()].push_back(tableSelection);
+			}
+			else
+			{
+				throw std::exception(("Failed to determine the name of the series of selection entity: " + tableSelectionName).c_str());
+			}
 		}
 		allRelevantTableSelections.clear();
 
@@ -107,7 +116,8 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 	{
 		//First we create the new series metadata entity
 		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		const std::string newSMDName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
+		const std::string oldName = elements.first;
+		const std::string newSMDName = CreateNewUniqueTopologyName(m_rmdEntityName, oldName);
 		newMSMD->setName(newSMDName);
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);

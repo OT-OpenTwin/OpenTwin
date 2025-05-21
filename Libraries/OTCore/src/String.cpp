@@ -128,6 +128,49 @@ std::string ot::String::evaluateEscapeCharacters(const std::string& _string) {
 	return result;
 }
 
+std::optional<std::string> ot::String::getEntitySubName(const std::string& _fullEntityName, int32_t _topologyLvl)
+{
+	if (_topologyLvl == -1)
+	{
+		int32_t pos = _fullEntityName.find_last_of("/");
+		if (pos < _fullEntityName.size())
+		{
+			return _fullEntityName.substr(pos + 1);
+		}
+		else
+		{
+			return {};
+		}
+	}
+	else
+	{
+		std::string subName (""), restName(_fullEntityName);
+
+		for (int32_t i = 0; i <= _topologyLvl; i++)
+		{
+			size_t levelPositionBorder = restName.find_first_of("/");
+			
+			if (levelPositionBorder < restName.size())
+			{
+				subName = restName.substr(0, levelPositionBorder);
+				restName = restName.substr(levelPositionBorder + 1);
+			}
+			else
+			{
+				if (i == _topologyLvl && !restName.empty())
+				{
+					return restName;
+				}
+				else
+				{
+					return {};
+				}
+			}
+		}
+		return subName;
+	}
+}
+
 std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {
 	std::string temp = _str;
 	std::list<std::string> ret;
