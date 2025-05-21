@@ -401,6 +401,11 @@ ECHO Build Executable: ConfigMongoDBWithAuth (Installation Helper)
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Executable: ModelLibraryUpdater
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\build.bat" %1 %2
+
 ECHO ====================================================================
 ECHO Build Admin Panel
 ECHO ====================================================================

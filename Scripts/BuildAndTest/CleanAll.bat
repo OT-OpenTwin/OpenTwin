@@ -271,6 +271,10 @@ ECHO ===============================================================
 ECHO Clean Executable: OToolkit
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\Clean.bat" 
+ECHO ===============================================================
+ECHO Clean Executable: ModelLibraryUpdater
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\Clean.bat" 
 
 GOTO END
 
