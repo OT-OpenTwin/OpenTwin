@@ -30,33 +30,61 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
-	// First we check if there is a state change
-	if (!isSelected() && _selected || isSelected() && !_selected)
-	{
+	if (m_selected != _selected) {
 		m_selected = _selected;
+
 		const std::list<Visualiser*>& visualisers = getVisualiser();
-		for (Visualiser* visualiser : visualisers)
-		{
+
+		VisualiserState state;
+		state.m_selected = _selected;
+		state.m_singleSelection = _singleSelection;
+		state.m_selectionOrigin = _selectionOrigin;
+		state.m_anyVisualiserHasFocus = false;
+
+		// Check if any visualiser has focus
+		for (Visualiser* visualiser : visualisers) {
+			if (FrontendAPI::instance()->hasViewFocus(getName(), visualiser->getViewType())) {
+				state.m_anyVisualiserHasFocus = true;
+				break;
+			}
+		}
+
+		for (Visualiser* visualiser : visualisers) {
+
 			// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
 			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
 			// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
 			// open or not.
-			if (visualiser->viewIsCurrentlyOpen()) {
-				if (m_selected) {
-					// Here we just want to focus an already opened view.
-					FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-					result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+
+			if (m_selected) {
+				// Entity was selected, so we want to visualise it
+
+				if (visualiser->getViewIsOpen()) {
+					// If the view is currently open and the entity is selected, we want to set the focus on the view
+					// We do not want to focus every visualiser, so if any visualiser has focus, we do not set the focus again
+					if (!state.m_anyVisualiserHasFocus) {
+						
+						FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
+
+						state.m_anyVisualiserHasFocus = true;
+					}
+					
+					// The visualizer may want to unhide/un-dim the visualisation
+					visualiser->showVisualisation(state);
+				}
+				else if (visualiser->mayVisualise()) {
+					// The view is not open and the visualiser is enabled
+					
+					if (visualiser->requestVisualization(state)) {
+						// Visualisation was requested
+						result |= ot::SelectionHandlingEvent::NewViewRequested;
+					}
 				}
 			}
-			else if (visualiser->mayVisualise()) {
-				VisualiserState state;
-				state.m_selected = _selected;
-				state.m_singleSelection = _singleSelection;
-				state.m_selectionOrigin = _selectionOrigin;
-				
-				if (visualiser->visualise(state)) {
-					result |= ot::SelectionHandlingEvent::NewViewRequested;
-				}
+			else if (visualiser->getViewIsOpen()) {
+				// Entity was deselected, so we potentially want to hide or dim the visualisation
+				visualiser->hideVisualisation(state);
 			}
 		}
 	}
@@ -64,6 +92,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 	return result;
 
 }
+
 void SceneNodeBase::setHighlighted(bool _highlight)
 {
 	if (m_highlighted != _highlight) 
@@ -94,8 +123,8 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		state.m_singleSelection = true;
 		for (Visualiser* visualiser : allVisualiser)
 		{
-			if (visualiser->getViewType() != _viewType && visualiser->viewIsCurrentlyOpen()) {
-				visualiser->visualise(state);
+			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {
+				visualiser->showVisualisation(state);
 			}
 		}
 	}

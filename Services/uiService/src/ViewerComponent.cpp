@@ -312,6 +312,19 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 	}
 }
 
+bool ViewerComponent::hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	const ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	if (!view) {
+		return false;
+	}
+	else if (view->getViewData().getEntityName() == _entityName && view->getViewData().getViewType() == _viewType) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 ot::WidgetView* ViewerComponent::getCurrentView(void) {
 	return ot::WidgetViewManager::instance().getCurrentlyFocusedView();
 }

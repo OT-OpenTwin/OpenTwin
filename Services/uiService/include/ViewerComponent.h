@@ -65,6 +65,7 @@ public:
 	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) override;
 
 	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 
 	virtual ot::WidgetView* getCurrentView(void) override;
 

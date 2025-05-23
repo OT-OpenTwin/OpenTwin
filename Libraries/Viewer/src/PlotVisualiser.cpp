@@ -9,10 +9,9 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 {
 }
 
-bool PlotVisualiser::visualise(const VisualiserState& _state)
+bool PlotVisualiser::requestVisualization(const VisualiserState& _state)
 {
-	if(!m_viewIsOpen && _state.m_selected && ! m_alreadyRequestedVisualisation)
-	{
+	if (!m_viewIsOpen && ! m_alreadyRequestedVisualisation) {
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
@@ -24,10 +23,17 @@ bool PlotVisualiser::visualise(const VisualiserState& _state)
 		FrontendAPI::instance()->messageModelService(doc.toJson());
 		return true;
 	}
-	else
-	{
+	else {
 		return false;
 	}
+}
+
+void PlotVisualiser::showVisualisation(const VisualiserState& _state) {
+
+}
+
+void PlotVisualiser::hideVisualisation(const VisualiserState& _state) {
+
 }
 
 void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)

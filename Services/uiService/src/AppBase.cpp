@@ -2584,6 +2584,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
+
+			if (!m_navigationManager.isSelectionHandlingRunning()) {
+				// Run selection handling if currently no selection handling is running
+				this->runSelectionHandling(ot::SelectionOrigin::View);
+			}
 		}
 
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());

@@ -5,5 +5,7 @@ class TableVisualiser : public Visualiser
 {
 public:
 	TableVisualiser(SceneNodeBase* _sceneNode);
-	bool visualise(const VisualiserState& _state) override;
+	virtual bool requestVisualization(const VisualiserState& _state) override;
+	virtual void showVisualisation(const VisualiserState& _state) override;
+	virtual void hideVisualisation(const VisualiserState& _state) override;
 };

@@ -12,7 +12,7 @@ TextVisualiser::TextVisualiser(SceneNodeBase* _sceneNode)
 {
 }
 
-bool TextVisualiser::visualise(const VisualiserState& _state)
+bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 {
 	if (!m_viewIsOpen && _state.m_selectionOrigin == ot::SelectionOrigin::User)
 	{
@@ -37,4 +37,12 @@ bool TextVisualiser::visualise(const VisualiserState& _state)
 		}
 	}
 	return false;
+}
+
+void TextVisualiser::showVisualisation(const VisualiserState& _state) {
+
+}
+
+void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
+
 }
