@@ -1,10 +1,10 @@
-/*
- * dllmain.cpp
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// C++ header
-#include <Windows.h>
-#include <iostream>
+// GDS header
+#include "Application.h"
 
 // OpenTwin header
 #include "OTCore/Logger.h"
@@ -12,11 +12,9 @@
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "OTServiceFoundation/Foundation.h"
 
-// Service header
-#include <Application.h>
-
-// Service header
-#include "Application.h"
+// std header
+#include <iostream>
+#include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -47,7 +45,7 @@ extern "C" {
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		std::string serviceURL = Application::instance()->getServiceURL();
+		std::string serviceURL = Application::instance().getServiceURL();
 
 		char *strServiceURL = new char[serviceURL.size() + 1];
 		strcpy_s(strServiceURL, serviceURL.size() + 1, serviceURL.c_str());
@@ -75,6 +73,6 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, loggerServiceURL, false);
 #endif
-		return Application::instance()->initialize("1", _ownURL, _globalSessionServiceURL);
+		return Application::instance().initialize("1", _ownURL, _globalSessionServiceURL);
 	};
 }

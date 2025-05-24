@@ -1,4 +1,9 @@
-// Service header
+//! @file StartupDispatcher.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// GDS header
 #include "Application.h"
 #include "StartupDispatcher.h"
 #include "LocalDirectoryService.h"
@@ -11,53 +16,59 @@
 #include <thread>
 #include <chrono>
 
-StartupDispatcher::StartupDispatcher(void) : m_isStopping(false),
-	m_workerThread(nullptr)
-{
-
-}
+StartupDispatcher::StartupDispatcher(void) : 
+	m_isStopping(false), m_workerThread(nullptr)
+{}
 
 StartupDispatcher::~StartupDispatcher() {
-	// todo: add cleanup
+	this->stop();
 }
 
-// ####################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Request management
 
-void StartupDispatcher::addRequest(const ServiceStartupInformation& _info) {
-	m_mutex.lock();
-	m_requests.push_back(_info);
-	run();
-	m_mutex.unlock();
+void StartupDispatcher::addRequest(ServiceInformation&& _info) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_requestedServices.push_back(std::move(_info));
+	
+	this->run();
 }
 
-void StartupDispatcher::addRequest(const std::list<ServiceStartupInformation>& _info) {
-	m_mutex.lock();
-	for (auto r : _info) m_requests.push_back(r);
-	run();
-	m_mutex.unlock();
+void StartupDispatcher::addRequest(std::list<ServiceInformation>&& _info) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_requestedServices.splice(m_requestedServices.end(), std::move(_info));
+	
+	this->run();
 }
 
-// ####################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private methods
 
 void StartupDispatcher::run(void) {
-	if (m_workerThread) return;
+	if (m_workerThread) {
+		return;
+	}
+
 	m_isStopping = false;
 	m_workerThread = new std::thread(&StartupDispatcher::workerFunction, this);
 }
 
 void StartupDispatcher::stop(void) {
-	if (m_workerThread == nullptr) return;
+	if (m_workerThread == nullptr) {
+		return;
+	}
+
 	m_isStopping = true;
+	
 	m_workerThread->join();
+	
 	delete m_workerThread;
 	m_workerThread = nullptr;
 }
-
-// ####################################################################################################################
-
-// Private functions
 
 void StartupDispatcher::workerFunction(void) {
 	using namespace std::chrono_literals;
@@ -65,49 +76,46 @@ void StartupDispatcher::workerFunction(void) {
 	while (!m_isStopping) {
 		// Check if there are any queued requests
 		while (!m_isStopping) {
-			m_mutex.lock();
-			if (!m_requests.empty()) {
-				m_mutex.unlock();
-				break;
+			{
+				std::lock_guard<std::mutex> lock(m_mutex);
+
+				if (!m_requestedServices.empty()) {
+					break;
+				}
 			}
-			m_mutex.unlock();
 
 			std::this_thread::sleep_for(100ms);
 		}
 
 		// Dispatch queued requests
 		while (!m_isStopping) {
-			m_mutex.lock();
-			if (m_requests.empty()) {
-				m_mutex.unlock();
+			std::lock_guard<std::mutex> lock(m_mutex);
+
+			if (m_requestedServices.empty()) {
 				break;
 			}
 			
 			// Grab first item
-			ServiceStartupInformation info = m_requests.front();
-			m_requests.pop_front();
+			ServiceInformation info(std::move(m_requestedServices.front()));
+			m_requestedServices.pop_front();
 
-			if (!Application::instance()->requestToRunService(info)) {
-				serviceStartRequestFailed(info);
+			if (!Application::instance().requestToRunService(info)) {
+				this->serviceStartRequestFailed(info);
 			}
-
-			m_mutex.unlock();
 		}
 	}
 }
 
-void StartupDispatcher::serviceStartRequestFailed(const ServiceStartupInformation& _serviceInfo) {
-	OT_LOG_E("Service startup failed (Name = \"" + _serviceInfo.serviceInformation().name() + "\"; Type = \"" + _serviceInfo.serviceInformation().type() + "\")");
+void StartupDispatcher::serviceStartRequestFailed(const ServiceInformation& _serviceInfo) {
+	OT_LOG_E("Service startup failed { \"Name\": \"" + _serviceInfo.getName() + "\", \"Type\": \"" + _serviceInfo.getType() + "\" }");
 
 	// Clean up other requests for the same session
 	bool erased = false;
 	while (erased) {
 		erased = false;
-		for (std::list<ServiceStartupInformation>::iterator it = m_requests.begin(); it != m_requests.end(); it++) {
-			if (it->sessionInformation().id() == _serviceInfo.sessionInformation().id() && 
-				it->sessionInformation().sessionServiceURL() == _serviceInfo.sessionInformation().sessionServiceURL())
-			{
-				m_requests.erase(it);
+		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
+			if (it->getSessionInformation() == _serviceInfo.getSessionInformation()) {
+				m_requestedServices.erase(it);
 				erased = true;
 				break;
 			}
@@ -117,10 +125,10 @@ void StartupDispatcher::serviceStartRequestFailed(const ServiceStartupInformatio
 	// Notify session service about the failed startup
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceStartupFailed, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.serviceInformation().name(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.serviceInformation().type(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.getType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Send message asynchronously
-	ot::msg::sendAsync(Application::instance()->getServiceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	ot::msg::sendAsync(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 }

@@ -1,65 +1,51 @@
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+//! @file Application.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Service header
+// GDS header
 #include "Application.h"
 #include "LocalDirectoryService.h"
-#include "ServiceStartupInformation.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
-// C++ header
-#include <iostream>
+// std header
 #include <list>
 #include <chrono>
+#include <iostream>
 
 #define HANDLE_CHECK_MEMBER_TYPE(___doc, ___member, ___type)  if (!___doc[___member].Is##___type()) { OT_LOG_W("JSON member \"" ___member "\" invalid type"); return OT_ACTION_RETURN_INDICATOR_Error "JSON member \"" ___member "\" invalid type"; }
 #define HANDLE_CHECK_MEMBER_EXISTS(___doc, ___member)  if (!___doc.HasMember(___member)) { OT_LOG_W("Missing JSON member \"" ___member "\""); return OT_ACTION_RETURN_INDICATOR_Error "JSON member \"" ___member "\" is missing"; }
 #define HANDLE_CHECK_MEMBER(___doc, ___member, ___type) HANDLE_CHECK_MEMBER_EXISTS(___doc, ___member) HANDLE_CHECK_MEMBER_TYPE(___doc, ___member, ___type)
 
-static Application * g_instance{ nullptr };
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// ##################################################################################################################################
+// Static methods
 
-Application * Application::instance(void) {
-	if (g_instance == nullptr) { g_instance = new Application; }
-	
+Application& Application::instance(void) {
+	static Application g_instance;
 	return g_instance;
 }
 
-void Application::deleteInstance(void) {
-	if (g_instance) { delete g_instance; }
-	g_instance = nullptr;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-Application::Application()
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService)
-{
-	m_systemLoadInformation.initialize();
-}
+// Management
 
-Application::~Application() {}
-
-// ##################################################################################################################################
-
-LocalDirectoryService * Application::leastLoadedDirectoryService(const ServiceStartupInformation& _info) {
-	if (m_localDirectoryServices.empty()) return nullptr;
+LocalDirectoryService* Application::leastLoadedDirectoryService(const ServiceInformation& _info) {
+	if (m_localDirectoryServices.empty()) {
+		return nullptr;
+	}
 
 	LoadInformation::load_t load = LoadInformation::maxLoadValue();
 	LocalDirectoryService * leastLoaded = m_localDirectoryServices[0];
 
 	for (auto lds : m_localDirectoryServices) {
-		if (lds->supportsService(_info.serviceInformation().name())) {
+		if (lds->supportsService(_info.getName())) {
 			if (lds->load() < load) {
 				load = lds->load();
 				leastLoaded = lds;
@@ -71,6 +57,67 @@ LocalDirectoryService * Application::leastLoadedDirectoryService(const ServiceSt
 	}
 	return leastLoaded;
 }
+
+bool Application::requestToRunService(const ServiceInformation& _serviceInfo) {
+	// Determine LDS
+	std::lock_guard<std::mutex> lock(m_mutex);
+	LocalDirectoryService* lds = leastLoadedDirectoryService(_serviceInfo);
+
+	if (lds) {
+		// Run service at lds, if failed erase all startup requests from the session with the given ID
+		return lds->requestToRunService(_serviceInfo);
+	}
+	else {
+		return false;
+	}
+}
+
+int Application::initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL) {
+	setSiteId(_siteID);
+	setServiceURL(_ownURL);
+	m_globalSessionServiceURL = _globalSessionServiceURL;
+
+	// Register at global session service
+	ot::JsonDocument gssDoc;
+	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_serviceURL, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+
+	OT_LOG_I("Sending registration document to the Global Session Service");
+
+	// Send message
+	std::string gssURL(_globalSessionServiceURL);
+
+
+	// Send request to GSS
+	std::string gssResponse;
+
+	// In case of error:
+	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
+	// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+	const int maxCt = 30;
+	int ct = 1;
+	bool ok = false;
+	do {
+		gssResponse.clear();
+
+		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+		}
+	} while (!ok && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Registration at Global Session Service (" + gssURL + ") failed after " + std::to_string(maxCt) + " attemts. Exiting...");
+		exit(ot::AppExitCode::GSSRegistrationFailed);
+	}
+
+	return 0;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler
 
 std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL, String);
@@ -144,7 +191,7 @@ std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 	
 	OT_LOG_I("Service start requested: { Name: " + serviceName + "; Type: " + serviceType + "; SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
 
-	m_startupDispatcher.addRequest(ServiceStartupInformation(serviceName, serviceType, sessionServiceURL, sessionID));
+	m_startupDispatcher.addRequest(ServiceInformation(serviceName, serviceType, sessionID, sessionServiceURL));
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -164,7 +211,7 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 		OT_LOG_W("Service array is empty");
 	}
 
-	std::list<ServiceStartupInformation> requestedServices;
+	std::list<ServiceInformation> requestedServices;
 
 	for (rapidjson::SizeType i = 0; i < services.Size(); i++) {
 		if (!services[i].IsObject()) {
@@ -182,11 +229,11 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 		OT_LOG_I("Service start requested (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS.URL = \"" + sessionServiceURL + "\")");
 
-		requestedServices.push_back(ServiceStartupInformation(serviceName, serviceType, sessionServiceURL, sessionID));
+		requestedServices.push_back(ServiceInformation(serviceName, serviceType, sessionID, sessionServiceURL));
 	}
 
 	// Add the list to the dispatcher queue
-	m_startupDispatcher.addRequest(requestedServices);
+	m_startupDispatcher.addRequest(std::move(requestedServices));
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -198,24 +245,22 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	std::string sessionID = _jsonDocument[OT_ACTION_PARAM_SESSION_ID].GetString();
 	std::string sessionServiceURL = _jsonDocument[OT_ACTION_PARAM_SESSION_SERVICE_URL].GetString();
 
-	ServiceStartupInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, sessionServiceURL, sessionID);
+	ServiceInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, sessionServiceURL, sessionID);
 
-	// Lock application mutex and determine lds
-	m_mutex.lock();
+	// Determine LDS
+	std::lock_guard<std::mutex> lock(m_mutex);
+	
 	LocalDirectoryService * lds = leastLoadedDirectoryService(info);
 	if (lds == nullptr) {
-		m_mutex.unlock();
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	if (!lds->requestToRunRelayService(info, websocketUrl, relayServiceURL)) {
-		m_mutex.unlock();
 		OT_LOG_E("Failed to start relay service");
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
-	m_mutex.unlock();
-
+	
 	OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
 	ot::JsonDocument responseDoc;
@@ -232,14 +277,13 @@ std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
-	SessionInformation sessionInfo(sessionID, lssURL);
-	ServiceInformation serviceInfo(name, type);
+	ServiceInformation serviceInfo(name, type, sessionID, lssURL);
 
-	m_mutex.lock();
+	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto lds : m_localDirectoryServices) {
-		lds->serviceClosed(sessionInfo, serviceInfo, url);
+		lds->serviceClosed(serviceInfo, url);
 	}
-	m_mutex.unlock();
+
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -328,60 +372,13 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-bool Application::requestToRunService(const ServiceStartupInformation& _info) {
-	// Lock application mutex and determine lds
-	m_mutex.lock();
-	LocalDirectoryService * lds = leastLoadedDirectoryService(_info);
-	if (lds == nullptr) {
-		m_mutex.unlock();
-		return false;
-	}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Run service at lds, if failed erase all startup requests from the session with the given ID
-	bool requestResult = lds->requestToRunService(_info);
-	m_mutex.unlock();
-	return requestResult;
+// Private methods
+
+Application::Application()
+	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService) {
+	m_systemLoadInformation.initialize();
 }
 
-int Application::initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL) {
-	setSiteId(_siteID);
-	setServiceURL(_ownURL);
-	m_globalSessionServiceURL = _globalSessionServiceURL;
-
-	// Register at global session service
-	ot::JsonDocument gssDoc;
-	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-	gssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_serviceURL, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-
-	OT_LOG_I("Sending registration document to the Global Session Service");
-
-	// Send message
-	std::string gssURL(_globalSessionServiceURL);
-
-
-	// Send request to GSS
-	std::string gssResponse;
-
-	// In case of error:
-	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
-	// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
-	const int maxCt = 30;
-	int ct = 1;
-	bool ok = false;
-	do {
-		gssResponse.clear();
-
-		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(500ms);
-		}
-	} while (!ok && ct++ <= maxCt);
-
-	if (!ok) {
-		OT_LOG_E("Registration at Global Session Service (" + gssURL + ") failed after " + std::to_string(maxCt) + " attemts. Exiting...");
-		exit(ot::AppExitCode::GSSRegistrationFailed);
-	}
-
-	return 0;
-}
+Application::~Application() {}

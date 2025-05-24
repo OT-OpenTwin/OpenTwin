@@ -1,27 +1,28 @@
-/*
- * LocalDirectoryService.h
- *
- *  Created on: 23.09.2022
- *	Author: Alexander Kuester
- *  Copyright (c) 2022, OpenTwin
- */
+//! @file LocalDirectoryService.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-#include "ServiceStartupInformation.h"
+// GDS header
 #include "LoadInformation.h"
 #include "ServiceInformation.h"
-#include "SessionInformation.h"
 
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
 
-// C++ header
+// std header
 #include <string>
 #include <list>
 
+//! @brief The LocalDirectoryService holds information about the LDS.
+//! It is used to start services, gather information about services started by the LDS, as well as to provide information about the system load of the LDS.
 class LocalDirectoryService : public ot::ServiceBase {
+	OT_DECL_NOCOPY(LocalDirectoryService)
+	OT_DECL_NOMOVE(LocalDirectoryService)
+	OT_DECL_NODEFAULT(LocalDirectoryService)
 public:
 	LocalDirectoryService(const std::string& _url);
 	virtual ~LocalDirectoryService();
@@ -34,18 +35,14 @@ public:
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
 	bool supportsService(const std::string& _serviceName);
 
-	bool requestToRunService(const ServiceStartupInformation& _serviceInfo);
-	bool requestToRunRelayService(const ServiceStartupInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
+	bool requestToRunService(const ServiceInformation& _serviceInfo);
+	bool requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
 
 	void sessionClosed(const SessionInformation& _session);
-	void serviceClosed(const SessionInformation& _session, const ServiceInformation& _service, const std::string& _serviceURL);
+	void serviceClosed(const ServiceInformation& _service, const std::string& _serviceURL);
 
 private:
-	std::list<std::string>											m_supportedServices;
-	LoadInformation													m_loadInformation;
-	std::list<std::pair<SessionInformation, ServiceInformation>>	m_services;
-
-	LocalDirectoryService() = delete;
-	LocalDirectoryService(LocalDirectoryService&) = delete;
-	LocalDirectoryService& operator = (LocalDirectoryService&) = delete;
+	std::list<std::string>        m_supportedServices; //! @brief List of supported services by the LDS.
+	LoadInformation               m_loadInformation; //! @brief Latest system load information of the LDS.
+	std::list<ServiceInformation> m_services; //! @brief List of services started by the LDS.
 };

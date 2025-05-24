@@ -190,7 +190,6 @@
     <ClCompile Include="src\LoadInformation.cpp" />
     <ClCompile Include="src\LocalDirectoryService.cpp" />
     <ClCompile Include="src\ServiceInformation.cpp" />
-    <ClCompile Include="src\ServiceStartupInformation.cpp" />
     <ClCompile Include="src\SessionInformation.cpp" />
     <ClCompile Include="src\StartupDispatcher.cpp" />
   </ItemGroup>
@@ -199,7 +198,6 @@
     <ClInclude Include="include\LoadInformation.h" />
     <ClInclude Include="include\LocalDirectoryService.h" />
     <ClInclude Include="include\ServiceInformation.h" />
-    <ClInclude Include="include\ServiceStartupInformation.h" />
     <ClInclude Include="include\SessionInformation.h" />
     <ClInclude Include="include\StartupDispatcher.h" />
   </ItemGroup>

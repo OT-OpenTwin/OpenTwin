@@ -1,39 +1,63 @@
+//! @file StartupDispatcher.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-#include "ServiceStartupInformation.h"
+// GDS header
+#include "ServiceInformation.h"
 
+// std header
 #include <list>
 #include <mutex>
 
-class Application;
 namespace std { class thread; }
 
+//! @brief The StartupDispatcher is responsible for managing service start requests.
+//! It collects requests and starts a worker thread to process them.
 class StartupDispatcher {
 public:
-	StartupDispatcher(void);
+	StartupDispatcher();
 	virtual ~StartupDispatcher();
 
-	// ####################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Request management
 
-	void addRequest(const ServiceStartupInformation& _info);
-	void addRequest(const std::list<ServiceStartupInformation>& _info);
+	//! @brief Add a service start request to the queue.
+	//! The request will be processed by the worker thread.
+	//! @param _info Information about the service to start.
+	void addRequest(ServiceInformation&& _info);
 
-	// ####################################################################################################################
+	//! @brief Add multiple service start requests to the queue.
+	//! The requests will be processed by the worker thread.
+	//! @param _info List of service information objects to start.
+	void addRequest(std::list<ServiceInformation>&& _info);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private methods
+
+private:
+	//! @brief Run the worker thread if it is not already running.
 	void run(void);
+	
+	//! @brief Stop the worker thread and wait for it to finish.
 	void stop(void);
 
-	// ####################################################################################################################
-private:
+	//! @brief The worker function that processes service start requests.
 	void workerFunction(void);
-	void serviceStartRequestFailed(const ServiceStartupInformation& _serviceInfo);
 
-	std::list<ServiceStartupInformation>	m_requests;
-	std::mutex								m_mutex;
-	std::thread *							m_workerThread;
-	bool									m_isStopping;
+	//! @brief Will notify the session service about a failed service start request.
+	//! @warning It is assumed that the mutex is locked when calling this method.
+	//! @param _serviceInfo Information about the service that failed to start.
+	void serviceStartRequestFailed(const ServiceInformation& _serviceInfo);
+
+	std::list<ServiceInformation> m_requestedServices; //! @brief List of service start requests that are waiting to be processed.
+	std::mutex                    m_mutex;             //! @brief Mutex to protect access to the request list.
+	std::thread*                  m_workerThread;      //! @brief The worker thread that processes service start requests.
+	bool                          m_isStopping;        //! @brief Flag indicating whether the worker thread is stopping.
 
 	StartupDispatcher(StartupDispatcher&) = delete;
 	StartupDispatcher& operator = (StartupDispatcher&) = delete;

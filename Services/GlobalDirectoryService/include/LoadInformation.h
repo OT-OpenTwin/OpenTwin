@@ -1,7 +1,14 @@
+//! @file LoadInformation.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
+// OpenTwin header
 #include "OTCore/JSON.h"
 
+//! @brief The LoadInformation class provides information about the current system load.
 class LoadInformation {
 public:
 	typedef unsigned long long memory_t;
@@ -20,11 +27,11 @@ public:
 private:
 	load_t calculateLoad(memory_t _total, memory_t _avail);
 
-	load_t					m_currentPhysicalMemoryLoad;
-	load_t					m_currentVirtualMemoryLoad;
+	load_t   m_currentPhysicalMemoryLoad;
+	load_t   m_currentVirtualMemoryLoad;
 
-	memory_t				m_totalPhysicalMemory;
-	memory_t				m_availablePhysicalMemory;
-	memory_t				m_totalVirtualMemory;
-	memory_t				m_availableVirtualMemory;
+	memory_t m_totalPhysicalMemory;
+	memory_t m_availablePhysicalMemory;
+	memory_t m_totalVirtualMemory;
+	memory_t m_availableVirtualMemory;
 };

@@ -1,30 +1,28 @@
-/*
- * Application.h
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+//! @file Application.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
+// GDS header
 #include "StartupDispatcher.h"
 
 // Open twin header
+#include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/IDManager.h"
-#include "OTSystem/SystemInformation.h"
 
-// C++ header
-#include <string>
-#include <vector>
+// std header
 #include <map>
 #include <mutex>
+#include <string>
+#include <vector>
 
-// Forward declaration
+// Forward declarations
 class LocalDirectoryService;
 namespace ot {
 	namespace components {
@@ -36,25 +34,26 @@ namespace ot {
 class Application : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(Application)
 public:
-	static Application * instance(void);
-	static void deleteInstance(void);
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-private:
-	Application();
-	virtual ~Application();
+	// Static methods
 
-	std::string								m_globalSessionServiceURL;
-	std::vector<LocalDirectoryService *>	m_localDirectoryServices;
-	ot::IDManager<ot::serviceID_t>			m_ldsIdManager;
-	std::mutex								m_mutex;
-	StartupDispatcher						m_startupDispatcher;
-	ot::SystemInformation					m_systemLoadInformation;
-	ot::LogModeManager m_logModeManager;
+	static Application& instance(void);
 
-public:
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	const std::vector<LocalDirectoryService *>& localDirectoryServices(void) const { return m_localDirectoryServices; }
-	LocalDirectoryService * leastLoadedDirectoryService(const ServiceStartupInformation& _info);
+	// Management
+
+	const std::vector<LocalDirectoryService *>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; }
+	LocalDirectoryService* leastLoadedDirectoryService(const ServiceInformation& _info);
+
+	bool requestToRunService(const ServiceInformation& _serviceInfo);
+
+	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler
 
 	OT_HANDLER(handleLocalDirectoryServiceConnected, Application, OT_ACTION_CMD_RegisterNewLocalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleStartService, Application, OT_ACTION_CMD_StartNewService, ot::SECURE_MESSAGE_TYPES)
@@ -66,7 +65,19 @@ public:
 	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSetGlobalLogFlags, Application, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
-	bool requestToRunService(const ServiceStartupInformation& _info);
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	int initialize(const char * _siteID, const char * _ownURL, const char * _globalSessionServiceURL);
+	// Private methods
+
+private:
+	Application();
+	virtual ~Application();
+
+	std::string                         m_globalSessionServiceURL;
+	std::vector<LocalDirectoryService*> m_localDirectoryServices;
+	ot::IDManager<ot::serviceID_t>      m_ldsIdManager;
+	std::mutex                          m_mutex;
+	StartupDispatcher                   m_startupDispatcher;
+	ot::SystemInformation               m_systemLoadInformation;
+	ot::LogModeManager                  m_logModeManager;
 };

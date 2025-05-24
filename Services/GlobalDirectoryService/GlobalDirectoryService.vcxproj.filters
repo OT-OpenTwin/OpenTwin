@@ -27,9 +27,6 @@
     <ClCompile Include="src\StartupDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ServiceStartupInformation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\LoadInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\StartupDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ServiceStartupInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\LoadInformation.h">
