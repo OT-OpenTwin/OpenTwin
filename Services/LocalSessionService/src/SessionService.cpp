@@ -564,10 +564,7 @@ std::string SessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	return reply.toJson();
 }
 
-std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc)
-{
-	OT_LOG_I("Creating new session..");
-
+std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc) {
 	// Example: {...; 'Session.ID':'The new sessions ID'; 'User.Name':'New user name'; 'Project.Name': 'The projects name'; 'Collection.Name':'The collections name'; 'Session.Type':'The session type'}
 
 	if (!m_gds->isConnected()) {

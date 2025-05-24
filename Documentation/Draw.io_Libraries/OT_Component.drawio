@@ -1,8 +1,8 @@
 <mxlibrary>[
   {
-    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;h3&amp;gt;Package&amp;lt;/h3&amp;gt;\" style=\"shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;connectable=1;allowArrows=1;rotatable=0;fillColor=#ffe6cc;strokeColor=#d79b00;container=1;align=left;verticalAlign=top;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"160\" height=\"160\" as=\"geometry\"&gt;&lt;mxRectangle x=\"640\" y=\"480\" width=\"90\" height=\"40\" as=\"alternateBounds\"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
-    "w": 160,
-    "h": 160,
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;h3&amp;gt;Package&amp;lt;/h3&amp;gt;\" style=\"shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;connectable=1;allowArrows=1;rotatable=0;fillColor=#ffe6cc;strokeColor=#d79b00;container=1;align=left;verticalAlign=top;recursiveResize=0;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"200\" height=\"240\" as=\"geometry\"&gt;&lt;mxRectangle x=\"640\" y=\"480\" width=\"90\" height=\"40\" as=\"alternateBounds\"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 200,
+    "h": 240,
     "aspect": "fixed",
     "title": "Package"
   },
