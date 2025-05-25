@@ -245,7 +245,7 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	std::string sessionID = _jsonDocument[OT_ACTION_PARAM_SESSION_ID].GetString();
 	std::string sessionServiceURL = _jsonDocument[OT_ACTION_PARAM_SESSION_SERVICE_URL].GetString();
 
-	ServiceInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, sessionServiceURL, sessionID);
+	ServiceInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, sessionID, sessionServiceURL);
 
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
