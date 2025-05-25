@@ -64,6 +64,9 @@ public:
 
 	const ServiceInformation& getInfo(void) const { return m_info; };
 
+	void setShuttingDown(bool _isShuttingDown) { m_isShuttingDown = _isShuttingDown; };
+	bool isShuttingDown(void) const { return m_isShuttingDown; };
+
 	const std::string& getUrl(void) const { return m_url; };
 	ot::port_t getPort(void) const { return m_port; };
 
@@ -82,7 +85,7 @@ private:
 	ServiceInformation	m_info;
 	
 	ServiceManager *	m_owner;
-	bool				m_isAlive;
+	bool                m_isShuttingDown;
 	std::string			m_url;
 	ot::port_t			m_port;
 	std::string			m_websocketUrl;

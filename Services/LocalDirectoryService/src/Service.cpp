@@ -21,17 +21,18 @@
 #include <thread>
 
 Service::Service(ServiceManager * _owner, const ServiceInformation& _info) :
-	m_owner(_owner), m_isAlive(false), m_info(_info), m_processHandle(OT_INVALID_PROCESS_HANDLE), 
-	m_port(0), m_websocketPort(0)
+	m_owner(_owner), m_info(_info), m_processHandle(OT_INVALID_PROCESS_HANDLE), 
+	m_port(0), m_websocketPort(0), m_isShuttingDown(false)
 {}
 
 Service::Service(Service&& _other) noexcept :
-	m_owner(_other.m_owner), m_isAlive(_other.m_isAlive), m_info(std::move(_other.m_info)),
+	m_owner(_other.m_owner), m_isShuttingDown(_other.m_isShuttingDown), m_info(std::move(_other.m_info)),
 	m_processHandle(_other.m_processHandle), m_port(_other.m_port), m_websocketPort(_other.m_websocketPort),
 	m_url(std::move(_other.m_url)), m_websocketUrl(std::move(_other.m_websocketUrl))
 {
 	_other.m_owner = nullptr;
 	_other.m_processHandle = OT_INVALID_PROCESS_HANDLE;
+	_other.m_isShuttingDown = false;
 }
 
 Service::~Service() {
@@ -48,7 +49,7 @@ Service::~Service() {
 Service& Service::operator=(Service&& _other) noexcept {
 	if (this != &_other) {
 		m_owner = _other.m_owner;
-		m_isAlive = _other.m_isAlive;
+		m_isShuttingDown = _other.m_isShuttingDown;
 		m_info = std::move(_other.m_info);
 		m_processHandle = _other.m_processHandle;
 		m_port = _other.m_port;
@@ -58,6 +59,7 @@ Service& Service::operator=(Service&& _other) noexcept {
 
 		_other.m_owner = nullptr;
 		_other.m_processHandle = OT_INVALID_PROCESS_HANDLE;
+		_other.m_isShuttingDown = false;
 	}
 
 	return *this;
@@ -72,7 +74,7 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	m_info.addToJsonObject(infoObj, _allocator);
 
 	_object.AddMember("Information", infoObj, _allocator);
-	_object.AddMember("IsAlive", m_isAlive, _allocator);
+	_object.AddMember("IsShuttingDown", m_isShuttingDown, _allocator);
 	_object.AddMember("URL", ot::JsonString(m_url, _allocator), _allocator);
 	_object.AddMember("Port", m_port, _allocator);
 	_object.AddMember("WebsocketURL", ot::JsonString(m_websocketUrl, _allocator), _allocator);
@@ -131,32 +133,26 @@ ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t
 }
 
 ot::RunResult Service::shutdown(void) {
-	
 	ot::RunResult result;
-	if (m_isAlive) 
-	{
-	#if defined(OT_OS_WINDOWS)
-		const uint32_t somethingWentWrongExitCode = 1;
-		bool processTerminated = TerminateProcess(m_processHandle, somethingWentWrongExitCode); //Closing process without condition. Call is asynchronous, on return the process may not be terminated yet!
-		if (processTerminated == FALSE)
-		{
-			result.setAsError(GetLastError());
-			result.setErrorMessage("Failed in trying to terminate the process");
-		}
-		bool handleClosed = CloseHandle(m_processHandle);
-		if (!handleClosed)
-		{
-			result.setAsError(GetLastError());
-			result.setErrorMessage("Failed in closing the process handle");
-		}
-	#endif
-		m_isAlive = false;
+
+#if defined(OT_OS_WINDOWS)
+	const uint32_t somethingWentWrongExitCode = 1;
+	bool processTerminated = TerminateProcess(m_processHandle, somethingWentWrongExitCode); // Closing process without condition. Call is asynchronous, on return the process may not be terminated yet!
+	if (processTerminated == FALSE) {
+		result.setAsError(GetLastError());
+		result.setErrorMessage("Failed in trying to terminate the process");
 	}
+	bool handleClosed = CloseHandle(m_processHandle);
+	if (!handleClosed) {
+		result.setAsError(GetLastError());
+		result.setErrorMessage("Failed in closing the process handle");
+	}
+#endif
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
 	return result;
 }
 
-ot::RunResult Service::checkAlive() {
+ot::RunResult Service::checkAlive(void) {
 	ot::RunResult result;
 #if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
@@ -173,9 +169,9 @@ ot::RunResult Service::checkAlive() {
 		result.setErrorMessage("Failed to get service exit code { \"Name\": \"" + m_info.getName() + "\"; \"Type\": \"" + m_info.getType() + "\"; \"URL\": \"" + m_url + "\" }.");
 	}
 
-	return result;
 #else
 	OT_LOG_EA("Function is implemented only for Windows OS");
-	return false;
 #endif // OT_OS_WINDOWS
+
+	return result;
 }

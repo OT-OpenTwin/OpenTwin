@@ -126,6 +126,35 @@ bool LocalDirectoryService::requestToRunRelayService(const ServiceInformation& _
 	return true;
 }
 
+void LocalDirectoryService::sessionClosing(const SessionInformation& _session) {
+	for (const ServiceInformation& service : m_services) {
+		
+		// Find the first service in the given session
+		// The notification should only be performed once per session
+
+		if (service.getSessionId() == _session.getId()) {
+			// Create document
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.getId(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+			// Send message and check response
+			std::string response;
+			if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				OT_LOG_E("Failed to send session closing notification to LDS at \"" + m_serviceURL + "\"");
+			}
+			else if (response != OT_ACTION_RETURN_VALUE_OK) {
+				OT_LOG_E("Invalid response when sending session closing notification to LDS at \"" + m_serviceURL + "\"");
+			}
+			else {
+				// Successfully notified the LDS about the session shutdown
+				return;
+			}
+		}
+	}
+}
+
 void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 	bool notified = false;
 	bool erased = true;
@@ -147,10 +176,10 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 					// Send message and check response
 					std::string response;
 					if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send session closed notification to LDS at " + m_serviceURL);
+						OT_LOG_E("Failed to send session closed notification to LDS at \"" + m_serviceURL + "\"");
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
-						OT_LOG_E("Invalid response when sending session closed notification to LDS at " + m_serviceURL);
+						OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + m_serviceURL + "\"");
 					}
 				}
 

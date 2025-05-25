@@ -143,6 +143,7 @@ private:
 	OT_HANDLER(handleSendBroadcastMessage, SessionService, OT_ACTION_CMD_SendBroadcastMessage, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetSessionExists, SessionService, OT_ACTION_CMD_GetSessionExists, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceClosing, SessionService, OT_ACTION_CMD_ServiceClosing, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceShutdownCompleted, SessionService, OT_ACTION_CMD_ServiceShutdownCompleted, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleMessage, SessionService, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownSession, SessionService, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceFailure, SessionService, OT_ACTION_CMD_ServiceFailure, ot::SECURE_MESSAGE_TYPES)

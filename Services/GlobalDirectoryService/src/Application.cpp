@@ -264,6 +264,21 @@ std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
+	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
+	std::string lssURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+
+	SessionInformation sessionInfo(sessionID, lssURL);
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	for (LocalDirectoryService& lds : m_localDirectoryServices) {
+		lds.sessionClosing(sessionInfo);
+	}
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	std::string lssURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);

@@ -90,7 +90,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="qYWw9UYQeMKu6ul-sRUe-17" value="&lt;h3&gt;Local Directory Service (LDS)&lt;/h3&gt;" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;connectable=1;allowArrows=1;rotatable=0;fillColor=#ffe6cc;strokeColor=#d79b00;container=1;align=center;verticalAlign=top;recursiveResize=0;" parent="1" vertex="1">
-          <mxGeometry x="1320" y="40" width="330" height="740" as="geometry">
+          <mxGeometry x="1320" y="40" width="340" height="740" as="geometry">
             <mxRectangle x="640" y="480" width="90" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>

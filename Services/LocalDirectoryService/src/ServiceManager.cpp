@@ -208,10 +208,30 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const Ses
 	return RequestResult::Success;
 }
 
+void ServiceManager::sessionClosing(const std::string& _sessionID) {
+	this->cleanUpSession_RequestedList(_sessionID);
+
+	std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
+
+	this->cleanUpSession_IniList(_sessionID);
+
+	std::lock_guard<std::mutex> servicesLock(m_mutexServices);
+	for (auto& session : m_services) {
+		if (session.first.getId() == _sessionID) {
+			// Mark all alive services in the given session as stopping
+			for (auto& service : *session.second) {
+				// Set the service to shutting down
+				service.setShuttingDown(true);
+			}
+		}
+	}
+}
+
 void ServiceManager::sessionClosed(const std::string& _sessionID) {
 	this->cleanUpSession_RequestedList(_sessionID);
 
 	std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
+	
 	this->cleanUpSession_IniList(_sessionID);
 	this->cleanUpSession_AliveList(_sessionID);
 }
@@ -392,6 +412,26 @@ bool ServiceManager::restartServiceAfterCrash(const Service& _service) {
 	return false;
 }
 
+void ServiceManager::notifyServiceShutdownCompleted(const Service& _service) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdownCompleted, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_service.getInfo().getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_service.getInfo().getType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_service.getUrl(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_service.getInfo().getSessionId(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", _service.getInfo().getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send shutdown completed message to session service { \"Name\": \"" + _service.getInfo().getName() +
+			"\", \"Type\": \"" + _service.getInfo().getType() + "\", \"Service.Url\": \"" + _service.getUrl() + "\", \"LSS.Url\": \"" + _service.getInfo().getSessionServiceURL() + "\" }");
+	}
+	else if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Invalid shutdown completed response from session service { \"Name\": \"" + _service.getInfo().getName() +
+			"\", \"Type\": \"" + _service.getInfo().getType() + "\", \"Service.Url\": \"" + _service.getUrl() + "\", \"LSS.Url\": \"" + _service.getInfo().getSessionServiceURL() +
+			"\", \"Response\": \"" + response + "\" }");
+	}
+}
+
 void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedService) {
 	// Clean up startup requests
 	std::lock_guard<std::mutex> lock(m_mutexRequestedServices);
@@ -458,12 +498,25 @@ void ServiceManager::cleanUpSession_RequestedList(const std::string& _sessionID)
 void ServiceManager::cleanUpSession_IniList(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> iniLock(m_mutexInitializingServices);
 
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
+	std::string cmd = doc.toJson();
+
 	bool erased = true;
 	while (erased) {
 		erased = false;
 		for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); it++) {
 			if (it->getInfo().getSessionId() == _sessionID) {
-				m_stoppingServices.push_back(std::move(*m_initializingServices.erase(it)));
+				// Send shutdown message to the service
+				auto x = m_initializingServices.erase(it);
+
+				std::string response;
+				if (!ot::msg::send("", x->getUrl(), ot::EXECUTE, cmd, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					OT_LOG_EAS("Failed to send shutdown message to service { \"Name\": \"" + x->getInfo().getName() + "\", \"Type\": \"" +
+						x->getInfo().getType() + "\", \"Url\": \"" + x->getUrl() + "\" }");
+				}
+
+				m_stoppingServices.push_back(std::move(*x));
 				erased = true;
 				break;
 			}
@@ -644,7 +697,7 @@ void ServiceManager::workerServiceInitializer(void) {
 					"\" }. App Error Message: " + result.getErrorMessage());
 				
 				result = info.shutdown();
-				OT_LOG_I("Service shutdown after crash completed with Error code: " + std::to_string(result.getErrorCode()) + " and Message: " + result.getErrorMessage());
+				OT_LOG_I("Service shutdown after crash completed with error code: " + std::to_string(result.getErrorCode()) + " and Message: " + result.getErrorMessage());
 
 				this->serviceInitializeFailed(info);
 			}
@@ -661,29 +714,44 @@ void ServiceManager::workerHealthCheck(void) {
 				bool erased = false;
 				// Itereate through every service in every session
 				for (auto& session : m_services) {
-					for (auto& service : *session.second) {
+					for (auto it = session.second->begin(); it != session.second->end(); it++) {
 
 						// Check if service crashed
-						ot::RunResult result = service.checkAlive();
+						ot::RunResult result = it->checkAlive();
 						if (!result.isOk()) {
-							// Application is not running, check if the shutdown was intended
+							// Service died
+							if (it->isShuttingDown()) {
+								// The shutdown was intentional
 
-							OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+								OT_LOG_D("Service shutdown completed { \"Name\": \"" + it->getInfo().getName() +
+									"\", \"Type\": \"" + it->getInfo().getType() + "\", \"Url\": \"" + it->getUrl() + "\" }");
 
-							ot::RunResult result = service.shutdown();
-							OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+								// Notify LSS about shutdown completed
+								this->notifyServiceShutdownCompleted(*it);
 
-							if (service.getStartCounter() < service.getInfo().getMaxCrashRestarts()) {
-								// Attempt to restart service, if successful the list did not change and we can continue the health check.
-								if (this->restartServiceAfterCrash(service)) {
-									continue;
+								// Remove the service from the session list
+								std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
+								m_stoppingServices.push_back(std::move(*session.second->erase(it)));
+							}
+							else {
+								OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+								
+								ot::RunResult result = it->shutdown();
+								OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
+
+								if (it->getStartCounter() < it->getInfo().getMaxCrashRestarts()) {
+									// Attempt to restart service, if successful the list did not change and we can continue the health check.
+									if (this->restartServiceAfterCrash(*it)) {
+										continue;
+									}
 								}
+
+								// Either the restart failed or the restart counter reached its max value.
+								// We notify the session service, clean up the lists and cancel the current health check.
+								// Health check will not be terminated just the current loop will be cancelled.
+								this->notifySessionEmergencyShutdown(*it);
 							}
 
-							// Either the restart failed or the restart counter reached its max value.
-							// We notify the session service, clean up the lists and cancel the current health check.
-							// Health check will not be terminated just the current loop will be cancelled.
-							this->notifySessionEmergencyShutdown(service);
 							erased = true;
 							break;
 						}

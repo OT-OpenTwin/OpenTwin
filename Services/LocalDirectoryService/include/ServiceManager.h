@@ -51,6 +51,14 @@ public:
 
 	RequestResult requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
 
+	//! @brief Will mark all services in the session as expected to shut down.
+	//! Services that are currently requested will be removed from the requested list.
+	//! Sercices that are currently initializing will be shut down and removed from the initializing list.
+	//! @param _sessionID Session that is expected to shut down.
+	void sessionClosing(const std::string& _sessionID);
+
+	//! @brief Will clean up all services in the session.
+	//! @param _sessionID 
 	void sessionClosed(const std::string& _sessionID);
 
 	void serviceDisconnected(const ServiceInformation& _info, const std::string& _serviceURL);
@@ -83,6 +91,7 @@ private:
 	std::vector<Service> * sessionServices(const SessionInformation& _sessionInformation);
 
 	bool restartServiceAfterCrash(const Service& _service);
+	void notifyServiceShutdownCompleted(const Service& _service);
 	void notifySessionEmergencyShutdown(const Service& _crashedService);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -92,7 +101,15 @@ private:
 	//! @brief Clean up session related information from requested services list.
 	//! @param _sessionID Session info to clean up.
 	void cleanUpSession_RequestedList(const std::string& _sessionID);
+
+	//! @brief Send shutdown message to all services that are currently initializing in the given session and clean up information
+	//! @warning The initializing services mutex is expected to be locked when calling this function.
+	//! @param _sessionID Session info to clean up.
 	void cleanUpSession_IniList(const std::string& _sessionID);
+
+	//! @brief Move all services in the given session from the alive list to the stopping list and clean up information.
+	//! @warning The initializing services mutex is expected to be locked when calling this function.
+	//! @param _sessionID Session info to clean up.
 	void cleanUpSession_AliveList(const std::string& _sessionID);
 	
 	// ###########################################################################################################################################################################################################################################################################################################################

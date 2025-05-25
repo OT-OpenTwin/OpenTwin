@@ -57,6 +57,7 @@ public:
 	OT_HANDLER(handleStartServices, Application, OT_ACTION_CMD_StartNewServices, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleStartRelayService, Application, OT_ACTION_CMD_StartNewRelayService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceStopped, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSessionClosing, Application, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateSystemLoad, Application, OT_ACTION_CMD_UpdateSystemLoad, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)

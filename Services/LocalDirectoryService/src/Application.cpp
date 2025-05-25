@@ -137,6 +137,13 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	return OT_ACTION_RETURN_INDICATOR_Error "Maximum number of start attempts reached";
 }
 
+std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
+	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
+	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+	m_serviceManager.sessionClosing(sessionID);
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);

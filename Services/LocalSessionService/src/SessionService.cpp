@@ -737,6 +737,22 @@ std::string SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _commandDoc) {
+	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
+	Session* theSession = getSession(sessionID);
+	if (!theSession) {
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+	
+
+
+	OT_LOG_EA("Not implemented yet");
+
+
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 std::string SessionService::handleMessage(ot::JsonDocument& _commandDoc) {
 	std::string senderName(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME));
 	OT_LOG_W("[UNEXPECTED] Message from \"" + senderName + "\": \"" +

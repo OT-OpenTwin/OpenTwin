@@ -40,6 +40,7 @@ public:
 	bool requestToRunService(const ServiceInformation& _serviceInfo);
 	bool requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
 
+	void sessionClosing(const SessionInformation& _session);
 	void sessionClosed(const SessionInformation& _session);
 	void serviceClosed(const ServiceInformation& _service, const std::string& _serviceURL);
 
