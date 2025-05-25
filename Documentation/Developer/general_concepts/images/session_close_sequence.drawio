@@ -1,0 +1,320 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.5 Chrome/134.0.6998.205 Electron/35.3.0 Safari/537.36" version="27.0.5">
+  <diagram name="Page-1" id="VMZdibjBmJLBxk7ZPFCg">
+    <mxGraphModel dx="1403" dy="576" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-53" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1180" y="710" as="sourcePoint" />
+            <mxPoint x="230" y="709.51" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-42" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="550" as="sourcePoint" />
+            <mxPoint x="465" y="549.51" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-35" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="940" y="410" as="sourcePoint" />
+            <mxPoint x="705" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="950.0000000000005" y="400" as="targetPoint" />
+            <mxPoint x="940" y="370" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="980" y="370" />
+              <mxPoint x="980" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-30" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="700" y="360.4" as="sourcePoint" />
+            <mxPoint x="935" y="360" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-21" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="460" y="270" as="sourcePoint" />
+            <mxPoint x="695" y="270" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="220" as="targetPoint" />
+            <mxPoint x="220" y="190" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="260" y="190" />
+              <mxPoint x="260" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-2" value="&lt;b&gt;LSS&lt;/b&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="160" y="40" width="120" height="940" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-3" value="&lt;b&gt;GSS&lt;/b&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="40" width="120" height="940" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-4" value="&lt;b&gt;GDS&lt;/b&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="40" width="120" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-5" value="&lt;b&gt;LDS&lt;/b&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="640" y="40" width="120" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-6" value="Service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="880" y="40" width="120" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-7" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="40" y="130" as="sourcePoint" />
+            <mxPoint x="215" y="130" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-8" value="1: Shutdow Session" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="109" width="140" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-10" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="215" y="119" width="10" height="131" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-11" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="220" y="210" width="10" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-13" value="3: Start shutdown worker" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="270" y="190" width="165" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="225.00000000000045" y="170" as="targetPoint" />
+            <mxPoint x="225.00000000000068" y="140" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="260" y="140" />
+              <mxPoint x="260" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-15" value="2: Remove session from lists" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="270" y="140" width="165" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-16" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="215" y="239.51" as="sourcePoint" />
+            <mxPoint x="40" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-17" value="4: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="220" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-18" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="230" y="260" as="sourcePoint" />
+            <mxPoint x="455" y="260" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-19" value="5: Notify session shutdown completed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="230" y="240" width="220" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-20" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="455" y="250" width="10" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-22" value="6: Notify session shutdown completed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="250" width="220" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-23" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="695" y="259.52" width="10" height="300.48" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-24" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="705.0000000000005" y="310" as="targetPoint" />
+            <mxPoint x="705.0000000000007" y="280" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="743.0000000000005" y="280" />
+              <mxPoint x="743.0000000000005" y="310" />
+              <mxPoint x="705.0000000000005" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-25" value="7: Remove requested services" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="755" y="280" width="175" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-28" value="Each service in initialize list" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;connectable=0;allowArrows=0;recursiveResize=0;width=60;height=60;" vertex="1" parent="1">
+          <mxGeometry x="620" y="320" width="490" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-29" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="935" y="350" width="10" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-31" value="8: Shutdown request" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="760" y="339" width="120" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-32" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="940" y="380" width="10" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-34" value="9: Shutdown thread" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="990.0000000000005" y="370" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-36" value="10: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="770" y="390" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-37" value="" style="shape=umlDestroy;whiteSpace=wrap;html=1;strokeWidth=3;targetShapes=umlLifeline;connectable=0;allowArrows=0;recursiveResize=0;rotatable=0;resizable=0;" vertex="1" parent="1">
+          <mxGeometry x="925" y="430" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-38" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="705.0200000000004" y="470" as="targetPoint" />
+            <mxPoint x="705.0200000000007" y="440" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="743.0200000000004" y="440" />
+              <mxPoint x="743.0200000000004" y="470" />
+              <mxPoint x="705.0200000000004" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-39" value="11: Remove service from initialize list" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="755.0200000000004" y="440" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-40" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="705.0000000000005" y="540" as="targetPoint" />
+            <mxPoint x="705.0000000000007" y="510" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="743.0000000000005" y="510" />
+              <mxPoint x="743.0000000000005" y="540" />
+              <mxPoint x="705.0000000000005" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-41" value="12: Move &quot;alive&quot; services to shutdown list" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="755" y="510" width="145" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-43" value="13: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="540" y="530" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-44" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="465.00000000000045" y="599" as="targetPoint" />
+            <mxPoint x="465.0000000000007" y="569" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="503.00000000000045" y="569" />
+              <mxPoint x="503.00000000000045" y="599" />
+              <mxPoint x="465.00000000000045" y="599" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-45" value="14: Clean-up lists" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="515.0000000000005" y="569" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-46" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="455" y="609.51" as="sourcePoint" />
+            <mxPoint x="230" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-47" value="15: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="290" y="589" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-48" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="1175" y="650" width="10" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-49" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="230" y="660" as="sourcePoint" />
+            <mxPoint x="1175" y="660" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-50" value="16: Notify session shutdown completed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="465" y="640" width="235" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-51" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1185.0000000000005" y="700" as="targetPoint" />
+            <mxPoint x="1185.0000000000007" y="670" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="1223.0000000000005" y="670" />
+              <mxPoint x="1223.0000000000005" y="700" />
+              <mxPoint x="1185.0000000000005" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-52" value="17: Clean-up lists" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="1235.0000000000005" y="670" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-54" value="18: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="535" y="690" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-55" value="Service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fad7ac;strokeColor=#b46504;fontColor=#000000;rounded=0;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;dropTarget=0;connectable=0;allowArrows=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="880" y="560" width="120" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-56" value="Each service in session" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;connectable=0;allowArrows=0;recursiveResize=0;width=60;height=60;" vertex="1" parent="1">
+          <mxGeometry x="140" y="740" width="980" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-57" value="" style="endArrow=open;html=1;rounded=1;dashed=1;endFill=0;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="940" y="830" as="sourcePoint" />
+            <mxPoint x="230" y="830" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-58" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="950.0000000000005" y="820" as="targetPoint" />
+            <mxPoint x="940" y="790" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="980" y="790" />
+              <mxPoint x="980" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-59" value="" style="html=1;verticalAlign=bottom;endArrow=classic;rounded=1;strokeColor=default;strokeWidth=1;align=center;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;edgeStyle=orthogonalEdgeStyle;curved=0;endFill=1;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="230" y="780" as="sourcePoint" />
+            <mxPoint x="935" y="780" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-60" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="935" y="770" width="10" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-61" value="19: Shutdown request" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="760" width="130" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-62" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#bac8d3;strokeColor=#23445d;rounded=0;align=left;verticalAlign=top;fontFamily=Helvetica;fontSize=12;fontColor=default;connectable=0;allowArrows=0;" vertex="1" parent="1">
+          <mxGeometry x="940" y="800" width="10" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-63" value="20: Shutdown thread" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="990.0000000000005" y="790" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-64" value="21: OK" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="530" y="810" width="80" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-65" value="" style="shape=umlDestroy;whiteSpace=wrap;html=1;strokeWidth=3;targetShapes=umlLifeline;connectable=0;allowArrows=0;recursiveResize=0;rotatable=0;resizable=0;" vertex="1" parent="1">
+          <mxGeometry x="925" y="850" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-68" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;strokeWidth=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;labelBackgroundColor=default;startArrow=none;startFill=0;endArrow=classic;endFill=1;curved=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230.00000000000045" y="940" as="targetPoint" />
+            <mxPoint x="230.00000000000068" y="910" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="268.00000000000045" y="910" />
+              <mxPoint x="268.00000000000045" y="940" />
+              <mxPoint x="230.00000000000045" y="940" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-69" value="22: Remove session and its services from lists" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;allowArrows=0;fontFamily=Helvetica;fontSize=12;fontColor=#000000;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="910" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EO8kv-_hzXF2GcDBW9tc-70" value="Sender" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="140" width="30" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

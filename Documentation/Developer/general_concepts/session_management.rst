@@ -18,6 +18,16 @@ They are responsible for starting, monitoring and shutting down services.
 The Session Services (:doc:`GSS </services/global_session_service>` and :doc:`LSS </services/local_session_service>`) handle the session management itself.
 They are use to create a session, request services from the :doc:`GDS </services/global_directory_service>` and broadcast messages in a session.
 
+
+Service Information Overview
+****************************
+
+The following diagram shows which Session and Service related information is known in the four :ref:`session management<session_management_top>` related services.
+
+.. image:: images/service_information_overview.svg
+    :width: 55%
+
+
 Create a Session
 ****************
 
@@ -29,11 +39,11 @@ Since currently the Frontend Application is the only "Service" that can be start
 .. image:: images/service_start_logic_sequence.svg
     :width: 40%
 
+Close a Session
+***************
 
-Service Information Overview
-****************************
+Any service can initiate a session close.
 
-The following diagram shows which Session and Service related information is known in the four :ref:`session management<session_management_top>` related services.
+.. image:: images/session_close_sequence.svg
+    :width: 40%
 
-.. image:: images/service_information_overview.svg
-    :width: 70%
