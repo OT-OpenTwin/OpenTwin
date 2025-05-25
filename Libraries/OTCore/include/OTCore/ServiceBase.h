@@ -42,7 +42,13 @@ namespace ot {
 		//! @param _other The other service
 		ServiceBase(const ServiceBase & _other);
 
+		//! @brief Move constructor
+		//! @param _other The other service
+		ServiceBase(ServiceBase&& _other) noexcept;
+
 		ServiceBase& operator = (const ServiceBase& _other);
+		ServiceBase& operator = (ServiceBase&& _other) noexcept;
+
 		bool operator == (const ServiceBase& _other) const;
 		bool operator != (const ServiceBase& _other) const;
 
