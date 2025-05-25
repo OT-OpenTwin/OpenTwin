@@ -1,12 +1,9 @@
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+//! @file Application.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Service header
+// LDS header
 #include "Application.h"
 #include "Configuration.h"
 
@@ -22,47 +19,24 @@
 
 // std header
 #include <thread>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
-#define LocalDirectoryService OT_INFO_SERVICE_TYPE_LocalDirectoryService
-#define LocalDirectory_SERVICE_TYPE OT_INFO_SERVICE_TYPE_LocalDirectoryService
-
-Application * g_instance{ nullptr };
-
-Application * Application::instance(void) {
-	if (g_instance == nullptr) { g_instance = new Application; }
-
+Application& Application::instance(void) {
+	static Application g_instance;
 	return g_instance;
 }
 
-void Application::deleteInstance(void) {
-	if (g_instance) { delete g_instance; }
-	g_instance = nullptr;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-Application::Application()
-	: ot::ServiceBase(LocalDirectoryService, LocalDirectory_SERVICE_TYPE)
-{
-	m_systemLoadInformation.initialize();
-}
+// Public functions
 
-Application::~Application()
-{
-	
-}
-
-// ##################################################################################################################################
-
-// Private functions
-
-int Application::initialize(const char * _ownURL, const char * _globalDirectoryServiceURL)
-{
+int Application::initialize(const char* _ownURL, const char* _globalDirectoryServiceURL) {
 	// Read supported services from environment
-	LDS_CFG.importFromEnvironment();
+	Configuration::instance().importFromEnvironment();
 
 	m_serviceURL = _ownURL;
-	
+
 	// Filter ip and port from own url
 	size_t ix = m_serviceURL.find(':');
 	if (ix == std::string::npos) {
@@ -78,7 +52,7 @@ int Application::initialize(const char * _ownURL, const char * _globalDirectoryS
 	if (convertFailed) {
 		exit(ot::AppExitCode::ServiceUrlInvalid);
 	}
-	
+
 	m_serviceManager.setServiceIP(ip);
 
 	ot::PortManager::instance().addPortRange(portNr + 1, 49151);
@@ -88,6 +62,23 @@ int Application::initialize(const char * _ownURL, const char * _globalDirectoryS
 	return ot::AppExitCode::Success;
 }
 
+void Application::globalDirectoryServiceCrashed(void) {
+	OT_LOG_E("GDS crash not handled yet");
+	exit(ot::AppExitCode::GDSNotRunning);
+}
+
+std::list<std::string> Application::getSupportedServices(void) const {
+	std::list<std::string> lst;
+	for (auto& s : Configuration::instance().getSupportedServices()) {
+		lst.push_back(s.getName());
+	}
+	return lst;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action handler
+
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
 	std::string serviceName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
@@ -96,19 +87,18 @@ std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) 
 
 	OT_LOG_I("Service start requested: (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS-URL = \"" + sessionServiceURL + "\")");
 
-	SessionInformation sessionInfo(sessionID, sessionServiceURL);
-	ServiceInformation serviceInfo(serviceName, serviceType);
+	ServiceInformation serviceInfo(serviceName, serviceType, SessionInformation(sessionID, sessionServiceURL));
 
 	// Get the limits from the configuration
-	for (auto s : LDS_CFG.supportedServices()) {
-		if (s.name() == serviceInfo.name() && s.type() == serviceInfo.type()) {
-			serviceInfo.setMaxCrashRestarts(s.maxCrashRestarts());
-			serviceInfo.setMaxStartupRestarts(s.maxStartupRestarts());
+	for (auto s : Configuration::instance().getSupportedServices()) {
+		if (s.getName() == serviceInfo.getName() && s.getType() == serviceInfo.getType()) {
+			serviceInfo.setMaxCrashRestarts(s.getMaxCrashRestarts());
+			serviceInfo.setMaxStartupRestarts(s.getMaxStartupRestarts());
 			break;
 		}
 	}
 	
-	if (m_serviceManager.requestStartService(sessionInfo, serviceInfo) != ServiceManager::RequestResult::Success) {
+	if (m_serviceManager.requestStartService(serviceInfo) != ServiceManager::RequestResult::Success) {
 		return OT_ACTION_RETURN_INDICATOR_Error + m_serviceManager.lastError();
 	}
 	else {
@@ -127,7 +117,7 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	
-	for (unsigned int attempt = 0; attempt < Configuration::instance().defaultMaxStartupRestarts(); attempt++) {
+	for (unsigned int attempt = 0; attempt < Configuration::instance().getDefaultMaxStartupRestarts(); attempt++) {
 		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL);
 		if (result == ServiceManager::RequestResult::Success) {
 			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
@@ -139,7 +129,7 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 			return responseDoc.toJson();
 		}
 		else {
-			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(Configuration::instance().defaultMaxStartupRestarts()));
+			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(Configuration::instance().getDefaultMaxStartupRestarts()));
 		}
 	}
 
@@ -160,7 +150,10 @@ std::string Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
 	std::string name = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
-	m_serviceManager.serviceDisconnected(sessionID, ServiceInformation(name, type), url);
+
+	ServiceInformation info(name, type);
+	info.setSessionId(sessionID);
+	m_serviceManager.serviceDisconnected(info, url);
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -168,7 +161,7 @@ std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocume
 	ot::JsonDocument doc;
 	
 	ot::JsonObject configObj;
-	LDS_CFG.addToJsonObject(configObj, doc.GetAllocator());
+	Configuration::instance().addToJsonObject(configObj, doc.GetAllocator());
 	doc.AddMember("Configuration", configObj, doc.GetAllocator());
 
 	ot::JsonObject serviceManagerObj;
@@ -195,11 +188,11 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
 
 	// Add information about the services which are supported on this node
-	reply.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(supportedServices(), reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(this->getSupportedServices(), reply.GetAllocator()), reply.GetAllocator());
 
 	// Now we add information about the sessions and their services
 	ot::JsonArray sessionInfo;
-	m_serviceManager.GetSessionInformation(sessionInfo, reply.GetAllocator());
+	m_serviceManager.getSessionInformation(sessionInfo, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_Sessions, sessionInfo, reply.GetAllocator());
 
 	return reply.toJson();
@@ -208,17 +201,17 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-void Application::globalDirectoryServiceCrashed(void) {
+// ###########################################################################################################################################################################################################################################################################################################################
 
+// Constructor/Destructor
+
+Application::Application() :
+	ot::ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService) {
+	m_systemLoadInformation.initialize();
 }
 
-std::list<std::string> Application::supportedServices(void) const {
-	std::list<std::string> lst;
-	for (auto s : LDS_CFG.supportedServices()) {
-		lst.push_back(s.name());
-	}
-	return lst;
-}
+Application::~Application() {}

@@ -1,10 +1,10 @@
-/*
- * dllmain.cpp
- */
+//! @file dllmain.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// C++ header
-#include <Windows.h>
-#include <iostream>
+// LDS header
+#include "Application.h"
 
 // OpenTwin header
 #include "OTCore/Logger.h"
@@ -12,10 +12,9 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
-// Service header
-#include "Application.h"
-
-static std::mutex g_performActionMutex;
+// std header
+#include <iostream>
+#include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -49,7 +48,7 @@ extern "C" {
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		std::string serviceURL = LDS_APP->getServiceURL();
+		std::string serviceURL = Application::instance().getServiceURL();
 
 		char *strServiceURL = new char[serviceURL.size() + 1];
 		strcpy_s(strServiceURL, serviceURL.size() + 1, serviceURL.c_str());
@@ -78,6 +77,6 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, false);
 #endif
-		return LDS_APP->initialize(_ownURL, _globalDirectoryServiceURL);
+		return Application::instance().initialize("127.0.0.1:9101", _globalDirectoryServiceURL);
 	};
 }

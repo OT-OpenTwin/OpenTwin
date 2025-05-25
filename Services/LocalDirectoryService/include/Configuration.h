@@ -1,22 +1,29 @@
+//! @file Configuration.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// Project header
+// LDS header
 #include "ServiceInformation.h"
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
 
-// C++ header
-#include <string>
+// std header
 #include <list>
+#include <string>
 
-//! Short form to get the configuration instance
-#define LDS_CFG Configuration::instance()
-
+//! @brief The Configuration holds the configuration for the Local Directory Service.
 class Configuration : public ot::Serializable {
 public:
 	static Configuration& instance(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
 
 	//! @brief Add the object contents to the provided JSON object
 	//! @param _object Json object reference
@@ -28,6 +35,10 @@ public:
 	//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Management
+
 	//! @brief Will load the confiuguration from the environment.
 	//! Will exit on error.
 	void importFromEnvironment(void);
@@ -35,20 +46,24 @@ public:
 	//! @brief Returns true if the provided service is supported by this LDS
 	bool supportsService(const std::string& _serviceName) const;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter/Getter
+
 	void setSupportedServices(const std::list<ServiceInformation>& _services) { m_supportedServices = _services; };
-	const std::list<ServiceInformation>& supportedServices(void) const { return m_supportedServices; };
+	const std::list<ServiceInformation>& getSupportedServices(void) const { return m_supportedServices; };
 
 	void setLauncherPath(const std::string& _launcherPath) { m_launcherPath = _launcherPath; };
-	const std::string launcherPath(void) const { return m_launcherPath; };
+	const std::string getLauncherPath(void) const { return m_launcherPath; };
 
 	void setServicesLibraryPath(const std::string& _path) { m_servicesLibraryPath = _path; };
-	const std::string& servicesLibraryPath(void) const { return m_servicesLibraryPath; };
+	const std::string& getServicesLibraryPath(void) const { return m_servicesLibraryPath; };
 
 	void setDefaultMaxCrashRestarts(unsigned int _restarts) { m_defaultMaxCrashRestarts = _restarts; };
-	unsigned int defaultMaxCrashRestarts(void) const { return m_defaultMaxCrashRestarts; };
+	unsigned int getDefaultMaxCrashRestarts(void) const { return m_defaultMaxCrashRestarts; };
 
 	void setDefaultMaxStartupRestarts(unsigned int _restarts) { m_defaultMaxStartupRestarts = _restarts; };
-	unsigned int defaultMaxStartupRestarts(void) const { return m_defaultMaxStartupRestarts; };
+	unsigned int getDefaultMaxStartupRestarts(void) const { return m_defaultMaxStartupRestarts; };
 
 private:
 	bool m_configurationImported;
@@ -58,8 +73,10 @@ private:
 	unsigned int m_defaultMaxCrashRestarts;
 	unsigned int m_defaultMaxStartupRestarts;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Constructor/Destructor
+
 	Configuration();
 	virtual ~Configuration();
-	Configuration(Configuration&) = delete;
-	Configuration& operator = (Configuration&) = delete;
 };

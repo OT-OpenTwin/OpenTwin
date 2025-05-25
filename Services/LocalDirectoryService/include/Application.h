@@ -1,50 +1,48 @@
-/*
- * Application.h
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
+//! @file Application.h
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
-#include "GlobalDirectoryService.h"
+// LDS header
 #include "ServiceManager.h"
+#include "GlobalDirectoryService.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
-// C++ header
-#include <string>
+// std header
 #include <list>
-
-// Forward declaration
-namespace ot {
-	namespace components {
-		class UiComponent;
-		class ModelComponent;
-	}
-}
-
-//! Short form to get the Application instance
-#define LDS_APP Application::instance()
+#include <string>
 
 class Application : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(Application)
 public:
-	static Application * instance(void);
-	static void deleteInstance(void);
+	static Application& instance(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Public functions
+
+	int initialize(const char * _ownURL, const char * _globalDirectoryServiceURL);
+
+	//! @brief Handle the crash of the global directory service.
+	//! @warning The crash of the GDS is not handled yet. The application will exit with the GDSNotRunning error code.
+	void globalDirectoryServiceCrashed(void);
+	
+	ServiceManager& getServiceManager(void) { return m_serviceManager; }
+
+	std::list<std::string> getSupportedServices(void) const;
 
 private:
-	Application();
-	virtual ~Application();
 
-	// ##################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private functions
+	// Action handler
 
 	OT_HANDLER(handleStartNewService, Application, OT_ACTION_CMD_StartNewService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleStartNewRelayService, Application, OT_ACTION_CMD_StartNewRelayService, ot::SECURE_MESSAGE_TYPES)
@@ -54,18 +52,14 @@ private:
 	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSetGlobalLogFlags, Application, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Constructor/Destructor
+
+	Application();
+	virtual ~Application();
+
 	ServiceManager				m_serviceManager;
 	GlobalDirectoryService		m_globalDirectoryService;
 	ot::SystemInformation		m_systemLoadInformation;
-
-	// ##################################################################################################################################
-public:
-	// Public functions
-
-	int initialize(const char * _ownURL, const char * _globalDirectoryServiceURL);
-
-	void globalDirectoryServiceCrashed(void);
-	
-	ServiceManager& serviceManager(void) { return m_serviceManager; }
-	std::list<std::string> supportedServices(void) const;
 };

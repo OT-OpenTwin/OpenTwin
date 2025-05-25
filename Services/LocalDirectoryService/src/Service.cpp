@@ -1,24 +1,37 @@
+//! @file Service.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// LDS header
 #include "Service.h"
-#include "ServiceManager.h"
-#include "Configuration.h"
 #include "Application.h"
+#include "Configuration.h"
+#include "ServiceManager.h"
 
-// Open Twin core types header
-#include "OTCore/otAssert.h"
+// OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
 #include "OTSystem/SystemProcess.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 
-// Standard headers
-#include <iostream>
+// std header
 #include <chrono>
 #include <thread>
 
-Service::Service(ServiceManager * _owner, const ServiceInformation& _info)
-	: m_owner(_owner), m_isAlive(false), m_info(_info), m_processHandle(OT_INVALID_PROCESS_HANDLE), m_port(0), m_websocketPort(0), m_startCounter(0)
+Service::Service(ServiceManager * _owner, const ServiceInformation& _info) :
+	m_owner(_owner), m_isAlive(false), m_info(_info), m_processHandle(OT_INVALID_PROCESS_HANDLE), 
+	m_port(0), m_websocketPort(0)
+{}
+
+Service::Service(Service&& _other) noexcept :
+	m_owner(_other.m_owner), m_isAlive(_other.m_isAlive), m_info(std::move(_other.m_info)),
+	m_processHandle(_other.m_processHandle), m_port(_other.m_port), m_websocketPort(_other.m_websocketPort),
+	m_url(std::move(_other.m_url)), m_websocketUrl(std::move(_other.m_websocketUrl))
 {
-	
+	_other.m_owner = nullptr;
+	_other.m_processHandle = OT_INVALID_PROCESS_HANDLE;
 }
 
 Service::~Service() {
@@ -32,12 +45,33 @@ Service::~Service() {
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
 }
 
+Service& Service::operator=(Service&& _other) noexcept {
+	if (this != &_other) {
+		m_owner = _other.m_owner;
+		m_isAlive = _other.m_isAlive;
+		m_info = std::move(_other.m_info);
+		m_processHandle = _other.m_processHandle;
+		m_port = _other.m_port;
+		m_websocketPort = _other.m_websocketPort;
+		m_url = std::move(_other.m_url);
+		m_websocketUrl = std::move(_other.m_websocketUrl);
+
+		_other.m_owner = nullptr;
+		_other.m_processHandle = OT_INVALID_PROCESS_HANDLE;
+	}
+
+	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
 void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	ot::JsonObject infoObj;
 	m_info.addToJsonObject(infoObj, _allocator);
 
 	_object.AddMember("Information", infoObj, _allocator);
-	_object.AddMember("StartCounter", m_startCounter, _allocator);
 	_object.AddMember("IsAlive", m_isAlive, _allocator);
 	_object.AddMember("URL", ot::JsonString(m_url, _allocator), _allocator);
 	_object.AddMember("Port", m_port, _allocator);
@@ -45,41 +79,53 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	_object.AddMember("WebsocketPort", m_websocketPort, _allocator);
 }
 
-ot::RunResult Service::run(const SessionInformation& _sessionInformation, const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
-	OT_LOG_D("Starting service (Name = \"" + m_info.name() + "\"; Type = \"" + m_info.type() + "\"; Session.ID = \"" + 
-		_sessionInformation.id() + "\"; LSS.Url = \"" + _sessionInformation.sessionServiceURL() + "\")");
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Service control
+
+ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
+	OT_LOG_D("Starting service { \"Name\": \"" + m_info.getName() + "\", \"Type\": \"" + m_info.getType() + 
+		"\", \"Session.ID\": \"" + m_info.getSessionId() + "\", \"LSS.Url\": \"" + m_info.getSessionServiceURL() + "\" }");
 
 	m_port = _port;
-	m_websocketPort = _websocketPort;
-
 	m_url = _url + ":" + std::to_string(m_port);
-	m_websocketUrl = _url + ":" + std::to_string(m_websocketPort);
+
+	if (m_info.getType() == OT_INFO_SERVICE_TYPE_RelayService) {
+		m_websocketPort = _websocketPort;
+		m_websocketUrl = _url + ":" + std::to_string(m_websocketPort);
+	}
 
 #if defined(OT_OS_WINDOWS)
 
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
 
-	std::string launcherName = LDS_CFG.launcherPath();
+	Configuration& cfg = Configuration::instance();
+	std::string launcherName = cfg.getLauncherPath();
 
-	std::string path = LDS_CFG.servicesLibraryPath();
-	if (!path.empty()) path.append("\\");
-	path.append(m_info.name()).append(".dll");
+	std::string path = cfg.getServicesLibraryPath();
 
-	// Websocket: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "websocketURL" "sessionServiceURL"
-	// Others:    open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "sessionServiceURL" "session ID"
-	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" + LDS_APP->getServiceURL() + "\" \"" + m_url + "\" \"";
-	if (m_info.type() == OT_INFO_SERVICE_TYPE_RelayService) {
-		commandLine.append(m_websocketUrl).append("\" \"").append(_sessionInformation.sessionServiceURL()).append("\"");
+	if (!path.empty()) {
+		path.append("\\");
+	}
+	path.append(m_info.getName()).append(".dll");
+
+	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" +
+		Application::instance().getServiceURL() + "\" \"" + m_url + "\" \"";
+
+	if (m_info.getType() == OT_INFO_SERVICE_TYPE_RelayService) {
+		// Relay: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "websocketURL" "sessionServiceURL"
+		commandLine.append(m_websocketUrl).append("\" \"").append(m_info.getSessionServiceURL()).append("\"");
 	}
 	else {
-		commandLine.append(_sessionInformation.sessionServiceURL()).append("\" \"").append(_sessionInformation.id()).append("\"");
+		// Others: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "sessionServiceURL" "session ID"
+		commandLine.append(m_info.getSessionServiceURL()).append("\" \"").append(m_info.getSessionId()).append("\"");
 	}
 	
 	OT_LOG_D("Starting \"" + launcherName + "\" with command line \"" + commandLine + "\"");
-
+	
 	return ot::SystemProcess::runApplication(launcherName, commandLine, m_processHandle);
 #else
-	otAssert(0, "Not implemented");
+	OT_LOG_EA("Not implemented");
 	return ot::SystemProcess::GeneralError;
 #endif
 }
@@ -110,14 +156,9 @@ ot::RunResult Service::shutdown(void) {
 	return result;
 }
 
-void Service::incrStartCounter(void) {
-	m_startCounter++;
-}
-
-ot::RunResult Service::checkAlive() 
-{
+ot::RunResult Service::checkAlive() {
 	ot::RunResult result;
-	#if defined(OT_OS_WINDOWS)
+#if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
 	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
@@ -126,17 +167,15 @@ ot::RunResult Service::checkAlive()
 			result.addToErrorMessage("Checked for process state but process is not active anymore.");
 		}
 	}
-	else 
-	{		
+	else {		
 		OT_LOG_E("Failed to get exit code");
 		result.setAsError(exitCode);
-		result.setErrorMessage("Failed to get service exit code { \"Name\": \"" + m_info.name() + "\"; \"Type\": \"" + m_info.type() + "\"; \"URL\": \"" + m_url + "\" }.");
+		result.setErrorMessage("Failed to get service exit code { \"Name\": \"" + m_info.getName() + "\"; \"Type\": \"" + m_info.getType() + "\"; \"URL\": \"" + m_url + "\" }.");
 	}
 
 	return result;
 #else
-	assert(0);
-	OT_LOG_E("Function is implemented only for Windows OS");
+	OT_LOG_EA("Function is implemented only for Windows OS");
 	return false;
 #endif // OT_OS_WINDOWS
 }

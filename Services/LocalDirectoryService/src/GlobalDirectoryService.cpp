@@ -1,4 +1,9 @@
-// Service header
+//! @file GlobalDirectoryService.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// LDS header
 #include "Application.h"
 #include "GlobalDirectoryService.h"
 
@@ -24,33 +29,32 @@ GlobalDirectoryService::~GlobalDirectoryService() {
 
 }
 
-// #################################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Connection
 
-bool GlobalDirectoryService::isConnected(void) const {
-	return m_connectionStatus == Connected;
-}
-
 void GlobalDirectoryService::connect(const std::string& _url) {
-	setServiceURL(_url);
+	this->setServiceURL(_url);
+
 	m_connectionStatus = WaitingForConnection;
 
 	std::thread t(&GlobalDirectoryService::registerAtGlobalDirectoryService, this);
 	t.detach();
 }
 
-// #################################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Private functions
+// Worker functions
 
 void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
-	
+	Application& app = Application::instance();
+
 	ot::JsonDocument registerDoc;
 	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLocalDirecotoryService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(LDS_APP->getServiceURL(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(LDS_APP->supportedServices(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	addSystemValues(registerDoc);
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app.getServiceURL(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(app.getSupportedServices(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	
+	this->addSystemValues(registerDoc);
 
 	// Send request and check if the request was successful
 	std::string response;
@@ -63,15 +67,15 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	bool ok = false;
 	do {
 		response.clear();
-		if (!(ok = ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-			OT_LOG_E("Register at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+		if (!(ok = ot::msg::send(app.getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			OT_LOG_E("Register at Global Directory Service (" + Application::instance().getServiceURL() + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
 		}
 	} while (!ok && ct++ <= maxCt);
 
 	if (!ok) {
-		OT_LOG_E("Registration at Global Directory Service (" + Application::instance()->getServiceURL() + ") failed after " + std::to_string(maxCt) + " attempts. Exiting...");
+		OT_LOG_E("Registration at Global Directory Service (" + Application::instance().getServiceURL() + ") failed after " + std::to_string(maxCt) + " attempts. Exiting...");
 		exit(ot::AppExitCode::GDSRegistrationFailed);
 	}
 
@@ -92,7 +96,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_ID)) { OT_LOG_E("Register at GDS, invalid response: Missing member"); return; }
 	if (!responseDoc[OT_ACTION_PARAM_SERVICE_ID].IsUint()) { OT_LOG_E("Register at GDS, invalid response: Invalid member type"); return; }
 
-	LDS_APP->setServiceID(responseDoc[OT_ACTION_PARAM_SERVICE_ID].GetUint());
+	app.setServiceID(responseDoc[OT_ACTION_PARAM_SERVICE_ID].GetUint());
 
 	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
 		ot::ConstJsonArray logFlags = ot::json::getArray(responseDoc, OT_ACTION_PARAM_GlobalLogFlags);
@@ -101,29 +105,32 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 
 	OT_LOG_I("Registration at Global Directory Service successful");
 	m_connectionStatus = Connected;
-	healthCheck();
+	
+	this->healthCheck();
 }
 
 void GlobalDirectoryService::healthCheck(void) {
 	OT_LOG_I("Starting Global Directory Service health check");
-	while (!m_isShuttingDown) {
 
+	Application& app = Application::instance();
+
+	while (!m_isShuttingDown) {
 		ot::JsonDocument systemStatusDoc;
 		systemStatusDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateSystemLoad, systemStatusDoc.GetAllocator()), systemStatusDoc.GetAllocator());
-		systemStatusDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, LDS_APP->getServiceID(), systemStatusDoc.GetAllocator());
+		systemStatusDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app.getServiceID(), systemStatusDoc.GetAllocator());
 		
 		addSystemValues(systemStatusDoc);
 
 		std::string response;
-		if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		if (!ot::msg::send(app.getServiceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send updated system load to global directory service");
-			LDS_APP->globalDirectoryServiceCrashed();
+			app.globalDirectoryServiceCrashed();
 			return;
 		}
 
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
 			OT_LOG_E("Health check for GDS: " + response);
-			LDS_APP->globalDirectoryServiceCrashed();
+			app.globalDirectoryServiceCrashed();
 			return;
 		}
 

@@ -1,4 +1,9 @@
-// Project header
+//! @file Configuration.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date September 2022
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// LDS header
 #include "Configuration.h"
 
 // OpenTwin header
@@ -8,11 +13,9 @@
 #include "OTCore/otAssert.h"
 #include "OTCommunication/ActionTypes.h"
 
-// C++ header
-#include <iostream>
+// std header
 #include <cassert>
-
-#undef GetObject
+#include <iostream>
 
 #define LDS_CFG_ENV "OT_LOCALDIRECTORYSERVICE_CONFIGURATION"
 #define LDS_CFG_DefaultMaxCrashRestarts "DefaultMaxCrashRestarts"
@@ -29,6 +32,10 @@ Configuration& Configuration::instance(void) {
 	static Configuration g_instance;
 	return g_instance;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
 
 void Configuration::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember(LDS_CFG_DefaultMaxCrashRestarts, m_defaultMaxCrashRestarts, _allocator);
@@ -96,7 +103,7 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 				newEntry.setType(type);
 			}
 			else {
-				newEntry.setType(newEntry.name());
+				newEntry.setType(newEntry.getName());
 			}
 
 			// Is Restartable
@@ -122,18 +129,22 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 		// Check for duplicates
 		for (auto check : m_supportedServices) {
-			if (check.name() == newEntry.name()) {
+			if (check.getName() == newEntry.getName()) {
 				OTAssert(0, "Supported service duplicate");
-				OT_LOG_E("A service with the name \"" + check.name() + "\" was already provided");
+				OT_LOG_E("A service with the name \"" + check.getName() + "\" was already provided");
 				return;
 			}
 		}
 
 		m_supportedServices.push_back(newEntry);
 		OT_LOG_D("[Configuration]: New supported service added (name = \"" +
-			newEntry.name() + "\"; type = \"" + newEntry.type() + "\"; maxCrashRestarts = " + std::to_string(newEntry.maxCrashRestarts()) + "\"; maxStartupRestarts = \"" + std::to_string(newEntry.maxStartupRestarts()) + "\")");
+			newEntry.getName() + "\"; type = \"" + newEntry.getType() + "\"; maxCrashRestarts = " + std::to_string(newEntry.getMaxCrashRestarts()) + "\"; maxStartupRestarts = \"" + std::to_string(newEntry.getMaxStartupRestarts()) + "\")");
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Management
 
 void Configuration::importFromEnvironment(void) {
 	if (m_configurationImported) {
@@ -163,10 +174,16 @@ void Configuration::importFromEnvironment(void) {
 
 bool Configuration::supportsService(const std::string& _serviceName) const {
 	for (auto s : m_supportedServices) {
-		if (s.name() == _serviceName) return true;
+		if (s.getName() == _serviceName) {
+			return true;
+		}
 	}
 	return false;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor/Destructor
 
 Configuration::Configuration() 
 	: m_configurationImported(false), m_defaultMaxCrashRestarts(8), m_defaultMaxStartupRestarts(64)
