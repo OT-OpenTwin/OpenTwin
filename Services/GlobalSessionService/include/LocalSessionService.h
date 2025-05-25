@@ -59,7 +59,7 @@ public:
 	//! @brief Removes the session from the memory.
 	//! The session will be removed from all containers.
 	//! @param _sessionId Session id to remove.
-	void closeSession(const std::string& _sessionId);
+	void sessionClosed(const std::string& _sessionId);
 
 	//! @brief Returns true if the session with the specified was assigned to this LSS.
 	//! The session will be searched in all containers.

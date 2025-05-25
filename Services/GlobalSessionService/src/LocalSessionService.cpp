@@ -104,7 +104,7 @@ bool LocalSessionService::confirmSession(const std::string& _sessionId) {
 	return false;
 }
 
-void LocalSessionService::closeSession(const std::string& _sessionId) {
+void LocalSessionService::sessionClosed(const std::string& _sessionId) {
 	for (auto it = m_iniSessions.begin(); it != m_iniSessions.end(); it++) {
 		if (it->second.getId() == _sessionId) {
 			m_iniSessions.erase(it);

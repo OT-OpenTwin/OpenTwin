@@ -538,7 +538,7 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 			throw std::out_of_range("LSS entry not found for existing session");
 		}
 
-		lss->second.closeSession(sessionID);
+		lss->second.sessionClosed(sessionID);
 
 		m_sessionMap.erase(sessionID);
 	}
