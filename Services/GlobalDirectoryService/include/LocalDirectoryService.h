@@ -21,11 +21,13 @@
 //! It is used to start services, gather information about services started by the LDS, as well as to provide information about the system load of the LDS.
 class LocalDirectoryService : public ot::ServiceBase {
 	OT_DECL_NOCOPY(LocalDirectoryService)
-	OT_DECL_NOMOVE(LocalDirectoryService)
 	OT_DECL_NODEFAULT(LocalDirectoryService)
 public:
 	LocalDirectoryService(const std::string& _url);
+	LocalDirectoryService(LocalDirectoryService&& _other) noexcept;
 	virtual ~LocalDirectoryService();
+
+	LocalDirectoryService& operator=(LocalDirectoryService&& _other) noexcept;
 
 	const LoadInformation& loadInformation(void) const { return m_loadInformation; }
 	LoadInformation::load_t load(void) const;

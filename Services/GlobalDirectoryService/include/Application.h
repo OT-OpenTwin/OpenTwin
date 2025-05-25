@@ -44,9 +44,6 @@ public:
 
 	// Management
 
-	const std::vector<LocalDirectoryService *>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; }
-	LocalDirectoryService* leastLoadedDirectoryService(const ServiceInformation& _info);
-
 	bool requestToRunService(const ServiceInformation& _serviceInfo);
 
 	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL);
@@ -70,14 +67,22 @@ public:
 	// Private methods
 
 private:
+	const std::vector<LocalDirectoryService>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; };
+
+	//! @brief Determines the least loaded directory service that supports the given service.
+	//! @warning It is expected that the mutex is locked when calling this method.
+	//! @param _info Service information.
+	//! @return A pointer to the least loaded directory service that supports the given service, or nullptr if no such service exists.
+	LocalDirectoryService* leastLoadedDirectoryService(const ServiceInformation& _info);
+
 	Application();
 	virtual ~Application();
 
-	std::string                         m_globalSessionServiceURL;
-	std::vector<LocalDirectoryService*> m_localDirectoryServices;
-	ot::IDManager<ot::serviceID_t>      m_ldsIdManager;
-	std::mutex                          m_mutex;
-	StartupDispatcher                   m_startupDispatcher;
-	ot::SystemInformation               m_systemLoadInformation;
-	ot::LogModeManager                  m_logModeManager;
+	std::string                        m_globalSessionServiceURL;
+	std::vector<LocalDirectoryService> m_localDirectoryServices;
+	ot::IDManager<ot::serviceID_t>     m_ldsIdManager;
+	std::mutex                         m_mutex;
+	StartupDispatcher                  m_startupDispatcher;
+	ot::SystemInformation              m_systemLoadInformation;
+	ot::LogModeManager                 m_logModeManager;
 };

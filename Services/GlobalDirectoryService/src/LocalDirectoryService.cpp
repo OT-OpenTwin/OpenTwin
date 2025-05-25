@@ -19,7 +19,23 @@ LocalDirectoryService::LocalDirectoryService(const std::string& _url) :
 	ot::ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService, _url, ot::invalidServiceID, "")
 {}
 
+LocalDirectoryService::LocalDirectoryService(LocalDirectoryService&& _other) noexcept :
+	ot::ServiceBase(std::move(_other)), m_supportedServices(std::move(_other.m_supportedServices)),
+	m_loadInformation(std::move(_other.m_loadInformation)), m_services(std::move(_other.m_services))
+{}
+
 LocalDirectoryService::~LocalDirectoryService() {}
+
+LocalDirectoryService& LocalDirectoryService::operator=(LocalDirectoryService&& _other) noexcept {
+	if (this != &_other) {
+		ot::ServiceBase::operator=(std::move(_other));
+		m_supportedServices = std::move(_other.m_supportedServices);
+		m_loadInformation = std::move(_other.m_loadInformation);
+		m_services = std::move(_other.m_services);
+	}
+
+	return *this;
+}
 
 LoadInformation::load_t LocalDirectoryService::load(void) const {
 	return m_loadInformation.load();

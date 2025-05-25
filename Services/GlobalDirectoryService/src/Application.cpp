@@ -36,28 +36,6 @@ Application& Application::instance(void) {
 
 // Management
 
-LocalDirectoryService* Application::leastLoadedDirectoryService(const ServiceInformation& _info) {
-	if (m_localDirectoryServices.empty()) {
-		return nullptr;
-	}
-
-	LoadInformation::load_t load = LoadInformation::maxLoadValue();
-	LocalDirectoryService * leastLoaded = m_localDirectoryServices[0];
-
-	for (auto lds : m_localDirectoryServices) {
-		if (lds->supportsService(_info.getName())) {
-			if (lds->load() < load) {
-				load = lds->load();
-				leastLoaded = lds;
-			}
-			else if (lds->load() == load && leastLoaded == nullptr) {
-				leastLoaded = lds;
-			}
-		}
-	}
-	return leastLoaded;
-}
-
 bool Application::requestToRunService(const ServiceInformation& _serviceInfo) {
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -126,6 +104,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	// Check if the provided URL is already registered
 	std::string ServiceURL = _jsonDocument[OT_ACTION_PARAM_SERVICE_URL].GetString();
 	std::list<std::string> supportedServices;
+
 	auto supportedServiesArray = _jsonDocument[OT_ACTION_PARAM_SUPPORTED_SERVICES].GetArray();
 	for (rapidjson::SizeType i = 0; i < supportedServiesArray.Size(); i++) {
 		if (!supportedServiesArray[i].IsString()) {
@@ -134,37 +113,34 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 		}
 		supportedServices.push_back(supportedServiesArray[i].GetString());
 	}
+
 	if (supportedServices.empty()) {
 		OT_LOG_W("LDS Connected: No supported services provided");
 		return OT_ACTION_RETURN_INDICATOR_Error ": No supported services provided";
 	}
 
-	// ##### MUTEX #####
-	m_mutex.lock();
-
+	std::lock_guard<std::mutex> lock(m_mutex);
+	
 	// Check if a local directory service under the given url is already registered
-	for (auto lds : m_localDirectoryServices) {
-		if (lds->getServiceURL() == ServiceURL) {
-			// ##### MUTEX #####
-			m_mutex.unlock();
+	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
+		if (lds.getServiceURL() == ServiceURL) {
 			OT_LOG_E("LDS connected: A LocalDirectoryService under the given URL is already registered");
 			return OT_ACTION_RETURN_INDICATOR_Error "A LocalDirectoryService under the given URL is already registered";
 		}
 	}
 
-	// Store information
-	LocalDirectoryService * newLds = new LocalDirectoryService(ServiceURL);
-	newLds->setServiceID(m_ldsIdManager.grabNextID());
-	if (!newLds->updateSystemUsageValues(_jsonDocument)) {
-		// ##### MUTEX #####
-		m_mutex.unlock();
+	// Create new LDS entry
+	LocalDirectoryService newLds(ServiceURL);
+	newLds.setServiceID(m_ldsIdManager.grabNextID());
+	newLds.setSupportedServices(supportedServices);
+
+	if (!newLds.updateSystemUsageValues(_jsonDocument)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Invalid system values provided";
 	}
-	m_localDirectoryServices.push_back(newLds);
 
 	// Create response
 	ot::JsonDocument responseDoc;
-	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds->getServiceID(), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds.getServiceID(), responseDoc.GetAllocator());
 
 	if (m_logModeManager.getGlobalLogFlagsSet()) {
 		ot::JsonArray flagsArr;
@@ -172,8 +148,8 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 		responseDoc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, responseDoc.GetAllocator());
 	}
 
-	// ##### MUTEX #####
-	m_mutex.unlock();
+	// Add LDS entry
+	m_localDirectoryServices.push_back(std::move(newLds));
 
 	return responseDoc.toJson();
 }
@@ -280,8 +256,9 @@ std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	ServiceInformation serviceInfo(name, type, sessionID, lssURL);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-	for (auto lds : m_localDirectoryServices) {
-		lds->serviceClosed(serviceInfo, url);
+
+	for (LocalDirectoryService& lds : m_localDirectoryServices) {
+		lds.serviceClosed(serviceInfo, url);
 	}
 
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -293,11 +270,12 @@ std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	
 	SessionInformation sessionInfo(sessionID, lssURL);
 	
-	m_mutex.lock();
-	for (auto lds : m_localDirectoryServices) {
-		lds->sessionClosed(sessionInfo);
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	for (LocalDirectoryService& lds : m_localDirectoryServices) {
+		lds.sessionClosed(sessionInfo);
 	}
-	m_mutex.unlock();
+
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -306,19 +284,23 @@ std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument)
 
 	ot::serviceID_t id = _jsonDocument[OT_ACTION_PARAM_SERVICE_ID].GetUint();
 
-	LocalDirectoryService * lds = nullptr;
-	for (LocalDirectoryService * l : m_localDirectoryServices) {
-		if (l->getServiceID() == id) { lds = l; break; }
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	for (LocalDirectoryService& lds : m_localDirectoryServices) {
+		if (lds.getServiceID() == id) {
+			if (lds.updateSystemUsageValues(_jsonDocument)) {
+				return OT_ACTION_RETURN_VALUE_OK;
+			}
+			else {
+				return OT_ACTION_RETURN_INDICATOR_Error "Invalid system values provided";
+			}
+		}
 	}
 
-	if (lds == nullptr) return OT_ACTION_RETURN_INDICATOR_Error "Unknown Local Directory Service ID";
-	if (!lds->updateSystemUsageValues(_jsonDocument)) return OT_ACTION_RETURN_INDICATOR_Error "Invalid system values provided";
-
-	return OT_ACTION_RETURN_VALUE_OK;
+	return OT_ACTION_RETURN_INDICATOR_Error "Unknown Local Directory Service ID";
 }
 
 std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
-
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
 	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
 
@@ -331,18 +313,15 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
 
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	// Now we add information about the session services
 	ot::JsonArray servicesInfo;
-
-	for (auto service : m_localDirectoryServices) {
-		ot::JsonValue info;
-		info.SetObject();
-
-		info.AddMember(OT_ACTION_PARAM_LDS_URL, ot::JsonString(service->getServiceURL(), reply.GetAllocator()), reply.GetAllocator());
-
+	for (const LocalDirectoryService& service : m_localDirectoryServices) {
+		ot::JsonObject info;
+		info.AddMember(OT_ACTION_PARAM_LDS_URL, ot::JsonString(service.getServiceURL(), reply.GetAllocator()), reply.GetAllocator());
 		servicesInfo.PushBack(info, reply.GetAllocator());
 	}
-
 	reply.AddMember(OT_ACTION_PARAM_LDS, servicesInfo, reply.GetAllocator());
 
 	return reply.toJson();
@@ -361,11 +340,13 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	std::string json = doc.toJson();
-	for (LocalDirectoryService* lds : m_localDirectoryServices) {
+	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
 		std::string response;
-		if (!ot::msg::send("", lds->getServiceURL(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to LSS at \"" + lds->getServiceURL() + "\"");
+		if (!ot::msg::send("", lds.getServiceURL(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to LSS at \"" + lds.getServiceURL() + "\"");
 		}
 	}
 
@@ -375,6 +356,28 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private methods
+
+LocalDirectoryService* Application::leastLoadedDirectoryService(const ServiceInformation& _info) {
+	if (m_localDirectoryServices.empty()) {
+		return nullptr;
+	}
+
+	LoadInformation::load_t load = LoadInformation::maxLoadValue();
+	LocalDirectoryService* leastLoaded = nullptr;
+
+	for (LocalDirectoryService& lds : m_localDirectoryServices) {
+		if (lds.supportsService(_info.getName())) {
+			if (lds.load() < load) {
+				load = lds.load();
+				leastLoaded = &lds;
+			}
+			else if (lds.load() == load && leastLoaded == nullptr) {
+				leastLoaded = &lds;
+			}
+		}
+	}
+	return leastLoaded;
+}
 
 Application::Application()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService) {

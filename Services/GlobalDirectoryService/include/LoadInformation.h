@@ -17,9 +17,11 @@ public:
 
 	LoadInformation();
 	LoadInformation(const LoadInformation& _other);
+	LoadInformation(LoadInformation&& _other) noexcept;
 	virtual ~LoadInformation();
 
 	LoadInformation& operator = (const LoadInformation& _other);
+	LoadInformation& operator = (LoadInformation&& _other) noexcept;
 
 	load_t load(void) const;
 	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);

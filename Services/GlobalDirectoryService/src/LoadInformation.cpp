@@ -11,37 +11,55 @@
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
 
-LoadInformation::LoadInformation() 
-	: m_currentPhysicalMemoryLoad(100.), m_currentVirtualMemoryLoad(100.),
+LoadInformation::LoadInformation() :
+	m_currentPhysicalMemoryLoad(100.), m_currentVirtualMemoryLoad(100.),
 	m_totalPhysicalMemory(0), m_totalVirtualMemory(0), m_availablePhysicalMemory(0), m_availableVirtualMemory(0)
-{
+{}
 
-}
+LoadInformation::LoadInformation(const LoadInformation& _other) :
+	m_currentPhysicalMemoryLoad(_other.m_currentPhysicalMemoryLoad),
+	m_currentVirtualMemoryLoad(_other.m_currentVirtualMemoryLoad),
+	m_totalPhysicalMemory(_other.m_totalPhysicalMemory),
+	m_totalVirtualMemory(_other.m_totalVirtualMemory),
+	m_availablePhysicalMemory(_other.m_availablePhysicalMemory),
+	m_availableVirtualMemory(_other.m_availableVirtualMemory)
+{}
 
-LoadInformation::LoadInformation(const LoadInformation& _other) {
-	m_currentPhysicalMemoryLoad = _other.m_currentPhysicalMemoryLoad;
-	m_currentVirtualMemoryLoad = _other.m_currentVirtualMemoryLoad;
+LoadInformation::LoadInformation(LoadInformation&& _other) noexcept :
+	m_currentPhysicalMemoryLoad(_other.m_currentPhysicalMemoryLoad),
+	m_currentVirtualMemoryLoad(_other.m_currentVirtualMemoryLoad),
+	m_totalPhysicalMemory(_other.m_totalPhysicalMemory),
+	m_totalVirtualMemory(_other.m_totalVirtualMemory),
+	m_availablePhysicalMemory(_other.m_availablePhysicalMemory),
+	m_availableVirtualMemory(_other.m_availableVirtualMemory)
+{}
 
-	m_totalPhysicalMemory = _other.m_totalPhysicalMemory;
-	m_totalVirtualMemory = _other.m_totalVirtualMemory;
-
-	m_availablePhysicalMemory = _other.m_availablePhysicalMemory;
-	m_availableVirtualMemory = _other.m_availableVirtualMemory;
-}
-
-LoadInformation::~LoadInformation() {
-
-}
+LoadInformation::~LoadInformation() {}
 
 LoadInformation& LoadInformation::operator = (const LoadInformation& _other) {
-	m_currentPhysicalMemoryLoad = _other.m_currentPhysicalMemoryLoad;
-	m_currentVirtualMemoryLoad = _other.m_currentVirtualMemoryLoad;
+	if (this != &_other) {
+		m_currentPhysicalMemoryLoad = _other.m_currentPhysicalMemoryLoad;
+		m_currentVirtualMemoryLoad = _other.m_currentVirtualMemoryLoad;
 
-	m_totalPhysicalMemory = _other.m_totalPhysicalMemory;
-	m_totalVirtualMemory = _other.m_totalVirtualMemory;
+		m_totalPhysicalMemory = _other.m_totalPhysicalMemory;
+		m_totalVirtualMemory = _other.m_totalVirtualMemory;
 
-	m_availablePhysicalMemory = _other.m_availablePhysicalMemory;
-	m_availableVirtualMemory = _other.m_availableVirtualMemory;
+		m_availablePhysicalMemory = _other.m_availablePhysicalMemory;
+		m_availableVirtualMemory = _other.m_availableVirtualMemory;
+	}
+
+	return *this;
+}
+
+LoadInformation& LoadInformation::operator=(LoadInformation&& _other) noexcept {
+	if (this != &_other) {
+		m_currentPhysicalMemoryLoad = _other.m_currentPhysicalMemoryLoad;
+		m_currentVirtualMemoryLoad = _other.m_currentVirtualMemoryLoad;
+		m_totalPhysicalMemory = _other.m_totalPhysicalMemory;
+		m_totalVirtualMemory = _other.m_totalVirtualMemory;
+		m_availablePhysicalMemory = _other.m_availablePhysicalMemory;
+		m_availableVirtualMemory = _other.m_availableVirtualMemory;
+	}
 
 	return *this;
 }
@@ -49,7 +67,10 @@ LoadInformation& LoadInformation::operator = (const LoadInformation& _other) {
 LoadInformation::load_t LoadInformation::load(void) const {
 	// Determine max load value
 	load_t l = m_currentPhysicalMemoryLoad;
-	if (m_currentVirtualMemoryLoad > l) l = m_currentVirtualMemoryLoad;
+	if (m_currentVirtualMemoryLoad > l) {
+		l = m_currentVirtualMemoryLoad;
+	}
+
 	return l;
 }
 
@@ -92,6 +113,9 @@ LoadInformation::load_t LoadInformation::calculateLoad(memory_t _total, memory_t
 	if (_total == 0) return 100.;
 	memory_t used = _total - _avail;
 	double result = ((double)used / (double)_total) * 100.;
-	if (result > 100.) result = 100.;
+	if (result > 100.) {
+		result = 100.;
+	}
+
 	return result;
 }
