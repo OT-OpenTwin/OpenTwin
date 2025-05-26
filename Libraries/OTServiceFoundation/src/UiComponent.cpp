@@ -770,26 +770,29 @@ void ot::components::UiComponent::sendUpdatedControlState(void)
 {
 	// Determine which state needs to be changed
 	std::list<std::string> enabledControls, disabledControls;
-
-	for (auto item : m_uiControlState)
+	std::map<std::string, bool>& enabledStateByButtonName = m_uiControlState;
+	for (auto& item : enabledStateByButtonName)
 	{
-		if (m_uiControlStateInUI.count(item.first) == 0)
+		const std::string& buttonName = item.first;
+		const bool enabledState = item.second;
+
+		if (m_uiControlStateInUI.count(buttonName) == 0)
 		{
-			m_uiControlStateInUI[item.first] = true;  // Items are enabled by default
+			m_uiControlStateInUI[buttonName] = true;  // Items are enabled by default
 		}
 
-		if (m_uiControlStateInUI[item.first] != item.second)
+		if (m_uiControlStateInUI[buttonName] != enabledState)
 		{
 			// The state of this item is changing
-			if (item.second)
+			if (enabledState)
 			{
 				// The item is now enabled
-				enabledControls.push_back(item.first);
+				enabledControls.push_back(buttonName);
 			}
 			else
 			{
 				// The item is now disabled
-				disabledControls.push_back(item.first);
+				disabledControls.push_back(buttonName);
 			}
 		}
 	}
