@@ -21,7 +21,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO :)
+ECHO Keep on documenting :)
 
 code "%OPENTWIN_DEV_ROOT%\Documentation\Developer"
 
