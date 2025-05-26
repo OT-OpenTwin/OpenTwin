@@ -62,6 +62,7 @@
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredVectorVolume.h"
+#include "EntityBatchImporter.h"
 
 #include "OTCore/TypeNames.h"
 
@@ -338,6 +339,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityResult1DCurve_New")
 	{
 		return new EntityResult1DCurve(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBatchImporter")
+	{
+		return new EntityBatchImporter(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

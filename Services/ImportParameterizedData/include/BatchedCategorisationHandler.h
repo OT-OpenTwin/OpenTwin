@@ -11,7 +11,7 @@ class BatchedCategorisationHandler : public BusinessLogicHandler
 {
 public:
 	void createNewScriptDescribedMSMD();
-
+	void addCreator();
 private:
 	ot::PythonServiceInterface* m_pythonInterface = nullptr;
 	std::string m_rmdEntityName;

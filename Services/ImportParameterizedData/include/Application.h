@@ -125,15 +125,16 @@ private:
 	std::mutex m_onlyOneActionPerTime;
 	UILockWrapper* m_twoPartsAction = nullptr;
 
-	ot::MenuButtonDescription _buttonImportTouchstone;
+	ot::MenuButtonDescription m_buttonImportTouchstone;
 	
-	ot::MenuButtonDescription _buttonCreateMSMDEntry;
-	ot::MenuButtonDescription _buttonCreateRMDEntry;
-	ot::MenuButtonDescription _buttonCreateParameterEntry;
-	ot::MenuButtonDescription _buttonCreateQuantityEntry;
-	ot::MenuButtonDescription _buttonAutomaticCreationMSMD;
+	ot::MenuButtonDescription m_buttonCreateMSMDEntry;
+	ot::MenuButtonDescription m_buttonCreateRMDEntry;
+	ot::MenuButtonDescription m_buttonCreateParameterEntry;
+	ot::MenuButtonDescription m_buttonCreateQuantityEntry;
+	ot::MenuButtonDescription m_buttonAutomaticCreationMSMD;
+	ot::MenuButtonDescription m_buttonAddBatchCreator;
 
-	ot::MenuButtonDescription _buttonCreateDataCollection;
+	ot::MenuButtonDescription m_buttonCreateDataCollection;
 
 	const std::string _dataSourcesFolder = "Files";
 	const std::string _scriptsFolder = ot::FolderNames::PythonScriptFolder;

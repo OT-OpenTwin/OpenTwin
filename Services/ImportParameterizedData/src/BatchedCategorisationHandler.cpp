@@ -6,6 +6,7 @@
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/String.h"
+#include "EntityBatchImporter.h"
 
 void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 {
@@ -58,6 +59,26 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 			_uiComponent->displayMessage("Python execution failed due to error: " + returnValue.getWhat() + ".\n");
 		}
 	}
+}
+
+void BatchedCategorisationHandler::addCreator()
+{
+	const std::string nameRoot = ot::FolderNames::DataCategorisationFolder;
+	const std::string name = "Batch Importer";
+	const std::string entityName = CreateNewUniqueTopologyName(nameRoot, name);
+	const std::string serviceName = Application::instance()->getServiceName();
+	
+	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName);
+	importer.setName(entityName);
+	importer.createProperties();
+	importer.StoreToDataBase();
+	
+	ot::NewModelStateInformation newEntities;
+	newEntities.m_topologyEntityIDs.push_back(importer.getEntityID());
+	newEntities.m_topologyEntityVersions.push_back(importer.getEntityStorageVersion());
+	newEntities.m_forceVisible.push_back(false);
+
+	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added batch importer");
 }
 
 inline void BatchedCategorisationHandler::ensureEssentials()

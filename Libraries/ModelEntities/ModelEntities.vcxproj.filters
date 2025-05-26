@@ -409,6 +409,9 @@
     <ClInclude Include="include\PropertyBundleQuerySettings.h">
       <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityBatchImporter.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -691,6 +694,9 @@
       <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityResult1DCurve.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityBatchImporter.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

@@ -117,25 +117,27 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
+	m_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
 
-	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
-	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
-	_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
-	_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
-	_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Auto Create Series Metadata");
-
-	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
-
-	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
-	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
-	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
-	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
-	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
+	m_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
+	m_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
+	m_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
+	m_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
 	
+	m_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Auto Create Series Metadata");
+	m_buttonAddBatchCreator.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Batch Importer");
 
-	_ui->addMenuButton(_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
-	_ui->addMenuButton(_buttonCreateDataCollection, modelWrite, "database");
+	m_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
+
+	_ui->addMenuButton(m_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
+	_ui->addMenuButton(m_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
+	_ui->addMenuButton(m_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
+	_ui->addMenuButton(m_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
+	_ui->addMenuButton(m_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
+	_ui->addMenuButton(m_buttonAddBatchCreator, modelWrite, "BatchProcessing");
+
+	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
+	_ui->addMenuButton(m_buttonCreateDataCollection, modelWrite, "database");
 
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
@@ -217,7 +219,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == _buttonImportTouchstone.GetFullDescription())
+			if (action == m_buttonImportTouchstone.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				ot::JsonDocument doc;
@@ -231,7 +233,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
 			}
-			else if (action == _buttonCreateRMDEntry.GetFullDescription())
+			else if (action == m_buttonCreateRMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
@@ -243,7 +245,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					 m_twoPartsAction = nullptr;
 				 }
 			}
-			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
+			else if (action == m_buttonCreateMSMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
@@ -255,7 +257,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					m_twoPartsAction = nullptr;
 				}
 			}
-			else if (action == _buttonCreateParameterEntry.GetFullDescription())
+			else if (action == m_buttonCreateParameterEntry.GetFullDescription())
 			{			
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
@@ -267,7 +269,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					m_twoPartsAction = nullptr;
 				}
 			}
-			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
+			else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
@@ -279,12 +281,12 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					m_twoPartsAction = nullptr;
 				}
 			}
-			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
+			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
 			{
 				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
 			}
-			else if (action == _buttonCreateDataCollection.GetFullDescription())
+			else if (action == m_buttonCreateDataCollection.GetFullDescription())
 			{
 				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				m_uiComponent->displayMessage("===========================================================================\n");
@@ -292,6 +294,10 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
+			}
+			else if (action == m_buttonAddBatchCreator.GetFullDescription())
+			{
+				m_batchedCategorisationHandler.addCreator();
 			}
 			else
 			{
