@@ -35,6 +35,9 @@
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTGui/PainterRainbowIterator.h"
 
+#include "EntityAPI.h"
+#include "EntityBatchImporter.h"
+
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -125,6 +128,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
 	
 	m_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Auto Create Series Metadata");
+	
 	m_buttonAddBatchCreator.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Batch Importer");
 
 	m_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
@@ -136,12 +140,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	_ui->addMenuButton(m_buttonAddBatchCreator, modelWrite, "BatchProcessing");
 
-	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
+	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "RunSolver");
 	_ui->addMenuButton(m_buttonCreateDataCollection, modelWrite, "database");
 
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
-		std::list<std::string> disabled;
+		std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .GetFullDescription()};
 
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
 	}
@@ -204,8 +208,36 @@ bool Application::settingChanged(const ot::Property * _item) {
 	return false;
 }
 
+
 void Application::modelSelectionChanged(void)
-{
+{	
+	Application::instance()->prefetchDocumentsFromStorage(m_selectedEntities);
+	ClassFactory& classFactory =  Application::instance()->getClassFactory();
+
+	EntityBatchImporter importer(0, nullptr, nullptr, nullptr, nullptr, "");
+	bool batchImporterSelected = false;
+	for (ot::UID selectedEntityID : m_selectedEntities)
+	{
+		ot::UID version = Application::instance()->getPrefetchedEntityVersion(selectedEntityID);
+		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityID, version, classFactory);
+		if (entityBase->getClassName() == importer.getClassName())
+		{
+			batchImporterSelected = true;
+			break;
+		}
+	}
+	std::list<std::string> enabled, disabled;
+	if (batchImporterSelected)
+	{
+		enabled.push_back(m_buttonAutomaticCreationMSMD.GetFullDescription());
+	}
+	else
+	{
+		disabled.push_back(m_buttonAutomaticCreationMSMD.GetFullDescription());
+	}
+
+	uiComponent()->setControlsEnabledState(enabled, disabled);
+
 	std::thread handler(&Application::HandleSelectionChanged,this);
 	handler.detach();
 }
