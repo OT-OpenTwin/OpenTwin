@@ -220,7 +220,7 @@ void Application::modelSelectionChanged(void)
 	{
 		ot::UID version = Application::instance()->getPrefetchedEntityVersion(selectedEntityID);
 		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityID, version, classFactory);
-		if (entityBase->getClassName() == importer.getClassName())
+		if (entityBase != nullptr && entityBase->getClassName() == importer.getClassName())
 		{
 			batchImporterSelected = true;
 			break;
