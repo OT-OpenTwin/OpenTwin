@@ -7,57 +7,55 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCore/String.h"
 #include "EntityBatchImporter.h"
-
-void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
+#include "OTServiceFoundation/ProgressUpdater.h"
+void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID>& _selectedEntities)
 {
-	ensureEssentials();
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = findAllTableSelectionsWithConsiderForBatching();
-	if (!allRelevantTableSelections.empty())
+	try
 	{
-		std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> allRelevantTableSelectionsByMSMD;
+		ot::UIDList selectedEntities =	_selectedEntities; //is passed on by reference through thread barrier. The passed on list is not thread safe!
+		UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 
-		allRelevantTableSelectionsByMSMD.clear();
-		for (const auto& tableSelection : allRelevantTableSelections)
+		ensureEssentials();
+		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
+		ClassFactory& classFactory = Application::instance()->getClassFactory();
+		std::list<std::unique_ptr<EntityBatchImporter>> selectedBatchImporter;
+		for (ot::UID entityID : selectedEntities)
 		{
-			std::string tableSelectionName = tableSelection->getName();
-
-
-			std::optional<std::string> msmdName = ot::String::getEntitySubName(tableSelectionName, 2);
-			if (msmdName.has_value())
+			ot::UID version = Application::instance()->getPrefetchedEntityVersion(entityID);
+			std::unique_ptr<EntityBase> baseEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, version, classFactory));
+			EntityBatchImporter* batchImporter = dynamic_cast<EntityBatchImporter*>(baseEntity.get());
+			if (batchImporter != nullptr)
 			{
-				allRelevantTableSelectionsByMSMD[msmdName.value()].push_back(tableSelection);
-			}
-			else
-			{
-				throw std::exception(("Failed to determine the name of the series of selection entity: " + tableSelectionName).c_str());
-			}
-		}
-		allRelevantTableSelections.clear();
-
-		auto batchingInformationsByPriority= createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD);
-
-		
-		for (auto batchingInformationByPriority = batchingInformationsByPriority.rbegin(); batchingInformationByPriority != batchingInformationsByPriority.rend(); batchingInformationByPriority++)
-		{
-			std::list<BatchUpdateInformation>&  batchingInformations = batchingInformationByPriority->second;
-			for (BatchUpdateInformation& batchingInformation : batchingInformations)
-			{
-				ot::Variable parameterEntityName(batchingInformation.m_selectionEntityNames);
-				std::list<ot::Variable> parameterList{ parameterEntityName };
-				const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
-				m_pythonInterface->AddScriptWithParameter(pythonScriptName , parameterList);
+				baseEntity.release();
+				selectedBatchImporter.push_back(std::unique_ptr<EntityBatchImporter>(batchImporter));
 			}
 		}
 
-		ot::ReturnMessage returnValue = m_pythonInterface->SendExecutionOrder();
-		if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
+		if (selectedBatchImporter.size() > 1)
 		{
-			_uiComponent->displayMessage("Python execution succeeded.\n");
+			throw std::exception("It is not supported to run multiple batch importer simultaniously");
 		}
 		else
 		{
-			_uiComponent->displayMessage("Python execution failed due to error: " + returnValue.getWhat() + ".\n");
+			auto batchImporter = selectedBatchImporter.begin();
+			uint32_t numberOfRuns = (*batchImporter)->getNumberOfRuns();
+			const std::string nameBase = (*batchImporter)->getNameBase();
+
+			_uiComponent->displayMessage("Executing " + std::to_string(numberOfRuns) + " batch imports in total\n");
+			ProgressUpdater updater(_uiComponent, "Execution of batch imports");
+			updater.setTotalNumberOfSteps(numberOfRuns);
+			
+			for (uint32_t i = 1; i <= numberOfRuns; i++)
+			{
+				_uiComponent->displayMessage("Executing import " + std::to_string(numberOfRuns) + "\n");
+				run(nameBase);
+				updater.triggerUpdate(i);
+			}
 		}
+	}
+	catch (std::exception& _e)
+	{
+		OT_LOG_E("Aborted batch import due to error: " +std::string(_e.what()));
 	}
 }
 
@@ -79,6 +77,62 @@ void BatchedCategorisationHandler::addCreator()
 	newEntities.m_forceVisible.push_back(false);
 
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added batch importer");
+}
+
+void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
+{
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = findAllTableSelectionsWithConsiderForBatching();
+	if (!allRelevantTableSelections.empty())
+	{
+		std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> allRelevantTableSelectionsByMSMD;
+
+		allRelevantTableSelectionsByMSMD.clear();
+		for (const auto& tableSelection : allRelevantTableSelections)
+		{
+			std::string tableSelectionName = tableSelection->getName();
+
+			std::optional<std::string> msmdName = ot::String::getEntitySubName(tableSelectionName, 2);
+			if (msmdName.has_value())
+			{
+				allRelevantTableSelectionsByMSMD[msmdName.value()].push_back(tableSelection);
+			}
+			else
+			{
+				throw std::exception(("Failed to determine the name of the series of selection entity: " + tableSelectionName).c_str());
+			}
+
+		}
+		allRelevantTableSelections.clear();
+
+		auto batchingInformationsByPriority = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD, _seriesNameBase);
+
+		for (auto batchingInformationByPriority = batchingInformationsByPriority.rbegin(); batchingInformationByPriority != batchingInformationsByPriority.rend(); batchingInformationByPriority++)
+		{
+			std::list<BatchUpdateInformation>& batchingInformations = batchingInformationByPriority->second;
+			for (BatchUpdateInformation& batchingInformation : batchingInformations)
+			{
+				ot::Variable parameterEntityName(batchingInformation.m_selectionEntityNames);
+				std::list<ot::Variable> parameterList{ parameterEntityName };
+				const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
+				m_pythonInterface->AddScriptWithParameter(pythonScriptName, parameterList);
+			}
+		}
+
+		ot::ReturnMessage returnValue = m_pythonInterface->SendExecutionOrder();
+		if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
+		{
+			_uiComponent->displayMessage("Update of selection properties succeeded.\n");
+		}
+		else
+		{
+			const std::string message = "Update of selection properties failed due to error in python execution: " + returnValue.getWhat();
+			throw std::exception(message.c_str());
+		}
+	}
+	else
+	{
+		throw std::exception("No selection is considered for batching");
+	}
 }
 
 inline void BatchedCategorisationHandler::ensureEssentials()
@@ -123,7 +177,8 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandl
 	return allRangeEntities;
 }
 
-std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD)
+
+std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD, const std::string& _newMSMDNameBase)
 {
 	ot::UIDList topoIDs, topoVers, dataEnt{};
 	std::list<bool> forceVis;
@@ -137,8 +192,16 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 	{
 		//First we create the new series metadata entity
 		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		const std::string oldName = elements.first;
-		const std::string newSMDName = CreateNewUniqueTopologyName(m_rmdEntityName, oldName);
+		std::string nameBase = "";
+		if (_newMSMDNameBase.empty())
+		{
+			nameBase = elements.first;
+		}
+		else
+		{
+			nameBase = _newMSMDNameBase;
+		}
+		const std::string newSMDName = CreateNewUniqueTopologyName(m_rmdEntityName, nameBase);
 		newMSMD->setName(newSMDName);
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);

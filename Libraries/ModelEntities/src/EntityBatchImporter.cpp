@@ -31,3 +31,15 @@ void EntityBatchImporter::addVisualizationNodes(void)
 
 	getObserver()->sendMessageToViewer(doc);
 }
+
+uint32_t EntityBatchImporter::getNumberOfRuns()
+{
+	int32_t repetitions =	PropertyHelper::getIntegerPropertyValue(this, "Repetitions", "Run");
+	return static_cast<uint32_t>(repetitions);
+}
+
+std::string EntityBatchImporter::getNameBase()
+{
+	const std::string nameBase = PropertyHelper::getStringPropertyValue(this, "Name base", "Categorisation");
+	return nameBase;
+}

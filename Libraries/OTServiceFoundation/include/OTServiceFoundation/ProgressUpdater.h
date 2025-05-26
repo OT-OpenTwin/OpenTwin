@@ -15,10 +15,17 @@ public:
 	ProgressUpdater operator=(ProgressUpdater&& _other) = delete;
 	~ProgressUpdater();
 
+	//! @brief This would trigger an update _triggerFrequency steps, additionally to the time trigger
 	void setTriggerFrequency(uint64_t  _triggerFrequency);
+	
+	//! @brief Mandatory!
 	void setTotalNumberOfSteps(uint64_t  _totalNumberofSteps);
 	void setTotalNumberOfUpdates(uint32_t  _numberOfUpdates, uint64_t _totalNumberofSteps);
+	
+	//! @brief default is set to 2 sec
 	void setTimeTrigger(std::chrono::seconds _timeTrigger);
+	
+	//! @brief requires the total number of steps. Triggers when the time trigger says so, or the current step is a multiple of the triggerfrequency
 	void triggerUpdate(int32_t _currentStep);
 
 	uint64_t getTriggerFrequency() const { return m_triggerFrequency; }
@@ -30,6 +37,7 @@ private:
 	ot::components::UiComponent* m_uiComponent = nullptr;
 	uint64_t m_triggerFrequency = 0;
 	uint64_t m_totalNumberOfSteps = 0;
+	int32_t m_priorStep = 0;
 	std::chrono::seconds m_timeTrigger = std::chrono::seconds(2);
 
 };

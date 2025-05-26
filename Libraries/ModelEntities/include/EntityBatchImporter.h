@@ -9,4 +9,7 @@ public:
 	entityType getEntityType(void) const override { return entityType::TOPOLOGY; };
 	virtual void addVisualizationNodes(void) override;
 	virtual std::string getClassName(void) override { return "EntityBatchImporter"; };
+
+	uint32_t getNumberOfRuns();
+	std::string getNameBase();
 };

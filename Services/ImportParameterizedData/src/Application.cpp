@@ -314,9 +314,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				}
 			}
 			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
-			{
-				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
-				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
+			{				
+				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, m_batchedCategorisationHandler, std::ref(m_selectedEntities));
+				worker.detach();
 			}
 			else if (action == m_buttonCreateDataCollection.GetFullDescription())
 			{

@@ -48,19 +48,27 @@ void ProgressUpdater::setTimeTrigger(std::chrono::seconds _timeTrigger)
 
 void ProgressUpdater::triggerUpdate(int32_t _currentStep)
 {
-	PRE(m_totalNumberOfSteps > 0 && m_triggerFrequency > 0);
-
+	PRE(m_totalNumberOfSteps > 0);
 	std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
 	std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(currentTime - m_priorTimestamp);
 	m_priorTimestamp = currentTime;
 
-	const bool isFirstStep = _currentStep == 0;
-	const bool isLastStep = _currentStep == m_totalNumberOfSteps;
-	const bool currentStepShouldTrigger = _currentStep% m_triggerFrequency == 0;
+	bool triggerUpdate = _currentStep != 0; //First step is skipped
+	triggerUpdate &= _currentStep != m_totalNumberOfSteps; //Last step is skipped
+	triggerUpdate &= _currentStep != m_priorStep; // If we still are in the same step, we don't want to trigger
+
 	
-	if (!isFirstStep && !isLastStep && (duration >= m_timeTrigger || currentStepShouldTrigger))
+	bool triggerUpdateByStep = false;
+	if (m_triggerFrequency != 0)
+	{
+		triggerUpdateByStep = _currentStep% m_triggerFrequency == 0; //If a trigger frequency is set, we want to trigger an update every x steps
+	}
+
+	if (triggerUpdate && (duration >= m_timeTrigger || triggerUpdateByStep))
 	{
 		const uint32_t percentage = static_cast<uint32_t>(std::lround(static_cast<float>(_currentStep) / m_totalNumberOfSteps * 100));
 		m_uiComponent->setProgress(percentage);
 	}
+
+	m_priorStep = _currentStep;
 }
