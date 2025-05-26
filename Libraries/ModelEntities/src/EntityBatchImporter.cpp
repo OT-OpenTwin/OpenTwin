@@ -3,7 +3,7 @@
 #include "OTCommunication/ActionTypes.h"
 
 EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
-	:EntityContainer(_ID, _parent, _obs, _ms, _factory, _owner)
+	:EntityBase(_ID, _parent, _obs, _ms, _factory, _owner)
 {
 }
 

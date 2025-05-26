@@ -1,6 +1,6 @@
 #pragma once
 #include "EntityContainer.h"
-class __declspec(dllexport) EntityBatchImporter : public EntityContainer
+class __declspec(dllexport) EntityBatchImporter : public EntityBase
 {
 public:
 	EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);

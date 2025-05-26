@@ -1560,7 +1560,10 @@ void Model::clearEntityUpdates(EntityBase *entity)
 void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config)
 {
 	std::list<EntityBase *> entities;
-	for (auto entityID : entityIDList) entities.push_back(getEntityByID(entityID));
+	for (auto entityID : entityIDList)
+	{
+		entities.push_back(getEntityByID(entityID));
+	}
 
 	EntityProperties props;
 	getCommonProperties(entities, props);
