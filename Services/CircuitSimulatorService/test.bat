@@ -58,7 +58,7 @@ IF %DEBUG%==1 (
 	ECHO %TYPE% DEBUGTEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\CircuitSimulatorService.vcxproj" %TYPE% "DebugTest|x64"  
 	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\x64\Debug\CircuitSimulatorServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateDebugReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\x64\Debug\CircuitSimulatorServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\CircuitSimulatorServiceDebugReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\CircuitSimulatorServiceDebugReport.xml" "CircuitSimulatorService" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\CircuitSimulatorServiceDebugReport.xml"
 )
@@ -67,7 +67,7 @@ IF %RELEASE%==1 (
 	ECHO %TYPE% RELEASETEST
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\CircuitSimulatorService.vcxproj" %TYPE% "ReleaseTest|x64"
 	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\x64\Release\CircuitSimulatorServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateReleaseReport.xml"
+	"%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\x64\Release\CircuitSimulatorServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\CircuitSimulatorServiceReleaseReport.xml"
 	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
 	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\CircuitSimulatorServiceReleaseReport.xml" "CircuitSimulatorService" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\CircuitSimulatorServiceReleaseReport.xml"
 ) 
