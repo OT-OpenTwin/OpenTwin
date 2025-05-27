@@ -8,6 +8,15 @@
 
 //std Header
 #include <string>
+#include <string>
+#include <thread>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+
+
 
 
 class Application {
@@ -31,7 +40,10 @@ private:
 	std::string getAdminUserName() { return "admin"; }
 
 	int connectToMongoDb(const char* _databasePWD);
-
+	void syncAndUpdateLocalModelsWithDB(const std::string& modelFolderPath);
+	std::string readFile(const std::filesystem::path& _filePath);
+	std::string extractType(const std::string& content);
+	std::string extractName(const std::string& content);
 
 	std::string m_databaseURL = "127.0.0.1:27017tls@";
 	std::string m_dbPassword;
@@ -40,6 +52,8 @@ private:
 	std::string m_dataBase = "Libraries";
 	std::string m_collectionCatalog = "Catalog";
 	std::string m_databasePWD;
+	const std::string m_folderPath = "C:\\Arbeit_Programmierung\\repos\\OpenTwin\\Assets\\CircuitModels";
+
 
 	static Application* instance;
 	
