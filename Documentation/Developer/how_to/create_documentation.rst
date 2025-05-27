@@ -51,7 +51,9 @@ For example the category ``how_to`` has a folder with the same name and the file
 To now add the ``how_to`` page to the documentation add it to the ``toctree`` in the ``index.rst`` file.
 
 .. code-block:: RST
-    :caption: index.rst
+    :linenos:
+
+    In the index.rst file the how_to category is added:
 
     .. toctree::
 
@@ -85,28 +87,6 @@ General documentation syntax:
     This is the second line. |br|
     Note that there is a space before the "|br|".
 
-Lists
-=====
-
-The following example
-
-.. code-block:: RST
-    :linenos:
-
-    - Bulleted list item 1
-    - Bulleted list item 2
-    
-    1. Numbered list item 1
-    2. Numbered list item 2
-
-will result in:
-
-- Bulleted list item 1
-- Bulleted list item 2
-    
-1. Numbered list item 1
-2. Numbered list item 2
-
 Inline Markup
 =============
 
@@ -129,6 +109,105 @@ This text **is bold**.
 This text *is italic*.
 
 This is ``something very important``.
+
+Headings
+========
+
+The level of a heading is indicated by a series of symbols below the heading text.
+
+The following symbols may be used for the different heading levels:
+
+- H1: Pound symbol ``#``
+- H2: Asterisk ``*``
+- H3: Equals symbol ``=``
+- H4: Hyphen ``-``
+- H5: Caret ``^``
+- H6: Quotation mark ``"``
+
+.. code-block:: RST
+    :linenos:
+
+    Heading 1
+    #########
+
+    Some text...
+
+    Heading 2
+    *********
+
+    Other text...
+
+    Another Heading 2
+    *****************
+
+    ...
+
+.. note::
+    The number of symbols below the heading text must have the exact same length as the heading text itself.
+
+Lists
+=====
+
+The following example
+
+.. code-block:: RST
+    :linenos:
+
+    - Bulleted list item 1
+    - Bulleted list item 2
+    
+    1. Numbered list item 1
+    2. Numbered list item 2
+
+will result in:
+
+- Bulleted list item 1
+- Bulleted list item 2
+    
+1. Numbered list item 1
+2. Numbered list item 2
+
+Tables
+======
+
+Each table has the number of columns and their associated relative widths indicated in a width tag.
+The width tag is optional.
+A title can be specified.
+
+For proper formatting, the asterisk indicating each row must align vertically, and the hyphens indicating each column must also align.
+Empty cells must be accounted for, so that each column in a row is always marked, even if there is no content in the table cell.
+An example of an empty cell is the second column in the first row of the following example.
+
+.. code-block:: RST
+    :linenos:
+
+    .. list-table:: Title
+        :widths: 25 25 50
+        :header-rows: 1
+
+        * - Heading row 1, column 1
+          - Heading row 1, column 2
+          - Heading row 1, column 3
+        * - Row 1, column 1
+          -
+          - Row 1, column 3
+        * - Row 2, column 1
+          - Row 2, column 2
+          - Row 2, column 3
+
+.. list-table:: Title
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Heading row 1, column 1
+     - Heading row 1, column 2
+     - Heading row 1, column 3
+   * - Row 1, column 1
+     -
+     - Row 1, column 3
+   * - Row 2, column 1
+     - Row 2, column 2
+     - Row 2, column 3
 
 Formulas
 ========
@@ -217,6 +296,78 @@ Using ``emphasize-lines`` will emphasize the specified lines.
 
 .. note::
     Note that there is a blank line after the code block arguments and the actual code.
+
+The following languages are supported by the Pygments lexer:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Language
+     - Code-Block Identifier(s)
+   * - Assembly
+     - ``asm``, ``nasm``
+   * - Bash / Shell
+     - ``bash``, ``sh``, ``shell``
+   * - C
+     - ``c``
+   * - C#
+     - ``c#``, ``csharp``
+   * - C++
+     - ``c++``, ``cpp``
+   * - CSS
+     - ``css``
+   * - Dockerfile
+     - ``docker``, ``dockerfile``
+   * - Go
+     - ``go``, ``golang``
+   * - Haskell
+     - ``haskell``
+   * - HTML
+     - ``html``
+   * - INI
+     - ``ini``
+   * - Java
+     - ``java``
+   * - JavaScript
+     - ``javascript``, ``js``
+   * - JSON
+     - ``json``
+   * - Kotlin
+     - ``kotlin``
+   * - Lua
+     - ``lua``
+   * - Makefile
+     - ``make``, ``makefile``
+   * - Markdown
+     - ``md``, ``markdown``
+   * - Matlab
+     - ``matlab``
+   * - Perl
+     - ``perl``
+   * - PHP
+     - ``php``
+   * - Plain Text
+     - ``text``, ``none``, or leave blank
+   * - Python
+     - ``python``
+   * - R
+     - ``r``
+   * - Ruby
+     - ``ruby``
+   * - Rust
+     - ``rust``
+   * - SQL
+     - ``sql``
+   * - Swift
+     - ``swift``
+   * - TOML
+     - ``toml``
+   * - TypeScript
+     - ``typescript``, ``ts``
+   * - XML
+     - ``xml``
+   * - YAML
+     - ``yaml``, ``yml``
 
 Nested Blocks
 =============
