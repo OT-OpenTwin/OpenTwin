@@ -701,6 +701,7 @@
 #define OT_INFO_SERVICE_TYPE_STUDIOSUITE "StudioSuiteService"
 #define OT_INFO_SERVICE_TYPE_LTSPICE "LTSpiceService"
 #define OT_INFO_SERVICE_TYPE_PYRIT "PyritService"
+#define OT_INFO_SERVICE_TYPE_LibraryManagementService "LibraryManagementService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

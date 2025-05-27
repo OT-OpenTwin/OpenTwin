@@ -254,6 +254,16 @@ ECHO Clean Service: CircuitSimulatorService
 ECHO ===============================================================
 CALL "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\Clean.bat" 
 
+ECHO ===============================================================
+ECHO Clean Service: CircuitExecution
+ECHO ===============================================================
+CALL "%OT_CIRCUIT_EXECUTION_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Service: LibraryMangementService
+ECHO ===============================================================
+CALL "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%\Clean.bat" 
+
 REM ################################################################################################################################
 REM EXECUTABLES
 

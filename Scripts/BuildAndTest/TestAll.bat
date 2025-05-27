@@ -124,6 +124,13 @@ ECHO Test Service: Circuit Simulator
 ECHO ===============================================================
 CALL "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%%testBat%" %1 %2
 
+ECHO ===============================================================
+ECHO Test Service: Library Management Service
+ECHO ===============================================================
+CALL "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%%testBat%" %1 %2
+
+
+
 
 
 ECHO ====================================================================

@@ -71,6 +71,7 @@ SET OT_CIRCUIT_SIMULATOR_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitSimula
 SET	OT_CIRCUIT_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitExecution
 SET OT_PYRIT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PyritService
 SET OT_DEBUGSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\DebugService
+SET OT_LIBRARY_MANAGEMENT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths

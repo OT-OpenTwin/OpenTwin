@@ -357,6 +357,11 @@ ECHO Build Service: CircuitExecution
 ECHO ===============================================================
 CALL "%OT_CIRCUIT_EXECUTION_ROOT%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Service: LibraryManagementService
+ECHO ===============================================================
+CALL "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%\build.bat" %1 %2
+
 REM ====================================================================
 REM Build the executables
 REM ====================================================================
