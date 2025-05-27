@@ -91,6 +91,7 @@ Application::Application()
 	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
 	classFactoryBlock->SetChainRoot(&classFactory);
 	classFactory.SetNextHandler(classFactoryBlock);
+	m_SimulationRunning = false;
 	
 }
 
