@@ -87,6 +87,7 @@ private:
 	OT_HANDLER(handleGetDebugInformation, GlobalSessionService, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetSystemInformation, GlobalSessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterSessionService, GlobalSessionService, OT_ACTION_CMD_RegisterNewSessionService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleRegisterLibraryManagementService, GlobalSessionService, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownSession, GlobalSessionService, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleForceHealthcheck, GlobalSessionService, OT_ACTION_CMD_ForceHealthCheck, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleNewGlobalDirectoryService, GlobalSessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)

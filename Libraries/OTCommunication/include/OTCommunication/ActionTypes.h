@@ -42,6 +42,7 @@
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"
 #define OT_ACTION_CMD_RegisterNewGlobalDirecotoryService "GlobalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLocalDirecotoryService "LocalDirectoryService.New"
+#define OT_ACTION_CMD_RegisterNewLibraryManagementService "LibraryManagementSerivce.New"
 #define OT_ACTION_CMD_UpdateSystemLoad "SystemLoad.Update"
 #define OT_ACTION_CMD_GetSystemInformation "System.GetInformation"
 
@@ -472,6 +473,7 @@
 #define OT_ACTION_PARAM_SESSION_SERVICE_URL "SessionService.URL"
 #define OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL "GlobalDirectoryService.URL"
 #define OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL "LocalDirectoryService.URL"
+#define OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL "LibraryManagementSerivce.URL"
 
 #define OT_ACTION_PARAM_START_RELAY "Start.Relay"
 #define OT_ACTION_PARAM_SUPPORTED_SERVICES "Services.Supported"

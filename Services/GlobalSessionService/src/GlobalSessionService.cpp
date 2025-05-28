@@ -525,6 +525,16 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	return reply.toJson();
 }
 
+std::string GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {
+	
+	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	// Register logic
+
+	
+	// Send Return
+	return ot::ReturnMessage().toJson();
+}
+
 std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) {
 	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
 
