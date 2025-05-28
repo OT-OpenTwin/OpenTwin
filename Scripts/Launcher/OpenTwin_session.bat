@@ -89,6 +89,19 @@ REM 5) Unused
 START "LOCAL DIRECTORY SERVICE" %pause_prefix%open_twin.exe LocalDirectoryService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LDS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GDS_PORT%" "%OPEN_TWIN_AUTH_PORT%"%pause_suffix%
 
 REM ===========================================================================
+REM Launch the local directory service 
+REM ===========================================================================
+
+REM Arguments of open_twin.exe:
+REM 1) Name of the DLL containing the service logic
+REM 2) IP address of the logging service (if running)
+REM 3) IP address of this local directory service
+REM 4) IP address of the global directory service
+REM 5) Unused
+
+START "LIBRARY MANAGEMENT SERVICE" %pause_prefix%open_twin.exe LibraryManagementService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LMS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "unused"%pause_suffix%
+
+REM ===========================================================================
 REM Launch the admin panel web server
 REM ===========================================================================
 

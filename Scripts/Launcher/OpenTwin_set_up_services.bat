@@ -47,6 +47,10 @@ if not defined OPEN_TWIN_ADMIN_PORT (
 	set OPEN_TWIN_ADMIN_PORT=8000
 )
 
+if not defined OPEN_TWIN_LMS_PORT (
+	set OPEN_TWIN_LMS_PORT=8002
+)
+
 if not defined OPEN_TWIN_SITE_ID  (
 	set OPEN_TWIN_SITE_ID=1
 )
