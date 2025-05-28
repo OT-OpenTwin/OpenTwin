@@ -14,6 +14,10 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 
+//std header
+#include <chrono>
+#include <thread>
+
 Application& Application::instance(void) {
 	static Application g_instance;
 	return g_instance;
@@ -58,6 +62,7 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 				OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(500ms);
+				
 			}
 		} while (!ok && ct++ <= maxCt);
 
