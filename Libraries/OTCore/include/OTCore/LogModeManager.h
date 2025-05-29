@@ -7,16 +7,16 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/OTClassHelper.h"
 
 namespace ot {
 
 	class OT_CORE_API_EXPORT LogModeManager {
+		OT_DECL_DEFCOPY(LogModeManager)
+		OT_DECL_DEFMOVE(LogModeManager)
 	public:
 		LogModeManager();
-		LogModeManager(const LogModeManager& _other);
 		virtual ~LogModeManager();
-
-		LogModeManager& operator = (const LogModeManager& _other);
 
 		void setGlobalLogFlags(const LogFlags& _flags) { m_globalFlags = _flags; m_globalFlagsSet = true; };
 		const LogFlags& getGlobalLogFlags(void) const { return m_globalFlags; };
