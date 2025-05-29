@@ -13,10 +13,10 @@
 
 namespace ot {
 
-    class Exception : public std::exception {
+    class GeneralException : public std::exception {
     public:
-        explicit Exception(const std::string& _message) : std::exception(_message.c_str()) {};
-        explicit Exception(const char* _message) : std::exception(_message) {};
+        explicit GeneralException(const std::string& _message) : std::exception(_message.c_str()) {};
+        explicit GeneralException(const char* _message) : std::exception(_message) {};
     };
 
     // ###########################################################################################################################################################################################################################################################################################################################
@@ -24,11 +24,11 @@ namespace ot {
     // Data
 
     //! @brief Basic object not found exception.
-    class ObjectNotFoundException : public Exception {
+    class ObjectNotFoundException : public GeneralException {
     public:
-        explicit ObjectNotFoundException() : Exception("Object not found") {};
-        explicit ObjectNotFoundException(const std::string& _message) : Exception(_message.c_str()) {};
-        explicit ObjectNotFoundException(const char* _message) : Exception(_message) {};
+        explicit ObjectNotFoundException() : GeneralException("Object not found") {};
+        explicit ObjectNotFoundException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ObjectNotFoundException(const char* _message) : GeneralException(_message) {};
     };
     namespace Exception { typedef ot::ObjectNotFoundException ObjectNotFound; }
 
@@ -37,11 +37,11 @@ namespace ot {
     // Network
 
     //! @brief Basic network error exception.
-    class NetworkErrorException : public Exception {
+    class NetworkErrorException : public GeneralException {
     public:
-        explicit NetworkErrorException() : Exception("Network error") {};
-        explicit NetworkErrorException(const std::string& _message) : Exception(_message.c_str()) {};
-        explicit NetworkErrorException(const char* _message) : Exception(_message) {};
+        explicit NetworkErrorException() : GeneralException("Network error") {};
+        explicit NetworkErrorException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit NetworkErrorException(const char* _message) : GeneralException(_message) {};
     };
     namespace Exception { typedef ot::NetworkErrorException NetworkError; }
 
