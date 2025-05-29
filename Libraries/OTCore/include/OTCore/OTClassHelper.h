@@ -13,16 +13,26 @@
 // std header
 #include <type_traits>
 
-//! \def OT_DECL_NOCOPY
-//! \brief Removes the default copy constructor and assignment operator.
+//! @def OT_DECL_NOCOPY
+//! @brief Removes the default copy constructor and assignment operator.
 #define OT_DECL_NOCOPY(___class) ___class(const ___class&) = delete; ___class& operator = (const ___class&) = delete;
 
-//! \def OT_DECL_NOMOVE
-//! \brief Removes the default move constructor and move operator.
+//! @def OT_DECL_NOCOPY
+//! @brief Declares the default copy constructor and assignment operator as default.
+//! @warning Will change the current scope to public.
+#define OT_DECL_DEFCOPY(___class) public: ___class(const ___class&) = default; ___class& operator = (const ___class&) = default;
+
+//! @def OT_DECL_NOMOVE
+//! @brief Removes the default move constructor and move operator.
 #define OT_DECL_NOMOVE(___class) ___class(___class&&) = delete; ___class& operator = (___class&&) = delete;
 
-//! \def OT_DECL_NODEFAULT
-//! \brief Removes the default copy constructor and assignment operator.
+//! @def OT_DECL_DEFMOVE
+//! @brief Declares the default move constructor and move operator as default.
+//! @warning Will change the current scope to public.
+#define OT_DECL_DEFMOVE(___class) public: ___class(___class&&) = default; ___class& operator = (___class&&) = default;
+
+//! @def OT_DECL_NODEFAULT
+//! @brief Removes the default copy constructor and assignment operator.
 #define OT_DECL_NODEFAULT(___class) ___class(void) = delete;
 
 //! \def OT_DECL_STATICONLY
@@ -45,7 +55,7 @@
 
 #endif
 
-//! \def OT_UNUSED
-//! \brief Avoid "warning C4101: unreferenced local variable".
-//! Use only when working with preprocessor definitions, unused locals should not occur in the first place :)
+//! @def OT_UNUSED
+//! @brief Avoid "warning C4101: unreferenced local variable".
+//! Use only when working with preprocessor definitions, unused locals should not occur in the first place :).
 #define OT_UNUSED(___unusedVariable) (void)(___unusedVariable);
