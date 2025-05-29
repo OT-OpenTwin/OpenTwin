@@ -282,9 +282,6 @@
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\OTAssert.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\OTClassHelper.h">
       <Filter>include\General</Filter>
     </ClInclude>

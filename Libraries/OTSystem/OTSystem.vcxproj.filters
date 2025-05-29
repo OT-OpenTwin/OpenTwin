@@ -83,5 +83,8 @@
     <ClInclude Include="include\OTSystem\Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTSystem\OTAssert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

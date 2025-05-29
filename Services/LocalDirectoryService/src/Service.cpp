@@ -11,7 +11,6 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTSystem/SystemProcess.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"

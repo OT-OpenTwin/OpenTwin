@@ -10,7 +10,6 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
-#include "OTCore/otAssert.h"
 #include "OTCommunication/ActionTypes.h"
 
 // std header

@@ -24,7 +24,6 @@
 // Open Twin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"

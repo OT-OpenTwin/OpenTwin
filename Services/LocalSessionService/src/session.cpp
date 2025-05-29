@@ -28,7 +28,7 @@ Session::Session(const std::string& _ID, const std::string& _userName, const std
 
 Session::~Session() {
 	for (auto p : m_debugPorts) {
-		ot::PortManager::instance().setPortNotInUse(p);
+		//ot::PortManager::instance().setPortNotInUse(p);
 	}
 }
 

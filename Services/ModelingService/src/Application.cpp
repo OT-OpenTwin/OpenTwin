@@ -36,7 +36,7 @@
 #include "zlib.h"
 
 // Open twin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyString.h"

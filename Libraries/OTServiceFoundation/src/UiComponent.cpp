@@ -6,7 +6,7 @@
  *  Copyright (c) 2021, OpenTwin
  */
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTCore/ThisService.h"
 
 #include "OTCommunication/actionTypes.h"

@@ -6,7 +6,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 

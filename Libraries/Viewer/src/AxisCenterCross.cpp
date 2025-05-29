@@ -2,7 +2,7 @@
 #include "AxisCenterCross.h"
 #include "ViewerSettings.h"
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 
 #include <osg/Group>
 #include <osg/Shape>

@@ -4,7 +4,7 @@
 #include "ViewerSettings.h"
 
 // Open twin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 
 // Osg header
 #include <osg/Array>

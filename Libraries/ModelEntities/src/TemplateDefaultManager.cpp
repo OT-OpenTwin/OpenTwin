@@ -1,10 +1,10 @@
 
 #include <cassert>
 
+#include "OTSystem/OTAssert.h"
+#include "OTGui/FillPainter2D.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "OTCore/OTAssert.h"
-#include "OTGui/FillPainter2D.h"
 
 #include "Document\DocumentAccessBase.h"
 #include "Document\DocumentAccess.h"

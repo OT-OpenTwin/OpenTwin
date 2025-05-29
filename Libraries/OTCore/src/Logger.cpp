@@ -6,7 +6,6 @@
 // Open Twin header
 #include "OTSystem/DateTime.h"
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/ServiceBase.h"
 
 // std header

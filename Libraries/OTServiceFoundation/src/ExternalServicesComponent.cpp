@@ -9,20 +9,19 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 
-#include "OTCore/otAssert.h"
 #include "OTCore/JSON.h"
-#include "OTCore/ThisService.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ThisService.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
+#include "OTCommunication/Msg.h"								// message sending
 #include "OTCommunication/ActionTypes.h"						// action member and types definition
 #include "OTCommunication/IpConverter.h"						// extract IP information from sender information
-#include "OTCommunication/Msg.h"								// message sending
-#include "OTCommunication/ServiceLogNotifier.h"				// logging
 #include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/ServiceLogNotifier.h"				// logging
 
-#include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/ExternalServicesComponent.h"	// Corresponding header
 
 #include <DataBase.h>

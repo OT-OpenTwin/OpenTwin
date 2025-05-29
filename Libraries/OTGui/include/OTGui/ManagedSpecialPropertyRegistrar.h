@@ -6,7 +6,7 @@
 #pragma once
 
 // OT header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyManager.h"
 #include "OTGui/ManagedPropertyObject.h"

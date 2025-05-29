@@ -7,8 +7,8 @@
  */
 
 // Open Twin header
+#include "OTSystem/OTAssert.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/OTAssert.h"
 
 //todo: investigate if the session count MUST be initialized with 1, more precise: increase the session count when assigned
 

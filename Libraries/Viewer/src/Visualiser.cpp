@@ -2,7 +2,7 @@
 #include "FrontendAPI.h"
 #include "Visualiser.h"
 #include "SceneNodeBase.h"
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 
 Visualiser::Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _viewType)
 	: m_node(_sceneNode), m_viewType(_viewType)

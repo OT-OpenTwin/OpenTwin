@@ -16,7 +16,7 @@
 #include "UserSettings.h"
 #include "OTCore/ReturnMessage.h"
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"

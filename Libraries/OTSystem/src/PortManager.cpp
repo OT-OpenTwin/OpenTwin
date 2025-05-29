@@ -1,79 +1,43 @@
-//! \file PortManager.cpp
-//! \author Alexander Kuester (alexk95)
-//! \date April 2023
+//! @file PortManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date April 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// OpenTwin header
+#include "OTSystem/OTAssert.h"
 #include "OTSystem/PortManager.h"
 
-#include <cassert>
-#include <iostream>
-
-ot::PortRange::PortRange() : m_from(0), m_to(0) {}
-
-ot::PortRange::PortRange(ot::port_t _from, ot::port_t _to) : m_from(_from), m_to(_to) {}
-
-ot::PortRange::PortRange(const PortRange& _other) : m_from(_other.m_from), m_to(_other.m_to) {}
-
-ot::PortRange& ot::PortRange::operator = (const PortRange& _other) {
-	m_from = _other.m_from;
-	m_to = _other.m_to;
-	return *this;
-}
-
-void ot::PortRange::set(ot::port_t _from, ot::port_t _to) {
-	m_from = _from;
-	m_to = _to;
-}
-
-// ######################################################################################################################################
-
-// ######################################################################################################################################
-
-// ######################################################################################################################################
-
-ot::PortManager& ot::PortManager::instance(void) {
-	static PortManager g_instance;
-	return g_instance;
-}
-
-void ot::PortManager::addPortRange(const PortRange& _range) {
-	m_ranges.push_back(_range);
+ot::PortManager::PortManager(ot::port_t _startingPort, ot::port_t _maxPort) {
+	this->addPortRange(_startingPort, _maxPort);
 }
 
 void ot::PortManager::addPortRange(ot::port_t _from, ot::port_t _to) {
 	m_ranges.push_back(PortRange(_from, _to));
 }
 
-void ot::PortManager::setPortNotInUse(ot::port_t _portNumber)
-{
+void ot::PortManager::freePort(ot::port_t _portNumber) {
+	OTAssert(this->isPortInUse(_portNumber), "Port is not in use");
 	m_portsInUse.erase(_portNumber);
 }
 
-bool ot::PortManager::isPortInUse(ot::port_t _portNumber)
-{
-	bool ret = false;
-	auto it = m_portsInUse.find(_portNumber);
-	ret = (it != m_portsInUse.end());
-
-	return ret;
+bool ot::PortManager::isPortInUse(ot::port_t _portNumber) const {
+	return m_portsInUse.find(_portNumber) != m_portsInUse.end();
 }
 
-ot::port_t ot::PortManager::determineAndBlockAvailablePort(void)
-{
-	//todo: add log message
+ot::port_t ot::PortManager::determineAndBlockAvailablePort(void) {
+	// Ensure that there are port ranges defined
 	if (m_ranges.empty()) {
-		assert(0);
-		return 0;
+		OTAssert(0, "PortManager has no port ranges defined. Please add a port range before calling determineAndBlockAvailablePort().");
+		return invalidPortNumber;
 	}
 
-	for (PortRange range : m_ranges) {
-		ot::port_t portNumber = range.from();
-		while (portNumber <= range.to())
-		{
-			if (!isPortInUse(portNumber)) {
+	// Find an available port in the defined ranges
+	for (const PortRange& range : m_ranges) {
+		ot::port_t portNumber = range.first;
+		while (portNumber <= range.second) {
+			if (!this->isPortInUse(portNumber)) {
 				// Block port
-				m_portsInUse.insert_or_assign(portNumber, true);
-
+				m_portsInUse.insert(portNumber);
 				return portNumber;
 			}
 			else {
@@ -81,13 +45,8 @@ ot::port_t ot::PortManager::determineAndBlockAvailablePort(void)
 			}
 		}
 	}
-	//todo: add log message
-	assert(0);
-	return 0;
-}
 
-ot::PortManager::PortManager() {
-	//m_portsInUse.insert_or_assign(9100, true);
+	// No available port found
+	OTAssert(0, "No available port found in the defined port ranges.");
+	return invalidPortNumber;
 }
-
-ot::PortManager::~PortManager() {}

@@ -1,12 +1,15 @@
 #include "BlockHandlerFileWriter.h"
-#include "OTCore/OTAssert.h"
+
+#include "OTSystem/OTAssert.h"
+
+#include "OTCore/FolderNames.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
+
 #include "EntityFileText.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/FolderNames.h"
 #include "EntityBinaryData.h"
 #include "StringConverter.h"
 #include "OTModelAPI/ModelServiceAPI.h"

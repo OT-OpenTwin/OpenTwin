@@ -43,7 +43,6 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 

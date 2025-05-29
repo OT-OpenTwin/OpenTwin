@@ -19,7 +19,6 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 
-#include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Color.h"
 #include "OTCore/ThisService.h"

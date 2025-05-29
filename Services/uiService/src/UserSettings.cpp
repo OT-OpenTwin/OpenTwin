@@ -1,7 +1,7 @@
 #include "UserSettings.h"
 #include "AppBase.h"
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/ApplicationPropertiesManager.h"

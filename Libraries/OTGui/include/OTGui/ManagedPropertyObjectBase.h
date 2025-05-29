@@ -6,10 +6,10 @@
 #pragma once
 
 // OT header
+#include "OTSystem/OTAssert.h"
 #include "OTCore/Rect.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"

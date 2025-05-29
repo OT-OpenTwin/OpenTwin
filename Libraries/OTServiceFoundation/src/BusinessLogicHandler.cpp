@@ -1,5 +1,5 @@
+#include "OTSystem/OTAssert.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTCore/OTAssert.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
 std::string BusinessLogicHandler::CreateNewUniqueTopologyName(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber, bool alwaysNumbered)

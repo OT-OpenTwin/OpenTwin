@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTWidgets/ManagedPropertyLink.h"
 #include "OTWidgets/WidgetPropertyManager.h"
 #include "OTWidgets/ManagedWidgetPropertyObject.h"

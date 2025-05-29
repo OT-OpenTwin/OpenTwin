@@ -21,9 +21,6 @@
     <ClCompile Include="src\SessionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PortManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Service.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,9 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SessionService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PortManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Service.h">

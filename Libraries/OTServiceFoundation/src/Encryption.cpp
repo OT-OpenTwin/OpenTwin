@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTEncryptionKey.h"
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTServiceFoundation/Encryption.h"
 
 // Third party header

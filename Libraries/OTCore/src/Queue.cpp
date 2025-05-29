@@ -5,7 +5,6 @@
 
 // OpenTwin header
 #include "OTCore/Queue.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 
 #ifndef OT_CFG_QueueUseGarbageLimit

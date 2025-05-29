@@ -3,7 +3,6 @@
 #include "Session.h"
 
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"

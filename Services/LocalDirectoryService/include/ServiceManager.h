@@ -9,8 +9,9 @@
 #include "Service.h"
 
 // OpenTwin header
-#include "OTCore/JSON.h"
 #include "OTSystem/Network.h"
+#include "OTSystem/PortManager.h"
+#include "OTCore/JSON.h"
 
 // std header
 #include <map>
@@ -67,6 +68,8 @@ public:
 
 	// Setter/Getter
 
+	void addPortRange(ot::port_t _start, ot::port_t _end);
+
 	void setServiceIP(const std::string& _ip) { m_servicesIpAddress = _ip; };
 
 	const std::string& lastError(void) const { return m_lastError; };
@@ -120,6 +123,8 @@ private:
 	void workerServiceInitializer(void);
 	void workerHealthCheck(void);
 	void workerServiceStopper(void);
+
+	ot::PortManager                                      m_portManager;
 
 	std::string                                          m_servicesIpAddress;
 	std::string                                          m_lastError;

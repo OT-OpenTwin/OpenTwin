@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTGui/PropertyManager.h"
 
 namespace ot {

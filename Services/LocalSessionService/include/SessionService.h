@@ -10,10 +10,10 @@
 
 // Service header
 #include "Service.h"
-#include "PortManager.h"
 #include "GlobalDirectoryService.h"
 
 // OpenTwin header
+#include "OTSystem/PortManager.h"
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/LogModeManager.h"
@@ -161,6 +161,8 @@ private:
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
 	void workerShutdownSession(ot::serviceID_t _serviceId, Session* _session);
+
+	ot::PortManager                             m_portManager;						//! @brief Port manager to determine available ports for debug services.
 
 	std::string									m_dataBaseURL;						//! @brief Database IP address
 	std::string									m_siteID;							//! @brief Site ID

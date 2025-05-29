@@ -15,7 +15,7 @@
 #include "HandleArrow.h"
 #include "TransformManipulator.h"
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"

@@ -16,7 +16,6 @@
 
 // Open Twin header
 #include "OTCore/Logger.h"
-#include "OTSystem/PortManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
@@ -133,7 +132,7 @@ void SessionService::setPort(const std::string& _port) {
 	
 	ot::port_t portFrom = std::stoi(m_port);;
 	portFrom++;
-	ot::PortManager::instance().addPortRange(ot::PortRange(portFrom, portFrom + 79));
+	m_portManager.addPortRange(portFrom, portFrom + 79);
 }
 
 void SessionService::setGlobalDirectoryServiceURL(const std::string& _url) {
@@ -319,7 +318,7 @@ bool SessionService::runServiceInDebug(const std::string& _serviceName, const st
 	path.append("\\Deployment\\" + serviceNameLower + ".cfg");
 
 	_serviceURL = m_ip;
-	ot::port_t portNumber = ot::PortManager::instance().determineAndBlockAvailablePort();
+	ot::port_t portNumber = m_portManager.determineAndBlockAvailablePort();
 	_serviceURL.append(":").append(std::to_string(portNumber));
 
 	std::list<std::string> arguments = { "1", _serviceURL, this->getUrl(),  _session->getId() };

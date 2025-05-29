@@ -11,12 +11,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
+#include "OTSystem/OTAssert.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <list>

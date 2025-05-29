@@ -7,8 +7,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/OTAssert.h"
 #include "OTCore/Matrix2.h"
-#include "OTCore/OTAssert.h"
 
 // std header
 #include <exception>

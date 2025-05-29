@@ -8,7 +8,6 @@
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTCommunication/Msg.h"			// Corresponding header

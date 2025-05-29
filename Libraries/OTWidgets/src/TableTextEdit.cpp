@@ -5,7 +5,6 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/TableTextEdit.h"
 

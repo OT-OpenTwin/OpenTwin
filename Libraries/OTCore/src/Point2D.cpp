@@ -4,9 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Point2D.h"
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
+#include "OTCore/Point2D.h"
 
 void ot::Point2D::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("x", m_x, _allocator);

@@ -1,6 +1,5 @@
-#include "OTCommunication/CommunicationTypes.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 ot::LogFlag ot::messageTypeToLogFlag(ot::MessageType _type) {
 	switch (_type)

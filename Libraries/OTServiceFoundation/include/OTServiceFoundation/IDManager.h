@@ -9,7 +9,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 
 // C++ header
 #include <map>

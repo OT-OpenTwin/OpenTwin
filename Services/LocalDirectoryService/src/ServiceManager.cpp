@@ -10,7 +10,6 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/OTAssert.h"
 #include "OTSystem/PortManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -126,12 +125,12 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const Ses
 
 	// Attempt to start service
 
-	ot::RunResult result = newService.run(m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
+	ot::RunResult result = newService.run(m_servicesIpAddress, m_portManager.determineAndBlockAvailablePort(), m_portManager.determineAndBlockAvailablePort());
 	if (!result.isOk()) {
 		m_mutexRequestedServices.unlock();
 
-		ot::PortManager::instance().setPortNotInUse(newService.getPort());
-		ot::PortManager::instance().setPortNotInUse(newService.getWebsocketPort());
+		m_portManager.freePort(newService.getPort());
+		m_portManager.freePort(newService.getWebsocketPort());
 
 		OT_LOG_E("Service start failed with return value: " + std::to_string(result.getErrorCode()) + " and message: " + result.getErrorMessage());
 		return RequestResult::FailedOnStart;
@@ -291,6 +290,10 @@ void ServiceManager::serviceDisconnected(const ServiceInformation& _info, const 
 	}
 	m_mutexStoppingServices.unlock();
 	m_mutexServices.unlock();
+}
+
+void ServiceManager::addPortRange(ot::port_t _start, ot::port_t _end) {
+	m_portManager.addPortRange(_start, _end);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -584,14 +587,14 @@ void ServiceManager::workerServiceStarter(void) {
 			Service newService(this, info);
 			
 			// Attempt to start service
-			ot::RunResult result = newService.run(m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort());
+			ot::RunResult result = newService.run(m_servicesIpAddress, m_portManager.determineAndBlockAvailablePort());
 			
 			if (!result.isOk()) {
 				OT_LOG_E("Service start failed with error code: " + std::to_string(result.getErrorCode()) + " and error message: " + result.getErrorMessage());
 				
 				// Clean up port numbers
-				ot::PortManager::instance().setPortNotInUse(newService.getPort());
-				ot::PortManager::instance().setPortNotInUse(newService.getWebsocketPort());
+				m_portManager.freePort(newService.getPort());
+				m_portManager.freePort(newService.getWebsocketPort());
 
 				// Service start failed
 				this->serviceStartFailed(info);
@@ -792,8 +795,8 @@ void ServiceManager::workerServiceStopper(void) {
 				// This is not an error, we simply wait for the exe to die to free up the port after the complete shutdown.
 
 				// Clean up port numbers
-				ot::PortManager::instance().setPortNotInUse(service.getPort());
-				ot::PortManager::instance().setPortNotInUse(service.getWebsocketPort());
+				m_portManager.freePort(service.getPort());
+				m_portManager.freePort(service.getWebsocketPort());
 			}
 		}
 

@@ -8,10 +8,10 @@
 #include "JSONEditor.h"
 #include "StatusManager.h"
 
-// OT header
-#include "OTCommunication/Msg.h"
-#include "OTCore/OTAssert.h"
+// OpenTwin header
+#include "OTSystem/OTAssert.h"
 #include "OTWidgets/Splitter.h"
+#include "OTCommunication/Msg.h"
 
 // Qt header
 #include <QtCore/qjsondocument.h>

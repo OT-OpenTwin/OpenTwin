@@ -112,7 +112,6 @@
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
     <ClInclude Include="include\OTCore\Logger.h" />
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
-    <ClInclude Include="include\OTCore\OTAssert.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />

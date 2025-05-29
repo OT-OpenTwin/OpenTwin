@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 #include "OTWidgets/BasicValidator.h"
 
 std::list<std::pair<char, char>> ot::BasicValidator::rangesToList(const ValidRanges& _ranges) {

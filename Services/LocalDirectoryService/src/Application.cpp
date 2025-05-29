@@ -54,8 +54,7 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	}
 
 	m_serviceManager.setServiceIP(ip);
-
-	ot::PortManager::instance().addPortRange(portNr + 1, 49151);
+	m_serviceManager.addPortRange(portNr + 1, ot::maxPortNumber);
 
 	m_globalDirectoryService.connect(_globalDirectoryServiceURL);
 

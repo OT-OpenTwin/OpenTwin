@@ -11,7 +11,7 @@
 
 #include <qapplication.h>
 
-#include "OTCore/OTAssert.h"
+#include "OTSystem/OTAssert.h"
 
 #include <osgViewer/Viewer>
 
