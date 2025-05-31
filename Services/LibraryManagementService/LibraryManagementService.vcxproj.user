@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\debug\open_twin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>"$(TargetPath)"  "$(OPEN_TWIN_LOGGING_URL)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_LMS_PORT)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_GSS_PORT)" ""</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"$(TargetPath)" "$(OPEN_TWIN_LOGGING_URL)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_LMS_PORT)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_GSS_PORT)" "$(OPEN_TWIN_MONGODB_PWD)"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
@@ -14,7 +14,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(OPENTWIN_DEV_ROOT)\Framework\OpenTwin\target\release\open_twin.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>$(TargetPath) "$(OPEN_TWIN_LOGGING_URL)" "127.0.0.1:9095" "127.0.0.1:9094" "unused"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"$(TargetPath)" "$(OPEN_TWIN_LOGGING_URL)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_LMS_PORT)" "$(OPEN_TWIN_SERVICES_ADDRESS):$(OPEN_TWIN_GSS_PORT)" "$(OPEN_TWIN_MONGODB_PWD)"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>

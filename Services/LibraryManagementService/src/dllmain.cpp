@@ -67,8 +67,10 @@ extern "C" {
 	};
 
 	// This function is called once upon startup of this service
-	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownURL, const char * _globalSessionServiceURL, const char * _unused2) {
+	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownURL, const char * _globalSessionServiceURL, const char * _databasePWD) {
 		std::string loggerServiceURL(_loggerServiceURL);
+
+		Application::instance().setServiceURL(_ownURL);
 
 #if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 		std::cout << "Library Management Service" << std::endl;
@@ -76,6 +78,8 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, false);
 #endif
-		return Application::instance().initialize(_ownURL, _globalSessionServiceURL);
+		Application::instance().initialize(_ownURL, _globalSessionServiceURL, _databasePWD);
+		return 0;
+
 	};
 }
