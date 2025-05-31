@@ -32,6 +32,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::ObjectNotFoundException ObjectNotFound; }
 
+    //! @brief Basic out of bounds exception.
+    class OutOfBoundsException : public GeneralException {
+    public:
+        explicit OutOfBoundsException() : GeneralException("Out of bounds") {};
+        explicit OutOfBoundsException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit OutOfBoundsException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::OutOfBoundsException OutOfBounds; }
+
     // ###########################################################################################################################################################################################################################################################################################################################
 
     // Network
