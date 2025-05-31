@@ -7,8 +7,9 @@
 #pragma once
 
 // Open Twin header
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/BasicServiceInformation.h"
 
 // C++ header
@@ -22,6 +23,8 @@ namespace ot {
 	//! @brief General service information.
 	//! The ServiceBase class is used to store the general service information.
 	class OT_CORE_API_EXPORT ServiceBase {
+		OT_DECL_DEFCOPY(ServiceBase)
+		OT_DECL_DEFMOVE(ServiceBase)
 	public:
 		//! @brief Constructor
 		ServiceBase();
@@ -37,17 +40,6 @@ namespace ot {
 		//! @param _url The URL of the service
 		//! @param _id The ID of the service
 		ServiceBase(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id, const std::string& _siteId = std::string());
-
-		//! @brief Copy constructor
-		//! @param _other The other service
-		ServiceBase(const ServiceBase & _other);
-
-		//! @brief Move constructor
-		//! @param _other The other service
-		ServiceBase(ServiceBase&& _other) noexcept;
-
-		ServiceBase& operator = (const ServiceBase& _other);
-		ServiceBase& operator = (ServiceBase&& _other) noexcept;
 
 		bool operator == (const ServiceBase& _other) const;
 		bool operator != (const ServiceBase& _other) const;

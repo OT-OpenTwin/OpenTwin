@@ -21,8 +21,8 @@ namespace ot {
 		Serializable(Serializable&&) noexcept = default;
 		virtual ~Serializable() = default;
 
-		Serializable& operator = (const Serializable&) { return *this; };
-		Serializable& operator = (Serializable&&) noexcept { return *this; };
+		Serializable& operator = (const Serializable&) = default;
+		Serializable& operator = (Serializable&&) noexcept = default;
 
 		//! @brief Serialize the object data into the provided object by using the provided allocator.
 		//! @param _object Json object value reference to write the data to.
