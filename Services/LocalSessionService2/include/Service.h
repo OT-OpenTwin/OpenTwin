@@ -1,101 +1,81 @@
 //! @file Service.h
 //! @authors Alexander Kuester (alexk95)
-//! @date November 2020
+//! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/SystemTypes.h"
 #include "OTCore/JSON.h"
+#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/Serializable.h"
+#include "OTCore/ServiceBase.h"
 
 // std header
 #include <list>
 #include <string>
 
-class Session;
-
-class Service : public ot::Serializable {
+class Service : public ot::ServiceBase {
 public:
+	enum ServiceStateFlag {
+		NoState      = 0 << 0,
+		IsDebug      = 1 << 0, //! @brief Service is in debug mode.
+		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
+		Visible      = 1 << 2, //! @brief Service is visible to other services in the same session.
+		ShuttingDown = 1 << 3  //! @brief Service is shutting down, no new connections are allowed.
+	};
+	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.
 
 	//! @brief Constructor.
-	Service(const std::string& _url, const std::string& _name, ot::serviceID_t _id, const std::string& _type, Session* _session, bool _showDebugInfo);
+	Service(const ot::ServiceBase& _serviceInfo, const std::string& _sessionId);
 
 	//! @brief Destructor.
 	virtual ~Service();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Management
-
-	//! @brief Set the visible state of the service to true.
-	//! Setting a service to visible will notify all other services in the same session.
-	void setVisible(void);
-
-	//! @brief Set the visible state of the service to false.
-	//! Setting a service to hidden will notify all other services in the same session.
-	void setHidden(void);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
 	// Setter / Getter
-
-	void setURL(const std::string& _url) { m_url = _url; };
-	std::string getUrl(void) const { return m_url; };
-
-	void setName(const std::string& _name) { m_name = _name; };
-	std::string getName(void) const { return m_name; };
 
 	void setID(ot::serviceID_t _id) { m_id = _id; };
 	ot::serviceID_t getId(void) const { return m_id; };
 
-	void setReceiveBroadcastMessages(bool _receive) { m_receiveBroadcastMessages = _receive; };
-	bool getReceiveBroadcastMessages(void) const { return m_receiveBroadcastMessages; };
+	void setURL(const std::string& _url) { m_url = _url; };
+	const std::string& getUrl(void) const { return m_url; };
 
-	std::string getType(void) const { return m_type; }
+	void setWebsocketUrl(const std::string& _websocketUrl) { m_websocketUrl = _websocketUrl; };
+	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
 
-	Session* getSession(void) const { return m_session; };
+	const std::string& getName(void) const { return m_name; };
+	const std::string& getType(void) const { return m_type; };
 
-	bool getIsVisible(void) const { return m_isVisible; };
+	void setVisible(bool _visible) { m_state.setFlag(Service::Visible, _visible); };
+	bool isVisible() const { return m_state & Service::Visible; };
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+	void setShuttingDown(bool _shuttingDown) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
+	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };
 
-	// Getter
+	void setIsDebug(bool _isDebug) { m_state.setFlag(Service::IsDebug, _isDebug); };
+	bool isDebug() const { return m_state & Service::IsDebug; };
 
-	//! @brief Will return the port numbers of this service
-	virtual std::list<unsigned long long> getPortNumbers(void) const;
+	//! @brief Will return the port numbers used by this service.
+	std::list<ot::port_t> getPortNumbers(void) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
 
-	//! @brief Serialize the object data into the provided object by using the provided allocator.
-	//! @param _object Json object value reference to write the data to.
-	//! @param _allocator Allocator to use when writing data.
-	//! @ref Serializable::addToJsonObject
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-
-	void addDebugInfoToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
-
-	//! @brief Set the data by deserializing the object.
-	//! Set the object contents from the provided JSON object.
-	//! @param _object The JSON object containing the information.
-	//! @ref Serializable::setFromJsonObject
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-
-protected:
-
-	std::string				m_url;			//! This services IP address
-	std::string				m_name;			//! This services name
-	ot::serviceID_t			m_id;			//! This services ID
-	std::string				m_type;			//! This services type
-	Session *				m_session;		//! The session this service belongs to
-	bool					m_receiveBroadcastMessages;
-	bool					m_isVisible;
+	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 private:
+	ot::serviceID_t  m_id;           //! @brief Service ID.
+	std::string      m_url;          //! @brief Service url.
+	std::string      m_websocketUrl; //! @brief Service websocket url (if available, otherwise empty).
+	std::string      m_name;         //! @brief Service name.
+	std::string      m_type;         //! @brief Service type.
+	ServiceState     m_state;        //! @brief Service state.
 
-	Service() = delete;
-	Service(const Service &) = delete;
+	std::string      m_sessionId;    //! @brief The session ID this service is registered in.
 };
+
+OT_ADD_FLAG_FUNCTIONS(Service::ServiceStateFlag)

@@ -333,6 +333,7 @@
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
+#define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
@@ -366,11 +367,13 @@
 #define OT_ACTION_PARAM_PROPERTY_Name "PropertyName"
 #define OT_ACTION_PARAM_PROPERTY_Group "PropertyGroup"
 
+// check
 #define OT_ACTION_PARAM_LSS "LocalSessionServices"
 #define OT_ACTION_PARAM_LSS_URL "URL"
 #define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
 #define OT_ACTION_PARAM_LSS_GLOBAL_CPU "GlobalCPU"
 #define OT_ACTION_PARAM_LSS_GLOBAL_MEMORY "GlobalMemory"
+// check
 #define OT_ACTION_PARAM_LDS "LocalDirectoryServices"
 #define OT_ACTION_PARAM_LDS_URL "URL"
 
