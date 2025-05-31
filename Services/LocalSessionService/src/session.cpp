@@ -296,5 +296,5 @@ std::list<std::string> Session::getToolBarTabOrder(void) {
 }
 
 ot::serviceID_t Session::generateNextServiceId(void) {
-	return m_serviceIdManager.grabNextID();
+	return m_serviceIdManager.nextID();
 }

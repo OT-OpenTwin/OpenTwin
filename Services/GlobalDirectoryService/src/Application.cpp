@@ -131,7 +131,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 
 	// Create new LDS entry
 	LocalDirectoryService newLds(ServiceURL);
-	newLds.setServiceID(m_ldsIdManager.grabNextID());
+	newLds.setServiceID(m_ldsIdManager.nextID());
 	newLds.setSupportedServices(supportedServices);
 
 	if (!newLds.updateSystemUsageValues(_jsonDocument)) {

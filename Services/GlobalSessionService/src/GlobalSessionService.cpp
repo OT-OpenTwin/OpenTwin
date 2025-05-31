@@ -102,7 +102,7 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot:
 	}
 
 	// Create copy and assign uid
-	_newId = m_lssIdManager.grabNextID();
+	_newId = m_lssIdManager.nextID();
 	_service.setId(_newId);
 
 	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(_service.getId()) + ", \"URL\": \"" + _service.getUrl() + "\" }");
