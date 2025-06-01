@@ -81,6 +81,8 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(this->getServiceType(), _allocator), _allocator);
 
 	_object.AddMember(OT_ACTION_PARAM_Alive, static_cast<bool>(m_state & Service::Alive), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_Debug, static_cast<bool>(m_state & Service::IsDebug), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_Requested, static_cast<bool>(m_state & Service::Requested), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_IsShutdown, static_cast<bool>(m_state & Service::ShuttingDown), _allocator);
 	
 	if (!m_websocketUrl.empty()) {

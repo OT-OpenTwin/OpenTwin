@@ -5,6 +5,9 @@
 
 #pragma once
 
+// LSS header
+#include "Service.h"
+
 // OpenTwin header
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
@@ -22,8 +25,6 @@
 class Session {
 	OT_DECL_NOCOPY(Session)
 	OT_DECL_NODEFAULT(Session)
-
-	OT_DECL_DEFMOVE(Session)
 public:
 	enum SessionStateFlag {
 		NoState      = 0 << 0, //! @brief No state set.
@@ -36,7 +37,11 @@ public:
 	//! @param _name The name of the session.
 	Session(const std::string& _id, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _type);
 
+	Session(Session&& _other) noexcept;
+
 	~Session();
+
+	Session& operator=(Session&& _other) noexcept;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -66,6 +71,15 @@ public:
 
 	std::list<std::string> getToolBarTabOrder(void);
 
+	//! @brief Returns true if any of the services in this session is flagged as requested.
+	bool hasRequestedServices();
+
+	//! @brief Returns true if any of the services in this session is alive.
+	bool hasAliveServices();
+
+	//! @brief Returns true if any of the services in this session is shutting down.
+	bool hasShuttingDownServices();
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Service management
@@ -74,35 +88,25 @@ public:
 	//! @param _service The service to store.
 	Service& addService(Service&& _service);
 	
+	//! @brief Will set the service with the specified ID as alive.
+	//! @param _serviceID Service ID.
+	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
+	std::optional<Service&> setServiceAlive(ot::serviceID_t _serviceID);
+
+	//! @brief Will set the service with the specified ID as shutdown completed (shutting down = false).
+	//! @param _serviceID Service ID.
+	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
+	std::optional<Service&> setServiceShutdownCompleted(ot::serviceID_t _serviceID);
+
 	//! @brief Will remove the service with the specified ID from this session.
 	//! @param _serviceID The ID of the service to remove.
 	//! @param _notifyOthers If true, a broadcast message will be send that the service is shutting down.
 	void serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers = false);
 
-	//! @brief Will return the writeable reference to the service with the specified ID.
-	//! @param _serviceID Service ID.
-	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
-	std::optional<Service&> getServiceFromID(ot::serviceID_t _serviceID);
-
-	//! @brief Will return the read only reference to the service with the specified ID.
-	//! @param _serviceID Service ID.
-	//! @return Empty optional if the service is not found, otherwise const reference to the specified service.
-	std::optional<const Service&> getServiceFromID(ot::serviceID_t _serviceID) const;
-
-	//! @brief Will return the writeable reference to the service with the specified url.
-	//! @param _serviceURL Service url.
-	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
-	std::optional<Service&> getServiceFromURL(const std::string& _serviceURL);
-
-	//! @brief Will return the read only reference to the service with the specified url.
-	//! @param _serviceURL Service url.
-	//! @return Empty optional if the service is not found, otherwise const reference to the specified service.
-	std::optional<const Service&> getServiceFromURL(const std::string& _serviceURL) const;
-
 	//! @brief Will add the alive services to the provided JSON array.
 	//! @param _array JSON array to add the services to.
 	//! @param _allocator Allocator.
-	void addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator) const;
+	void addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator);
 
 	ot::serviceID_t generateNextServiceID() { return m_serviceIdManager.nextID(); };
 
@@ -129,16 +133,20 @@ public:
 	//! @param _emergencyShutdown If true, the session will be shutdown in emergency mode, otherwise a regular shutdown will be performed.
 	void shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown);
 
+private:
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Messaging
+	// Private: Messaging
 
 	//! @brief Broadcast a message action with the given message as a parameter to all alive services of this session that may receive broadcast messages.
+	//! @warning The mutex must be locked before calling this function.
 	//! @param _senderService The sender of this message.
 	//! @param _message The message text.
 	void broadcastMessage(ot::serviceID_t _senderServiceID, const std::string& _message);
 
 	//! @brief Broadcast a action to all alive services of this session that may receive broadcast messages.
+	//! @warning The mutex must be locked before calling this function.
 	//! @param _senderService The sender of this message.
 	//! @param _action The action to broadcast.
 	void broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action);
@@ -147,20 +155,45 @@ public:
 	//! @param _sender The sender of this message. The sender will not receive the broadcast message.
 	//! @param _message The message to broadcast.
 	//! @param _async If true the massage(s) will be send from a worker thread.
-	void broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, bool _async = false);
+	//! @warning The mutex must be locked before calling this with the _async param set to false.
+	void broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, bool _async);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
 
-private:
+	//! @brief Will return the writeable reference to the service with the specified ID.
+	//! @warning The mutex must be locked before calling this function.
+	//! @param _serviceID Service ID.
+	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
+	std::optional<Service&> getServiceFromID(ot::serviceID_t _serviceID);
+
+	//! @brief Will return the read only reference to the service with the specified ID.
+	//! @warning The mutex must be locked before calling this function.
+	//! @param _serviceID Service ID.
+	//! @return Empty optional if the service is not found, otherwise const reference to the specified service.
+	std::optional<const Service&> getServiceFromID(ot::serviceID_t _serviceID) const;
+
+	//! @brief Will return the writeable reference to the service with the specified url.
+	//! @warning The mutex must be locked before calling this function. 
+	//! @param _serviceURL Service url.
+	//! @return Empty optional if the service is not found, otherwise reference to the specified service.
+	std::optional<Service&> getServiceFromURL(const std::string& _serviceURL);
+
+	//! @brief Will return the read only reference to the service with the specified url.
+	//! @warning The mutex must be locked before calling this function.
+	//! @param _serviceURL Service url.
+	//! @return Empty optional if the service is not found, otherwise const reference to the specified service.
+	std::optional<const Service&> getServiceFromURL(const std::string& _serviceURL) const;
+
 	void broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message);
 
 	//! @brief Will prepare the broadcast document with the sender information.
+	//! @warning The mutex must be locked before calling this function.
 	//! @param _doc The document to prepare.
 	//! @param _action The action that will be broadcasted.
 	//! @param _senderService The ID of the service that is sending the broadcast message.
-	void prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string& _action, ot::serviceID_t _senderService) const;
+	void prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string& _action, ot::serviceID_t _senderService);
 
 	void prepareServiceFailure(Service& _failedService);
 

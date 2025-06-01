@@ -42,10 +42,7 @@ public:
 
 	std::list<std::string> getSessionIds(void);
 
-
-
 	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
-
 
 private:
 	GlobalSessionService   m_gss;
