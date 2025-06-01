@@ -27,11 +27,10 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Building Project
+ECHO Launching development enviroment
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService2\.vs"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService2\x64"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService2\packages"
+REM Open project
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService\LocalSessionService.vcxproj"
 
 GOTO END
 
