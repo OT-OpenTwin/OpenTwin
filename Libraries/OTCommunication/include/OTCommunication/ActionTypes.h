@@ -318,6 +318,7 @@
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Size "Size"
+#define OT_ACTION_PARAM_Alive "Alive"
 #define OT_ACTION_PARAM_State "State"
 #define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
@@ -334,6 +335,7 @@
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
+#define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
@@ -655,8 +657,6 @@
 #define OT_ACTION_PARAM_TEXTEDITOR_Name "TextEditor.Name"
 #define OT_ACTION_PARAM_TEXTEDITOR_Text "TextEditor.Text"
 #define OT_ACTION_PARAM_TEXTEDITOR_Title "TextEditor.Title"
-
-#define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 
 #define OT_ACTION_PARAM_RegisterForModelEvents "ModelEvents.Register"
 #define OT_ACTION_PARAM_ElementLockTypes "UI.Element.LockTypes"

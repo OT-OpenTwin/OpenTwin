@@ -13,7 +13,7 @@
 #include "OTCommunication/ActionTypes.h"
 
 Service::Service(const ot::ServiceBase& _serviceInfo, const std::string& _sessionId) :
-	ot::ServiceBase(_serviceInfo), m_sessionId(_sessionId), m_state(Service::NoState), m_id(ot::invalidServiceID)
+	ot::ServiceBase(_serviceInfo), m_state(Service::NoState)
 {
 	OT_LOG_D([=]() {
 		ot::JsonDocument dbg;
@@ -37,13 +37,13 @@ Service::~Service() {
 std::list<ot::port_t> Service::getPortNumbers(void) const {
 	std::list<ot::port_t> ports;
 
-	size_t colonIndex = m_url.rfind(':');
+	size_t colonIndex = this->getServiceURL().rfind(':');
 	if (colonIndex != std::string::npos) {
-		std::string port = m_url.substr(colonIndex + 1);
+		std::string port = this->getServiceURL().substr(colonIndex + 1);
 		bool fail = false;
 		ot::port_t portNumber = ot::String::toNumber<ot::port_t>(port, fail);
 		if (fail) {
-			OT_LOG_E("Failed to convert port number from URL: \"" + m_url + "\"");
+			OT_LOG_E("Failed to convert port number from URL: \"" + this->getServiceURL() + "\"");
 		}
 		else {
 			ports.push_back(portNumber);
@@ -75,13 +75,15 @@ std::list<ot::port_t> Service::getPortNumbers(void) const {
 // Serialization
 
 void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(m_name, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(m_type, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(this->getServiceURL(), _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(this->getServiceName(), _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(this->getServiceType(), _allocator), _allocator);
 
-	_object.AddMember(OT_ACTION_PARAM_Visible, static_cast<bool>(m_state & Service::Visible), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_Alive, static_cast<bool>(m_state & Service::Alive), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_IsShutdown, static_cast<bool>(m_state & Service::ShuttingDown), _allocator);
 	
-	_object.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_sessionId, _allocator), _allocator);
+	if (!m_websocketUrl.empty()) {
+		_object.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(m_websocketUrl, _allocator), _allocator);
+	}
 }
