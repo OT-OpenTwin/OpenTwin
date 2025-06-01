@@ -81,12 +81,13 @@ std::list<std::string> Application::getSupportedServices(void) const {
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
 	std::string serviceName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionServiceURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 
-	OT_LOG_I("Service start requested: (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS-URL = \"" + sessionServiceURL + "\")");
+	OT_LOG_D("Service start requested: (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS-URL = \"" + sessionServiceURL + "\")");
 
-	ServiceInformation serviceInfo(serviceName, serviceType, SessionInformation(sessionID, sessionServiceURL));
+	ServiceInformation serviceInfo(serviceName, serviceType, serviceID, SessionInformation(sessionID, sessionServiceURL));
 
 	// Get the limits from the configuration
 	for (auto s : Configuration::instance().getSupportedServices()) {
@@ -106,10 +107,11 @@ std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) 
 }
 
 std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionServiceURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	
-	OT_LOG_I("Relay Service start requested: { SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
+	OT_LOG_D("Relay Service start requested: { SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
 
 	SessionInformation sessionInfo(sessionID, sessionServiceURL);
 
@@ -117,9 +119,10 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	std::string websocketUrl;
 	
 	for (unsigned int attempt = 0; attempt < Configuration::instance().getDefaultMaxStartupRestarts(); attempt++) {
-		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL);
+		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(serviceID, sessionInfo, websocketUrl, relayServiceURL);
+
 		if (result == ServiceManager::RequestResult::Success) {
-			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
+			OT_LOG_D("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
 			ot::JsonDocument responseDoc;
 			responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
@@ -155,10 +158,10 @@ std::string Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
 	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string name = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
-	ServiceInformation info(name, type);
-	info.setSessionId(sessionID);
+	ServiceInformation info(name, type, serviceID, SessionInformation(sessionID, lssUrl));
 	m_serviceManager.serviceDisconnected(info, url);
 	return OT_ACTION_RETURN_VALUE_OK;
 }

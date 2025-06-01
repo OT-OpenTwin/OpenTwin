@@ -33,9 +33,6 @@
     <ClCompile Include="src\GlobalDirectoryService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ServiceRunStarter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GSSRegistrationInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GlobalDirectoryService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ServiceRunStarter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GSSRegistrationInfo.h">

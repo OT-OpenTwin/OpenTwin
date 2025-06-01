@@ -162,12 +162,13 @@ std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 
 	std::string serviceName = _jsonDocument[OT_ACTION_PARAM_SERVICE_NAME].GetString();
 	std::string serviceType = _jsonDocument[OT_ACTION_PARAM_SERVICE_TYPE].GetString();
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID = _jsonDocument[OT_ACTION_PARAM_SESSION_ID].GetString();
 	std::string sessionServiceURL = _jsonDocument[OT_ACTION_PARAM_SESSION_SERVICE_URL].GetString();
 	
 	OT_LOG_I("Service start requested: { Name: " + serviceName + "; Type: " + serviceType + "; SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
 
-	m_startupDispatcher.addRequest(ServiceInformation(serviceName, serviceType, sessionID, sessionServiceURL));
+	m_startupDispatcher.addRequest(ServiceInformation(serviceName, serviceType, serviceID, sessionID, sessionServiceURL));
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -199,13 +200,15 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 		HANDLE_CHECK_MEMBER(service, OT_ACTION_PARAM_SERVICE_NAME, String);
 		HANDLE_CHECK_MEMBER(service, OT_ACTION_PARAM_SERVICE_TYPE, String);
+		HANDLE_CHECK_MEMBER(service, OT_ACTION_PARAM_SERVICE_ID, Int);
 
 		std::string serviceName = service[OT_ACTION_PARAM_SERVICE_NAME].GetString();
 		std::string serviceType = service[OT_ACTION_PARAM_SERVICE_TYPE].GetString();
+		ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(service, OT_ACTION_PARAM_SERVICE_ID));
 
 		OT_LOG_I("Service start requested (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS.URL = \"" + sessionServiceURL + "\")");
 
-		requestedServices.push_back(ServiceInformation(serviceName, serviceType, sessionID, sessionServiceURL));
+		requestedServices.push_back(ServiceInformation(serviceName, serviceType, serviceID, sessionID, sessionServiceURL));
 	}
 
 	// Add the list to the dispatcher queue
@@ -217,11 +220,13 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_ID, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL, String);
+	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID, Int);
 
 	std::string sessionID = _jsonDocument[OT_ACTION_PARAM_SESSION_ID].GetString();
 	std::string sessionServiceURL = _jsonDocument[OT_ACTION_PARAM_SESSION_SERVICE_URL].GetString();
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 
-	ServiceInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, sessionID, sessionServiceURL);
+	ServiceInformation info(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, serviceID, sessionID, sessionServiceURL);
 
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -251,9 +256,10 @@ std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	std::string lssURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string name = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
-	ServiceInformation serviceInfo(name, type, sessionID, lssURL);
+	ServiceInformation serviceInfo(name, type, serviceID, sessionID, lssURL);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 

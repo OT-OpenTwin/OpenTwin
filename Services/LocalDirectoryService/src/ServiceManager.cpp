@@ -118,10 +118,10 @@ ServiceManager::RequestResult ServiceManager::requestStartService(const ServiceI
 	return RequestResult::Success;
 }
 
-ServiceManager::RequestResult ServiceManager::requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
+ServiceManager::RequestResult ServiceManager::requestStartRelayService(ot::serviceID_t _serviceID, const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL) {
 	m_mutexRequestedServices.lock();
 
-	Service newService(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, _sessionInformation));
+	Service newService(this, ServiceInformation(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService, _serviceID, _sessionInformation));
 
 	// Attempt to start service
 

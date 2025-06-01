@@ -50,7 +50,7 @@ public:
 	//! @param _serviceURL The URL where the service will be running will be written here
 	RequestResult requestStartService(const ServiceInformation& _serviceInformation);
 
-	RequestResult requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
+	RequestResult requestStartRelayService(ot::serviceID_t _serviceID, const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
 
 	//! @brief Will mark all services in the session as expected to shut down.
 	//! Services that are currently requested will be removed from the requested list.

@@ -79,6 +79,7 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInformation.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInformation.getServiceID(), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
@@ -109,10 +110,11 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
-	for (auto s : _serviceInformation) {
+	for (const ServiceBase& service : _serviceInformation) {
 		ot::JsonObject serviceObj;
-		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(s.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(s.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(service.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_ID, service.getServiceID(), requestDoc.GetAllocator());
 		serviceArr.PushBack(serviceObj, requestDoc.GetAllocator());
 	}
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, serviceArr, requestDoc.GetAllocator());
@@ -132,7 +134,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	return false;
 }
 
-bool GlobalDirectoryService::startRelayService(const std::string& _sessionID, std::string& _websocketURL, std::string& _relayServiceURL) {
+bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _websocketURL, std::string& _relayServiceURL) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string lssUrl = SessionService::instance().getUrl();
@@ -140,6 +142,7 @@ bool GlobalDirectoryService::startRelayService(const std::string& _sessionID, st
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceID, requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	

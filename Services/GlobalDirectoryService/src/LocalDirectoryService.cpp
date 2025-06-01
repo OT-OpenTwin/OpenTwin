@@ -60,6 +60,7 @@ bool LocalDirectoryService::requestToRunService(const ServiceInformation& _servi
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.getType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInfo.getID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
@@ -78,6 +79,7 @@ bool LocalDirectoryService::requestToRunService(const ServiceInformation& _servi
 bool LocalDirectoryService::requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInfo.getID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
@@ -211,6 +213,7 @@ void LocalDirectoryService::serviceClosed(const ServiceInformation& _service, co
 					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_service.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 					doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_service.getName(), doc.GetAllocator()), doc.GetAllocator());
 					doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_service.getType(), doc.GetAllocator()), doc.GetAllocator());
+					doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _service.getID(), doc.GetAllocator());
 					doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, doc.GetAllocator()), doc.GetAllocator());
 
 					// Send message and check response
