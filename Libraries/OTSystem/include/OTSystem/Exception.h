@@ -32,6 +32,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::ObjectNotFoundException ObjectNotFound; }
 
+    //! @brief Basic object already exists exception.
+    class ObjectAlreadyExistsException : public GeneralException {
+    public:
+        explicit ObjectAlreadyExistsException() : GeneralException("Object not found") {};
+        explicit ObjectAlreadyExistsException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ObjectAlreadyExistsException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::ObjectAlreadyExistsException ObjectAlreadyExists; }
+
     //! @brief Basic out of bounds exception.
     class OutOfBoundsException : public GeneralException {
     public:
