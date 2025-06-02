@@ -29,7 +29,7 @@
 //! @def OT_DECL_DEFMOVE
 //! @brief Declares the default move constructor and move operator as default.
 //! @warning Will change the current scope to public.
-#define OT_DECL_DEFMOVE(___class) public: ___class(___class&&) = default; ___class& operator = (___class&&) = default;
+#define OT_DECL_DEFMOVE(___class) public: ___class(___class&&) noexcept = default; ___class& operator = (___class&&) noexcept = default;
 
 //! @def OT_DECL_NODEFAULT
 //! @brief Removes the default copy constructor and assignment operator.
