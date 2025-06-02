@@ -43,6 +43,7 @@ public:
 	~MongoWrapper() = default;
 
 	std::optional<bsoncxx::document::value> getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value);
+	std::string getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value);
 
 private:
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);

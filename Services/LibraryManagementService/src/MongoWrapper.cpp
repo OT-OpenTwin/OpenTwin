@@ -58,6 +58,48 @@ std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::str
     }
 }
 
+std::string MongoWrapper::getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value) {
+    auto db = m_client[dbName];
+
+    //Check if collection exists
+    auto collections = db.list_collection_names();
+    auto it = std::find(collections.begin(), collections.end(), _collectionName);
+    if (it == collections.end()) {
+        OT_LOG_E("Collection " + _collectionName + " " + "does not exist!");
+        return "";
+    }
+
+    auto collection = db[_collectionName];
+
+    try {
+        bsoncxx::builder::stream::document filter_builder;
+        filter_builder << _fieldType << _value;
+
+        auto existing = collection.find(filter_builder.view());
+        std::string responseData = "{ \"Documents\": [";
+        bool isFirst = true;
+        for (auto result : existing) {
+            if (!isFirst) {
+                responseData += ",";
+            }
+            responseData += bsoncxx::to_json(result);
+            isFirst = false;
+        }
+        responseData += "]}";
+
+
+        if (responseData.empty()) {
+            OT_LOG_E("Document " + bsoncxx::to_json(filter_builder.view()) + " does not exist!");
+            return "";
+        }
+
+        return responseData;
+    }
+    catch (const bsoncxx::exception& e) {
+        OT_LOG_E("Seaching error: " + std::string(e.what()));
+    }
+}
+
 std::string MongoWrapper::getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword) {
     return DataStorageAPI::ConnectionAPI::getMongoURL(_databaseURL, _dbUserName, _dbPassword);
 }

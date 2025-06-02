@@ -15,10 +15,13 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 
+
+// Thirdparty header
 #include <bsoncxx/builder/stream/helpers.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/json.hpp>
+
 
 
 
@@ -97,6 +100,9 @@ void Application::syncAndUpdateLocalModelsWithDB(const std::string& _folderPath)
                 continue;
             }
 
+
+            std::string modelType = parseSpiceTypeToString(extractType(content));
+
             // Check if model exits
             auto filter = bsoncxx::builder::stream::document{} << "Name" << modelName << bsoncxx::builder::stream::finalize;
             auto existing = collection.find_one(filter.view());
@@ -108,6 +114,7 @@ void Application::syncAndUpdateLocalModelsWithDB(const std::string& _folderPath)
                 // Add new
                 bsoncxx::document::value doc = bsoncxx::builder::stream::document{}
                     << "Name" << modelName
+                    << "Type" << modelType
                     << "content" << content
                     << "filename" << entry.path().filename().string()
                     << bsoncxx::builder::stream::finalize;
@@ -172,6 +179,14 @@ std::string Application::extractName(const std::string& content) {
     }
 
     return "UnknownModel";
+}
+
+std::string Application::parseSpiceTypeToString(const std::string& _type) {
+    std::string output = _type;
+    std::transform(output.begin(), output.end(), output.begin(), ::toupper);
+
+    if (output == "D") return "Diode";
+
 }
 
 

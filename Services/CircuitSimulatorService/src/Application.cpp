@@ -55,7 +55,7 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_Block3 "Diode"
 #define EXAMPLE_NAME_BLOCK4 "Transistor"
 #define EXAMPLE_NAME_BLOCK5 "Connector"
-#define LMS_TESTING 0
+#define LMS_TESTING 1
 
 #undef GetObject
 
@@ -315,6 +315,59 @@ void Application::runCircuitSimulation() {
 	std::string modelDescription = ot::json::getString(model, "content");
 
 	OT_LOG_T(modelDescription);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	OT_LOG_T("Now all Documents with specified type");
+
+	// Get Models by type
+	lmsRespose.clear();
+	ot::JsonDocument lmsDocs;
+
+
+	lmsDocs.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_GetDocumentList, lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Type", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+	lmsDocs.AddMember(OT_ACTION_PARAM_Value, ot::JsonString("Diode", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
+
+	// In case of error:
+		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
+
+	do {
+		lmsRespose.clear();
+		if (!(ok = ot::msg::send(this->getServiceURL(), "127.0.0.1:8002", ot::EXECUTE, lmsDocs.toJson(), lmsRespose, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+
+		}
+	} while (!ok && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Failed to get Models");
+	}
+
+	
+	rMsg = ot::ReturnMessage::fromJson(lmsRespose);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Get Models failed: " + rMsg.getWhat());
+
+	}
+
+	ot::JsonDocument models;
+	models.fromJson(rMsg.getWhat());
+
+	if (models.IsObject()) {
+		ot::ConstJsonObject obj = models.GetConstObject();
+		ot::ConstJsonArray docs = obj["Documents"].GetArray();
+
+		for (const ot::JsonValue& val: docs) {
+			ot::ConstJsonObject doc = val.GetObject();
+			std::string content = doc["content"].GetString();
+			OT_LOG_T(content);
+		}
+	}
+
+
 
 #endif
 

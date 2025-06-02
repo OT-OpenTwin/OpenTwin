@@ -13,9 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-
-
-
+#include <algorithm>
 
 
 class Application {
@@ -43,6 +41,8 @@ private:
 	std::string readFile(const std::filesystem::path& _filePath);
 	std::string extractType(const std::string& content);
 	std::string extractName(const std::string& content);
+
+	std::string parseSpiceTypeToString(const std::string& _type);
 
 	std::string m_databaseURL = "127.0.0.1:27017tls@";
 	std::string m_dbPassword;

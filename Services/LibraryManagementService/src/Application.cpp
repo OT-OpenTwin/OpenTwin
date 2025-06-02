@@ -133,6 +133,24 @@ std::string Application::handleGetDocument(ot::JsonDocument& _document) {
 
 }
 
+
+std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
+
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
+	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+	auto result = db->getDocumentList(collectionName, fieldType, value);
+	if (!result.empty()) {
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
+	}
+	else {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+	}
+
+
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Constructor/Destructor
