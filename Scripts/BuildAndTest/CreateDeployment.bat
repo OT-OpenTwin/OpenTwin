@@ -217,7 +217,11 @@ COPY "%NGSPICE_ROOT%\visualc\sharedspice\Release.x64\ngspice.dll" "%OT_DEPLOYMEN
 
 REM PYRIT
 MKDIR "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
-XCOPY /S "%OT_PYRIT_ROOT%\pyrit-packages\*.*" "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages" 
+XCOPY /S "%OT_PYRIT_ROOT%\pyrit-packages\*.*" "%OT_DEPLOYMENT_DIR%\Python\Lib\pyrit-packages"
+
+REM CircuitModels
+MKDIR "%OT_DEPLOYMENT_DIR%\CircuitModels"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\CircuitModels\*.*" "%OT_DEPLOYMENT_DIR%\CircuitModels"
 
 REM Apache Server
 MKDIR "%OT_DEPLOYMENT_DIR%\Apache"
