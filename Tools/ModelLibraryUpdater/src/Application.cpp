@@ -102,6 +102,10 @@ void Application::syncAndUpdateLocalModelsWithDB(const std::string& _folderPath)
 
 
             std::string modelType = parseSpiceTypeToString(extractType(content));
+            if (modelType == "") {
+                OT_LOG_E("ModelType not correct!");
+                return;
+            }
 
             // Check if model exits
             auto filter = bsoncxx::builder::stream::document{} << "Name" << modelName << bsoncxx::builder::stream::finalize;
@@ -186,6 +190,7 @@ std::string Application::parseSpiceTypeToString(const std::string& _type) {
     std::transform(output.begin(), output.end(), output.begin(), ::toupper);
 
     if (output == "D") return "Diode";
+    else return "";
 
 }
 

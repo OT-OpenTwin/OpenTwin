@@ -55,6 +55,7 @@ std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::str
         }
     } catch (const bsoncxx::exception& e) {
         OT_LOG_E("Seaching error: " + std::string(e.what()));
+        return std::nullopt;
     }
 }
 
@@ -97,6 +98,7 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
     }
     catch (const bsoncxx::exception& e) {
         OT_LOG_E("Seaching error: " + std::string(e.what()));
+        return "";
     }
 }
 
