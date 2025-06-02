@@ -55,6 +55,8 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_Block3 "Diode"
 #define EXAMPLE_NAME_BLOCK4 "Transistor"
 #define EXAMPLE_NAME_BLOCK5 "Connector"
+#define LMS_TESTING 0
+
 #undef GetObject
 
 namespace ottest {
@@ -269,14 +271,17 @@ void Application::addSolver()
 
 void Application::runCircuitSimulation() {
 
+#if LMS_TESTING
+
 	//Testing section for LMS
 
 	std::string lmsRespose;
 	
 	ot::JsonDocument lmsDoc;
 	lmsDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_GetDocument, lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-	lmsDoc.AddMember(OT_PARAM_AUTH_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-	lmsDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString("d1n5342b", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
+	lmsDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
+	lmsDoc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Name", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
+	lmsDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString("mbraf2h100t3g", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
 
 	// In case of error:
 		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
@@ -305,8 +310,13 @@ void Application::runCircuitSimulation() {
 		
 	}
 
-	OT_LOG_T(rMsg.getWhat());
+	ot::JsonDocument model;
+	model.fromJson(rMsg.getWhat());
+	std::string modelDescription = ot::json::getString(model, "content");
 
+	OT_LOG_T(modelDescription);
+
+#endif
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 

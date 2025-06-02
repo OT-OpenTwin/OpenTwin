@@ -27,7 +27,7 @@ MongoWrapper::MongoWrapper(const std::string& _databaseIP, const std::string& _d
 
 }
 
-std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::string& _collectionName, const std::string& _name) {
+std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value) {
     auto db = m_client[dbName];
 
     //Check if collection exists
@@ -40,15 +40,21 @@ std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::str
 
     auto collection = db[_collectionName];
 
-    auto filter = bsoncxx::builder::stream::document{} << "Name" << _name << bsoncxx::builder::stream::finalize;
-    auto existing = collection.find_one(filter.view());
+    try {
+        bsoncxx::builder::stream::document filter_builder;
+        filter_builder << _fieldType << _value;
 
-    if (existing) {
-        return bsoncxx::document::value(existing->view());
-    }
-    else {
-        OT_LOG_E("Document " + _name + " does not exist!");
-        return std::nullopt;
+        auto existing = collection.find_one(filter_builder.view());
+
+        if (existing) {
+            return bsoncxx::document::value(existing->view());
+        }
+        else {
+            OT_LOG_E("Document " + bsoncxx::to_json(filter_builder.view()) + " does not exist!");
+            return std::nullopt;
+        }
+    } catch (const bsoncxx::exception& e) {
+        OT_LOG_E("Seaching error: " + std::string(e.what()));
     }
 }
 

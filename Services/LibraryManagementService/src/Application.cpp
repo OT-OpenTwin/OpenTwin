@@ -118,13 +118,12 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 
 std::string Application::handleGetDocument(ot::JsonDocument& _document) {
 
-	std::string collectionName= ot::json::getString(_document, OT_PARAM_AUTH_COLLECTION_NAME);
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+	std::string collectionName= ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
+	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 
-
-	auto result = db->getDocument(collectionName,name);
-	if (result) {
-		
+	auto result = db->getDocument(collectionName, fieldType, value);
+	if (result) {	
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, bsoncxx::to_json(*result)).toJson();
 	}
 	else {
