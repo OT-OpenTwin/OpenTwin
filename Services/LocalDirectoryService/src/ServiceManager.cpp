@@ -93,7 +93,7 @@ void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 		startArray.PushBack(obj, _allocator);
 	}
 	m_mutexRequestedServices.unlock();
-	_object.AddMember("StartingServices", startArray, _allocator);
+	_object.AddMember("RequestedServices", startArray, _allocator);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

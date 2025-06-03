@@ -80,10 +80,9 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 	}
 	_object.AddMember("LSSMap", lssArr, _allocator);
 
-	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, _allocator);
-	_object.AddMember("GlobalLogFlags", flagsArr, _allocator);
-	_object.AddMember("GlobalLogFlagsSet", m_logModeManager.getGlobalLogFlagsSet(), _allocator);
+	ot::JsonObject logManagerObj;
+	m_logModeManager.addToJsonObject(logManagerObj, _allocator);
+	_object.AddMember("LogModeManager", logManagerObj, _allocator);
 	
 	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
 }
@@ -525,13 +524,19 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 }
 
 std::string GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {
-	
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
 	// Register logic
 
-	
+
+	// Send DBUrl and AuthUrl
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
 	// Send Return
-	return ot::ReturnMessage().toJson();
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
 std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) {

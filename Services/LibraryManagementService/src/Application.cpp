@@ -27,7 +27,7 @@ Application& Application::instance(void) {
 
 // Public functions
 
-int Application::initialize(const char* _ownURL, const char* _globalSessionServiceURL) {
+int Application::initialize(const char* _ownURL, const char* _globalSessionServiceURL, const char * _databasePWD) {
 	try {
 		OT_LOG_I("Library Management Service initialization");
 
@@ -77,6 +77,23 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 			exit(ot::AppExitCode::GSSRegistrationFailed);
 		}
 
+		// Get DBUrl and AuthUrl from gss response
+
+		ot::JsonDocument gssRespoonseUrls;
+		gssRespoonseUrls.fromJson(rMsg.getWhat());
+
+		std::string dbUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_DBURL);
+		std::string authUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_AUTHURL);
+				
+		// Now we need password and we get it from authorisation Service
+		//Authorisation has no password so I will to it currently like in authorisation service by command argument 
+
+
+		// Initialzation of MongoDB connection
+		db = new MongoWrapper(dbUrl, _databasePWD);
+
+
+
 	}
 	catch (std::exception& e) {
 		OT_LOG_EAS(std::string{"Uncaught exception: "}.append(e.what()));
@@ -99,6 +116,40 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 
 // Action handler
 
+std::string Application::handleGetDocument(ot::JsonDocument& _document) {
+
+	std::string collectionName= ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
+	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+	auto result = db->getDocument(collectionName, fieldType, value);
+	if (result) {	
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, bsoncxx::to_json(*result)).toJson();
+	}
+	else {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+	}
+
+
+}
+
+
+std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
+
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
+	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+	auto result = db->getDocumentList(collectionName, fieldType, value);
+	if (!result.empty()) {
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
+	}
+	else {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+	}
+
+
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -106,7 +157,7 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 
 Application::Application() :
 	ot::ServiceBase(OT_INFO_SERVICE_TYPE_LibraryManagementService, OT_INFO_SERVICE_TYPE_LibraryManagementService) {
-	
+
 }
 
 Application::~Application() {}

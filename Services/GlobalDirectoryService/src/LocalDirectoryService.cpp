@@ -37,6 +37,10 @@ LocalDirectoryService& LocalDirectoryService::operator=(LocalDirectoryService&& 
 	return *this;
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Load information
+
 LoadInformation::load_t LocalDirectoryService::load(void) const {
 	return m_loadInformation.load();
 }
@@ -44,6 +48,10 @@ LoadInformation::load_t LocalDirectoryService::load(void) const {
 bool LocalDirectoryService::updateSystemUsageValues(ot::JsonDocument& _jsonDocument) {
 	return m_loadInformation.updateSystemUsageValues(_jsonDocument);
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Service management
 
 bool LocalDirectoryService::supportsService(const std::string& _serviceName) {
 	for (std::string serviceName : m_supportedServices) {
@@ -237,4 +245,20 @@ void LocalDirectoryService::serviceClosed(const ServiceInformation& _service, co
 			} // if (it->first == _session && it->second == _service)
 		} // for (; it != m_services.end(); it++)
 	} // while (erased)
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
+void LocalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("SupportedServices", ot::JsonArray(m_supportedServices, _allocator), _allocator);
+
+	ot::JsonArray servicesArr;
+	for (const ServiceInformation& service : m_services) {
+		ot::JsonObject serviceObj;
+		service.addToJsonObject(serviceObj, _allocator);
+		servicesArr.PushBack(serviceObj, _allocator);
+	}
+	_jsonObject.AddMember("Services", servicesArr, _allocator);
 }

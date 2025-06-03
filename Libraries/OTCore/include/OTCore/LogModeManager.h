@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTClassHelper.h"
 
@@ -18,9 +19,19 @@ namespace ot {
 		LogModeManager();
 		virtual ~LogModeManager();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
 		void setGlobalLogFlags(const LogFlags& _flags) { m_globalFlags = _flags; m_globalFlagsSet = true; };
 		const LogFlags& getGlobalLogFlags(void) const { return m_globalFlags; };
 		bool getGlobalLogFlagsSet(void) const { return m_globalFlagsSet; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
+
+		void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 
 	private:
 		bool m_globalFlagsSet;

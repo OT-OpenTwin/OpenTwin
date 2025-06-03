@@ -5,6 +5,9 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/JSON.h"
+
 // GDS header
 #include "SessionInformation.h"
 
@@ -28,6 +31,10 @@ public:
 	bool operator == (const ServiceInformation& _other) const;
 	bool operator != (const ServiceInformation& _other) const;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
 	void setName(const std::string& _name) { m_name = _name; };
 	const std::string& getName(void) const { return m_name; };
 
@@ -45,6 +52,12 @@ public:
 
 	void setSessionServiceURL(const std::string& _sessionServiceURL) { m_session.setSessionServiceURL(_sessionServiceURL); };
 	const std::string& getSessionServiceURL(void) const { return m_session.getSessionServiceURL(); };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 
 private:
 	std::string m_name; //! @brief Service name.

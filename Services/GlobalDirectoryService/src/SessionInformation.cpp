@@ -47,3 +47,8 @@ bool SessionInformation::operator == (const SessionInformation& _other) const {
 bool SessionInformation::operator != (const SessionInformation& _other) const {
 	return !(*this == _other);
 }
+
+void SessionInformation::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("ID", ot::JsonString(m_id, _allocator), _allocator);
+	_jsonObject.AddMember("LSS.Url", ot::JsonString(m_sessionServiceURL, _allocator), _allocator);
+}

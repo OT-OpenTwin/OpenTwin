@@ -99,7 +99,7 @@ REM 3) IP address of this local directory service
 REM 4) IP address of the global directory service
 REM 5) Unused
 
-REM START "LIBRARY MANAGEMENT SERVICE" %pause_prefix%open_twin.exe LibraryManagementService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LMS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "unused"%pause_suffix%
+REM START "LIBRARY MANAGEMENT SERVICE" %pause_prefix%open_twin.exe LibraryManagementService.dll "%OPEN_TWIN_LOGGING_URL%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LMS_PORT%" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_GSS_PORT%" "%OPEN_TWIN_MONGODB_PWD%" %pause_suffix%
 
 REM ===========================================================================
 REM Launch the admin panel web server

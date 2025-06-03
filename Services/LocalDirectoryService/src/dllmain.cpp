@@ -77,6 +77,6 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, false);
 #endif
-		return Application::instance().initialize("127.0.0.1:9101", _globalDirectoryServiceURL);
+		return Application::instance().initialize(_ownURL, _globalDirectoryServiceURL);
 	};
 }
