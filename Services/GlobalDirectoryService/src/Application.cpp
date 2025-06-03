@@ -368,6 +368,32 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string Application::handleGetDebugInformation(ot::JsonDocument& _doc) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	ot::JsonDocument doc;
+
+	doc.AddMember("GSS.URL", ot::JsonString(m_globalSessionServiceURL, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonArray ldsArr;
+	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
+		ot::JsonObject ldsObj;
+		lds.addToJsonObject(ldsObj, doc.GetAllocator());
+		ldsArr.PushBack(ldsObj, doc.GetAllocator());
+	}
+	doc.AddMember("LDS.Info", ldsArr, doc.GetAllocator());
+
+	ot::JsonObject startupObj;
+	m_startupDispatcher.addToJsonObject(startupObj, doc.GetAllocator());
+	doc.AddMember("StartupDispatcher", startupObj, doc.GetAllocator());
+
+	ot::JsonObject logManagerObj;
+	m_logModeManager.addToJsonObject(logManagerObj, doc.GetAllocator());
+	doc.AddMember("LogModeManager", logManagerObj, doc.GetAllocator());
+
+	return doc.toJson();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private methods

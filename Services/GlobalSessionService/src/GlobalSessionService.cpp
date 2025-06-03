@@ -80,10 +80,9 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 	}
 	_object.AddMember("LSSMap", lssArr, _allocator);
 
-	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, _allocator);
-	_object.AddMember("GlobalLogFlags", flagsArr, _allocator);
-	_object.AddMember("GlobalLogFlagsSet", m_logModeManager.getGlobalLogFlagsSet(), _allocator);
+	ot::JsonObject logManagerObj;
+	m_logModeManager.addToJsonObject(logManagerObj, _allocator);
+	_object.AddMember("LogModeManager", logManagerObj, _allocator);
 	
 	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
 }

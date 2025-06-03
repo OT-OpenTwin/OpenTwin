@@ -29,10 +29,18 @@ public:
 
 	LocalDirectoryService& operator=(LocalDirectoryService&& _other) noexcept;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Load information
+
 	const LoadInformation& loadInformation(void) const { return m_loadInformation; }
 	LoadInformation::load_t load(void) const;
 
 	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Service management
 
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
 	bool supportsService(const std::string& _serviceName);
@@ -43,6 +51,12 @@ public:
 	void sessionClosing(const SessionInformation& _session);
 	void sessionClosed(const SessionInformation& _session);
 	void serviceClosed(const ServiceInformation& _service, const std::string& _serviceURL);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 
 private:
 	std::list<std::string>        m_supportedServices; //! @brief List of supported services by the LDS.

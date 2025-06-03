@@ -5,6 +5,10 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/JSON.h"
+#include "OTCore/OTClassHelper.h"
+
 // GDS header
 #include "ServiceInformation.h"
 
@@ -17,6 +21,8 @@ namespace std { class thread; }
 //! @brief The StartupDispatcher is responsible for managing service start requests.
 //! It collects requests and starts a worker thread to process them.
 class StartupDispatcher {
+	OT_DECL_NOCOPY(StartupDispatcher)
+	OT_DECL_NOMOVE(StartupDispatcher)
 public:
 	StartupDispatcher();
 	virtual ~StartupDispatcher();
@@ -34,6 +40,12 @@ public:
 	//! The requests will be processed by the worker thread.
 	//! @param _info List of service information objects to start.
 	void addRequest(std::list<ServiceInformation>&& _info);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -57,8 +69,5 @@ private:
 	std::list<ServiceInformation> m_requestedServices; //! @brief List of service start requests that are waiting to be processed.
 	std::mutex                    m_mutex;             //! @brief Mutex to protect access to the request list.
 	std::thread*                  m_workerThread;      //! @brief The worker thread that processes service start requests.
-	bool                          m_isStopping;        //! @brief Flag indicating whether the worker thread is stopping.
-
-	StartupDispatcher(StartupDispatcher&) = delete;
-	StartupDispatcher& operator = (StartupDispatcher&) = delete;
+	std::atomic_bool              m_isStopping;        //! @brief Flag indicating whether the worker thread is stopping.
 };

@@ -46,6 +46,29 @@ void StartupDispatcher::addRequest(std::list<ServiceInformation>&& _info) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Serialization
+
+void StartupDispatcher::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_isStopping) {
+		_jsonObject.AddMember("IsStopping", true, _allocator);
+	}
+	else {
+		_jsonObject.AddMember("IsStopping", false, _allocator);
+	}
+
+	ot::JsonArray requestedArr;
+	for (const ServiceInformation& info : m_requestedServices) {
+		ot::JsonObject obj;
+		info.addToJsonObject(obj, _allocator);
+		requestedArr.PushBack(obj, _allocator);
+	}
+	_jsonObject.AddMember("RequestedServices", requestedArr, _allocator);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Private methods
 
 void StartupDispatcher::run(void) {

@@ -57,3 +57,16 @@ bool ServiceInformation::operator == (const ServiceInformation& _other) const {
 bool ServiceInformation::operator != (const ServiceInformation& _other) const {
 	return !(*this == _other);
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
+void ServiceInformation::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
+	_jsonObject.AddMember("Type", ot::JsonString(m_type, _allocator), _allocator);
+
+	ot::JsonObject sessionObj;
+	m_session.addToJsonObject(sessionObj, _allocator);
+	_jsonObject.AddMember("Session", sessionObj, _allocator);
+}
