@@ -3409,7 +3409,7 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags);
 
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
@@ -3435,7 +3435,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
@@ -3489,7 +3489,7 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
@@ -3627,7 +3627,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	// Now we refresh the plot visualisation.
 	plot->refresh();
 	plot->resetView();
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	// Lastly we notify the scene nodes that they have a state change to view opened.
 	const auto& viewerType = plotView->getViewData().getViewType();
@@ -3702,7 +3702,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
@@ -3795,7 +3795,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
@@ -3840,7 +3840,7 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 	table->getTable()->setContentChanged(true);
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(table, true);
-	AppBase::instance()->autoCloseUnpinnedViews();
+	//AppBase::instance()->autoCloseUnpinnedViews();
 
 	return "";
 }
