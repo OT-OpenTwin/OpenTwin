@@ -132,7 +132,7 @@ std::optional<std::string> ot::String::getEntitySubName(const std::string& _full
 {
 	if (_topologyLvl == -1)
 	{
-		int32_t pos = _fullEntityName.find_last_of("/");
+		size_t pos = _fullEntityName.find_last_of("/");
 		if (pos < _fullEntityName.size())
 		{
 			return _fullEntityName.substr(pos + 1);

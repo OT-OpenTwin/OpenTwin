@@ -5,7 +5,9 @@
 
 // Open Twin header
 #include "OTSystem/DateTime.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTCore/ServiceBase.h"
 
 // std header
@@ -275,19 +277,29 @@ ot::LogDispatcher& ot::LogDispatcher::instance(void) {
 }
 
 ot::LogDispatcher& ot::LogDispatcher::initialize(const std::string& _serviceName, bool _addCoutReceiver) {
+	ot::LogDispatcher& dispatcher = ot::LogDispatcher::instance();
+
+	// Setup name
 	if (!_serviceName.empty()) {
-		LogDispatcher::instance().setServiceName(_serviceName);
-	}
-	if (_addCoutReceiver) {
-		LogDispatcher::instance().addReceiver(new LogNotifierStdCout);
+		dispatcher.setServiceName(_serviceName);
 	}
 
-	return LogDispatcher::instance();
+	// Add cout notifier if need
+	if (_addCoutReceiver) {
+		dispatcher.addReceiver(new LogNotifierStdCout);
+	}
+
+	// Add file notifier if needed
+	if (String::toLower(OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_FILE_LOGGING")) == "true") {
+		dispatcher.addFileWriter();
+	}
+
+	return dispatcher;
 }
 
 void ot::LogDispatcher::addFileWriter(void) {
 	LogDispatcher& dispatcher = LogDispatcher::instance();
-	dispatcher.addReceiver(new LogNotifierFileWriter(dispatcher.m_serviceName));
+	dispatcher.addReceiver(new LogNotifierFileWriter(dispatcher.m_serviceName + ".otlog"));
 }
 
 // #################################################################################
@@ -350,7 +362,7 @@ void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
 	}
 }
 
-ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"), m_logFlags(NO_LOG)
+ot::LogDispatcher::LogDispatcher() : m_serviceName("NO SERVICE NAME PROVIDED"), m_logFlags(NO_LOG)
 {
 	// Get env
 	char buffer[4096];
