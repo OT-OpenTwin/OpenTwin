@@ -23,6 +23,8 @@
 #include <string>
 
 class SessionService {
+	OT_DECL_NOCOPY(SessionService)
+	OT_DECL_NOMOVE(SessionService)
 	OT_DECL_ACTION_HANDLER(SessionService)
 private:
 	SessionService();
@@ -44,7 +46,13 @@ public:
 
 	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Worker
+
 private:
+	void workerShutdownSession(ot::serviceID_t _serviceID, std::string _sessionID);
+
 	GlobalSessionService   m_gss;
 	GlobalDirectoryService m_gds;
 
@@ -188,8 +196,6 @@ private:
 
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
-	void workerShutdownSession(ot::serviceID_t _serviceId, Session* _session);
-
 	std::mutex                                  m_mutex;
 
 	std::string									m_dataBaseURL;                      //! @brief Database IP address
@@ -212,7 +218,4 @@ private:
 	std::list<std::string> m_sessionShutdownQueue;
 
 	ot::LogModeManager m_logModeManager;
-
-	SessionService(const SessionService&) = delete;
-	SessionService & operator =(const SessionService&) = delete;
 };
