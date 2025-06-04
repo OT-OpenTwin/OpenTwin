@@ -37,6 +37,7 @@
 
 #include "EntityAPI.h"
 #include "EntityBatchImporter.h"
+#include "InvalidUID.h"
 
 Application * g_instance{ nullptr };
 
@@ -219,11 +220,14 @@ void Application::modelSelectionChanged(void)
 	for (ot::UID selectedEntityID : m_selectedEntities)
 	{
 		ot::UID version = Application::instance()->getPrefetchedEntityVersion(selectedEntityID);
-		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityID, version, classFactory);
-		if (entityBase != nullptr && entityBase->getClassName() == importer.getClassName())
+		if (version != ot::getInvalidUID())
 		{
-			batchImporterSelected = true;
-			break;
+			EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityID, version, classFactory);
+			if (entityBase != nullptr && entityBase->getClassName() == importer.getClassName())
+			{
+				batchImporterSelected = true;
+				break;
+			}
 		}
 	}
 	std::list<std::string> enabled, disabled;
@@ -238,8 +242,8 @@ void Application::modelSelectionChanged(void)
 
 	uiComponent()->setControlsEnabledState(enabled, disabled);
 
-	std::thread handler(&Application::HandleSelectionChanged,this);
-	handler.detach();
+	//std::thread handler(&Application::HandleSelectionChanged,this);
+	//handler.detach();
 }
 
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)

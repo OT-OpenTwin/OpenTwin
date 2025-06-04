@@ -35,6 +35,8 @@
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
 
+#include "InvalidUID.h"
+
 // Third party header
 #include "curl/curl.h"
 
@@ -638,9 +640,12 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 
 	for (auto entity : entityInfo)
 	{
-		m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
+		if (entity.getEntityID() != ot::getInvalidUID() && entity.getEntityVersion() != ot::getInvalidUID())
+		{
+			m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
 
-		prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
+			prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
+		}
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
@@ -648,9 +653,14 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 
 ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID entityID)
 {
-	OTAssert(m_prefetchedEntityVersions.count(entityID) > 0, "The entity was not prefetched");
-
-	return m_prefetchedEntityVersions[entityID];
+	if (m_prefetchedEntityVersions.count(entityID) == 0)
+	{
+		return ot::getInvalidUID();
+	}
+	else
+	{
+		return m_prefetchedEntityVersions[entityID];
+	}
 }
 
 std::string ot::ApplicationBase::getLogInUserName() const
