@@ -76,7 +76,7 @@ extern "C" {
 		std::cout << "Library Management Service" << std::endl;
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LibraryManagementService, loggerServiceURL, true);
 #else
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalDirectoryService, loggerServiceURL, false);
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LibraryManagementService, loggerServiceURL, false);
 #endif
 		Application::instance().initialize(_ownURL, _globalSessionServiceURL, _databasePWD);
 		return 0;

@@ -7,10 +7,12 @@
 
 #include "FrontendAPI.h"
 
-SceneNodeBase::~SceneNodeBase()
-{
-	for (Visualiser* visualiser : m_visualiser)
-	{
+SceneNodeBase::~SceneNodeBase() {
+	// Remove visualiser before deleting to avoid access to visualiser during deletion
+	std::list<Visualiser*> visualisers = std::move(m_visualiser);
+	m_visualiser.clear();
+
+	for (Visualiser* visualiser : visualisers) {
 		delete visualiser;
 		visualiser = nullptr;
 	}

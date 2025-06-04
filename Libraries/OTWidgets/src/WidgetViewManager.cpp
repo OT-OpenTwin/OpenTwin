@@ -197,26 +197,25 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 		OTAssertNullptr(dock);
 		if ((view.second->getViewData().getViewFlags() & _flags) == _flags && !dock->getIsPinned()) {
 			bool concider = true;
-			if (!_ignoreCurrent) {
-				concider = view.second != m_focusInfo.last &&
-					view.second != m_focusInfo.lastCentral &&
-					view.second != m_focusInfo.lastSide &&
-					view.second != m_focusInfo.lastTool;
+			if (_ignoreCurrent) {
+				concider = !(view.second == m_focusInfo.last ||
+					view.second == m_focusInfo.lastCentral ||
+					view.second == m_focusInfo.lastSide ||
+					view.second == m_focusInfo.lastTool);
 
 				
 			}
 
 			if (concider && !_activeSelection.getSelectedNavigationItems().empty()) {
-				concider = false;
 				for (const UID& active : _activeSelection.getSelectedNavigationItems()) {
 					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
 						if (active == viewSelection) {
-							concider = true;
+							concider = false;
 							break;
 						}
 					}
 
-					if (concider) {
+					if (!concider) {
 						break;
 					}
 				}

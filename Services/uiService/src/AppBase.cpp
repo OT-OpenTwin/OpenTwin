@@ -1649,8 +1649,6 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
-	return;
-
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
@@ -2592,6 +2590,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 	}
+
+	AppBase::instance()->autoCloseUnpinnedViews();
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
@@ -3240,9 +3240,7 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 }
 
 void AppBase::setupNewCentralView(ot::WidgetView* _view) {
-	ot::SelectionInformation selectionInfo;
-	selectionInfo.setSelectedNavigationItems(m_projectNavigation->getTree()->selectedItems());
-	_view->setSelectionInformation(selectionInfo);
+	_view->setSelectionInformation(this->getSelectedNavigationTreeItems());
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
