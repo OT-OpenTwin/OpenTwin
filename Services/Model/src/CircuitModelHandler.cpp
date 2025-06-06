@@ -44,7 +44,8 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 		
 
 	// Just for pushing, remove this later
-	actionIsHandled = true;
+	//	actionIsHandled = true; 
+	// Bad idea!!
 	return actionIsHandled;
 
 }
