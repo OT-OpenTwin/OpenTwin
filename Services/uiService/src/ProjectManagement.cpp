@@ -391,7 +391,7 @@ bool ProjectManagement::InitializeConnection(void)
 
 	try {
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
 
 		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
 		m_isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, m_projectCatalogCollectionName);

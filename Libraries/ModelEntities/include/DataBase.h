@@ -31,7 +31,7 @@ public:
 
 	static DataBase* GetDataBase();
 
-	bool InitializeConnection(const std::string &serverURL, const std::string &siteID);
+	bool InitializeConnection(const std::string &serverURL);
 	void setProjectName(const std::string &name) { projectName = name; };
 	std::string getProjectName(void) { return projectName; };
 	int getSiteID(void) { return serviceSiteID; };

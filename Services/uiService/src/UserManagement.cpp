@@ -99,7 +99,7 @@ bool UserManagement::checkConnectionDataBase(const std::string &userName, const 
 	{
 		try
 		{
-			DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", userName, password);
+			DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, userName, password);
 		}
 		catch (std::exception e)
 		{
@@ -308,13 +308,13 @@ bool UserManagement::initializeDatabaseConnection(void)
 	try
 	{
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
 
 		m_isConnected = true;
 
 		return m_isConnected;
 	}
-	catch (std::exception&)
+	catch (std::exception& _e)
 	{
 		return false; // Connection failed
 	}

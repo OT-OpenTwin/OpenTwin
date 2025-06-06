@@ -73,11 +73,10 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		const std::string userName = ot::json::getString(doc, OT_PARAM_AUTH_USERNAME);
 		const std::string psw = ot::json::getString(doc, OT_PARAM_AUTH_PASSWORD);
 		const std::string collectionName = ot::json::getString(doc, OT_ACTION_PARAM_COLLECTION_NAME);
-		const std::string siteID = ot::json::getString(doc, OT_ACTION_PARAM_SITE_ID);
-
+	
 		DataBase::GetDataBase()->setProjectName(collectionName);
 		DataBase::GetDataBase()->setUserCredentials(userName, psw);
-		DataBase::GetDataBase()->InitializeConnection(url, siteID);
+		DataBase::GetDataBase()->InitializeConnection(url);
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
 		OT_LOG_D("Initialise UID Generator");

@@ -3,6 +3,7 @@
 #include "..\include\Connection\ConnectionAPI.h"
 #include "..\include\DataStorageLogger.h"
 
+
 #include "OTSystem\UrlEncoding.h"
 #include "OTSystem/OperatingSystem.h"
 
@@ -14,6 +15,9 @@
 
 namespace DataStorageAPI
 {
+
+	ThreadLocalClientInitialiser ConnectionAPI::m_clientInitialiser;
+
 	void callMe(void)
 	{
 
@@ -25,54 +29,28 @@ namespace DataStorageAPI
 		return instance;
 	}
 
-	void ConnectionAPI::setMongoInstance(int siteId, std::ostream * logger)
+	void ConnectionAPI::setMongoInstance(std::ostream * logger)
 	{
 		if (_mongoInstance != nullptr) {
 			return;
 		}
-
-		_siteId = siteId;
 		_mongoInstance = bsoncxx::stdx::make_unique<mongocxx::instance>(
 			bsoncxx::stdx::make_unique<DataStorageLogger>(logger));
 	}
 
-	void ConnectionAPI::configurePool(std::string connectionUri, bool useDefaultUri)
-	{
-		static std::string lastConnectionUri;
-		if (lastConnectionUri == connectionUri) return;  // In this case, the connection pool has already been configured
-
-		lastConnectionUri = connectionUri;
-
-		mongocxx::uri uri{ useDefaultUri ? mongocxx::uri::k_default_uri : connectionUri };
-		_pool = bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(uri));
-	}
-
-	connection DataStorageAPI::ConnectionAPI::getConnection()
-	{
-		return _pool->acquire();
-	}
-
-	bsoncxx::stdx::optional<connection> DataStorageAPI::ConnectionAPI::tryGetConnection()
-	{
-		return _pool->try_acquire();
-	}
-
-	mongocxx::collection ConnectionAPI::getCollection(std::string databaseName, std::string collectionName)
+	mongocxx::collection ConnectionAPI::getCollection(std::string _databaseName, std::string _collectionName)
 	{	
-		auto connection = this->getConnection();
-		return (*connection)[databaseName][collectionName];
+		return m_clientInitialiser.getClient()[_databaseName][_collectionName];
 	}
 
-	mongocxx::database ConnectionAPI::getDatabase(std::string databaseName)
+	mongocxx::database ConnectionAPI::getDatabase(std::string _databaseName)
 	{
-		auto connection = this->getConnection();
-		return (*connection)[databaseName];
+		return m_clientInitialiser.getClient()[_databaseName];
 	}
 
-	bool ConnectionAPI::checkCollectionExists(std::string databaseName, std::string collectionName)
+	bool ConnectionAPI::checkCollectionExists(std::string _databaseName, std::string _collectionName)
 	{
-		auto connection = this->getConnection();
-		return (*connection)[databaseName].has_collection(collectionName);
+		return m_clientInitialiser.getClient()[_databaseName].has_collection(_collectionName);;
 	}
 
 	bool ConnectionAPI::checkServerIsRunning()
@@ -93,12 +71,11 @@ namespace DataStorageAPI
 	}
 
 
-	bool ConnectionAPI::createCollection(std::string databaseName, std::string collectionName)
+	bool ConnectionAPI::createCollection(std::string _databaseName, std::string _collectionName)
 	{
-		auto connection = this->getConnection();
 		try 
 		{
-			(*connection)[databaseName].create_collection(collectionName);
+			m_clientInitialiser.getClient()[_databaseName].create_collection(_collectionName);
 		}
 		catch (mongocxx::exception)
 		{
@@ -108,13 +85,12 @@ namespace DataStorageAPI
 		return true;
 	}
 
-	bool ConnectionAPI::deleteCollection(std::string databaseName, std::string collectionName)
+	bool ConnectionAPI::deleteCollection(std::string _databaseName, std::string _collectionName)
 	{
-		auto connection = this->getConnection();
 		try
 		{
 			// Try to remove the collection and all its documents from the data base
-			(*connection)[databaseName][collectionName].drop();
+			m_clientInitialiser.getClient()[_databaseName][_collectionName].drop();
 		}
 		catch (mongocxx::exception)
 		{
@@ -124,28 +100,20 @@ namespace DataStorageAPI
 		return true;
 	}
 
-	void ConnectionAPI::establishConnection(const std::string &serverURL, const std::string &siteID, const std::string &userName, const std::string &userPassword)
+	void ConnectionAPI::establishConnection(const std::string &serverURL, const std::string &userName, const std::string &userPassword)
 	{
-		std::string fixedServerURL(serverURL);
-		if (serverURL.find("tls@") == 0)
-		{
-			fixedServerURL = fixedServerURL.substr(4);
-		}
-
-		// Read and store the siteID
-		int serviceSiteID = std::stoi(siteID);
-
-		std::string mongoServerURI = getMongoURL(fixedServerURL, userName, userPassword);
-
 		// Establish a connection to the server
-		DataStorageAPI::ConnectionAPI::getInstance().setMongoInstance(serviceSiteID, &std::cout);
-		DataStorageAPI::ConnectionAPI::getInstance().configurePool(mongoServerURI, mongoServerURI.empty());
-
-		// Now test, whetehr the connection is working
-		auto connection = DataStorageAPI::ConnectionAPI::getInstance().getConnection();
+		DataStorageAPI::ConnectionAPI::getInstance().setMongoInstance(&std::cout);
+		
+		m_clientInitialiser.setCredentials(serverURL, userName, userPassword);
+		auto& client = m_clientInitialiser.getClient();
+		if (!client)
+		{
+			throw std::exception("Failed to establish connection with MongoDB.");
+		}
 	}
 
-	std::string ConnectionAPI::getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
+	std::string ConnectionAPI::getMongoURL(std::string _databaseURL, std::string _dbUsername, std::string _dbPassword)
 	{
 		//if (!mongoURL.empty()) return mongoURL;  Deactivate caching, since the connection needs to be checked with different accounts.
 
@@ -184,13 +152,14 @@ namespace DataStorageAPI
 			throw std::exception(("CertificateKeyFile could not be found at path: " + certKeyPath).c_str());
 		}
 
-		std::string uriStr = "mongodb://" + ot::url::urlEncode(dbUsername) + ":" + ot::url::urlEncode(dbPassword) + "@" + databaseURL;
+		std::string uriStr = "mongodb://" + ot::url::urlEncode(_dbUsername) + ":" + ot::url::urlEncode(_dbPassword) + "@" + _databaseURL;
 
 		//CA file is not explicitly added since the system root ca is used.
 		std::string mongoURL = uriStr + "/?tls=true&tlsCertificateKeyFile=" + certKeyPath;
 
 		return mongoURL;
 	}
+
 
 }
 

@@ -99,17 +99,14 @@ std::string DataBase::StoreDataItem(bsoncxx::builder::basic::document &storage)
 	return res.getResult();
 }
 
-bool DataBase::InitializeConnection(const std::string &serverURL, const std::string &siteID)
+bool DataBase::InitializeConnection(const std::string &serverURL)
 {
 	if (isConnected) return true;
-
-	// Read and store the siteID
-	serviceSiteID = std::stoi(siteID);
 
 	try
 	{
 		// Now test, whetehr the connection is working
-		DataStorageAPI::ConnectionAPI::establishConnection(serverURL, siteID, userName, userPassword);
+		DataStorageAPI::ConnectionAPI::establishConnection(serverURL, userName, userPassword);
 
 		databaseServerURL = serverURL;
 		isConnected = true;
@@ -246,7 +243,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	}
 
 	auto queryBuilderDoc = bsoncxx::builder::basic::document{};
-	queryBuilderDoc.append(kvp("$or", queryArray));
+	queryBuilderDoc.append(kvp("$and", queryArray));
 
 	BsonViewOrValue filterQuery = queryBuilderDoc.extract();
 	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);

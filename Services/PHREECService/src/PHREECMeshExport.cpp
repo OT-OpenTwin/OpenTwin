@@ -1030,7 +1030,7 @@ bool PHREECMeshExport::initializeConnection(const std::string &serverURL)
 
 	try
 	{
-		DataStorageAPI::ConnectionAPI::establishConnection(serverURL, "1", DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(serverURL,DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword());
 
 		isConnected = true;
 

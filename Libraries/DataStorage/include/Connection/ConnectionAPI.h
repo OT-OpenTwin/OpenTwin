@@ -3,10 +3,9 @@
 #include <string>
 
 #include <mongocxx/client.hpp>
-#include <mongocxx/pool.hpp>
 #include <mongocxx/instance.hpp>
 
-using connection = mongocxx::pool::entry;
+#include "ThreadLocalClientInitialiser.h"
 
 namespace DataStorageAPI
 {
@@ -17,11 +16,14 @@ namespace DataStorageAPI
 	public:
 		static ConnectionAPI& getInstance();
 
-		static void establishConnection(const std::string &serverURL, const std::string &siteID, const std::string &userName, const std::string &userPassword);
+		//! @brief Needs to be called before anything else is done with this class.
+		//! @param serverURL 
+		//! @param userName 
+		//! @param userPassword 
+		static void establishConnection(const std::string &serverURL, const std::string &userName, const std::string &userPassword);
 
 		// This method needs to be called initially only once when the application runs.
-		void setMongoInstance(int siteId, std::ostream* logger);
-		void configurePool(std::string connectionUri, bool useDefaultUri = false);
+		void setMongoInstance(std::ostream* logger);
 
 		mongocxx::collection getCollection(std::string databaseName, std::string collectionName);
 		bool checkCollectionExists(std::string databaseName, std::string collectionName);
@@ -31,19 +33,14 @@ namespace DataStorageAPI
 		bool checkServerIsRunning(void);
 
 		mongocxx::database getDatabase(std::string databaseName);
-
-		int getSiteId() { return _siteId; };
-
+		int getSiteId() { return 1; } //Legacy and nothing realy happens with it. A ticket is in the backlog to clean that one up.
 		static std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword);
 	private:
-		connection getConnection();
-
-		bsoncxx::stdx::optional<connection> tryGetConnection();
+		
+		static ThreadLocalClientInitialiser m_clientInitialiser;
 
 		ConnectionAPI() = default;
 		std::unique_ptr<mongocxx::instance> _mongoInstance = nullptr;
-		std::unique_ptr<mongocxx::pool> _pool = nullptr;
-		int _siteId;
 	};
 };
 

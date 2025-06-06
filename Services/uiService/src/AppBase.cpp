@@ -1193,14 +1193,14 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	m_collectionName = m_sessionID.substr(index + 1);*/
 
 
-	int siteID = AppBase::instance()->getSiteID();
+	
 	std::string projectName = AppBase::instance()->getCollectionName();
 	auto dataBase = DataBase::GetDataBase();
-	dataBase->setSiteIDString(std::to_string(siteID));
+	
 	dataBase->setProjectName(projectName);
 	
 	dataBase->setUserCredentials(m_loginData.getSessionUser(), m_loginData.getSessionPassword());
-	bool success = dataBase->InitializeConnection(m_loginData.getDatabaseUrl(), std::to_string(siteID));
+	bool success = dataBase->InitializeConnection(m_loginData.getDatabaseUrl());
 
 	assert(success);
 

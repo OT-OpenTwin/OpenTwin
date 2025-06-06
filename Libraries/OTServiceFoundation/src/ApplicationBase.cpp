@@ -324,7 +324,7 @@ bool ot::ApplicationBase::EnsureDataBaseConnection(void)
 {
 	DataBase::GetDataBase()->setProjectName(m_collectionName);
 
-	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL, m_siteID);;
+	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL);;
 }
 
 bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
@@ -350,7 +350,7 @@ bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config,
 	try
 	{
 		// Ensure that we are connected to the database server
-		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _siteID, _userName, _userPassword);
+		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _userName, _userPassword);
 
 		// First, open a connection to the user's settings collection
 		DataStorageAPI::DocumentAccess docManager("UserSettings", _userCollection);
@@ -431,7 +431,7 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 	try
 	{
 		// Ensure that we are connected to the database server
-		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _siteID, _userName, _userPassword);
+		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _userName, _userPassword);
 
 		// First, open a connection to the user's settings collection
 		DataStorageAPI::DocumentAccess docManager("UserSettings", _userCollection);
