@@ -296,7 +296,16 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 	}	
 	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
 	{
-		m_selectedEntities = json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+		auto selectedEntityInfos =	json::getObjectList(_doc, OT_ACTION_PARAM_MODEL_EntityInfo);
+		m_selectedEntityInfos.clear();
+		m_selectedEntities.clear();
+		for (auto& selectedEntityInfo : selectedEntityInfos)
+		{
+			ot::EntityInformation entityInfo;
+			entityInfo.setFromJsonObject(selectedEntityInfo);
+			m_selectedEntityInfos.push_back(entityInfo);
+			m_selectedEntities.push_back(entityInfo.getEntityID());
+		}
 
 		for (auto command : m_modalCommands)
 		{

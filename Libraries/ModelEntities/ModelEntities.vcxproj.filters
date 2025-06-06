@@ -412,6 +412,9 @@
     <ClInclude Include="include\EntityBatchImporter.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\InvalidUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">

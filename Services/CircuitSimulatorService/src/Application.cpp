@@ -193,18 +193,14 @@ void Application::createInitialCircuit() {
 	
 }
 
-std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
-	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	modelSelectionChangedNotification();
-	return std::string();
-}
 
-void Application::modelSelectionChangedNotification(void) {
+
+void Application::modelSelectionChanged() {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (selectedEntities.size() > 0) {
+		if (m_selectedEntities.size() > 0) {
 			enabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 		else {
@@ -279,20 +275,15 @@ void Application::runCircuitSimulation() {
 		return;
 	}
 
-	if (selectedEntities.empty()) {
+	if (m_selectedEntities.empty()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
-	//First we get a list of all selected Entities
-	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
-
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
-	for (auto entity : selectedEntityInfo) {
+	for (auto& entity : m_selectedEntityInfos) {
 		if (entity.getEntityType() == "EntitySolverCircuitSimulator" || entity.getEntityType() == "EntitySolver") {
 			if (entity.getEntityName().substr(0, 8) == "Solvers/") {
 				size_t index = entity.getEntityName().find('/', 8);

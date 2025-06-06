@@ -111,11 +111,10 @@ public:
 	// ##################################################################################################################################
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleExecuteFunction, Application, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES);
 
 	// Add your custom functions/ members here
-	void modelSelectionChangedNotification(void);
+	virtual void modelSelectionChanged() override;
 
 	void createMesh(void);
 	void updateMesh(void);
@@ -132,7 +131,6 @@ public:
 	ot::UID getCurrentlySelectedMeshDataID(void);
 
 private:
-	std::list<ot::UID>	selectedEntities;
 	ot::UID				visualizationModelID;
 
 	static std::string materialsFolder;

@@ -519,6 +519,7 @@
 #define OT_ACTION_PARAM_MODEL_EntityVersionList "Model.Entities.VersionList"
 #define OT_ACTION_PARAM_MODEL_BrepVersionList "Model.Brep.VersionList"
 #define OT_ACTION_PARAM_MODEL_EntityInfoID "Model.EntityInfo.ID"
+#define OT_ACTION_PARAM_MODEL_EntityInfo "Model.EntityInfo"
 #define OT_ACTION_PARAM_MODEL_EntityInfoVersion "Model.EntityInfo.Version"
 #define OT_ACTION_PARAM_MODEL_EntityParentList "Model.Entities.ParentList"
 #define OT_ACTION_PARAM_MODEL_EntityTypeList "Model.Entities.TypeList"

@@ -107,9 +107,8 @@ public:
 
 	// Handler
 	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
 
-	void modelSelectionChangedNotification(void);
+	virtual void modelSelectionChanged() override;
 
 	void addSolver(void);
 	void runSolver(void);
@@ -121,6 +120,5 @@ public:
 
 private:
 	SubprocessManager*		m_subprocessManager;
-	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 };

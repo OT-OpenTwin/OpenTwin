@@ -84,13 +84,13 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 	return ""; // Return empty string if the request does not expect a return
 }
 
-void Application::modelSelectionChangedNotification(void)
+void Application::modelSelectionChanged()
 {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (selectedEntities.size() > 0)
+		if (m_selectedEntities.size() > 0)
 		{
 			enabled.push_back("Mesh:Tet Mesh:Update Tet Mesh");
 			enabled.push_back("Mesh:Import / Export:Export Tet Mesh");
@@ -122,7 +122,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Mesh", "Import / Export", "Import Tet Mesh", "Import Tet Mesh", modelWrite, "Import", "Default");
 	_ui->addMenuButton("Mesh", "Import / Export", "Export Tet Mesh", "Export Tet Mesh", modelWrite, "ProjectSaveAs", "Default");
 
-	modelSelectionChangedNotification();
+	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -217,11 +217,6 @@ std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
-	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	modelSelectionChangedNotification();
-	return std::string();
-}
 
 void Application::createMesh(void)
 {
@@ -296,7 +291,7 @@ void Application::updateMesh(void)
 		return;
 	}
 
-	if (selectedEntities.empty())
+	if (m_selectedEntities.empty())
 	{
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
@@ -306,7 +301,7 @@ void Application::updateMesh(void)
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
 	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
+	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> mesherRunMap;
@@ -487,17 +482,14 @@ void Application::exportMeshFile(const std::string &fileName)
 
 std::string Application::getCurrentlySelectedMeshName(void)
 {
-	if (selectedEntities.empty()) return "";
+	if (m_selectedEntities.empty()) return "";
 
 	// We first get a list of all selected entities
-	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	std::string selectedMeshItem;
 
 	std::map<std::string, bool> mesherRunMap;
-	for (auto entity : selectedEntityInfo)
+	for (auto& entity : m_selectedEntityInfos)
 	{
 		if (entity.getEntityType() == "EntityMeshTet")
 		{

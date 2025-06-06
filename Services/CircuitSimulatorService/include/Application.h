@@ -44,7 +44,7 @@ private:
 	virtual ~Application();
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
-	std::list<ot::UID>	selectedEntities;
+
 	std::string m_serverName;
 	bool m_SimulationRunning;
 	std::mutex m_mutex;
@@ -70,13 +70,12 @@ public:
 	OT_HANDLER(handleRemoveGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleItemChanged, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleConnectionToConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, ot::SECURE_MESSAGE_TYPES);
 	void createNewCircuit();
 	void createInitialCircuit();
 
-	void modelSelectionChangedNotification(void);
+	virtual void modelSelectionChanged() override;
 
 	void addSolver();
 	void runCircuitSimulation();
