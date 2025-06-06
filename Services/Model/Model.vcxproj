@@ -333,6 +333,7 @@
     </ClCompile>
     <ClCompile Include="src\ActionAndFunctionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\CircuitModelHandler.cpp" />
     <ClCompile Include="src\CopyPasteHandler.cpp" />
     <ClCompile Include="src\CheckGeometry.cpp" />
     <ClCompile Include="src\ClassFactoryModel.cpp" />
@@ -340,6 +341,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\GeometryOperations.cpp" />
+    <ClCompile Include="src\LibraryManagementWrapper.cpp" />
     <ClCompile Include="src\MaterialHandler.cpp" />
     <ClCompile Include="src\MicroserviceAPI.cpp" />
     <ClCompile Include="src\MicroserviceNotifier.cpp" />
@@ -364,12 +366,14 @@
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ActionAndFunctionHandler.h" />
+    <ClInclude Include="include\CircuitModelHandler.h" />
     <ClInclude Include="include\CopyPasteHandler.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />
     <ClInclude Include="include\FileHandler.h" />
     <ClInclude Include="include\GeometryOperations.h" />
+    <ClInclude Include="include\LibraryManagementWrapper.h" />
     <ClInclude Include="include\MaterialHandler.h" />
     <ClInclude Include="include\MicroserviceAPI.h" />
     <ClInclude Include="include\Model.h" />

@@ -25,7 +25,7 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Public functions
-	int initialize(const char* _ownURL, const char* _globalSessionServiceURL, const char* _databasePWD);
+	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL, const char* _databasePWD);
 	
 
 	

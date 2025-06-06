@@ -108,6 +108,12 @@
     <ClCompile Include="src\MaterialHandler.cpp">
       <Filter>Source Files\Handler</Filter>
     </ClCompile>
+    <ClCompile Include="src\CircuitModelHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibraryManagementWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -187,6 +193,12 @@
     </ClInclude>
     <ClInclude Include="include\MaterialHandler.h">
       <Filter>Header Files\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitModelHandler.h">
+      <Filter>Header Files\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LibraryManagementWrapper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

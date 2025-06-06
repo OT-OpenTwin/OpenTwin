@@ -994,6 +994,7 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 
 	return ot::ReturnMessage().toJson();
 }
+
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -1181,6 +1182,9 @@ void Application::addButtons()
 
 	m_materialHandler.addButtons(uiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_materialHandler);
+
+	m_circuitModelHandler.addButtons(uiComponent(), pageName);
+
 }
 
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
@@ -1304,6 +1308,10 @@ Application::Application()
 
 	m_plotHandler.setDontDeleteHandler();
 	m_materialHandler.setNextHandler(&m_plotHandler);
+
+	m_circuitModelHandler.setDontDeleteHandler();
+	m_plotHandler.setNextHandler(&m_circuitModelHandler);
+	
 }
 
 Application::~Application() {

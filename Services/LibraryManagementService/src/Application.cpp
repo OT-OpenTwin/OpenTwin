@@ -27,10 +27,11 @@ Application& Application::instance(void) {
 
 // Public functions
 
-int Application::initialize(const char* _ownURL, const char* _globalSessionServiceURL, const char * _databasePWD) {
+int Application::initialize(const char* _siteID,const char* _ownURL, const char* _globalSessionServiceURL, const char * _databasePWD) {
 	try {
 		OT_LOG_I("Library Management Service initialization");
-
+		setSiteId(_siteID);
+		setServiceURL(_ownURL);
 		// Now store the command line arguments and perform the initialization
 		if (_ownURL == nullptr) {
 			exit(ot::AppExitCode::ServiceUrlInvalid);
@@ -84,13 +85,15 @@ int Application::initialize(const char* _ownURL, const char* _globalSessionServi
 
 		std::string dbUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_DBURL);
 		std::string authUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_AUTHURL);
+
+		
+
 				
-		// Now we need password and we get it from authorisation Service
-		//Authorisation has no password so I will to it currently like in authorisation service by command argument 
+
 
 
 		// Initialzation of MongoDB connection
-		db = new MongoWrapper(dbUrl, _databasePWD);
+		db = new MongoWrapper(_siteID);
 
 
 
@@ -139,8 +142,11 @@ std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
 	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
 	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db->getDocumentList(collectionName, fieldType, value);
+	auto result = db->getDocumentList(collectionName, fieldType, value, dbUserName, dbUserPassword, dbServerUrl);
 	if (!result.empty()) {
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}

@@ -585,7 +585,7 @@
 #define OT_ACTION_PARAM_MODEL_VersionLabel "Model.VersionLabel"
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
 #define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
-
+#define OT_ACTION_PARAM_MODEL_AddCircuitModelToProject "Model.AddCircuitModelToProject"
 
 #define OT_ACTION_PARAM_MESH_CartesianCoordX "Mesh.Cartesian.X"
 #define OT_ACTION_PARAM_MESH_CartesianCoordY "Mesh.Cartesian.Y"
@@ -669,6 +669,7 @@
 
 #define OT_ACTION_VALUE_FILE_Mode_Name "File.Mode:Name"
 #define OT_ACTION_VALUE_FILE_Mode_Content "File.Mode:Content"
+
 
 #define OT_ACTION_VALUE_UI_ObjectType_ToolButton "UI.ObjectType.Type.ToolButton"
 #define OT_ACTION_VALUE_UI_ObjectType_SubGroup "UI.ObjectType.Type.SubGroup"
