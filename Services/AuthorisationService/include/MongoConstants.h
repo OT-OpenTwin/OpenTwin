@@ -30,6 +30,9 @@ namespace MongoConstants
 	std::string const PROJECT_CATALOG_ROLE = "project_catalog_collection_role";
 	std::string const PROJECT_DB_LIST_COLLECTIONS_ROLE = "project_db_list_collections_role";
 
+	//std::string const LIBRARIES_DB = "Libraries";
+	
+
 	std::string const GROUPS_COLLECTION = "Groups";
 	std::string const GROUP_ROLE = "groups_collection_role";
 
