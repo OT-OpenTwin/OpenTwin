@@ -17,7 +17,7 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
     
    
     DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
-    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl, m_siteID);
+    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
 
     
     
