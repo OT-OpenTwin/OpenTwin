@@ -7,9 +7,46 @@ MongoWrapper::MongoWrapper(std::string _siteID) {
     this->m_siteID = _siteID;
 }
 
-std::optional<bsoncxx::document::value> MongoWrapper::getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value) {
-    std::optional<bsoncxx::document::value> test;
-    return test;
+std::string MongoWrapper::getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+    
+    DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
+    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+        DataStorageAPI::QueryBuilder queryBuilder;
+
+        std::vector<std::string> columnNames;
+        columnNames.push_back("Content");
+        columnNames.push_back("ModelType");
+
+        auto query = bsoncxx::builder::basic::document{};
+        auto queryArray = bsoncxx::builder::basic::array();
+
+        auto builder = bsoncxx::builder::basic::document{};
+        builder.append(bsoncxx::builder::basic::kvp(_fieldType, _value));
+        queryArray.append(builder);
+
+        auto queryBuilderDoc = bsoncxx::builder::basic::document{};
+        queryBuilderDoc.append(kvp("$or", queryArray));
+
+        BsonViewOrValue filterQuery = queryBuilderDoc.extract();
+        auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
+
+        auto result = docBase.GetDocument(std::move(filterQuery), std::move(projectionQuery));
+
+        std::string responseData = bsoncxx::to_json(result->view());
+
+        if (responseData.empty()) {
+            OT_LOG_E("Document does not exist!");
+            return "";
+        }
+        return responseData;
+    }
+    catch (std::exception) {
+        OT_LOG_E("Getting document went wrong");
+        return "";
+    }
 }
 
 std::string MongoWrapper::getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
@@ -62,7 +99,8 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
         return responseData;
     }
     catch (std::exception) {
-        OT_LOG_E("Something went wrong!");
+        OT_LOG_E("Getting Document List went wrong");
+        return "";
     }
     
     

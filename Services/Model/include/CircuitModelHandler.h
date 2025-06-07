@@ -30,8 +30,14 @@ protected:
 
 private:
 
-	void createModelDialog();
+	ot::UIDList m_entityIDsTopo;
+	ot::UIDList m_entityVersionsTopo;
+	ot::UIDList m_entityIDsData {};
+	ot::UIDList m_entityVersionsData {};
+	std::list<bool> m_forceVisible;
 
+	void createModelDialog();
+	void createModelTextEntity(std::string _modelName);
 	ot::MenuButtonDescription m_buttonAddCircuitModel;
 	LibraryManagementWrapper m_libraryMangementWrapper;
 

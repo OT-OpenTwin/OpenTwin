@@ -11,7 +11,11 @@
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTCore/ReturnMessage.h"
-
+#include "EntityFileText.h"
+#include "OTCore/FolderNames.h"
+#include "OTCore/EncodingGuesser.h"
+#include "EntityResultTextData.h"
+#include "EntityBinaryData.h"
 
 #include <assert.h>
 
@@ -31,12 +35,10 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 	//}
 	//else if (_action == OT_ACTION_PARAM_MODEL_AddCircuitModelToProject) {
 	//	std::string model = ot::json::getString(_doc, OT_ACTION_PARAM_Value);
-
-	//	// Get modelString from LMS 
-
-
-	//	// Add Model as FileEntity
-	//
+	//	
+	//	createModelTextEntity(model);
+	//	Model* modelComp = Application::instance()->getModel();
+	//	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
 
 
 	//	actionIsHandled = true;
@@ -86,4 +88,62 @@ void CircuitModelHandler::createModelDialog() {
 	//Send
 	std::string response;
 	Application::instance()->uiComponent()->sendMessage(true, doc, response);
+}
+
+void CircuitModelHandler::createModelTextEntity(std::string _modelName) {
+	std::string modelInfo = m_libraryMangementWrapper.getCircuitModel(_modelName);
+
+	ot::JsonDocument circuitModelDoc;
+	circuitModelDoc.fromJson(modelInfo);
+
+	std::string modelText = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_Content);
+	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
+
+	// Create entity Id's
+
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	ot::UID entIDData = model->createEntityUID();
+	ot::UID entIDTopo = model->createEntityUID();
+
+	// Create EntityFile Text
+	std::unique_ptr<EntityFileText> circuitModel;
+	circuitModel.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+
+	//Create the data entity
+	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	fileContent.setData(modelText.data(),modelText.size());
+	fileContent.StoreToDataBase();
+
+	//ot::EncodingGuesser guesser;
+
+	// set the data entity 
+	circuitModel->setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
+	circuitModel->setFileProperties("", "", "");
+	
+	circuitModel->setTextEncoding(ot::TextEncoding::UTF8);
+
+	EntityPropertiesString* nameProp = EntityPropertiesString::createProperty("Model", "Name", _modelName, "Default", circuitModel->getProperties());
+	nameProp->setReadOnly(true);
+
+	EntityPropertiesString* modelTypeProp = EntityPropertiesString::createProperty("Model", "ModelType", modelType, "Default", circuitModel->getProperties());
+	modelTypeProp->setReadOnly(true);
+
+	circuitModel->getProperties().getProperty("Path", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("Filename", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("FileType", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
+	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
+
+	std::list<std::string> folderEntities = model->getListOfFolderItems(ot::FolderNames::CircuitModelsFolder, true);
+	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, ot::FolderNames::CircuitModelsFolder, _modelName);
+	circuitModel->setName(entityName);
+
+	circuitModel->StoreToDataBase();
+	m_entityIDsTopo.push_back(entIDTopo);
+	m_entityVersionsTopo.push_back(circuitModel->getEntityStorageVersion());
+	m_entityIDsData.push_back(entIDData);
+	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
+	m_forceVisible.push_back(false);
 }

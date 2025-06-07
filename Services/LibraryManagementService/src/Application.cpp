@@ -124,10 +124,13 @@ std::string Application::handleGetDocument(ot::JsonDocument& _document) {
 	std::string collectionName= ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	std::string fieldType = ot::json::getString(_document, OT_ACTION_PARAM_Type);
 	std::string value = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db->getDocument(collectionName, fieldType, value);
-	if (result) {	
-		return ot::ReturnMessage(ot::ReturnMessage::Ok, bsoncxx::to_json(*result)).toJson();
+	auto result = db->getDocument(collectionName, fieldType, value,dbUserName,dbUserPassword,dbServerUrl);
+	if (!result.empty()) {	
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
 	else {
 		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();

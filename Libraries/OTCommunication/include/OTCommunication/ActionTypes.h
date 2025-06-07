@@ -332,10 +332,12 @@
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Visible "Visible"
+#define OT_ACTION_PARAM_Content "Content"
 #define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
+#define OT_ACTION_PARAM_ModelType "ModelType"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
@@ -343,6 +345,7 @@
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
+
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

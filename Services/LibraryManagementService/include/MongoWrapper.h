@@ -46,7 +46,7 @@ public:
 	MongoWrapper(std::string _siteID);
 	~MongoWrapper() = default;
 
-	std::optional<bsoncxx::document::value> getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value);
+	std::string getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 private:
