@@ -215,11 +215,27 @@
 //! @param ___text The log message.
 #define OT_LOG_T(___text) OT_LOG(___text, ot::TEST_LOG)
 
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_TA(___text) OTAssert(0, ___text); OT_LOG(___text, ot::TEST_LOG)
+
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_TAS(___text) OTAssert(0, ""); OT_LOG(___text, ot::TEST_LOG)
+
 #else // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
 
 //! @brief Log a test message according to the service logger configuration.
 //! @param ___text The log message.
 #define OT_LOG_T(___text)
+
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_TA(___text)
+
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_TAS(___text)
 
 #endif // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
 
