@@ -64,10 +64,15 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	blockCoordinates->StoreToDataBase();
 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
+	
+	// Get the CircuitModel folder infos
+	std::string circuitModelFolderName = "CircuitModels";
+	ot::EntityInformation entityInfo;
+	ot::ModelServiceAPI::getEntityInformation(circuitModelFolderName, entityInfo);
 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
-	
-	std::string elementName = InitSpecialisedCircuitElementEntity(blockEntity);
+
+	std::string elementName = InitSpecialisedCircuitElementEntity(circuitModelFolderName, entityInfo.getEntityID(), blockEntity);
 	if (elementName != "") {
 	//Create block Titles
 	//First get a list of all folder items of the Circuit folder
@@ -400,55 +405,16 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 	}
 }
 
-std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
-	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
-	if (CircuitElement != nullptr) {
-		CircuitElement->createProperties();
-		return "V";
+std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID, std::shared_ptr<EntityBlock> blockEntity) {
+	EntityBlockCircuitElement* element = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+	if (element != nullptr) {
+		element->createProperties(_circuitModelFolderID);
+		return element->getTypeAbbreviation();
 	}
-
-	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-	if (resistor != nullptr) {
-		resistor->createProperties();
-		return "R";
-	}
-
-	EntityBlockCircuitDiode* diode = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
-	if (diode != nullptr) {
-		diode->createProperties();
-		return "D";
-	}
-
-	EntityBlockCircuitCapacitor* capacitor = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
-	if (capacitor != nullptr) {
-		capacitor->createProperties();
-		return "C";
-	}
-
-	EntityBlockCircuitInductor* inductor = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
-	if (inductor != nullptr) {
-		inductor->createProperties();
-		return "L";
+	else if(blockEntity->getClassName() != "EntityBlockCircuitGND" && blockEntity->getClassName() != "EntityBlockCircuitConnector") {
+		OT_LOG_E("EntityBlockCircuitElement is null");
 	}
 	
-	EntityBlockCircuitVoltageMeter* voltMeter = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
-	if (voltMeter != nullptr) {
-		return "VM";
-	}
-
-	EntityBlockCircuitCurrentMeter* currentMeter = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
-	if (currentMeter != nullptr) {
-		return "CM";
-	}
-
-	EntityBlockCircuitTransmissionLine* transmissionLine = dynamic_cast<EntityBlockCircuitTransmissionLine*>(blockEntity.get());
-	if (transmissionLine != nullptr) {
-		transmissionLine->createProperties();
-		return "T";
-	}
-
-
-
 	return "";
 }
 

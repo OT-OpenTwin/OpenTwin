@@ -8,6 +8,8 @@
 #include "OTCore/CoreTypes.h"
 #include "SelectionChangedObserver.h"
 
+#include "EntityInformation.h"
+
 class SelectionHandler
 {
 public:
@@ -36,7 +38,7 @@ private:
 	std::atomic_bool m_modelSelectionChangedNotificationInProgress = false;
 	std::mutex m_changeSelectedEntitiesBuffer;
 
-	std::map<std::string,ot::UIDList> m_ownersWithSelection;
+	std::map<std::string,std::list<ot::EntityInformation>> m_ownersWithSelection;
 	std::list<ot::UID> m_selectedEntityIDs;
 	std::list<ot::UID> m_selectedVisibleEntityIDs;
 
@@ -44,7 +46,7 @@ private:
 	
 	void notifyObservers(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons);
 	void notifyOwners();
-	void notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap);
+	void notifyOwnerThread(const std::map<std::string, std::list<ot::EntityInformation>>& _ownerEntityListMap);
 
 	void setSelectedEntityIDs(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs);
 };

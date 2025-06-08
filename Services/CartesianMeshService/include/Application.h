@@ -108,14 +108,13 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
 	
+
+	virtual void modelSelectionChanged() override;
 	// ##################################################################################################################################
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
 
 	// Add your custom functions/ members here
-	void modelSelectionChangedNotification(void);
-
 	void createMesh(void);
 	void updateMesh(void);
 
@@ -123,7 +122,6 @@ public:
 	void runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity);
 
 private:
-	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 
 	static std::string materialsFolder;

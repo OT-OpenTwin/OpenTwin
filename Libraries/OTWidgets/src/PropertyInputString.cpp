@@ -16,6 +16,7 @@ ot::PropertyInputString::PropertyInputString(const QString& _text) :
 	m_text(_text)
 {
 	m_lineEdit = new LineEdit;
+	m_lineEdit->setFocusPolicy(Qt::ClickFocus);
 	this->connect(m_lineEdit, &QLineEdit::editingFinished, this, &PropertyInputString::lclValueChanged);
 }
 

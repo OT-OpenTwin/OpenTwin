@@ -263,6 +263,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		}
 
 		if (_flags & msg::ExitOnFail) {
+			assert(false);
 			exit(1);
 		}
 

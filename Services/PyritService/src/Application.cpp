@@ -121,7 +121,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 	//	_ui->addMenuButton("Pyrit", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
 
-	modelSelectionChangedNotification();
+	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -191,19 +191,13 @@ std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
-	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	modelSelectionChangedNotification();
-	return std::string();
-}
-
-void Application::modelSelectionChangedNotification(void)
+void Application::modelSelectionChanged()
 {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (selectedEntities.size() > 0)
+		if (m_selectedEntities.size() > 0)
 		{
 			enabled.push_back("Pyrit:Solver:Run Solver");
 		}
@@ -288,21 +282,17 @@ void Application::runSolver(void)
 		return;
 	}
 
-	if (selectedEntities.empty())
+	if (m_selectedEntities.empty())
 	{
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
-	// We first get a list of all selected entities
-	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
-	for (auto entity : selectedEntityInfo)
+	for (auto& entity : m_selectedEntityInfos)
 	{
 		if (entity.getEntityType() == "EntitySolverPyrit")
 		{

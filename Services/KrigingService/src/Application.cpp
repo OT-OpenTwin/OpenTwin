@@ -79,11 +79,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 
 		}
 	}
-	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
-	{
-		selectedEntities = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-		modelSelectionChangedNotification();
-	}
 	else {
 		return OT_ACTION_RETURN_UnknownAction;
 	}
@@ -120,7 +115,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Post Processing", "Kriging", "Predict", "Predict", modelWrite, "Kriging", "Default");
 	_ui->addMenuButton("Post Processing", "Kriging", "Save", "Save", modelWrite, "Kriging", "Default");
 
-	modelSelectionChangedNotification();
+	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -166,7 +161,7 @@ bool Application::startAsRelayService(void) const
 
 // ##################################################################################################################################
 
-void Application::modelSelectionChangedNotification(void)
+void Application::modelSelectionChanged(void)
 {
 	OT_LOG_D("Called..."); // todo: remove debug code
 

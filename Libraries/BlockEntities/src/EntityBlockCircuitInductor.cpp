@@ -25,8 +25,9 @@ EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* p
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitInductor::createProperties()
+void EntityBlockCircuitInductor::createProperties(const ot::UID& _circuitModelFolderID)
 {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 	EntityPropertiesString::createProperty("Element Property", "Inductance", "100mH", "default", getProperties());
 }
 
@@ -66,6 +67,10 @@ std::string EntityBlockCircuitInductor::getElementType()
 	assert(elementType != nullptr);
 
 	return elementType->getValue();
+}
+
+std::string EntityBlockCircuitInductor::getTypeAbbreviation() {
+	return "L";
 }
 
 #define TEST_ITEM_LOADER true

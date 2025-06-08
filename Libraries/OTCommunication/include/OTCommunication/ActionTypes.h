@@ -334,11 +334,13 @@
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Visible "Visible"
+#define OT_ACTION_PARAM_Content "Content"
 #define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_Requested "Requested"
+#define OT_ACTION_PARAM_ModelType "ModelType"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
@@ -348,6 +350,7 @@
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
+
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"
@@ -526,6 +529,7 @@
 #define OT_ACTION_PARAM_MODEL_EntityVersionList "Model.Entities.VersionList"
 #define OT_ACTION_PARAM_MODEL_BrepVersionList "Model.Brep.VersionList"
 #define OT_ACTION_PARAM_MODEL_EntityInfoID "Model.EntityInfo.ID"
+#define OT_ACTION_PARAM_MODEL_EntityInfo "Model.EntityInfo"
 #define OT_ACTION_PARAM_MODEL_EntityInfoVersion "Model.EntityInfo.Version"
 #define OT_ACTION_PARAM_MODEL_EntityParentList "Model.Entities.ParentList"
 #define OT_ACTION_PARAM_MODEL_EntityTypeList "Model.Entities.TypeList"
@@ -592,7 +596,7 @@
 #define OT_ACTION_PARAM_MODEL_VersionLabel "Model.VersionLabel"
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
 #define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
-
+#define OT_ACTION_PARAM_MODEL_AddCircuitModelToProject "Model.AddCircuitModelToProject"
 
 #define OT_ACTION_PARAM_MESH_CartesianCoordX "Mesh.Cartesian.X"
 #define OT_ACTION_PARAM_MESH_CartesianCoordY "Mesh.Cartesian.Y"
@@ -674,6 +678,7 @@
 
 #define OT_ACTION_VALUE_FILE_Mode_Name "File.Mode:Name"
 #define OT_ACTION_VALUE_FILE_Mode_Content "File.Mode:Content"
+
 
 #define OT_ACTION_VALUE_UI_ObjectType_ToolButton "UI.ObjectType.Type.ToolButton"
 #define OT_ACTION_VALUE_UI_ObjectType_SubGroup "UI.ObjectType.Type.SubGroup"

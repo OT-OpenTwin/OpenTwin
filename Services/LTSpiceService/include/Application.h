@@ -122,9 +122,8 @@ public:
 	// ##################################################################################################################################
 
 	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleModelSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES);
-
-	void modelSelectionChangedNotification(void);
+	
+	virtual void modelSelectionChanged() override;
 
 	void importProject(void);
 	void setLTSpiceFile(void);
@@ -163,7 +162,6 @@ private:
 	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
 	
-	std::list<ot::UID>		selectedEntities;
 	ot::UID					visualizationModelID;
 
 	std::map<std::string, std::tuple<double, double, double>> materialColors;

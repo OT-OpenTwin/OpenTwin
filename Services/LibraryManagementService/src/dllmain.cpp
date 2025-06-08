@@ -78,7 +78,7 @@ extern "C" {
 #else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LibraryManagementService, loggerServiceURL, false);
 #endif
-		Application::instance().initialize(_ownURL, _globalSessionServiceURL, _databasePWD);
+		Application::instance().initialize("1", _ownURL, _globalSessionServiceURL, _databasePWD);
 		return 0;
 
 	};

@@ -98,7 +98,8 @@ void SelectionHandler::notifyObservers(std::list<EntityBase*>& _selectedEntities
 
 void SelectionHandler::notifyOwners()
 {
-	std::map<std::string, std::list<ot::UID>> ownerEntityListMap;
+	std::map<std::string, std::list<ot::EntityInformation>> ownerEntityListMap;
+	ot::EntityInformation entityInfos;
 
 	// All owners which were involved in the previous selection will receive a notification. 
 	// Portentially, they receive an empty ID list, which says that their prior selected entity is now deselected.
@@ -112,10 +113,11 @@ void SelectionHandler::notifyOwners()
 	Model* model = Application::instance()->getModel();
 	for (auto entityID : m_selectedEntityIDs)
 	{
-		const std::string ownerName = model->getEntityByID(entityID)->getOwningService();
+		EntityBase* entity = model->getEntityByID(entityID);
+		const std::string ownerName = entity->getOwningService();
 		if (ownerName != modelServiceName)
 		{
-			ownerEntityListMap[ownerName].push_back(entityID);
+			ownerEntityListMap[ownerName].push_back(ot::EntityInformation(entity));
 		}
 	}
 
@@ -138,13 +140,23 @@ void SelectionHandler::notifyOwners()
 	}
 }
 
-void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap)
+void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<ot::EntityInformation>>& _ownerEntityListMap)
 {
 	for (auto owner : _ownerEntityListMap)
 	{
 		ot::JsonDocument notify;
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(owner.second, notify.GetAllocator()), notify.GetAllocator());
+		
+		ot::UIDList entityIDs;
+		ot::JsonArray entityInfos;
+		for (ot::EntityInformation& entityInfo : owner.second)
+		{
+			ot::JsonObject entry;
+			entityInfo.addToJsonObject(entry, notify.GetAllocator());
+			entityInfos.PushBack(entry,notify.GetAllocator());
+			entityIDs.push_back(entityInfo.getEntityID());
+		}
+		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, entityInfos, notify.GetAllocator());
 
 		Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
 	}

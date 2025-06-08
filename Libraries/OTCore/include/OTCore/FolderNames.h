@@ -12,6 +12,7 @@ namespace ot
 		const std::string ResultFolder = "Results";
 		const std::string DataCategorisationFolder = "Data Categorization";
 		const std::string CircuitsFolder = "Circuits";
+		const std::string CircuitModelsFolder = "CircuitModels";
 
 	}
 }

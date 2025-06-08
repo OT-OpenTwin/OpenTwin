@@ -4,8 +4,7 @@
 
 UnittestDocumentAccessBase::UnittestDocumentAccessBase(const std::string& collectionName)
 {
-	DataStorageAPI::ConnectionAPI::getInstance().setMongoInstance(1, &std::cout);
-	DataStorageAPI::ConnectionAPI::getInstance().configurePool(_serverURL, false);
+	DataStorageAPI::ConnectionAPI::getInstance().setMongoInstance( &std::cout);
 
 	// Now test, whetehr the connection is working
 	mongoCollection =	DataStorageAPI::ConnectionAPI::getInstance().getCollection(_dbName, collectionName);

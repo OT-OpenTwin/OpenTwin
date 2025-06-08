@@ -25,8 +25,9 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitCapacitor::createProperties()
+void EntityBlockCircuitCapacitor::createProperties(const ot::UID& _circuitModelFolderID)
 {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
 }
 
@@ -65,6 +66,10 @@ std::string EntityBlockCircuitCapacitor::getElementType()
 	assert(elementType != nullptr);
 
 	return elementType->getValue();
+}
+
+std::string EntityBlockCircuitCapacitor::getTypeAbbreviation() {
+	return "C";
 }
 
 #define TEST_ITEM_LOADER true

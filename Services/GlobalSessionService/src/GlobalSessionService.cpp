@@ -719,7 +719,7 @@ LocalSessionService* GlobalSessionService::determineLeastLoadedLSS(void) {
 
 void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultArray, const std::string& _user, const std::string& _password) {
 	try {
-		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseUrl, "1", _user, _password);
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseUrl, _user, _password);
 
 		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
 		if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Projects", "Catalog")) {

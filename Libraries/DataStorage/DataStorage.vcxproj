@@ -337,6 +337,7 @@
     <ClInclude Include="include\System\SystemDataAccess.h" />
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Helper\UniqueFileName.h" />
+    <ClInclude Include="include\ThreadLocalClientInitialiser.h" />
     <ClInclude Include="include\UniqueUIDGenerator.h" />
     <ClInclude Include="include\Unittest\UnittestDocumentAccess.h" />
     <ClInclude Include="include\Unittest\UnittestDocumentAccessBase.h" />
@@ -369,6 +370,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\SystemDataAccess.cpp" />
+    <ClCompile Include="src\ThreadLocalClientInitialiser.cpp" />
     <ClCompile Include="src\UniqueFileName.cpp" />
     <ClCompile Include="src\UniqueUIDGenerator.cpp" />
     <ClCompile Include="src\UnittestDocumentAccess.cpp" />

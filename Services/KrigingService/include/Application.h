@@ -106,7 +106,7 @@ public:
 
 	// Add your custom functions/ members here
 
-	void modelSelectionChangedNotification(void);
+	virtual void modelSelectionChanged() override;
 
 	void loadDataset(void);
 	void train(void);

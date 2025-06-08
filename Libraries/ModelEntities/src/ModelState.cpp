@@ -11,6 +11,7 @@
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccessBase.h"
 #include "Helper\QueryBuilder.h"
+#include "InvalidUID.h"
 
 #include <fstream>
 
@@ -374,10 +375,10 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 
 ModelStateEntity::EntityVersion ModelState::getCurrentEntityVersion(ModelStateEntity::EntityID entityID)
 {
-	// If the entity is not part of the current state, return -1
+	// If the entity is not part of the current state, return invalid UID
 	if (m_entities.count(entityID) == 0)
 	{
-		return -1;
+		return ot::getInvalidUID();
 	}
 
 	// Ensure that the entity exists

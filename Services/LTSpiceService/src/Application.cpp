@@ -141,7 +141,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
 
-	modelSelectionChangedNotification();
+	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -198,13 +198,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	return std::string();
 }
 
-std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
-	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	modelSelectionChangedNotification();
-	return std::string();
-}
-
-void Application::modelSelectionChangedNotification(void)
+void Application::modelSelectionChanged()
 {
 	//if (isUiConnected()) {
 	//	std::list<std::string> enabled;

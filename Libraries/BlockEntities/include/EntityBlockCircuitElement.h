@@ -6,8 +6,8 @@ public:
 	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitElement"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual void createProperties() = 0;
-	
+	virtual void createProperties(const ot::UID& _circuitModelFolderID);
+	virtual std::string getTypeAbbreviation() = 0;
 	
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 

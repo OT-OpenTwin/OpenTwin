@@ -312,7 +312,7 @@ namespace ot {
 		std::list<ot::ModalCommandBase *>				m_modalCommands;
 
 		std::list<UID>									m_selectedEntities;
-
+		std::list<ot::EntityInformation>				m_selectedEntityInfos;
 		std::map<UID, UID>								m_prefetchedEntityVersions;
 
 		void __serviceConnected(const std::string& _name, const std::string& _type, const std::string& _url, serviceID_t _id);

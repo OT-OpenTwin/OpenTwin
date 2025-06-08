@@ -25,9 +25,9 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitDiode::createProperties()
+void EntityBlockCircuitDiode::createProperties(const ot::UID& _circuitModelFolderID)
 {
-	EntityPropertiesString::createProperty("Element Property", "Model", "D1N4148", "default", getProperties());
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 }
 
 const double EntityBlockCircuitDiode::getRotation() {
@@ -66,6 +66,10 @@ std::string EntityBlockCircuitDiode::getElementType()
 	assert(elementType != nullptr);
 
 	return elementType->getValue();
+}
+
+std::string EntityBlockCircuitDiode::getTypeAbbreviation() {
+	return "D";
 }
 
 #define TEST_ITEM_LOADER true

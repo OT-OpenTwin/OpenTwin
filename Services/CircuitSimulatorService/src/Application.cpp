@@ -55,7 +55,6 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_Block3 "Diode"
 #define EXAMPLE_NAME_BLOCK4 "Transistor"
 #define EXAMPLE_NAME_BLOCK5 "Connector"
-#define LMS_TESTING 1
 
 #undef GetObject
 
@@ -194,18 +193,14 @@ void Application::createInitialCircuit() {
 	
 }
 
-std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document) {
-	selectedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	modelSelectionChangedNotification();
-	return std::string();
-}
 
-void Application::modelSelectionChangedNotification(void) {
+
+void Application::modelSelectionChanged() {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (selectedEntities.size() > 0) {
+		if (m_selectedEntities.size() > 0) {
 			enabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 		else {
@@ -270,107 +265,6 @@ void Application::addSolver()
 }
 
 void Application::runCircuitSimulation() {
-
-#if LMS_TESTING
-
-	//Testing section for LMS
-
-	std::string lmsRespose;
-	
-	ot::JsonDocument lmsDoc;
-	lmsDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_GetDocument, lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-	lmsDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-	lmsDoc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Name", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-	lmsDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString("mbraf2h100t3g", lmsDoc.GetAllocator()), lmsDoc.GetAllocator());
-
-	// In case of error:
-		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
-		// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
-	const int maxCt = 30;
-	int ct = 1;
-	bool ok = false;
-
-	do {
-		lmsRespose.clear();
-		if (!(ok = ot::msg::send(this->getServiceURL(), "127.0.0.1:8002", ot::EXECUTE, lmsDoc.toJson(), lmsRespose, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-			OT_LOG_E("Getting Document from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(500ms);
-
-		}
-	} while (!ok && ct++ <= maxCt);
-
-	if (!ok) {
-		OT_LOG_E("Failed to get Document");
-	}
-
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(lmsRespose);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Get Document failed: " + rMsg.getWhat());
-		
-	}
-
-	ot::JsonDocument model;
-	model.fromJson(rMsg.getWhat());
-	std::string modelDescription = ot::json::getString(model, "content");
-
-	OT_LOG_T(modelDescription);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	OT_LOG_T("Now all Documents with specified type");
-
-	// Get Models by type
-	lmsRespose.clear();
-	ot::JsonDocument lmsDocs;
-
-
-	lmsDocs.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_GetDocumentList, lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString("CircuitModels", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_ACTION_PARAM_Type, ot::JsonString("Type", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-	lmsDocs.AddMember(OT_ACTION_PARAM_Value, ot::JsonString("Diode", lmsDocs.GetAllocator()), lmsDocs.GetAllocator());
-
-	// In case of error:
-		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
-
-	do {
-		lmsRespose.clear();
-		if (!(ok = ot::msg::send(this->getServiceURL(), "127.0.0.1:8002", ot::EXECUTE, lmsDocs.toJson(), lmsRespose, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(500ms);
-
-		}
-	} while (!ok && ct++ <= maxCt);
-
-	if (!ok) {
-		OT_LOG_E("Failed to get Models");
-	}
-
-	
-	rMsg = ot::ReturnMessage::fromJson(lmsRespose);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Get Models failed: " + rMsg.getWhat());
-
-	}
-
-	ot::JsonDocument models;
-	models.fromJson(rMsg.getWhat());
-
-	if (models.IsObject()) {
-		ot::ConstJsonObject obj = models.GetConstObject();
-		ot::ConstJsonArray docs = obj["Documents"].GetArray();
-
-		for (const ot::JsonValue& val: docs) {
-			ot::ConstJsonObject doc = val.GetObject();
-			std::string content = doc["content"].GetString();
-			OT_LOG_T(content);
-		}
-	}
-
-
-
-#endif
-
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	
@@ -381,20 +275,15 @@ void Application::runCircuitSimulation() {
 		return;
 	}
 
-	if (selectedEntities.empty()) {
+	if (m_selectedEntities.empty()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
-	//First we get a list of all selected Entities
-	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(selectedEntities, selectedEntityInfo);
-
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
-	for (auto entity : selectedEntityInfo) {
+	for (auto& entity : m_selectedEntityInfos) {
 		if (entity.getEntityType() == "EntitySolverCircuitSimulator" || entity.getEntityType() == "EntitySolver") {
 			if (entity.getEntityName().substr(0, 8) == "Solvers/") {
 				size_t index = entity.getEntityName().find('/', 8);

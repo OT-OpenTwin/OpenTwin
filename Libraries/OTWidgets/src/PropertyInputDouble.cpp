@@ -226,7 +226,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		
 		if (!m_lineEdit) {
 			m_lineEdit = new LineEdit;
-			m_lineEdit->setFocusPolicy(Qt::NoFocus);
+			m_lineEdit->setFocusPolicy(Qt::ClickFocus);
 		}
 		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputDouble::lclTextChanged);
 		this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputDouble::lclEditingFinishedChanged);
