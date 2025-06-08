@@ -1,159 +1,170 @@
-/*
- * SessionService.cpp
- *
- *  Created on: November 26, 2020
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file SessionService.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date June 2025
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Service header
-#include "SessionService.h"		// Corresponding header
-#include "GlobalSessionService.h"
-#include "Session.h"
-#include "Service.h"
-#include "RelayService.h"
-#include "ServiceRunStarter.h"
+// LSS header
+#include "SessionService.h"
 
-// Open Twin header
-#include "OTCore/Logger.h"
+// OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTSystem/PortManager.h"
+#include "OTSystem/AppExitCodes.h"
+#include "OTCore/Logger.h"
+#include "OTCore/String.h"
+#include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
-#include "OTCommunication/Msg.h"
 
 // std header
-#include <cassert>
 #include <fstream>
-#include <iostream>
-#include <stdlib.h>
-#include <algorithm>
 
 SessionService& SessionService::instance(void) {
 	static SessionService g_instance;
 	return g_instance;
 }
 
-void SessionService::connectToGDS(const std::string& _url) {
-	m_gds.connect(_url);
-	this->initializeSystemInformation();
+int SessionService::initialize(const std::string& _ownUrl, const std::string& _gssUrl) {
+	if (_ownUrl.empty()) {
+		OT_LOG_EA("Uwn url may not be empty");
+		return ot::AppExitCode::ServiceUrlInvalid;
+	}
+
+	SessionService& lss = SessionService::instance();
+	lss.m_url = _ownUrl;
+
+	// Determine debug port ranges
+	size_t colonIndex = _ownUrl.rfind(':');
+	if (colonIndex == std::string::npos) {
+		OT_LOG_EA("Unable to determine own port");
+		return ot::AppExitCode::FailedToConvertPort;
+	}
+
+	bool failed = false;
+	ot::port_t portFrom = ot::String::toNumber<ot::port_t>(_ownUrl.substr(colonIndex + 1), failed);
+	if (failed || portFrom == 0) {
+		OT_LOG_EA("Invalid port number format");
+		return ot::AppExitCode::FailedToConvertPort;
+	}
+	lss.m_debugPortManager.addPortRange(portFrom, portFrom + 79);
+
+	// Initialize connection to GSS
+	if (!lss.m_gss.connect(_gssUrl)) {
+		return ot::AppExitCode::GSSRegistrationFailed;
+	}
+
+	// Initialize connection to GDS
+	GSSRegistrationInfo regInfo = lss.m_gss.getRegistrationResult();
+	if (!lss.m_gds.connect(regInfo.getGdsURL())) {
+		return ot::AppExitCode::GDSRegistrationFailed;
+	}
+
+	// Initialize system load information
+	lss.m_systemLoadInformation.initialize();
+
+	return ot::AppExitCode::Success;
 }
 
 SessionService::SessionService() 
-	: m_gss(nullptr), m_gds(nullptr), m_id(ot::invalidServiceID)
+	: m_id(ot::invalidServiceID)
 {
-	m_gds = new GlobalDirectoryService(this);
-
 	//
 	// Development services list (this contains all services together (potentially even including experimental ones) for testing purposes)
 	//
-	std::vector<ot::ServiceBase> *DevelopmentSessionServices = new std::vector<ot::ServiceBase>;
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PHREEC, OT_INFO_SERVICE_TYPE_PHREEC));
-	//DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_KRIGING, OT_INFO_SERVICE_TYPE_KRIGING));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
-	DevelopmentSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, DevelopmentSessionServices);
+	std::list<ot::ServiceBase> DevelopmentSessionServices;
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PHREEC, OT_INFO_SERVICE_TYPE_PHREEC));
+	//DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_KRIGING, OT_INFO_SERVICE_TYPE_KRIGING));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
+	DevelopmentSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, std::move(DevelopmentSessionServices));
 
 	//
 	// 3D Simulation services list (this contains all services relevant for 3D simulation)
 	//
-	std::vector<ot::ServiceBase> *Simulation3DSessionServices = new std::vector<ot::ServiceBase>;
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PHREEC, OT_INFO_SERVICE_TYPE_PHREEC));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
-	Simulation3DSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_3DSIM, Simulation3DSessionServices);
+	std::list<ot::ServiceBase> Simulation3DSessionServices;
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PHREEC, OT_INFO_SERVICE_TYPE_PHREEC));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FITTD, OT_INFO_SERVICE_TYPE_FITTD));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CartesianMeshService, OT_INFO_SERVICE_TYPE_CartesianMeshService));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_GETDP, OT_INFO_SERVICE_TYPE_GETDP));
+	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_3DSIM, std::move(Simulation3DSessionServices));
 
 	//
 	// Data Pipeline services list (this contains all services relevant for pipeline based data processing)
 	//
-	std::vector<ot::ServiceBase> *DataPipelineSessionServices = new std::vector<ot::ServiceBase>;
-	DataPipelineSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	DataPipelineSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	DataPipelineSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
-	DataPipelineSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, DataPipelineSessionServices);
+	std::list<ot::ServiceBase> DataPipelineSessionServices;
+	DataPipelineSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	DataPipelineSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	DataPipelineSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
+	DataPipelineSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, std::move(DataPipelineSessionServices));
 
 	//
 	// StudioSuite services list (this contains all services relevant for Studio Suite integration)
 	//
-	std::vector<ot::ServiceBase>* StudioSuiteSessionServices = new std::vector<ot::ServiceBase>;
-	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_STUDIOSUITE, OT_INFO_SERVICE_TYPE_STUDIOSUITE));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, StudioSuiteSessionServices);
+	std::list<ot::ServiceBase> StudioSuiteSessionServices;
+	StudioSuiteSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	StudioSuiteSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_STUDIOSUITE, OT_INFO_SERVICE_TYPE_STUDIOSUITE));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, std::move(StudioSuiteSessionServices));
 
 	//
 	// LTSpice services list (this contains all services relevant for LTSpice integration)
 	//
-	std::vector<ot::ServiceBase>* LTSpiceSessionServices = new std::vector<ot::ServiceBase>;
-	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LTSPICE, OT_INFO_SERVICE_TYPE_LTSPICE));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, LTSpiceSessionServices);
+	std::list<ot::ServiceBase> LTSpiceSessionServices;
+	LTSpiceSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	LTSpiceSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LTSPICE, OT_INFO_SERVICE_TYPE_LTSPICE));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, std::move(LTSpiceSessionServices));
 
 	//
 	// Pyrit services list (this contains all services relevant for Pyrit integration)
 	//
-	std::vector<ot::ServiceBase>* PyritSessionServices = new std::vector<ot::ServiceBase>;
-	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
-	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
-	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
-	PyritSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_PYRIT, PyritSessionServices);
+	std::list<ot::ServiceBase> PyritSessionServices;
+	PyritSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	PyritSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ModelingService, OT_INFO_SERVICE_TYPE_ModelingService));
+	PyritSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_VisualizationService, OT_INFO_SERVICE_TYPE_VisualizationService));
+	PyritSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_TetMeshService, OT_INFO_SERVICE_TYPE_TetMeshService));
+	PyritSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_PYRIT, std::move(PyritSessionServices));
 
 	//
 	// Circuit Simulation services list (this contains all services relevant for Pyrit integration)
 	//
-	std::vector<ot::ServiceBase>* CircuitSimulationSessionServices = new std::vector<ot::ServiceBase>;
-	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
-	CircuitSimulationSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
-	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, CircuitSimulationSessionServices);
+	std::list<ot::ServiceBase> CircuitSimulationSessionServices;
+	CircuitSimulationSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	CircuitSimulationSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, std::move(CircuitSimulationSessionServices));
 }
 
-bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
-	return (m_serviceDebugList.count(_serviceName) > 0);
-}
-
-// ######################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
 
-void SessionService::setPort(const std::string& _port) {
-	m_port = _port;
-	
-	ot::port_t portFrom = std::stoi(m_port);;
-	portFrom++;
-	ot::PortManager::instance().addPortRange(ot::PortRange(portFrom, portFrom + 79));
+bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
+	return m_debugServices.contains(_serviceName);
 }
 
-// ######################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// Service management
+// Management
 
-Session * SessionService::createSession(
-	const std::string &						_sessionID,
-	const std::string &						_userName,
-	const std::string &						_projectName,
-	const std::string &						_collectionName,
-	const std::string &						_sessionType
-) {
+Session& SessionService::createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType) {
 	if (_sessionID.length() == 0) {
+		throw ot::Exception::InvalidArgument();
 		throw std::out_of_range("Session ID must not be empty");
 	}
 
@@ -163,67 +174,52 @@ Session * SessionService::createSession(
 		return itm->second;
 	}
 
-	Session * newSession = new Session(_sessionID, _userName, _projectName, _collectionName, _sessionType);
+	Session newSession(_sessionID, _userName, _projectName, _collectionName, _sessionType);
 	m_sessionMap.insert_or_assign(_sessionID, newSession);
 
 	return newSession;
 }
 
-Session * SessionService::getSession(const std::string& _sessionID) {
-	auto s = m_sessionMap.find(_sessionID);
-	if (s == m_sessionMap.end()) {
+Session& SessionService::getSession(const std::string& _sessionID) {
+	auto it = m_sessions.find(_sessionID);
+	if (it == m_sessions.end()) {
 		OT_LOG_E("Session not found \"" + _sessionID + "\"");
-		return nullptr;
+		throw ot::Exception::ObjectNotFound("Session \"" + _sessionID + "\" not found");
 	}
 	else {
-		return s->second;
+		return it->second;
 	}
 }
 
-bool SessionService::runMandatoryServices(
-	const std::string &						_sessionID
-) {
-	auto s = m_sessionMap.find(_sessionID);
-	if (s == m_sessionMap.end()) {
-		std::string ex("A session with the ID \"");
-		ex.append(_sessionID);
-		ex.append("\" could not be found");
-		throw std::out_of_range(ex.c_str());
-	}
-	return runMandatoryServices(s->second);
+bool SessionService::runMandatoryServices(const std::string& _sessionID) {
+	return this->runMandatoryServices(this->getSession(_sessionID));
 }
 
-bool SessionService::runMandatoryServices(
-	Session *								_session
-) {
-	if (_session == nullptr) { throw std::exception("A nullptr was provided as session"); }
-	auto it = m_mandatoryServicesMap.find(_session->getType());
+bool SessionService::runMandatoryServices(Session& _session) {
+	auto it = m_mandatoryServicesMap.find(_session.getType());
 	if (it == m_mandatoryServicesMap.end()) {
-		OT_LOG_E("No mandatory services registered for the session (Type = \"" + _session->getType() + "\")");
-		std::string ex("No mandatory services registered for the session type \"");
-		ex.append(_session->getType());
-		ex.append("\" found");
-		throw std::out_of_range(ex.c_str());
+		OT_LOG_E("No mandatory services registered for the session { \"Type\": \"" + _session.getType() + "\" }");
+		throw ot::Exception::ObjectNotFound("No mandatory services registered for the session { \"Type\": \"" + _session.getType() + "\" }");
 	}
 
 	// Collect all services to run in debug and release mode
 	std::list<ot::ServiceBase> debugServices;
 	std::list<ot::ServiceBase> releaseServices;
 
-	for (auto s : *it->second) {
-		if (getIsServiceInDebugMode(s.getServiceName())) {
-			debugServices.push_back(s);
+	for (const ot::ServiceBase& serviceInfo : it->second) {
+		if (getIsServiceInDebugMode(serviceInfo.getServiceName())) {
+			debugServices.push_back(serviceInfo);
 		}
 		else {
-			releaseServices.push_back(s);
+			releaseServices.push_back(serviceInfo);
 		}
 	}
 
-	// Request the user to start all the debug services
-	for (auto s : debugServices) {
+	// Request the user to start the debug services
+	for (const ot::ServiceBase& serviceInfo : debugServices) {
 		std::string serviceUrl;
-		if (!runServiceInDebug(s.getServiceName(), s.getServiceType(), _session, serviceUrl)) {
-			OT_LOG_E("Failed to run service in debug mode (Name = \"" + s.getServiceName() + "\"; Type = \"" + s.getServiceType() + "\")");
+		if (!runServiceInDebug(serviceInfo.getServiceName(), serviceInfo.getServiceType(), _session, serviceUrl)) {
+			OT_LOG_E("Failed to run service in debug mode { \"Name\": \"" + serviceInfo.getServiceName() + "\", \"Type\": \"" + serviceInfo.getServiceType() + "\" }");
 			return false;
 		}
 	}
@@ -243,6 +239,107 @@ bool SessionService::runMandatoryServices(
 
 	return true;
 }
+
+bool SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session) {
+	OT_LOG_D("Starting service in debug mode { \"Name\": \"" + _serviceInfo.getServiceName() + "\", \"Type\": \"" + _serviceInfo.getServiceType() + "\" }");
+
+	// Get dev root path
+	char* buffer = nullptr;
+	size_t bufferSize = 0;
+	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
+		OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
+		return false;
+	}
+	std::string path = buffer;
+	delete[] buffer;
+	buffer = nullptr;
+
+	std::string serviceNameLower = ot::String::toLower(_serviceInfo.getServiceName());
+
+	path.append("\\Deployment\\" + serviceNameLower + ".cfg");
+
+	// Create new service url
+	size_t colonIndex = m_url.rfind(':');
+	if (colonIndex == std::string::npos) {
+		OT_LOG_EA("Unable to determine own port");
+		return ot::AppExitCode::FailedToConvertPort;
+	}
+	std::string serviceURL = m_url.substr(0, colonIndex);
+	ot::port_t portNumber = m_debugPortManager.determineAndBlockAvailablePort();
+	serviceURL.append(":").append(std::to_string(portNumber));
+
+	// Create new service object
+	Service newDebugService(_serviceInfo, _session.getId());
+	newDebugService.setIsDebug(true);
+	newDebugService.setRequested(true);
+	newDebugService.setServiceID(_session.generateNextServiceID());
+
+	// Create start params
+	ot::JsonDocument statupParams;
+	statupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_ID, newDebugService.getServiceID(), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(this->getUrl(), statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.getId(), statupParams.GetAllocator()), statupParams.GetAllocator());
+
+	std::ofstream stream(path);
+	stream << statupParams.toJson();
+	stream.close();
+
+	OT_LOG_D("Debug service params written to file { \"Service\": \"" + newDebugService.getServiceName() + "\", \"File\": \"" + path + "\" }");
+
+	// Add service to session
+	_session.addService(std::move(newDebugService));
+
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ######################################################################################
+
+// Service management
 
 void SessionService::serviceClosing(
 	Service *								_service,
@@ -299,50 +396,6 @@ std::list<const Session *> SessionService::sessions(void) {
 		ret.push_back(s.second);
 	}
 	return ret;
-}
-
-bool SessionService::runServiceInDebug(const std::string& _serviceName, const std::string& _serviceType, Session* _session, std::string& _serviceURL) {
-	OT_LOG_D("Starting service in debug mode (Name = \"" + _serviceName + "\"; Type = \"" + _serviceType + "\")");
-
-	char * buffer = nullptr;
-	size_t bufferSize = 0;
-	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
-		OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
-		return false;
-	}
-	std::string path = buffer;
-	delete[] buffer;
-	buffer = nullptr;
-
-	std::string serviceNameLower = _serviceName;
-	std::transform(serviceNameLower.begin(), serviceNameLower.end(), serviceNameLower.begin(),
-		[](unsigned char c) { return std::tolower(c); });
-
-	path.append("\\Deployment\\" + serviceNameLower + ".cfg");
-
-	_serviceURL = m_ip;
-	ot::port_t portNumber = ot::PortManager::instance().determineAndBlockAvailablePort();
-	_serviceURL.append(":").append(std::to_string(portNumber));
-
-	std::list<std::string> arguments = { "1", _serviceURL, this->getUrl(),  _session->getId() };
-
-	ot::JsonDocument statupParams;
-	statupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(this->getUrl(), statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->getId(), statupParams.GetAllocator()), statupParams.GetAllocator());
-
-	std::ofstream stream(path);
-	stream << statupParams.toJson();
-	stream.close();
-
-	OT_LOG_D("Service params written to file (service.name = \"" + _serviceName + "\"; file = \"" + path + "\")");
-
-	_session->addRequestedService(_serviceName, _serviceType);
-	_session->addDebugPortInUse(portNumber);
-
-	return true;
 }
 
 bool SessionService::runRelayService(Session * _session, std::string & _websocketURL, std::string& _serviceURL) {
@@ -1054,53 +1107,6 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 	this->updateLogMode(m_logModeManager);
 
 	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* _session) {
-	// Get service info
-	if (_session == nullptr) {
-		OT_LOG_E("No session provided");
-		return;
-	}
-	Service* theService = _session->getService(_serviceId);
-
-	std::string senderServiceName("<No service name>");
-	if (theService) {
-		senderServiceName = theService->getName();
-		theService->setReceiveBroadcastMessages(false);
-	}
-	// Notify GDS
-	m_gds->notifySessionClosed(_session->getId());
-
-	// Notify GSS
-	ot::JsonDocument gssShutdownDoc;
-	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->getId(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send(getUrl(), m_gss->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send \"session shutdown completed\" notification to GSS at \"" + m_gss->getServiceURL() + "\"");
-	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invaild response for \"session shutdown completed\" notification from GSS at \"" + m_gss->getServiceURL() + "\"");
-	}
-
-	// Remove service that requested shutdown
-	_session->removeService(_serviceId, false);
-
-	// Close session
-	_session->shutdown(nullptr);
-
-	// Show info log
-	OT_LOG_D("The session with the ID \"" + _session->getId() + "\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
-
-	// Finally delete the session
-	delete _session;
-}
-
-void SessionService::initializeSystemInformation() {
-
-	m_systemLoadInformation.initialize();
 }
 
 void SessionService::updateLogMode(const ot::LogModeManager& _newData) {

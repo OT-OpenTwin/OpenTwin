@@ -693,7 +693,7 @@
 #define OT_INFO_SERVICE_TYPE_PHREEC "PHREECService"
 #define OT_INFO_SERVICE_TYPE_FITTD "FITTDService"
 #define OT_INFO_SERVICE_TYPE_KRIGING "KrigingService"
-#define OT_INFO_SERVICE_TYPE_SessionService "SessionService"
+#define OT_INFO_SERVICE_TYPE_LocalSessionService "LocalSessionService"
 #define OT_INFO_SERVICE_TYPE_GlobalSessionService "GlobalSessionService"
 #define OT_INFO_SERVICE_TYPE_ModelingService "ModelingService"
 #define OT_INFO_SERVICE_TYPE_VisualizationService "VisualizationService"

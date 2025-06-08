@@ -45,6 +45,8 @@ namespace ot {
 		//! @brief Determines the next available port and blocks it.
 		ot::port_t determineAndBlockAvailablePort(void);
 
+		bool hasPortRanges() const { return !m_ranges.empty(); };
+
 	private:
 		using PortRange = std::pair<ot::port_t, ot::port_t>;
 

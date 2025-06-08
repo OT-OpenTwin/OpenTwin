@@ -50,6 +50,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::OutOfBoundsException OutOfBounds; }
 
+    //! @brief Basic invalid argument exception.
+    class InvalidArgumentException : public GeneralException {
+    public:
+        explicit InvalidArgumentException() : GeneralException("Invalid argument") {};
+        explicit InvalidArgumentException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit InvalidArgumentException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::InvalidArgumentException InvalidArgument; }
+
     // ###########################################################################################################################################################################################################################################################################################################################
 
     // Network

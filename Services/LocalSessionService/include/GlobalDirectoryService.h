@@ -37,7 +37,7 @@ public:
 	//! @brief Connects to the Global Directory Service at the given URL.
 	//! Will change the connection status to CheckingNewConnection and start a health check thread.
 	//! @param _url Global Directory Service url.
-	void connect(const std::string& _url);
+	bool connect(const std::string& _url);
 
 	//! @brief Checks if the Global Directory Service is connected.
 	//! Will return true if the connection status is Connected, otherwise false.
@@ -69,7 +69,11 @@ public:
 	//! @param _sessionID The ID of the session that was closed.
 	void notifySessionClosed(const std::string& _sessionID);
 
+	void stopHealthCheck();
+
 private:
+	void startHealthCheck();
+
 	//! @brief Health check thread function.
 	void healthCheck(void);
 
@@ -77,5 +81,5 @@ private:
 
 	std::mutex       m_mutex;             //! @brief Mutex to protect the connection status and service URL.
 	std::thread*     m_healthCheckThread; //! @brief Thread for the health check.
-	std::atomic_bool m_isShuttingDown;    //! @brief Flag to indicate if the worker thread should be shutting down.
+	std::atomic_bool m_healthCheckRunning;    //! @brief Flag to indicate if the worker thread should be shutting down.
 };

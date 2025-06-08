@@ -38,17 +38,18 @@ public:
 
 	bool confirmSession(const std::string& _sessionId, const std::string& _userName);
 
-	void startHealthCheck(void);
+	void startHealthCheck();
 
-	void stopHealthCheck(bool _joinThread);
+	void stopHealthCheck();
 
-	GSSRegistrationInfo getRegistrationResult(void);
+	GSSRegistrationInfo getRegistrationResult();
 
 private:
 	void healthCheck(void);
 
 	std::mutex          m_mutex;
 	std::atomic_bool    m_healthCheckRunning;
+
 	ConnectionStatus    m_connectionStatus;
 	std::thread*        m_workerThread;
 	GSSRegistrationInfo m_registrationResult;

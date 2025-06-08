@@ -41,22 +41,16 @@ bool GlobalSessionService::connect(const std::string& _url) {
 		}
 
 		// Clean up potentially running health check thread
-		if (m_workerThread) {
-			m_healthCheckRunning = false;
-			m_workerThread->join();
-			delete m_workerThread;
-			m_workerThread = nullptr;
-		}
-
+		this->stopHealthCheck();
+		
 		// Update information
 		this->setServiceURL(_url);
 
-		m_healthCheckRunning = true;
 		m_connectionStatus = CheckingNewConnection;
 
 		OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
 
-		m_workerThread = new std::thread(&GlobalSessionService::healthCheck, this);
+		this->startHealthCheck();
 	}
 	
 	// Wait for health check to finish
@@ -65,6 +59,7 @@ bool GlobalSessionService::connect(const std::string& _url) {
 	while (!this->isConnected()) {
 		if (ct++ >= maxCt) {
 			OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\" after " + std::to_string(maxCt) + " attempts");
+			this->stopHealthCheck();
 			return false;
 		}
 
@@ -106,8 +101,8 @@ bool GlobalSessionService::confirmSession(const std::string& _sessionId, const s
 }
 
 void GlobalSessionService::startHealthCheck(void) {
-	if (m_workerThread) {
-		OTAssert(0, "Health check already running");
+	if (m_healthCheckRunning) {
+		OT_LOG_EA("Health check already running");
 		return;
 	}
 
@@ -117,19 +112,19 @@ void GlobalSessionService::startHealthCheck(void) {
 	m_workerThread = new std::thread(&GlobalSessionService::healthCheck, this);
 }
 
-void GlobalSessionService::stopHealthCheck(bool _joinThread) {
+void GlobalSessionService::stopHealthCheck() {
 	if (m_workerThread) {
 		m_healthCheckRunning = false;
-		if (_joinThread) {
+		if (m_workerThread->joinable()) {
 			m_workerThread->join();
 		}
-	}
-	else {
-		OTAssert(0, "No health check currently running");
+
+		delete m_workerThread;
+		m_workerThread = nullptr;
 	}
 }
 
-GSSRegistrationInfo GlobalSessionService::getRegistrationResult(void) {
+GSSRegistrationInfo GlobalSessionService::getRegistrationResult() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_registrationResult;
 }
@@ -147,11 +142,6 @@ void GlobalSessionService::healthCheck(void) {
 	std::string lssUrl = SessionService::instance().getUrl();
 
 	while (m_healthCheckRunning) {
-		ct = 0;
-		while (ct++ < 60) { // Wait for 1 min
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1s);
-		}
 		std::string pingResponse;
 
 		// Send ping
@@ -165,7 +155,6 @@ void GlobalSessionService::healthCheck(void) {
 			m_connectionStatus = Disconnected;
 		}
 		else if (m_connectionStatus != Connected) {
-
 			// Register at the session service
 			ot::JsonDocument registerDoc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, doc.GetAllocator()), doc.GetAllocator());
@@ -211,9 +200,17 @@ void GlobalSessionService::healthCheck(void) {
 					info.setLogInfo(logManager);
 				}
 
+				m_registrationResult = std::move(info);
+
 				// Set connection status to connected
 				m_connectionStatus = Connected;
 			}
+		}
+
+		ct = 0;
+		while (ct++ < 60 && m_healthCheckRunning) { // Wait for 1 min
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(1s);
 		}
 	}
 }

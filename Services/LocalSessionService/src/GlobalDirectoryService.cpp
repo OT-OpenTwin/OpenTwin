@@ -18,50 +18,55 @@
 
 GlobalDirectoryService::GlobalDirectoryService() :
 	ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService),
-	m_connectionStatus(Disconnected), m_isShuttingDown(false), m_healthCheckThread(nullptr)
+	m_connectionStatus(Disconnected), m_healthCheckRunning(false), m_healthCheckThread(nullptr)
 {
 
 }
 
 GlobalDirectoryService::~GlobalDirectoryService() {
-	if (m_healthCheckThread) {
-		m_isShuttingDown = true;
-		m_healthCheckThread->join();
-		delete m_healthCheckThread;
-		m_healthCheckThread = nullptr;
-	}
+	this->stopHealthCheck();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Management
 
-void GlobalDirectoryService::connect(const std::string& _url) {
+bool GlobalDirectoryService::connect(const std::string& _url) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Ensure connection status is disconnected
 	if (m_connectionStatus != Disconnected) {
 		OT_LOG_E("GDS state is not Disconnected. Ignoring request for \"" + _url + "\"");
-		return;
+		return false;
 	}
 
 	// Clean up potentially running health check thread
-	if (m_healthCheckThread) {
-		m_isShuttingDown = true;
-		m_healthCheckThread->join();
-		delete m_healthCheckThread;
-		m_healthCheckThread = nullptr;
-	}
+	this->stopHealthCheck();
 
 	// Update information
 	this->setServiceURL(_url);
 
-	m_isShuttingDown = false;
 	m_connectionStatus = CheckingNewConnection;
 	
 	OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
 
-	m_healthCheckThread = new std::thread(&GlobalDirectoryService::healthCheck, this);
+	// Start health check and wait for success
+	this->startHealthCheck();
+
+	// Wait for connection success
+	int ct = 0;
+	const int maxCt = 60;
+	while (!this->isConnected()) {
+		if (ct++ >= maxCt) {
+			OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\" after " + std::to_string(maxCt) + " attempts");
+			this->stopHealthCheck();
+			return false;
+		}
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+
+	return true;
 }
 
 bool GlobalDirectoryService::isConnected(void) {
@@ -192,6 +197,34 @@ void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) 
 	}
 }
 
+void GlobalDirectoryService::stopHealthCheck() {
+	if (m_healthCheckThread) {
+		m_healthCheckRunning = false;
+		if (m_healthCheckThread->joinable()) {
+			m_healthCheckThread->join();
+		}
+
+		delete m_healthCheckThread;
+		m_healthCheckThread = nullptr;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private
+
+void GlobalDirectoryService::startHealthCheck(void) {
+	if (m_healthCheckRunning) {
+		OT_LOG_EA("Health check already running");
+		return;
+	}
+
+	m_healthCheckRunning = true;
+
+	OT_LOG_D("Starting health check");
+	m_healthCheckThread = new std::thread(&GlobalDirectoryService::healthCheck, this);
+}
+
 void GlobalDirectoryService::healthCheck(void) {
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
@@ -202,7 +235,7 @@ void GlobalDirectoryService::healthCheck(void) {
 
 	OT_LOG_D("Starting health check worker...");
 
-	while (!m_isShuttingDown) {
+	while (m_healthCheckRunning) {
 		
 		// Check connection
 		std::string response;
@@ -221,7 +254,7 @@ void GlobalDirectoryService::healthCheck(void) {
 				
 				m_mutex.unlock();
 
-				for (int ct = 0; ct < 60 && !m_isShuttingDown; ct++) {
+				for (int ct = 0; ct < 60 && m_healthCheckRunning; ct++) {
 					using namespace std::chrono_literals;
 					std::this_thread::sleep_for(1s);
 				}

@@ -96,7 +96,7 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 	m_sessionService.doc = nullptr;
 	m_sessionService.enabledCounter = 0;
 	if (m_sessionService.service != nullptr) { delete m_sessionService.service; }
-	m_sessionService.service = new ServiceBase(OT_INFO_SERVICE_TYPE_SessionService, OT_INFO_SERVICE_TYPE_SessionService, _url, invalidServiceID);
+	m_sessionService.service = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, _url, invalidServiceID);
 	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
 }
 
