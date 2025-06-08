@@ -59,6 +59,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::InvalidArgumentException InvalidArgument; }
 
+    //! @brief Basic file exception.
+    class FileException : public GeneralException {
+    public:
+        explicit FileException() : GeneralException("File exception") {};
+        explicit FileException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit FileException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::FileException File; }
+
     // ###########################################################################################################################################################################################################################################################################################################################
 
     // Network
