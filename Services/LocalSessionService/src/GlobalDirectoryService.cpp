@@ -139,7 +139,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	return false;
 }
 
-bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _websocketURL, std::string& _relayServiceURL) {
+bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string lssUrl = SessionService::instance().getUrl();

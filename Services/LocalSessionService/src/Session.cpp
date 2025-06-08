@@ -138,16 +138,11 @@ bool Session::hasShuttingDownServices() {
 
 // Service management
 
-Service& Session::addService(Service&& _service) {
-	if (this->getServiceFromID(_service.getServiceID())) {
-		OT_LOG_E("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
-		throw ot::Exception::ObjectAlreadyExists("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
-	}
-	
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	m_services.push_back(std::move(_service));
-	return m_services.back();
+Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation) {
+	Service newService(_serviceInformation, m_id);
+	newService.setRequested(true);
+	newService.setServiceID(this->generateNextServiceID());
+	return this->addService(std::move(newService));
 }
 
 std::optional<Service&> Session::setServiceAlive(ot::serviceID_t _serviceID) {
@@ -287,6 +282,11 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 	}
 }
 
+void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	this->broadcast(_senderServiceID, _message, false);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Messaging
@@ -317,6 +317,18 @@ void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _me
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
+
+Service& Session::addService(Service&& _service) {
+	if (this->getServiceFromID(_service.getServiceID())) {
+		OT_LOG_E("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
+		throw ot::Exception::ObjectAlreadyExists("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_services.push_back(std::move(_service));
+	return m_services.back();
+}
 
 std::optional<Service&> Session::getServiceFromID(ot::serviceID_t _serviceID) {
 	for (Service& service : m_services) {

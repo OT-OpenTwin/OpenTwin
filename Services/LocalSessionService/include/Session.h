@@ -47,7 +47,7 @@ public:
 
 	// Setter / Getter
 
-	std::string getId() const { return m_id; };
+	std::string getID() const { return m_id; };
 	std::string getUserName() const { return m_userName; };
 	std::string getProjectName() const { return m_projectName; };
 	std::string getCollectionName() const { return m_collectionName; };
@@ -84,9 +84,11 @@ public:
 
 	// Service management
 
-	//! @brief Will store the provided service in this session.
-	//! @param _service The service to store.
-	Service& addService(Service&& _service);
+	//! @brief Will create and store the service in this session.
+	//! The created service will be flagged as requested and get a id assigned.
+	//! @param _serviceInformation Information about the service.
+	//! @return The created service.
+	Service& addRequestedService(const ot::ServiceBase& _serviceInformation);
 	
 	//! @brief Will set the service with the specified ID as alive.
 	//! @param _serviceID Service ID.
@@ -101,14 +103,12 @@ public:
 	//! @brief Will remove the service with the specified ID from this session.
 	//! @param _serviceID The ID of the service to remove.
 	//! @param _notifyOthers If true, a broadcast message will be send that the service is shutting down.
-	void serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers = false);
+	void serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers);
 
 	//! @brief Will add the alive services to the provided JSON array.
 	//! @param _array JSON array to add the services to.
 	//! @param _allocator Allocator.
 	void addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator);
-
-	ot::serviceID_t generateNextServiceID() { return m_serviceIdManager.nextID(); };
 
 	void startHealthCheck();
 	void stopHealthCheck();
@@ -132,6 +132,11 @@ public:
 	//! @param _senderServiceID The ID of the service that initiated the shutdown.
 	//! @param _emergencyShutdown If true, the session will be shutdown in emergency mode, otherwise a regular shutdown will be performed.
 	void shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown);
+
+	//! @brief Will broadcast the provided message to all services in this session.
+	//! @param _sender The sender of this message. The sender will not receive the broadcast message.
+	//! @param _message The message to broadcast.
+	void sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message);
 
 private:
 
@@ -161,6 +166,13 @@ private:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
+
+	//! @brief Will generate a new service ID.
+	ot::serviceID_t generateNextServiceID() { return m_serviceIdManager.nextID(); };
+
+	//! @brief Will store the provided service in this session.
+	//! @param _service The service to store.
+	Service& addService(Service&& _service);
 
 	//! @brief Will return the writeable reference to the service with the specified ID.
 	//! @warning The mutex must be locked before calling this function.

@@ -44,6 +44,10 @@ public:
 	void setSiteID(std::string _id) { m_siteID = _id; };
 	const std::string& getSiteID() const { return m_siteID; };
 
+	std::list<std::string> getSessionIDs();
+
+private:
+
 	bool getIsServiceInDebugMode(const std::string& _serviceName);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -58,85 +62,31 @@ public:
 
 	bool runMandatoryServices(Session& _session);
 
-	bool runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session);
+	void updateLogMode(const ot::LogModeManager& _newData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Session Information
 
-	std::list<std::string> getSessionIds(void);
-
 	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
+
+	Service& runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session);
+
+	Service& runRelayService(Session& _session);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Worker
 
-private:
 	void workerShutdownSession(ot::serviceID_t _serviceID, std::string _sessionID);
 
-	std::mutex                                        m_mutex;
-	
-	GlobalSessionService                              m_gss;
-	GlobalDirectoryService                            m_gds;
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	std::string                                       m_siteID; //! @brief Site ID
-
-	std::string                                       m_url;
-	ot::serviceID_t                                   m_id;
-	ot::SystemInformation                             m_systemLoadInformation;
-
-	std::unordered_set<std::string>                   m_debugServices;
-
-	std::map<std::string, Session>                    m_sessions;
-	std::map<std::string, std::list<ot::ServiceBase>> m_mandatoryServicesMap; //! @brief Map containing all names of mandatory services for each session type
-
-	ot::PortManager                                   m_debugPortManager;
-	ot::LogModeManager                                m_logModeManager;
-
-public:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// ######################################################################################
-
-	// Setter / Getter
-
-
-
-	// ######################################################################################
-
-	// Service management
-
-	//! @brief Will close the service and deregister it from its session
-	void serviceClosing(Service* _service, bool _notifyOthers, bool _autoCloseSessionIfMandatory = true);
-
-	bool runRelayService(Session * _session, std::string& _websocketURL, std::string& _serviceURL);
-
-	void setGlobalSessionService(GlobalSessionService * _gss) { m_gss = _gss; }
-
-	Service * getServiceFromURL(const std::string& _url);
-
-	void updateLogMode(const ot::LogModeManager& _newData);
-
-private:
-	// Message handling
+	// Action handler
 
 	OT_HANDLER(handleGetDBURL, SessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetAuthURL, SessionService, OT_ACTION_CMD_GetAuthorisationServerUrl, ot::ALL_MESSAGE_TYPES)
@@ -168,4 +118,24 @@ private:
 	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES)
 
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
+
+	std::mutex                                        m_mutex;
+	
+	GlobalSessionService                              m_gss;
+	GlobalDirectoryService                            m_gds;
+
+	std::string                                       m_siteID; //! @brief Site ID
+
+	std::string                                       m_url;
+	ot::serviceID_t                                   m_id;
+	ot::SystemInformation                             m_systemLoadInformation;
+
+	std::unordered_set<std::string>                   m_debugServices;
+
+	std::map<std::string, Session>                    m_sessions;
+	std::map<std::string, std::list<ot::ServiceBase>> m_mandatoryServicesMap; //! @brief Map containing all names of mandatory services for each session type
+
+	ot::PortManager                                   m_debugPortManager;
+	ot::LogModeManager                                m_logModeManager;
+
 };

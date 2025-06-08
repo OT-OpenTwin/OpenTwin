@@ -63,7 +63,7 @@ public:
 	//! @param _websocketURL Will be set to the websocket URL of the relay service on success.
 	//! @param _relayServiceURL Will be set to the URL of the relay service on success.
 	//! @return Returns true if the relay service was successfully started, false otherwise.
-	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _websocketURL, std::string& _relayServiceURL);
+	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL);
 	
 	//! @brief Notifies the GDS that a session was closed.
 	//! @param _sessionID The ID of the session that was closed.
