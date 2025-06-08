@@ -27,8 +27,9 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 
 }
 
-void EntityBlockCircuitResistor::createProperties() {
+void EntityBlockCircuitResistor::createProperties(const ot::UID& _circuitModelFolderID) {
 	EntityPropertiesString::createProperty("Element Property", "Resistance", "200", "default", getProperties());
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 }
 
 double EntityBlockCircuitResistor::getRotation() {
@@ -53,6 +54,9 @@ std::string EntityBlockCircuitResistor::getResistance() {
 	assert(elementType != nullptr);
 
 	return elementType->getValue();
+}
+std::string EntityBlockCircuitResistor::getTypeAbbreviation() {
+	return "R";
 }
 #define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg() {

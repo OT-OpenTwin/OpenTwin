@@ -5,10 +5,10 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 		virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageSource"; };
 		virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-		virtual void createProperties() override;
+		virtual void createProperties(const ot::UID& _circuitModelFolderID) override;
 		std::string getVoltage();
 		std::string getFunction();
-
+		virtual std::string getTypeAbbreviation() override;
 
 		double getRotation();
 		std::string getFlip();

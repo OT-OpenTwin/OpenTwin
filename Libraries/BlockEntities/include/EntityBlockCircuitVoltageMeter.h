@@ -6,8 +6,8 @@ public:
 	EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageMeter"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual void createProperties() override;
-	//std::string getElementType();
+	virtual void createProperties(const ot::UID& _circuitModelFolderID) override;
+	virtual std::string getTypeAbbreviation() override;
 
 	double getRotation();
 	std::string getFlip();

@@ -25,9 +25,14 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitVoltageMeter::createProperties() {
+void EntityBlockCircuitVoltageMeter::createProperties(const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
+}
+
+std::string EntityBlockCircuitVoltageMeter::getTypeAbbreviation() {
+	return "VM";
 }
 
 double EntityBlockCircuitVoltageMeter::getRotation() {

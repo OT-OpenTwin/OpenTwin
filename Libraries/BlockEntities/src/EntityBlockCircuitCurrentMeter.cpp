@@ -24,9 +24,14 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitCurrentMeter::createProperties() {
+void EntityBlockCircuitCurrentMeter::createProperties(const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
+}
+
+std::string EntityBlockCircuitCurrentMeter::getTypeAbbreviation() {
+	return "CM";
 }
 
 const double EntityBlockCircuitCurrentMeter::getRotation() {

@@ -23,9 +23,13 @@ EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, Ent
 
 }
 
-void EntityBlockCircuitGND::createProperties() {
+void EntityBlockCircuitGND::createProperties(const ot::UID& _circuitModelFolderID) {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
+}
+
+std::string EntityBlockCircuitGND::getTypeAbbreviation() {
+	return "GND";
 }
 
 

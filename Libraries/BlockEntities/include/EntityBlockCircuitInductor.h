@@ -6,8 +6,9 @@ public:
 	EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitInductor"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual void createProperties() override;
+	virtual void createProperties(const ot::UID& _circuitModelFolderID) override;
 	std::string getElementType();
+	virtual std::string getTypeAbbreviation() override;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
