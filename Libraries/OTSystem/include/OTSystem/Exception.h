@@ -81,5 +81,13 @@ namespace ot {
     };
     namespace Exception { typedef ot::NetworkErrorException NetworkError; }
 
+    //! @brief Basic request failed exception.
+    class RequestFailedException : public GeneralException {
+    public:
+        explicit RequestFailedException() : GeneralException("Request failed") {};
+        explicit RequestFailedException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit RequestFailedException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::RequestFailedException RequestFailed; }
 
 }
