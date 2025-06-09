@@ -225,7 +225,7 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
 
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_databaseInfo.getDataBaseUrl(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString(m_databaseInfo.getSiteId(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString(m_databaseInfo.getSiteID(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(m_databaseInfo.getCollectionName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(m_databaseInfo.getUserName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(m_databaseInfo.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());

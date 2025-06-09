@@ -77,7 +77,7 @@ void Application::run(void) {
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
 	DataBaseInfo info;
-	info.setSiteId(this->siteID());
+	info.setSiteID(this->siteID());
 	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
 	info.setCollectionName(this->m_collectionName);
 	info.setUserName(DataBase::GetDataBase()->getUserName());

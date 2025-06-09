@@ -51,7 +51,7 @@ bool Application::requestToRunService(const ServiceInformation& _serviceInfo) {
 }
 
 int Application::initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL) {
-	setSiteId(_siteID);
+	setSiteID(_siteID);
 	setServiceURL(_ownURL);
 	m_globalSessionServiceURL = _globalSessionServiceURL;
 

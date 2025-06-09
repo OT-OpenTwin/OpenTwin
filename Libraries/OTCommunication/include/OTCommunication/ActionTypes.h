@@ -38,7 +38,6 @@
 #define OT_ACTION_CMD_ConfirmSession "Session.Confirm"
 #define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
 #define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
-#define OT_ACTION_CMD_SendBroadcastMessage "Broadcast"
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"
 #define OT_ACTION_CMD_RegisterNewGlobalDirecotoryService "GlobalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLocalDirecotoryService "LocalDirectoryService.New"

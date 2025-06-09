@@ -247,21 +247,6 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 	}
 }
 
-bool ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _message) {
-	JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_SendBroadcastMessage, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_serviceID, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_sessionID, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	return ot::msg::send(m_serviceURL, m_sessionService.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
-}
-
-bool ot::ApplicationBase::broadcastMessage(bool _queue, const JsonDocument& _doc) {
-	return this->broadcastMessage(_queue, _doc.toJson());
-}
-
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
 {
 	OTAssert(std::find(m_modalCommands.begin(), m_modalCommands.end(), command) == m_modalCommands.end(), "modal command is alreay in list"); // Ensure that the command is not yet in the list

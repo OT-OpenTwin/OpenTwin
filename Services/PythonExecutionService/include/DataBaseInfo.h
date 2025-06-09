@@ -16,8 +16,8 @@ public:
 	void setDataBaseUrl(const std::string& _url) { m_dbUrl = _url; };
 	const std::string& getDataBaseUrl(void) const { return m_dbUrl; };
 
-	void setSiteId(const std::string& _id) { m_siteId = _id; };
-	const std::string& getSiteId(void) const { return m_siteId; };
+	void setSiteID(const std::string& _id) { m_siteID = _id; };
+	const std::string& getSiteID(void) const { return m_siteID; };
 
 	void setCollectionName(const std::string& _collectionName) { m_collectionName = _collectionName; };
 	const std::string& getCollectionName(void) const { return m_collectionName; };
@@ -30,7 +30,7 @@ public:
 
 private:
 	std::string m_dbUrl;
-	std::string m_siteId;
+	std::string m_siteID;
 	std::string m_collectionName;
 
 	std::string m_userName;

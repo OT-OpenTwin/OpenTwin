@@ -69,7 +69,7 @@ namespace ot {
 
 		//! @brief Set the site ID
 		//! @param _id The site ID to set
-		void setSiteId(const std::string& _id) { m_siteId = _id; };
+		void setSiteID(const std::string& _id) { m_siteId = _id; };
 
 		//! @brief Set the session count
 		//! @param _count Count to set
@@ -98,7 +98,7 @@ namespace ot {
 		std::string getServiceType(void) const { return m_serviceType; };
 
 		//! @brief Return the site ID
-		std::string getSiteId(void) const { return m_siteId; };
+		std::string getSiteID(void) const { return m_siteId; };
 
 		BasicServiceInformation getBasicServiceInformation(void) const { return BasicServiceInformation(m_serviceName, m_serviceType); };
 

@@ -30,7 +30,7 @@ Application& Application::instance(void) {
 int Application::initialize(const char* _siteID,const char* _ownURL, const char* _globalSessionServiceURL, const char * _databasePWD) {
 	try {
 		OT_LOG_I("Library Management Service initialization");
-		setSiteId(_siteID);
+		setSiteID(_siteID);
 		setServiceURL(_ownURL);
 		// Now store the command line arguments and perform the initialization
 		if (_ownURL == nullptr) {

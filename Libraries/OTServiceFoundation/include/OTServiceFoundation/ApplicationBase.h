@@ -251,16 +251,6 @@ namespace ot {
 		//! @param _response The reponse will be written here
 		bool sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
-		//! @brief Will send the message to all other services in this session
-		//! @param _queue If true, the message will be queued
-		//! @param _message The message to send
-		bool broadcastMessage(bool _queue, const std::string& _message);
-
-		//! @brief Will send the message to all other services in this session
-		//! @param _queue If true, the message will be queued
-		//! @param _doc The JSON Document to send
-		bool broadcastMessage(bool _queue, const JsonDocument& _doc);
-
 		void prefetchDocumentsFromStorage(const std::list<UID> &entities);
 		void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo);
 		UID getPrefetchedEntityVersion(UID entityID);
