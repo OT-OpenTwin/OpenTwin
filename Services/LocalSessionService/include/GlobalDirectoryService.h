@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
 
 // std header
@@ -37,7 +38,7 @@ public:
 	//! @brief Connects to the Global Directory Service at the given URL.
 	//! Will change the connection status to CheckingNewConnection and start a health check thread.
 	//! @param _url Global Directory Service url.
-	bool connect(const std::string& _url);
+	bool connect(const std::string& _url, bool _waitForConnection);
 
 	//! @brief Checks if the Global Directory Service is connected.
 	//! Will return true if the connection status is Connected, otherwise false.
@@ -65,11 +66,19 @@ public:
 	//! @return Returns true if the relay service was successfully started, false otherwise.
 	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL);
 	
+	void notifySessionShuttingDown(const std::string& _sessionID);
+
 	//! @brief Notifies the GDS that a session was closed.
 	//! @param _sessionID The ID of the session that was closed.
-	void notifySessionClosed(const std::string& _sessionID);
+	void notifySessionShutdownCompleted(const std::string& _sessionID);
 
 	void stopHealthCheck();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
 private:
 	void startHealthCheck();

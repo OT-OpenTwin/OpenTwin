@@ -46,6 +46,8 @@ public:
 
 	std::list<std::string> getSessionIDs();
 
+	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
+
 private:
 
 	bool getIsServiceInDebugMode(const std::string& _serviceName);
@@ -66,23 +68,20 @@ private:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Session Information
-
-	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
 	// Private: Helper
 
 	Service& runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session);
 
 	Service& runRelayService(Session& _session);
 
+	bool hasMandatoryService(const std::string& _serviceName);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Worker
 
-	void workerShutdownSession(ot::serviceID_t _serviceID, std::string _sessionID);
+	void workerShutdownSession();
+	void workerRunServices();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -95,24 +94,19 @@ private:
 	OT_HANDLER(handleGetSystemInformation, SessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES)
 
-	OT_HANDLER(handleRegisterNewService, SessionService, OT_ACTION_CMD_RegisterNewService, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCreateNewSession, SessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
-
 	OT_HANDLER(handleCheckProjectOpen, SessionService, OT_ACTION_CMD_IsProjectOpen, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSendBroadcastMessage, SessionService, OT_ACTION_CMD_SendBroadcastMessage, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleRegisterNewService, SessionService, OT_ACTION_CMD_RegisterNewService, ot::ALL_MESSAGE_TYPES)
+	
 	OT_HANDLER(handleGetSessionExists, SessionService, OT_ACTION_CMD_GetSessionExists, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceClosing, SessionService, OT_ACTION_CMD_ServiceClosing, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceShutdownCompleted, SessionService, OT_ACTION_CMD_ServiceShutdownCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleMessage, SessionService, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownSession, SessionService, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceFailure, SessionService, OT_ACTION_CMD_ServiceFailure, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceShutdownCompleted, SessionService, OT_ACTION_CMD_ServiceShutdownCompleted, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleEnableServiceDebug, SessionService, OT_ACTION_CMD_ServiceEnableDebug, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleDisableServiceDebug, SessionService, OT_ACTION_CMD_ServiceDisableDebug, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleReset, SessionService, OT_ACTION_CMD_Reset, ot::SECURE_MESSAGE_TYPES) // todo: you thought i work? well.. no i do not (yet) :D
 	OT_HANDLER(handleGetDebugInformation, SessionService, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleCheckStartupCompleted, SessionService, OT_ACTION_CMD_CheckStartupCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceShow, SessionService, OT_ACTION_CMD_ServiceShow, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceHide, SessionService, OT_ACTION_CMD_ServiceHide, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMandatoryService, SessionService, OT_ACTION_CMD_AddMandatoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterNewGlobalDirectoryService, SessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES)
@@ -120,7 +114,8 @@ private:
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
 	std::mutex                                        m_mutex;
-	
+	std::atomic_bool                                  m_workerRunning;
+
 	GlobalSessionService                              m_gss;
 	GlobalDirectoryService                            m_gds;
 

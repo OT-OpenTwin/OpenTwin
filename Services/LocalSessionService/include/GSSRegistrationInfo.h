@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/LogModeManager.h"
 
@@ -32,6 +33,12 @@ public:
 
 	void setLogInfo(const ot::LogModeManager& _logManager) { m_logManager = _logManager; };
 	const ot::LogModeManager& getLogInfo(void) const { return m_logManager; };
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
 private:
 	ot::serviceID_t    m_serviceID;

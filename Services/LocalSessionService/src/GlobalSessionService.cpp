@@ -74,14 +74,14 @@ bool GlobalSessionService::isConnected() {
 	return (m_connectionStatus == Connected);
 }
 
-bool GlobalSessionService::confirmSession(const std::string& _sessionId, const std::string& _userName) {
+bool GlobalSessionService::confirmSession(const std::string& _sessionID, const std::string& _userName) {
 	SessionService& lss = SessionService::instance();
 
 	ot::JsonDocument confirmDoc;
 	confirmDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ConfirmSession, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
-	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionId, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(_userName, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
-	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, lss.getId(), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_registrationResult.getServiceID(), confirmDoc.GetAllocator());
 
 	// Send ping
 	std::string responseStr;
@@ -95,7 +95,32 @@ bool GlobalSessionService::confirmSession(const std::string& _sessionId, const s
 		return true;
 	}
 	else {
-		OT_LOG_E("Failed to confirm session \"" + _sessionId + "\". Message: \"" + msg.getWhat() + "\"");
+		OT_LOG_E("Failed to confirm session \"" + _sessionID + "\". Message: \"" + msg.getWhat() + "\"");
+		return false;
+	}
+}
+
+bool GlobalSessionService::notifySessionShutdownCompleted(const std::string& _sessionID) {
+	SessionService& lss = SessionService::instance();
+
+	ot::JsonDocument confirmDoc;
+	confirmDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
+	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_registrationResult.getServiceID(), confirmDoc.GetAllocator());
+
+	// Send ping
+	std::string responseStr;
+	if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, confirmDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Global session service can not be reached");
+		return false;
+	}
+
+	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(responseStr);
+	if (msg == ot::ReturnMessage::Ok) {
+		return true;
+	}
+	else {
+		OT_LOG_E("Failed to notify session closed \"" + _sessionID + "\". Message: \"" + msg.getWhat() + "\"");
 		return false;
 	}
 }
@@ -129,6 +154,43 @@ GSSRegistrationInfo GlobalSessionService::getRegistrationResult() {
 	return m_registrationResult;
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
+void GlobalSessionService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_healthCheckRunning) {
+		_jsonObject.AddMember("HealthCheckRunning", true, _allocator);
+	}
+	else {
+		_jsonObject.AddMember("HealthCheckRunning", false, _allocator);
+	}
+
+	switch (m_connectionStatus) {
+	case GlobalSessionService::Connected:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("Connected", _allocator), _allocator);
+		break;
+
+	case GlobalSessionService::Disconnected:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("Disconnected", _allocator), _allocator);
+		break;
+
+	case GlobalSessionService::CheckingNewConnection:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("CheckingNewConnection", _allocator), _allocator);
+		break;
+
+	default:
+		OT_LOG_EAS("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
+		break;
+	}
+
+	ot::JsonObject registrationInfo;
+	m_registrationResult.addToJsonObject(registrationInfo, _allocator);
+	_jsonObject.AddMember("RegistrationResult", registrationInfo, _allocator);
+}
+
 // #################################################################################################################################################
 
 // Private functions
@@ -160,7 +222,7 @@ void GlobalSessionService::healthCheck(void) {
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, doc.GetAllocator()), doc.GetAllocator());
 
-			doc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIds(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), doc.GetAllocator()), doc.GetAllocator());
 
 			ot::JsonArray iniListArr;
 			doc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, doc.GetAllocator());

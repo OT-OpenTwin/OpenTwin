@@ -22,7 +22,7 @@ public:
 		NoState      = 0 << 0,
 		IsDebug      = 1 << 0, //! @brief Service is in debug mode.
 		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
-		Alive        = 1 << 2, //! @brief Service is visible to other services in the same session.
+		Alive        = 1 << 2, //! @brief Service is registered in the session.
 		ShuttingDown = 1 << 3  //! @brief Service is shutting down, waiting for confirmation.
 	};
 	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.

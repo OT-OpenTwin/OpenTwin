@@ -31,14 +31,8 @@ GlobalDirectoryService::~GlobalDirectoryService() {
 
 // Management
 
-bool GlobalDirectoryService::connect(const std::string& _url) {
+bool GlobalDirectoryService::connect(const std::string& _url, bool _waitForConnection) {
 	std::lock_guard<std::mutex> lock(m_mutex);
-
-	// Ensure connection status is disconnected
-	if (m_connectionStatus != Disconnected) {
-		OT_LOG_E("GDS state is not Disconnected. Ignoring request for \"" + _url + "\"");
-		return false;
-	}
 
 	// Clean up potentially running health check thread
 	this->stopHealthCheck();
@@ -53,17 +47,20 @@ bool GlobalDirectoryService::connect(const std::string& _url) {
 	// Start health check and wait for success
 	this->startHealthCheck();
 
-	// Wait for connection success
-	int ct = 0;
-	const int maxCt = 60;
-	while (!this->isConnected()) {
-		if (ct++ >= maxCt) {
-			OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\" after " + std::to_string(maxCt) + " attempts");
-			this->stopHealthCheck();
-			return false;
+	if (_waitForConnection) {
+		// Wait for connection success
+		int ct = 0;
+		const int maxCt = 60;
+		while (!this->isConnected()) {
+			if (ct++ >= maxCt) {
+				OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\" after " + std::to_string(maxCt) + " attempts");
+				this->stopHealthCheck();
+				return false;
+			}
+
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 
 	return true;
@@ -180,7 +177,24 @@ bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const
 	return true;
 }
 
-void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) {
+void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessionID) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send(SessionService::instance().getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send session shutdown notification to GDS at \"" + m_serviceURL + "\"");
+	}
+	if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Unexpected GDS response \"" + m_serviceURL + "\": \"" + response + "\"");
+	}
+}
+
+void GlobalDirectoryService::notifySessionShutdownCompleted(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::JsonDocument requestDoc;
@@ -190,7 +204,7 @@ void GlobalDirectoryService::notifySessionClosed(const std::string& _sessionID) 
 
 	std::string response;
 	if (!ot::msg::send(SessionService::instance().getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send session shutdown notification to GDS at \"" + m_serviceURL + "\"");
+		OT_LOG_E("Failed to send session shutdown completed notification to GDS at \"" + m_serviceURL + "\"");
 	}
 	if (response != OT_ACTION_RETURN_VALUE_OK) {
 		OT_LOG_E("Unexpected GDS response \"" + m_serviceURL + "\": \"" + response + "\"");
@@ -206,6 +220,39 @@ void GlobalDirectoryService::stopHealthCheck() {
 
 		delete m_healthCheckThread;
 		m_healthCheckThread = nullptr;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
+void GlobalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_healthCheckRunning) {
+		_jsonObject.AddMember("HealthCheckRunning", true, _allocator);
+	}
+	else {
+		_jsonObject.AddMember("HealthCheckRunning", false, _allocator);
+	}
+
+	switch (m_connectionStatus) {
+	case GlobalDirectoryService::Connected:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("Connected", _allocator), _allocator);
+		break;
+
+	case GlobalDirectoryService::Disconnected:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("Disconnected", _allocator), _allocator);
+		break;
+
+	case GlobalDirectoryService::CheckingNewConnection:
+		_jsonObject.AddMember("ConnectionStatus", ot::JsonString("CheckingNewConnection", _allocator), _allocator);
+		break;
+
+	default:
+		OT_LOG_EAS("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
+		break;
 	}
 }
 

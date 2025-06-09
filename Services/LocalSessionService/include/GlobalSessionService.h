@@ -9,6 +9,7 @@
 #include "GSSRegistrationInfo.h"
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
 
 // std header
@@ -36,13 +37,21 @@ public:
 
 	bool isConnected();
 
-	bool confirmSession(const std::string& _sessionId, const std::string& _userName);
+	bool confirmSession(const std::string& _sessionID, const std::string& _userName);
+
+	bool notifySessionShutdownCompleted(const std::string& _sessionID);
 
 	void startHealthCheck();
 
 	void stopHealthCheck();
 
 	GSSRegistrationInfo getRegistrationResult();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Serialization
+
+	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
 private:
 	void healthCheck(void);
