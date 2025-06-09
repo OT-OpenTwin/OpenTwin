@@ -58,6 +58,7 @@
 #include "EntityCoordinates2D.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
+#include "EntityResultUnstructuredMeshVtk.h"
 #include "EntitySolverCircuitSimulator.h"
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
@@ -327,6 +328,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityResultUnstructuredMeshData")
 	{
 		return new EntityResultUnstructuredMeshData(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityResultUnstructuredMeshVtk")
+	{
+		return new EntityResultUnstructuredMeshVtk(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else if (entityType == "EntitySolverCircuitSimulator")
 	{

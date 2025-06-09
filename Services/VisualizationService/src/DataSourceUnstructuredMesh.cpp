@@ -5,6 +5,7 @@
 #include "EntityBase.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
+#include "EntityResultUnstructuredMeshVtk.h"
 #include "ClassFactory.h"
 
 #include <vtkNew.h>
@@ -19,15 +20,19 @@
 #include <vtkCellData.h>
 #include <vtkTriangle.h>
 #include <vtkTetra.h>
+#include <vtkXMLUnstructuredGridReader.h>
 
 DataSourceUnstructuredMesh::DataSourceUnstructuredMesh()
 {
-
+	vtkGrid = vtkUnstructuredGrid::New();
 }
 
 DataSourceUnstructuredMesh::~DataSourceUnstructuredMesh()
 {
 	FreeMemory();
+
+	vtkGrid->Delete();
+	vtkGrid = nullptr;
 }
 
 bool DataSourceUnstructuredMesh::loadMeshData(EntityBase* meshEntity, ClassFactory* classFactory)
@@ -210,10 +215,25 @@ void DataSourceUnstructuredMesh::buildVectorArray(size_t length, float* data, vt
 	}
 }
 
-bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory)
+bool DataSourceUnstructuredMesh::loadData(EntityBase* resultEntity, EntityBase* meshEntity, ClassFactory* classFactory)
+{
+	if (dynamic_cast<EntityResultUnstructuredMeshData*>(resultEntity) != nullptr)
+	{
+		return loadData(dynamic_cast<EntityResultUnstructuredMeshData*>(resultEntity), meshEntity, classFactory);
+	}
+	else if (dynamic_cast<EntityResultUnstructuredMeshVtk*>(resultEntity) != nullptr)
+	{
+		return loadData(dynamic_cast<EntityResultUnstructuredMeshVtk*>(resultEntity), classFactory);
+	}
+
+	assert(0); // Unknown result type
+	return false;
+}
+		
+bool DataSourceUnstructuredMesh::loadData(EntityResultUnstructuredMeshData* resultData, EntityBase* meshEntity, ClassFactory* classFactory)
 {
 	// First, load the mesh data
-	EntityResultUnstructuredMesh *meshData = dynamic_cast<EntityResultUnstructuredMesh*>(meshEntity);
+	EntityResultUnstructuredMesh* meshData = dynamic_cast<EntityResultUnstructuredMesh*>(meshEntity);
 
 	if (meshData == nullptr)
 	{
@@ -230,19 +250,91 @@ bool DataSourceUnstructuredMesh::loadData(EntityBase *resultEntity, EntityBase *
 	if (!success) return false;
 
 	// Now, load the result data from the data base
-	EntityResultUnstructuredMeshData *resultData = dynamic_cast<EntityResultUnstructuredMeshData*>(resultEntity);
 	if (resultData == nullptr)
 	{
 		assert(0); // Wrong data type
 		return false;
 	}
 
-	success = loadResultData(resultEntity, classFactory);
+	success = loadResultData(resultData, classFactory);
 
 	delete resultData;
 	resultData = nullptr;
 
 	return success;
+}
+
+bool DataSourceUnstructuredMesh::loadData(EntityResultUnstructuredMeshVtk* resultData, ClassFactory* classFactory)
+{
+	FreeMemory();
+
+	assert(resultData != nullptr);
+
+	std::string quantityName;
+	EntityResultUnstructuredMeshVtk::eQuantityType quantityType = EntityResultUnstructuredMeshVtk::SCALAR;
+	std::vector<char> data;
+
+	resultData->getData(quantityName, quantityType, data, classFactory);
+
+	if (data.empty()) return false;
+
+	vtkXMLUnstructuredGridReader *unstructuredGridReader = vtkXMLUnstructuredGridReader::New();
+
+	std::string input(data.data());
+	unstructuredGridReader->SetInputString(input);
+	unstructuredGridReader->ReadFromInputStringOn();
+	unstructuredGridReader->Update();
+
+	vtkGrid->Delete();
+	vtkGrid = unstructuredGridReader->GetOutput();
+
+	for (int index = 0; index < vtkGrid->GetCellData()->GetNumberOfArrays(); index++)
+	{
+		std::string name = vtkGrid->GetCellData()->GetArrayName(index);
+
+		if (name == quantityName)
+		{
+			if (quantityType == EntityResultUnstructuredMeshVtk::SCALAR)
+			{
+				vtkGrid->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::SCALARS);
+				hasCellScalar = true;
+			}
+			else if (quantityType == EntityResultUnstructuredMeshVtk::VECTOR)
+			{
+				vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				hasCellVector = true;
+			}
+			else
+			{
+				assert(0); // Unknown data type
+			}
+		}
+	}
+
+	for (int index = 0; index < vtkGrid->GetPointData()->GetNumberOfArrays(); index++)
+	{
+		std::string name = vtkGrid->GetPointData()->GetArrayName(index);
+
+		if (name == quantityName)
+		{
+			if (quantityType == EntityResultUnstructuredMeshVtk::SCALAR)
+			{
+				vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::SCALARS);
+				hasPointScalar = true;
+			}
+			else if (quantityType == EntityResultUnstructuredMeshVtk::VECTOR)
+			{
+				vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				hasPointVector = true;
+			}
+			else
+			{
+				assert(0); // Unknown data type
+			}
+		}
+	}
+
+	return true;
 }
 
 void DataSourceUnstructuredMesh::FreeMemory(void)

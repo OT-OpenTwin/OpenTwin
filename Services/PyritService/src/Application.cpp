@@ -28,7 +28,11 @@
 #include "EntitySolverPyrit.h"
 #include "EntityResultText.h"
 #include "EntityFileText.h"
+#include "EntityResultUnstructuredMeshVtk.h"
+#include "EntityVisUnstructuredScalarVolume.h"
 #include "ClassFactory.h"
+
+#include <fstream>
 
 Application * g_instance{ nullptr };
 
@@ -506,14 +510,6 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		m_uiComponent->displayMessage(message);
 		m_subprocessManager->addLogText(message);
 	}
-
-	//GetDPLauncher getDPSolver(this);
-	//modelComponent()->clearNewEntityList();
-
-	//std::string logFileText;
-	//std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
-	//											 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
-	//m_uiComponent->displayMessage(output + "\n");
 	 
 	std::string logFileText;
 	m_subprocessManager->endLogging(logFileText);
@@ -524,6 +520,51 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
+
+	// TEMPORARY: Read the result data file and create a new result entity
+	std::ifstream file("resultme.vtu", std::ios::binary | std::ios::ate);
+	int data_length = (int)file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	char* fileData = new char[data_length+1];
+	file.read(fileData, data_length);
+	fileData[data_length] = 0;
+
+	EntityBinaryData *vtkData = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkData->setData(fileData, data_length+1);
+	vtkData->StoreToDataBase();
+
+	ot::UID vtkDataEntityID = vtkData->getEntityID();
+	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
+
+	delete[] fileData;
+	fileData = nullptr;
+
+	EntityResultUnstructuredMeshVtk *vtkResult = new EntityResultUnstructuredMeshVtk(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkResult->setData("energy_density", EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
+	vtkResult->StoreToDataBase();
+
+	EntityVisUnstructuredScalarVolume* visualizationEntity = new EntityVisUnstructuredScalarVolume(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/energy_density");
+	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
+	visualizationEntity->setEditable(true);
+	visualizationEntity->setInitiallyHidden(true);
+
+	visualizationEntity->createProperties();
+
+	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
+
+	visualizationEntity->StoreToDataBase();
+
+	modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+	modelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());
+	modelComponent()->addNewDataEntity(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion(), visualizationEntity->getEntityID());
+
+	delete visualizationEntity;
+	visualizationEntity = nullptr;
+
+	delete vtkResult;
+	vtkResult = nullptr;
 
 	// Store the newly created items in the data base
 	m_modelComponent->storeNewEntities("added solver results");
