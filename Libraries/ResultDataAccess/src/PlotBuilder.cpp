@@ -40,6 +40,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 		m_parameterLabels.push_back(parameterDescription.m_label);
 	}
 	curveEntity.setCurve(_config);
+	curveEntity.setEditable(true);
 	m_curves.push_back(curveEntity);
 }
 
@@ -114,6 +115,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.setFamilyOfCurveProperties(m_parameterLabels,m_quantityLabel);
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
+	plotEntity.setEditable(true);
 	plotEntity.StoreToDataBase();
 
 	for (EntityResult1DCurve& curve : m_curves)

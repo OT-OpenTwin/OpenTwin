@@ -4,6 +4,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include <algorithm>
+#include "OTCore/String.h"
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -127,7 +128,6 @@ bool EntityResult1DPlot::updatePropertyVisibilities(void)
 
 void EntityResult1DPlot::createProperties(void)
 {
-	EntityPropertiesString::createProperty("General", "Title", "", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot quantity", { "Magnitude", "Phase", "Real", "Imaginary" }, "Real", "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
@@ -173,7 +173,19 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
 	
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
-	const std::string title = PropertyHelper::getStringPropertyValue(this, "Title");
+	
+	const std::string entityName = getName();
+	auto shortName = ot::String::getEntitySubName(entityName);
+	std::string title ("");
+	if (shortName.has_value())
+	{
+		title = shortName.value();
+	}
+	else
+	{
+		assert(false);
+	}
+
 	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type");
 	const std::string plotQuantity = PropertyHelper::getSelectionPropertyValue(this, "Plot quantity");
 
@@ -197,8 +209,8 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "X axis");
 	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "Y axis");
-	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
-	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
+	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
+	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
 
 	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
@@ -279,7 +291,6 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view& d
 void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
 	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
-	PropertyHelper::setStringPropertyValue(_config.getTitle(), this, "Title");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::plotTypeToString(_config.getPlotType()), this, "Plot type");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::axisQuantityToString(_config.getAxisQuantity()), this, "Plot quantity");
 	

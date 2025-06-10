@@ -58,9 +58,6 @@ void EntityResult1DCurve::createProperties(void)
 	auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
 
 	EntityPropertiesGuiPainter::createProperty("General", "Color", stylePainter, "", getProperties());
-	
-	EntityPropertiesBoolean::createProperty("General", "Automatic label", true, "", getProperties());
-	EntityPropertiesString::createProperty("General", "Label override", "", "", getProperties());
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -80,25 +77,19 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 
 
 	std::string curveLabel("");
-	const bool autoLabel = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "General");
-	if (autoLabel)
+	
+	curveLabel = getName();
+	auto shortName = ot::String::getEntitySubName(curveLabel);
+	if (shortName.has_value())
 	{
-		curveLabel = getName();
-		auto shortName = ot::String::getEntitySubName(curveLabel);
-		if (shortName.has_value())
-		{
-			curveLabel = shortName.value();
-		}
-		else
-		{
-			assert(false); //Failed to get the short name which should always be possible
-			curveLabel = "";
-		}
+		curveLabel = shortName.value();
 	}
 	else
 	{
-		curveLabel = PropertyHelper::getStringPropertyValue(this, "Label override");
+		assert(false); //Failed to get the short name which should always be possible
+		curveLabel = "";
 	}
+	
 	
 	curveCfg.setTitle(curveLabel);
 	curveCfg.setQueryInformation(m_queryInformation);
@@ -109,8 +100,6 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 {
 	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().painter(), this, "Color");
-	PropertyHelper::setStringPropertyValue(_curve.getTitle(), this, "Label override");
-
 	m_queryInformation = _curve.getQueryInformation();
 }
 
