@@ -1,6 +1,26 @@
 #include "PropertyHelper.h"
 #include "OTCore/Logger.h"
 
+bool PropertyHelper::hasProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	auto allProperties = _base->getProperties().getListOfAllProperties();	
+	for (auto property : allProperties)
+	{
+		if (property->getName() == _name)
+		{
+			if (_groupName == "")
+			{
+				return true;
+			}
+			else if (_groupName == property->getGroup())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 double PropertyHelper::getDoublePropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesDouble* doubleProperty = getDoubleProperty(_base, _name, _groupName);

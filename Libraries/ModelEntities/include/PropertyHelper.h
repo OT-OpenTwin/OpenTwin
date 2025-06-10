@@ -4,6 +4,8 @@
 
 namespace PropertyHelper
 {
+	bool hasProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
 	double getDoublePropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	std::string getStringPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	std::string getSelectionPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");

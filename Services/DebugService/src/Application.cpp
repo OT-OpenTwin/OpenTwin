@@ -133,7 +133,7 @@ void Application::createPlotOneCurve()
 	const std::string plotName = "Test/A_plot_Single";
 	curveCfg.setEntityName(plotName + "/A_Curve");
 
-	builder.addCurve(std::move(description), curveCfg, ot::FolderNames::DatasetFolder + "/A_Curve");
+	builder.addCurve(std::move(description), curveCfg, "SingleCurve");
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
@@ -196,7 +196,7 @@ void Application::createFamilyOfCurves()
 	auto stylePainter = rainbowPainterIt.getNextPainter();
 
 	curveCfg.setLinePen(stylePainter.release());
-	builder.addCurve(std::move(descriptions), curveCfg, "SingleCurve");
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve");
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
@@ -268,7 +268,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3PConst");
 
 
 	//Here the shared part
@@ -341,7 +341,7 @@ void Application::createFamilyOfCurves3Parameter()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3P");
 
 
 	//Here the shared part

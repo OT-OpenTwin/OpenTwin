@@ -57,15 +57,9 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
+	
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->needsUpdate();
 
-	auto titleProperty = PropertyHelper::getStringProperty(this, "Title", "General");
-	if (titleProperty->needsUpdate())
-	{
-		const std::string newTitle = titleProperty->getValue();
-		const std::string fullEntityName =	getName();
-		const std::string entityNameTrunk = fullEntityName.substr(0, fullEntityName.find_last_of("/"));
-		setName(entityNameTrunk + newTitle);
-	}
 	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, true, requiresDataToBeFetched);
 
 	getProperties().forceResetUpdateForAllProperties();
