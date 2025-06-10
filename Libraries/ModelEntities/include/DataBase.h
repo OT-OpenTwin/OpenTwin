@@ -18,6 +18,7 @@
 #include "EntityBase.h"
 
 #include "Geometry.h"
+#include <mutex>
 
 class ClassFactory;
 
@@ -89,13 +90,15 @@ public:
 	static void readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::Edge> &edges);
 	/** ************************************************************************************************************************************************/
 private:
+	std::recursive_mutex m_accessPrefetchDocuments;
+
 	bool isConnected;
 	std::string projectName;
 	std::string databaseServerURL;
 	int serviceSiteID;
 	std::string serviceSiteIDString;
 	bool queueWritingFlag;
-	std::map<unsigned long long, bsoncxx::builder::basic::document *> prefetchedDocuments;
+	std::map<unsigned long long, bsoncxx::builder::basic::document *> m_prefetchedDocuments;
 	std::string userName;
 	std::string userPassword;
 };
