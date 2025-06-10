@@ -608,10 +608,6 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 	dataset.setQuantityDescription(quantDesc.release());
 
 	ot::Plot1DCurveCfg curveConfig;
-	curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
-	curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
-	curveConfig.setTitle(pipeline->GetResultLegendLabel());
-
 	_plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel());
 
 	ot::Plot1DCfg plotCfg;
@@ -621,7 +617,6 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 		plotName += "/" + pipeline->GetResultTitle();
 	}
 	plotCfg.setEntityName(plotName);
-
 	_plotBuilder.buildPlot(plotCfg,false);
 }
 
@@ -684,9 +679,6 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 
 		dataset.setQuantityDescription(quantDesc.release());
 		ot::Plot1DCurveCfg curveConfig;
-		curveConfig.setXAxisTitle(pipeline->GetLabelXAxis());
-		curveConfig.setYAxisTitle(pipeline->GetLabelYAxis());
-		curveConfig.setTitle(curveName);
 		curveConfig.setLinePen(painter.release());
 		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
 	}

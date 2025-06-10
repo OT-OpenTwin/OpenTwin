@@ -3537,10 +3537,9 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	// Get/create plot view that matches the plot config 
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
+	
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags);
 	ot::Plot* plot = plotView->getPlot();
-	plot->setConfig(plotConfig);
 
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
 	if (refreshData)
@@ -3581,7 +3580,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 			}
 
 			if (curveHasDataToVisualise) {
-				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg, xAxisParameter, queries);
+				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(plotConfig, curveCfg, xAxisParameter, queries);
 
 				for (const std::string& message : curveFactory.getCurveIDDescriptions()) {
 					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
@@ -3601,6 +3600,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 		//Now we add the data sets to the plot and visualise them
 		int32_t curveCounter(1);
+		plot->setConfig(plotConfig);
 		for (ot::PlotDataset* dataSet : dataSets) {
 
 

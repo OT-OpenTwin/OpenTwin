@@ -10,7 +10,7 @@ public:
 	CurveDatasetFactory(const std::string& _collectionName)
 		: m_dataAccess(_collectionName){ }
 	
-	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions);
+	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions);
 
 	const std::vector<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
 private:
@@ -25,11 +25,13 @@ private:
 	std::list<std::string> m_skippedValueComparisions;
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 
+	std::string createAxisLabel(const std::string& _title, const std::string& _unit);
+
 	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions);
 	const std::list<ValueComparisionDefinition> extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions);
 	CurveType determineCurveType(const ot::QueryInformation& _curveCfg);
-	ot::PlotDataset* createSingleCurve(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
-	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments);
+	ot::PlotDataset* createSingleCurve(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
+	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments);
 	
 	std::optional<ValueComparisionDefinition> createValidValueComparision(const ot::QuantityContainerEntryDescription& _desciption, const ValueComparisionDefinition& _comparision);
 

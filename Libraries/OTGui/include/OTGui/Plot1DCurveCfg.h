@@ -51,18 +51,6 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string& getTitle(void) const { return m_title; };
 
-		void setXAxisTitle(const std::string& _title) { m_axisTitleX = _title; };
-		const std::string& getXAxisTitle(void) const { return m_axisTitleX; };
-
-		void setXAxisUnit(const std::string& _unit) { m_axisUnitX = _unit; };
-		const std::string& getXAxisUnit(void) const { return m_axisUnitX; };
-
-		void setYAxisTitle(const std::string& _title) { m_axisTitleY = _title; };
-		const std::string& getYAxisTitle(void) const { return m_axisTitleY; };
-
-		void setYAxisUnit(const std::string& _unit) { m_axisUnitY = _unit; };
-		const std::string& getYAxisUnit(void) const { return m_axisUnitY; };
-
 		void setVisible(bool _isVisible) { m_visible = _isVisible; };
 		bool getVisible(void) const { return m_visible; };
 
@@ -97,11 +85,6 @@ namespace ot {
 		UID m_navigationId;
 
 		std::string m_title;
-
-		std::string m_axisTitleX;
-		std::string m_axisUnitX;
-		std::string m_axisTitleY;
-		std::string m_axisUnitY;
 
 		bool m_visible;
 		bool m_dimmed;

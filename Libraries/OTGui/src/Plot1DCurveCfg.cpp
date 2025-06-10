@@ -37,11 +37,6 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexc
 
 		m_title = std::move(_other.m_title);
 
-		m_axisTitleX = std::move(_other.m_axisTitleX);
-		m_axisUnitX = std::move(_other.m_axisUnitX);
-		m_axisTitleY = std::move(_other.m_axisTitleY);
-		m_axisUnitY = std::move(_other.m_axisUnitY);
-
 		m_visible = _other.m_visible;
 		m_dimmed = _other.m_dimmed;
 
@@ -70,11 +65,6 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other) 
 		m_navigationId = _other.m_navigationId;
 		
 		m_title = _other.m_title;
-
-		m_axisTitleX = _other.m_axisTitleX;
-		m_axisUnitX = _other.m_axisUnitX;
-		m_axisTitleY = _other.m_axisTitleY;
-		m_axisUnitY = _other.m_axisUnitY;
 		
 		m_visible = _other.m_visible;
 		m_dimmed = _other.m_dimmed;
@@ -106,10 +96,6 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("NavID", m_navigationId, _allocator);
 
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
-	_object.AddMember("AxisTitleX", JsonString(m_axisTitleX, _allocator), _allocator);
-	_object.AddMember("AxisUnitX", JsonString(m_axisUnitX, _allocator), _allocator);
-	_object.AddMember("AxisTitleY", JsonString(m_axisTitleY, _allocator), _allocator);
-	_object.AddMember("AxisUnitY", JsonString(m_axisUnitY, _allocator), _allocator);
 
 	_object.AddMember("Visible", m_visible, _allocator);
 	_object.AddMember("Dimmed", m_dimmed, _allocator);
@@ -139,10 +125,6 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_navigationId = json::getUInt64(_object, "NavID");
 
 	m_title = json::getString(_object, "Title");
-	m_axisTitleX = json::getString(_object, "AxisTitleX");
-	m_axisUnitX = json::getString(_object, "AxisUnitX");
-	m_axisTitleY = json::getString(_object, "AxisTitleY");
-	m_axisUnitY = json::getString(_object, "AxisUnitY");
 
 	m_visible = json::getBool(_object, "Visible");
 	m_dimmed = json::getBool(_object, "Dimmed");

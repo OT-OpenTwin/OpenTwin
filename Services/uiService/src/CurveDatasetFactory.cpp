@@ -9,7 +9,7 @@
 #include "Datapoints.h"
 #include "ShortParameterDescription.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	m_curveIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
@@ -22,15 +22,20 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg
 	std::list<ot::PlotDataset*> dataSets;
 	if (curveType == CurveType::m_single)
 	{
-		ot::PlotDataset* dataset = createSingleCurve(_config, allMongoDocuments);
+		ot::PlotDataset* dataset = createSingleCurve(_plotCfg,_config, allMongoDocuments);
 		dataSets.push_back(dataset);
 	}
 	else
 	{
 		assert(curveType == CurveType::m_familyCurve);
-		dataSets = createCurveFamily(_config, _xAxisParameter, allMongoDocuments);
+		dataSets = createCurveFamily(_plotCfg, _config, _xAxisParameter, allMongoDocuments);
 	}
 	return dataSets;
+}
+
+std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, const std::string& _unit)
+{
+	return _title + " [" + _unit +"]";
 }
 
 ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
@@ -130,7 +135,7 @@ CurveDatasetFactory::CurveType CurveDatasetFactory::determineCurveType(const ot:
 	}
 }
 
-ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const ot::QueryInformation& queryInformation =_curveCfg.getQueryInformation();
@@ -143,6 +148,7 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 	dataX.reserve(numberOfDocuments);
 
 	auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
 
@@ -156,23 +162,20 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _cur
 		dataX.push_back(parameterValue);
 	}
 	
-	if (_curveCfg.getXAxisUnit().empty())
+	if (_plotCfg.getXLabelAxisAutoDetermine())
 	{
-		_curveCfg.setXAxisUnit(entryDescription->m_unit); //Could be overwritten be the calling code, the default is the parameter unit.
+		_plotCfg.setAxisLabelX(createAxisLabel(entryDescription->m_label, entryDescription->m_unit));
 	}
-
-	if (_curveCfg.getTitle().empty())
+	if (_plotCfg.getYLabelAxisAutoDetermine())
 	{
-		const std::string entityName = _curveCfg.getEntityName();
-		const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
-		_curveCfg.setTitle(shortName);
+		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, quantityInformation.m_unit));
 	}
 
 	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(std::move(dataX),dataY.release()));
 	return singleCurve;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	std::list<ot::PlotDataset*> dataSets;
 
@@ -349,7 +352,6 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	}
 	
 	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
-	
 	for (auto& singleCurve : familyOfCurves) {
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
 		auto pen = newCurveCfg.getLinePen();
@@ -375,8 +377,6 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		{
 			newCurveCfg.setTitle(singleCurve.first);
 		}
-		newCurveCfg.setXAxisUnit(xAxisParameter->m_unit);
-		newCurveCfg.setXAxisTitle(xAxisParameter->m_label);
 				
 		std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
 		yData->m_real = std::move(singleCurve.second.m_yData);
@@ -384,6 +384,16 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		ot::PlotDatasetData datasetData(std::move(singleCurve.second.m_xData), yData.release());
 		auto dataset = new ot::PlotDataset (nullptr, newCurveCfg, std::move(datasetData));
 		dataSets.push_back(dataset);
+	}
+
+
+	if (_plotCfg.getYLabelAxisAutoDetermine())
+	{
+		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, quantityInformation.m_unit));
+	}
+	if (_plotCfg.getXLabelAxisAutoDetermine())
+	{
+		_plotCfg.setAxisLabelX(createAxisLabel(xAxisParameter->m_label, xAxisParameter->m_unit));
 	}
 
 	return dataSets;

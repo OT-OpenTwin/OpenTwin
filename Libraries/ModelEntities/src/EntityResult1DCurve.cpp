@@ -5,6 +5,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/StyleRefPainter2D.h"
+#include "OTCore/String.h"
 
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
@@ -57,15 +58,9 @@ void EntityResult1DCurve::createProperties(void)
 	auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
 
 	EntityPropertiesGuiPainter::createProperty("General", "Color", stylePainter, "", getProperties());
-	EntityPropertiesString::createProperty("X axis", "X axis label", "", "", getProperties());
-	EntityPropertiesString::createProperty("X axis", "X axis unit", "", "", getProperties());
-	EntityPropertiesString::createProperty("Y axis", "Y axis label", "", "", getProperties());
-	EntityPropertiesString::createProperty("Y axis", "Y axis unit", "", "", getProperties());
-
-	PropertyHelper::getStringProperty(this, "X axis label")->setReadOnly(true);
-	PropertyHelper::getStringProperty(this, "X axis unit")->setReadOnly(true);
-	PropertyHelper::getStringProperty(this, "Y axis label")->setReadOnly(true);
-	PropertyHelper::getStringProperty(this, "Y axis unit")->setReadOnly(true);
+	
+	EntityPropertiesBoolean::createProperty("General", "Curve label automatic", true, "", getProperties());
+	EntityPropertiesString::createProperty("General", "Curve label", "", "", getProperties());
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -78,41 +73,43 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	curveCfg.setEntityName(entityName);
 	curveCfg.setEntityID(getEntityID());
 	curveCfg.setEntityVersion(getEntityStorageVersion());
-
-	const std::string xAxisLabel =PropertyHelper::getStringPropertyValue(this, "X axis label");
-	const std::string xAxisUnit =PropertyHelper::getStringPropertyValue(this, "X axis unit");
-
-	const std::string yAxisLabel =PropertyHelper::getStringPropertyValue(this, "Y axis label");
-	const std::string yAxisUnit =PropertyHelper::getStringPropertyValue(this, "Y axis unit");
 	
-	
-
 	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
 	ot::PenFCfg penCfg(painter->createCopy());
 	curveCfg.setLinePen(penCfg);
 
-	curveCfg.setXAxisTitle(xAxisLabel);
-	curveCfg.setXAxisUnit(xAxisUnit);
 
-	curveCfg.setYAxisTitle(yAxisLabel);
-	curveCfg.setYAxisUnit(yAxisUnit);
-
-	curveCfg.setTitle(m_curveLabel);
-
+	std::string curveLabel("");
+	const bool autoLabel = PropertyHelper::getBoolPropertyValue(this, "Curve label automatic", "General");
+	if (autoLabel)
+	{
+		curveLabel = getName();
+		auto shortName = ot::String::getEntitySubName(curveLabel);
+		if (shortName.has_value())
+		{
+			curveLabel = shortName.value();
+		}
+		else
+		{
+			assert(false); //Failed to get the short name which should always be possible
+			curveLabel = "";
+		}
+	}
+	else
+	{
+		curveLabel = PropertyHelper::getStringPropertyValue(this, "Curve label");
+	}
+	
+	curveCfg.setTitle(curveLabel);
 	curveCfg.setQueryInformation(m_queryInformation);
+
 	return curveCfg;
 }
 
 void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 {
 	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().painter(), this, "Color");
-	PropertyHelper::setStringPropertyValue(_curve.getXAxisTitle(), this, "X axis label");
-	PropertyHelper::setStringPropertyValue(_curve.getXAxisUnit(), this, "X axis unit");
-
-	PropertyHelper::setStringPropertyValue(_curve.getYAxisTitle(), this, "Y axis label");
-	PropertyHelper::setStringPropertyValue(_curve.getYAxisUnit(), this, "Y axis unit");
-
-	m_curveLabel = _curve.getTitle();
+	PropertyHelper::setStringPropertyValue(_curve.getTitle(), this, "Curve label");
 
 	m_queryInformation = _curve.getQueryInformation();
 }
@@ -167,9 +164,6 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::
 void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
-	
-	const std::string entityName = getName();
-	m_curveLabel = entityName.substr(entityName.find_last_of("/") + 1);
 
 	m_queryInformation.m_query = doc_view["Query"].get_string();
 	m_queryInformation.m_projection = doc_view["Projection"].get_string();

@@ -618,11 +618,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setTitle(curveName);
-		curveCfg.setXAxisTitle(parameter.parameterName);
-		curveCfg.setXAxisUnit(parameter.unit);
-
-
-		
+				
 		auto stylePainter = rainbowPainterIt.getNextPainter();
 		curveCfg.setLinePen(stylePainter.release());
 
@@ -630,8 +626,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 		{
 			yLabel = "Voltage";
-			curveCfg.setYAxisTitle(yLabel);
-			curveCfg.setYAxisUnit(yUnit);
 			quantity->setName(yLabel);
 			quantity->addValueDescription("", ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());
@@ -641,8 +635,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		{
 			yLabel = "Current";
 			yUnit = "I";
-			curveCfg.setYAxisTitle(yLabel);
-			curveCfg.setYAxisUnit(yUnit);
 			quantity->setName(yLabel);
 			quantity->addValueDescription("", ot::TypeNames::getDoubleTypeName(), yUnit);
 			dataset.setQuantityDescription(quantity.release());

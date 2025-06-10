@@ -18,10 +18,10 @@ namespace ot {
 	public:
 		Plot1DAxisCfg();
 
-		Plot1DAxisCfg(const Plot1DAxisCfg& _other);
+		Plot1DAxisCfg(const Plot1DAxisCfg& _other) = default;
 		virtual ~Plot1DAxisCfg();
 
-		Plot1DAxisCfg& operator = (const Plot1DAxisCfg& _other);
+		Plot1DAxisCfg& operator = (const Plot1DAxisCfg& _other) = default;
 
 		bool operator==(const Plot1DAxisCfg& _other) const;
 		bool operator!=(const Plot1DAxisCfg& _other) const;
@@ -48,11 +48,20 @@ namespace ot {
 		void setIsAutoScale(bool _autoScaleEnabled) { m_isAutoScale = _autoScaleEnabled; };
 		bool getIsAutoScale(void) const { return m_isAutoScale; };
 
+		bool getAutoDetermineAxisLabel() const { return m_autoDetermineAxisLabel; }
+		const std::string& getAxisLabel() const { return m_axisLabel; }
+		void setAutoDetermineAxisLabel(const bool _autoDetermineAxisLabel) { m_autoDetermineAxisLabel = _autoDetermineAxisLabel; }
+		void setAxisLabel(const std::string& _label) { m_axisLabel = _label; }
+
+
 	private:
 		double m_min;
 		double m_max;
 		bool m_isLogScale = false;
 		bool m_isAutoScale = true;
+		bool m_autoDetermineAxisLabel = true;
+		std::string m_axisLabel = "";
+		
 	};
 
 }

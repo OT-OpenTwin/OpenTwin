@@ -124,6 +124,19 @@ namespace ot {
 		std::string getXAxisParameter() const { return m_xAxisParameter; }
 		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; }
 
+		bool getXLabelAxisAutoDetermine() const {return m_xAxis.getAutoDetermineAxisLabel(); }
+		void setXLabelAxisAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); }
+
+		bool getYLabelAxisAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); }
+		void setYLabelAxisAutoDetermine(bool _autoDetermine) { m_yAxis.setAutoDetermineAxisLabel(_autoDetermine); }
+
+		const std::string& getAxisLabelY() const {return m_yAxis.getAxisLabel(); }
+		void setAxisLabelY(const std::string& _label) { m_yAxis.setAxisLabel(_label); }
+
+		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); }
+		void setAxisLabelX(const std::string& _label) {m_xAxis.setAxisLabel(_label);}
+
+
 		const std::list<ValueComparisionDefinition>& getQueries() { return m_queries; }
 		void setQueries(std::list<ValueComparisionDefinition>& _queries);
 
@@ -132,6 +145,8 @@ namespace ot {
 
 		void setLimitOfCurves(int32_t _curveLimit) { m_curveLimit = _curveLimit; }
 		int32_t getLimitOfCurves() const { return m_curveLimit; }
+
+
 
 	private:
 		std::string m_projectName;

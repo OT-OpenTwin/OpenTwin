@@ -265,11 +265,6 @@ std::list<ot::Plot1DCurveCfg> PlotHandler::createCurves(std::list<EntityMetadata
 		ot::Plot1DCurveCfg curveConfig;
 		const std::string fullName = seriesMetadata->getName();
 		const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
-		curveConfig.setTitle(shortName);
-		curveConfig.setXAxisTitle("X-Title");
-		curveConfig.setYAxisTitle("Y-Title");
-		curveConfig.setXAxisUnit("X-Unit");
-		curveConfig.setYAxisUnit("Y-Unit");
 		auto painter = colourIt.getNextPainter();
 		curveConfig.setLinePen(painter.release());
 

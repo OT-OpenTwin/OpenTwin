@@ -33,7 +33,6 @@ public:
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 
 private:
-	std::string m_curveLabel;
 	ot::QueryInformation m_queryInformation;
 	
 	virtual void AddStorageData(bsoncxx::builder::basic::document& storage);

@@ -71,42 +71,9 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 			(datasetDescription.getQuantityDescription() != nullptr) && 
 			(datasetDescription.getQuantityDescription()->getMetadataQuantity().valueDescriptions.size() > 0 );
 	}
-	
-	if (!valid)
-	{
-		return valid;
-	}
-
-	//Only for now with a single y-axis
-	const std::string labelY = _config.getYAxisTitle();
-
-	for (auto& datasetDescription : _dataSetDescriptions)
-	{
-		valid &= (labelY == datasetDescription.getQuantityDescription()->getName());		
-		//The x label is flexible, multiple options may exist, thus a comparision does not make sense
-	}
-
 	return valid;
 }
 
-void PlotBuilder::setDefaults(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config)
-{
-	for (auto& datasetDescription : _dataSetDescriptions)
-	{
-		if (datasetDescription.getParameters().size() == 1)
-		{
-			const MetadataParameter& parameter = (*datasetDescription.getParameters().begin())->getMetadataParameter();
-			if (_config.getXAxisTitle().empty())
-			{
-				_config.setXAxisTitle(parameter.parameterLabel);
-			}
-			if (_config.getXAxisUnit().empty())
-			{
-				_config.setXAxisUnit(parameter.unit);
-			}
-		}
-	}
-}
 
 void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
 { 
@@ -140,7 +107,9 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 		const std::string shortName =  entityName.substr(entityName.find_last_of("/") + 1);
 		_plotCfg.setTitle(shortName);
 	}
+	m_parameterLabels.sort();
 	m_parameterLabels.unique();
+	m_quantityLabel.sort();
 	m_quantityLabel.unique();
 	plotEntity.setFamilyOfCurveProperties(m_parameterLabels,m_quantityLabel);
 	plotEntity.createProperties();

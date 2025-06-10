@@ -144,6 +144,11 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
 
+	EntityPropertiesBoolean::createProperty("Axis Label", "X axis label automatic", true, "", getProperties());
+	EntityPropertiesString::createProperty("Axis Label", "X axis label", "", "", getProperties());
+	EntityPropertiesBoolean::createProperty("Axis Label", "Y axis label automatic", true, "", getProperties());
+	EntityPropertiesString::createProperty("Axis Label", "Y axis label", "", "", getProperties());
+
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
 
@@ -191,6 +196,11 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
 
+	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "X axis label automatic");
+	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Y axis label automatic");
+	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Y axis label");
+	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "X axis label");
+
 	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
 	ot::Plot1DCfg config;
@@ -220,6 +230,12 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setYAxisIsAutoScale(autoScaleY);
 	config.setYAxisMin(minY);
 	config.setYAxisMax(maxY);
+
+	config.setYLabelAxisAutoDetermine(automaticLabelY);
+	config.setXLabelAxisAutoDetermine(automaticLabelX);
+	config.setAxisLabelY(labelY);
+	config.setAxisLabelX(labelX);
+
 
 	config.setQueries(queries);
 
@@ -280,6 +296,11 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", "Y axis");
+
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelX(), this, "X axis label");
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelY(), this, "Y axis label");
+	PropertyHelper::setBoolPropertyValue(_config.getYLabelAxisAutoDetermine(), this, "Y axis label automatic");
+	PropertyHelper::setBoolPropertyValue(_config.getXLabelAxisAutoDetermine(), this, "X axis label automatic");
 }
 
 
