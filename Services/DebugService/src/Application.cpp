@@ -41,6 +41,7 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo("Table", "Big (10M)", "RedCircle", std::bind(&Application::testTableBig, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Single Curve", "Plot1DVisible", std::bind(&Application::createPlotOneCurve, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves, this)));
+	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P const", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3Parameter, this)));
 
 	// Enable features (Exit)
@@ -151,10 +152,7 @@ void Application::createFamilyOfCurves()
 	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kHz";
 
-	const std::string plotName = "Test/S-Parameter";
-
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setEntityName(plotName + "/A_Curve");
+	const std::string plotName = "Test/A_plot_2Param";
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
 	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
@@ -191,15 +189,87 @@ void Application::createFamilyOfCurves()
 		descriptions.push_back(std::move(description));
 	}
 
-	int counter = 0;
 	ot::PainterRainbowIterator rainbowPainterIt;
-	for (auto& description : descriptions)
+	
+	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setEntityName(plotName + "/A_Curve");
+	auto stylePainter = rainbowPainterIt.getNextPainter();
+
+	curveCfg.setLinePen(stylePainter.release());
+	builder.addCurve(std::move(descriptions), curveCfg, "SingleCurve");
+
+	//Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	builder.buildPlot(plotCfg);
+}
+
+void Application::createFamilyOfCurves3ParameterConst()
+{
+	const std::string collName = Application::instance()->getCollectionName();
+
+	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	PlotBuilder builder(extender);
+
+	MetadataParameter parameter;
+	parameter.parameterName = "Frequency";
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
+	parameter.unit = "kHz";
+
+
+
+	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
+	const std::string plotName = "Test/A_plot_3Param_const";
+	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
+
+	std::vector<float> offsets{ 3.5f,7.2f,13.f };
+	std::shared_ptr<ParameterDescription> parameterDesc = nullptr;
+	std::list<DatasetDescription> descriptions;
+	for (int material = 0; material < 3; material++)
 	{
-		auto stylePainter = rainbowPainterIt.getNextPainter();
-		curveCfg.setLinePen(stylePainter.release());
-		counter++;
-		builder.addCurve(std::move(description), curveCfg, "Curve_" + std::to_string(counter));
+		for (int runID = 0; runID < 1; runID++)
+		{
+			DatasetDescription description;
+
+			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+			quantDesc->setName("S_11 (Magnitude)");
+			quantDesc->addValueDescription("", ot::TypeNames::getFloatTypeName(), "dB");
+
+			for (float i = 0.; i <= 50.; i++)
+			{
+				float value = static_cast<float>((i * (runID + 1))) * powf(-1,static_cast<float>(material));
+				quantDesc->addDatapoint(ot::Variable(value));
+				parameter.values.push_back(ot::Variable(i));
+			}
+			if (parameterDesc == nullptr)
+			{
+				parameterDesc.reset(new ParameterDescription(parameter, false));
+			}
+
+			MetadataParameter additionalParameter;
+			additionalParameter.parameterName = "Offset";
+			additionalParameter.values.push_back(offsets[runID]);
+			additionalParameter.typeName = ot::TypeNames::getFloatTypeName();
+			additionalParameter.unit = "mm";
+			std::shared_ptr<ParameterDescription> additionalParameterDescription(new ParameterDescription(additionalParameter, true));
+
+			MetadataParameter additionalParameter2;
+			additionalParameter2.parameterName = "Radius";
+			additionalParameter2.values.push_back(material);
+			additionalParameter2.typeName = ot::TypeNames::getInt32TypeName();
+			additionalParameter2.unit = "mm";
+			std::shared_ptr<ParameterDescription> additionalParameterDescription2(new ParameterDescription(additionalParameter2, true));
+
+			description.setQuantityDescription(quantDesc.release());
+			description.addParameterDescription(parameterDesc);
+			description.addParameterDescription(additionalParameterDescription);
+			description.addParameterDescription(additionalParameterDescription2);
+			descriptions.push_back(std::move(description));
+		}
 	}
+	builder.addCurve(std::move(descriptions), curveCfg, ot::FolderNames::DatasetFolder + "/A_FamilyOfCurves2");
+
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
@@ -223,7 +293,7 @@ void Application::createFamilyOfCurves3Parameter()
 
 	ot::Plot1DCurveCfg curveCfg;
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
-	const std::string plotName = "Test/A_plot3_ConstParameter";
+	const std::string plotName = "Test/A_plot_3Param";
 	curveCfg.setEntityName(plotName + "/A_FamilyOfCurves");
 
 	std::vector<float> offsets{ 3.5f,7.2f,13.f };
@@ -231,7 +301,7 @@ void Application::createFamilyOfCurves3Parameter()
 	std::list<DatasetDescription> descriptions;
 	for (int material = 0; material < 3; material++)
 	{
-		for (int runID = 0; runID < 1; runID++)
+		for (int runID = 0; runID < 3; runID++)
 		{
 			DatasetDescription description;
 
@@ -241,7 +311,7 @@ void Application::createFamilyOfCurves3Parameter()
 
 			for (float i = 0.; i <= 50.; i++)
 			{
-				float value = static_cast<float>((i * (runID + 1))) * powf(-1,static_cast<float>(material));
+				float value = static_cast<float>((i * (runID + 1))) * powf(-1, static_cast<float>(material));
 				quantDesc->addDatapoint(ot::Variable(value));
 				parameter.values.push_back(ot::Variable(i));
 			}
