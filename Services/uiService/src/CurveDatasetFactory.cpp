@@ -279,6 +279,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		std::list<std::string> nonConstParameter;
 		for (auto& parameterValues : parameterValuesByParameterName)
 		{
+			parameterValues.second.sort();
 			parameterValues.second.unique();
 			if (parameterValues.second.size() != 1)
 			{
@@ -290,6 +291,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		if (nonConstParameter.size() == 1)
 		{
 			const std::string notConstParameterName = *nonConstParameter.begin();
+			std::string message = shortName + ":\n";
+			bool firstParameterDescription = true;
 			for (auto& curve : familyOfCurves) {
 				std::string complexName = curve.first;
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
@@ -300,11 +303,19 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 					{
 						simpleName += "=" + description.m_value + " " + description.m_unit + ")";
 					}
+					else if(firstParameterDescription)
+					{
+						message +=
+							"	" + description.m_label + " = " + description.m_value + " " + description.m_unit + "\n";
+						firstParameterDescription = false;
+					}
 				}
 
 				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
 				curve.second = Datapoints();
 			}
+			m_curveIDDescriptions.push_back(message);
+
 		}
 		else if (nonConstParameter.size() == 0)
 		{
