@@ -138,16 +138,15 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesBoolean::createProperty("X axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "Max", 0.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Automatic label", true, "", getProperties());
+	EntityPropertiesString::createProperty("X axis", "Label override", "", "", getProperties());
 
 	EntityPropertiesBoolean::createProperty("Y axis", "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
-
-	EntityPropertiesBoolean::createProperty("Axis Label", "X axis label automatic", true, "", getProperties());
-	EntityPropertiesString::createProperty("Axis Label", "X axis label", "", "", getProperties());
-	EntityPropertiesBoolean::createProperty("Axis Label", "Y axis label automatic", true, "", getProperties());
-	EntityPropertiesString::createProperty("Axis Label", "Y axis label", "", "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Automatic label", true, "", getProperties());
+	EntityPropertiesString::createProperty("Y axis", "Label override", "", "", getProperties());
 
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
@@ -196,10 +195,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
 
-	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "X axis label automatic");
-	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Y axis label automatic");
-	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Y axis label");
-	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "X axis label");
+	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "X axis");
+	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "Y axis");
+	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
+	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
 
 	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
@@ -297,10 +296,11 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", "Y axis");
 
-	PropertyHelper::setStringPropertyValue(_config.getAxisLabelX(), this, "X axis label");
-	PropertyHelper::setStringPropertyValue(_config.getAxisLabelY(), this, "Y axis label");
-	PropertyHelper::setBoolPropertyValue(_config.getYLabelAxisAutoDetermine(), this, "Y axis label automatic");
-	PropertyHelper::setBoolPropertyValue(_config.getXLabelAxisAutoDetermine(), this, "X axis label automatic");
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelX(), this, "Label override", "X axis");
+	PropertyHelper::setBoolPropertyValue(_config.getXLabelAxisAutoDetermine(), this, "Automatic label", "X axis");
+	
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelY(), this, "Label override", "Y axis");
+	PropertyHelper::setBoolPropertyValue(_config.getYLabelAxisAutoDetermine(), this, "Automatic label", "Y axis");
 }
 
 
