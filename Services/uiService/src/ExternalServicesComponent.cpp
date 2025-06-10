@@ -3633,8 +3633,6 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 }
 
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
 
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
