@@ -267,12 +267,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	// 2c) All but one parameter are constant -> FoC: name of each curve shows the value of the not-constant parameter. The other parameter values of each curve are communicated
 
 	
-	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
-
-	const std::string entityName = _curveCfg.getEntityName();
-	const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
-
+	//In this case we need to make the names better readable. Since we have more then one parameter in the name 	
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
+	std::string simpleNameBase = _curveCfg.getTitle();
+
 	if (numberOfParameter > 2)
 	{	
 		//Naming case 1b and 2c
@@ -287,16 +285,16 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			}
 		}
 		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
-
+	
 		if (nonConstParameter.size() == 1)
 		{
 			const std::string notConstParameterName = *nonConstParameter.begin();
-			std::string message = shortName + ":\n";
+			std::string message = simpleNameBase + ":\n";
 			bool firstParameterDescription = true;
 			for (auto& curve : familyOfCurves) {
 				std::string complexName = curve.first;
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-				std::string simpleName = shortName + " (" + notConstParameterName;
+				std::string simpleName =  + " (" + notConstParameterName;
 				for (const ShortParameterDescription& description : additionalParameterDescription)
 				{
 					if (description.m_label == notConstParameterName)
@@ -323,10 +321,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			assert(familyOfCurves.size() == 1); 
 			auto singleCurve = familyOfCurves.begin();
 
-			familyOfCurvesSimplerNames.insert({ shortName,std::move(singleCurve->second)});
+			familyOfCurvesSimplerNames.insert({ simpleNameBase,std::move(singleCurve->second)});
 			
 			std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[singleCurve->first];
-			std::string message = shortName +":\n";
+			std::string message = simpleNameBase +":\n";
 			for (auto entry : additionalParameterDescription) 
 			{
 				message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
@@ -344,7 +342,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			for (auto& curve : familyOfCurves) {
 
 				std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
-				const std::string simpleName = shortName + " (curve " + curveNumber + ")";
+				const std::string simpleName = simpleNameBase + " (curve " + curveNumber + ")";
 				counter++;
 
 				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
@@ -382,7 +380,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 
 		if (numberOfParameter == 2)
 		{
-			newCurveCfg.setTitle(shortName + " " + singleCurve.first);
+			newCurveCfg.setTitle(simpleNameBase + " " + singleCurve.first);
 		}
 		else
 		{
