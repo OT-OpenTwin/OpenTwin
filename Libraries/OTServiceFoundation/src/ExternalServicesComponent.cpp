@@ -384,6 +384,7 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 		bool hasHandler{ false };
 		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, _messageType);
 
+		std::lock_guard<std::mutex> guard (m_actionDispatching);
 		// Prode the 
 		if (!hasHandler && action == OT_ACTION_CMD_GetSystemInformation)
 		{

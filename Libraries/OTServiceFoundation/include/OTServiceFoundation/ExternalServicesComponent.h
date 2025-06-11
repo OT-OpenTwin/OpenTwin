@@ -103,10 +103,11 @@ namespace ot {
 			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
-			
+
 			// #####################################################################################################################################
 
-			// Private member
+				// Private member
+			std::mutex m_actionDispatching;
 
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
