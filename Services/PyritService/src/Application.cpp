@@ -29,8 +29,8 @@
 #include "EntityResultText.h"
 #include "EntityFileText.h"
 #include "EntityResultUnstructuredMeshVtk.h"
-#include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredScalarSurface.h"
+#include "EntityVisUnstructuredVectorVolume.h"
 #include "ClassFactory.h"
 
 #include <fstream>
@@ -527,26 +527,40 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	int data_length = (int)file.tellg();
 	file.seekg(0, std::ios::beg);
 
-	char* fileData = new char[data_length+1];
+	char* fileData = new char[data_length + 1];
 	file.read(fileData, data_length);
 	fileData[data_length] = 0;
 
-	EntityBinaryData *vtkData = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-	vtkData->setData(fileData, data_length+1);
+	addScalarResult("energy_density", fileData, data_length, solverEntity);
+	addScalarResult("region IDs", fileData, data_length, solverEntity);
+	addScalarResult("reluctivity", fileData, data_length, solverEntity);
+	addScalarResult("vector_potential", fileData, data_length, solverEntity);
+
+	addVectorResult("flux_density", fileData, data_length, solverEntity);
+	addVectorResult("magnetic_field", fileData, data_length, solverEntity);
+
+	delete[] fileData;
+	fileData = nullptr;
+
+	// Store the newly created items in the data base
+	m_modelComponent->storeNewEntities("added solver results");
+}
+
+void Application::addScalarResult(const std::string &resultName, char* fileData, int data_length, EntityBase* solverEntity)
+{
+	EntityBinaryData* vtkData = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkData->setData(fileData, data_length + 1);
 	vtkData->StoreToDataBase();
 
 	ot::UID vtkDataEntityID = vtkData->getEntityID();
 	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
 
-	delete[] fileData;
-	fileData = nullptr;
-
-	EntityResultUnstructuredMeshVtk *vtkResult = new EntityResultUnstructuredMeshVtk(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-	vtkResult->setData("energy_density", EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
+	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
 	vtkResult->StoreToDataBase();
 
 	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/energy_density");
+	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
 	visualizationEntity->setEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
@@ -566,9 +580,42 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	delete vtkResult;
 	vtkResult = nullptr;
+}
 
-	// Store the newly created items in the data base
-	m_modelComponent->storeNewEntities("added solver results");
+void Application::addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity)
+{
+	EntityBinaryData* vtkData = new EntityBinaryData(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkData->setData(fileData, data_length + 1);
+	vtkData->StoreToDataBase();
+
+	ot::UID vtkDataEntityID = vtkData->getEntityID();
+	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
+
+	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::VECTOR, vtkData);
+	vtkResult->StoreToDataBase();
+
+	EntityVisUnstructuredVectorVolume* visualizationEntity = new EntityVisUnstructuredVectorVolume(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
+	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
+	visualizationEntity->setEditable(true);
+	visualizationEntity->setInitiallyHidden(true);
+
+	visualizationEntity->createProperties();
+
+	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
+
+	visualizationEntity->StoreToDataBase();
+
+	modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+	modelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());
+	modelComponent()->addNewDataEntity(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion(), visualizationEntity->getEntityID());
+
+	delete visualizationEntity;
+	visualizationEntity = nullptr;
+
+	delete vtkResult;
+	vtkResult = nullptr;
 }
 
 void Application::deleteSingleSolverResults(EntityBase* solverEntity)

@@ -118,6 +118,10 @@ public:
 	void deleteSingleSolverResults(EntityBase* solverEntity);
 	std::string problemTypeScript(EntityBase* solverEntity);
 
+	void addScalarResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
+	void addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
+
+
 private:
 	SubprocessManager*		m_subprocessManager;
 	ot::UID					visualizationModelID;
