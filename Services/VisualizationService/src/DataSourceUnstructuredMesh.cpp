@@ -301,7 +301,7 @@ bool DataSourceUnstructuredMesh::loadData(EntityResultUnstructuredMeshVtk* resul
 			}
 			else if (quantityType == EntityResultUnstructuredMeshVtk::VECTOR)
 			{
-				vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				vtkGrid->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
 				hasCellVector = true;
 			}
 			else
