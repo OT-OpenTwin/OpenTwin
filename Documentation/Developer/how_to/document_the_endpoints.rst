@@ -12,8 +12,7 @@ The endpoint documentation starts with the first trimmed line that contains the 
 
 .. code-block:: c++
 
-    //api @service My Service
-    //api @endpoint Secure
+    //api @security mTLS
     //api @action OT_ACTION_CMD_MyAction
     //api @brief Some short brief description.
     //api Here is a more detailed description.
@@ -45,14 +44,18 @@ The endpoint documentation starts with the first trimmed line that contains the 
     //api @rparam OT_ACTION_PARAM_MyParam3 String My return parameter description.
     OT_HANDLER(handlerFunctionName, HandlerClassName, OT_ACTION_CMD_MyAction, ot::SECURE_MESSAGE_TYPES)
 
-    //api @service My Service
-    //api @endpoint Oneway
+    //api @security tls
     //api @action OT_ACTION_CMD_MyAction2
     //api @brief Another short brief description.
     //api @param OT_ACTION_PARAM_MyParam4 String My parameter description.
     //api @return This endpoint does not return anything.
     //api If not providing any return text a default text indicating that this enpoint has no return value should be generated.
-    OT_HANDLER(handlerFunctionName, HandlerClassName, OT_ACTION_CMD_MyAction, ot::SECURE_MESSAGE_TYPES)
+    OT_HANDLER(shortHandlerFunction, HandlerClassName, OT_ACTION_CMD_MyAction2, ot::SECURE_MESSAGE_TYPES)
+
+    //api @security mtls
+    //api @action OT_ACTION_CMD_MyAction3
+    //api @brief Short brief description.
+    OT_HANDLER(minimalHandlerFunction, HandlerClassName, OT_ACTION_CMD_MyAction3, ot::SECURE_MESSAGE_TYPES)
 
 Example Result
 ==============
@@ -71,21 +74,21 @@ Actions
 ^^^^^^^
 
 .. list-table:: Actions Overview
-    :widths: 25 25 50 50
+    :widths: 25 50 25
     :header-rows: 1
 
     * - Endpoint
-      - Endpoint Secur
       - Brief Description
       - Macro
     * - :ref:`My.Custom.Action <EXAMPLE-ENDPOINT-ONE>`
-      - mTLS
       - Some short brief description.
       - OT_ACTION_CMD_MyAction
     * - :ref:`My.Other.Action <EXAMPLE-ENDPOINT-TWO>`
-      - One-way-TLS
       - Another short brief description.
       - OT_ACTION_CMD_MyAction2
+    * - :ref:`My.Other.Action <EXAMPLE-ENDPOINT-THREE>`
+      - Short brief description.
+      - OT_ACTION_CMD_MyAction3
 
 .. _EXAMPLE-ENDPOINT-ONE:
 
@@ -160,10 +163,15 @@ If the response will return a JSON object we use the same syntax rules as with t
       - String
       - My return parameter description.
       - OT_ACTION_PARAM_MyParam3
-    
-.. _EXAMPLE-ENDPOINT-TWO:
+
+Security
+""""""""
+
+mTLS
 
 ----
+
+.. _EXAMPLE-ENDPOINT-TWO:
 
 My.Other.Action
 ^^^^^^^^^^^^^^^
@@ -190,3 +198,27 @@ Response
 
 This endpoint does not return anything.
 If not providing any return text a default text indicating that this enpoint has no return value should be generated.
+
+Security
+""""""""
+
+TLS
+
+----
+
+.. _EXAMPLE-ENDPOINT-THREE:
+
+My.Minimal.Action
+^^^^^^^^^^^^^^^^^
+
+Short brief description.
+
+Response
+""""""""
+
+This endpoint does not return anything.
+
+Security
+""""""""
+
+mTLS
