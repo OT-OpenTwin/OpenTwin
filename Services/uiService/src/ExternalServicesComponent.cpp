@@ -3235,7 +3235,7 @@ std::string ExternalServicesComponent::handleRenameEntity(ot::JsonDocument& _doc
 	std::string fromPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_FROM);
 	std::string toPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_To);
 
-	ViewerAPI::renameEntityPath(fromPath, toPath);
+	AppBase::instance()->renameEntity(fromPath, toPath);
 
 	return "";
 }

@@ -41,6 +41,7 @@
 #include "OTSystem/SystemProcess.h"
 
 #include "OTCore/Flags.h"
+#include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ReturnMessage.h"
@@ -843,6 +844,27 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 void AppBase::setWaitingAnimationVisible(bool flag)
 {
 	ak::uiAPI::window::setWaitingAnimationVisible(m_mainWindow, flag);
+}
+
+void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toPath) {
+	// Update entity path in viewer
+	ViewerAPI::renameEntityPath(_fromPath, _toPath);
+
+	// Get entity name
+	std::string fromName = _fromPath;
+	auto from = ot::String::getEntitySubName(_fromPath);
+	if (from.has_value()) {
+		fromName = *from;
+	}
+
+	std::string toName = _toPath;
+	auto to = ot::String::getEntitySubName(_toPath);
+	if (to.has_value()) {
+		toName = *to;
+	}
+
+	// Update views in local map
+
 }
 
 // ##############################################################################################

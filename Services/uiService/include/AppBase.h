@@ -234,6 +234,8 @@ public:
 	void setViewHandlingConfigFlags(const ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
 	const ViewHandlingFlags& getViewHandlingConfigFlags(void) const { return m_viewHandling; };
 
+	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
+
 	// ############################################################################################
 
 	// Information gathering
