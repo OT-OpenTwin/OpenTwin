@@ -3594,7 +3594,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 			}
 			else
 			{
-				OT_LOG_W("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter);
+				AppBase::instance()->appendInfoMessage(QString(("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n").c_str()));
 			}
 		}
 
