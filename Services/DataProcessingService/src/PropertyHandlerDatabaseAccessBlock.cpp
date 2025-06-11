@@ -84,17 +84,6 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		parameterList.push_front(m_selectedValueNone);
 
 		//Now we update all parameter overviews and the labels of the parameter
-		auto parameterValueCharacteristics1 =_dbAccessEntity->getParameterValueCharacteristic1();
-		updateSelectionIfNecessary(parameterList, parameterValueCharacteristics1.m_label, newProperties);
-		updateParameterIfNecessary(*resultCollectionAccess, parameterValueCharacteristics1, newProperties);
-
-		auto parameterValueCharacteristics2 = _dbAccessEntity->getParameterValueCharacteristic2();
-		updateSelectionIfNecessary(parameterList, parameterValueCharacteristics2.m_label, newProperties);	
-		updateParameterIfNecessary(*resultCollectionAccess, parameterValueCharacteristics2, newProperties);
-
-		auto parameterValueCharacteristics3 = _dbAccessEntity->getParameterValueCharacteristic3();
-		updateSelectionIfNecessary(parameterList, parameterValueCharacteristics3.m_label, newProperties);
-		updateParameterIfNecessary(*resultCollectionAccess, parameterValueCharacteristics3, newProperties);
 
 		if (!newProperties.getListOfAllProperties().empty())
 		{

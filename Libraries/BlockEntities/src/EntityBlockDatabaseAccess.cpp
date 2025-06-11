@@ -13,22 +13,8 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 
 
 	const std::string connectorNameQuantity = "Quantity";
-	m_connectorQuantity = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
-	m_connectorsByName[connectorNameQuantity] = m_connectorQuantity;
-
-	const std::string connectorNameParameter1 = "Parameter1";
-	const std::string connectorTitleParameter1 = "Parameter 1";
-	m_connectorParameter1 = { ot::ConnectorType::Out,connectorNameParameter1, connectorTitleParameter1 };
-
-	const std::string connectorNameParameter2 = "Parameter2";
-	const std::string connectorTitleParameter2 = "Parameter 2";
-	m_connectorParameter2 = { ot::ConnectorType::Out,connectorNameParameter2, connectorTitleParameter2 };
-
-	const std::string connectorNameParameter3 = "Parameter3";
-	const std::string connectorTitleParameter3 = "Parameter 3";
-	m_connectorParameter3 = { ot::ConnectorType::Out,connectorNameParameter3, connectorTitleParameter3 };
-
-	m_connectorsByName[connectorNameParameter1] = m_connectorParameter1;
+	m_connectorOutput = { ot::ConnectorType::Out, connectorNameQuantity, connectorNameQuantity };
+	m_connectorsByName[connectorNameQuantity] = m_connectorOutput;
 }
 
 void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& comparators)
@@ -37,42 +23,31 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	getProperties().createProperty(projectList, "Database");
 
 	//Basic properties:
-	EntityPropertiesSelection::createProperty(m_groupQuerySettings, m_propertyNameDimension, { m_propertyValueDimension1,m_propertyValueDimension2, m_propertyValueDimension3, m_propertyValueDimensionCustom }, m_propertyValueDimension1, "default", getProperties());
 	EntityPropertiesSelection::createProperty(m_groupQuerySettings, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
 	
 	//Quantity Settings
-	std::list<std::string> groupNames{ m_groupQuantitySetttings,m_groupParamSettings1,m_groupParamSettings2,m_groupParamSettings3 };
+	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
+	
 
-	std::list<std::string>::iterator groupName = groupNames.begin();
-	for (; groupName != groupNames.end(); groupName++)
-	{
-		EntityPropertiesSelection::createProperty(*groupName, m_propertyName, {""}, "", "default", getProperties());
+	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
+	typeLabelProperty->setReadOnly(true);
+	typeLabelProperty->setName(m_propertyDataType);
+	typeLabelProperty->setGroup(m_groupQuantitySetttings);
+	typeLabelProperty->setValue("");
+	getProperties().createProperty(typeLabelProperty, m_groupQuantitySetttings);
 
-		if (*groupName == m_groupQuantitySetttings)
-		{
-			EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
-		}
-
-		EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
-		typeLabelProperty->setReadOnly(true);
-		typeLabelProperty->setName(m_propertyDataType);
-		typeLabelProperty->setGroup(*groupName);
-		typeLabelProperty->setValue("");
-		getProperties().createProperty(typeLabelProperty, *groupName);
-
-		EntityPropertiesString* unitLabelProperty = new EntityPropertiesString();
-		unitLabelProperty->setReadOnly(true);
-		unitLabelProperty->setName(m_propertyUnit);
-		unitLabelProperty->setGroup(*groupName);
-		unitLabelProperty->setValue("");
-		getProperties().createProperty(unitLabelProperty, *groupName);
+	EntityPropertiesString* unitLabelProperty = new EntityPropertiesString();
+	unitLabelProperty->setReadOnly(true);
+	unitLabelProperty->setName(m_propertyUnit);
+	unitLabelProperty->setGroup(m_groupQuantitySetttings);
+	unitLabelProperty->setValue("");
+	getProperties().createProperty(unitLabelProperty, m_groupQuantitySetttings);
 
 
-		EntityPropertiesString::createProperty(*groupName, m_propertyValue, "", "default", getProperties());
-		EntityPropertiesSelection::createProperty(*groupName, m_propertyComparator, comparators, comparators.back(), "default", getProperties());
-	}
-	setVisibleParameter2(false);
-	setVisibleParameter3(false);
+	EntityPropertiesString::createProperty(m_groupQuantitySetttings, m_propertyValue, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyComparator, comparators, comparators.back(), "default", getProperties());
+	
 }
 
 void EntityBlockDatabaseAccess::setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue)
@@ -95,43 +70,6 @@ std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 	return  selectedProjectName->getValue();
 }
 
-std::string EntityBlockDatabaseAccess::getQueryDimension()
-{
-	auto propertyBase = getProperties().getProperty("Outcome dimension");
-	auto outcome = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	assert(outcome != nullptr);
-
-	return outcome->getValue();
-}
-
-const bool EntityBlockDatabaseAccess::isQueryDimension1D()
-{
-	std::string selectedValue = getQueryDimension();
-	return selectedValue == m_propertyValueDimension1;
-}
-
-const bool EntityBlockDatabaseAccess::isQueryDimension2D()
-{
-	std::string selectedValue = getQueryDimension();
-	return selectedValue == m_propertyValueDimension2;
-}
-
-const bool EntityBlockDatabaseAccess::isQueryDimension3D()
-{
-	std::string selectedValue = getQueryDimension();
-	return selectedValue == m_propertyValueDimension3;
-}
-
-bool EntityBlockDatabaseAccess::setVisibleParameter2(bool _visible)
-{
-	return setVisibleParameter(m_groupParamSettings2,_visible);
-}
-
-bool EntityBlockDatabaseAccess::setVisibleParameter3(bool _visible)
-{
-	return setVisibleParameter(m_groupParamSettings3, _visible);
-}
-
 bool EntityBlockDatabaseAccess::setVisibleParameter(const std::string& _groupName, bool _visible)
 {
 	bool isVisible = getProperties().getProperty(m_propertyName, _groupName)->getVisible();
@@ -150,52 +88,7 @@ bool EntityBlockDatabaseAccess::setVisibleParameter(const std::string& _groupNam
 
 void EntityBlockDatabaseAccess::updateBlockConfig()
 {
-	bool updateOfDimensionality = getProperties().getProperty(m_propertyNameDimension, m_groupQuerySettings)->needsUpdate();
-	if (updateOfDimensionality)
-	{
-		const std::string queryDimension = getQueryDimension();
-		std::list<std::string> connectorsForRemoval;
-		if (m_propertyValueDimension2 == queryDimension)
-		{
-			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) != m_connectorsByName.end())
-			{
-				m_connectorsByName.erase(m_connectorParameter3.getConnectorName());
-				connectorsForRemoval.push_back(m_connectorParameter3.getConnectorName());
-			}
-			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) == m_connectorsByName.end())
-			{
-				m_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
-			}
-		}
-		else if (m_propertyValueDimension3 == queryDimension)
-		{
-			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) == m_connectorsByName.end())
-			{
-				m_connectorsByName[m_connectorParameter2.getConnectorName()] = m_connectorParameter2;
-			}
-			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) == m_connectorsByName.end())
-			{
-				m_connectorsByName[m_connectorParameter3.getConnectorName()] = m_connectorParameter3;
-			}
-		}
-		else
-		{
-			assert(m_propertyValueDimension1 == queryDimension);
-			if (m_connectorsByName.find(m_connectorParameter3.getConnectorName()) != m_connectorsByName.end())
-			{
-				m_connectorsByName.erase(m_connectorParameter3.getConnectorName());
-				connectorsForRemoval.push_back(m_connectorParameter3.getConnectorName());
-			}
-			if (m_connectorsByName.find(m_connectorParameter2.getConnectorName()) != m_connectorsByName.end())
-			{
-				m_connectorsByName.erase(m_connectorParameter2.getConnectorName());
-				connectorsForRemoval.push_back(m_connectorParameter2.getConnectorName());
-			}
-		}
 
-		CreateBlockItem();
-		updateConnections(connectorsForRemoval);
-	}
 }
 
 
@@ -305,32 +198,10 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
 {
-	auto baseProperty = getProperties().getProperty(m_propertyNameDimension);
-	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
-	bool refresh = false;
-	if (selectionProperty->getValue() == m_propertyValueDimension1)
-	{
-		refresh = setVisibleParameter2(false);
-		refresh |= setVisibleParameter3(false);
-	}
-	else if (selectionProperty->getValue() == m_propertyValueDimension2)
-	{
-		refresh = setVisibleParameter2(true);
-		refresh |= setVisibleParameter3(false);
-	}
-	else if (selectionProperty->getValue() == m_propertyValueDimension3)
-	{
-		refresh = setVisibleParameter2(true);
-		refresh |= setVisibleParameter3(true);
-	}
-	
-	updateBlockConfig();
 
-	if (refresh)
-	{
-		getProperties().forceResetUpdateForAllProperties();
-	}
-	return refresh;
+	//updateBlockConfig();
+
+	return false;
 }
 
 void EntityBlockDatabaseAccess::AddStorageData(bsoncxx::builder::basic::document& storage)
@@ -359,21 +230,6 @@ EntityPropertiesSelection* EntityBlockDatabaseAccess::getQuantityValueDescriptio
 	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(base);
 	assert(selection != nullptr);
 	return selection;
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getParameterValueCharacteristic1()
-{
-	return getValueCharacteristics(m_groupParamSettings1);
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getParameterValueCharacteristic2()
-{
-	return getValueCharacteristics(m_groupParamSettings2);
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getParameterValueCharacteristic3()
-{
-	return getValueCharacteristics(m_groupParamSettings3);
 }
 
 ValueCharacteristicProperties EntityBlockDatabaseAccess::getQuantityValueCharacteristic()
@@ -417,21 +273,6 @@ void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propNa
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
 {
 	return getSelectedValueComparisionDefinition(m_groupQuantitySetttings);
-}
-
-const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter1Definition()
-{
-	return getSelectedValueComparisionDefinition(m_groupParamSettings1);
-}
-
-const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter2Definition()
-{
-	return getSelectedValueComparisionDefinition(m_groupParamSettings2);
-}
-
-const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedParameter3Definition()
-{
-	return getSelectedValueComparisionDefinition(m_groupParamSettings3);
 }
 
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedValueComparisionDefinition(const std::string& _groupName)

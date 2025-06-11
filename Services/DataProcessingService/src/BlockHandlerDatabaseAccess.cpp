@@ -160,44 +160,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
 {
-	const std::string parameterConnectorName = _blockEntity->getConnectorParameter1().getConnectorName();
-	ValueComparisionDefinition param1Def = _blockEntity->getSelectedParameter1Definition();
-	const auto parameter1 = m_resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
-	if (parameter1 == nullptr)
-	{
-		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
-	}
-	addParameterQueryDescription(param1Def, *parameter1, parameterConnectorName);
-	addComparision(param1Def);
-
-	//Depending on the entity setting, we are now adding additional parameter queries.
-	const bool queryDimensionIs3D = _blockEntity->isQueryDimension3D();
-	const bool queryDimensionIs2D = _blockEntity->isQueryDimension2D();
-
-	if (queryDimensionIs2D || queryDimensionIs3D)
-	{
-		auto param2Def = _blockEntity->getSelectedParameter2Definition();
-		const std::string param2ConnectorName = _blockEntity->getConnectorParameter2().getConnectorName();
-		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
-		if (parameter == nullptr)
-		{
-			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
-		}
-		addParameterQueryDescription(param2Def, *parameter, param2ConnectorName);
-		addComparision(param2Def);
-	}
-	if (queryDimensionIs3D)
-	{
-		auto param3Def = _blockEntity->getSelectedParameter3Definition();
-		const std::string param3ConnectorName = _blockEntity->getConnectorParameter3().getConnectorName();
-		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
-		if (parameter == nullptr)
-		{
-			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
-		}
-		addParameterQueryDescription(param3Def, *parameter, param3ConnectorName);
-		addComparision(param3Def);
-	}
+	
 }
 
 const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity)
