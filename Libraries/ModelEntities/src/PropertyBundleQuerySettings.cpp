@@ -96,6 +96,11 @@ bool PropertyBundleQuerySettings::requiresUpdate(EntityBase* _thisObject)
 	return updateRequired;
 }
 
+EntityPropertiesInteger* PropertyBundleQuerySettings::getNumberOfQueriesProperty(EntityBase* _thisObject)
+{
+	return PropertyHelper::getIntegerProperty(_thisObject, m_propertyNbOfComparisions, m_groupQuerySettings);
+}
+
 void PropertyBundleQuerySettings::updateQuerySettings(EntityBase* _thisObject, const std::list<std::string>& _queryOptions)
 {
 
