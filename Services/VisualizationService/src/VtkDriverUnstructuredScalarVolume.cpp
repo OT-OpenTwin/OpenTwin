@@ -259,6 +259,11 @@ vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* 
 		dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
 	}
 
+	planeCut->Update();
+	int arrays = planeCut->GetOutput()->GetPointData()->GetNumberOfArrays();
+	vtkDataArray* data1 = planeCut->GetOutput()->GetPointData()->GetScalars();
+	vtkDataArray* data2 = planeCut->GetOutput()->GetPointData()->GetScalars("energy_density");
+
 	return planeCut->GetOutputPort();
 }
 

@@ -30,6 +30,7 @@
 #include "EntityFileText.h"
 #include "EntityResultUnstructuredMeshVtk.h"
 #include "EntityVisUnstructuredScalarVolume.h"
+#include "EntityVisUnstructuredScalarSurface.h"
 #include "ClassFactory.h"
 
 #include <fstream>
@@ -544,7 +545,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	vtkResult->setData("energy_density", EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
 	vtkResult->StoreToDataBase();
 
-	EntityVisUnstructuredScalarVolume* visualizationEntity = new EntityVisUnstructuredScalarVolume(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/energy_density");
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
 	visualizationEntity->setEditable(true);
