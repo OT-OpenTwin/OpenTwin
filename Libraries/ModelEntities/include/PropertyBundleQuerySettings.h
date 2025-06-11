@@ -14,6 +14,8 @@ public:
 
 	bool requiresUpdate(EntityBase* _thisObject);
 
+	void updateQuerySettings(EntityBase* _thisObject,const std::list<std::string>& _queryOptions);
+
 private:
 	const std::string m_groupQuerySettings = "Query settings";
 	const std::string m_propertyNbOfComparisions = "Number of queries";

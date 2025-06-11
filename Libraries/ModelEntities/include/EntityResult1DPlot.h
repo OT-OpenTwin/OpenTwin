@@ -19,11 +19,12 @@ public:
 	virtual bool updateFromProperties(void) override;
 	bool updatePropertyVisibilities(void);
 	
+	virtual void addChild(EntityBase* _child) override;
+	virtual void removeChild(EntityBase* _child) override;
+
+
 	void createProperties(void);
 	
-	//! @brief Needs to be called before createProperties
-	void setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames);
-
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
 	void setPlot(const ot::Plot1DCfg& _config) override;
@@ -33,6 +34,8 @@ public:
 	void updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames);
 private:
 	PropertyBundleQuerySettings m_querySettings;
+
+	void setQuerySelections();
 
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;

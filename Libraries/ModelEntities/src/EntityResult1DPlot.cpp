@@ -5,6 +5,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include <algorithm>
 #include "OTCore/String.h"
+#include "EntityResult1DCurve.h"
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -120,8 +121,26 @@ bool EntityResult1DPlot::updatePropertyVisibilities(void)
 	return updatePropertiesGrid;
 }
 
+void EntityResult1DPlot::addChild(EntityBase* _child)
+{
+	EntityContainer::addChild(_child);
+	setQuerySelections();
+}
+
+void EntityResult1DPlot::removeChild(EntityBase* _child)
+{
+	EntityContainer::removeChild(_child);
+	setQuerySelections();
+}
+
 void EntityResult1DPlot::createProperties(void)
 {
+	//Query options are set in the addChild and removeChild methods
+	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
+	std::list<std::string> allQueryOptions{ "" };
+	m_querySettings.setQueryDefinitions(allQueryOptions);
+	m_querySettings.setProperties(this);
+
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot quantity", { "Magnitude", "Phase", "Real", "Imaginary" }, "Real", "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
@@ -150,18 +169,6 @@ void EntityResult1DPlot::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-void EntityResult1DPlot::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
-{
-	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", _parameterNames, *_parameterNames.begin(), "default", getProperties());
-	
-	std::list<std::string> allQueryOptions{""};
-	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
-	
-	m_querySettings.setQueryDefinitions(allQueryOptions);
-	m_querySettings.setProperties(this);
-
-	getProperties().forceResetUpdateForAllProperties();
-}
 
 const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
@@ -255,19 +262,31 @@ bool EntityResult1DPlot::visualisePlot()
 	return true;
 }
 
-void EntityResult1DPlot::updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
+void EntityResult1DPlot::setQuerySelections()
 {
-	EntityPropertiesSelection* xAxisProp = PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set");
-	std::list<std::string> allQueryOptions, selectionOptions = { xAxisProp->getOptions().begin(),xAxisProp->getOptions().end() };
-	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
-	allQueryOptions.unique();
-	if (allQueryOptions != selectionOptions)
+	std::list<std::string> filterOptions, parameterOptions;
+	for (EntityBase* child : getChildrenList())
 	{
-		m_querySettings.setQueryDefinitions(allQueryOptions);
-		m_querySettings.setProperties(this);
-
-		getProperties().forceResetUpdateForAllProperties();
+		auto curve = dynamic_cast<EntityResult1DCurve*>(child);
+		if (curve != nullptr)
+		{
+			const ot::QueryInformation& queryInformation = curve->getQueryInformation();
+			filterOptions.push_back(queryInformation.m_quantityDescription.m_label);
+			for (auto& parameterDescr : queryInformation.m_parameterDescriptions)
+			{
+				filterOptions.push_back(parameterDescr.m_label);
+				parameterOptions.push_back(parameterDescr.m_label);
+			}
+		}
 	}
+	filterOptions.push_back("");
+	filterOptions.sort();
+	filterOptions.unique();
+	parameterOptions.sort();
+	parameterOptions.unique();
+
+	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->resetOptions(parameterOptions);
+	m_querySettings.updateQuerySettings(this, filterOptions);
 }
 
 void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document& storage)

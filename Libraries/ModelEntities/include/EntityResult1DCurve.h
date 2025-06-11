@@ -32,6 +32,8 @@ public:
 	ot::Plot1DCurveCfg getCurve() override;
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 
+	const ot::QueryInformation& getQueryInformation() const { return m_queryInformation; }
+
 private:
 	ot::QueryInformation m_queryInformation;
 	

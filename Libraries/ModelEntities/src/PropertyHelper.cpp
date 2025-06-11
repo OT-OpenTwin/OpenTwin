@@ -215,6 +215,12 @@ void PropertyHelper::setSelectionPropertyValue(const std::string& _value, Entity
 	selectionProperty->setValue(_value);
 }
 
+void PropertyHelper::setSelectionPropertyValue(const std::list<std::string>& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesSelection* selectionProperty = getSelectionProperty(_base, _name, _groupName);
+	selectionProperty->resetOptions(_values);
+}
+
 void PropertyHelper::setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesBoolean* booleanProeprty = getBoolProperty(_base, _name, _groupName);

@@ -112,7 +112,6 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	m_parameterLabels.unique();
 	m_quantityLabel.sort();
 	m_quantityLabel.unique();
-	plotEntity.setFamilyOfCurveProperties(m_parameterLabels,m_quantityLabel);
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.setEditable(true);

@@ -761,7 +761,7 @@ void EntityPropertiesSelection::copySettings(EntityPropertiesBase *other, Entity
 	}
 }
 
-void EntityPropertiesSelection::resetOptions(std::list<std::string>& _options)
+void EntityPropertiesSelection::resetOptions(const std::list<std::string>& _options)
 {
 	m_options.clear();
 	m_options.reserve(_options.size());
