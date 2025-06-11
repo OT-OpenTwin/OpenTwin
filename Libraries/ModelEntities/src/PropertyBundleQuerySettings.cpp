@@ -88,10 +88,9 @@ bool PropertyBundleQuerySettings::requiresUpdate(EntityBase* _thisObject)
 			auto queryValue = PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName);
 
 			updateRequired |=
-				selectedComparator->getValue() != "" & !queryValue->getValue().empty() & //A comparator and a value are necessary for a query. Without them, the data in the ui does not need to be reloaded.
-				(selectedComparator->needsUpdate() | //If a query could be performed we check now if the properties have changed
-					queryValue->needsUpdate() |
-					PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate());
+				selectedComparator->needsUpdate() | //If a query could be performed we check now if the properties have changed
+				queryValue->needsUpdate() |
+				PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate();
 		}
 	}
 	return updateRequired;
