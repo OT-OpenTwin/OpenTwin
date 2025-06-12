@@ -5,7 +5,7 @@
 
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 #include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID>& _selectedEntities)
@@ -91,7 +91,7 @@ void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
 		{
 			std::string tableSelectionName = tableSelection->getName();
 
-			std::optional<std::string> msmdName = ot::String::getEntitySubName(tableSelectionName, 2);
+			std::optional<std::string> msmdName = ot::EntityName::getSubName(tableSelectionName, 2);
 			if (msmdName.has_value())
 			{
 				allRelevantTableSelectionsByMSMD[msmdName.value()].push_back(tableSelection);

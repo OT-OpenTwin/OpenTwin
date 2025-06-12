@@ -10,69 +10,6 @@ TEST(StringTests, StringEscapeTest) {
 	EXPECT_EQ(result, "Test\nString\"\"with some escape\bcharacters");
 }
 
-TEST(StringTest, EntityTopologyName_ShortName)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName);
-	EXPECT_TRUE(subName.has_value());
-
-	const std::string expectedName = "Short_Name";
-	EXPECT_EQ(subName.value(), expectedName);
-}
-
-TEST(StringTest, EntityTopologyName_Root)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName,0);
-	EXPECT_TRUE(subName.has_value());
-
-	const std::string expectedName = "Root";
-	EXPECT_EQ(subName.value(), expectedName);
-}
-
-TEST(StringTest, EntityTopologyName_FirstLvl)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName, 1);
-	EXPECT_TRUE(subName.has_value());
-
-	const std::string expectedName = "First_Lvl";
-	EXPECT_EQ(subName.value(), expectedName);
-}
-
-TEST(StringTest, EntityTopologyName_ThirdLvl)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName, 3);
-	EXPECT_TRUE(subName.has_value());
-
-	const std::string expectedName = "Third_Lvl";
-	EXPECT_EQ(subName.value(), expectedName);
-}
-
-TEST(StringTest, EntityTopologyName_Empty)
-{
-	const std::string fullEntityName = "";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName, 0);
-	EXPECT_FALSE(subName.has_value());
-}
-
-TEST(StringTest, EntityTopologyName_LvlNotExist)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName, 5);
-	EXPECT_FALSE(subName.has_value());
-}
-
-TEST(StringTest, EntityTopologyName_ShortNameByLvl)
-{
-	const std::string fullEntityName = "Root/First_Lvl/Second_Lvl/Third_Lvl/Short_Name";
-	std::optional<std::string> subName = ot::String::getEntitySubName(fullEntityName, 4);
-	EXPECT_TRUE(subName.has_value());
-
-	const std::string expectedName = "Short_Name";
-	EXPECT_EQ(subName.value(), expectedName);
-}
 
 TEST(StringTests, StringSmartSplit) {
 	//std::string src = "Test\nString \"containing\nsubstring with\\nsome escape\\\"\"\n";

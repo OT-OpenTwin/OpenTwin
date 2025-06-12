@@ -5,7 +5,7 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/StyleRefPainter2D.h"
-#include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
@@ -79,7 +79,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	std::string curveLabel("");
 	
 	curveLabel = getName();
-	auto shortName = ot::String::getEntitySubName(curveLabel);
+	auto shortName = ot::EntityName::getSubName(curveLabel);
 	if (shortName.has_value())
 	{
 		curveLabel = shortName.value();

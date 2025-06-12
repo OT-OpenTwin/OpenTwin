@@ -12,7 +12,6 @@
 // std header
 #include <list>
 #include <string>
-#include <optional>
 
 namespace ot {
 
@@ -32,13 +31,16 @@ namespace ot {
 		//! @brief Changes the provided string to the lower case.
 		static std::string toLower(const std::string& _string);
 
+		//! @brief Finds the index of the characters n-th occurance in the string.
+		//! The result when searching for the second occurance of '/' in "A/BB/CCC" will be 4.
+		//! @param _string String to search in.
+		//! @param _character Character to find.
+		//! @param _occurance Occurance to find.
+		//! @return Index of the character or std::string::npos if the n-th character was not found.
+		static size_t findOccurance(const std::string& _string, char _character, int _occurance = 1);
+
 		//! @brief Evaluates any escape characters in this string.
 		static std::string evaluateEscapeCharacters(const std::string& _string);
-
-		//! @brief Extract a name from the full topology entity name
-		//! @param _topologyLvl 0 = root folder, 1 = next level container .... n = short name of entity (default)
-		//! @return 
-		static std::optional<std::string> getEntitySubName(const std::string& _fullEntityName, int32_t _topologyLvl = -1);
 
 		//! @brief Split the provided string
 		//! @param _str String to split

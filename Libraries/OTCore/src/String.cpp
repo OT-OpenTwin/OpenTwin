@@ -54,6 +54,19 @@ std::string ot::String::toLower(const std::string& _string)
 	return result;
 }
 
+size_t ot::String::findOccurance(const std::string& _string, char _character, int _occurance) {
+	const size_t size = _string.size();
+	size_t count = 0;
+	for (size_t i = 0; i < size; ++i) {
+		if (_string[i] == _character) {
+			if (++count == _occurance) {
+				return i;
+			}
+		}
+	}
+	return std::string::npos;
+}
+
 std::string ot::String::evaluateEscapeCharacters(const std::string& _string) {
 	std::string result;
 	size_t len = _string.length() - 1;
@@ -126,49 +139,6 @@ std::string ot::String::evaluateEscapeCharacters(const std::string& _string) {
 	}
 
 	return result;
-}
-
-std::optional<std::string> ot::String::getEntitySubName(const std::string& _fullEntityName, int32_t _topologyLvl)
-{
-	if (_topologyLvl == -1)
-	{
-		size_t pos = _fullEntityName.find_last_of("/");
-		if (pos < _fullEntityName.size())
-		{
-			return _fullEntityName.substr(pos + 1);
-		}
-		else
-		{
-			return {};
-		}
-	}
-	else
-	{
-		std::string subName (""), restName(_fullEntityName);
-
-		for (int32_t i = 0; i <= _topologyLvl; i++)
-		{
-			size_t levelPositionBorder = restName.find_first_of("/");
-			
-			if (levelPositionBorder < restName.size())
-			{
-				subName = restName.substr(0, levelPositionBorder);
-				restName = restName.substr(levelPositionBorder + 1);
-			}
-			else
-			{
-				if (i == _topologyLvl && !restName.empty())
-				{
-					return restName;
-				}
-				else
-				{
-					return {};
-				}
-			}
-		}
-		return subName;
-	}
 }
 
 std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {

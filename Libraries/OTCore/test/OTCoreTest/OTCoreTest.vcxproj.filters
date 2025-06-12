@@ -45,6 +45,9 @@
     <ClCompile Include="src\TestReturnMessage.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestEntityName.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="TestEncodingTypeFiles\ANSI.txt">

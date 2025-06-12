@@ -4,7 +4,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include <algorithm>
-#include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 #include "EntityResult1DCurve.h"
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
@@ -176,7 +176,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
 	
 	const std::string entityName = getName();
-	auto shortName = ot::String::getEntitySubName(entityName);
+	auto shortName = ot::EntityName::getSubName(entityName);
 	std::string title ("");
 	if (shortName.has_value())
 	{

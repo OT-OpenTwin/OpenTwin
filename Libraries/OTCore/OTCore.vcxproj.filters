@@ -133,6 +133,9 @@
     <ClCompile Include="src\ExplicitStringValueConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntityName.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -371,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ExplicitStringValueConverter.h">
       <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\EntityName.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

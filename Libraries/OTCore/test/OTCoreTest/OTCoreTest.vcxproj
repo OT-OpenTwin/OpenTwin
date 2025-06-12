@@ -39,6 +39,7 @@
     <ClCompile Include="src\FixtureTextEncoding.cpp" />
     <ClCompile Include="src\FixtureVariable.cpp" />
     <ClCompile Include="src\TestContainerHelper.cpp" />
+    <ClCompile Include="src\TestEntityName.cpp" />
     <ClCompile Include="src\TestGenericDataStruct.cpp" />
     <ClCompile Include="src\TestReturnMessage.cpp" />
     <ClCompile Include="src\TestReturnValues.cpp" />
