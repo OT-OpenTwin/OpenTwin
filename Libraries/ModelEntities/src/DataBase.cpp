@@ -245,7 +245,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	}
 
 	auto queryBuilderDoc = bsoncxx::builder::basic::document{};
-	queryBuilderDoc.append(kvp("$and", queryArray));
+	queryBuilderDoc.append(kvp("$or", queryArray));
 
 	BsonViewOrValue filterQuery = queryBuilderDoc.extract();
 	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
