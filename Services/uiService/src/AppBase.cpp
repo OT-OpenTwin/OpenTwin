@@ -847,23 +847,70 @@ void AppBase::setWaitingAnimationVisible(bool flag)
 }
 
 void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toPath) {
+	// Ensure a change has occured
+	if (_fromPath == _toPath) {
+		return;
+	}
+
 	// Update entity path in viewer
 	ViewerAPI::renameEntityPath(_fromPath, _toPath);
 
-	// Get entity name
-	std::string fromName = _fromPath;
-	auto from = ot::String::getEntitySubName(_fromPath);
-	if (from.has_value()) {
-		fromName = *from;
-	}
-
-	std::string toName = _toPath;
-	auto to = ot::String::getEntitySubName(_toPath);
-	if (to.has_value()) {
-		toName = *to;
-	}
+	// Update views in view manager
+	ot::WidgetViewManager::instance().renameView(_fromPath, _toPath);
 
 	// Update views in local map
+
+	// Graphics
+	auto graphicsIt = m_graphicsViews.find(_fromPath);
+	if (graphicsIt != m_graphicsViews.end()) {
+		auto check = m_graphicsViews.find(_toPath);
+		if (check != m_graphicsViews.end()) {
+			OT_LOG_EAS("A graphics view with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_graphicsViews.insert_or_assign(_toPath, graphicsIt->second);
+			m_graphicsViews.erase(_fromPath);
+		}
+	}
+
+	// TextEdit
+	auto textIt = m_textEditors.find(_fromPath);
+	if (textIt != m_textEditors.end()) {
+		auto check = m_textEditors.find(_toPath);
+		if (check != m_textEditors.end()) {
+			OT_LOG_EAS("A text edit with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_textEditors.insert_or_assign(_toPath, textIt->second);
+			m_textEditors.erase(_fromPath);
+		}
+	}
+
+	// Tables
+	auto tableIt = m_tables.find(_fromPath);
+	if (tableIt != m_tables.end()) {
+		auto check = m_tables.find(_toPath);
+		if (check != m_tables.end()) {
+			OT_LOG_EAS("A table with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_tables.insert_or_assign(_toPath, tableIt->second);
+			m_tables.erase(_fromPath);
+		}
+	}
+
+	// Plots
+	auto plotIt = m_plots.find(_fromPath);
+	if (plotIt != m_plots.end()) {
+		auto check = m_plots.find(_toPath);
+		if (check != m_plots.end()) {
+			OT_LOG_EAS("A plot with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_plots.insert_or_assign(_toPath, plotIt->second);
+			m_plots.erase(_fromPath);
+		}
+	}
 
 }
 

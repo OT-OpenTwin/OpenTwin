@@ -293,6 +293,31 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	return view;
 }
 
+void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const std::string _newEntityName) {
+	// Ensure change occured
+	if (_oldEntityName == _newEntityName) {
+		return;
+	}
+
+	// Rename in owner map
+	for (auto& it : m_viewOwnerMap) {
+		for (ViewNameTypeListEntry& entry : *it.second) {
+			if (entry.first == _oldEntityName) {
+				entry.first = _newEntityName;
+			}
+		}
+	}
+
+	// Rename in views list
+	for (ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getEntityName() == _oldEntityName) {
+			WidgetViewBase data = entry.second->getViewData();
+			data.setEntityName(_newEntityName);
+			entry.second->setViewData(data);
+		}
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // View manipulation

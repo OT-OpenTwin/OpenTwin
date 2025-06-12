@@ -138,6 +138,9 @@ namespace ot {
 		//! @param _entityName Widget view name.
 		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
 
+		//! @brief Renames the view with the given name.
+		void renameView(const std::string& _oldEntityName, const std::string _newEntityName);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// View manipulation
