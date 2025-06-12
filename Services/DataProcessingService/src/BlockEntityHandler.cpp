@@ -172,10 +172,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
 	if (dbaBlock != nullptr)
 	{
-		auto comparators = ot::ComparisionSymbols::g_comparators;
-		comparators.push_back(getQueryForRangeSelection());
-		comparators.push_back(" ");
-		dbaBlock->createProperties(comparators);
+		dbaBlock->createProperties();
 	}
 
 	EntityBlockDataDimensionReducer* dataAR = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());

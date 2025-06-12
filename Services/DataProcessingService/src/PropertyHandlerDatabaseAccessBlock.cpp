@@ -14,40 +14,29 @@
  
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {
-	std::string collectionName;
-	std::unique_ptr<ResultCollectionMetadataAccess>resultCollectionAccess(getResultCollectionMetadataAccess(_dbAccessEntity.get(),collectionName));
 
-	if (!resultCollectionAccess->collectionHasMetadata())
-	{
-		_uiComponent->displayMessage("Selected collection has no meta data and cannot be used by a database access block.\n");
+	const std::string projectName = _dbAccessEntity->getSelectedProjectName();
+	EntityPropertiesSelection* selectionSeries = _dbAccessEntity->getSeriesSelection();
+	std::string selectedSeries = selectionSeries->getValue();
 	
-	}
-	else
-	{
-		EntityProperties newProperties;
-		
-		//First we check if the series selection must be updated
-		std::list<std::string> allSeriesLabels  = resultCollectionAccess->listAllSeriesNames();
-		//The user also needs the option to select no value
-		allSeriesLabels.push_front(m_selectedValueNone);
-		EntityPropertiesSelection* selectionSeries = _dbAccessEntity->getSeriesSelection();
-		updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties);
-		
-		auto soFarAddedProperties =	newProperties.getListOfAllProperties();
-		std::string selectedSeries;
-		if (!soFarAddedProperties.empty())
-		{
-			//If a property was added at this point, it can only be a single property which is the series selection
-			auto newSeriesSelection = dynamic_cast<EntityPropertiesSelection*>(soFarAddedProperties.back());
-			newSeriesSelection->getValue();
-		}
-		else
-		{
-			//Otherwise take the selected series.
-			selectedSeries = selectionSeries->getValue();
-		}
 
-		std::list<std::string> allQuantityLabels;
+	std::list<std::string> allSeriesLabels{};
+	std::list<std::string> allQuantityLabels{};
+	std::list<std::string> parameterList{};
+	EntityProperties newProperties;
+
+	//First we try to load information from the selected project
+	if (!projectName.empty())
+	{
+		std::string collectionName;
+		std::unique_ptr<ResultCollectionMetadataAccess>resultCollectionAccess(getResultCollectionMetadataAccess(_dbAccessEntity.get(),collectionName));
+
+		if (!resultCollectionAccess->collectionHasMetadata())
+		{
+			_uiComponent->displayMessage("Selected collection has no meta data and cannot be used by a database access block.\n");
+		}
+		allSeriesLabels  = resultCollectionAccess->listAllSeriesNames();
+
 		if (selectedSeries == m_selectedValueNone)
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabels();
@@ -56,16 +45,10 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabelsFromSeries(selectedSeries);
 		}
-		
-		//Update Quantity Overview
-		auto quantityValueCharacteristics = _dbAccessEntity->getQuantityValueCharacteristic();
-		allQuantityLabels.push_front(m_selectedValueNone);
-		updateSelectionIfNecessary(allQuantityLabels, quantityValueCharacteristics.m_label, newProperties);
-		//Update Quantity labels and value description overview.
-		std::list<std::string> dependingParameterLables = updateQuantityIfNecessary(_dbAccessEntity, resultCollectionAccess.get(),newProperties);
 
+		//Update Quantity labels and value description overview.
+		std::list<std::string> dependingParameterLables = updateQuantityIfNecessary(_dbAccessEntity, resultCollectionAccess.get(), newProperties);
 		//If the returned list is empty, no quantity has been selected and the list of parameter needs to be filled appropriately
-		std::list<std::string> parameterList;
 		if (dependingParameterLables.empty())
 		{
 			if (selectedSeries == "")
@@ -81,16 +64,33 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		{
 			parameterList = dependingParameterLables;
 		}
-		parameterList.push_front(m_selectedValueNone);
 
-		//Now we update all parameter overviews and the labels of the parameter
+	}
+	allQuantityLabels.push_front(m_selectedValueNone);
+	allSeriesLabels.push_front(m_selectedValueNone);
+	parameterList.push_front(m_selectedValueNone);
 
-		if (!newProperties.getListOfAllProperties().empty())
-		{
-			ot::UIDList entityIDs{ _dbAccessEntity->getEntityID() };
-			requestPropertyUpdate(entityIDs, newProperties.createJSON(nullptr,false));
-		}
-	}	
+	//First we check if the series selection must be updated
+	updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties);
+				
+	//Update Quantity Overview
+	auto quantityValueCharacteristics = _dbAccessEntity->getQuantityValueCharacteristic();
+	updateSelectionIfNecessary(allQuantityLabels, quantityValueCharacteristics.m_label, newProperties);
+
+	//Now we update all parameter overviews and the labels of the parameter
+
+	int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+	for (int32_t i = 1; i <= numberOfQueries; i++)
+	{
+		auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
+		updateSelectionIfNecessary(parameterList, queryValueCharacteristics.m_label, newProperties);
+	}
+
+	if (!newProperties.getListOfAllProperties().empty())
+	{
+		ot::UIDList entityIDs{ _dbAccessEntity->getEntityID() };
+		requestPropertyUpdate(entityIDs, newProperties.createJSON(nullptr,false));
+	}
 }
 
  ResultCollectionMetadataAccess* PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(EntityBlockDatabaseAccess* _dbAccessEntity, std::string& _collectionName)

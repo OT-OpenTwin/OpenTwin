@@ -16,7 +16,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	void createProperties(std::list<std::string>& comparators);
+	void createProperties();
 	void setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue);
 
 	std::string getSelectedProjectName();
@@ -26,7 +26,10 @@ public:
 	
 	ValueCharacteristicProperties getQuantityValueCharacteristic();
 	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
+	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
 	
+	int32_t getMaxNumberOfQueries();
+
 	const ValueComparisionDefinition getSelectedQuantityDefinition();
 
 	const ot::Connector getConnectorQuantity() const { return m_connectorOutput; }	
@@ -42,11 +45,16 @@ protected:
 
 private:
 
+	const uint32_t m_maxNbOfQueries = 100;
+
 	const std::string m_propertyNameProjectName = "Projectname";
 	const std::string m_propertyNameSeriesMetadata = "Measurement series";
 
-	const std::string m_groupQuerySettings = "Query settings";
+	const std::string m_groupMetadataFilter = "Dataset";
 	const std::string m_groupQuantitySetttings = "Quantity settings";
+	const std::string m_groupQuerySetttings = "Query settings";
+
+	const std::string m_propertyNumberOfQueries = "Number of queries";
 
 	const std::string m_propertyName = "Name";
 	const std::string m_propertyValueDescription = "Type";
