@@ -114,16 +114,18 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 		{
-			if (m_selectedEntities.size() == 1)
+			EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
+			if (m_selectedEntities.size() == 1 && m_selectedEntityInfos.begin()->getEntityType() == dbA.getClassName())
 			{
-				std::list<ot::EntityInformation> entityInfos;
-				ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, entityInfos);
-
-				auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), getClassFactory());
+				auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_selectedEntityInfos.begin()->getEntityID(), m_selectedEntityInfos.begin()->getEntityVersion(), getClassFactory());
 				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 				if (dbAccess != nullptr)
 				{
 					m_propertyHandlerDatabaseAccessBlock.performEntityUpdateIfRequired(dbAccess);
+				}
+				else
+				{
+					assert(false);
 				}
 			}
 		}
