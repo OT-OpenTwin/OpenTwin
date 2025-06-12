@@ -6,17 +6,17 @@
 #include "OldTreeIcon.h"
 #include "PropertyBundlePlane.h"
 #include "PropertyBundleScaling.h"
-#include "PropertyBundleVisUnstructuredVectorVolume.h"
+#include "PropertyBundleVisUnstructuredVectorSurface.h"
 
 #include <list>
 
-class __declspec(dllexport) EntityVisUnstructuredVectorVolume : public EntityVis2D3D
+class __declspec(dllexport) EntityVisUnstructuredVectorSurface : public EntityVis2D3D
 {
 public:
-	EntityVisUnstructuredVectorVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
-	virtual ~EntityVisUnstructuredVectorVolume();
+	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	virtual ~EntityVisUnstructuredVectorSurface();
 
-	virtual std::string getClassName(void) override { return "EntityVisUnstructuredVectorVolume"; };
+	virtual std::string getClassName(void) override { return "EntityVisUnstructuredVectorSurface"; };
 
 	virtual bool updateFromProperties(void) override;
 
@@ -29,9 +29,8 @@ protected:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	PropertyBundlePlane propertyBundlePlane;
 	PropertyBundleScaling propertyBundleScaling;
-	PropertyBundleVisUnstructuredVectorVolume propertyBundleVisUnstructuredVector;
+	PropertyBundleVisUnstructuredVectorSurface propertyBundleVisUnstructuredVector;
 	// Temporary
 	//EntityResultBase *source;
 };

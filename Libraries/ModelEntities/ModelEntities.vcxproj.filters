@@ -313,7 +313,7 @@
     <ClInclude Include="include\PropertiesVisUnstructuredVector.h">
       <Filter>Header Files\PropertyBundleDescription</Filter>
     </ClInclude>
-    <ClInclude Include="include\PropertyBundleVisUnstructuredVector.h">
+    <ClInclude Include="include\PropertyBundleVisUnstructuredVectorVolume.h">
       <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
     <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVector.h">
@@ -331,7 +331,7 @@
     <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredScalar.h">
       <Filter>Header Files\PropertyBundleDataHandle</Filter>
     </ClInclude>
-    <ClInclude Include="include\PropertyBundleVisUnstructuredScalar.h">
+    <ClInclude Include="include\PropertyBundleVisUnstructuredScalarVolume.h">
       <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
     <ClInclude Include="include\PropertiesVisUnstructuredScalarSurface.h">
@@ -417,6 +417,15 @@
     </ClInclude>
     <ClInclude Include="include\EntityResultUnstructuredMeshVtk.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityVisUnstructuredVectorSurface.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleVisUnstructuredVectorSurface.h">
+      <Filter>Header Files\PropertyBundle</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVectorSurface.h">
+      <Filter>Header Files\PropertyBundleDataHandle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -642,7 +651,7 @@
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVector.cpp">
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyBundleVisUnstructuredVector.cpp">
+    <ClCompile Include="src\PropertyBundleVisUnstructuredVectorVolume.cpp">
       <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
     <ClCompile Include="src\BSONToVariableConverter.cpp">
@@ -654,7 +663,7 @@
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredScalar.cpp">
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyBundleVisUnstructuredScalar.cpp">
+    <ClCompile Include="src\PropertyBundleVisUnstructuredScalarVolume.cpp">
       <Filter>Source Files\PropertyBundle</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyBundleVisUnstructuredScalarSurface.cpp">
@@ -707,6 +716,15 @@
     </ClCompile>
     <ClCompile Include="src\EntityResultUnstructuredMeshVtk.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityVisUnstructuredVectorSurface.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleVisUnstructuredVectorSurface.cpp">
+      <Filter>Source Files\PropertyBundle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVectorSurface.cpp">
+      <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

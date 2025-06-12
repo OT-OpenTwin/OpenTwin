@@ -1,6 +1,6 @@
-#include "PropertyBundleVisUnstructuredScalar.h"
+#include "PropertyBundleVisUnstructuredScalarVolume.h"
 
-void PropertyBundleVisUnstructuredScalar:: setProperties(EntityBase * _thisObject)
+void PropertyBundleVisUnstructuredScalarVolume:: setProperties(EntityBase * _thisObject)
 {
 	EntityPropertiesSelection::createProperty(m_groupNameGeneral, m_properties.GetNameVisType(),
 		{
@@ -21,7 +21,7 @@ void PropertyBundleVisUnstructuredScalar:: setProperties(EntityBase * _thisObjec
 	EntityPropertiesInteger::createProperty(m_groupNamePoints, m_properties.GetNameMaxPoints(), 1000, m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleVisUnstructuredScalar::updatePropertyVisibility(EntityBase * _thisObject)
+bool PropertyBundleVisUnstructuredScalarVolume::updatePropertyVisibility(EntityBase * _thisObject)
 {
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	EntityPropertiesDouble* pointScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetNamePointScale()));
@@ -165,7 +165,7 @@ bool PropertyBundleVisUnstructuredScalar::updatePropertyVisibility(EntityBase * 
 	return false;
 }
 
-bool PropertyBundleVisUnstructuredScalar::is2dType(EntityBase* _thisObject)
+bool PropertyBundleVisUnstructuredScalarVolume::is2dType(EntityBase* _thisObject)
 {
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	assert(visType != nullptr);

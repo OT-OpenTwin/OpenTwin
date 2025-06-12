@@ -63,6 +63,7 @@
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredVectorVolume.h"
+#include "EntityVisUnstructuredVectorSurface.h"
 #include "EntityBatchImporter.h"
 
 #include "OTCore/TypeNames.h"
@@ -320,6 +321,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityVisUnstructuredVectorVolume")
 	{
 		return new EntityVisUnstructuredVectorVolume(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityVisUnstructuredVectorSurface")
+	{
+		return new EntityVisUnstructuredVectorSurface(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else if (entityType == "EntityResultUnstructuredMesh")
 	{

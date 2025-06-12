@@ -30,7 +30,7 @@
 #include "EntityFileText.h"
 #include "EntityResultUnstructuredMeshVtk.h"
 #include "EntityVisUnstructuredScalarSurface.h"
-#include "EntityVisUnstructuredVectorVolume.h"
+#include "EntityVisUnstructuredVectorSurface.h"
 #include "ClassFactory.h"
 
 #include <fstream>
@@ -595,7 +595,7 @@ void Application::addVectorResult(const std::string& resultName, char* fileData,
 	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::VECTOR, vtkData);
 	vtkResult->StoreToDataBase();
 
-	EntityVisUnstructuredVectorVolume* visualizationEntity = new EntityVisUnstructuredVectorVolume(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
 	visualizationEntity->setEditable(true);

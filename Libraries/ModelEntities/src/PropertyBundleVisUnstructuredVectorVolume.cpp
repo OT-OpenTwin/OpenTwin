@@ -1,6 +1,6 @@
-#include "PropertyBundleVisUnstructuredVector.h"
+#include "PropertyBundleVisUnstructuredVectorVolume.h"
 
-void PropertyBundleVisUnstructuredVector:: setProperties(EntityBase * _thisObject)
+void PropertyBundleVisUnstructuredVectorVolume:: setProperties(EntityBase * _thisObject)
 {
 	EntityPropertiesSelection::createProperty(m_groupNameGeneral, m_properties.GetNameVisType(),
 		{
@@ -35,7 +35,7 @@ void PropertyBundleVisUnstructuredVector:: setProperties(EntityBase * _thisObjec
 	EntityPropertiesInteger::createProperty(m_groupNameArrows, m_properties.GetNameMaxArrows(), 1000, m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleVisUnstructuredVector::updatePropertyVisibility(EntityBase * _thisObject)
+bool PropertyBundleVisUnstructuredVectorVolume::updatePropertyVisibility(EntityBase * _thisObject)
 {
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	EntityPropertiesSelection* visComp = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisComponent()));
@@ -197,7 +197,7 @@ bool PropertyBundleVisUnstructuredVector::updatePropertyVisibility(EntityBase * 
 	return false;
 }
 
-bool PropertyBundleVisUnstructuredVector::is2dType(EntityBase* _thisObject)
+bool PropertyBundleVisUnstructuredVectorVolume::is2dType(EntityBase* _thisObject)
 {
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	assert(visType != nullptr);
