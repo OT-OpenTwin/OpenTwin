@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/EntityName.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/WidgetView.h"
@@ -55,9 +56,42 @@ ot::GraphicsView::~GraphicsView() {
 	
 }
 
-// ########################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::GraphicsView::resetView(void) {
+// Setter / Getter
+
+void ot::GraphicsView::setGraphicsViewName(const std::string& _name) {
+	m_viewName = _name;
+
+	// Reparent items
+	for (auto& it : m_items) {
+		if (EntityName::isChildOf(it.second->getGraphicsItemName(), m_viewName)) {
+			it.second->setGraphicsItemName(EntityName::changeParentPath(it.second->getGraphicsItemName(), m_viewName));
+		}
+	}
+}
+
+void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene) {
+	OTAssertNullptr(_scene);
+
+	if (_scene == m_scene) {
+		return;
+	}
+
+	if (m_scene) {
+		delete m_scene;
+	}
+
+	m_scene = _scene;
+
+	this->setScene(_scene);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// View handling
+
+void ot::GraphicsView::resetView() {
 	OTAssertNullptr(m_scene);
 	QRectF boundingRect = m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins);
 	if (m_viewFlags & ViewManagesSceneRect) {
@@ -68,7 +102,7 @@ void ot::GraphicsView::resetView(void) {
 	this->centerOn(boundingRect.center());
 }
 
-void ot::GraphicsView::ensureViewInBounds(void) {
+void ot::GraphicsView::ensureViewInBounds() {
 	OTAssertNullptr(m_scene);
 	QRect itemsRect = this->mapFromScene(m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins)).boundingRect();
 	QRect viewPortRect = this->viewport()->rect();
@@ -78,13 +112,13 @@ void ot::GraphicsView::ensureViewInBounds(void) {
 	}
 }
 
-void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene) {
-	if (_scene == m_scene) return;
-	if (!_scene) return;
-	if (m_scene) delete m_scene;
-	m_scene = _scene;
-	this->setScene(_scene);
+QRectF ot::GraphicsView::getVisibleSceneRect() const {
+	return this->mapToScene(this->viewport()->rect()).boundingRect();
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Item handling
 
 ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID&  _itemUid) {
 	auto it = m_items.find(_itemUid);
@@ -203,7 +237,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	this->blockSignals(false);
 }
 
-std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs(void) const {
+std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const {
 	std::list<ot::UID> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -217,7 +251,7 @@ std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs(void) const {
 	return sel;
 }
 
-std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems(void) const {
+std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems() const {
 	std::list<GraphicsItem*> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -328,7 +362,7 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
 	this->blockSignals(false);
 }
 
-ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
+ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs() const {
 	ot::UIDList sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
@@ -342,7 +376,7 @@ ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
 	return sel;
 }
 
-std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionItems(void) const {
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionItems() const {
 	std::list<GraphicsConnectionItem*> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
@@ -368,6 +402,10 @@ void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid
 	Q_EMIT connectionToConnectionRequested(_fromItemUid, _fromItemConnector, _toConnectionUid, _newControlPoint);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Callback handling
+
 void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
@@ -385,13 +423,9 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 }
 
-QRectF ot::GraphicsView::getVisibleSceneRect(void) const {
-	return this->mapToScene(this->viewport()->rect()).boundingRect();
-}
-
 // ########################################################################################################
 
-// Protected: Slots
+// Protected: Events
 
 void ot::GraphicsView::wheelEvent(QWheelEvent* _event) {
 	if ((m_viewStateFlags & MiddleMousePressedState) || !m_wheelEnabled) return;
@@ -668,7 +702,11 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	_event->acceptProposedAction();
 }
 
-void ot::GraphicsView::slotCopy(void) {
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void ot::GraphicsView::slotCopy() {
 	CopyInformation info;
 	if (this->getParentWidgetView()) {
 		info.setOriginViewInfo(this->getParentWidgetView()->getViewData());
@@ -676,7 +714,7 @@ void ot::GraphicsView::slotCopy(void) {
 	Q_EMIT copyRequested(info);
 }
 
-void ot::GraphicsView::slotPaste(void) {
+void ot::GraphicsView::slotPaste() {
 	CopyInformation info;
 
 	if (this->getParentWidgetView()) {
@@ -693,7 +731,11 @@ void ot::GraphicsView::slotPaste(void) {
 	Q_EMIT pasteRequested(info);
 }
 
-void ot::GraphicsView::beginItemMove(void) {
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+void ot::GraphicsView::beginItemMove() {
 	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState)) {
 		return;
 	}
@@ -708,7 +750,7 @@ void ot::GraphicsView::beginItemMove(void) {
 	}
 }
 
-void ot::GraphicsView::endItemMove(void) {
+void ot::GraphicsView::endItemMove() {
 	if (!(m_viewStateFlags & ItemMoveInProgress) || (m_viewStateFlags & ReadOnlyState)) {
 		return;
 	}

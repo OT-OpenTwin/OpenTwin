@@ -314,6 +314,7 @@ void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const 
 			WidgetViewBase data = entry.second->getViewData();
 			data.setEntityName(_newEntityName);
 			entry.second->setViewData(data);
+			entry.second->viewRenamed();
 		}
 	}
 }
