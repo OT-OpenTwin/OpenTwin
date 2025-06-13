@@ -11,6 +11,7 @@
 #include "OTGui/GraphicsPackage.h"
 #include "EntityBlockConnection.h"
 #include "ClassFactory.h"
+#include "EntityFileText.h"
 
 // C++ header
 #include <string>
@@ -24,6 +25,8 @@ public:
 	void OrderUIToCreateBlockPicker();
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections();
+	std::shared_ptr<EntityFileText> getCircuitModel(std::string _modelName);
+
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
 	void AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos);

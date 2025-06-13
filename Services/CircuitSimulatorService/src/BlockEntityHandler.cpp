@@ -221,6 +221,24 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	return entityBlockConnectionsByBlockID;	
 }
 
+std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(std::string _modelName) {
+	ot::EntityInformation circuitModelInfo;
+	ot::ModelServiceAPI::getEntityInformation("CircuitModels/" + _modelName, circuitModelInfo);
+	ClassFactory classFactory;
+	
+	auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(circuitModelInfo.getEntityID(), circuitModelInfo.getEntityVersion(), Application::instance()->getClassFactory());
+	if (baseEntity != nullptr) {
+		std::shared_ptr<EntityFileText> circuitModelEntity(dynamic_cast<EntityFileText*>(baseEntity));
+		assert(circuitModelEntity != nullptr);
+		return circuitModelEntity;
+	}
+	else {
+		OT_LOG_E("No CircuitModelEntity found: " + _modelName);
+		return nullptr;
+	}
+
+}
+
 bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName) {
 	auto allConnectors = blockEntity->getAllConnectorsByName();
 	const ot::ConnectorType connectorType = allConnectors[connectorName].getConnectorType();
@@ -527,18 +545,17 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 	}
 	xValues.clear();
 
-	//Now i try to find the branch and erase it too
+	// Now i try to find the branch and erase it too
 	auto it = resultVectors.find("v1#branch");
 	if (it != resultVectors.end()) {
 		resultVectors.erase(it);
 	}
 	else {
 		OT_LOG_E("No v1#branch vector found");
-		//ngSpice_Command(const_cast<char*>("quit"));
 	}
 
 
-	//Here i want to delete the ediff vector from my Result beacuse i dont need it
+	// Here i want to delete the ediff vector from my Result beacuse i dont need it
 	while (true) {
 			
 		auto it2 = std::find_if(resultVectors.begin(), resultVectors.end(),
@@ -643,24 +660,24 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		}
 	}
 	
-	//Here i create the plot for all the curves of voltage
+	// Here i create the plot for all the curves of voltage
 	const std::string _plotNameVoltage = "/" + simulationType+"-Voltage";
 	const std::string plotFolderVoltage = solverName + "/" + "Results";
 	const std::string fullPlotNameVoltage = plotFolderVoltage + _plotNameVoltage;
 
-	//Here i create the plit for all the curves of current
+	// Here i create the plit for all the curves of current
 	const std::string _plotNameCurrent = "/" + simulationType+ "-Current";
 	const std::string plotFolderCurrent = solverName + "/" + "Results";
 	const std::string fullPlotNameCurrent = plotFolderCurrent + _plotNameCurrent;
 
-	//Creating the Plot Entity for Voltage
+	// Creating the Plot Entity for Voltage
 	if (plotBuilderVoltage.getNumberOfCurves() != 0)
 	{
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setEntityName(fullPlotNameVoltage);
 		plotBuilderVoltage.buildPlot(plotCfg, false);			
 	}
-	//Creating the Plot Entity for Current
+	// Creating the Plot Entity for Current
 	if (plotBuilderCurrent.getNumberOfCurves() != 0)
 	{
 		ot::Plot1DCfg plotCfg;
@@ -669,139 +686,12 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 	}
 }
 
-//void BlockEntityHandler::createResultCurves(std::string solverName, std::string simulationType, std::string circuitName) {
-//
-//	std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
-//	std::list<std::pair<ot::UID, std::string>> curves;
-//	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
-//	std::list<bool> forceVis;
-//	const int colorID(0);
-//
-//	std::vector<double> xValues;
-//
-//	if (simulationType == ".dc") {
-//		auto it = resultVectors.find("v-sweep");
-//		xValues = resultVectors.at("v-sweep");
-//		if (it != resultVectors.end()) {
-//			resultVectors.erase(it);
-//		}
-//	}
-//	else if (simulationType == ".TRAN") {
-//		auto it = resultVectors.find("time");
-//		xValues = resultVectors.at("time");
-//		if (it != resultVectors.end()) {
-//			resultVectors.erase(it);
-//
-//		}
-//	}
-//	else {
-//		auto it = resultVectors.find("frequency");
-//		xValues = resultVectors.at("frequency");
-//		if (it != resultVectors.end()) {
-//			resultVectors.erase(it);
-//		}
-//
-//	}
-//
-//
-//
-//	//First i try to find the xValues of the Curve and that are the sweep 
-//	//Then i fill my vector with it and erase it out of the map
-//
-//
-//
-//	//Now i try to find the branch and erase it too
-//	auto it = resultVectors.find("v1#branch");
-//	if (it != resultVectors.end()) {
-//		resultVectors.erase(it);
-//	}
-//
-//
-//	//Here i want to delete the ediff vector from my Result beacuse i dont need it
-//	while (true) {
-//
-//		auto it2 = std::find_if(resultVectors.begin(), resultVectors.end(),
-//			[&](const std::pair<const std::string, std::vector<double>>& element) {
-//				return element.first.find("ediff") != std::string::npos;
-//			});
-//		if (it2 != resultVectors.end()) {
-//
-//			resultVectors.erase(it2);
-//		}
-//		else {
-//
-//			break;
-//		}
-//	}
-//
-//	std::string _curveFolderPath = solverName + "/" + "Results" + "/" + "1D/Curves";
-//
-//	// No i want to get the node vectors of voltage and for each of them i create a curve
-//	for (auto& it : resultVectors) {
-//		std::string curveName;
-//		std::string fullCurveName;
-//		std::string xLabel;
-//		std::string xUnit;
-//		std::string yUnit;
-//
-//		if (simulationType == ".dc") {
-//			curveName = it.first + "-DC";
-//			fullCurveName = _curveFolderPath + "/" + curveName;
-//			xLabel = "sweep";
-//			xUnit = "V";
-//			yUnit = "V";
-//
-//		}
-//		else if (simulationType == ".TRAN") {
-//			curveName = it.first + "-TRAN";
-//			fullCurveName = _curveFolderPath + "/" + curveName;
-//			xLabel = "time";
-//			xUnit = "ms";
-//			yUnit = "V";
-//		}
-//		else {
-//			curveName = it.first + "-AC";
-//			fullCurveName = _curveFolderPath + "/" + curveName;
-//			xLabel = "frequency";
-//			xUnit = "hz";
-//			yUnit = "V";
-//		}
-//
-//		std::string yLabel = it.first;
-//		EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
-//		curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
-//
-//		topoEntID.push_back(curve->getEntityID());
-//		topoEntVers.push_back(curve->getEntityStorageVersion());
-//		dataEntID.push_back((ot::UID)curve->getCurveDataStorageId());
-//		dataEntVers.push_back((ot::UID)curve->getCurveDataStorageId());
-//		dataEntParent.push_back(curve->getEntityID());
-//		forceVis.push_back(false);
-//	}
-//
-//	//Here i create the plot for all the curves
-//	const std::string _plotName = "/" + simulationType + "-Simulation";
-//	const std::string plotFolder = solverName + "/" + "Results";
-//	const std::string fullPlotName = plotFolder + _plotName;
-//
-//	//Creating the Plot Entity
-//	EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
-//	topoEntID.push_back(plotID->getEntityID());
-//	topoEntVers.push_back(plotID->getEntityStorageVersion());
-//	forceVis.push_back(false);
-//
-//	_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
-//}
-
-
-//Setter
+// Setter
 void BlockEntityHandler::setPackageName(std::string name) {
 	this->_packageName = name;
 }
 
-
-
-//Getter
+// Getter
 const std::string BlockEntityHandler::getPackageName() const {
 	return this->_packageName;
 }

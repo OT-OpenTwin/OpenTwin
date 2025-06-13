@@ -6,7 +6,7 @@
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-
+#include "EntityFileText.h"
 
 //ThirdPartyHeader
 #include <iostream>
@@ -36,8 +36,12 @@ public:
 	std::string generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname);
 	std::string generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname);
 	std::list<std::string> ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
-	void clearBufferStructure(std::string name); 
-	
+	void clearBufferStructure(std::string name);
+
+	// CircuitModel functions
+	std::shared_ptr<EntityFileText> getModelEntity(std::string _modelName);
+	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
+	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
 
 	//Connection Algorithm functions
 	void connectionAlgorithmWithGNDElement(std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
@@ -51,7 +55,7 @@ public:
 	bool checkIfConnectionIsConnectedToGndVoltageSource(std::string pole, ot::UID voltageSourceUID, ot::UID elementUID);
 	bool checkIfConnectionIsConnectedToVoltageMeter( std::string blockTitle);
 	void setNodeNumbersOfVoltageSource(std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-
+	std::string removeComments(const std::string& _input);
 	
 	//Setter
 	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);

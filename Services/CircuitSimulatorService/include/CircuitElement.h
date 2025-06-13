@@ -36,6 +36,7 @@ protected:
 	std::string m_netlistName;
 	std::string m_customName;
 	std::map < std::string, Connection > m_listOfConnections;
+	std::string m_model;
 	
 public:
 
@@ -55,6 +56,7 @@ public:
 	std::map<std::string ,Connection>& getList();
 	std::string getNetlistName();
 	std::string getCustomName();
+	std::string getModel();
 
 	//Setter
 	void setItemName(std::string name);
@@ -62,6 +64,7 @@ public:
 	void setUID(ot::UID id);
 	void setNetlistName(std::string name);
 	void setCustomName(std::string name);
+	void setModel(std::string _model);
 
 	//Additional Functions
 	/*bool*/ void addConnection(std::string connactable,const Connection& obj);

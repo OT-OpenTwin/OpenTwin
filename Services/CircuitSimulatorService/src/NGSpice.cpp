@@ -11,6 +11,7 @@
 #include "CircuitElements/CurrentMeter.h"
 #include "CircuitElements/TransmissionLine.h"
 #include "SimulationResults.h"
+#include "BlockEntityHandler.h"
 
 
 //Open Twin Header
@@ -65,6 +66,41 @@ void NGSpice::clearBufferStructure(std::string name)
 	//ngSpice_Command(const_cast<char*>("reset"));
 	
 	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
+}
+
+std::shared_ptr<EntityFileText> NGSpice::getModelEntity(std::string _modelName) {
+	BlockEntityHandler blockHandler;
+	std::shared_ptr<EntityFileText> circuitModelEntity = blockHandler.getCircuitModel(_modelName);
+	
+	if (circuitModelEntity != nullptr) {
+		return circuitModelEntity;
+	}
+
+	OT_LOG_E("No CircuitModelEntity found with name: " + _modelName);
+	return nullptr;
+}
+
+std::string NGSpice::getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity) {
+	if (_circuitModelEntity != nullptr) {
+		auto propertyBase = _circuitModelEntity->getProperties().getProperty("ModelType");
+		auto circuitModelType = dynamic_cast<EntityPropertiesString*>(propertyBase);
+		return circuitModelType->getValue();
+	}
+
+	OT_LOG_E("No Circuit model type found: " + _circuitModelEntity->getClassName() + " is null");
+	return "";
+}
+
+std::string NGSpice::getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity) {
+	if (_circuitModelEntity != nullptr) {
+		auto data = _circuitModelEntity->getData()->getData();
+		std::string modelText(data.begin(), data.end());
+		return removeComments(modelText);
+	}
+
+	OT_LOG_E("No Circuit model type found: " + _circuitModelEntity->getClassName() + " is null");
+	return "";
+
 }
 
 
@@ -493,6 +529,35 @@ void NGSpice::setNodeNumbersOfVoltageSource(std::string startingElement, int cou
 	return;
 }
 
+std::string NGSpice::removeComments(const std::string& _input) {
+	std::istringstream stream(_input);
+	std::ostringstream result;
+	std::string line;
+
+	while (std::getline(stream, line)) {
+		// Entferne führende Leerzeichen
+		std::string trimmed = line;
+		trimmed.erase(0, trimmed.find_first_not_of(" \t"));
+
+		// Wenn die Zeile leer ist oder mit '*' beginnt → überspringen
+		if (trimmed.empty() || trimmed[0] == '*') {
+			continue;
+		}
+
+		// Optional: Zeilen, die **nur aus Sternchen bestehen**, ignorieren
+		bool onlyStars = !trimmed.empty() && std::all_of(trimmed.begin(), trimmed.end(), [](char c) {
+			return c == '*';
+			});
+		if (onlyStars) {
+			continue;
+		}
+
+		result << line << '\n';
+	}
+
+	return result.str();
+}
+
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
@@ -526,6 +591,10 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			voltageSource->setCustomName(myElement->getNameOnly());
 			voltageSource->setNetlistName(assignElementID("V"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+
+			voltageSource->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(voltageSource->getCustomName(), voltageSource->getNetlistName()) || 
@@ -545,6 +614,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 				}
 
 				function += ")";
+
+				
 
 				voltageSource->setFunction(function);
 				
@@ -589,6 +660,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			resistor->setCustomName(myElement->getNameOnly());
 			resistor->setNetlistName(assignElementID("R"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			resistor->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(resistor->getCustomName(), resistor->getNetlistName()) ||
@@ -604,10 +678,13 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		else if (blockEntity->getClassName() == "EntityBlockCircuitDiode")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
-			auto diode = std::make_unique<Diode>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+			auto diode = std::make_unique<Diode>("", myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
 			diode->setCustomName(myElement->getNameOnly());
 			diode->setNetlistName(assignElementID("D"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			diode->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(diode->getCustomName(), diode->getNetlistName()) ||
@@ -627,6 +704,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			capacitor->setCustomName(myElement->getNameOnly());
 			capacitor->setNetlistName(assignElementID("C"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			capacitor->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(capacitor->getCustomName(), capacitor->getNetlistName()) ||
@@ -646,6 +726,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			inductor->setCustomName(myElement->getNameOnly());
 			inductor->setNetlistName(assignElementID("L"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			inductor->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(inductor->getCustomName(), inductor->getNetlistName()) ||
@@ -664,6 +747,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			voltMeter->setCustomName(myElement->getNameOnly());
 			voltMeter->setNetlistName(assignElementID("VM"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			voltMeter->setModel(circuitModel);
 
 			ot::UID uid = voltMeter->getUID();
 			auto voltMeter_p = voltMeter.release();
@@ -675,6 +761,10 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			currentMeter->setCustomName(myElement->getNameOnly());
 			currentMeter->setNetlistName(assignElementID("CM"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			currentMeter->setModel(circuitModel);
+
 			ot::UID uid = currentMeter->getUID();
 			auto currentMeter_p = currentMeter.release();
 			it->second.addElement(uid, currentMeter_p);
@@ -685,6 +775,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			transmissionLine->setCustomName(myElement->getNameOnly());
 			transmissionLine->setNetlistName(assignElementID("T"));
+			std::string circuitModel = myElement->getCircuitModel();
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			transmissionLine->setModel(circuitModel);
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName()) ||
@@ -787,7 +880,26 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		std::string netlistNodeNumbers;
 		std::string netlistVoltageSourceType="";
 		std::string modelNetlistLine = "circbyline ";
+		std::string modelType = "";
 		
+		//Check if circuitElement has a model
+		if (circuitElement->getModel() != "failed") {
+			// First we get the entity
+			std::shared_ptr<EntityFileText> circuitModelEntity = getModelEntity(circuitElement->getModel());
+
+			// Now we need to get the model type (subcircuit or model)
+			modelType = getCircuitModelType(circuitModelEntity);
+
+			// As last step we need the model text
+			modelNetlistLine += getCircuitModelText(circuitModelEntity);
+		}
+		else {
+			circuitElement->setModel("");
+		}
+		
+		// First we just implement the .model functionality
+
+
 		if (circuitElement->type() == "VoltageSource")
 		{
 			VoltageSource* voltagesource = dynamic_cast<VoltageSource*>(circuitElement);
@@ -796,7 +908,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			{
 				voltagesource->setType("DC");
 				netlistVoltageSourceType = voltagesource->getType() + " ";
-				netlistValue = voltagesource->getValue();
+				netlistValue = voltagesource->getValue() + " " + voltagesource->getModel();
 			}
 			else if (simulationType == ".ac")
 			{
@@ -820,7 +932,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 			netlistElementName = resistor->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			netlistValue = resistor->getResistance();
+			netlistValue = resistor->getResistance() + " " + resistor->getModel();
 		}
 		else if (circuitElement->type() == "Diode")
 		{
@@ -828,8 +940,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 			netlistElementName = diode->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			modelNetlistLine += ".MODEL D1N4148 D(IS=2.52E-9,RS=0.01,N=1.5)";
-			netlistValue = diode->getValue();
+			netlistValue = diode->getValue() + " " + diode->getModel();
 		}
 		else if (circuitElement->type() == "VoltageMeter")
 		{
@@ -914,7 +1025,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			
 			netlistElementName = capacitor->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			netlistValue = capacitor->getCapacity();
+			netlistValue = capacitor->getCapacity() + " " + capacitor->getModel();
 		}
 		else if (circuitElement->type() == "Inductor")
 		{
@@ -922,14 +1033,14 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 			netlistElementName = inductor->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			netlistValue = inductor->getInductance();
+			netlistValue = inductor->getInductance() + " " + inductor->getModel();
 		}
 		else if (circuitElement->type() == "TransmissionLine") 
 		{
 			TransmissionLine* transmissionLine = dynamic_cast<TransmissionLine*>(circuitElement);
 			netlistElementName = transmissionLine->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			netlistValue = transmissionLine->getImpedance() + " " + transmissionLine->getTransmissionDelay();
+			netlistValue = transmissionLine->getImpedance() + " " + transmissionLine->getTransmissionDelay() + " " + transmissionLine->getModel();
 		}
 		
 		
@@ -1025,6 +1136,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		//Here i put the netlist instance line into my _netlist
 		_netlist.push_back(const_cast<char*>(netlistLine.c_str()));
 		
+		// If we have a model included into the element
 		if (modelNetlistLine != "circbyline ")
 		{
 			_netlist.push_back(const_cast<char*>(modelNetlistLine.c_str()));

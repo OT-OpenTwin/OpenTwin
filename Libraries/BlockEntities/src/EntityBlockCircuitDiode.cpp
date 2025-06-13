@@ -58,16 +58,6 @@ bool EntityBlockCircuitDiode::updateFromProperties(void)
 	return refresh;
 }
 
-
-std::string EntityBlockCircuitDiode::getElementType()
-{
-	auto propertyBase = getProperties().getProperty("Model");
-	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(elementType != nullptr);
-
-	return elementType->getValue();
-}
-
 std::string EntityBlockCircuitDiode::getTypeAbbreviation() {
 	return "D";
 }

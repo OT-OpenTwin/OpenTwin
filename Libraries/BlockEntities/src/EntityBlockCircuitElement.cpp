@@ -13,6 +13,14 @@ void EntityBlockCircuitElement::createProperties(const ot::UID& _circuitModelFol
 	EntityPropertiesEntityList::createProperty("Model-Properties", "Model", "CircuitModels", _circuitModelFolderID, "", -1, "default", getProperties());
 }
 
+std::string EntityBlockCircuitElement::getCircuitModel() {
+	auto propertyBase = getProperties().getProperty("Model");
+	auto propertyCircuitModel = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
+	assert(propertyBase != nullptr);
+	std::string value = propertyCircuitModel->getValueName();
+	return value;
+}
+
 
 
 void EntityBlockCircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)

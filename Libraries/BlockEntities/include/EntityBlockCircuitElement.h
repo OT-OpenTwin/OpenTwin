@@ -11,7 +11,7 @@ public:
 	
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
-
+	virtual std::string getCircuitModel();
 
 private:
 
