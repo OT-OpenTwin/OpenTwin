@@ -338,6 +338,7 @@
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ModelType "ModelType"
+#define OT_ACTION_PARAM_ElementType "ElementType"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"

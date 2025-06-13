@@ -29,25 +29,21 @@ void CircuitModelHandler::addButtons(ot::components::UiComponent* _uiComponent, 
 bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc) {
 	bool actionIsHandled = false;
 
-	//if (_action == m_buttonAddCircuitModel.GetFullDescription()) {
-	//	createModelDialog();
-	//	actionIsHandled = true;
-	//}
-	//else if (_action == OT_ACTION_PARAM_MODEL_AddCircuitModelToProject) {
-	//	std::string model = ot::json::getString(_doc, OT_ACTION_PARAM_Value);
-	//	
-	//	createModelTextEntity(model);
-	//	Model* modelComp = Application::instance()->getModel();
-	//	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
-
-
-	//	actionIsHandled = true;
-	//}
+	/*if (_action == m_buttonAddCircuitModel.GetFullDescription()) {
+		createModelDialog();
+		actionIsHandled = true;
+	}
+	else if (_action == OT_ACTION_PARAM_MODEL_AddCircuitModelToProject) {
+		std::string model = ot::json::getString(_doc, OT_ACTION_PARAM_Value);
 		
+		createModelTextEntity(model);
+		Model* modelComp = Application::instance()->getModel();
+		modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
 
-	// Just for pushing, remove this later
-	//	actionIsHandled = true; 
-	// Bad idea!!
+
+		actionIsHandled = true;
+	}*/
+		
 	return actionIsHandled;
 
 }
@@ -98,7 +94,7 @@ void CircuitModelHandler::createModelTextEntity(std::string _modelName) {
 
 	std::string modelText = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_Content);
 	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
-
+	std::string elementType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ElementType);
 	// Create entity Id's
 
 	Model* model = Application::instance()->getModel();
@@ -136,8 +132,8 @@ void CircuitModelHandler::createModelTextEntity(std::string _modelName) {
 	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
 	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
 
-	std::list<std::string> folderEntities = model->getListOfFolderItems(ot::FolderNames::CircuitModelsFolder, true);
-	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, ot::FolderNames::CircuitModelsFolder, _modelName);
+	std::list<std::string> folderEntities = model->getListOfFolderItems(ot::FolderNames::CircuitModelsFolder + "/" + elementType, true);
+	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, ot::FolderNames::CircuitModelsFolder + "/" + elementType, _modelName);
 	circuitModel->setName(entityName);
 
 	circuitModel->StoreToDataBase();

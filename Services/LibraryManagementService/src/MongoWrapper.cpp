@@ -19,6 +19,7 @@ std::string MongoWrapper::getDocument(const std::string& _collectionName, const 
         std::vector<std::string> columnNames;
         columnNames.push_back("Content");
         columnNames.push_back("ModelType");
+        columnNames.push_back("ElementType");
 
         auto query = bsoncxx::builder::basic::document{};
         auto queryArray = bsoncxx::builder::basic::array();
