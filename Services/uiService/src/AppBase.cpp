@@ -190,6 +190,7 @@ AppBase::AppBase() :
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
 	m_logIntensity(nullptr),
+	m_lastFocusedView(nullptr),
 	m_lastFocusedCentralView(nullptr),
 	m_defaultView(nullptr),
 	m_loginDialog(nullptr)
@@ -2618,6 +2619,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 	// Newly focused (focus in)
 	if (_focusedView) {
+		// Avoid focus change to same view
+		if (_focusedView == m_lastFocusedView) {
+			return;
+		}
+		m_lastFocusedView = _focusedView;
+
 		m_navigationManager.slotViewSelected();
 
 		// Update graphics picker content
@@ -2662,9 +2669,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		}
 
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
-	}
 
-	AppBase::instance()->autoCloseUnpinnedViews();
+		AppBase::instance()->autoCloseUnpinnedViews();
+	}
+	else {
+		m_lastFocusedView = nullptr;
+	}
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {

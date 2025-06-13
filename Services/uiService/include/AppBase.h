@@ -623,6 +623,7 @@ private:
 	StateInformation			m_currentStateWindow;
 	
 	ot::WidgetView* m_defaultView;
+	ot::WidgetView* m_lastFocusedView;
 	ot::WidgetView* m_lastFocusedCentralView;
 
 	ot::VersionGraphManagerView* m_versionGraph;

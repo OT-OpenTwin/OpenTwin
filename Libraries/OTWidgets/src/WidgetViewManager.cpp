@@ -22,7 +22,7 @@
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qmenu.h>
 
-ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
+ot::WidgetViewManager& ot::WidgetViewManager::instance() {
 	static WidgetViewManager g_instance;
 	return g_instance;
 }
@@ -171,7 +171,7 @@ void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 	}
 }
 
-void ot::WidgetViewManager::closeViews(void) {
+void ot::WidgetViewManager::closeViews() {
 	OTAssertNullptr(m_dockManager);
 
 	ViewNameTypeList tmp;
@@ -191,46 +191,11 @@ void ot::WidgetViewManager::closeViews(void) {
 }
 
 void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
-	std::list<WidgetView*> views;
-	for (const ViewEntry& view : m_views) {
-		const WidgetViewDock* dock = view.second->getViewDockWidget();
-		OTAssertNullptr(dock);
-		if ((view.second->getViewData().getViewFlags() & _flags) == _flags && !dock->getIsPinned()) {
-			bool concider = true;
-			if (_ignoreCurrent) {
-				concider = !(view.second == m_focusInfo.last ||
-					view.second == m_focusInfo.lastCentral ||
-					view.second == m_focusInfo.lastSide ||
-					view.second == m_focusInfo.lastTool);
+	m_autoCloseInfo.flags = _flags;
+	m_autoCloseInfo.activeSelection = _activeSelection;
+	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
 
-				
-			}
-
-			if (concider && !_activeSelection.getSelectedNavigationItems().empty()) {
-				for (const UID& active : _activeSelection.getSelectedNavigationItems()) {
-					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
-						if (active == viewSelection) {
-							concider = false;
-							break;
-						}
-					}
-
-					if (!concider) {
-						break;
-					}
-				}
-			}
-
-			if (concider) {
-				views.push_back(view.second);
-			}
-			
-		}
-	}
-
-	for (WidgetView* view : views) {
-		this->handleViewCloseRequest(view);
-	}
+	m_autoCloseTimer.start();
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
@@ -399,7 +364,7 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	return result;
 }
 
-void ot::WidgetViewManager::applyInitialState(void) {
+void ot::WidgetViewManager::applyInitialState() {
 	if (m_initialState.empty()) {
 		OT_LOG_D("Initial state is empty.");
 	}
@@ -460,7 +425,7 @@ std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicS
 	return std::move(result);
 }
 
-bool ot::WidgetViewManager::getAnyViewContentModified(void) {
+bool ot::WidgetViewManager::getAnyViewContentModified() {
 	for (const ViewEntry& entry : m_views) {
 		if (entry.second->getViewContentModified()) {
 			return true;
@@ -469,7 +434,7 @@ bool ot::WidgetViewManager::getAnyViewContentModified(void) {
 	return false;
 }
 
-ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView(void) const {
+ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView() const {
 	return this->getViewFromDockWidget(m_dockManager->focusedDockWidget());
 }
 
@@ -507,7 +472,7 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 	}
 }
 
-void ot::WidgetViewManager::slotViewCloseRequested(void) {
+void ot::WidgetViewManager::slotViewCloseRequested() {
 	if (m_state & MulticloseViewState) {
 		OT_LOG_E("Enexpected event");
 		return;
@@ -522,7 +487,7 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 	}
 }
 
-void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
+void ot::WidgetViewManager::slotUpdateViewVisibility() {
 	if (m_state & MulticloseViewState) {
 		return;
 	}
@@ -539,7 +504,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 	}
 }
 
-void ot::WidgetViewManager::slotViewTabClicked(void) {
+void ot::WidgetViewManager::slotViewTabClicked() {
 	if (m_state & MulticloseViewState) {
 		OT_LOG_E("Enexpected event");
 		return;
@@ -558,7 +523,7 @@ void ot::WidgetViewManager::slotViewTabClicked(void) {
 	Q_EMIT viewTabClicked(view);
 }
 
-void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
+void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 	if (m_state & MulticloseViewState) {
 		return;
 	}
@@ -571,21 +536,70 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged(void) {
 	Q_EMIT viewDataModifiedChanged(view);
 }
 
+void ot::WidgetViewManager::slotCloseUnpinnedViews() {
+	std::list<WidgetView*> views;
+	for (const ViewEntry& view : m_views) {
+		const WidgetViewDock* dock = view.second->getViewDockWidget();
+		OTAssertNullptr(dock);
+		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
+			bool concider = true;
+			if (m_autoCloseInfo.ignoreCurrent) {
+				concider = !(view.second == m_focusInfo.last ||
+					view.second == m_focusInfo.lastCentral ||
+					view.second == m_focusInfo.lastSide ||
+					view.second == m_focusInfo.lastTool);
+
+
+			}
+
+			if (concider && !m_autoCloseInfo.activeSelection.getSelectedNavigationItems().empty()) {
+				for (const UID& active : m_autoCloseInfo.activeSelection.getSelectedNavigationItems()) {
+					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
+						if (active == viewSelection) {
+							concider = false;
+							break;
+						}
+					}
+
+					if (!concider) {
+						break;
+					}
+				}
+			}
+
+			if (concider) {
+				views.push_back(view.second);
+			}
+
+		}
+	}
+
+	for (WidgetView* view : views) {
+		this->handleViewCloseRequest(view);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
 
 ot::WidgetViewManager::WidgetViewManager() :
 	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState), 
-	m_dockComponentsFactory(nullptr), m_initialStateVersion(0)
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;
 	m_focusInfo.lastTool = nullptr;
 	m_focusInfo.lastCentral = nullptr;
+
+	m_autoCloseTimer.setInterval(0);
+	m_autoCloseTimer.setSingleShot(true);
+	this->connect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
 }
 
 ot::WidgetViewManager::~WidgetViewManager() {
+	this->disconnect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
+
 	this->deleteLater();
 }
 
