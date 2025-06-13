@@ -1557,6 +1557,9 @@ void ExternalServicesComponent::queueAction(const char* json, const char* sender
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);
+
+		QEventLoop loop;
+		loop.processEvents();
 	}
 
 	lock = true;
