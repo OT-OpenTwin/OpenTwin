@@ -35,8 +35,8 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 
 }
 
-void EntityBlockCircuitTransmissionLine::createProperties(const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+void EntityBlockCircuitTransmissionLine::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
 	EntityPropertiesString::createProperty("Element Property", "Characteristic Impedance", "50", "default", getProperties());
 	EntityPropertiesString::createProperty("Element Property", "Transmission Delay", "10NS", "default", getProperties());
 }
@@ -59,6 +59,10 @@ std::string EntityBlockCircuitTransmissionLine::getTransmissionDelay() {
 
 std::string EntityBlockCircuitTransmissionLine::getTypeAbbreviation() {
 	return "T";
+}
+
+std::string EntityBlockCircuitTransmissionLine::getFolderName() {
+	return "Transmission Line";
 }
 
 ot::GraphicsItemCfg* EntityBlockCircuitTransmissionLine::CreateBlockCfg() {

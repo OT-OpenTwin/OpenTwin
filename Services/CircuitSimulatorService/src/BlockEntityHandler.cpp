@@ -65,14 +65,11 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 	
-	// Get the CircuitModel folder infos
-	std::string circuitModelFolderName = "CircuitModels";
-	ot::EntityInformation entityInfo;
-	ot::ModelServiceAPI::getEntityInformation(circuitModelFolderName, entityInfo);
+	
 
 	//Von Blockentity in CircuitEntity casten und createProperties aufrufen
 
-	std::string elementName = InitSpecialisedCircuitElementEntity(circuitModelFolderName, entityInfo.getEntityID(), blockEntity);
+	std::string elementName = InitSpecialisedCircuitElementEntity(blockEntity);
 	if (elementName != "") {
 	//Create block Titles
 	//First get a list of all folder items of the Circuit folder
@@ -221,9 +218,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	return entityBlockConnectionsByBlockID;	
 }
 
-std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(std::string _modelName) {
+std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(const std::string& _folderName,std::string _modelName) {
 	ot::EntityInformation circuitModelInfo;
-	ot::ModelServiceAPI::getEntityInformation("CircuitModels/" + _modelName, circuitModelInfo);
+	ot::ModelServiceAPI::getEntityInformation("Circuit Models/" + _folderName + "/" + _modelName, circuitModelInfo);
 	ClassFactory classFactory;
 	
 	auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(circuitModelInfo.getEntityID(), circuitModelInfo.getEntityVersion(), Application::instance()->getClassFactory());
@@ -423,13 +420,20 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 	}
 }
 
-std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID, std::shared_ptr<EntityBlock> blockEntity) {
+std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
 	EntityBlockCircuitElement* element = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+
 	if (element != nullptr) {
-		element->createProperties(_circuitModelFolderID);
+		// Get the CircuitModel folder infos
+		const std::string circuitModelFolderName = "Circuit Models/" + element->getFolderName();
+		ot::EntityInformation entityInfo;
+		ot::ModelServiceAPI::getEntityInformation(circuitModelFolderName, entityInfo);
+
+	
+		element->createProperties(circuitModelFolderName, entityInfo.getEntityID());
 		return element->getTypeAbbreviation();
-	}
-	else if(blockEntity->getClassName() != "EntityBlockCircuitGND" && blockEntity->getClassName() != "EntityBlockCircuitConnector") {
+		
+	} else if(blockEntity->getClassName() != "EntityBlockCircuitGND" && blockEntity->getClassName() != "EntityBlockCircuitConnector") {
 		OT_LOG_E("EntityBlockCircuitElement is null");
 	}
 	

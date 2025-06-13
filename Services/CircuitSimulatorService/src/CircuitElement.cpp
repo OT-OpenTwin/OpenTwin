@@ -38,6 +38,8 @@ std::string CircuitElement::getCustomName() { return this->m_customName; }
 
 std::string CircuitElement::getModel() { return this->m_model; }
 
+std::string CircuitElement::getFolderName() { return this->m_folderName; }
+
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
@@ -51,6 +53,8 @@ void CircuitElement::setNetlistName(std::string name) { this->m_netlistName = na
 void CircuitElement::setCustomName(std::string name) {	this->m_customName = name; }
 
 void CircuitElement::setModel(std::string _model) { this->m_model = _model; }
+
+void CircuitElement::setFolderName(std::string _folderName) { this->m_folderName = _folderName; }
 
 //Additional Functions
 

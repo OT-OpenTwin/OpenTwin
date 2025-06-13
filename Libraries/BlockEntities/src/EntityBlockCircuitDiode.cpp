@@ -25,9 +25,13 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitDiode::createProperties(const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitDiode::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
 {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
+}
+
+std::string EntityBlockCircuitDiode::getFolderName() {
+	return "Diode";
 }
 
 const double EntityBlockCircuitDiode::getRotation() {

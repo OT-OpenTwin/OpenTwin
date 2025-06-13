@@ -39,7 +39,7 @@ public:
 	void clearBufferStructure(std::string name);
 
 	// CircuitModel functions
-	std::shared_ptr<EntityFileText> getModelEntity(std::string _modelName);
+	std::shared_ptr<EntityFileText> getModelEntity(const std::string& _folderName,std::string _modelName);
 	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
 

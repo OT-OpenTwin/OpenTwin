@@ -28,8 +28,8 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 
 }
 
-void EntityBlockCircuitVoltageSource::createProperties(const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+void EntityBlockCircuitVoltageSource::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
 	createDCProperties();
 	createTRANProperties();
 	createACProperties();
@@ -374,6 +374,10 @@ std::string EntityBlockCircuitVoltageSource::getFunction()
 
 std::string EntityBlockCircuitVoltageSource::getTypeAbbreviation() {
 	return "V";
+}
+
+std::string EntityBlockCircuitVoltageSource::getFolderName() {
+	return "Voltage Source";
 }
 
 

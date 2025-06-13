@@ -37,6 +37,7 @@ protected:
 	std::string m_customName;
 	std::map < std::string, Connection > m_listOfConnections;
 	std::string m_model;
+	std::string m_folderName;
 	
 public:
 
@@ -57,6 +58,7 @@ public:
 	std::string getNetlistName();
 	std::string getCustomName();
 	std::string getModel();
+	std::string getFolderName();
 
 	//Setter
 	void setItemName(std::string name);
@@ -65,6 +67,7 @@ public:
 	void setNetlistName(std::string name);
 	void setCustomName(std::string name);
 	void setModel(std::string _model);
+	void setFolderName(std::string _folderName);
 
 	//Additional Functions
 	/*bool*/ void addConnection(std::string connactable,const Connection& obj);

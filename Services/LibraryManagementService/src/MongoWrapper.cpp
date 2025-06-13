@@ -70,12 +70,11 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
         auto queryArray = bsoncxx::builder::basic::array();
 
         auto builder = bsoncxx::builder::basic::document{};
-        builder.append(bsoncxx::builder::basic::kvp(_fieldType, _value));
         queryArray.append(builder);
 
         auto queryBuilderDoc = bsoncxx::builder::basic::document{};
         queryBuilderDoc.append(kvp("$or", queryArray));
-
+        
         BsonViewOrValue filterQuery = queryBuilderDoc.extract();
         auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
 

@@ -25,7 +25,7 @@ public:
 	void OrderUIToCreateBlockPicker();
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections();
-	std::shared_ptr<EntityFileText> getCircuitModel(std::string _modelName);
+	std::shared_ptr<EntityFileText> getCircuitModel(const std::string& _folderName, std::string _modelName);
 
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
@@ -44,7 +44,7 @@ private:
 	std::string _packageName = "Circuit Simulator";
 	const std::string m_initialCircuitName = "Circuit 1";
 
-	std::string InitSpecialisedCircuitElementEntity(const std::string& _circuitModelFolderName,const ot::UID& _circuitModelFolderID,std::shared_ptr<EntityBlock> blockEntity);
+	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
 };
 

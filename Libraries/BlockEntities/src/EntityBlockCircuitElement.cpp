@@ -6,11 +6,11 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 	
 }
 
-void EntityBlockCircuitElement::createProperties(const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitElement::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-	EntityPropertiesEntityList::createProperty("Model-Properties", "Model", "CircuitModels", _circuitModelFolderID, "", -1, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Model-Properties", "Model", _circuitModelFolderName, _circuitModelFolderID, "", -1, "default", getProperties());
 }
 
 std::string EntityBlockCircuitElement::getCircuitModel() {

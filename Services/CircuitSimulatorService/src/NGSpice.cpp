@@ -68,9 +68,9 @@ void NGSpice::clearBufferStructure(std::string name)
 	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 }
 
-std::shared_ptr<EntityFileText> NGSpice::getModelEntity(std::string _modelName) {
+std::shared_ptr<EntityFileText> NGSpice::getModelEntity(const std::string& _folderName, std::string _modelName) {
 	BlockEntityHandler blockHandler;
-	std::shared_ptr<EntityFileText> circuitModelEntity = blockHandler.getCircuitModel(_modelName);
+	std::shared_ptr<EntityFileText> circuitModelEntity = blockHandler.getCircuitModel(_folderName,_modelName);
 	
 	if (circuitModelEntity != nullptr) {
 		return circuitModelEntity;
@@ -592,9 +592,10 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			voltageSource->setCustomName(myElement->getNameOnly());
 			voltageSource->setNetlistName(assignElementID("V"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 
 			voltageSource->setModel(circuitModel);
+			voltageSource->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(voltageSource->getCustomName(), voltageSource->getNetlistName()) || 
@@ -661,8 +662,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			resistor->setCustomName(myElement->getNameOnly());
 			resistor->setNetlistName(assignElementID("R"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			resistor->setModel(circuitModel);
+			resistor->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(resistor->getCustomName(), resistor->getNetlistName()) ||
@@ -683,8 +685,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			diode->setCustomName(myElement->getNameOnly());
 			diode->setNetlistName(assignElementID("D"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			diode->setModel(circuitModel);
+			diode->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(diode->getCustomName(), diode->getNetlistName()) ||
@@ -705,8 +708,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			capacitor->setCustomName(myElement->getNameOnly());
 			capacitor->setNetlistName(assignElementID("C"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			capacitor->setModel(circuitModel);
+			capacitor->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(capacitor->getCustomName(), capacitor->getNetlistName()) ||
@@ -727,8 +731,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			inductor->setCustomName(myElement->getNameOnly());
 			inductor->setNetlistName(assignElementID("L"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			inductor->setModel(circuitModel);
+			inductor->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(inductor->getCustomName(), inductor->getNetlistName()) ||
@@ -748,8 +753,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			voltMeter->setCustomName(myElement->getNameOnly());
 			voltMeter->setNetlistName(assignElementID("VM"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			voltMeter->setModel(circuitModel);
+			voltMeter->setFolderName(myElement->getFolderName());
 
 			ot::UID uid = voltMeter->getUID();
 			auto voltMeter_p = voltMeter.release();
@@ -762,8 +768,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			currentMeter->setCustomName(myElement->getNameOnly());
 			currentMeter->setNetlistName(assignElementID("CM"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			currentMeter->setModel(circuitModel);
+			currentMeter->setFolderName(myElement->getFolderName());
 
 			ot::UID uid = currentMeter->getUID();
 			auto currentMeter_p = currentMeter.release();
@@ -776,8 +783,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			transmissionLine->setCustomName(myElement->getNameOnly());
 			transmissionLine->setNetlistName(assignElementID("T"));
 			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 1);
+			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			transmissionLine->setModel(circuitModel);
+			transmissionLine->setFolderName(myElement->getFolderName());
 
 			//Add customName and netlistName to Map
 			if (!addToCustomNameToNetlistMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName()) ||
@@ -885,7 +893,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		//Check if circuitElement has a model
 		if (circuitElement->getModel() != "failed") {
 			// First we get the entity
-			std::shared_ptr<EntityFileText> circuitModelEntity = getModelEntity(circuitElement->getModel());
+			std::shared_ptr<EntityFileText> circuitModelEntity = getModelEntity(circuitElement->getFolderName(),circuitElement->getModel());
 
 			// Now we need to get the model type (subcircuit or model)
 			modelType = getCircuitModelType(circuitModelEntity);
