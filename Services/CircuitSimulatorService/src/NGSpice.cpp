@@ -951,7 +951,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				std::unordered_set<std::string> temp;
 				auto connections = circuitElement->getList();
 
-				// Verarbeite zuerst die positivePole Verbindung
+				// First process the positivePole connection
 				if (connections.find("positivePole") != connections.end())
 				{
 					auto& positiveConn = connections.at("positivePole");
@@ -963,7 +963,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 					}
 				}
 
-				// Verarbeite danach die negativePole Verbindung
+				// process the negative connection
 				if (connections.find("negativePole") != connections.end())
 				{
 					auto& negativeConn = connections.at("negativePole");
@@ -975,7 +975,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 					}
 				}
 				nodesOfVoltageMeter.push_back(nodeNumbers);
-				// I am doing a continue here becaue i dont want to generate an instance Line for this element
+				// I am doing a continue here because i dont want to generate an instance Line for this element
 				continue;		
 		}
 		else if (circuitElement->type() == "CurrentMeter")
@@ -990,7 +990,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				std::unordered_set<std::string> temp;
 				auto connections = circuitElement->getList();
 
-				// Verarbeite zuerst die positivePole Verbindung
+				// First process the positivePole connection
 				if (connections.find("positivePole") != connections.end())
 				{
 					auto& positiveConn = connections.at("positivePole");
@@ -1002,7 +1002,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 					}
 				}
 
-				// Verarbeite danach die negativePole Verbindung
+				// process the negative connection
 				if (connections.find("negativePole") != connections.end())
 				{
 					auto& negativeConn = connections.at("negativePole");
@@ -1016,7 +1016,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 				nodesOfCurrentMeter.push_back(nodeNumbers);
 
-				// Hier überspringen wir die Instanzlinien-Generierung für dieses Element
+				// Now we skip the instance line generation
 				continue;
 		}
 		else if (circuitElement->type() == "Capacitor")
