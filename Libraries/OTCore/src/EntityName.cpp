@@ -16,8 +16,7 @@ std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEn
 			return _fullEntityName.substr(pos + 1);
 		}
 		else {
-			//! maybe return the full entity name if the entity name is a top level entity?
-			return {};
+			return _fullEntityName;
 		}
 	}
 	else {
@@ -43,7 +42,7 @@ std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEn
 	}
 }
 
-bool ot::EntityName::isChildOf(const std::string& _parentEntityPath, const std::string& _childEntityPath) {
+bool ot::EntityName::isChildOf(const std::string& _childEntityPath, const std::string& _parentEntityPath) {
 	return _childEntityPath.find(_parentEntityPath) == 0;
 }
 
@@ -71,4 +70,8 @@ std::string ot::EntityName::changeParentPath(const std::string& _currentEntityPa
 	}
 
 	return _newParentPath + _currentEntityPath.substr(String::findOccurance(_currentEntityPath, '/', static_cast<int>(parentTopo + 1)));
+}
+
+std::string ot::EntityName::changeParentWithTopo(const std::string& _currentEntityPath, const std::string& _newParentPath) {
+	return _newParentPath + "/" + EntityName::getSubName(_currentEntityPath, -1).value();
 }
