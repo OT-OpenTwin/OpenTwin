@@ -873,6 +873,11 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 		}
 	}
 
+	// Items in graphics view
+	for (auto& it : m_graphicsViews) {
+		it.second->getGraphicsView()->renameItem(_fromPath, _toPath);
+	}
+
 	// TextEdit
 	auto textIt = m_textEditors.find(_fromPath);
 	if (textIt != m_textEditors.end()) {
@@ -911,7 +916,6 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 			m_plots.erase(_fromPath);
 		}
 	}
-
 }
 
 // ##############################################################################################

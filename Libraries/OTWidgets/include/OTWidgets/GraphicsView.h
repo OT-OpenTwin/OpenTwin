@@ -107,6 +107,11 @@ namespace ot {
 		GraphicsItem* getItem(const ot::UID& _itemUid);
 		GraphicsConnectionItem* getConnection(const ot::UID& _connectionUid);
 		
+		//! @brief Will rename the item if it exists.
+		//! @param _oldEntityName Old item entity name.
+		//! @param _newEntityName New item entity name.
+		void renameItem(const std::string& _oldEntityName, const std::string& _newEntityName);
+
 		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
 		void addItem(ot::GraphicsItem* _item);

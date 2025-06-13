@@ -141,6 +141,14 @@ ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _conn
 	}
 }
 
+void ot::GraphicsView::renameItem(const std::string& _oldEntityName, const std::string& _newEntityName) {
+	for (auto& it : m_items) {
+		if (it.second->getGraphicsItemName() == _oldEntityName) {
+			it.second->setGraphicsItemName(_newEntityName);
+		}
+	}
+}
+
 bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& _connection)
 {
 	bool alreadyExisting = false;
