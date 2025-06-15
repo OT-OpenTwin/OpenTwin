@@ -24,6 +24,9 @@ public:
 	void setName(const std::string &n) { m_name = n; };
 	const std::string& getName(void) { return m_name; };
 
+	//! @brief Is called when the entity was renamed by the user
+	virtual void entityRenamed();
+
 	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
 	osg::Switch *getShapeNode(void) { return m_shapeNode; };
 
@@ -44,7 +47,6 @@ public:
 	//! \return Returns true if the selection has requested a new view.
 	virtual ot::SelectionHandlingResult setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool singleSelection);
 	
-
 	bool isTransparent(void) { return m_transparent; };
 	virtual void setTransparent(bool t) { m_transparent = t; };
 

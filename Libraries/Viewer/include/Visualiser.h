@@ -26,11 +26,14 @@ public:
 	//! The visualiser should only hide or dim the visualisation.
 	virtual void hideVisualisation(const VisualiserState& _state) = 0;
 
+	//! @brief Is called when the entity was renamed by the user.
+	virtual void entityRenamed() {};
+
 	bool mayVisualise(void) const { return m_mayVisualise; };
 
 	//! @brief Switch to turn a visualisation type off
 	void setMayVisualise(bool _visible) { m_mayVisualise = _visible;}
-	
+
 	//! @brief Switch for deciding if a data pull is necessary or if a lookup is necessary, if the displayed data may still be up-to date
 	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; };
 	bool getViewIsOpen(void) const { return m_viewIsOpen; };

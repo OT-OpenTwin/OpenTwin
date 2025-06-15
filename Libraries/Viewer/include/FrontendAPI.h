@@ -45,7 +45,7 @@ public:
 	virtual void removeViewer(ot::UID viewerID) {};
 
 	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) {};
-
+	
 	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
 
 	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) { return false; };

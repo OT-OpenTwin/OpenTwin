@@ -3636,19 +3636,21 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 }
 
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
-
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
+
+	OT_LOG_T("Curve in plot: " + plotName);
+
 	if (plotView != nullptr)
 	{
 		ot::Plot1DCurveCfg config;
 		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 		ot::Plot* plot = plotView->getPlot();
-		std::list<ot::PlotDataset*> allDatasets = plot->getAllDatasets();
-		for (ot::PlotDataset* dataSet : allDatasets)
-		{
-			if (dataSet->getEntityName() == config.getEntityName())
-			{
+		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
+
+		OT_LOG_T("Curve: " + config.getEntityName());
+		for (ot::PlotDataset* dataSet : allDatasets) {
+			if (dataSet->getEntityName() == config.getEntityName()) {
 				dataSet->setConfig(config);
 				dataSet->updateCurveVisualization();
 				break;

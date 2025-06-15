@@ -104,6 +104,14 @@ void ot::PlotBase::resetView(void) {
 	m_polarPlot->resetPlotView();
 }
 
+void ot::PlotBase::renameDataset(const std::string& _oldEntityPath, const std::string& _newEntityPath) {
+	for (PlotDataset* data : this->getAllDatasets()) {
+		if (data->getEntityName() == _oldEntityPath) {
+			data->setEntityName(_newEntityPath);
+		}
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data handling

@@ -853,9 +853,6 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 		return;
 	}
 
-	// Update entity path in viewer
-	ViewerAPI::renameEntityPath(_fromPath, _toPath);
-
 	// Update views in view manager
 	ot::WidgetViewManager::instance().renameView(_fromPath, _toPath);
 
@@ -917,6 +914,15 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 			m_plots.erase(_fromPath);
 		}
 	}
+
+	// Update curve names in plots
+	for (auto& it : m_plots) {
+		it.second->getPlot()->renameDataset(_fromPath, _toPath);
+	}
+
+	// Finally update entity path in viewer
+	ViewerAPI::renameEntityPath(_fromPath, _toPath);
+
 }
 
 // ##############################################################################################

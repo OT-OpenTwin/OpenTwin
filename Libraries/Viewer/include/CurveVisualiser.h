@@ -8,4 +8,5 @@ public:
 	bool requestVisualization(const VisualiserState& _state) override;
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
+	virtual void entityRenamed() override;
 };

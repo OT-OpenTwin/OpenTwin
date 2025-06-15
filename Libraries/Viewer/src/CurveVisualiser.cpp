@@ -16,10 +16,16 @@ bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
 	bool newVisualisation = false;
 
 	SceneNodeBase* plot = m_node->getParent();
+	OTAssertNullptr(plot);
+
 	const std::list<Visualiser*>& allVisualiser = plot->getVisualiser();
 	assert(allVisualiser.size() == 1); //Currently, the plot has only a single visualiser
+	
 	auto visualiser = *allVisualiser.begin();
 	PlotVisualiser* plotVisualiser = dynamic_cast<PlotVisualiser*>(visualiser);
+	
+	OTAssertNullptr(plotVisualiser);
+
 	if (!plotVisualiser->alreadyRequestedVisualisation()) {
 		VisualiserState plotState;
 		plotState.m_selected = true;
@@ -41,4 +47,8 @@ void CurveVisualiser::hideVisualisation(const VisualiserState& _state) {
 	SceneNodeBase* plot = m_node->getParent();
 	OTAssertNullptr(plot);
 	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), true);
+}
+
+void CurveVisualiser::entityRenamed() {
+	
 }

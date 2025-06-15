@@ -28,6 +28,15 @@ SceneNodeBase::~SceneNodeBase() {
 	}
 }
 
+void SceneNodeBase::entityRenamed() {
+	const std::list<Visualiser*>& visualisers = getVisualiser();
+
+	// Check if any visualiser has focus
+	for (Visualiser* visualiser : visualisers) {
+		visualiser->entityRenamed();
+	}
+}
+
 ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
