@@ -174,3 +174,15 @@ A custom ``ActionDispatcher`` may be created in case the application requires mu
 
         ...
     };
+
+.. _reference-ot-return-message:
+
+ot::ReturnMessage
+*****************
+
+The ReturnMessage class serves as a structured return value.
+
+It contains a status (Ok or Failed) to indicate the success or failure of a process and a message that can contain details,
+error descriptions or optionally additional return values such as more complex data structures.
+
+The class also supports serialization and deserialization to and from JSON.
