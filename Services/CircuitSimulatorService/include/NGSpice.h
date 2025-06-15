@@ -42,6 +42,8 @@ public:
 	std::shared_ptr<EntityFileText> getModelEntity(const std::string& _folderName,std::string _modelName);
 	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
+	std::vector<std::string> convertToCircByLine(const std::string& lines);
+	std::string trim(const std::string& line);
 
 	//Connection Algorithm functions
 	void connectionAlgorithmWithGNDElement(std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
@@ -55,7 +57,7 @@ public:
 	bool checkIfConnectionIsConnectedToGndVoltageSource(std::string pole, ot::UID voltageSourceUID, ot::UID elementUID);
 	bool checkIfConnectionIsConnectedToVoltageMeter( std::string blockTitle);
 	void setNodeNumbersOfVoltageSource(std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	std::string removeComments(const std::string& _input);
+	
 	
 	//Setter
 	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);
@@ -79,7 +81,8 @@ private:
 	const std::string m_voltageMeterTitle = "Voltage Meter";
 	const std::string m_positivePole = "positivePole";
 	const std::string m_gndPole = "GNDPole";
-
+	const std::string m_modelType = "MODEL";
+	const std::string m_subcktType = "SUBCKT";
 	
 	
 };

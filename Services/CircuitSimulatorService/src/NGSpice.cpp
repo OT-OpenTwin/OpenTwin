@@ -95,12 +95,41 @@ std::string NGSpice::getCircuitModelText(std::shared_ptr<EntityFileText> _circui
 	if (_circuitModelEntity != nullptr) {
 		auto data = _circuitModelEntity->getData()->getData();
 		std::string modelText(data.begin(), data.end());
-		return removeComments(modelText);
+		return modelText;
 	}
 
 	OT_LOG_E("No Circuit model type found: " + _circuitModelEntity->getClassName() + " is null");
 	return "";
 
+}
+
+std::vector<std::string> NGSpice::convertToCircByLine(const std::string& lines) {
+	std::istringstream stream(lines);
+	std::string line;
+	std::vector<std::string> circLines;
+
+	while (std::getline(stream, line)) {
+		if (line.empty()) continue; // skip emtpy line
+		circLines.push_back("circbyline " + line);
+	}
+
+	return circLines;
+}
+
+std::string NGSpice::trim(const std::string& line) {
+	std::string result = line;
+
+	while (!result.empty()) {
+		char lastChar = result[result.length() - 1];
+		if (lastChar == ' ' || lastChar == '\t' || lastChar == '\r' || lastChar == '\n') {
+			result.erase(result.length() - 1, 1);
+		}
+		else {
+			break;
+		}
+	}
+
+	return result;
 }
 
 
@@ -529,34 +558,6 @@ void NGSpice::setNodeNumbersOfVoltageSource(std::string startingElement, int cou
 	return;
 }
 
-std::string NGSpice::removeComments(const std::string& _input) {
-	std::istringstream stream(_input);
-	std::ostringstream result;
-	std::string line;
-
-	while (std::getline(stream, line)) {
-		// Entferne führende Leerzeichen
-		std::string trimmed = line;
-		trimmed.erase(0, trimmed.find_first_not_of(" \t"));
-
-		// Wenn die Zeile leer ist oder mit '*' beginnt → überspringen
-		if (trimmed.empty() || trimmed[0] == '*') {
-			continue;
-		}
-
-		// Optional: Zeilen, die **nur aus Sternchen bestehen**, ignorieren
-		bool onlyStars = !trimmed.empty() && std::all_of(trimmed.begin(), trimmed.end(), [](char c) {
-			return c == '*';
-			});
-		if (onlyStars) {
-			continue;
-		}
-
-		result << line << '\n';
-	}
-
-	return result.str();
-}
 
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
@@ -869,6 +870,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	std::vector<std::vector<std::string>> nodesOfCurrentMeter;
 	std::vector<std::string> namesOfCurrentMeter;
 	std::vector<std::string> nameOfRShunts;
+	std::unordered_set<std::string> usedModels;
 	int rshuntCounter = 1; // Initialisiere den Zähler
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
@@ -887,7 +889,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		std::string netlistValue = "";
 		std::string netlistNodeNumbers;
 		std::string netlistVoltageSourceType="";
-		std::string modelNetlistLine = "circbyline ";
+		std::vector<std::string> modelNetlistLine;
 		std::string modelType = "";
 		
 		//Check if circuitElement has a model
@@ -897,15 +899,22 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 			// Now we need to get the model type (subcircuit or model)
 			modelType = getCircuitModelType(circuitModelEntity);
+			
+			auto it = usedModels.find(circuitElement->getModel());
+			if (it == usedModels.end()) {
+				// As last step we need the model text
+				modelNetlistLine = convertToCircByLine(getCircuitModelText(circuitModelEntity));
+				usedModels.insert(circuitElement->getModel());
+			}
 
-			// As last step we need the model text
-			modelNetlistLine += getCircuitModelText(circuitModelEntity);
+
+
+			
 		}
 		else {
 			circuitElement->setModel("");
 		}
-		
-		// First we just implement the .model functionality
+
 
 
 		if (circuitElement->type() == "VoltageSource")
@@ -946,9 +955,19 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		{
 			Diode* diode = dynamic_cast<Diode*>(circuitElement);
 
-			netlistElementName = diode->getNetlistName();
+			// Check if .model or .subckt
+			if (modelType == m_subcktType) {
+				netlistElementName = assignElementID("X");
+				netlistValue = diode->getValue() + " " + diode->getModel();
+			}
+			else {
+				netlistElementName = diode->getNetlistName();
+				netlistValue = diode->getValue() + " " + diode->getModel();
+			}
+
+
 			netlistLine += netlistElementName + " ";
-			netlistValue = diode->getValue() + " " + diode->getModel();
+			
 		}
 		else if (circuitElement->type() == "VoltageMeter")
 		{
@@ -1145,9 +1164,13 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		_netlist.push_back(const_cast<char*>(netlistLine.c_str()));
 		
 		// If we have a model included into the element
-		if (modelNetlistLine != "circbyline ")
+		if (!modelNetlistLine.empty())
 		{
-			_netlist.push_back(const_cast<char*>(modelNetlistLine.c_str()));
+			for (auto line : modelNetlistLine){
+				_netlist.push_back(const_cast<char*>(line.c_str()));
+			}
+			
+			
 		}
 	}
 
