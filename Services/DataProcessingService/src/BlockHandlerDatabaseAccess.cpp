@@ -15,6 +15,7 @@
 #include "PropertyHandlerDatabaseAccessBlock.h"
 
 #include "OTCore/ExplicitStringValueConverter.h"
+#include "OTCore/ComparisionSymbols.h"
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	: BlockHandler(blockEntity, handlerMap)
@@ -160,7 +161,11 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
 {
-	
+	std::list<ValueComparisionDefinition> queries =	_blockEntity->getAdditionalQueries();
+	for (const ValueComparisionDefinition& query : queries)
+	{
+		addComparision(query);
+	}
 }
 
 const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockDatabaseAccess* _blockEntity)
@@ -178,11 +183,16 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 	else
 	{
 		const std::list<MetadataSeries>& allSeries = m_resultCollectionMetadataAccess->getMetadataCampaign().getSeriesMetadata();
+		AdvancedQueryBuilder builder;
+		std::list< BsonViewOrValue> queries;
 		for (const MetadataSeries& series : allSeries)
 		{
 			ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(series.getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
-			addComparision(seriesComparision);
+			BsonViewOrValue query = builder.createComparison(seriesComparision);
+			queries.push_back(std::move(query));
 		}
+		BsonViewOrValue query = builder.connectWithOR(std::move(queries));
+		m_comparisons.push_back(query);
 	}
 
 	return  series;
@@ -231,8 +241,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	m_queryDescriptions.push_back(quantityQueryDescr);
 	addComparision(quantityDef);
 }
-
-
 
 
 void BlockHandlerDatabaseAccess::extractQuantity(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument)
@@ -363,10 +371,14 @@ void BlockHandlerDatabaseAccess::extractParameter(QueryDescription& _queryDescri
 
 void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition& _definition)
 {
-	const std::string& comparator = _definition.getComparator();
-	AdvancedQueryBuilder builder;
-	BsonViewOrValue query =	builder.createComparison(_definition);
-	m_comparisons.push_back(query);
+	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
+	{
+		const std::string& comparator = _definition.getComparator();
+		AdvancedQueryBuilder builder;
+		BsonViewOrValue query =	builder.createComparison(_definition);
+		m_comparisons.push_back(query);
+	}
+
 }
 
 void BlockHandlerDatabaseAccess::addParameterQueryDescription(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)

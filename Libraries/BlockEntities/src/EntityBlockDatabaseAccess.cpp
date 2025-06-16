@@ -344,6 +344,24 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityD
 	return getSelectedValueComparisionDefinition(m_groupQuantitySetttings);
 }
 
+const std::list<ValueComparisionDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()
+{
+	std::list<ValueComparisionDefinition> valueComparisionDefinitions;
+	
+	for (int i = 1; i <= getMaxNumberOfQueries(); i++)
+	{
+		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);
+		const std::string dataType = PropertyHelper::getStringPropertyValue(this, m_propertyDataType, groupName);
+		const std::string unit = PropertyHelper::getStringPropertyValue(this, m_propertyUnit, groupName);
+		const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
+		const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
+		const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
+		const ValueComparisionDefinition valueComparisionDefinition(name, comparator, value, dataType, unit);
+		valueComparisionDefinitions.push_back(valueComparisionDefinition);
+	}
+	return valueComparisionDefinitions;
+}
+
 const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedValueComparisionDefinition(const std::string& _groupName)
 {
 	auto baseProp = getProperties().getProperty(m_propertyName,_groupName);
