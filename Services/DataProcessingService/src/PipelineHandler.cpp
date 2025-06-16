@@ -25,10 +25,11 @@ void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNo
 			std::shared_ptr<BlockHandler> handler = _blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
 		}
+		_uiComponent->displayMessage("Pipeline executed successfull");
 	}
 	catch (const std::exception& ex)
 	{
-		OT_LOG_E(std::string(ex.what())+"\n");
+		OT_LOG_E("Pipeline execution failed with error:" +  std::string(ex.what())+"\n");
 	}
 }
 
