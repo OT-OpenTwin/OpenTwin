@@ -43,7 +43,6 @@ public:
 	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::vector<std::string> convertToCircByLine(const std::string& lines);
-	std::string trim(const std::string& line);
 
 	//Connection Algorithm functions
 	void connectionAlgorithmWithGNDElement(std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);

@@ -116,23 +116,6 @@ std::vector<std::string> NGSpice::convertToCircByLine(const std::string& lines) 
 	return circLines;
 }
 
-std::string NGSpice::trim(const std::string& line) {
-	std::string result = line;
-
-	while (!result.empty()) {
-		char lastChar = result[result.length() - 1];
-		if (lastChar == ' ' || lastChar == '\t' || lastChar == '\r' || lastChar == '\n') {
-			result.erase(result.length() - 1, 1);
-		}
-		else {
-			break;
-		}
-	}
-
-	return result;
-}
-
-
 void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	counter++;
