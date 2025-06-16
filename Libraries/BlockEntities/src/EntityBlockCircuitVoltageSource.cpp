@@ -323,6 +323,7 @@ std::string EntityBlockCircuitVoltageSource::getAmplitude()
 bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	auto baseProperty = getProperties().getProperty("TRAN");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
@@ -348,7 +349,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 		getProperties().forceResetUpdateForAllProperties();
 		
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 

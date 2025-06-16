@@ -13,6 +13,17 @@ void EntityBlockCircuitElement::createProperties(const std::string& _circuitMode
 	EntityPropertiesEntityList::createProperty("Model-Properties", "Model", _circuitModelFolderName, _circuitModelFolderID, "", -1, "default", getProperties());
 }
 
+bool EntityBlockCircuitElement::updateFromProperties(void) {
+	auto rotationProperty = getProperties().getProperty("Rotation");
+	auto flipProperty = getProperties().getProperty("Flip");
+
+	if (rotationProperty->needsUpdate() || flipProperty->needsUpdate()) {
+		CreateBlockItem();
+		
+	}
+	return true;
+}
+
 std::string EntityBlockCircuitElement::getCircuitModel() {
 	auto propertyBase = getProperties().getProperty("Model");
 	auto propertyCircuitModel = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);

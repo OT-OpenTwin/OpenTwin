@@ -137,13 +137,15 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg() {
 }
 
 bool EntityBlockCircuitCurrentMeter::updateFromProperties(void) {
+
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+
 	return refresh;
 }
 

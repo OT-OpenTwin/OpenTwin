@@ -9,6 +9,7 @@ public:
 	virtual void createProperties(const std::string& _circuitModelFolderName,const ot::UID& _circuitModelFolderID);
 	virtual std::string getTypeAbbreviation() = 0;
 	virtual std::string getFolderName() = 0;
+	virtual bool updateFromProperties(void) override;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 

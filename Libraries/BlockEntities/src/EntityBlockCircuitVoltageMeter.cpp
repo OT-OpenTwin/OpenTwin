@@ -142,12 +142,13 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg() {
 bool EntityBlockCircuitVoltageMeter::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 

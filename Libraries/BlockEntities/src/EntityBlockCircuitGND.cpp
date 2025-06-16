@@ -93,12 +93,13 @@ ot::GraphicsItemCfg* EntityBlockCircuitGND::CreateBlockCfg() {
 bool EntityBlockCircuitGND::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 
