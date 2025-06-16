@@ -117,13 +117,16 @@ void EntityFileText::setText(const std::string& _text)
 	}
 }
 
-ot::TextEditorCfg EntityFileText::createConfig(void) {
+ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	OT_TEST_ENTITYFILETEXT_Interval("Create config");
 
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
-	result.setPlainText(this->getText());
+	if (_includeData)
+	{
+		result.setPlainText(this->getText());
+	}
 
 	const std::string fileType = getFileType();
 	if (fileType == "py")

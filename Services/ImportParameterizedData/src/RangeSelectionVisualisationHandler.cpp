@@ -204,8 +204,8 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_OverwriteContent, false, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
-
-	ot::TableCfg tableCfg = table->getTableConfig();;
+	const bool loadContent = true;
+	ot::TableCfg tableCfg = table->getTableConfig(true);;
 	ot::JsonObject cfgObj;
 	tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
 

@@ -20,7 +20,7 @@ public:
 	//! @brief Setting a text will change the underlying data entity. If the modelstate is set, the data entity is directly stored and added to the modelstate.
 	void setText(const std::string& _text) override;
 	bool visualiseText() override { return true; }
-	ot::TextEditorCfg createConfig() override;
+	ot::TextEditorCfg createConfig(bool _includeData) override;
 	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);

@@ -3681,20 +3681,23 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
+	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
 	if (editor) {
-		editor->getTextEditor()->setupFromConfig(config, true);
-		
-		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
-			AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+		if (overwriteContent)
+		{
+			editor->getTextEditor()->setupFromConfig(config, true);
+
+			if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
+				AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+			}
 		}
 	}
 	else {
 		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
 	}
-
-	editor->getTextEditor()->setContentSaved();
 	
+	editor->getTextEditor()->setContentSaved();
 	const std::string& name = editor->getViewData().getEntityName();
 	const auto& viewerType = editor->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;

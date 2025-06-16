@@ -1513,6 +1513,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	{
 		blockEntity->CreateBlockItem();
 	}
+	Application::instance()->getVisualisationHandler().handleRenaming(renamedEntity->getEntityID());
 
 	modelChangeOperationCompleted("rename shapes");
 

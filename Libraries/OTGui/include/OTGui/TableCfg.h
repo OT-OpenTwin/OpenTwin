@@ -81,15 +81,14 @@ namespace ot {
 		void initialize(void);
 		void initialize(int _rows, int _columns);
 
-		int m_rows;
-		int m_columns;
-		bool m_sortingEnabled;
-		bool m_sortingClearable;
+		int m_rows = 0;
+		int m_columns = 0;
+		bool m_sortingEnabled = false;
+		bool m_sortingClearable = false;
 
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;
 		std::vector<std::vector<std::string>> m_data;
-
 	};
 
 }

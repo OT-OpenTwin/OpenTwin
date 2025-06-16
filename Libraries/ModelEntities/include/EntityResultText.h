@@ -42,7 +42,7 @@ public:
 	void setText(const std::string &text) override;
 	std::string getText() override;
 	bool visualiseText() override;
-	ot::TextEditorCfg createConfig() override;
+	ot::TextEditorCfg createConfig(bool _includeData) override;
 	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 private:

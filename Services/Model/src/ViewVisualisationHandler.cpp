@@ -28,7 +28,6 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	Model* model = Application::instance()->getModel();
 	EntityBase* baseEntity = model->getEntityByID(_entityID);
 	assert(baseEntity != nullptr);
-	
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	if (_visualisationType == OT_ACTION_CMD_UI_TABLE_Setup)
 	{
@@ -44,7 +43,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 		
-			ot::TableCfg tableCfg = tableEntity->getTableConfig();
+			ot::TableCfg tableCfg = tableEntity->getTableConfig(_overrideContent);
 			ot::JsonObject cfgObj;
 			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
 
@@ -67,7 +66,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 
-			ot::TextEditorCfg configuration = textEntity->createConfig();
+			ot::TextEditorCfg configuration = textEntity->createConfig(_overrideContent);
 			ot::JsonObject cfgObj;
 			configuration.addToJsonObject(cfgObj, document.GetAllocator());
 
@@ -95,17 +94,20 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
 
-			ot::JsonArray curveCfgs;
-			for (EntityBase* curveEntity : curveEntities)
+			if(_overrideContent)
 			{
-				IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
-				ot::Plot1DCurveCfg curveCfg = curve->getCurve();
-				ot::JsonObject curveCfgSerialised;
-				curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
-				curveCfgs.PushBack(curveCfgSerialised, document.GetAllocator());
-			}
+				ot::JsonArray curveCfgs;
+				for (EntityBase* curveEntity : curveEntities)
+				{
+					IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
+					ot::Plot1DCurveCfg curveCfg = curve->getCurve();
+					ot::JsonObject curveCfgSerialised;
+					curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
+					curveCfgs.PushBack(curveCfgSerialised, document.GetAllocator());
+				}
 
-			document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
+				document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
+			}
 
 			std::string response;
 			Application::instance()->queuedRequestToFrontend(document);
@@ -121,9 +123,73 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	}
 }
 
+void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
+{
+	Model* model = Application::instance()->getModel();
+	EntityBase* baseEntity = model->getEntityByID(_entityID);
+	assert(baseEntity != nullptr);
+	const bool includeData = false;
+	const bool setAsActiveView = true;
+	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
+
+	IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
+	if (tableEntity != nullptr && tableEntity->visualiseTable())
+	{
+		ot::JsonDocument document;
+		info.addToJsonObject(document, document.GetAllocator());
+		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, setAsActiveView, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_OverwriteContent, includeData, document.GetAllocator());
+		
+		ot::TableCfg tableCfg = tableEntity->getTableConfig(includeData);
+		ot::JsonObject cfgObj;
+		tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
+
+		document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+		std::string response;
+		Application::instance()->queuedRequestToFrontend(document);
+	}
+
+	IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
+	if (textEntity != nullptr && textEntity->visualiseText())
+	{
+		ot::JsonDocument document;
+		info.addToJsonObject(document, document.GetAllocator());
+		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, setAsActiveView, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_OverwriteContent, includeData, document.GetAllocator());
+		
+		ot::TextEditorCfg configuration = textEntity->createConfig(includeData);
+		ot::JsonObject cfgObj;
+		configuration.addToJsonObject(cfgObj, document.GetAllocator());
+
+		document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+		std::string response;
+		Application::instance()->queuedRequestToFrontend(document);
+	}
+
+	IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
+	if (plotEntity != nullptr && plotEntity->visualisePlot())
+	{
+
+		ot::JsonDocument document;
+		info.addToJsonObject(document, document.GetAllocator());
+		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_VIEW1D_Setup, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, setAsActiveView, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_OverwriteContent, includeData, document.GetAllocator());
+
+		const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
+		ot::JsonObject cfgObj;
+		plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+
+		std::string response;
+		Application::instance()->queuedRequestToFrontend(document);
+	}
+
+}
+
 void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView)
 {
-	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(_plotEntityBase);
 
 }

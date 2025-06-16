@@ -130,12 +130,15 @@ bool EntityResultText::visualiseText()
 	return true;
 }
 
-ot::TextEditorCfg EntityResultText::createConfig()
+ot::TextEditorCfg EntityResultText::createConfig(bool _includeData)
 {
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
-	result.setPlainText(this->getText());
+	if (_includeData)
+	{
+		result.setPlainText(this->getText());
+	}
 
 	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
 	

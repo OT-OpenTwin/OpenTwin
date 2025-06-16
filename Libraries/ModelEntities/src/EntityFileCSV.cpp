@@ -183,12 +183,16 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 	setText(csvTableText);
 }
 
-ot::TableCfg EntityFileCSV::getTableConfig()
+ot::TableCfg EntityFileCSV::getTableConfig(bool _includeData)
 {
-	OT_TEST_ENTITYFILECSV_Interval("Get table config");
-	ot::GenericDataStructMatrix matrix = getTable();
-	ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
-	ot::TableCfg tableCfg(matrix, headerMode);
+	ot::TableCfg tableCfg;
+	if (_includeData)
+	{
+		OT_TEST_ENTITYFILECSV_Interval("Get table config");
+		ot::GenericDataStructMatrix matrix = getTable();
+		ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
+		tableCfg = ot::TableCfg(matrix, headerMode);
+	}
 	tableCfg.setEntityName(getName());
 	tableCfg.setTitle(getName());
 	return tableCfg;
