@@ -38,6 +38,8 @@ public:
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
+	bool getReproducableOrder() ;
+
 	static const std::string getIconName() {return "Database_access.svg";}
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

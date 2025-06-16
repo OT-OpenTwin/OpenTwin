@@ -131,7 +131,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 	//Next we add a query corresponding to the selected quantity.
 	addQuantityQuery(_blockEntity);
 
-	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
+	const bool reproducableOrder = _blockEntity->getReproducableOrder();
 	addParameterQueries(_blockEntity);
 
 	m_query = builder.connectWithAND(std::move(m_comparisons));

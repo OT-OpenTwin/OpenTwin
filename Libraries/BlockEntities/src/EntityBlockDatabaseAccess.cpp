@@ -50,6 +50,8 @@ void EntityBlockDatabaseAccess::createProperties()
 	EntityPropertiesString::createProperty(m_groupQuantitySetttings, m_propertyValue, "", "default", getProperties());
 	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
 
+	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, "Order reproducable", true,"default", getProperties());
+
 	//Add all query fields
 	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
 	{
@@ -227,6 +229,12 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 
 	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
+}
+
+bool EntityBlockDatabaseAccess::getReproducableOrder()
+{
+	const bool orderReproducable = PropertyHelper::getBoolPropertyValue(this, "Order reproducable", m_groupQuerySetttings);
+	return orderReproducable;
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
