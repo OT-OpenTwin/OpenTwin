@@ -35,8 +35,13 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		{
 			_uiComponent->displayMessage("Selected collection has no meta data and cannot be used by a database access block.\n");
 		}
-		allSeriesLabels  = resultCollectionAccess->listAllSeriesNames();
+		const MetadataSeries* selectedSeriesMetadata = resultCollectionAccess->findMetadataSeries(selectedSeries);
+		if (selectedSeriesMetadata == nullptr)
+		{
+			selectedSeries = m_selectedValueNone;
+		}
 
+		allSeriesLabels  = resultCollectionAccess->listAllSeriesNames();
 		if (selectedSeries == m_selectedValueNone)
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabels();
