@@ -1454,6 +1454,8 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 		}
 	}
 
+
+
 	// Check whether we have encountered an error in one of the previous operations
 	if (!error.empty())
 	{
@@ -1502,6 +1504,14 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 				item->setName(newName);
 			}
 		}
+	}
+
+
+	EntityBase* renamedEntity = findEntityFromName(toPath);
+	EntityBlock* blockEntity =  dynamic_cast<EntityBlock*>(renamedEntity);
+	if (blockEntity != nullptr)
+	{
+		blockEntity->CreateBlockItem();
 	}
 
 	modelChangeOperationCompleted("rename shapes");

@@ -52,6 +52,8 @@ public:
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
+	void CreateBlockItem();
+
 protected:
 	std::string m_blockTitle = "";
 	ot::UID m_coordinate2DEntityID = 0;
@@ -69,6 +71,5 @@ protected:
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 	void CreateNavigationTreeEntry();
-	void CreateBlockItem();
 	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };
