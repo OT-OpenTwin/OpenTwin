@@ -175,6 +175,16 @@ const MetadataSeries* BlockHandlerDatabaseAccess::addSeriesQuery(EntityBlockData
 		ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
 		addComparision(seriesComparision);
 	}
+	else
+	{
+		const std::list<MetadataSeries>& allSeries = m_resultCollectionMetadataAccess->getMetadataCampaign().getSeriesMetadata();
+		for (const MetadataSeries& series : allSeries)
+		{
+			ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(series.getSeriesIndex()), ot::TypeNames::getInt64TypeName(), "");
+			addComparision(seriesComparision);
+		}
+	}
+
 	return  series;
 }
 
