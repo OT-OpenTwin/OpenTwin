@@ -119,6 +119,8 @@ public:
 
 	virtual void modelSelectionChanged(void) override;
 	virtual ~Application();
+
+	void propertyChanged(ot::JsonDocument& _doc) override;
 private:
 	Application();
 

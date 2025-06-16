@@ -112,6 +112,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	void propertyChanged(ot::JsonDocument& _doc) override;
+
 private:
 	Application();
 	virtual ~Application();

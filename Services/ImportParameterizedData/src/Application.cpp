@@ -70,6 +70,11 @@ Application::~Application()
 	}
 }
 
+void Application::propertyChanged(ot::JsonDocument& _doc)
+{
+	//The message is expected to come, but nothing needs to be done
+}
+
 
 
 // ##################################################################################################################################
@@ -396,10 +401,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 			}
-		}
-		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-		{
-			//The message is expected to come, but nothing needs to be done
 		}
 		else {
 			OT_LOG_W(OT_ACTION_RETURN_UnknownAction);

@@ -319,6 +319,37 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 		return "";  // No further processing necessary
 	}
 
+	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
+	{
+		auto serialisedChangedEntityInfos = json::getObjectList(_doc, OT_ACTION_PARAM_MODEL_EntityInfo);
+		std::list<ot::EntityInformation> changedEntityInfos;
+		for (auto& serialisedChangedEntityInfo : serialisedChangedEntityInfos)
+		{
+			ot::EntityInformation info;
+			info.setFromJsonObject(serialisedChangedEntityInfo);
+			changedEntityInfos.push_back(info);
+		}
+
+		ot::UIDList changedEntityIDs = json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+		for (ot::UID& changedEntityID : changedEntityIDs)
+		{
+			for (auto selectedEntityInfo = m_selectedEntityInfos.begin(); selectedEntityInfo != m_selectedEntityInfos.end();)
+			{
+				if (selectedEntityInfo->getEntityID() == changedEntityID)
+				{
+					selectedEntityInfo = m_selectedEntityInfos.erase(selectedEntityInfo);
+				}
+				else
+				{
+					++selectedEntityInfo;
+				}
+			}
+		}
+		m_selectedEntityInfos.insert(m_selectedEntityInfos.end(), changedEntityInfos.begin(), changedEntityInfos.end());
+		propertyChanged(_doc);
+		return "";
+	}
+
 	OT_LOG_D("Action \"" + _action + "\" does not have any handler nor is a modal command");
 
 	// Otherwise process the local actions
@@ -507,6 +538,7 @@ std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _docum
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
 	}
 }
+
 
 std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
 	PropertyGridCfg gridConfig;

@@ -2396,7 +2396,8 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	for (auto serviceUpdate : otherServicesUpdate)
 	{
 		std::list<ot::UID> entityIDs, entityVersions, brepVersions;
-
+		ot::JsonArray changedEntitiesInfos;
+		ot::JsonDocument notify;
 		for (auto entity : serviceUpdate.second)
 		{
 			ot::UID brepVersion = 0;
@@ -2410,10 +2411,17 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 			entityIDs.push_back(entity.first);
 			entityVersions.push_back(entity.second);
 			brepVersions.push_back(brepVersion);
+			auto changedEntityByID = entityMap.find(entity.first);
+			assert(changedEntityByID != entityMap.end());
+			ot::EntityInformation entityInfo(changedEntityByID->second);
+			ot::JsonObject entityInfoSerialised;
+			entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
+			changedEntitiesInfos.PushBack(entityInfoSerialised, notify.GetAllocator());
 		}
 
-		ot::JsonDocument notify;
+
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, changedEntitiesInfos, notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
@@ -4518,7 +4526,19 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
 {
 	ot::JsonDocument notify;
+	ot::JsonArray changedEntitiesInfos;
+	for (ot::UID& entityID : entityIDs)
+	{
+		auto changedEntityByID = entityMap.find(entityID);
+		assert(changedEntityByID != entityMap.end());
+		ot::EntityInformation entityInfo(changedEntityByID->second);
+		ot::JsonObject entityInfoSerialised;
+		entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
+		changedEntitiesInfos.PushBack(entityInfoSerialised, notify.GetAllocator());
+	}
+
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, changedEntitiesInfos, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());

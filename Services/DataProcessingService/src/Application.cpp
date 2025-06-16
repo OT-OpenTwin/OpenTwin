@@ -112,23 +112,6 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				worker.detach();
 			}
 		}
-		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-		{
-			EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
-			if (m_selectedEntities.size() == 1 && m_selectedEntityInfos.begin()->getEntityType() == dbA.getClassName())
-			{
-				auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_selectedEntityInfos.begin()->getEntityID(), m_selectedEntityInfos.begin()->getEntityVersion(), getClassFactory());
-				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
-				if (dbAccess != nullptr)
-				{
-					m_propertyHandlerDatabaseAccessBlock.performEntityUpdateIfRequired(dbAccess);
-				}
-				else
-				{
-					assert(false);
-				}
-			}
-		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 		{
 			std::string itemName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
@@ -172,6 +155,24 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		OT_LOG_E(e.what());
 	}
 	return ""; // Return empty string if the request does not expect a return
+}
+
+void Application::propertyChanged(ot::JsonDocument& _doc)
+{
+	EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
+	if (m_selectedEntities.size() == 1 && m_selectedEntityInfos.begin()->getEntityType() == dbA.getClassName())
+	{
+		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_selectedEntityInfos.begin()->getEntityID(), m_selectedEntityInfos.begin()->getEntityVersion(), getClassFactory());
+		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+		if (dbAccess != nullptr)
+		{
+			m_propertyHandlerDatabaseAccessBlock.performEntityUpdateIfRequired(dbAccess);
+		}
+		else
+		{
+			assert(false);
+		}
+	}
 }
 
 std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc)

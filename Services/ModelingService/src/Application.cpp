@@ -150,19 +150,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 
 		getPrimitiveManager()->createFromRubberbandJson(note, json, transform);
 	}
-	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-	{
-		std::list<ot::UID> entityIDs      = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		std::list<ot::UID> brepVersions   = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
-		bool itemsVisible			  = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
-
-		std::list<ot::UID> modifiedEntities = getUpdateManager()->updateEntities(entityIDs, entityVersions, brepVersions, itemsVisible);
-
-		getUpdateManager()->checkParentUpdates(modifiedEntities);
-
-		entityCache.shrinkCache();
-	}
 	else if (_action == OT_ACTION_CMD_MODEL_EntitiesSelected)
 	{
 		std::string selectionAction         = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_SelectionAction);
@@ -322,6 +309,20 @@ void Application::modelSelectionChanged(void)
 
 	// We need to call the handler in the base class
 	ApplicationBase::modelSelectionChanged();
+}
+
+void Application::propertyChanged(ot::JsonDocument& _doc)
+{
+	std::list<ot::UID> entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	std::list<ot::UID> brepVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
+	bool itemsVisible = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
+
+	std::list<ot::UID> modifiedEntities = getUpdateManager()->updateEntities(entityIDs, entityVersions, brepVersions, itemsVisible);
+
+	getUpdateManager()->checkParentUpdates(modifiedEntities);
+
+	entityCache.shrinkCache();
 }
 
 

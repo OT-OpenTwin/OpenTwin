@@ -117,7 +117,7 @@ public:
 	std::list<ot::EntityInformation> getSelectedGeometryEntities(void);
 	EntityCache *getEntityCache(void) { return &entityCache; }
 	virtual void modelSelectionChanged(void) override;
-
+	virtual void propertyChanged(ot::JsonDocument& _doc) override;
 
 	// ##################################################################################################################################
 
