@@ -26,9 +26,6 @@ public:
 	//! The visualiser should only hide or dim the visualisation.
 	virtual void hideVisualisation(const VisualiserState& _state) = 0;
 
-	//! @brief Is called when the entity was renamed by the user.
-	virtual void entityRenamed() {};
-
 	bool mayVisualise(void) const { return m_mayVisualise; };
 
 	//! @brief Switch to turn a visualisation type off

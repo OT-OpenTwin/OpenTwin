@@ -916,8 +916,6 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 				m_nameToSceneNodesMap[newPath] = item.second;
 				m_nameToSceneNodesMap.erase(name);
 
-				item.second->entityRenamed();
-
 				std::string newText;
 
 				size_t index = newPath.rfind("/");

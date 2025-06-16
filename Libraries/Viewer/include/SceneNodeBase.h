@@ -24,9 +24,6 @@ public:
 	void setName(const std::string &n) { m_name = n; };
 	const std::string& getName(void) { return m_name; };
 
-	//! @brief Is called when the entity was renamed by the user
-	virtual void entityRenamed();
-
 	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
 	osg::Switch *getShapeNode(void) { return m_shapeNode; };
 

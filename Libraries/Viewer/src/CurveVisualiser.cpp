@@ -48,7 +48,3 @@ void CurveVisualiser::hideVisualisation(const VisualiserState& _state) {
 	OTAssertNullptr(plot);
 	FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), true);
 }
-
-void CurveVisualiser::entityRenamed() {
-	
-}
