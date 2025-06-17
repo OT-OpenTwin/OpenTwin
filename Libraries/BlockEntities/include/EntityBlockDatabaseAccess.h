@@ -49,7 +49,7 @@ protected:
 
 private:
 
-	const uint32_t m_maxNbOfQueries = 100;
+	const uint32_t m_maxNbOfQueries = 40;
 
 	const std::string m_propertyNameProjectName = "Projectname";
 	const std::string m_propertyNameSeriesMetadata = "Measurement series";

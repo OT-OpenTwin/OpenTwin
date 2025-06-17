@@ -14,12 +14,12 @@ public:
 	BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler);
 	virtual ~BlockHandler();
 	void executeOwnNode(std::shared_ptr<GraphNode> ownNode);
-	virtual void setData(PipelineData& data, const std::string& targetPort);
+	virtual void setData(PipelineData* data, const std::string& targetPort);
 
 protected:
 	std::string _blockName;
 	virtual bool executeSpecialized() = 0;
-	std::map<std::string, PipelineData&> _dataPerPort;
+	std::map<std::string, PipelineData*> _dataPerPort;
 
 	const std::string _errorMessageBase = "Block execution failed due to incompatible input data dimension. ";
 

@@ -83,7 +83,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-			ot::JsonValue translatedResponseDoc;
+			ot::JsonObject translatedResponseDoc;
 			for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairs)
 			{
 				if (singleMongoDocument.HasMember(labelFieldNamePair.m_fieldName.c_str()))
@@ -120,7 +120,7 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 	m_queriedData.m_campaign = campaign;
 	m_queriedData.m_series = series;
 
-	_dataPerPort.insert(std::pair<std::string, PipelineData&>(outputConnectorName,m_queriedData));
+	_dataPerPort[outputConnectorName] = &m_queriedData;
 }
 
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
@@ -153,6 +153,7 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 
 	const bool reproducableOrder = _blockEntity->getReproducableOrder();
 
+	createLabelFieldNameMap();
 	AdvancedQueryBuilder builder;
 	m_query = builder.connectWithAND(std::move(m_comparisons));
 

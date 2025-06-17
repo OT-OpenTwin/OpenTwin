@@ -44,13 +44,13 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 			const EdgeInfo info = edge.second;
 
 			const std::shared_ptr<BlockHandler> nextHandler = _allHandler.find(nextNode)->second;
-			//nextHandler->setData(_dataPerPort[info.thisNodePort], info.succeedingNodePort);
+			nextHandler->setData(_dataPerPort[info.thisNodePort], info.succeedingNodePort);
 			nextHandler->executeOwnNode(nextNode);
 		}
 	}
 }
 
-void BlockHandler::setData(PipelineData& data, const std::string& targetPort)
+void BlockHandler::setData(PipelineData* data, const std::string& targetPort)
 {
-	_dataPerPort.insert(std::pair<std::string, PipelineData&>(targetPort, data));
+	_dataPerPort[targetPort] =  data;
 }
