@@ -19,7 +19,7 @@ public:
 protected:
 	std::string _blockName;
 	virtual bool executeSpecialized() = 0;
-	std::map<std::string, PipelineData> _dataPerPort;
+	std::map<std::string, PipelineData&> _dataPerPort;
 
 	const std::string _errorMessageBase = "Block execution failed due to incompatible input data dimension. ";
 

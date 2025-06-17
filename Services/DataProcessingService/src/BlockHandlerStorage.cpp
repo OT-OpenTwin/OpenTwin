@@ -84,86 +84,86 @@ bool BlockHandlerStorage::allInputsAvailable()
 std::list<std::shared_ptr<ParameterDescription>> BlockHandlerStorage::createAllParameter()
 {
 	std::list<std::shared_ptr<ParameterDescription>> allParameter;
-	for (auto& connector : m_connectorsParameter)
-	{
-		
-		MetadataParameter newParameter = extractParameter(connector);
-		const std::string parameterName = connector.getConnectorName();
+	//for (auto& connector : m_connectorsParameter)
+	//{
+	//	
+	//	MetadataParameter newParameter = extractParameter(connector);
+	//	const std::string parameterName = connector.getConnectorName();
 
-		auto portData = _dataPerPort.find(parameterName);
-		assert(portData != _dataPerPort.end()); //Should have been checked before
-		const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
-		const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName);
-		const std::string portLabel = connector.getConnectorTitle();		
-		
-		auto& pipelineDocumentList = portData->second.m_data;
-		
-		if (pipelineDocumentList.size() == 0)
-		{
-			const std::string errorMessageNoValuesReceived = "The parameter port " + portLabel + " has not received any values.";
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
-		
-		for (auto& pipelineDocument : pipelineDocumentList)
-		{
-			if (pipelineDocument.m_parameter.size()> 1)
-			{
-				throw std::exception(("The parameter port " + portLabel + " has a dimension that is not supported.").c_str());
-			}
-			else
-			{
-				const ot::Variable& value = pipelineDocument.m_parameter.begin()->second;
-				newParameter.values.push_back(value);
-			}
-		}
-		
-		allParameter.push_back(std::make_shared< ParameterDescription>(newParameter, selectedProperties.m_propertyConstParameter));
-	}
+	//	auto portData = _dataPerPort.find(parameterName);
+	//	assert(portData != _dataPerPort.end()); //Should have been checked before
+	//	const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
+	//	const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName);
+	//	const std::string portLabel = connector.getConnectorTitle();		
+	//	
+	//	auto& pipelineDocumentList = portData->second.m_data;
+	//	
+	//	if (pipelineDocumentList.size() == 0)
+	//	{
+	//		const std::string errorMessageNoValuesReceived = "The parameter port " + portLabel + " has not received any values.";
+	//		throw std::exception(errorMessageNoValuesReceived.c_str());
+	//	}
+	//	
+	//	for (auto& pipelineDocument : pipelineDocumentList)
+	//	{
+	//		if (pipelineDocument.m_parameter.size()> 1)
+	//		{
+	//			throw std::exception(("The parameter port " + portLabel + " has a dimension that is not supported.").c_str());
+	//		}
+	//		else
+	//		{
+	//			const ot::Variable& value = pipelineDocument.m_parameter.begin()->second;
+	//			newParameter.values.push_back(value);
+	//		}
+	//	}
+	//	
+	//	allParameter.push_back(std::make_shared< ParameterDescription>(newParameter, selectedProperties.m_propertyConstParameter));
+	//}
 	
 	return allParameter;
 }
 
 MetadataParameter BlockHandlerStorage::extractParameter(const ot::Connector& _connector)
 {
-	const std::string parameterName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(parameterName);
-	assert(portData != _dataPerPort.end()); //Should have been checked before
-	const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
-	const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName); //Parameter settings that are set in the properties
+	//const std::string parameterName = _connector.getConnectorName();
+	//auto portData = _dataPerPort.find(parameterName);
+	//assert(portData != _dataPerPort.end()); //Should have been checked before
+	//const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
+	//const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName); //Parameter settings that are set in the properties
 
 	MetadataParameter newParameter;
-	if (metadataParameterFromPort != nullptr)
-	{
-		//Data stream carries relevant meta data with it. The user has the option to overwrite these meta data via the entity properties.
+	//if (metadataParameterFromPort != nullptr)
+	//{
+	//	//Data stream carries relevant meta data with it. The user has the option to overwrite these meta data via the entity properties.
 
-		if (selectedProperties.m_propertyName == "")
-		{
-			newParameter.parameterName = metadataParameterFromPort->parameterName;
-		}
-		else
-		{
-			newParameter.parameterName = selectedProperties.m_propertyName;
-		}
+	//	if (selectedProperties.m_propertyName == "")
+	//	{
+	//		newParameter.parameterName = metadataParameterFromPort->parameterName;
+	//	}
+	//	else
+	//	{
+	//		newParameter.parameterName = selectedProperties.m_propertyName;
+	//	}
 
-		if (selectedProperties.m_propertyUnit == "")
-		{
-			newParameter.unit = metadataParameterFromPort->unit;
-		}
-		else
-		{
-			newParameter.unit = selectedProperties.m_propertyUnit;
-		}
-	}
-	else
-	{
-		if (selectedProperties.m_propertyName == "" || selectedProperties.m_propertyUnit == "")
-		{
-			const std::string errorMessagePropertyMustBeSet = _connector.getConnectorTitle() + " did not receive meta data from the processing pipeline. All properties for this quantity have to be set manually, which is currently not the case.";
-			throw std::exception(errorMessagePropertyMustBeSet.c_str());
-		}
-		newParameter.parameterName = selectedProperties.m_propertyName;
-		newParameter.unit = selectedProperties.m_propertyUnit;
-	}
+	//	if (selectedProperties.m_propertyUnit == "")
+	//	{
+	//		newParameter.unit = metadataParameterFromPort->unit;
+	//	}
+	//	else
+	//	{
+	//		newParameter.unit = selectedProperties.m_propertyUnit;
+	//	}
+	//}
+	//else
+	//{
+	//	if (selectedProperties.m_propertyName == "" || selectedProperties.m_propertyUnit == "")
+	//	{
+	//		const std::string errorMessagePropertyMustBeSet = _connector.getConnectorTitle() + " did not receive meta data from the processing pipeline. All properties for this quantity have to be set manually, which is currently not the case.";
+	//		throw std::exception(errorMessagePropertyMustBeSet.c_str());
+	//	}
+	//	newParameter.parameterName = selectedProperties.m_propertyName;
+	//	newParameter.unit = selectedProperties.m_propertyUnit;
+	//}
 	return newParameter;
 }
 
@@ -193,82 +193,82 @@ std::list<DatasetDescription> BlockHandlerStorage::createDatasets()
 
 QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::Connector& _connector, std::string& _outTypeName)
 {
-	const std::string portLabel = _connector.getConnectorTitle();
-	const std::string quantityName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(quantityName);
+	//const std::string portLabel = _connector.getConnectorTitle();
+	//const std::string quantityName = _connector.getConnectorName();
+	//auto portData = _dataPerPort.find(quantityName);
 
-	//Now we assign the parameter values and check if the characteristics are matching.
-	const std::string errorMessageNoValuesReceived = "The quantity port " + portLabel + " has not received any values.";
+	////Now we assign the parameter values and check if the characteristics are matching.
+	//const std::string errorMessageNoValuesReceived = "The quantity port " + portLabel + " has not received any values.";
 
-	auto& pipelineData = portData->second.m_data;
-	auto firstDataEntry = pipelineData.begin()->m_quantity;
-	assert(firstDataEntry != nullptr);
-	if (pipelineData.size() == 0)
-	{
-		throw std::exception(errorMessageNoValuesReceived.c_str());
-	}
+	//auto& pipelineData = portData->second.m_data;
+	//auto firstDataEntry = pipelineData.begin()->m_quantity;
+	//assert(firstDataEntry != nullptr);
+	//if (pipelineData.size() == 0)
+	//{
+	//	throw std::exception(errorMessageNoValuesReceived.c_str());
+	//}
 
 	QuantityDescription* quantityDescription = nullptr;
-	ot::GenericDataStructSingle* singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(firstDataEntry.get());
-	if (singleEntry != nullptr)
-	{
-		_outTypeName = singleEntry->getValue().getTypeName();
-		auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
-		for (auto dataEntry : pipelineData)
-		{
-			singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.m_quantity.get());
-			ot::Variable value = singleEntry->getValue();
-			quantityDescriptionCurve->addDatapoint(std::move(value));
-		}
-		quantityDescription = quantityDescriptionCurve.release();
-	}
+	//ot::GenericDataStructSingle* singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(firstDataEntry.get());
+	//if (singleEntry != nullptr)
+	//{
+	//	_outTypeName = singleEntry->getValue().getTypeName();
+	//	auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
+	//	for (auto dataEntry : pipelineData)
+	//	{
+	//		singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.m_quantity.get());
+	//		ot::Variable value = singleEntry->getValue();
+	//		quantityDescriptionCurve->addDatapoint(std::move(value));
+	//	}
+	//	quantityDescription = quantityDescriptionCurve.release();
+	//}
 
-	ot::GenericDataStructVector* vectorEntry = dynamic_cast<ot::GenericDataStructVector*>(firstDataEntry.get());
-	if (vectorEntry != nullptr)
-	{
-		if (vectorEntry->getNumberOfEntries() == 0)
-		{
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
+	//ot::GenericDataStructVector* vectorEntry = dynamic_cast<ot::GenericDataStructVector*>(firstDataEntry.get());
+	//if (vectorEntry != nullptr)
+	//{
+	//	if (vectorEntry->getNumberOfEntries() == 0)
+	//	{
+	//		throw std::exception(errorMessageNoValuesReceived.c_str());
+	//	}
 
-		if ((pipelineData.size() > 1 && vectorEntry->getNumberOfEntries() > 1)) //Essentially a matrix of entries
-		{
-			assert(false); //Should not be.
-		}
+	//	if ((pipelineData.size() > 1 && vectorEntry->getNumberOfEntries() > 1)) //Essentially a matrix of entries
+	//	{
+	//		assert(false); //Should not be.
+	//	}
 
-		std::vector<ot::Variable> values = vectorEntry->getValues();
-		_outTypeName = values.begin()->getTypeName();
-		auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
-		quantityDescriptionCurve->setDataPoints({ values.begin(), values.end() });
-		quantityDescription = quantityDescriptionCurve.release();
-	}
+	//	std::vector<ot::Variable> values = vectorEntry->getValues();
+	//	_outTypeName = values.begin()->getTypeName();
+	//	auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
+	//	quantityDescriptionCurve->setDataPoints({ values.begin(), values.end() });
+	//	quantityDescription = quantityDescriptionCurve.release();
+	//}
 
-	ot::GenericDataStructMatrix* matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(firstDataEntry.get());
-	if (matrixEntry != nullptr)
-	{
-		if (matrixEntry->getNumberOfEntries() == 0)
-		{
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
-		ot::MatrixEntryPointer pointer;
-		pointer.m_column = 0;
-		pointer.m_row = 0;
-		const ot::Variable& value = matrixEntry->getValue(pointer);
-		const uint32_t numberOfRows = matrixEntry->getNumberOfColumns();
-		const uint32_t numberOfColumns = matrixEntry->getNumberOfRows();
-		ot::MatrixEntryPointer matrixDimension;
-		matrixDimension.m_column = numberOfColumns;
-		matrixDimension.m_row= numberOfRows;
-		_outTypeName = value.getTypeName();
-		auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>(matrixDimension, pipelineData.size()));
-		for (auto dataEntry : pipelineData)
-		{
-			matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.m_quantity.get());
-			quantityDescriptionMatrix->addToValues(*matrixEntry);
-			quantityDescription = quantityDescriptionMatrix.release();
-		}
-	}
-	assert(quantityDescription != nullptr);
+	//ot::GenericDataStructMatrix* matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(firstDataEntry.get());
+	//if (matrixEntry != nullptr)
+	//{
+	//	if (matrixEntry->getNumberOfEntries() == 0)
+	//	{
+	//		throw std::exception(errorMessageNoValuesReceived.c_str());
+	//	}
+	//	ot::MatrixEntryPointer pointer;
+	//	pointer.m_column = 0;
+	//	pointer.m_row = 0;
+	//	const ot::Variable& value = matrixEntry->getValue(pointer);
+	//	const uint32_t numberOfRows = matrixEntry->getNumberOfColumns();
+	//	const uint32_t numberOfColumns = matrixEntry->getNumberOfRows();
+	//	ot::MatrixEntryPointer matrixDimension;
+	//	matrixDimension.m_column = numberOfColumns;
+	//	matrixDimension.m_row= numberOfRows;
+	//	_outTypeName = value.getTypeName();
+	//	auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>(matrixDimension, pipelineData.size()));
+	//	for (auto dataEntry : pipelineData)
+	//	{
+	//		matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.m_quantity.get());
+	//		quantityDescriptionMatrix->addToValues(*matrixEntry);
+	//		quantityDescription = quantityDescriptionMatrix.release();
+	//	}
+	//}
+	//assert(quantityDescription != nullptr);
 	return quantityDescription;
 }
 

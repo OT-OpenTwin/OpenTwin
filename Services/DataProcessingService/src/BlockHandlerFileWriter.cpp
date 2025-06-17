@@ -24,7 +24,7 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 
 bool BlockHandlerFileWriter::executeSpecialized()
 {
-	_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
+	/*_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
 
 	m_fileStream << m_headline<<"\n";
 
@@ -34,7 +34,7 @@ bool BlockHandlerFileWriter::executeSpecialized()
 	for (auto& pipelineDocument : pipelineDocumentList)
 	{
 		m_fileStream <<	ot::toString(pipelineDocument);
-	}
+	}*/
 	
 	createFile();
 

@@ -34,7 +34,7 @@ public:
 
 	const std::list<ValueComparisionDefinition> getAdditionalQueries();
 
-	const ot::Connector getConnectorQuantity() const { return m_connectorOutput; }	
+	const ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
 
 	virtual bool updateFromProperties() override;
 

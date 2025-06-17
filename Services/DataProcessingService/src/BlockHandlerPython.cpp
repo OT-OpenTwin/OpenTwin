@@ -34,7 +34,7 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const Han
 bool BlockHandlerPython::executeSpecialized()
 {
     bool allInputsComplete = true;
-    for (std::string& requiredPort : _requiredInput)
+   /* for (std::string& requiredPort : _requiredInput)
     {
         allInputsComplete &= _dataPerPort.find(requiredPort) != _dataPerPort.end();
         if (!allInputsComplete) { break; }
@@ -93,7 +93,7 @@ bool BlockHandlerPython::executeSpecialized()
         {
             throw std::exception(returnMessage.getWhat().c_str());
         }
-    }
+    }*/
     return allInputsComplete;
 }
 

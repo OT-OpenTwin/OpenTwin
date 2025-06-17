@@ -10,17 +10,17 @@ BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* blockEntity, const 
 
 bool BlockHandlerDisplay::executeSpecialized()
 {
-	_uiComponent->displayMessage("Executing Display Block: " + _blockName);
-	PipelineData& incommingPortData = _dataPerPort[m_input.getConnectorName()];
+	//_uiComponent->displayMessage("Executing Display Block: " + _blockName);
+	//PipelineData& incommingPortData = _dataPerPort[m_input.getConnectorName()];
 
-	PipelineDataDocumentList& documentList = incommingPortData.m_data;
-	std::string displayMessage = m_description + "\n";
-	
-	for (const auto& document : documentList)
-	{
-		displayMessage += ot::toString(document);
-	}
+	//PipelineDataDocumentList& documentList = incommingPortData.m_data;
+	//std::string displayMessage = m_description + "\n";
+	//
+	//for (const auto& document : documentList)
+	//{
+	//	displayMessage += ot::toString(document);
+	//}
 
-	_uiComponent->displayMessage(displayMessage + "\n");
+	//_uiComponent->displayMessage(displayMessage + "\n");
 	return true;
 }

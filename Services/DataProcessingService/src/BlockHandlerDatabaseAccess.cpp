@@ -78,39 +78,25 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		if (Application::instance()->uiComponent()) {
 			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.");
 		}
-
+		auto& dataDoc = m_queriedData.m_data;
+		ot::JsonArray entries;
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-
-			//Now we extract each of the projected value
-			for (QueryDescription& queryDescription : m_queryDescriptions)
+			ot::JsonValue translatedResponseDoc;
+			for (const LabelFieldNamePair& labelFieldNamePair : m_labelFieldNamePairs)
 			{
-				const std::string& projectionName = queryDescription.m_projectionName;
-
-				//If the entry was not fixed (query for an equal value), then the value is not known and needs to be extracted.
-				if (m_fixedParameter.find(projectionName) == m_fixedParameter.end())
+				if (singleMongoDocument.HasMember(labelFieldNamePair.m_fieldName.c_str()))
 				{
-					//The query does not contain one of the projected values.
-					if (!singleMongoDocument.HasMember(projectionName.c_str()))
-					{
-						const std::string message = ("Expected value was not returned with the queried documents: " + projectionName);
-						throw std::exception(message.c_str());
-					}
-
-					const bool projectedValueIsQuantityValue = projectionName == QuantityContainer::getFieldName();
-					if (projectedValueIsQuantityValue)
-					{
-						extractQuantity(queryDescription, singleMongoDocument);
-					}
-					else
-					{
-						extractParameter(queryDescription, singleMongoDocument);
-					}
+					ot::JsonValue value(singleMongoDocument[labelFieldNamePair.m_fieldName.c_str()], dataDoc.GetAllocator());
+					ot::JsonString newKey(labelFieldNamePair.m_label, dataDoc.GetAllocator());
+					translatedResponseDoc.AddMember(std::move(newKey), std::move(value), dataDoc.GetAllocator());
 				}
 			}
+			entries.PushBack(translatedResponseDoc, dataDoc.GetAllocator());
 		}
 	
+		m_queriedData.setData(std::move(entries));
 	}
 	else
 	{
@@ -121,42 +107,58 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 }
 
+void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity)
+{
+	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
+
+	//If a series is selected, we need to add a corresponding query. Maybe n
+	const MetadataSeries* series = addSeriesQuery(_blockEntity);
+
+	//Now we setup the datastream
+	ot::Connector outputConnector = _blockEntity->getConnectorOutput();
+	const std::string outputConnectorName = outputConnector.getConnectorName();
+	m_queriedData.m_campaign = campaign;
+	m_queriedData.m_series = series;
+
+	_dataPerPort.insert(std::pair<std::string, PipelineData&>(outputConnectorName,m_queriedData));
+}
+
+void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
+{
+	
+	const std::string selectedQuantity = m_queriedData.m_quantity->quantityLabel;
+	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
+	const MetadataQuantity* quantity = campaign.getMetadataQuantitiesByLabel().find(selectedQuantity)->second;
+	auto& allDependingParameter = campaign.getMetadataParameterByUID();
+	const std::vector<ot::UID>& dependingParameterIDs = quantity->dependingParameterIds;
+	for (ot::UID dependingParameterID : dependingParameterIDs)
+	{
+		LabelFieldNamePair queryDescription;
+		queryDescription.m_label = allDependingParameter.find(dependingParameterID)->second.parameterLabel;
+		queryDescription.m_fieldName = std::to_string(dependingParameterID);
+		m_labelFieldNamePairs.push_back(queryDescription);
+	}
+}
+
 void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEntity)
 {
-	AdvancedQueryBuilder builder;
-	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
-	
-	//If a series is selected, we need to add a corresponding query.
-	const MetadataSeries* series = addSeriesQuery(_blockEntity);
+	collectMetadataForPipeline(_blockEntity);
 
 	//Next we add a query corresponding to the selected quantity.
 	addQuantityQuery(_blockEntity);
 
-	const bool reproducableOrder = _blockEntity->getReproducableOrder();
+
+	//Adding all parameter that may occur in the returned documents.
 	addParameterQueries(_blockEntity);
 
+	const bool reproducableOrder = _blockEntity->getReproducableOrder();
+
+	AdvancedQueryBuilder builder;
 	m_query = builder.connectWithAND(std::move(m_comparisons));
 
 	std::vector<std::string> projectionNamesForExclusion{ "SchemaVersion", "SchemaType"};
-	for (QueryDescription& queryDescription : m_queryDescriptions)
-	{
-		//If a field is queried for an equal value, we can exclude it from the returned documents.
-		if (m_fixedParameter.find(queryDescription.m_projectionName) != m_fixedParameter.end())
-		{
-			projectionNamesForExclusion.push_back(queryDescription.m_projectionName);
-		}
-		queryDescription.m_pipelineData.m_campaign = campaign;
-		queryDescription.m_pipelineData.m_series = series;
-		queryDescription.m_pipelineData.m_fixedParameter = m_fixedParameter;
-		
-		_dataPerPort[queryDescription.m_connectorName].m_campaign = campaign;
-		_dataPerPort[queryDescription.m_connectorName].m_series = series;
-		_dataPerPort[queryDescription.m_connectorName].m_quantity = queryDescription.m_pipelineData.m_quantity;
-		_dataPerPort[queryDescription.m_connectorName].m_quantityDescription = queryDescription.m_pipelineData.m_quantityDescription;
-		_dataPerPort[queryDescription.m_connectorName].m_parameter = queryDescription.m_pipelineData.m_parameter;
-	}
-	m_projection = builder.GenerateSelectQuery(projectionNamesForExclusion, false,false);
 
+	m_projection = builder.GenerateSelectQuery(projectionNamesForExclusion, false, false);
 }
 
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
@@ -209,6 +211,8 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	const std::string& valueDescriptionLabel = _blockEntity->getQuantityValueDescriptionSelection()->getValue();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
+	m_queriedData.m_quantity = selectedQuantity;
+
 	if (selectedQuantity == nullptr)
 	{
 		throw std::exception("DatabaseAccessBlock has quantity set which is not part of the selected result collection.");
@@ -216,13 +220,12 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 
 	auto& valueDescriptions = selectedQuantity->valueDescriptions;
 	ot::UID valueUID = 0;
-	QueryDescription quantityQueryDescr;
 	for (auto& valueDescription : valueDescriptions)
 	{
 		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
 		{
 			valueUID = valueDescription.quantityIndex;
-			quantityQueryDescr.m_pipelineData.m_quantityDescription = &valueDescription;
+			m_queriedData.m_quantityDescription = &valueDescription;
 		}
 	}
 	assert(valueUID != 0);
@@ -232,163 +235,22 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	addComparision(selectedQuantityDef);
 
 	//Now we add a comparision for the searched quantity value.
+	LabelFieldNamePair labelFieldNamePair;
+	labelFieldNamePair.m_label = quantityDef.getName();
 	quantityDef.setName(QuantityContainer::getFieldName());
-	quantityQueryDescr.m_projectionName = quantityDef.getName();
-	quantityQueryDescr.m_pipelineData.m_quantity = selectedQuantity;
-	
-	const std::string quantityConnectorName = _blockEntity->getConnectorQuantity().getConnectorName();
-	quantityQueryDescr.m_connectorName = quantityConnectorName;
-	m_queryDescriptions.push_back(quantityQueryDescr);
+	labelFieldNamePair.m_fieldName = QuantityContainer::getFieldName();
 	addComparision(quantityDef);
-}
 
-
-void BlockHandlerDatabaseAccess::extractQuantity(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument)
-{
-	const MetadataQuantity* quantity = _queryDescription.m_pipelineData.m_quantity;
-	const auto& dimensions = quantity->dataDimensions;
-	ot::JSONToVariableConverter converter; //Maybe better the type that is explicitly given by the metadata definition
-
-	//Value is stored as a tensor
-	if (dimensions.size() != 1)
-	{
-		if (dimensions.size() != 2)
-		{
-			const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " have " + std::to_string(dimensions.size()) + " dimensions. Currently a maximum of 2 dimensions (matrices) are supported.";
-			throw std::exception(errorMessage.c_str());
-		}
-
-		if (dimensions[0] != dimensions[1])
-		{
-			const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " are of a matrix structure but of unequal dimensions, which is currently not supported.";
-			throw std::exception(errorMessage.c_str());
-		}
-
-		ot::MatrixEntryPointer mantrixEntry;
-		mantrixEntry.m_row = dimensions[0];
-		mantrixEntry.m_column = dimensions[0];
-		
-		//Could be that the value array is smaller then the data array because of the query.
-		auto jsValues = ot::json::getArray(_databaseDocument, _queryDescription.m_projectionName.c_str());
-		const std::string typeName = _queryDescription.m_pipelineData.m_quantityDescription->dataTypeName;
-		std::list<ot::Variable> values;
-		for (auto& jsValue : jsValues)
-		{			
-			values.push_back(ot::ExplicitStringValueConverter::setValueFromString(jsValue, typeName));
-		}
-		
-		ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(mantrixEntry));
-		dataBlock->setValues(values);
-		
-		PipelineDataDocument pipelineDocument;
-		pipelineDocument.m_quantity = std::shared_ptr<ot::GenericDataStruct>(dataBlock);
-		addNotFixedParameter(pipelineDocument, _databaseDocument, _queryDescription.m_pipelineData.m_series, _queryDescription.m_pipelineData.m_campaign);
-		_dataPerPort[_queryDescription.m_connectorName].m_data.push_back(pipelineDocument);
-	}
-	else
-	{
-		uint32_t vectorDimension = dimensions[0];
-
-		//Value is stored as a single point
-		if (vectorDimension == 1)
-		{
-			ot::Variable value = converter(_databaseDocument[_queryDescription.m_projectionName.c_str()]);
-			ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
-			dataBlock->setValue(value);
-			
-			PipelineDataDocument returnedDocument;
-			returnedDocument.m_quantity = std::shared_ptr<ot::GenericDataStruct>(dataBlock);
-			addNotFixedParameter(returnedDocument, _databaseDocument, _queryDescription.m_pipelineData.m_series, _queryDescription.m_pipelineData.m_campaign);
-			_dataPerPort[_queryDescription.m_connectorName].m_data.push_back(returnedDocument);
-		}
-		else
-		{
-			//Value is stored as a vector
-			const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " are of a vector structure, which is currently not supported.";
-			throw std::exception(errorMessage.c_str());
-		}
-	}
-
-}
-
-void BlockHandlerDatabaseAccess::addNotFixedParameter(PipelineDataDocument& _document, ot::ConstJsonObject& _databaseDocument, const MetadataSeries* _series, const MetadataCampaign* _campaign)
-{
-	//First we find all parameter that are not fixed and that should be part of the mongodb document.
-	std::map<std::string, const MetadataParameter*> freeParameters;
-	if (_series != nullptr)
-	{
-		const std::list<MetadataParameter>&metadataParameters = _series->getParameter();
-		for (auto& parameter : metadataParameters)
-		{
-			const std::string projectionName = std::to_string(parameter.parameterUID);
-			if (m_fixedParameter.find(projectionName) != m_fixedParameter.end())
-			{
-				freeParameters[projectionName]= &parameter;
-			}
-		}
-	}
-	else
-	{
-		assert(_campaign != nullptr);
-		const auto& allParameter =	_campaign->getMetadataParameterByUID();
-		for (auto& parameter : allParameter)
-		{
-			const std::string projectionName = std::to_string(parameter.first);
-			if (m_fixedParameter.find(projectionName) != m_fixedParameter.end())
-			{
-				freeParameters[projectionName] = &parameter.second;
-			}
-		}
-	}
-
-	//now extract the values of the parameters
-	for (const auto& freeParameter : freeParameters)
-	{
-		if (_databaseDocument.HasMember(freeParameter.first.c_str()))
-		{
-			auto& entry =	_databaseDocument[freeParameter.first.c_str()];
-			_document.m_parameter[freeParameter.second->parameterLabel] = ot::ExplicitStringValueConverter::setValueFromString(entry, freeParameter.second->typeName);
-		}
-		else
-		{
-			std::string message = ("Expected value was not returned with the queried documents: " + freeParameter.second->parameterLabel);
-			throw std::exception(message.c_str());
-		}
-	}
-}
-
-void BlockHandlerDatabaseAccess::extractParameter(QueryDescription& _queryDescription, ot::ConstJsonObject& _databaseDocument)
-{
-	assert(_queryDescription.m_pipelineData.m_parameter != nullptr);
-	//Projected value is a parameter value
-	auto& entry = _databaseDocument[_queryDescription.m_projectionName.c_str()];
-	const std::string& typeName =	_queryDescription.m_pipelineData.m_parameter->typeName;
-	
-	PipelineDataDocument document;
-	document.m_parameter[_queryDescription.m_projectionName] = ot::ExplicitStringValueConverter::setValueFromString(entry, typeName);
-	_dataPerPort[_queryDescription.m_connectorName].m_data.push_back(document);
+	m_labelFieldNamePairs.push_back(labelFieldNamePair);
 }
 
 void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition& _definition)
 {
 	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
 	{
-		const std::string& comparator = _definition.getComparator();
 		AdvancedQueryBuilder builder;
 		BsonViewOrValue query =	builder.createComparison(_definition);
 		m_comparisons.push_back(query);
 	}
 
-}
-
-void BlockHandlerDatabaseAccess::addParameterQueryDescription(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)
-{
-	definition.setName(std::to_string(parameter.parameterUID));
-	
-	QueryDescription parameterQueryDesc;
-	parameterQueryDesc.m_connectorName = connectorName;
-	parameterQueryDesc.m_projectionName = definition.getName();
-	parameterQueryDesc.m_pipelineData.m_parameter = &parameter;
-	
-	m_queryDescriptions.push_back(parameterQueryDesc);
 }

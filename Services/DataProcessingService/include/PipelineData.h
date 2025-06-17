@@ -11,20 +11,30 @@
 #include <memory>
 #include <map>
 
-
-using PipelineDataDocumentList = std::list<PipelineDataDocument>;
-//! @brief Data struct that is send down the pipeline connections
 struct PipelineData
 {
 	const MetadataCampaign* m_campaign = nullptr;
 	const MetadataSeries* m_series = nullptr;
-
-	const MetadataParameter* m_parameter = nullptr;
 	const MetadataQuantity* m_quantity = nullptr;
 	const MetadataQuantityValueDescription* m_quantityDescription = nullptr;
 
-	std::map<std::string, ot::Variable> m_fixedParameter; 
-	PipelineDataDocumentList m_data;
+	//! @param _data Must be created with the allocator of the m_data document
+	void setData(ot::JsonArray&& _data)
+	{
+		m_data.AddMember("Data", std::move(_data), m_data.GetAllocator());
+	}
 
-	void copyMetaDataReferences(PipelineData& _other);
+	ot::ConstJsonArray getData()
+	{
+		return ot::json::getArray(m_data, "Data");
+	}
+
+	PipelineData& operator=(const PipelineData& _pipeline)
+	{
+		const ot::JsonDocument& source = _pipeline.m_data;
+		m_data.CopyFrom(source, m_data.GetAllocator());
+		return *this;
+	}
+
+	ot::JsonDocument m_data;
 };
