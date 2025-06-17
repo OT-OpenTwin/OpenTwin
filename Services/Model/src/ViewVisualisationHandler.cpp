@@ -187,6 +187,27 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 		Application::instance()->queuedRequestToFrontend(document);
 	}
 
+	IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(baseEntity);
+	if (curve != nullptr && curve->visualiseCurve())
+	{
+		ot::JsonDocument document;
+		info.addToJsonObject(document, document.GetAllocator());
+		document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UpdateCurvesOfPlot, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, setAsActiveView, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_OverwriteContent, includeData, document.GetAllocator());
+
+		const std::string plotName = baseEntity->getParent()->getName();
+		document.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(plotName, document.GetAllocator()), document.GetAllocator());
+
+		ot::JsonObject curveCfgSerialised;
+		ot::Plot1DCurveCfg curveCfg = curve->getCurve();
+		curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
+		document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised, document.GetAllocator());
+
+		std::string response;
+		Application::instance()->queuedRequestToFrontend(document);
+	}
+
 }
 
 void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView)
