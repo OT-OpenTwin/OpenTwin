@@ -1506,15 +1506,6 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 		}
 	}
 
-
-	EntityBase* renamedEntity = findEntityFromName(toPath);
-	EntityBlock* blockEntity =  dynamic_cast<EntityBlock*>(renamedEntity);
-	if (blockEntity != nullptr)
-	{
-		blockEntity->CreateBlockItem();
-	}
-	Application::instance()->getVisualisationHandler().handleRenaming(renamedEntity->getEntityID());
-
 	modelChangeOperationCompleted("rename shapes");
 
 	// Finally send the path rename operation to the entity
@@ -1525,6 +1516,16 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+
+	EntityBase* renamedEntity = findEntityFromName(toPath);
+	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(renamedEntity);
+	if (blockEntity != nullptr)
+	{
+		blockEntity->CreateBlockItem();
+	}
+
+	Application::instance()->getVisualisationHandler().handleRenaming(renamedEntity->getEntityID());
+
 }
 
 void Model::keySequenceActivated(const std::string &keySequence) {
