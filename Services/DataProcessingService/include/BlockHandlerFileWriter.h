@@ -16,5 +16,4 @@ private:
 
 	std::stringstream m_fileStream;
 	void createFile();
-	void streamVariable(std::stringstream& stream, const ot::Variable& value);
 };
