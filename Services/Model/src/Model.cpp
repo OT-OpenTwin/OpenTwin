@@ -1517,14 +1517,13 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 
-	EntityBase* renamedEntity = findEntityFromName(toPath);
-	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(renamedEntity);
+	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity);
 	if (blockEntity != nullptr)
 	{
 		blockEntity->CreateBlockItem();
 	}
 
-	Application::instance()->getVisualisationHandler().handleRenaming(renamedEntity->getEntityID());
+	Application::instance()->getVisualisationHandler().handleRenaming(entityID);
 
 }
 

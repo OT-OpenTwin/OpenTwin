@@ -3622,7 +3622,19 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 			curveCounter++;
 		}
 	}
-
+	else
+	{
+		const ot::Plot1DCfg& oldConfig = plot->getPlot()->getConfiguration();
+		if (plotConfig.getXLabelAxisAutoDetermine())
+		{
+			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
+		}
+		if (plotConfig.getYLabelAxisAutoDetermine())
+		{
+			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
+		}
+		plot->setConfig(plotConfig);
+	}
 	// Now we refresh the plot visualisation.
 	plot->refresh();
 	plot->resetView();
