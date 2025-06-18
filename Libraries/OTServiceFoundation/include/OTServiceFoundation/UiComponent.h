@@ -9,7 +9,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"

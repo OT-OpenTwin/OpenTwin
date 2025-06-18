@@ -1,8 +1,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/Logger.h"
 
 // std header

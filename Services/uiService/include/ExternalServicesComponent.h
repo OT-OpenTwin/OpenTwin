@@ -10,8 +10,8 @@
 #include "uiServiceTypes.h"				// Model and View types
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/BasicServiceInformation.h"

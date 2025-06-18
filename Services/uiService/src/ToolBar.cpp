@@ -4,7 +4,7 @@
 #include "UserSettings.h"
 
 // openTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewManager.h"

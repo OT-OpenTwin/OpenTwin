@@ -103,7 +103,6 @@
     <ClInclude Include="include\OTCore\EncodingGuesser.h" />
     <ClInclude Include="include\OTCore\FactoryTemplate.h" />
     <ClInclude Include="include\OTCore\FactoryTemplate.hpp" />
-    <ClInclude Include="include\OTCore\Flags.h" />
     <ClInclude Include="include\OTCore\FolderNames.h" />
     <ClInclude Include="include\OTCore\GenericDataStruct.h" />
     <ClInclude Include="include\OTCore\GenericDataStructFactory.h" />

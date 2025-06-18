@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"		// Add flag fuctions
+#include "OTSystem/Flags.h"		// Add flag fuctions
 #include "OTCore/Logger.h"	// LogFlag type
 
 namespace ot {

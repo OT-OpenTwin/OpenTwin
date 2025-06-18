@@ -33,6 +33,7 @@
     <ClInclude Include="include\OTSystem\AppExitCodes.h" />
     <ClInclude Include="include\OTSystem\DateTime.h" />
     <ClInclude Include="include\OTSystem\Exception.h" />
+    <ClInclude Include="include\OTSystem\Flags.h" />
     <ClInclude Include="include\OTSystem\OTAssert.h" />
     <ClInclude Include="include\OTSystem\SystemProcess.h" />
     <ClInclude Include="include\OTSystem\ArchitectureInfo.h" />

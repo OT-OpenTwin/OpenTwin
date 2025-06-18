@@ -40,7 +40,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"

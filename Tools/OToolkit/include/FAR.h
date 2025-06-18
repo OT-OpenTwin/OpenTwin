@@ -6,9 +6,11 @@
 #pragma once
 
 // Toolkit API header
-#include "OTCore/OTClassHelper.h"
-#include "OTCore/Flags.h"
 #include "OToolkitAPI/Tool.h"
+
+// OpenTwin header
+#include "OTSystem/Flags.h"
+#include "OTCore/OTClassHelper.h"
 
 // Qt header
 #include <QtCore/qstringlist.h>

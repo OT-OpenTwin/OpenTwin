@@ -11,9 +11,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTSystem/OTAssert.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/CoreAPIExport.h"

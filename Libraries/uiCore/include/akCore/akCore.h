@@ -12,9 +12,9 @@
 
 #pragma once
 
- // AK header
+ // OpenTwin header
+#include "OTSystem/Flags.h"
 #include <akCore/globalDataTypes.h>
-#include "OTCore/Flags.h"
 
  // Qt header
 #include <QtCore/qstring.h>		// QString

@@ -255,9 +255,6 @@
     <ClInclude Include="include\OTCore\FactoryTemplate.hpp">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\Flags.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\FolderNames.h">
       <Filter>include\General</Filter>
     </ClInclude>

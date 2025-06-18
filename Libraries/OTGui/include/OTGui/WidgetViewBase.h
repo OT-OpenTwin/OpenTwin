@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTGui/OTGuiAPIExport.h"

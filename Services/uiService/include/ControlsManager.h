@@ -12,7 +12,7 @@
 #include <akCore/globalDataTypes.h>
 
 // Open twin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 

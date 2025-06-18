@@ -9,7 +9,7 @@
 #include <qicon.h>
 
 // open twin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTGui/GuiTypes.h"
 #include <qvectornd.h>
 

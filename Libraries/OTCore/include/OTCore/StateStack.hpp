@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Flags.h"
 #include "OTCore/StateStack.h"
 
 template<typename T>

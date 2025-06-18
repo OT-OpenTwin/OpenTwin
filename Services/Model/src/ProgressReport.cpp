@@ -3,8 +3,8 @@
 #include "Application.h"
 #include "ProgressReport.h"
 
+#include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTCommunication/Msg.h"

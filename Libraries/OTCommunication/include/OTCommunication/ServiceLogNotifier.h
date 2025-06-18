@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OTCore/Logger.h"
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"
 
