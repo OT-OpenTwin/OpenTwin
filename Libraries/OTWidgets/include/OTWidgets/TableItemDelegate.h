@@ -25,6 +25,8 @@ namespace ot {
 
 		virtual void paint(QPainter* _painter, const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;
 
+		virtual QSize sizeHint(const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;
+
 		virtual QWidget* createEditor(QWidget* _parent, const QStyleOptionViewItem& _option, const QModelIndex& _index) const override;
 
 		virtual void setEditorData(QWidget* _editor, const QModelIndex& _index) const override;

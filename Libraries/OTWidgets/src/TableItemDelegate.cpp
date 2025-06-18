@@ -77,6 +77,10 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
     _painter->restore();
 }
 
+QSize ot::TableItemDelegate::sizeHint(const QStyleOptionViewItem& _option, const QModelIndex& _index) const {
+    return QStyledItemDelegate::sizeHint(_option, _index) + QSize(4, 4);
+}
+
 QWidget* ot::TableItemDelegate::createEditor(QWidget* _parent, const QStyleOptionViewItem& _option, const QModelIndex& _index) const {
     TableTextEdit* newEditor = new TableTextEdit(_parent, m_table, _index);
     newEditor->setContentsMargins(QMargins(2, 2, 2, 2));
