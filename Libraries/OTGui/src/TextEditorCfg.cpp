@@ -22,7 +22,7 @@
 #endif
 
 ot::TextEditorCfg::TextEditorCfg() :
-	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable),
+	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle),
 	m_syntax(DocumentSyntax::PlainText), m_readOnly(false)
 {}
 

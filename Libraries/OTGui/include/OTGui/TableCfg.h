@@ -27,7 +27,7 @@ namespace ot {
 		static std::string toString(TableHeaderMode _headerMode);
 		static TableHeaderMode stringToHeaderMode(const std::string& _headerMode);
 
-		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable));
+		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewNameAsTitle));
 		TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode);
 		TableCfg(const TableCfg& _other);
 		TableCfg(TableCfg&& _other) noexcept;

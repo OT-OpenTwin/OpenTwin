@@ -64,6 +64,7 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
 	
 	m_dockWidget->setObjectName(QString::fromStdString(WidgetView::createStoredViewName(m_data)));
+	m_dockWidget->setWindowTitle(QString::fromStdString(m_data.getTitle()));
 
 	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.getTitle()));
 	m_dockWidget->toggleViewAction()->setVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);

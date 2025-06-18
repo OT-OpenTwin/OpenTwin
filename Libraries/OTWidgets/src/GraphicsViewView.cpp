@@ -30,5 +30,6 @@ QWidget* ot::GraphicsViewView::getViewWidget(void) {
 }
 
 void ot::GraphicsViewView::viewRenamed() {
+	ot::WidgetView::viewRenamed();
 	this->getGraphicsView()->setGraphicsViewName(this->getViewData().getEntityName());
 }

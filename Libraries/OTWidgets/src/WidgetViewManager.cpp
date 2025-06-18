@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCore/EntityName.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -276,8 +277,35 @@ void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const 
 	// Rename in views list
 	for (ViewEntry& entry : m_views) {
 		if (entry.second->getViewData().getEntityName() == _oldEntityName) {
+			// Update entity name
 			WidgetViewBase data = entry.second->getViewData();
 			data.setEntityName(_newEntityName);
+
+			// Check if title should be adjusted
+			if (data.getViewFlags() & WidgetViewBase::ViewNameAsTitle) {
+				// Try to fit in short name
+				std::string shortName = EntityName::getSubName(_newEntityName).value();
+
+				if (!this->getViewTitleExists(shortName)) {
+					data.setTitle(shortName);
+				}
+				else if (!this->getViewTitleExists((shortName.append(" - " + WidgetViewBase::toString(data.getViewType()))))) {
+					data.setTitle(shortName);
+				}
+				else if (!this->getViewTitleExists(_newEntityName)) {
+					data.setTitle(_newEntityName);
+				}
+				else {
+					std::string newTitle = _newEntityName + " - " + WidgetViewBase::toString(data.getViewType());
+					if (!this->getViewTitleExists(newTitle)) {
+						data.setTitle(newTitle);
+					}
+					else {
+						OT_LOG_W("Failed to rename view title. No unique title found");
+					}
+				}
+			}
+
 			entry.second->setViewData(data);
 			entry.second->viewRenamed();
 		}
