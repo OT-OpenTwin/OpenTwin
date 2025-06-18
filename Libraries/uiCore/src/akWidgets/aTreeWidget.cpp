@@ -12,6 +12,7 @@
 
 // OpenTwin header
 #include "OTCore/BasicScopedBoolWrapper.h"
+#include "OTWidgets/TreeItemDelegate.h"
 #include "OTWidgets/SignalBlockWrapper.h"
 
 // AK header
@@ -814,6 +815,7 @@ ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
 	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
+	this->setItemDelegate(new ot::TreeItemDelegate);
 }
 
 ak::aTreeWidgetBase::~aTreeWidgetBase() { A_OBJECT_DESTROYING }

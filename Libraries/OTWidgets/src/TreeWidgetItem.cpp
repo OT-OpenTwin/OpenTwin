@@ -10,7 +10,7 @@
 ot::TreeWidgetItem::TreeWidgetItem(int _type)
 	: QTreeWidgetItem(_type), m_flags(ot::NoNavigationTreeItemFlags)
 {
-
+	
 }
 
 ot::TreeWidgetItem::TreeWidgetItem(const TreeWidgetItemInfo& _item, int _type)

@@ -1391,6 +1391,7 @@ QSlider::handle:vertical:focus {
 
 QLineEdit {
     background-color: rgba(30,30,30,255);
+    margin: 0px;
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 4px;
@@ -1891,6 +1892,13 @@ QTreeView::item:pressed,
 QListView::item:pressed,
 QTableView::item:pressed,
 QColumnView::item:pressed {
+    height: auto;
+}
+
+QTreeView::item:pressed,
+QListView::item:pressed,
+QTableView::item:pressed,
+QColumnView::item:pressed {
     background-color: rgba(0,255,0,255);
     color: rgba(0,0,0,255);
 }
@@ -1924,6 +1932,16 @@ QTableCornerButton::section {
     background-color: rgba(50,50,50,255);
     border: 1px solid transparent;
     border-radius: 0px;
+}
+
+QTreeWidget::item {
+    height: 20px;
+}
+
+#OT_TreeItemEdit {
+    padding: 0px;
+    margin: 0px;
+    height: 20px;
 }
 
 /* ##################################################################################### */
