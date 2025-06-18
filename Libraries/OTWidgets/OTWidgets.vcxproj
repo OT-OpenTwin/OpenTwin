@@ -106,6 +106,7 @@
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
     <ClCompile Include="src\Plot.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
+    <ClCompile Include="src\TreeItemDelegate.cpp" />
     <ClCompile Include="src\WidgetPropertyManager.cpp" />
     <ClCompile Include="src\PlotDatasetData.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
+    <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h" />
     <QtMoc Include="include\OTWidgets\PropertyManagerGridLink.h" />

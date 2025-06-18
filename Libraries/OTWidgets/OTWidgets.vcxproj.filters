@@ -514,6 +514,9 @@
     <ClCompile Include="src\CoordinateFormatConverter.cpp">
       <Filter>src\Plot</Filter>
     </ClCompile>
+    <ClCompile Include="src\TreeItemDelegate.cpp">
+      <Filter>src\Delegates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -979,6 +982,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h">
       <Filter>include\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TreeItemDelegate.h">
+      <Filter>include\Delegates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
