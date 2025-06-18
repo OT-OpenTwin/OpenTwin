@@ -147,6 +147,7 @@ namespace MongoUserFunctions
 		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECTS_LARGE_DATA_ROLE, userRoleName, adminClient);
 		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SYSTEM_DB_ROLE, userRoleName, adminClient);
 		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SETTINGS_DB_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::LIBRARIES_DB_ROLE, userRoleName, adminClient);
 
 		return true;
 	}

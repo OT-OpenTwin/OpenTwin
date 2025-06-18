@@ -294,6 +294,11 @@ namespace MongoRoleFunctions
 			adminClient);
 	}
 
+	bool createInitialLibrariesDbRole(mongocxx::client& adminClient) {
+		return createAllAccessibleRole(MongoConstants::LIBRARIES_DB,
+			MongoConstants::LIBRARIES_DB_ROLE, adminClient);
+	}
+
 	bool createAllAccessibleRole(std::string dbName, std::string roleName, mongocxx::client& adminClient)
 	{
 		/*
@@ -447,25 +452,6 @@ namespace MongoRoleFunctions
 			<< "dropIndex"
 			<< close_array
 			<< close_document
-		
-		/* << open_document
-			<< "resource"
-			<< open_document
-			<< "db" << MongoConstants::LIBRARIES_DB
-			<< "collection" << "" // Project collection Name for results
-			<< close_document
-			<< "actions"
-			<< open_array
-			<< "find"
-			<< "insert"
-			<< "update"
-			<< "remove"
-			<< "listIndexes"
-			<< "listCollections"
-			<< "createIndex"
-			<< "dropIndex"
-			<< close_array
-			<< close_document */
 
 			<< close_array
 			<< "roles" << open_array << close_array

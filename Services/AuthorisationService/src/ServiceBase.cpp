@@ -204,6 +204,17 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 		}
 	}
 
+	try 
+	{
+		MongoRoleFunctions::createInitialLibrariesDbRole(adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating initial libraries db role in database: " + std::string(err.what()));
+		}
+	}
+
 	/* HANDLING USER ROLE AND INDEXES */
 
 	try
