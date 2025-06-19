@@ -10,6 +10,7 @@
 // std header
 #include <set>
 #include <algorithm>
+#include <unordered_set>
 
 template <typename K, typename V>
 std::list<K> ot::ContainerHelper::getKeys(const std::map<K, V>& _map) {
@@ -126,4 +127,30 @@ std::vector<T> ot::ContainerHelper::createDiff(const std::vector<T>& _left, cons
 	}
 
 	return diff;
+}
+
+template<typename T>
+bool ot::ContainerHelper::isSubset(const std::list<T>& _subset, const std::list<T>& _list) {
+	std::unordered_set<T> data(_list.begin(), _list.end());
+
+	for (const T& val : _subset) {
+		if (data.find(val) == data.end()) {
+			return false; // value is not in list
+		}
+	}
+
+	return true;
+}
+
+template<typename T>
+bool ot::ContainerHelper::isSubset(const std::vector<T>& _subset, const std::vector<T>& _vector) {
+	std::unordered_set<T> data(_vector.begin(), _vector.end());
+
+	for (const T& val : _subset) {
+		if (data.find(val) == data.end()) {
+			return false; // value is not in vector
+		}
+	}
+
+	return true;
 }

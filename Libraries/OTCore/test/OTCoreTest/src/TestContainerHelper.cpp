@@ -84,3 +84,21 @@ TEST(ContainerTests, DiffMissingBoth) {
 		it++;
 	}
 }
+
+TEST(ContainerTests, SubsetList) {
+	std::list<int> list = { 1, 2, 3 };
+	std::list<int> sub = { 1, 2 };
+	std::list<int> invalid = { 3, 4 };
+
+	EXPECT_TRUE(ot::ContainerHelper::isSubset(sub, list));
+	EXPECT_FALSE(ot::ContainerHelper::isSubset(invalid, list));
+}
+
+TEST(ContainerTests, SubsetVector) {
+	std::vector<int> list = { 1, 2, 3 };
+	std::vector<int> sub = { 1, 2 };
+	std::vector<int> invalid = { 3, 4 };
+
+	EXPECT_TRUE(ot::ContainerHelper::isSubset(sub, list));
+	EXPECT_FALSE(ot::ContainerHelper::isSubset(invalid, list));
+}

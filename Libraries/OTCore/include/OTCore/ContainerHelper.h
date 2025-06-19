@@ -54,6 +54,18 @@ namespace ot {
 		template <typename T> static std::list<T> createDiff(const std::list<T>& _left, const std::list<T>& _right, DiffMode _diffMode);
 		template <typename T> static std::vector<T> createDiff(const std::vector<T>& _left, const std::vector<T>& _right, DiffMode _diffMode);
 
+		//! @brief Returns true if _subset is a subset of _list.
+		//! @tparam T List value type.
+		//! @param _subset List expected to be a subset.
+		//! @param _list List expected to contain the subset.
+		template <typename T> static bool isSubset(const std::list<T>& _subset, const std::list<T>& _list);
+
+		//! @brief Returns true if _subset is a subset of _vector.
+		//! @tparam T Vector value type.
+		//! @param _subset Vector expected to be a subset.
+		//! @param _vector Vector expected to contain the subset.
+		template <typename T> static bool isSubset(const std::vector<T>& _subset, const std::vector<T>& _vector);
+
 	};	
 }
 
