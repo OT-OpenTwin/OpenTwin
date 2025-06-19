@@ -3651,8 +3651,6 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
 
-	OT_LOG_T("Curve in plot: " + plotName);
-
 	if (plotView != nullptr)
 	{
 		ot::Plot1DCurveCfg config;
@@ -3660,12 +3658,10 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 		ot::Plot* plot = plotView->getPlot();
 		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
 
-		OT_LOG_T("Curve: " + config.getEntityName());
 		for (ot::PlotDataset* dataSet : allDatasets) {
 			if (dataSet->getEntityName() == config.getEntityName()) {
 				dataSet->setConfig(config);
 				dataSet->updateCurveVisualization();
-				break;
 			}
 		}
 		

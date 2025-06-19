@@ -157,19 +157,6 @@ void ot::PlotDataset::setCurvePointOuterColorWidth(double _size, bool _repaint) 
 	}
 }
 
-void ot::PlotDataset::setCurveTitle(const std::string& _title) {
-	m_config.setTitle(_title);
-	if (m_cartesianCurve != nullptr)
-	{
-		m_cartesianCurve->setTitle(QString::fromStdString(m_config.getTitle()));
-	}
-	else
-	{
-		assert(m_polarCurve != nullptr);
-		m_polarCurve->setTitle(QString::fromStdString(m_config.getTitle()));
-	}
-}
-
 void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
 	m_config.setDimmed(_isDimmed);
 	if (_repaint) {
@@ -233,48 +220,39 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	// Setup curve
 	if (m_config.getVisible()) {
 		if (m_config.getDimmed()) {
-			if (m_cartesianCurve != nullptr)
-			{
+			if (m_cartesianCurve != nullptr) {
 				m_cartesianCurve->setPen(dimmedPen);
 			}
-			else
-			{
+			else {
 				m_polarCurve->setPen(dimmedPen);
 			}
 		}
 		else {
-			if (m_cartesianCurve != nullptr)
-			{
+			if (m_cartesianCurve != nullptr) {
 				m_cartesianCurve->setPen(linePen);
 			}
-			else
-			{
+			else {
 				m_polarCurve->setPen(linePen);
 			}
 		}
 	}
 	else {
-		if (m_cartesianCurve != nullptr)
-		{
+		if (m_cartesianCurve != nullptr) {
 			m_cartesianCurve->setPen(invisPen);
 		}
-		else
-		{
+		else {
 			m_polarCurve->setPen(invisPen);
 		}
 	}
 
 	// Setup points
 	if (m_config.getPointsVisible()) {
-
 		if (m_config.getDimmed()) {
-			if (m_cartesianCurvePointSymbol != nullptr)
-			{
+			if (m_cartesianCurvePointSymbol != nullptr) {
 				m_cartesianCurvePointSymbol->setPen(dimmedPen);
 				m_cartesianCurvePointSymbol->setBrush(dimmedBrush);
 			}
-			else
-			{
+			else {
 				m_polarCurvePointSymbol->setPen(dimmedPen);
 				m_polarCurvePointSymbol->setBrush(dimmedBrush);
 			}
@@ -283,24 +261,20 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 			QPen pointOutlinePen = QtFactory::toQPen(m_config.getPointsOutlinePen());
 			QBrush pointOutlineFillBrush = QtFactory::toQBrush(m_config.getPointsFillPainter());
 
-			if (m_cartesianCurvePointSymbol != nullptr)
-			{
+			if (m_cartesianCurvePointSymbol != nullptr) {
 				m_cartesianCurvePointSymbol->setPen(pointOutlinePen);
 				m_cartesianCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
-			else
-			{
+			else {
 				m_polarCurvePointSymbol->setPen(pointOutlinePen);
 				m_polarCurvePointSymbol->setBrush(pointOutlineFillBrush);
 			}
 		}
-		if (m_cartesianCurvePointSymbol != nullptr)
-		{
+		if (m_cartesianCurvePointSymbol != nullptr) {
 			m_cartesianCurvePointSymbol->setSize(m_config.getPointsSize());
 			m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
 		}
-		else
-		{
+		else {
 			m_polarCurvePointSymbol->setSize(m_config.getPointsSize());
 		}
 	}
@@ -310,12 +284,13 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 			m_cartesianCurve->setSymbol(nullptr);
 		}
 	}
-	if (m_cartesianCurve != nullptr)
-	{
+
+	if (m_cartesianCurve) {
+		m_cartesianCurve->setTitle(QString::fromStdString(m_config.getTitle()));
 		m_cartesianCurve->setVisible(m_config.getVisible());
 	}
-	else
-	{
+	if (m_polarCurve) {
+		m_polarCurve->setTitle(QString::fromStdString(m_config.getTitle()));
 		m_polarCurve->setVisible(m_config.getVisible());
 	}
 }

@@ -78,8 +78,6 @@ namespace ot {
 
 		void setCurvePointOuterColorWidth(double _size, bool _repaint = true);
 
-		void setCurveTitle(const std::string& _title);
-
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
 		void setConfig(ot::Plot1DCurveCfg& _config) 
