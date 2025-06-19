@@ -67,6 +67,6 @@ void ot::Painter2DPreview::paintEvent(QPaintEvent* _event) {
 	painter.drawRect(r);
 }
 
-void ot::Painter2DPreview::slotGlobalStyleChanged(void) {
+void ot::Painter2DPreview::slotGlobalStyleChanged() {
 	this->update();
 }

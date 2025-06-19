@@ -517,6 +517,24 @@
     <ClCompile Include="src\TreeItemDelegate.cpp">
       <Filter>src\Delegates</Filter>
     </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogGradientBase.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogLinearGradientEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogRadialGradientEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogReferenceEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -986,6 +1004,15 @@
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h">
       <Filter>include\Delegates</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogFillEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogLinearGradientEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1185,6 +1212,15 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ImagePreview.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogGradientBase.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h">
+      <Filter>include\Dialogs</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

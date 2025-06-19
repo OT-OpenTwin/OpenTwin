@@ -67,6 +67,12 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogGradientBase.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogLinearGradientEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogRadialGradientEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogReferenceEntry.cpp" />
     <ClCompile Include="src\PathBrowseEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GlobalShortcutWrapper.cpp" />
@@ -246,6 +252,12 @@
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
     <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogGradientBase.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogEntry.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogFillEntry.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogLinearGradientEntry.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />

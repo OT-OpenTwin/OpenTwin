@@ -16,7 +16,7 @@
 
 namespace ot {
 
-	class Painter2DEditFilter : public Serializable {
+	class OT_GUI_API_EXPORT Painter2DEditFilter : public Serializable {
 		OT_DECL_DEFCOPY(Painter2DEditFilter)
 		OT_DECL_DEFMOVE(Painter2DEditFilter)
 	public:

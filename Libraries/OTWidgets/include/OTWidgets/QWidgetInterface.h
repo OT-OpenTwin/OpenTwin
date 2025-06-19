@@ -23,14 +23,14 @@ namespace ot {
 		virtual ~QWidgetInterface() {};
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getQWidget(void) = 0;
-		virtual const QWidget* getQWidget(void) const = 0;
+		virtual QWidget* getQWidget() = 0;
+		virtual const QWidget* getQWidget() const = 0;
 
 		void setOTWidgetFlags(const WidgetFlags& _flags);
-		const WidgetFlags& otWidgetFlags(void) const { return m_widgetFlags; };
+		const WidgetFlags& otWidgetFlags() const { return m_widgetFlags; };
 
 		void setParentWidgetView(WidgetView* _view) { m_parentView = _view; };
-		WidgetView* getParentWidgetView(void) const { return m_parentView; };
+		WidgetView* getParentWidgetView() const { return m_parentView; };
 
 	protected:
 		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};

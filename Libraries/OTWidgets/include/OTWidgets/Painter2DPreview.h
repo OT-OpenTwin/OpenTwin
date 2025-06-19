@@ -28,14 +28,14 @@ namespace ot {
 
 		virtual void paintEvent(QPaintEvent* _event) override;
 
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		void setMaintainAspectRatio(bool _maintain) { m_maintainAspectRatio = _maintain; };
-		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
+		bool isMaintainAspectRatio() const { return m_maintainAspectRatio; };
 
 	private Q_SLOTS:
-		void slotGlobalStyleChanged(void);
+		void slotGlobalStyleChanged();
 
 	private:
 		bool m_maintainAspectRatio;
