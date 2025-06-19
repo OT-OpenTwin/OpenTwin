@@ -503,10 +503,18 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	}
 }
 
-std::list<std::string> ot::getAllColorStyleValueEntries(void) {
+std::list<std::string> ot::getAllColorStyleValueEntryStrings() {
 	std::list<std::string> ret;
 	for (int i = 0; i < (int)ColorStyleValueEntry::ColorStyleValueEntry_End; i++) {
 		ret.push_back(toString((ColorStyleValueEntry)i));
+	}
+	return ret;
+}
+
+std::list<ot::ColorStyleValueEntry> ot::getAllColorStyleValueEntries() {
+	std::list<ot::ColorStyleValueEntry> ret;
+	for (int i = 0; i < (int)ColorStyleValueEntry::ColorStyleValueEntry_End; i++) {
+		ret.push_back((ColorStyleValueEntry)i);
 	}
 	return ret;
 }

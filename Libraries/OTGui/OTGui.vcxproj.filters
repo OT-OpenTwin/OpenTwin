@@ -443,6 +443,9 @@
     <ClInclude Include="include\OTGui\Painter2DEditDialogWhitelist.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2DEditFilter.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -783,6 +786,9 @@
     </ClCompile>
     <ClCompile Include="src\Painter2DEditDialogWhitelist.cpp">
       <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditFilter.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

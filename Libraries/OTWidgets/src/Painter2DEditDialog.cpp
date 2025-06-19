@@ -284,7 +284,7 @@ ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const P
 	const StyleRefPainter2D* actualPainter = dynamic_cast<const StyleRefPainter2D*>(_painter);
 
 	QStringList optionList;
-	for (const std::string& opt : ot::getAllColorStyleValueEntries()) {
+	for (const std::string& opt : ot::getAllColorStyleValueEntryStrings()) {
 		optionList.append(QString::fromStdString(opt));
 	}
 	
