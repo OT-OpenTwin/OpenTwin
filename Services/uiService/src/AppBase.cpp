@@ -2640,26 +2640,39 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-			const ot::SelectionInformation& viewSelectionInfo = _focusedView->getSelectionInformation();
+			{
+				ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
 
-			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+				// Reset current selection
+				m_projectNavigation->getTree()->deselectAllItems(false);
 
-			m_projectNavigation->getTree()->deselectAllItems(false);
-			for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
-				m_projectNavigation->getTree()->setItemSelected(uid, true);
-			}
+				bool restoreSelection = true;
+				std::list<ot::UID> viewSelection = _focusedView->getSelectionInformation().getSelectedNavigationItems();
 
-			// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
-			if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
-				bool added = false;
-				for (UID id : ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft)) {
-					m_projectNavigation->getTree()->setItemSelected(id, true);
-					added = true;
+				// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
+				if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
+					// The diff contains newly selected items that were selected during the last selection change
+					std::list<UID> diff = ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft);
+
+					// If the diff is a subset of the views selection information we will not restore the selection
+					restoreSelection = diff.empty() || !ot::ContainerHelper::isSubset(diff, viewSelection);
+
+					// Select the diff items
+					for (UID id : diff) {
+						m_projectNavigation->getTree()->setItemSelected(id, true);
+					}
 				}
-			}
 
-			m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-			_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
+				// If the selection of the view still needs to be restored do so
+				if (restoreSelection) {
+					for (ot::UID uid : viewSelection) {
+						m_projectNavigation->getTree()->setItemSelected(uid, true);
+					}
+				}
+
+				m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+				_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
+			}
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
@@ -3279,7 +3292,8 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 
 void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin) {
 	// If true is returned a new view was requested
-	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems()));
+	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
+	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
 }
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
