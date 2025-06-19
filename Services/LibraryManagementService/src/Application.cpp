@@ -160,6 +160,25 @@ std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
 
 }
 
+std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
+
+	std::string entityID = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	std::string uiUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+
+	// Create the config
+
+
+	// send Config to UI
+
+
+
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+
+
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Constructor/Destructor

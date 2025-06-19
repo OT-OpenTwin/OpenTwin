@@ -175,6 +175,7 @@ public:
 	void addButtons();
 
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
+	CircuitModelHandler& getCircuitModelHandler() { return m_circuitModelHandler; }
 
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);

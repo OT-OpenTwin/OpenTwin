@@ -40,6 +40,7 @@ private:
 	// Action handler
 	OT_HANDLER(handleGetDocument, Application, OT_ACTION_CMD_LMS_GetDocument, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleGetListOfDocuments, Application, OT_ACTION_CMD_LMS_GetDocumentList, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateDialogConfig, Application, OT_ACTION_CMD_LMS_CreateConfig, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

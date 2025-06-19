@@ -3886,6 +3886,12 @@ void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::U
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
 }
 
+void Model::sendMessageToLms(ot::JsonDocument& doc) {
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->uiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	
+	Application::instance()->getCircuitModelHandler().tryToHandleAction(OT_ACTION_CMD_LMS_CreateConfig, doc);
+}
+
 void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
 {
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationType, _setAsActiveView, _overrideContent);

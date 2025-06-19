@@ -124,3 +124,40 @@ std::string LibraryManagementWrapper::getCircuitModel(std::string _modelName) {
 
 	return rMsg.getWhat();	
 }
+
+std::string LibraryManagementWrapper::requestCreateConfig(ot::JsonDocument& _doc) {
+	std::string lmsResonse;
+	
+
+	// In case of error:
+		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
+		// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+	const int maxCt = 30;
+	int ct = 1;
+	bool ok = false;
+
+	do {
+		lmsResonse.clear();
+		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), m_lmsLocalUrl, ot::EXECUTE, _doc.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+
+		}
+	} while (!ok && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Failed to get Models");
+		return {};
+	}
+
+	std::list<std::string> listOfModels;
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(lmsResonse);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Get Models failed: " + rMsg.getWhat());
+		return {};
+	}
+
+	return rMsg.getWhat();
+}

@@ -25,6 +25,7 @@ public:
 
 	void addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName);
 
+
 protected:
 	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
 
@@ -38,6 +39,7 @@ private:
 
 	void createModelDialog();
 	void createModelTextEntity(std::string _modelName);
+	void sendRequestOfDialogConfig(ot::JsonDocument& _doc);
 	ot::MenuButtonDescription m_buttonAddCircuitModel;
 	LibraryManagementWrapper m_libraryMangementWrapper;
 
