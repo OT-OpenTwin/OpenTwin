@@ -25,7 +25,7 @@ TEST(StringTests, FindOccurance) {
 TEST(StringTests, SplitByCharacter_SkipEmpty) {
 	const std::string txt = "A|BB||CCC";
 
-	const std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::split(txt, '|', true));
+	const std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::split(txt, '|', true));
 
 	EXPECT_EQ(3, result.size());
 
@@ -37,7 +37,7 @@ TEST(StringTests, SplitByCharacter_SkipEmpty) {
 TEST(StringTests, SplitByCharacter_KeepEmpty) {
 	const std::string txt = "A|BB||CCC";
 
-	const std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::split(txt, '|', false));
+	const std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::split(txt, '|', false));
 
 	EXPECT_EQ(4, result.size());
 
@@ -50,7 +50,7 @@ TEST(StringTests, SplitByCharacter_KeepEmpty) {
 TEST(StringTests, SplitByString_SkipEmpty) {
 	const std::string txt = "AsplitBBsplitsplitCCC";
 
-	const std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::split(txt, "split", true));
+	const std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::split(txt, "split", true));
 
 	EXPECT_EQ(3, result.size());
 
@@ -62,7 +62,7 @@ TEST(StringTests, SplitByString_SkipEmpty) {
 TEST(StringTests, SplitByString_KeepEmpty) {
 	const std::string txt = "AsplitBBsplitsplitCCC";
 
-	const std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::split(txt, "split", false));
+	const std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::split(txt, "split", false));
 
 	EXPECT_EQ(4, result.size());
 
@@ -275,7 +275,7 @@ TEST(StringTests, EvaluateEscapeCharacters) {
 TEST(StringTests, StringSmartSplit_EvaluateEscapeKeepEmpty) {
 	const std::string src = "Test\nString \"containing\nsubstring with\\nsome escape\\\"\"\n";
 
-	std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(src, "\n", true, false)); // evaluate escape, keep empty
+	std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::smartSplit(src, "\n", true, false)); // evaluate escape, keep empty
 	
 	// Check result size
 	EXPECT_EQ(result.size(), 3);
@@ -289,7 +289,7 @@ TEST(StringTests, StringSmartSplit_EvaluateEscapeKeepEmpty) {
 TEST(StringTests, StringSmartSplit_EvaluateEscapeSkipEmpty) {
 	const std::string src = "Test\nString \"containing\nsubstring with\\nsome escape\\\"\"\n";
 
-	std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(src, "\n", true, true)); // evaluate escape, skip empty
+	std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::smartSplit(src, "\n", true, true)); // evaluate escape, skip empty
 
 	// Check result size
 	EXPECT_EQ(result.size(), 2);
@@ -302,7 +302,7 @@ TEST(StringTests, StringSmartSplit_EvaluateEscapeSkipEmpty) {
 TEST(StringTests, StringSmartSplit_NoEscapeKeepEmpty) {
 	const std::string src = "Test\nString \"containing\nsubstring\\\" with\\nsome escape\\\"\"\n";
 
-	std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(src, "\n", false, false)); // no escape, keep empty
+	std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::smartSplit(src, "\n", false, false)); // no escape, keep empty
 	
 	// Check result size
 	EXPECT_EQ(result.size(), 3);
@@ -316,7 +316,7 @@ TEST(StringTests, StringSmartSplit_NoEscapeKeepEmpty) {
 TEST(StringTests, StringSmartSplit_NoEscapeSkipEmpty) {
 	const std::string src = "Test\nString \"containing\nsubstring\\\" with\\nsome escape\\\"\"\n";
 
-	std::vector<std::string> result = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(src, "\n", false, true)); // no escape, skip empty
+	std::vector<std::string> result = ot::ContainerHelper::toVector(ot::String::smartSplit(src, "\n", false, true)); // no escape, skip empty
 
 	// Check result size
 	EXPECT_EQ(result.size(), 2);

@@ -6,12 +6,12 @@
 
 ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) {
 	assert(_properties.m_columnDelimiter != "" && _properties.m_rowDelimiter != "");
-	std::vector<std::string> rows = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(_csvText, _properties.m_rowDelimiter, _properties.m_evaluateEscapeCharacters, true));
+	std::vector<std::string> rows = ot::ContainerHelper::toVector(ot::String::smartSplit(_csvText, _properties.m_rowDelimiter, _properties.m_evaluateEscapeCharacters, true));
 
 	std::list<std::vector<std::string>> matrixRaw;
 	int columnSize = -1;
 	for (const std::string& row : rows) {
-		const std::vector<std::string> columns = ot::ContainerHelper::vectorFromList(ot::String::smartSplit(row, _properties.m_columnDelimiter, _properties.m_evaluateEscapeCharacters));
+		const std::vector<std::string> columns = ot::ContainerHelper::toVector(ot::String::smartSplit(row, _properties.m_columnDelimiter, _properties.m_evaluateEscapeCharacters));
 		if (columns.size() != columnSize && columnSize >= 0) {
 			OT_LOG_W("Inconsistent column count");
 		}

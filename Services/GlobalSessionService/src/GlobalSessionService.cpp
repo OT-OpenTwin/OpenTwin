@@ -975,7 +975,7 @@ void GlobalSessionService::workerSessionIni(void) {
 			
 			std::list<Session> timedOut;
 
-			auto lssIdList = ot::ContainerHelper::listFromMapValues(m_sessionMap);
+			auto lssIdList = ot::ContainerHelper::getValues(m_sessionMap);
 			lssIdList.unique();
 
 			std::list<LocalSessionService*> lssList;

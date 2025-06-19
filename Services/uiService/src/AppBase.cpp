@@ -1183,10 +1183,6 @@ void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
 
-void AppBase::registerSession(const std::string& _projectName, const std::string& _collectionName) {
-
-}
-
 ModelUIDtype AppBase::createModel() {
 	ViewerUIDtype view = m_viewerComponent->createModel();
 	//NOTE, modeIDs will not be used in the future
@@ -1867,7 +1863,7 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _en
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
-	return std::move(ot::ContainerHelper::listFromMapValues(m_graphicsViews));
+	return std::move(ot::ContainerHelper::getValues(m_graphicsViews));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3306,19 +3302,19 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	ot::PlotView* plot = dynamic_cast<ot::PlotView*>(_view);
 	if (graphics) {
-		ot::ContainerHelper::removeFromMapByValue(m_graphicsViews, graphics);
+		ot::ContainerHelper::removeByValue(m_graphicsViews, graphics);
 		this->lockManager()->uiElementDestroyed(graphics->getGraphicsView());
 	}
 	if (txt) {
-		ot::ContainerHelper::removeFromMapByValue(m_textEditors, txt);
+		ot::ContainerHelper::removeByValue(m_textEditors, txt);
 		this->lockManager()->uiElementDestroyed(txt->getTextEditor());
 	}
 	if (table) {
-		ot::ContainerHelper::removeFromMapByValue(m_tables, table);
+		ot::ContainerHelper::removeByValue(m_tables, table);
 		this->lockManager()->uiViewDestroyed(table);
 	}
 	if (plot) {
-		ot::ContainerHelper::removeFromMapByValue(m_plots, plot);
+		ot::ContainerHelper::removeByValue(m_plots, plot);
 		this->lockManager()->uiViewDestroyed(plot);
 	}
 

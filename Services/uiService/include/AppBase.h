@@ -199,8 +199,6 @@ public:
 
 	bool debug(void) const;
 
-	void registerSession(const std::string& _projectName, const std::string& _collectionName);
-
 	ModelUIDtype createModel();
 
 	ViewerUIDtype createView(ModelUIDtype _modelUID, const std::string& _projectName);
