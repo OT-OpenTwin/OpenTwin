@@ -1370,6 +1370,7 @@ void EntityPropertiesGuiPainter::addToConfiguration(ot::PropertyGridCfg& _config
 {
 	OTAssertNullptr(m_painter);
 	ot::PropertyPainter2D* newProp = new ot::PropertyPainter2D(this->getName(), m_painter->createCopy());
+	newProp->setFilter(m_filter);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -1382,6 +1383,7 @@ void EntityPropertiesGuiPainter::setFromConfiguration(const ot::Property* _prope
 		return;
 	}
 
+	m_filter = actualProperty->getFilter();
 	this->setValue(actualProperty->getPainter()->createCopy());
 }
 
@@ -1394,6 +1396,10 @@ void EntityPropertiesGuiPainter::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 	m_painter->addToJsonObject(painterObj, jsonDoc.GetAllocator());
 	container.AddMember("Value", painterObj, jsonDoc.GetAllocator());
 
+	ot::JsonObject filterObj;
+	m_filter.addToJsonObject(filterObj, jsonDoc.GetAllocator());
+	container.AddMember("Filter", filterObj, jsonDoc.GetAllocator());
+
 	rapidjson::Value::StringRefType jsonName(getName().c_str());
 
 	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
@@ -1404,7 +1410,13 @@ void EntityPropertiesGuiPainter::readFromJsonObject(const ot::ConstJsonObject& _
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
 
 	ot::Painter2D* newPainter = ot::Painter2DFactory::create(ot::json::getObject(_object, "Value"));
-	if (!newPainter) return;
+	if (!newPainter) {
+		return;
+	}
+
+	if (_object.HasMember("Filter")) {
+		m_filter.setFromJsonObject(ot::json::getObject(_object, "Filter"));
+	}
 
 	setValue(newPainter);
 }
