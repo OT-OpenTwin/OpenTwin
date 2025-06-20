@@ -39,6 +39,7 @@ public:
 	virtual void refreshSelection(void) {};
 	virtual void addKeyShortcut(const std::string& keySequence) {};
 	virtual void fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {};
+	virtual void clearModalPropertyGrid() {};
 	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {};
 	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) { return 0.0; };
 	virtual void lockSelectionAndModification(bool flag) {};

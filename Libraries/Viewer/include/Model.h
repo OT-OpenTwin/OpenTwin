@@ -150,6 +150,7 @@ public:
 	osg::Matrix getCurrentWorkingPlaneTransformTransposedInverse(void) { return currentWorkingplaneTransformTransposedInverse; }
 
 	void   fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
+	void   clearModalPropertyGrid();
 	void   setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value);
 	double getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName);
 	bool   propertyGridValueChanged(const ot::Property* _property);

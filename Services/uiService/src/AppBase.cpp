@@ -1678,6 +1678,14 @@ const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems(void) {
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	OTAssertNullptr(m_propertyGrid);
 
+	if (m_propertyGrid->getPropertyGrid()->getIsModal()) {
+		if (_configuration.getIsModal()) {
+			OT_LOG_W("Ignoring request for modal property grid since current property grid is modal");
+		}
+
+		return;
+	}
+
 	// Properties with the "ProjectList" special type need to get the project list set by the frontend
 	std::list<ot::Property*> projListProps = _configuration.findPropertiesBySpecialType("ProjectList");
 	for (ot::Property* p : projListProps) {
@@ -1692,6 +1700,15 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	}
 
 	m_propertyGrid->getPropertyGrid()->setupGridFromConfig(_configuration);
+}
+
+void AppBase::clearModalPropertyGrid() {
+	if (!m_propertyGrid->getPropertyGrid()->getIsModal()) {
+		OT_LOG_W("Attempting to clear modal property grid while property grid is not modal. Ignoring...");
+		return;
+	}
+
+	m_propertyGrid->getPropertyGrid()->clear();
 }
 
 void AppBase::focusPropertyGridItem(const std::string& _group, const std::string& _name) {

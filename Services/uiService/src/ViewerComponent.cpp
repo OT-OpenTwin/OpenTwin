@@ -221,6 +221,10 @@ void ViewerComponent::fillPropertyGrid(const ot::PropertyGridCfg& _configuration
 	AppBase::instance()->setupPropertyGrid(_configuration);
 }
 
+void ViewerComponent::clearModalPropertyGrid() {
+	AppBase::instance()->clearModalPropertyGrid();
+}
+
 void ViewerComponent::setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) {
 	ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupName, _itemName);
 	if (!itm) {

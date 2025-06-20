@@ -143,6 +143,10 @@ void Model::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
 	FrontendAPI::instance()->fillPropertyGrid(_configuration);
 }
 
+void Model::clearModalPropertyGrid() {
+	FrontendAPI::instance()->clearModalPropertyGrid();
+}
+
 void Model::setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value)
 {
 	FrontendAPI::instance()->setDoublePropertyValue(_groupName, _itemName, value);

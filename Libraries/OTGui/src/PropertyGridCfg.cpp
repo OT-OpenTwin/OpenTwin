@@ -9,7 +9,7 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyGridCfg.h"
 
-ot::PropertyGridCfg::PropertyGridCfg() {
+ot::PropertyGridCfg::PropertyGridCfg() : m_isModal(false) {
 
 }
 
@@ -17,7 +17,7 @@ ot::PropertyGridCfg::PropertyGridCfg(const PropertyGridCfg& _other) {
 	*this = _other;
 }
 
-ot::PropertyGridCfg::PropertyGridCfg(PropertyGridCfg&& _other) noexcept : Serializable(_other), m_rootGroups(std::move(_other.m_rootGroups)) {
+ot::PropertyGridCfg::PropertyGridCfg(PropertyGridCfg&& _other) noexcept : Serializable(_other), m_rootGroups(std::move(_other.m_rootGroups)), m_isModal(_other.m_isModal) {
 	_other.m_rootGroups.clear();
 }
 
@@ -33,6 +33,8 @@ ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _ot
 			PropertyGroup* ng = new PropertyGroup(*g);
 			this->addRootGroup(ng);
 		}
+
+		m_isModal = _other.m_isModal;
 	}
 
 	return *this;
@@ -41,7 +43,7 @@ ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _ot
 ot::PropertyGridCfg& ot::PropertyGridCfg::operator=(PropertyGridCfg&& _other) noexcept {
 	if (this != &_other) {
 		m_rootGroups = std::move(_other.m_rootGroups);
-
+		m_isModal = _other.m_isModal;
 	}
 
 	return *this;
@@ -55,6 +57,7 @@ void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 		gArr.PushBack(gObj, _allocator);
 	}
 	_object.AddMember("Groups", gArr, _allocator);
+	_object.AddMember("IsModal", m_isModal, _allocator);
 }
 
 void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -70,6 +73,8 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 			m_rootGroups.push_back(newGroup);
 		}
 	}
+
+	m_isModal = json::getBool(_object, "IsModal");
 }
 
 void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, const PropertyBase::MergeMode& _mergeMode) {

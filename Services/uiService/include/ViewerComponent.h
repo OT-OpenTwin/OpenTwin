@@ -57,6 +57,7 @@ public:
 	virtual void refreshSelection(void) override;
 	virtual void addKeyShortcut(const std::string &keySequence) override;
 	virtual void fillPropertyGrid(const ot::PropertyGridCfg& configuration) override;
+	virtual void clearModalPropertyGrid() override;
 	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) override;
 	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) override;
 	virtual void lockSelectionAndModification(bool flag) override;

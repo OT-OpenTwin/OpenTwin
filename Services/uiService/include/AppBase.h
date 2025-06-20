@@ -343,6 +343,8 @@ public:
 	
 	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
 
+	void clearModalPropertyGrid();
+
 	void focusPropertyGridItem(const std::string& _group, const std::string& _name);
 
 	//void fillPropertyGrid(const std::string &settings);

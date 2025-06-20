@@ -34,80 +34,80 @@ TransformManipulator::TransformManipulator(Viewer *viewer, std::list<SceneNodeBa
 	assert(!objects.empty());
 	assert(viewer != nullptr);
 
-	viewer3D = viewer;
-	transformedObjects = objects;
+	m_viewer3D = viewer;
+	m_transformedObjects = objects;
 
 	// Store the transformation of all the objects
 	storeTransformations();
 
 	// Get the current working plane transformation
-	osg::Matrix workingPlaneTransform = viewer3D->getWorkingPlaneTransform();
+	osg::Matrix workingPlaneTransform = m_viewer3D->getWorkingPlaneTransform();
 
-	workingPlaneRotation = osg::Matrix(workingPlaneTransform.getRotate());
+	m_workingPlaneRotation = osg::Matrix(workingPlaneTransform.getRotate());
 	//osg::Matrix workingPlaneRotationT;
 	//workingPlaneRotationT.transpose(workingPlaneRotation);
 
 	// Get the bounding sphere of the objects
-	getBoundingSphere(sphereCenter, sphereRadius, objects);
+	getBoundingSphere(m_sphereCenter, m_sphereRadius, objects);
 
-	initialSphereCenter = sphereCenter;
+	m_initialSphereCenter = m_sphereCenter;
 
 	double colorX[] = { 1.0, 0.0, 0.0, 1.0 };
 	double colorY[] = { 0.0, 1.0, 0.0, 1.0 };
 	double colorZ[] = { 0.0, 0.0, 1.0, 1.0 };
 
-	double arrowSize          = 0.2   * sphereRadius;
-	double arrowHandlerRadius = 0.025 * sphereRadius;
-	double wheelHandlerRadius = 0.02  * sphereRadius;
+	double arrowSize          = 0.2   * m_sphereRadius;
+	double arrowHandlerRadius = 0.025 * m_sphereRadius;
+	double wheelHandlerRadius = 0.02  * m_sphereRadius;
 
 	// Create the handles for the six coordinate directions
 	osg::Vec3d vectorX(1.0, 0.0, 0.0);
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = workingPlaneRotation * vectorX;
-	vectorY = workingPlaneRotation * vectorY;
-	vectorZ = workingPlaneRotation * vectorZ;
+	vectorX = m_workingPlaneRotation * vectorX;
+	vectorY = m_workingPlaneRotation * vectorY;
+	vectorZ = m_workingPlaneRotation * vectorZ;
 
-	handlerPosition[0] = sphereCenter - vectorX * sphereRadius;
-	handlerPosition[1] = sphereCenter + vectorX * sphereRadius;
-	handlerPosition[2] = sphereCenter - vectorY * sphereRadius;
-	handlerPosition[3] = sphereCenter + vectorY * sphereRadius;
-	handlerPosition[4] = sphereCenter - vectorZ * sphereRadius;
-	handlerPosition[5] = sphereCenter + vectorZ * sphereRadius;
+	m_handlerPosition[0] = m_sphereCenter - vectorX * m_sphereRadius;
+	m_handlerPosition[1] = m_sphereCenter + vectorX * m_sphereRadius;
+	m_handlerPosition[2] = m_sphereCenter - vectorY * m_sphereRadius;
+	m_handlerPosition[3] = m_sphereCenter + vectorY * m_sphereRadius;
+	m_handlerPosition[4] = m_sphereCenter - vectorZ * m_sphereRadius;
+	m_handlerPosition[5] = m_sphereCenter + vectorZ * m_sphereRadius;
 
-	arrowHandlers[0] = new HandleArrow(handlerPosition[0], -vectorX, colorX, arrowSize, arrowHandlerRadius);  // -> -x Direction
-	arrowHandlers[1] = new HandleArrow(handlerPosition[1],  vectorX, colorX, arrowSize, arrowHandlerRadius);  // -> +x Direction
-	arrowHandlers[2] = new HandleArrow(handlerPosition[2], -vectorY, colorY, arrowSize, arrowHandlerRadius);  // -> -y Direction
-	arrowHandlers[3] = new HandleArrow(handlerPosition[3],  vectorY, colorY, arrowSize, arrowHandlerRadius);  // -> +y Direction
-	arrowHandlers[4] = new HandleArrow(handlerPosition[4], -vectorZ, colorZ, arrowSize, arrowHandlerRadius);  // -> -z Direction
-	arrowHandlers[5] = new HandleArrow(handlerPosition[5],  vectorZ, colorZ, arrowSize, arrowHandlerRadius);  // -> +z Direction
+	m_arrowHandlers[0] = new HandleArrow(m_handlerPosition[0], -vectorX, colorX, arrowSize, arrowHandlerRadius);  // -> -x Direction
+	m_arrowHandlers[1] = new HandleArrow(m_handlerPosition[1],  vectorX, colorX, arrowSize, arrowHandlerRadius);  // -> +x Direction
+	m_arrowHandlers[2] = new HandleArrow(m_handlerPosition[2], -vectorY, colorY, arrowSize, arrowHandlerRadius);  // -> -y Direction
+	m_arrowHandlers[3] = new HandleArrow(m_handlerPosition[3],  vectorY, colorY, arrowSize, arrowHandlerRadius);  // -> +y Direction
+	m_arrowHandlers[4] = new HandleArrow(m_handlerPosition[4], -vectorZ, colorZ, arrowSize, arrowHandlerRadius);  // -> -z Direction
+	m_arrowHandlers[5] = new HandleArrow(m_handlerPosition[5],  vectorZ, colorZ, arrowSize, arrowHandlerRadius);  // -> +z Direction
 
 	for (int i = 0; i < 6; i++)
 	{
-		viewer3D->addHandler(arrowHandlers[i]);
-		arrowHandlers[i]->addNotifier(this);
+		m_viewer3D->addHandler(m_arrowHandlers[i]);
+		m_arrowHandlers[i]->addNotifier(this);
 	}
 
-	wheelHandlers[0] = new HandleWheel(sphereCenter, vectorX, sphereRadius, wheelHandlerRadius, colorX);  // -> x Normal
-	wheelHandlers[1] = new HandleWheel(sphereCenter, vectorY, sphereRadius, wheelHandlerRadius, colorY);  // -> y Normal
-	wheelHandlers[2] = new HandleWheel(sphereCenter, vectorZ, sphereRadius, wheelHandlerRadius, colorZ);  // -> z Normal
+	m_wheelHandlers[0] = new HandleWheel(m_sphereCenter, vectorX, m_sphereRadius, wheelHandlerRadius, colorX);  // -> x Normal
+	m_wheelHandlers[1] = new HandleWheel(m_sphereCenter, vectorY, m_sphereRadius, wheelHandlerRadius, colorY);  // -> y Normal
+	m_wheelHandlers[2] = new HandleWheel(m_sphereCenter, vectorZ, m_sphereRadius, wheelHandlerRadius, colorZ);  // -> z Normal
 
 	for (int i = 0; i < 3; i++)
 	{
-		viewer3D->addHandler(wheelHandlers[i]);
-		wheelHandlers[i]->addNotifier(this);
+		m_viewer3D->addHandler(m_wheelHandlers[i]);
+		m_wheelHandlers[i]->addNotifier(this);
 	}
 
-	rotationDegX = 0.0;
-	rotationDegY = 0.0;
-	rotationDegZ = 0.0;
+	m_rotationDegX = 0.0;
+	m_rotationDegY = 0.0;
+	m_rotationDegZ = 0.0;
 
 	// Set the property grid
 	setPropertyGrid();
 
 	// Lock the ui
-	viewer3D->getModel()->lockSelectionAndModification(true);
+	m_viewer3D->getModel()->lockSelectionAndModification(true);
 }
 
 TransformManipulator::~TransformManipulator()
@@ -115,60 +115,64 @@ TransformManipulator::~TransformManipulator()
 	// Detach the handlers
 	for (int i = 0; i < 6; i++)
 	{
-		viewer3D->removeHandler(arrowHandlers[i]);
+		m_viewer3D->removeHandler(m_arrowHandlers[i]);
 	
-		delete arrowHandlers[i];
-		arrowHandlers[i] = nullptr;
+		delete m_arrowHandlers[i];
+		m_arrowHandlers[i] = nullptr;
 	}
 
 	for (int i = 0; i < 3; i++)
 	{
-		viewer3D->removeHandler(wheelHandlers[i]);
+		m_viewer3D->removeHandler(m_wheelHandlers[i]);
 
-		delete wheelHandlers[i];
-		wheelHandlers[i] = nullptr;
+		delete m_wheelHandlers[i];
+		m_wheelHandlers[i] = nullptr;
 	}
+
+	// Reset modal property grid
+	OTAssertNullptr(m_viewer3D->getModel());
+	m_viewer3D->getModel()->clearModalPropertyGrid();
 }
 
 void TransformManipulator::cancelOperation(void)
 {
 	// Here we need to reset the transformations of the nodes
-	for (auto item : transformedObjects)
+	for (auto item : m_transformedObjects)
 	{
 		SceneNodeGeometry *geometryItem = dynamic_cast<SceneNodeGeometry *>(item);
 		if (geometryItem != nullptr)
 		{
-			geometryItem->applyTransform(initialObjectTransform[item]);
+			geometryItem->applyTransform(m_initialObjectTransform[item]);
 		}
 	}
 
-	assert(viewer3D->getModel() != nullptr);
+	assert(m_viewer3D->getModel() != nullptr);
 
 	// Unlock the ui
-	viewer3D->getModel()->lockSelectionAndModification(false);
+	m_viewer3D->getModel()->lockSelectionAndModification(false);
 
 	// Refresh the selection (will also restore the original property grid
-	viewer3D->getModel()->refreshSelection();
+	m_viewer3D->getModel()->refreshSelection();
 }
 
 void TransformManipulator::performOperation(void)
 {
-	assert(viewer3D->getModel() != nullptr);
+	assert(m_viewer3D->getModel() != nullptr);
 
 	// Unlock the ui
-	viewer3D->getModel()->lockSelectionAndModification(false);
+	m_viewer3D->getModel()->lockSelectionAndModification(false);
 
 	// Now we just need to send the property grid settings
 	ot::JsonDocument doc;
-	doc.AddMember("Translate X", lastPropertyOffset.x(), doc.GetAllocator());
-	doc.AddMember("Translate Y", lastPropertyOffset.y(), doc.GetAllocator());
-	doc.AddMember("Translate Z", lastPropertyOffset.z(), doc.GetAllocator());
+	doc.AddMember("Translate X", m_lastPropertyOffset.x(), doc.GetAllocator());
+	doc.AddMember("Translate Y", m_lastPropertyOffset.y(), doc.GetAllocator());
+	doc.AddMember("Translate Z", m_lastPropertyOffset.z(), doc.GetAllocator());
 
-	doc.AddMember("Axis X", lastPropertyAxis.x(), doc.GetAllocator());
-	doc.AddMember("Axis Y", lastPropertyAxis.y(), doc.GetAllocator());
-	doc.AddMember("Axis Z", lastPropertyAxis.z(), doc.GetAllocator());
+	doc.AddMember("Axis X", m_lastPropertyAxis.x(), doc.GetAllocator());
+	doc.AddMember("Axis Y", m_lastPropertyAxis.y(), doc.GetAllocator());
+	doc.AddMember("Axis Z", m_lastPropertyAxis.z(), doc.GetAllocator());
 
-	doc.AddMember("Angle", lastPropertyAngle, doc.GetAllocator());
+	doc.AddMember("Angle", m_lastPropertyAngle, doc.GetAllocator());
 	
 	std::string selectionInfo = doc.toJson();
 
@@ -178,7 +182,7 @@ void TransformManipulator::performOperation(void)
 
 void TransformManipulator::storeTransformations(void)
 {
-	for (auto item : transformedObjects)
+	for (auto item : m_transformedObjects)
 	{
 		osg::Matrix transformation;
 		SceneNodeGeometry *geometryItem = dynamic_cast<SceneNodeGeometry *>(item);
@@ -187,7 +191,7 @@ void TransformManipulator::storeTransformations(void)
 			transformation = geometryItem->getParentTransformation();
 		}
 
-		initialObjectTransform[item] = transformation;
+		m_initialObjectTransform[item] = transformation;
 	}
 }
 
@@ -219,25 +223,25 @@ void TransformManipulator::updateHandlerPositions(void)
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = workingPlaneRotation * vectorX;
-	vectorY = workingPlaneRotation * vectorY;
-	vectorZ = workingPlaneRotation * vectorZ;
+	vectorX = m_workingPlaneRotation * vectorX;
+	vectorY = m_workingPlaneRotation * vectorY;
+	vectorZ = m_workingPlaneRotation * vectorZ;
 
-	handlerPosition[0] = sphereCenter - vectorX * sphereRadius;
-	handlerPosition[1] = sphereCenter + vectorX * sphereRadius;
-	handlerPosition[2] = sphereCenter - vectorY * sphereRadius;
-	handlerPosition[3] = sphereCenter + vectorY * sphereRadius;
-	handlerPosition[4] = sphereCenter - vectorZ * sphereRadius;
-	handlerPosition[5] = sphereCenter + vectorZ * sphereRadius;
+	m_handlerPosition[0] = m_sphereCenter - vectorX * m_sphereRadius;
+	m_handlerPosition[1] = m_sphereCenter + vectorX * m_sphereRadius;
+	m_handlerPosition[2] = m_sphereCenter - vectorY * m_sphereRadius;
+	m_handlerPosition[3] = m_sphereCenter + vectorY * m_sphereRadius;
+	m_handlerPosition[4] = m_sphereCenter - vectorZ * m_sphereRadius;
+	m_handlerPosition[5] = m_sphereCenter + vectorZ * m_sphereRadius;
 
 	for (int i = 0; i < 6; i++)
 	{
-		arrowHandlers[i]->setPosition(handlerPosition[i]);
+		m_arrowHandlers[i]->setPosition(m_handlerPosition[i]);
 	}
 
 	for (int i = 0; i < 3; i++)
 	{
-		wheelHandlers[i]->setPosition(sphereCenter);
+		m_wheelHandlers[i]->setPosition(m_sphereCenter);
 	}
 }
 
@@ -249,19 +253,19 @@ void TransformManipulator::handlerInteraction(HandlerBase *handler)
 	osg::Vec3d vectorY(0.0, 1.0, 0.0);
 	osg::Vec3d vectorZ(0.0, 0.0, 1.0);
 
-	vectorX = workingPlaneRotation * vectorX;
-	vectorY = workingPlaneRotation * vectorY;
-	vectorZ = workingPlaneRotation * vectorZ;
+	vectorX = m_workingPlaneRotation * vectorX;
+	vectorY = m_workingPlaneRotation * vectorY;
+	vectorZ = m_workingPlaneRotation * vectorZ;
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (arrowHandlers[i] == handler)
+		if (m_arrowHandlers[i] == handler)
 		{
 			// Determine the offset of the handler position 
-			osg::Vec3 offset = arrowHandlers[i]->getPosition() - handlerPosition[i];
+			osg::Vec3 offset = m_arrowHandlers[i]->getPosition() - m_handlerPosition[i];
 
 			// Determine the new sphere center
-			sphereCenter = sphereCenter + offset;
+			m_sphereCenter = m_sphereCenter + offset;
 
 			// Assign new positions to all handlers
 			updateHandlerPositions();
@@ -271,38 +275,38 @@ void TransformManipulator::handlerInteraction(HandlerBase *handler)
 		}
 	}
 
-	if (!applyTransform && wheelHandlers[0] == handler)
+	if (!applyTransform && m_wheelHandlers[0] == handler)
 	{
 		// Determine the offset of the handler position 
-		double deltaRotX = wheelHandlers[0]->getRotationAngleDeg() - rotationDegX;
+		double deltaRotX = m_wheelHandlers[0]->getRotationAngleDeg() - m_rotationDegX;
 		osg::Matrix deltaRotate;
 		deltaRotate.makeRotate(deltaRotX * M_PI / 180.0, vectorX);
-		totalRotation = totalRotation * deltaRotate;
-		rotationDegX = wheelHandlers[0]->getRotationAngleDeg();
+		m_totalRotation = m_totalRotation * deltaRotate;
+		m_rotationDegX = m_wheelHandlers[0]->getRotationAngleDeg();
 
 		applyTransform = true;
 	}
 
-	if (!applyTransform && wheelHandlers[1] == handler)
+	if (!applyTransform && m_wheelHandlers[1] == handler)
 	{
 		// Determine the offset of the handler position 
-		double deltaRotY = wheelHandlers[1]->getRotationAngleDeg() - rotationDegY;
+		double deltaRotY = m_wheelHandlers[1]->getRotationAngleDeg() - m_rotationDegY;
 		osg::Matrix deltaRotate;
 		deltaRotate.makeRotate(deltaRotY * M_PI / 180.0, vectorY);
-		totalRotation = totalRotation * deltaRotate;
-		rotationDegY = wheelHandlers[1]->getRotationAngleDeg();
+		m_totalRotation = m_totalRotation * deltaRotate;
+		m_rotationDegY = m_wheelHandlers[1]->getRotationAngleDeg();
 
 		applyTransform = true;
 	}
 
-	if (!applyTransform && wheelHandlers[2] == handler)
+	if (!applyTransform && m_wheelHandlers[2] == handler)
 	{
 		// Determine the offset of the handler position 
-		double deltaRotZ = wheelHandlers[2]->getRotationAngleDeg() - rotationDegZ;
+		double deltaRotZ = m_wheelHandlers[2]->getRotationAngleDeg() - m_rotationDegZ;
 		osg::Matrix deltaRotate;
 		deltaRotate.makeRotate(deltaRotZ * M_PI / 180.0, vectorZ);
-		totalRotation = totalRotation * deltaRotate;
-		rotationDegZ = wheelHandlers[2]->getRotationAngleDeg();
+		m_totalRotation = m_totalRotation * deltaRotate;
+		m_rotationDegZ = m_wheelHandlers[2]->getRotationAngleDeg();
 
 		applyTransform = true;
 	}
@@ -320,19 +324,19 @@ void TransformManipulator::handlerInteraction(HandlerBase *handler)
 void TransformManipulator::applyObjectTransformations(void)
 {
 	// Determine the current transformation (consider translation)
-	osg::Vec3d offset = sphereCenter - initialSphereCenter;
+	osg::Vec3d offset = m_sphereCenter - m_initialSphereCenter;
 
 	osg::Matrix translation;
 	translation.makeTranslate(offset);
 
 	// Now consider the rotation
 	osg::Matrix translationToOrigin;
-	translationToOrigin.makeTranslate(-initialSphereCenter);
+	translationToOrigin.makeTranslate(-m_initialSphereCenter);
 
 	osg::Matrix translationFromOrigin;
-	translationFromOrigin.makeTranslate(initialSphereCenter);
+	translationFromOrigin.makeTranslate(m_initialSphereCenter);
 
-	osg::Matrix rotation = translationToOrigin * totalRotation * translationFromOrigin;
+	osg::Matrix rotation = translationToOrigin * m_totalRotation * translationFromOrigin;
 
 	// Combine the matrices
 	osg::Matrix transformation;
@@ -340,12 +344,12 @@ void TransformManipulator::applyObjectTransformations(void)
 
 	// Now apply the transformation to each object
 	// Here we need to reset the transformations of the nodes
-	for (auto item : transformedObjects)
+	for (auto item : m_transformedObjects)
 	{
 		SceneNodeGeometry *geometryItem = dynamic_cast<SceneNodeGeometry *>(item);
 		if (geometryItem != nullptr)
 		{
-			osg::Matrix newTransformation = initialObjectTransform[item] * transformation;
+			osg::Matrix newTransformation = m_initialObjectTransform[item] * transformation;
 			geometryItem->applyTransform(newTransformation);
 		}
 	}
@@ -353,11 +357,11 @@ void TransformManipulator::applyObjectTransformations(void)
 
 void TransformManipulator::setPropertyGrid(void)
 {
-	lastPropertyOffset = sphereCenter - initialSphereCenter;
+	m_lastPropertyOffset = m_sphereCenter - m_initialSphereCenter;
 
-	osg::Quat totQuat = totalRotation.getRotate();
-	totQuat.getRotate(lastPropertyAngle, lastPropertyAxis);
-	lastPropertyAngle *= 180.0 / M_PI;
+	osg::Quat totQuat = m_totalRotation.getRotate();
+	totQuat.getRotate(m_lastPropertyAngle, m_lastPropertyAxis);
+	m_lastPropertyAngle *= 180.0 / M_PI;
 
 	// Create the configuration
 	ot::PropertyGridCfg cfg;
@@ -365,9 +369,9 @@ void TransformManipulator::setPropertyGrid(void)
 	{
 		ot::PropertyGroup* gTranslation = new ot::PropertyGroup(PROP_Group_Translation);
 
-		ot::PropertyDouble* iTranslateX = new ot::PropertyDouble(PROP_Item_TranslateX, lastPropertyOffset.x());
-		ot::PropertyDouble* iTranslateY = new ot::PropertyDouble(PROP_Item_TranslateY, lastPropertyOffset.y());
-		ot::PropertyDouble* iTranslateZ = new ot::PropertyDouble(PROP_Item_TranslateZ, lastPropertyOffset.z());
+		ot::PropertyDouble* iTranslateX = new ot::PropertyDouble(PROP_Item_TranslateX, m_lastPropertyOffset.x());
+		ot::PropertyDouble* iTranslateY = new ot::PropertyDouble(PROP_Item_TranslateY, m_lastPropertyOffset.y());
+		ot::PropertyDouble* iTranslateZ = new ot::PropertyDouble(PROP_Item_TranslateZ, m_lastPropertyOffset.z());
 
 		gTranslation->addProperty(iTranslateX);
 		gTranslation->addProperty(iTranslateY);
@@ -378,10 +382,10 @@ void TransformManipulator::setPropertyGrid(void)
 	{
 		ot::PropertyGroup* gRotation = new ot::PropertyGroup(PROP_Group_Rotation);
 
-		ot::PropertyDouble* iRotationX = new ot::PropertyDouble(PROP_Item_AxisX, lastPropertyAxis.x());
-		ot::PropertyDouble* iRotationY = new ot::PropertyDouble(PROP_Item_AxisY, lastPropertyAxis.y());
-		ot::PropertyDouble* iRotationZ = new ot::PropertyDouble(PROP_Item_AxisZ, lastPropertyAxis.z());
-		ot::PropertyDouble* iAngle = new ot::PropertyDouble(PROP_Item_Angle, lastPropertyAngle);
+		ot::PropertyDouble* iRotationX = new ot::PropertyDouble(PROP_Item_AxisX, m_lastPropertyAxis.x());
+		ot::PropertyDouble* iRotationY = new ot::PropertyDouble(PROP_Item_AxisY, m_lastPropertyAxis.y());
+		ot::PropertyDouble* iRotationZ = new ot::PropertyDouble(PROP_Item_AxisZ, m_lastPropertyAxis.z());
+		ot::PropertyDouble* iAngle = new ot::PropertyDouble(PROP_Item_Angle, m_lastPropertyAngle);
 
 		gRotation->addProperty(iRotationX);
 		gRotation->addProperty(iRotationY);
@@ -390,23 +394,25 @@ void TransformManipulator::setPropertyGrid(void)
 		cfg.addRootGroup(gRotation);
 	}
 
-	assert(viewer3D->getModel() != nullptr);
-	viewer3D->getModel()->fillPropertyGrid(cfg);
+	cfg.setIsModal(true);
+
+	OTAssertNullptr(m_viewer3D->getModel());
+	m_viewer3D->getModel()->fillPropertyGrid(cfg);
 }
 
 void TransformManipulator::updatePropertyGrid(void)
 {
 	// We first build the current transformation matrix and apply the working plane rotation
 	osg::Matrix workingPlaneRotationI;
-	workingPlaneRotationI = workingPlaneRotationI.inverse(workingPlaneRotation);
+	workingPlaneRotationI = workingPlaneRotationI.inverse(m_workingPlaneRotation);
 
 	osg::Matrix currentTransformT;
-	currentTransformT.makeTranslate(sphereCenter - initialSphereCenter);
+	currentTransformT.makeTranslate(m_sphereCenter - m_initialSphereCenter);
 
-	osg::Matrix currentTransformR = totalRotation;
+	osg::Matrix currentTransformR = m_totalRotation;
 	osg::Matrix currentTransform = currentTransformR * currentTransformT;
 
-	currentTransform = currentTransform * workingPlaneRotation;
+	currentTransform = currentTransform * m_workingPlaneRotation;
 
 	// From the rotated transformation matrix in the working plane coordinates, we can now get the properties for the translation and rotation settings
 	osg::Vec3d offset = currentTransform.getTrans();
@@ -425,18 +431,18 @@ void TransformManipulator::updatePropertyGrid(void)
 		angle = 0.0;
 	}
 
-	if (offset.x() != lastPropertyOffset.x()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateX, offset.x());
-	if (offset.y() != lastPropertyOffset.y()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateY, offset.y());
-	if (offset.z() != lastPropertyOffset.z()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateZ, offset.z());
+	if (offset.x() != m_lastPropertyOffset.x()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateX, offset.x());
+	if (offset.y() != m_lastPropertyOffset.y()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateY, offset.y());
+	if (offset.z() != m_lastPropertyOffset.z()) updateSetting(PROP_Group_Translation, PROP_Item_TranslateZ, offset.z());
 
-	if (axis.x() != lastPropertyAxis.x()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisX, axis.x());
-	if (axis.y() != lastPropertyAxis.y()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisY, axis.y());
-	if (axis.z() != lastPropertyAxis.z()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisZ, axis.z());
-	if (angle    != lastPropertyAngle)    updateSetting(PROP_Group_Rotation, PROP_Item_Angle, angle);
+	if (axis.x() != m_lastPropertyAxis.x()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisX, axis.x());
+	if (axis.y() != m_lastPropertyAxis.y()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisY, axis.y());
+	if (axis.z() != m_lastPropertyAxis.z()) updateSetting(PROP_Group_Rotation, PROP_Item_AxisZ, axis.z());
+	if (angle    != m_lastPropertyAngle)    updateSetting(PROP_Group_Rotation, PROP_Item_Angle, angle);
 
-	lastPropertyOffset = offset;
-	lastPropertyAxis = axis;
-	lastPropertyAngle = angle;
+	m_lastPropertyOffset = offset;
+	m_lastPropertyAxis = axis;
+	m_lastPropertyAngle = angle;
 }
 
 void TransformManipulator::addSetting(rapidjson::Document &jsonDoc, const std::string &group, const std::string &name, double value)
@@ -473,15 +479,15 @@ void TransformManipulator::addSetting(rapidjson::Document &jsonDoc, const std::s
 
 void TransformManipulator::updateSetting(const std::string& _groupName, const std::string& _itemName, double value)
 {
-	assert(viewer3D->getModel() != nullptr);
+	assert(m_viewer3D->getModel() != nullptr);
 
 	if (fabs(value) < 1e-6) value = 0.0;  // Trim small values to 0
-	viewer3D->getModel()->setDoublePropertyGridValue(_groupName, _itemName, value);
+	m_viewer3D->getModel()->setDoublePropertyGridValue(_groupName, _itemName, value);
 }
 
 bool TransformManipulator::propertyGridValueChanged(const ot::Property* _property)
 {
-	osg::Vec3d offset = lastPropertyOffset;
+	osg::Vec3d offset = m_lastPropertyOffset;
 
 	ot::PropertyGroup* propertyGroup = _property->getParentGroup();
 	OTAssertNullptr(propertyGroup);
@@ -493,7 +499,7 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 				OT_LOG_EA("Item cast failed");
 				return false;
 			}
-			lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), lastPropertyAxis.y(), lastPropertyAxis.z());
+			m_lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), m_lastPropertyAxis.y(), m_lastPropertyAxis.z());
 		}
 		else if (_property->getPropertyName() == PROP_Item_AxisY) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
@@ -501,7 +507,7 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 				OT_LOG_EA("Item cast failed");
 				return false;
 			}
-			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), actualProperty->getValue(), lastPropertyAxis.z());
+			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), actualProperty->getValue(), m_lastPropertyAxis.z());
 		}
 		else if (_property->getPropertyName() == PROP_Item_AxisZ) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
@@ -509,7 +515,7 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 				OT_LOG_EA("Item cast failed");
 				return false;
 			}
-			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), lastPropertyAxis.y(), actualProperty->getValue());
+			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), m_lastPropertyAxis.y(), actualProperty->getValue());
 		}
 		else if (_property->getPropertyName() == PROP_Item_Angle) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
@@ -517,7 +523,7 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 				OT_LOG_EA("Item cast failed");
 				return false;
 			}
-			lastPropertyAngle = actualProperty->getValue();
+			m_lastPropertyAngle = actualProperty->getValue();
 		}
 		else {
 			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
@@ -557,12 +563,12 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 		return false;
 	}
 
-	lastPropertyOffset = offset;
+	m_lastPropertyOffset = offset;
 
 	// Update the transformation
 	osg::Matrix propertyRotate;
-	propertyRotate.makeRotate(lastPropertyAngle * M_PI / 180.0, lastPropertyAxis);
-	propertyRotate = workingPlaneRotation * propertyRotate;
+	propertyRotate.makeRotate(m_lastPropertyAngle * M_PI / 180.0, m_lastPropertyAxis);
+	propertyRotate = m_workingPlaneRotation * propertyRotate;
 
 	osg::Matrix propertyTranslate;
 	propertyTranslate.makeTranslate(offset);
@@ -570,19 +576,19 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 	osg::Matrix currentTransform = propertyRotate * propertyTranslate;
 
 	osg::Matrix workingPlaneRotationI;
-	workingPlaneRotationI = workingPlaneRotationI.inverse(workingPlaneRotation);
+	workingPlaneRotationI = workingPlaneRotationI.inverse(m_workingPlaneRotation);
 
 	currentTransform =   currentTransform * workingPlaneRotationI;
 
 	offset = currentTransform.getTrans();
-	totalRotation = osg::Matrix(currentTransform.getRotate());
+	m_totalRotation = osg::Matrix(currentTransform.getRotate());
 
 
 
 //	totalRotation.makeRotate(lastPropertyAngle * M_PI / 180.0, lastPropertyAxis);
 //	totalRotation = totalRotation * workingPlaneRotation;
 
-	sphereCenter = initialSphereCenter + offset;
+	m_sphereCenter = m_initialSphereCenter + offset;
 
 	// Assign new positions to all handlers
 	updateHandlerPositions();
@@ -591,7 +597,7 @@ bool TransformManipulator::propertyGridValueChanged(const ot::Property* _propert
 	applyObjectTransformations();
 
 	// Refresh the scene
-	viewer3D->refresh();
+	m_viewer3D->refresh();
 
 	return true;  // We handle the property grid change
 }
