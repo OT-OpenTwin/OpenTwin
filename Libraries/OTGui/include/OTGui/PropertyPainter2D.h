@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTGui/Property.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/Painter2DDialogFilter.h"
 
 namespace ot {
 
@@ -54,6 +55,9 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 		const Painter2D* getPainter(void) const { return m_painter; };
 
+		void setFilter(const Painter2DDialogFilter& _filter) { m_filter = _filter; };
+		const Painter2DDialogFilter& getFilter() const { return m_filter; };
+
 	protected:
 		//! @brief Add the property data to the provided JSON object
 		//! The property type is already added
@@ -68,6 +72,7 @@ namespace ot {
 
 	private:
 		Painter2D* m_painter;
+		Painter2DDialogFilter m_filter;
 	};
 
 }

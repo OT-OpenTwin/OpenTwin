@@ -69,6 +69,7 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	m_button->blockSignals(true);
 
 	m_button->setPainter(actualProperty->getPainter());
+	m_button->setFilter(actualProperty->getFilter());
 	m_button->getPushButton()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_button->getPushButton()->setText("...");

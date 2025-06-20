@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/Painter2DDialogFilter.h"
 #include "OTWidgets/Painter2DEditDialogEntry.h"
 
 namespace ot {
@@ -14,7 +15,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialogReferenceEntry : public Painter2DEditDialogEntry {
 	public:
-		Painter2DEditDialogReferenceEntry(const Painter2D* _painter = (Painter2D*)nullptr);
+		Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter = (Painter2D*)nullptr);
 		virtual ~Painter2DEditDialogReferenceEntry();
 
 		virtual DialogEntryType getEntryType() const { return Painter2DEditDialogEntry::ReferenceType; };

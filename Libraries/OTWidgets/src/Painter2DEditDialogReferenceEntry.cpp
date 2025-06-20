@@ -4,32 +4,52 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Painter2DEditDialogReferenceEntry.h"
 
-ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const Painter2D* _painter) {
+ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const Painter2DDialogFilter& _filter, const Painter2D* _painter) {
 	m_comboBox = new ComboBox;
 
 	const StyleRefPainter2D* actualPainter = dynamic_cast<const StyleRefPainter2D*>(_painter);
-	
+
+	// Determine available options
 	QStringList optionList;
-	for (const std::string& opt : ot::getAllColorStyleValueEntryStrings()) {
-		optionList.append(QString::fromStdString(opt));
+	bool currentFound = false;
+	for (ColorStyleValueEntry opt : _filter.getStyleReferences()) {
+		if (actualPainter && actualPainter->getReferenceKey() == opt) {
+			currentFound = true;
+		}
+		optionList.append(QString::fromStdString(ot::toString(opt)));
 	}
 
+	if (!currentFound && actualPainter) {
+		optionList.append(QString::fromStdString(ot::toString(actualPainter->getReferenceKey())));
+	}
+
+	optionList.sort();
+	m_comboBox->addItems(optionList);
+
+	// Determine initial text and valid options
 	QString txt;
 	if (actualPainter) {
 		txt = QString::fromStdString(toString(actualPainter->getReferenceKey()));
 	}
+	else if (!optionList.isEmpty()) {
+		txt = optionList.first();
+	}
 	else {
-		txt = QString::fromStdString(toString(ColorStyleValueEntry::WidgetBackground));
+		OT_LOG_W("No color style references whitelisted. Disabling selection...");
+		m_comboBox->setEnabled(false);
 	}
 
+	// Finalize
 	m_comboBox->setEditable(false);
 	m_comboBox->addItems(optionList);
 	m_comboBox->setCurrentText(txt);
 
+	// Connect signals
 	this->connect(m_comboBox, &ComboBox::currentTextChanged, this, &Painter2DEditDialogReferenceEntry::slotValueChanged);
 }
 

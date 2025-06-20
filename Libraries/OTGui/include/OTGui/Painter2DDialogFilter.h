@@ -16,9 +16,9 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Painter2DEditFilter : public Serializable {
-		OT_DECL_DEFCOPY(Painter2DEditFilter)
-		OT_DECL_DEFMOVE(Painter2DEditFilter)
+	class OT_GUI_API_EXPORT Painter2DDialogFilter : public Serializable {
+		OT_DECL_DEFCOPY(Painter2DDialogFilter)
+		OT_DECL_DEFMOVE(Painter2DDialogFilter)
 	public:
 		enum PainterType {
 			None           = 0 << 0, //! @brief No painter type allowed. Set painter won't be editable
@@ -31,8 +31,8 @@ namespace ot {
 		};
 		typedef Flags<PainterType> PainterTypes;
 
-		Painter2DEditFilter();
-		virtual ~Painter2DEditFilter() = default;
+		Painter2DDialogFilter();
+		virtual ~Painter2DDialogFilter() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -60,4 +60,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::Painter2DEditFilter::PainterType)
+OT_ADD_FLAG_FUNCTIONS(ot::Painter2DDialogFilter::PainterType)

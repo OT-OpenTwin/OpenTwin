@@ -36,8 +36,8 @@
 #define P2DED_Radial "Radial"
 #define P2DED_StyleRef "Style Reference"
 
-ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2D* _painter) :
-	m_currentEntry(nullptr), m_changed(false)
+ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2DDialogFilter& _filter, const Painter2D* _painter) :
+	m_currentEntry(nullptr), m_changed(false), m_filter(_filter)
 {
 	// Initialize data
 	if (_painter) m_painter = _painter->createCopy();
@@ -58,15 +58,20 @@ ot::Painter2D* ot::Painter2DEditDialog::createPainter() const {
 void ot::Painter2DEditDialog::slotTypeChanged() {
 	ot::Painter2D* newPainter = nullptr;
 
-	if (m_typeSelectionBox->currentText() == P2DED_Fill) { newPainter = new FillPainter2D; }
-	else if (m_typeSelectionBox->currentText() == P2DED_Linear) { newPainter = new LinearGradientPainter2D; }
-	else if (m_typeSelectionBox->currentText() == P2DED_Radial) { newPainter = new RadialGradientPainter2D; }
-	else if (m_typeSelectionBox->currentText() == P2DED_StyleRef) { newPainter = new StyleRefPainter2D; }
-	else {
-		OT_LOG_EA("Unknown entry type");
+	if (m_typeSelectionBox->currentText() == P2DED_Fill) { 
+		newPainter = new FillPainter2D;
 	}
-	
-	if (!newPainter) {
+	else if (m_typeSelectionBox->currentText() == P2DED_Linear) {
+		newPainter = new LinearGradientPainter2D;
+	}
+	else if (m_typeSelectionBox->currentText() == P2DED_Radial) {
+		newPainter = new RadialGradientPainter2D;
+	}
+	else if (m_typeSelectionBox->currentText() == P2DED_StyleRef) {
+		newPainter = new StyleRefPainter2D;
+	}
+	else {
+		OT_LOG_E("Unknown entry type: \"" + m_typeSelectionBox->currentText().toStdString());
 		return;
 	}
 	
@@ -129,9 +134,23 @@ void ot::Painter2DEditDialog::ini() {
 	cLay->addWidget(m_confirm);
 	cLay->addWidget(m_cancel);
 
-	// Setup controls
-	m_typeSelectionBox->addItems(QStringList({ P2DED_Fill, P2DED_Linear, P2DED_Radial, P2DED_StyleRef }));
+	// Initialize allowed painter types
+	QStringList painterOpt;
+	if (m_filter.getPainterTypes() & Painter2DDialogFilter::Fill || m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
+		painterOpt.append(P2DED_Fill);
+	}
+	if (m_filter.getPainterTypes() & Painter2DDialogFilter::LinearGradient || m_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
+		painterOpt.append(P2DED_Linear);
+	}
+	if (m_filter.getPainterTypes() & Painter2DDialogFilter::RadialGradient || m_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) {
+		painterOpt.append(P2DED_Radial);
+	}
+	if (m_filter.getPainterTypes() & Painter2DDialogFilter::StyleRef || m_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) {
+		painterOpt.append(P2DED_StyleRef);
+	}
+	m_typeSelectionBox->addItems(painterOpt);
 
+	// Initialize currently selected painter type
 	if (m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		m_typeSelectionBox->setCurrentText(P2DED_Fill);
 	}
@@ -156,17 +175,24 @@ void ot::Painter2DEditDialog::ini() {
 
 	this->setMinimumSize(600, 600);
 
+	// Update controls and painter selection
 	this->applyPainter(m_painter);
 	this->slotUpdate();
 	m_changed = false;
+
+	// Connect signals
 	this->connect(m_confirm, &PushButton::clicked, this, &Painter2DEditDialog::slotConfirm);
 	this->connect(m_cancel, &PushButton::clicked, this, &Dialog::closeCancel);
 	this->connect(m_typeSelectionBox, &ComboBox::currentTextChanged, this, &Painter2DEditDialog::slotTypeChanged);
 
+	// Apply layout
 	this->setLayout(cLay);
 }
 
 void ot::Painter2DEditDialog::applyPainter(const Painter2D* _painter) {
+	OTAssertNullptr(_painter);
+
+	// Remove currently set entry
 	if (m_currentEntry) {
 		this->disconnect(m_currentEntry, &Painter2DEditDialogEntry::valueChanged, this, &Painter2DEditDialog::slotUpdate);
 		m_currentEntry->getRootWidget()->hide();
@@ -176,12 +202,22 @@ void ot::Painter2DEditDialog::applyPainter(const Painter2D* _painter) {
 		delete m_currentEntry;
 		m_currentEntry = nullptr;
 	}
-	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) m_currentEntry = new Painter2DEditDialogFillEntry(_painter);
-	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) m_currentEntry = new Painter2DEditDialogLinearGradientEntry(_painter);
-	else if (_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) m_currentEntry = new Painter2DEditDialogRadialGradientEntry(_painter);
-	else if (_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) m_currentEntry = new Painter2DEditDialogReferenceEntry(_painter);
+
+	// Setup new entry
+	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
+		m_currentEntry = new Painter2DEditDialogFillEntry(_painter);
+	}
+	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
+		m_currentEntry = new Painter2DEditDialogLinearGradientEntry(_painter);
+	}
+	else if (_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) {
+		m_currentEntry = new Painter2DEditDialogRadialGradientEntry(_painter);
+	}
+	else if (_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) {
+		m_currentEntry = new Painter2DEditDialogReferenceEntry(m_filter, _painter);
+	}
 	else {
-		OT_LOG_E("Unknown painter type");
+		OT_LOG_E("Unknown painter type: \"" + _painter->getFactoryKey() + "\"");
 	}
 	if (m_currentEntry) {
 		m_vLayout->addWidget(m_currentEntry->getRootWidget());

@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
+#include "OTGui/Painter2DDialogFilter.h"
 #include "OTGui/GradientPainterStop2D.h"
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/ColorStyle.h"
@@ -23,6 +24,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Painter2DEditDialog : public Dialog {
 		Q_OBJECT
+		OT_DECL_NODEFAULT(Painter2DEditDialog)
 	public:
 		enum PainterEntryType {
 			FillType,
@@ -30,7 +32,7 @@ namespace ot {
 			RadialType
 		};
 
-		Painter2DEditDialog(const Painter2D* _painter = (Painter2D*)nullptr);
+		Painter2DEditDialog(const Painter2DDialogFilter& _filter, const Painter2D* _painter = (const Painter2D*)nullptr);
 		virtual ~Painter2DEditDialog();
 
 		const Painter2D* currentPainter() const { return m_painter; };
@@ -52,6 +54,7 @@ namespace ot {
 		void applyPainter(const Painter2D* _painter);
 
 		Painter2D* m_painter;
+		Painter2DDialogFilter m_filter;
 
 		bool m_changed;
 		ComboBox* m_typeSelectionBox;

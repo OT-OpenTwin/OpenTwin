@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Painter2DEditFilter.h"
+#include "OTGui/Painter2DDialogFilter.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
@@ -43,8 +43,8 @@ namespace ot{
 		void setPainter(const Painter2D* _painter);
 		const Painter2D* getPainter() { return m_painter; };
 
-		void setFilter(const Painter2DEditFilter& _filter) { m_filter = _filter; };
-		const Painter2DEditFilter& getFilter() const { return m_filter; };
+		void setFilter(const Painter2DDialogFilter& _filter) { m_filter = _filter; };
+		const Painter2DDialogFilter& getFilter() const { return m_filter; };
 
 	Q_SIGNALS:
 		void painter2DChanged();
@@ -53,7 +53,7 @@ namespace ot{
 		void slotClicked();
 
 	private:
-		Painter2DEditFilter m_filter;
+		Painter2DDialogFilter m_filter;
 		Painter2D* m_painter;
 		PushButton* m_btn;
 		QString m_btnTip;
