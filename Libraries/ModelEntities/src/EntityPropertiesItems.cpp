@@ -1319,6 +1319,7 @@ EntityPropertiesGuiPainter::EntityPropertiesGuiPainter(const EntityPropertiesGui
 	: EntityPropertiesBase(other), m_painter(nullptr)
 {
 	m_painter = other.getValue()->createCopy();
+	m_filter = other.m_filter;
 }
 
 EntityPropertiesGuiPainter& EntityPropertiesGuiPainter::operator=(const EntityPropertiesGuiPainter& other) {
@@ -1326,6 +1327,7 @@ EntityPropertiesGuiPainter& EntityPropertiesGuiPainter::operator=(const EntityPr
 	{
 		EntityPropertiesBase::operator=(other);
 		setValue(other.getValue()->createCopy());
+		m_filter = other.m_filter;
 	}
 
 	return *this;
@@ -1431,6 +1433,7 @@ void EntityPropertiesGuiPainter::copySettings(EntityPropertiesBase* other, Entit
 	if (entity != nullptr)
 	{
 		setValue(entity->getValue()->createCopy());
+		m_filter = entity->m_filter;
 	}
 }
 

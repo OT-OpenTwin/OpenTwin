@@ -1,11 +1,12 @@
 #include "EntityResult1DCurve.h"
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCore/EntityName.h"
 #include "OTGui/Painter2D.h"
-#include "OTGui/VisualisationTypes.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/StyleRefPainter2D.h"
-#include "OTCore/EntityName.h"
+#include "OTGui/VisualisationTypes.h"
+#include "OTGui/Painter2DDialogFilterDefaults.h"
 
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
@@ -53,11 +54,8 @@ bool EntityResult1DCurve::updateFromProperties(void)
 
 void EntityResult1DCurve::createProperties(void)
 {
-	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
-	ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
-	auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
-
-	EntityPropertiesGuiPainter::createProperty("General", "Color", stylePainter, "", getProperties());
+	EntityPropertiesGuiPainter* colorProp = EntityPropertiesGuiPainter::createProperty("General", "Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurve), "", getProperties());
+	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
 	getProperties().forceResetUpdateForAllProperties();
 }

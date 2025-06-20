@@ -16,16 +16,8 @@ ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const P
 
 	// Determine available options
 	QStringList optionList;
-	bool currentFound = false;
 	for (ColorStyleValueEntry opt : _filter.getStyleReferences()) {
-		if (actualPainter && actualPainter->getReferenceKey() == opt) {
-			currentFound = true;
-		}
 		optionList.append(QString::fromStdString(ot::toString(opt)));
-	}
-
-	if (!currentFound && actualPainter) {
-		optionList.append(QString::fromStdString(ot::toString(actualPainter->getReferenceKey())));
 	}
 
 	optionList.sort();
@@ -46,7 +38,6 @@ ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const P
 
 	// Finalize
 	m_comboBox->setEditable(false);
-	m_comboBox->addItems(optionList);
 	m_comboBox->setCurrentText(txt);
 
 	// Connect signals

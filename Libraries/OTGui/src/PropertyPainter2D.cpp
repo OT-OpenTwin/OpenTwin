@@ -19,6 +19,7 @@ ot::PropertyPainter2D::PropertyPainter2D(const PropertyPainter2D* _other)
 {
 	OTAssertNullptr(_other->m_painter);
 	this->setPainter(_other->m_painter->createCopy());
+	m_filter = _other->m_filter;
 }
 
 ot::PropertyPainter2D::PropertyPainter2D(const PropertyBase& _base)

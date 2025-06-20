@@ -441,7 +441,10 @@
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\Painter2DDialogFilter.h">
-      <Filter>Header Files\Widgets</Filter>
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2DDialogFilterDefaults.h">
+      <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -782,7 +785,10 @@
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
     <ClCompile Include="src\Painter2DDialogFilter.cpp">
-      <Filter>Source Files\Widgets</Filter>
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DDialogFilterDefaults.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
