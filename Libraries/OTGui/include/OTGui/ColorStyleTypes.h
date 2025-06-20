@@ -235,6 +235,7 @@ namespace ot {
 		PythonFunction,
 		PythonComment,
 
+		PlotCurve,
 		PlotCurveDimmed,
 
 		ErrorForeground,
