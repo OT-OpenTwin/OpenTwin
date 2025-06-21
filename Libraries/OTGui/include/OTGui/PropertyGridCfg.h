@@ -63,7 +63,12 @@ namespace ot {
 
 		// Setter / Getter
 
+		//! @brief Sets the modal option.
+		//! If a proeprty grid is filled with the modal option all further fill requests for the property grid will be ignored until the modal option is explicitly unset.
+		//! @param _isModal Modal option.
 		void setIsModal(bool _isModal = true) { m_isModal = _isModal; };
+
+		//! @ref setIsModal
 		bool getIsModal() const { return m_isModal; };
 
 		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false);
