@@ -29,13 +29,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	if (modelProperty->getValue() == "LoadFromLibrary") {
 
 		// if it was selected use observer to send message to LMS
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER,ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, ot::JsonString(std::to_string(this->getEntityID()), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(this->getFolderName(), doc.GetAllocator()), doc.GetAllocator());
-			
-		getObserver()->sendMessageToLms(doc);
+		getObserver()->requestConfigForModelDialog(this->getEntityID(),"CiruitModels", this->getFolderName(),this->getFolderName());
 	}
 
 	return true;

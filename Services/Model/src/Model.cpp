@@ -3886,7 +3886,14 @@ void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::U
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
 }
 
-void Model::sendMessageToLms(ot::JsonDocument& doc) {
+void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::string _collectionType, const std::string& _targetFolder, const std::string& _modelType) {
+	ot::JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, ot::JsonString(std::to_string(_entityID), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(_targetFolder, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_ModelType, ot::JsonString(_modelType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->uiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	
 	Application::instance()->getCircuitModelHandler().tryToHandleAction(OT_ACTION_CMD_LMS_CreateConfig, doc);

@@ -163,11 +163,16 @@ std::string Application::handleGetListOfDocuments(ot::JsonDocument& _document) {
 std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 
 	std::string entityID = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string modelType = ot::json::getString(_document, OT_ACTION_PARAM_ModelType);
 	std::string uiUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 
-	// Create the config
+	// First get the metaData from db
 
+
+	//Create model dialog config with metadata
+	
 
 	// send Config to UI
 

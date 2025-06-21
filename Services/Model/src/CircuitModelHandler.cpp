@@ -44,7 +44,7 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 		actionIsHandled = true;
 	}
 	else if (_action == OT_ACTION_CMD_LMS_CreateConfig) {
-	/*	sendRequestOfDialogConfig(_doc);*/
+		//sendRequestOfDialogConfig(_doc);
 		actionIsHandled = true;
 	}
 		

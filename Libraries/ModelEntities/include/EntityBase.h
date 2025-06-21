@@ -28,7 +28,7 @@ public:
 
 	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
-	virtual void sendMessageToLms(ot::JsonDocument& doc) {};
+	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _modelType) {};
 	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) {};
 
 };
