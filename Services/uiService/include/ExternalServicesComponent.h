@@ -271,6 +271,7 @@ public:
 
 	// Property Grid
 	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleClearModalPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_ClearModalPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleFocusPropertyGridItem, ExternalServicesComponent, OT_ACTION_CMD_UI_FocusPropertyGridItem, ot::MessageType::ALL_MESSAGE_TYPES)
 		
 	// Version Graph

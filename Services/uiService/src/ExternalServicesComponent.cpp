@@ -3312,6 +3312,11 @@ std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& 
 	return "";
 }
 
+std::string ExternalServicesComponent::handleClearModalPropertyGrid(ot::JsonDocument& _document) {
+	AppBase::instance()->clearModalPropertyGrid();
+	return "";
+}
+
 std::string ExternalServicesComponent::handleFocusPropertyGridItem(ot::JsonDocument& _document) {
 	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Name);
 	std::string group = ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Group);

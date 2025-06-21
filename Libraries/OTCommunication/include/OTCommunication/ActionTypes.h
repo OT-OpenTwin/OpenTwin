@@ -152,6 +152,7 @@
 #define OT_ACTION_CMD_UI_SaveFileContent "UI.SaveFileContent"
 #define OT_ACTION_CMD_UI_FocusPropertyGridItem "UI.FocusPropertyGridItem"
 #define OT_ACTION_CMD_UI_FillPropertyGrid "UI.FillPropertyGrid"
+#define OT_ACTION_CMD_UI_ClearModalPropertyGrid "UI.ClearModalPropertyGrid"
 #define OT_ACTION_CMD_UI_AddMenuPage "UI.TTB.AddPage"
 #define OT_ACTION_CMD_UI_AddMenuGroup "UI.TTB.AddGroup"
 #define OT_ACTION_CMD_UI_AddMenuSubgroup "UI.TTB.AddSubgroup"
