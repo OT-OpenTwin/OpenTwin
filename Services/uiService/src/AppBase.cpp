@@ -1663,7 +1663,7 @@ void AppBase::removeNavigationTreeItems(const std::vector<ot::UID> & itemIds) {
 	m_projectNavigation->getTree()->deleteItems(itemIds);
 }
 
-void AppBase::clearNavigationTreeSelection(void) {
+void AppBase::clearNavigationTreeSelection() {
 	m_projectNavigation->getTree()->deselectAllItems(true);
 }
 
@@ -2358,37 +2358,35 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	for (auto selectedItem : selectedItems) 
-	{
+	for (auto selectedItem : selectedItems) {
 		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
-		if (selectedGraphicsItem) 
-		{
+		if (selectedGraphicsItem) {
 			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
 			continue;
 		}
 		
 		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
-		if (selectedConnection) 
-		{
+		if (selectedConnection) {
 			selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
 			continue;
 		}
 
-		if(selectedConnection == nullptr && selectedGraphicsItem == nullptr)
-		{
-			// Unknown selected
-			OTAssert(0, "Unknown graphics item selected");
-		}
+		OTAssert(0, "Unknown graphics element selected");
 	}
 	
 	m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-	clearNavigationTreeSelection();
-	
-	for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
+
 	{
-		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
-		setNavigationTreeItemSelected(treeID, true);	
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		clearNavigationTreeSelection();
+
+		for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs) {
+			ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
+			setNavigationTreeItemSelected(treeID, true);
+		}
 	}
+
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {

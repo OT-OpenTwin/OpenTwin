@@ -339,7 +339,7 @@ public:
 
 	void removeNavigationTreeItems(const std::vector<ot::UID> & itemIds);
 
-	void clearNavigationTreeSelection(void);
+	void clearNavigationTreeSelection();
 	
 	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
 
