@@ -40,7 +40,7 @@ public:
 	virtual void entityRemoved(EntityBase *entity) override;
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
-	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _modelType) override;
+	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) override;
 	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);

@@ -446,6 +446,12 @@
     <ClInclude Include="include\OTGui\Painter2DDialogFilterDefaults.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\ModelDialogCfg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\LibraryModel.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -789,6 +795,12 @@
     </ClCompile>
     <ClCompile Include="src\Painter2DDialogFilterDefaults.cpp">
       <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelDialogCfg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibraryModel.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

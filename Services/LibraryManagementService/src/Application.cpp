@@ -6,13 +6,18 @@
 // LDS header
 #include "Application.h"
 
-// OpenTwin header#
+// OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCore/ReturnMessage.h"
+
+
+
+
+
 
 //std header
 #include <chrono>
@@ -114,6 +119,80 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	return ot::AppExitCode::Success;
 }
 
+std::string Application::getModelInformation(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	auto result = db->getDocumentList(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
+	return result;
+}
+
+std::string Application::getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	auto result = db->getMetaData(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
+	return result;
+}
+
+void Application::createModelDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	
+	// First get model info from database
+	std::string modelInfos = getModelInformation(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
+
+	ot::JsonDocument modelInfosDoc;
+	modelInfosDoc.fromJson(modelInfos);
+
+
+	if (modelInfosDoc.IsObject()) {
+		ot::ConstJsonObject obj = modelInfosDoc.GetConstObject();
+		ot::ConstJsonArray docs = obj["Documents"].GetArray();
+
+		for (const ot::JsonValue& val : docs) {
+			ot::ConstJsonObject doc = val.GetObject();
+			std::string name = doc["Name"].GetString();
+			std::string fileName = doc["Filename"].GetString();
+			std::string modelType = doc["ModelType"].GetString();
+			std::string elementType = doc["ElementType"].GetString();
+			std::string metaDataId;
+
+			// Check if meta data exists
+			if (doc.HasMember("MetaDataID")) {
+				ot::ConstJsonObject metaDataIdObj = doc["MetaDataID"].GetObject();
+				if (metaDataIdObj.HasMember("$oid")) {
+					metaDataId = metaDataIdObj["$oid"].GetString();
+				}
+			}
+
+			// Create library model object
+			ot::LibraryModel model(name, fileName, modelType, elementType);
+
+			// Get the meta data
+			std::string metaDataInfos = getModelMetaData(circuitMetaDataCollection, "_id", metaDataId, _dbUserName, _dbUserPassword, _dbServerUrl);
+
+			auto metaDoc = bsoncxx::from_json(metaDataInfos);
+	
+
+			// Fill object with meta data
+			extractMetaToMap(metaDoc.view(), model);
+
+			// Library model is filled now fill the model dialog cfg
+
+			
+
+		}
+	}
+
+}
+
+void Application::extractMetaToMap(const bsoncxx::document::view& _doc, ot::LibraryModel& _model) {
+	if (_doc["Parameters"] && _doc["Parameters"].type() == bsoncxx::type::k_document) {
+		auto paramsDoc = _doc["Parameters"].get_document().value;
+
+		for (auto&& element : paramsDoc) {
+			if (element.type() == bsoncxx::type::k_double) {
+				std::string key = std::string(element.key());
+				std::string value = std::to_string(element.get_double().value);
+				_model.addData(key, value);
+			}
+		}
+	}
+}
+
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -165,11 +244,21 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	std::string entityID = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityID);
 	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
 	std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	std::string modelType = ot::json::getString(_document, OT_ACTION_PARAM_ModelType);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
 	std::string uiUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	// First get the metaData from db
+	//First check if model request is circuit model
+	if (!elementType.empty()) {
+		createModelDialogCfg(collectionName, "ElementType", elementType, dbUserName, dbUserPassword, dbServerUrl);
+	}
 
+
+	// get the metaData from db
+	
+	
 
 	//Create model dialog config with metadata
 	

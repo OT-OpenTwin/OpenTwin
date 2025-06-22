@@ -27,6 +27,7 @@
     <ClInclude Include="include\OTGui\CopyEntityInformation.h" />
     <ClInclude Include="include\OTGui\CopyInformation.h" />
     <ClInclude Include="include\OTGui\DefaultPropertyValues.h" />
+    <ClInclude Include="include\OTGui\LibraryModel.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObjectBase.h" />
@@ -52,6 +53,7 @@
     <ClInclude Include="include\OTGui\Grid.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
     <ClInclude Include="include\OTGui\MenuSeparatorCfg.h" />
+    <ClInclude Include="include\OTGui\ModelDialogCfg.h" />
     <ClInclude Include="include\OTGui\NavigationTreeItemIcon.h" />
     <ClInclude Include="include\OTGui\Painter2DDialogFilter.h" />
     <ClInclude Include="include\OTGui\Painter2DDialogFilterDefaults.h" />
@@ -164,6 +166,7 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
+    <ClCompile Include="src\LibraryModel.cpp" />
     <ClCompile Include="src\LineEditCfg.cpp" />
     <ClCompile Include="src\ManagedPropertyObject.cpp" />
     <ClCompile Include="src\MenuCfg.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="src\MenuEntryCfgFactory.cpp" />
     <ClCompile Include="src\MenuButtonCfg.cpp" />
     <ClCompile Include="src\MenuSeparatorCfg.cpp" />
+    <ClCompile Include="src\ModelDialogCfg.cpp" />
     <ClCompile Include="src\NavigationTreeItemIcon.cpp" />
     <ClCompile Include="src\Painter2DDialogFilter.cpp" />
     <ClCompile Include="src\Painter2DDialogFilterDefaults.cpp" />

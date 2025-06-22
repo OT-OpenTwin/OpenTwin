@@ -29,7 +29,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	if (modelProperty->getValue() == "LoadFromLibrary") {
 
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(this->getEntityID(),"CiruitModels", this->getFolderName(),this->getFolderName());
+		getObserver()->requestConfigForModelDialog(this->getEntityID(),"CircuitModels", this->getFolderName(),this->getFolderName());
 	}
 
 	return true;

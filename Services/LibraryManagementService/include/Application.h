@@ -11,6 +11,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTGui/ModelDialogCfg.h"
 
 
 // std header
@@ -35,6 +36,16 @@ public:
 
 private:
 
+	std::string getModelInformation(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	std::string getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	void createModelDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	void extractMetaToMap(const bsoncxx::document::view& _doc, ot::LibraryModel& _model);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action handler
@@ -50,5 +61,7 @@ private:
 	Application();
 	virtual ~Application();
 
+	std::string circuitMetaDataCollection = "CircuitMetaData";
+	std::string circuitMetaParameters = "Parameters";
 	
 };

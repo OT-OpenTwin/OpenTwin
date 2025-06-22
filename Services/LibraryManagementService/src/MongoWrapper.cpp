@@ -57,7 +57,9 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
     DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
     DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
 
-    
+    DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Libraries", "CircuitModels");
+    DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Libraries", "CircuitMetaData");
+
     
     try{
         DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
@@ -65,11 +67,16 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
 
         std::vector<std::string> columnNames;
         columnNames.push_back("Name");
+        columnNames.push_back("Filename");
+        columnNames.push_back("ModelType");
+        columnNames.push_back("ElementType");
+        columnNames.push_back("MetaDataID");
 
         auto query = bsoncxx::builder::basic::document{};
         auto queryArray = bsoncxx::builder::basic::array();
 
         auto builder = bsoncxx::builder::basic::document{};
+        builder.append(bsoncxx::builder::basic::kvp(_fieldType, _value));
         queryArray.append(builder);
 
         auto queryBuilderDoc = bsoncxx::builder::basic::document{};
@@ -104,6 +111,40 @@ std::string MongoWrapper::getDocumentList(const std::string& _collectionName, co
     }
     
     
+}
+
+std::string MongoWrapper::getMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+    DataBase::GetDataBase()->setUserCredentials(_dbUserName, _dbUserPassword);
+    DataBase::GetDataBase()->InitializeConnection(_dbServerUrl);
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+ 
+
+        bsoncxx::oid object_id{_value};
+
+        bsoncxx::builder::basic::document filter{};
+        filter.append(bsoncxx::builder::basic::kvp("_id", object_id));
+
+ 
+        auto result = docBase.GetDocument(filter.extract(), bsoncxx::document::view{});
+
+        if (!result) {
+            OT_LOG_E("No Document found");
+            return "";
+        }
+
+
+        auto view = result->view();
+
+        std::string fullDocJson = bsoncxx::to_json(view);
+
+        return fullDocJson;
+    }
+    catch (std::exception) {
+        OT_LOG_E("Getting document went wrong");
+        return "";
+    }
 }
 
 
