@@ -535,6 +535,9 @@
     <ClCompile Include="src\Painter2DEditDialogReferenceEntry.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\CartesianPlotCurve.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1012,6 +1015,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h">
       <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotCurve.h">
+      <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

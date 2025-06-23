@@ -452,6 +452,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
@@ -660,7 +661,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
-	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
@@ -869,6 +871,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 

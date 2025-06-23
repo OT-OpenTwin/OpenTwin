@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/Plot.h"
 #include "OTWidgets/PlotDataset.h"
+#include "OTWidgets/CartesianPlotCurve.h"
 
 ot::Plot::Plot() {
 

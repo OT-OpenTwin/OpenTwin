@@ -19,13 +19,13 @@
 #include <string>
 
 class QwtSymbol;
-class QwtPlotCurve;
 class QwtPolarCurve;
 
 namespace ot {
 
 	class PlotBase;
 	class PolarPlotData;
+	class CartesianPlotCurve;
 
 	class OT_WIDGETS_API_EXPORT PlotDataset {
 		OT_DECL_NOCOPY(PlotDataset)
@@ -80,16 +80,18 @@ namespace ot {
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
-		void setConfig(ot::Plot1DCurveCfg& _config) 
-		{
+		void setConfig(ot::Plot1DCurveCfg& _config) {
 			m_config = _config;
 		}
+
+		void setSelected(bool _isSelected);
+		bool isSelected() const { return m_isSelected; };
 
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
-		QwtPlotCurve* getCartesianCurve(void) ;
-		QwtPolarCurve* getPolarCurve(void);
+		CartesianPlotCurve* getCartesianCurve();
+		QwtPolarCurve* getPolarCurve();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -108,11 +110,12 @@ namespace ot {
 		PlotBase* m_ownerPlot = nullptr;
 
 		bool m_isAttatched = false;
+		bool m_isSelected = false;
 
 		PlotDatasetData m_data;
 		CoordinateFormatConverter m_CoordinateFormatConverter;
 		// Plot elements
-		QwtPlotCurve* m_cartesianCurve = nullptr;
+		CartesianPlotCurve* m_cartesianCurve = nullptr;
 
 		QwtPolarCurve* m_polarCurve = nullptr;
 		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 

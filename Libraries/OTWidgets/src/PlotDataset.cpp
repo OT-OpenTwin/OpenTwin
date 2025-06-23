@@ -12,18 +12,18 @@
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/PolarPlotData.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/CartesianPlotCurve.h"
 #include "OTWidgets/CoordinateFormatConverter.h"
+
 // Qwt header
 #include <qwt_symbol.h>
-#include <qwt_plot_curve.h>
 #include <qwt_polar_curve.h>
 #include "OTWidgets/PlotDataset.h"
 
 ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data) :
 	m_config(_config), m_data(std::move(_data))
 {
-	if (_ownerPlot != nullptr)
-	{
+	if (_ownerPlot != nullptr) {
 		setOwnerPlot(_ownerPlot);
 	}
 }
@@ -31,14 +31,12 @@ ot::PlotDataset::PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config
 ot::PlotDataset::~PlotDataset() {
 	this->detach();
 	
-	if (m_polarCurve != nullptr)
-	{
+	if (m_polarCurve != nullptr) {
 		delete m_polarCurve;
 		m_polarCurve = nullptr;
 		// point and data is deleted by the polar curve
 	}
-	if (m_cartesianCurve != nullptr)
-	{
+	if (m_cartesianCurve != nullptr) {
 		delete m_cartesianCurve;
 		m_cartesianCurve = nullptr;
 		delete m_cartesianCurvePointSymbol;
@@ -164,14 +162,21 @@ void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
 	}
 }
 
-QwtPlotCurve* ot::PlotDataset::getCartesianCurve(void)
-{
-	if (m_cartesianCurve != nullptr)
-	{
+void ot::PlotDataset::setSelected(bool _isSelected) {
+	if (_isSelected == m_isSelected) {
+		return;
+	}
+
+	m_isSelected = _isSelected;
+
+	this->updateCurveVisualization();
+}
+
+ot::CartesianPlotCurve* ot::PlotDataset::getCartesianCurve() {
+	if (m_cartesianCurve != nullptr) {
 		return m_cartesianCurve;
 	}
-	else
-	{
+	else {
 		assert(m_polarCurve != nullptr);
 		detach();
 		delete m_polarCurve;
@@ -185,14 +190,11 @@ QwtPlotCurve* ot::PlotDataset::getCartesianCurve(void)
 	}
 }
 
-QwtPolarCurve* ot::PlotDataset::getPolarCurve(void)
-{
-	if (m_polarCurve != nullptr)
-	{
+QwtPolarCurve* ot::PlotDataset::getPolarCurve(void) {
+	if (m_polarCurve != nullptr) {
 		return m_polarCurve;
 	}
-	else
-	{
+	else {
 		assert(m_cartesianCurve != nullptr);
 		detach();
 		delete m_cartesianCurve;
@@ -203,12 +205,12 @@ QwtPolarCurve* ot::PlotDataset::getPolarCurve(void)
 		attach();
 		return m_polarCurve;
 	}
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Data Setter / Getter
+
 void ot::PlotDataset::updateCurveVisualization(void) {
 	QPen linePen = QtFactory::toQPen(m_config.getLinePen());
 
@@ -216,6 +218,25 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	QBrush dimmedBrush = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush();
 	QPen dimmedPen(dimmedBrush, linePen.width());
 	QPen invisPen(QBrush(), 0., Qt::NoPen);
+	QPen outlinePen = QPen(cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush(), linePen.width() * 3.);
+
+	// Setup outline
+	if (m_isSelected) {
+		if (m_cartesianCurve != nullptr) {
+			m_cartesianCurve->setOutlinePen(outlinePen);
+		}
+		else {
+			//m_polarCurve->setOutlinePen(outlinePen);
+		}
+	}
+	else {
+		if (m_cartesianCurve != nullptr) {
+			m_cartesianCurve->setOutlinePen(QPen(Qt::NoPen));
+		}
+		else {
+			//m_polarCurve->setOutlinePen(QPen(Qt::NoPen));
+		}
+	}
 
 	// Setup curve
 	if (m_config.getVisible()) {
@@ -295,22 +316,19 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	}
 }
 
-const ot::PointsContainer ot::PlotDataset::getDisplayedPoints()
-{
+const ot::PointsContainer ot::PlotDataset::getDisplayedPoints() {
 	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	return points;
 }
 
-void ot::PlotDataset::buildCartesianCurve()
-{
-	m_cartesianCurve = new QwtPlotCurve(QString::fromStdString(m_config.getTitle()));
+void ot::PlotDataset::buildCartesianCurve() {
+	m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_cartesianCurvePointSymbol = new QwtSymbol();
 	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 }
 
-void ot::PlotDataset::buildPolarCurve()
-{
+void ot::PlotDataset::buildPolarCurve() {
 	m_polarCurve = new QwtPolarCurve(QString::fromStdString(m_config.getTitle()));
 	m_polarCurvePointSymbol = new QwtSymbol();
 	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
