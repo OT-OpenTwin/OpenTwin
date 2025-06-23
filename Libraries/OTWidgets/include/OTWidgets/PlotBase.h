@@ -79,8 +79,6 @@ namespace ot {
 
 		void clear(bool _clearCache);
 
-		void datasetSelectionChanged(PlotDataset* _selectedDataset);
-
 		//! \brief Returns the dataset for the given plot curve.
 		//! Returns NULL if the dataset does not exist.
 		//! The Plot keeps ownership of the dataset.
@@ -101,9 +99,12 @@ namespace ot {
 		//! @brief Returns all datasets.
 		virtual std::list<PlotDataset*> getAllDatasets(void) const = 0;
 
+		void requestResetItemSelection();
+		void requestCurveDoubleClicked(UID _treeItemUid, bool _hasControlModifier);
+
 	Q_SIGNALS:
-		void resetItemSelectionRequest(void);
-		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
+		void resetItemSelectionRequest();
+		void curveDoubleClicked(UID _entityID, bool _hasControlModifier);
 
 	protected:
 		virtual void clearCache(void) = 0;

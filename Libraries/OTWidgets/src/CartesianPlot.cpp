@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/PlotBase.h"
+#include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
 #include "OTWidgets/CartesianPlotAxis.h"
 #include "OTWidgets/CartesianPlotGrid.h"
@@ -53,7 +54,7 @@ ot::CartesianPlot::~CartesianPlot() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Plot
+// Virtual methods
 
 void ot::CartesianPlot::updateLegend(void) {
 	if (this->getConfiguration().getLegendVisible()) {
@@ -133,6 +134,42 @@ void ot::CartesianPlot::resetPlotView(void) {
 	}
 }
 
+void ot::CartesianPlot::mouseDoubleClickEvent(QMouseEvent* _event) {
+	QwtPlot::mouseDoubleClickEvent(_event);
+	if (_event->button() == Qt::LeftButton) {
+		int ix = 0;
+		QwtPlotCurve* curve = this->findNearestCurve(_event->pos(), ix);
+
+		if (curve) {
+			QPointF point = curve->sample(ix);
+
+			// Point in pixel coordinates
+			QPointF pxPoint(transform(xBottom, point.x()), transform(yLeft, point.y()));
+
+			// Distance to the mouse position in pixel coordinates
+			double dist = QPointF(_event->position() - pxPoint).manhattanLength();
+
+			const double pixelThreshold = 150.0;
+
+			if (dist <= pixelThreshold) {
+				PlotDataset* dataset = this->getOwner()->findDataset(curve);
+				if (!dataset) {
+					OT_LOG_E("Failed to find dataset from curve");
+					return;
+				}
+
+				this->getOwner()->requestCurveDoubleClicked(dataset->getEntityID(), _event->modifiers() & Qt::KeyboardModifier::ControlModifier);
+			}
+			else {
+				this->getOwner()->requestResetItemSelection();
+			}
+		}
+		else {
+			this->getOwner()->requestResetItemSelection();
+		}
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Grid
@@ -155,8 +192,7 @@ QwtPlotCurve * ot::CartesianPlot::findNearestCurve(const QPoint & _pos, int& _po
 
 	QwtPlotCurve * curve = nullptr;
 
-	for (QwtPlotItemIterator it = itemList().begin();
-		it != itemList().end(); ++it)
+	for (QwtPlotItemIterator it = itemList().begin(); it != itemList().end(); ++it)
 	{
 		if ((*it)->rtti() == QwtPlotItem::Rtti_PlotCurve)
 		{

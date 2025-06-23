@@ -53,14 +53,11 @@ ot::PlotBase::~PlotBase() {
 
 // Setter
 
-ot::AbstractPlot* ot::PlotBase::getPlot()
-{
-	if (m_currentPlotType == Plot1DCfg::PlotType::Cartesian)
-	{
+ot::AbstractPlot* ot::PlotBase::getPlot() {
+	if (m_currentPlotType == Plot1DCfg::PlotType::Cartesian) {
 		return m_cartesianPlot;
 	}
-	else
-	{
+	else {
 		return m_polarPlot;
 	}
 }
@@ -208,17 +205,12 @@ void ot::PlotBase::clear(bool _clearCache) {
 	return;
 }
 
-void ot::PlotBase::datasetSelectionChanged(PlotDataset * _selectedDataset) {
-	bool ctrlPressed = (QApplication::keyboardModifiers() & Qt::ControlModifier);
+void ot::PlotBase::requestResetItemSelection() {
+	Q_EMIT resetItemSelectionRequest();
+}
 
-	if (_selectedDataset == nullptr) {
-		if (!ctrlPressed) {
-			Q_EMIT resetItemSelectionRequest();
-		}
-	}
-	else {
-		Q_EMIT setItemSelectedRequest(_selectedDataset->getNavigationId(), ctrlPressed);
-	}
+void ot::PlotBase::requestCurveDoubleClicked(UID _entityID, bool _hasControlModifier) {
+	Q_EMIT curveDoubleClicked(_entityID, _hasControlModifier);
 }
 
 void ot::PlotBase::applyConfig(void) {
@@ -290,8 +282,7 @@ void ot::PlotBase::applyConfig(void) {
 	m_polarPlot->updateWholePlot();
 }
 
-std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit)
-{
+std::string ot::PlotBase::createAxisLabel(const std::string& _axisTitle, std::string _unit) {
 	_unit.erase(std::remove_if(_unit.begin(), _unit.end(), isspace), _unit.end());	
 	if (!_unit.empty())
 	{

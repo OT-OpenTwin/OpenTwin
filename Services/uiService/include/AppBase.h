@@ -335,6 +335,8 @@ public:
 
 	bool isTreeItemExpanded(ot::UID _itemID);
 
+	bool isTreeItemSelected(ot::UID _itemID);
+
 	void toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds);
 
 	void removeNavigationTreeItems(const std::vector<ot::UID> & itemIds);
@@ -535,6 +537,13 @@ private Q_SLOTS:
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
 	void slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Plot slots
+
+	void slotPlotResetItemSelectionRequest();
+	void slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier);
 
 private:
 	enum class AppState {

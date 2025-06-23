@@ -62,6 +62,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -1651,6 +1652,11 @@ bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
 	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
 }
 
+bool AppBase::isTreeItemSelected(ot::UID _itemID) {
+	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems(); 
+	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
+}
+
 void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
 	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
 
@@ -2045,6 +2051,9 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Bas
 
 	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newPlot, _viewInsertFlags);
+	
+	this->connect(newPlot->getPlot(), &ot::Plot::resetItemSelectionRequest, this, &AppBase::slotPlotResetItemSelectionRequest);
+	this->connect(newPlot->getPlot(), &ot::Plot::curveDoubleClicked, this, &AppBase::slotPlotCurveDoubleClicked);
 
 	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
@@ -3309,6 +3318,91 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	// If true is returned a new view was requested
 	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
 	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
+
+	// Get the potentially updated selection
+	ot::SelectionInformation newSelection = this->getSelectedNavigationTreeItems();
+
+	// Notifiy views about selection change
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Plot slots
+
+void AppBase::slotPlotResetItemSelectionRequest() {
+	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
+	if (!plot) {
+		OT_LOG_EA("Plot cast failed");
+		return;
+	}
+	
+	try {
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+
+		// Set plot selection
+		this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), true);
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+
+	this->runSelectionHandling(ot::SelectionOrigin::User);
+}
+
+void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier) {
+	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
+	if (!plot) {
+		OT_LOG_EA("Plot cast failed");
+		return;
+	}
+	
+	try {
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+
+		ot::UID treeId = ViewerAPI::getTreeIDFromModelEntityID(_entityID);
+
+		if (_hasControlModifier) {
+			this->toggleNavigationTreeItemSelection(treeId, false);
+
+			// Check if any curve will be visible after the operation
+			bool hasSelection = false;
+			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
+				if (data->getEntityID() == _entityID && !this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
+					hasSelection = true;
+					break;
+				}
+				else if (this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
+					hasSelection = true;
+					break;
+				}
+			}
+
+			// If no more curve is selected we select the plot itself and therefore all the curves
+			if (!hasSelection) {
+				this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), true);
+			}
+
+		}
+		else {
+			// Remove plot selection
+			this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), false);
+
+			// Reset selection for other curves in plot
+			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
+				if (data->getEntityID() != _entityID) {
+					this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()), false);
+				}
+			}
+
+			// Set curve selection
+			this->setNavigationTreeItemSelected(treeId, true);
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {

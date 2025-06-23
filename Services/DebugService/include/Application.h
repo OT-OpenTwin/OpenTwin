@@ -39,6 +39,7 @@ public:
 	void testTableBig(void);
 	
 	void createPlotOneCurve();
+	void createPlotTwoCurves();
 	void createFamilyOfCurves();
 	void createFamilyOfCurves3ParameterConst();
 	void createFamilyOfCurves3Parameter();
