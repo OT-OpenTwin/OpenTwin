@@ -99,6 +99,11 @@ namespace ot {
 		//! @brief Returns all datasets.
 		virtual std::list<PlotDataset*> getAllDatasets(void) const = 0;
 
+		//! @brief Sets the selected state of the curves in the plot.
+		//! Curves not in the list will be deselected.
+		//! @param _selectedCurves List of selected curves (by UID).
+		void setSelectedCurves(const UIDList& _selectedCurves);
+
 		void requestResetItemSelection();
 		void requestCurveDoubleClicked(UID _treeItemUid, bool _hasControlModifier);
 

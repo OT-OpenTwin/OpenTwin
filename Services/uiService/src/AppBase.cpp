@@ -3319,10 +3319,17 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
 	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
 
-	// Get the potentially updated selection
-	ot::SelectionInformation newSelection = this->getSelectedNavigationTreeItems();
-
 	// Notifiy views about selection change
+	ot::UIDList selectedUids;
+	m_viewerComponent->getSelectedModelEntityIDs(selectedUids);
+
+	for (auto& plot : m_plots) {
+		plot.second->getPlot()->setSelectedCurves(selectedUids);
+	}
+
+	for (auto& graphics : m_graphicsViews) {
+		graphics.second->getGraphicsView()->setSelectedElements(selectedUids);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

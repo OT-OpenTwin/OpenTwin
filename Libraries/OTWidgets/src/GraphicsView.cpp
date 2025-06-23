@@ -245,6 +245,19 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	this->blockSignals(false);
 }
 
+void ot::GraphicsView::setSelectedElements(const ot::UIDList& _uids) {
+	QSignalBlocker blocker(this);
+	QSignalBlocker blocker2(m_scene);
+
+	for (auto& item : m_items) {
+		item.second->getQGraphicsItem()->setSelected(std::find(_uids.begin(), _uids.end(), item.second->getGraphicsItemUid()) != _uids.end());
+	}
+
+	for (auto& conn : m_connections) {
+		conn.second->getQGraphicsItem()->setSelected(std::find(_uids.begin(), _uids.end(), conn.second->getConfiguration().getUid()) != _uids.end());
+	}
+}
+
 std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const {
 	std::list<ot::UID> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {

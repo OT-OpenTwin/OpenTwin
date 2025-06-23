@@ -205,6 +205,17 @@ void ot::PlotBase::clear(bool _clearCache) {
 	return;
 }
 
+void ot::PlotBase::setSelectedCurves(const UIDList& _selectedCurves) {
+	for (PlotDataset* dataset : this->getAllDatasets()) {
+		if (std::find(_selectedCurves.begin(), _selectedCurves.end(), dataset->getEntityID()) != _selectedCurves.end()) {
+			dataset->setSelected(true);
+		}
+		else {
+			dataset->setSelected(false);
+		}
+	}
+}
+
 void ot::PlotBase::requestResetItemSelection() {
 	Q_EMIT resetItemSelectionRequest();
 }

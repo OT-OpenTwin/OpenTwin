@@ -116,6 +116,13 @@ namespace ot {
 
 		void addItem(ot::GraphicsItem* _item);
 		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
+		
+		//! @brief Selects the item with the given UID.
+		//! Items not in the list will be deselected.
+		//! During this operation no signals will be emitted.
+		//! @param _uids List of item UIDs to select.
+		void setSelectedElements(const ot::UIDList& _uids);
+
 		std::list<ot::UID> getSelectedItemUIDs() const;
 		std::list<GraphicsItem*> getSelectedGraphicsItems() const;
 
