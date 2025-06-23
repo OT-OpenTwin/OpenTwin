@@ -57,6 +57,18 @@ void EntityResult1DCurve::createProperties(void)
 	EntityPropertiesGuiPainter* colorProp = EntityPropertiesGuiPainter::createProperty("General", "Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurve), "", getProperties());
 	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
+	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 1, 1, 99, "", getProperties());
+	widthProp->setAllowCustomValues(false);
+
+	EntityPropertiesSelection* selectionProp = EntityPropertiesSelection::createProperty("General", "Line Style", {
+		ot::toString(ot::LineStyle::SolidLine),
+		ot::toString(ot::LineStyle::DashLine),
+		ot::toString(ot::LineStyle::DotLine),
+		ot::toString(ot::LineStyle::DashDotLine),
+		ot::toString(ot::LineStyle::DashDotDotLine)
+		},
+		ot::toString(ot::LineStyle::SolidLine), "", getProperties());
+
 	getProperties().forceResetUpdateForAllProperties();
 }
 
@@ -71,8 +83,15 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	
 	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
 	ot::PenFCfg penCfg(painter->createCopy());
+	try {
+		penCfg.setWidth(static_cast<double>(PropertyHelper::getIntegerPropertyValue(this, "Line Width")));
+	}
+	catch (...) {}
+	try {
+		penCfg.setStyle(ot::stringToLineStyle(PropertyHelper::getSelectionPropertyValue(this, "Line Style")));
+	}
+	catch (...) {}
 	curveCfg.setLinePen(penCfg);
-
 
 	std::string curveLabel("");
 	
@@ -95,9 +114,25 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	return curveCfg;
 }
 
-void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
-{
-	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().painter(), this, "Color");
+void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
+	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().getPainter(), this, "Color");
+	
+	try {
+		EntityPropertiesInteger* prop = PropertyHelper::getIntegerProperty(this, "Line Width");
+		if (prop) {
+			prop->setValue(static_cast<long>(_curve.getLinePen().getWidth()));
+		}
+	}
+	catch (...) {}
+
+	try {
+		EntityPropertiesSelection* prop = PropertyHelper::getSelectionProperty(this, "Line Style");
+		if (prop) {
+			prop->setValue(ot::toString(_curve.getLinePen().getStyle()));
+		}
+	}
+	catch (...) {}
+
 	m_queryInformation = _curve.getQueryInformation();
 }
 
