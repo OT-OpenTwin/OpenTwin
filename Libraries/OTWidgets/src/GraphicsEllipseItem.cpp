@@ -43,7 +43,7 @@ bool ot::GraphicsEllipseItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 QMarginsF ot::GraphicsEllipseItem::getOutlineMargins(void) const {
 	const GraphicsEllipseItemCfg* cfg = this->getItemConfiguration<GraphicsEllipseItemCfg>();
 	OTAssertNullptr(cfg);
-	double margs = cfg->getOutline().width() / 2.;
+	double margs = cfg->getOutline().getWidth() / 2.;
 	return QMarginsF(margs, margs, margs, margs);
 }
 

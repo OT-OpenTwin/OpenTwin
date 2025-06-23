@@ -12,12 +12,12 @@
 std::string ot::toString(LineStyle _style) {
 	switch (_style)
 	{
-	case ot::NoLine: return "NoLine";
-	case ot::SolidLine: return "SolidLine";
-	case ot::DashLine: return "DashLine";
-	case ot::DotLine: return "DotLine";
-	case ot::DashDotLine: return "DashDotLine";
-	case ot::DashDotDotLine: return "DashDotDotLine";
+	case LineStyle::NoLine: return "None";
+	case LineStyle::SolidLine: return "Solid";
+	case LineStyle::DashLine: return "Dashed";
+	case LineStyle::DotLine: return "Dotted";
+	case LineStyle::DashDotLine: return "Dash Dot";
+	case LineStyle::DashDotDotLine: return "Dash Dot Dot";
 	default:
 		OT_LOG_E("Unknown line style (" + std::to_string((int)_style) + ")");
 		return "NoLine";
@@ -25,24 +25,24 @@ std::string ot::toString(LineStyle _style) {
 }
 
 ot::LineStyle ot::stringToLineStyle(const std::string& _style) {
-	if (_style == toString(NoLine)) return NoLine;
-	else if (_style == toString(SolidLine)) return SolidLine;
-	else if (_style == toString(DashLine)) return DashLine;
-	else if (_style == toString(DotLine)) return DotLine;
-	else if (_style == toString(DashDotLine)) return DashDotLine;
-	else if (_style == toString(DashDotDotLine)) return DashDotDotLine;
+	if (_style == toString(LineStyle::NoLine)) return LineStyle::NoLine;
+	else if (_style == toString(LineStyle::SolidLine)) return LineStyle::SolidLine;
+	else if (_style == toString(LineStyle::DashLine)) return LineStyle::DashLine;
+	else if (_style == toString(LineStyle::DotLine)) return LineStyle::DotLine;
+	else if (_style == toString(LineStyle::DashDotLine)) return LineStyle::DashDotLine;
+	else if (_style == toString(LineStyle::DashDotDotLine)) return LineStyle::DashDotDotLine;
 	else {
 		OT_LOG_E("Unknown line style \"" + _style + "\"");
-		return NoLine;
+		return LineStyle::NoLine;
 	}
 }
 
 std::string ot::toString(LineCapStyle _cap) {
 	switch (_cap)
 	{
-	case ot::FlatCap: return "Flat";
-	case ot::SquareCap: return "Square";
-	case ot::RoundCap: return "Round";
+	case LineCapStyle::FlatCap: return "Flat";
+	case LineCapStyle::SquareCap: return "Square";
+	case LineCapStyle::RoundCap: return "Round";
 	default:
 		OT_LOG_E("Unknown cap style (" + std::to_string((int)_cap) + ")");
 		return "Square";
@@ -50,22 +50,22 @@ std::string ot::toString(LineCapStyle _cap) {
 }
 
 ot::LineCapStyle ot::stringToCapStyle(const std::string& _cap) {
-	if (_cap == toString(FlatCap)) return FlatCap;
-	else if (_cap == toString(SquareCap)) return SquareCap;
-	else if (_cap == toString(RoundCap)) return RoundCap;
+	if (_cap == toString(LineCapStyle::FlatCap)) return LineCapStyle::FlatCap;
+	else if (_cap == toString(LineCapStyle::SquareCap)) return LineCapStyle::SquareCap;
+	else if (_cap == toString(LineCapStyle::RoundCap)) return LineCapStyle::RoundCap;
 	else {
 		OT_LOG_E("Unknown cap style \"" + _cap + "\"");
-		return SquareCap;
+		return LineCapStyle::SquareCap;
 	}
 }
 
 std::string ot::toString(LineJoinStyle _join) {
 	switch (_join)
 	{
-	case ot::MiterJoin: return "Milter";
-	case ot::BevelJoin: return "Bevel";
-	case ot::RoundJoin: return "Round";
-	case ot::SvgMiterJoin: return "SvgMiter";
+	case ot::LineJoinStyle::MiterJoin: return "Milter";
+	case ot::LineJoinStyle::BevelJoin: return "Bevel";
+	case ot::LineJoinStyle::RoundJoin: return "Round";
+	case ot::LineJoinStyle::SvgMiterJoin: return "SvgMiter";
 	default:
 		OT_LOG_E("Unknown join style (" + std::to_string((int)_join) + ")");
 		return "Bevel";
@@ -73,13 +73,13 @@ std::string ot::toString(LineJoinStyle _join) {
 }
 
 ot::LineJoinStyle ot::stringToJoinStyle(const std::string& _join) {
-	if (_join == toString(MiterJoin)) return MiterJoin;
-	else if (_join == toString(BevelJoin)) return BevelJoin;
-	else if (_join == toString(RoundJoin)) return RoundJoin;
-	else if (_join == toString(SvgMiterJoin)) return SvgMiterJoin;
+	if (_join == toString(LineJoinStyle::MiterJoin)) return LineJoinStyle::MiterJoin;
+	else if (_join == toString(LineJoinStyle::BevelJoin)) return LineJoinStyle::BevelJoin;
+	else if (_join == toString(LineJoinStyle::RoundJoin)) return LineJoinStyle::RoundJoin;
+	else if (_join == toString(LineJoinStyle::SvgMiterJoin)) return LineJoinStyle::SvgMiterJoin;
 	else {
 		OT_LOG_E("Unknown join style \"" + _join + "\"");
-		return BevelJoin;
+		return LineJoinStyle::BevelJoin;
 	}
 }
 
@@ -102,7 +102,7 @@ ot::PenCfg::PenCfg(int _width, DefaultColor _color) : PenCfg(_width, new FillPai
 ot::PenCfg::PenCfg(int _width, const Color& _color) : PenCfg(_width, new FillPainter2D(_color)) {};
 
 ot::PenCfg::PenCfg(int _width, Painter2D* _painter)
-	: m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
+	: m_width(_width), m_painter(_painter), m_style(LineStyle::SolidLine), m_cap(LineCapStyle::SquareCap), m_join(LineJoinStyle::BevelJoin)
 {
 	if (!m_painter) {
 		m_painter = new FillPainter2D(Black);
@@ -174,18 +174,18 @@ void ot::PenCfg::setPainter(Painter2D* _painter) {
 	m_painter = _painter;
 }
 
-ot::Painter2D* ot::PenCfg::takePainter(void) {
+ot::Painter2D* ot::PenCfg::takePainter() {
 	Painter2D* ret = m_painter;
 	m_painter = new FillPainter2D(Black);
 	return ret;
 }
 
-ot::PenFCfg ot::PenCfg::toPenFCfg(void) const {
+ot::PenFCfg ot::PenCfg::toPenFCfg() const {
 	if (m_painter) {
-		return PenFCfg((double)m_width, m_painter->createCopy());
+		return PenFCfg(static_cast<double>(m_width), m_painter->createCopy());
 	}
 	else {
-		return PenFCfg((double)m_width, Color());
+		return PenFCfg(static_cast<double>(m_width), Color());
 	}
 }
 
@@ -208,7 +208,7 @@ ot::PenFCfg::PenFCfg(double _width, DefaultColor _color) : PenFCfg(_width, new F
 ot::PenFCfg::PenFCfg(double _width, const Color& _color) : PenFCfg(_width, new FillPainter2D(_color)) {}
 
 ot::PenFCfg::PenFCfg(double _width, Painter2D* _painter) : 
-	m_width(_width), m_painter(_painter), m_style(SolidLine), m_cap(SquareCap), m_join(BevelJoin)
+	m_width(_width), m_painter(_painter), m_style(LineStyle::SolidLine), m_cap(LineCapStyle::SquareCap), m_join(LineJoinStyle::BevelJoin)
 {
 	if (!m_painter) {
 		m_painter = new FillPainter2D(Black);
@@ -277,17 +277,17 @@ void ot::PenFCfg::setPainter(Painter2D* _painter) {
 	m_painter = _painter;
 }
 
-ot::Painter2D* ot::PenFCfg::takePainter(void) {
+ot::Painter2D* ot::PenFCfg::takePainter() {
 	Painter2D* ret = m_painter;
 	m_painter = new FillPainter2D(Black);
 	return ret;
 }
 
-ot::PenCfg ot::PenFCfg::toPenCfg(void) const {
+ot::PenCfg ot::PenFCfg::toPenCfg() const {
 	if (m_painter) {
-		return PenCfg((int)m_width, m_painter->createCopy());
+		return PenCfg(static_cast<int>(m_width), m_painter->createCopy());
 	}
 	else {
-		return PenCfg((int)m_width, Color());
+		return PenCfg(static_cast<int>(m_width), Color());
 	}
 }

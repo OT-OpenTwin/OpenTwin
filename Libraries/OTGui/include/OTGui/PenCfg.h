@@ -15,7 +15,7 @@ namespace ot {
 	class Painter2D;
 
 	//! @brief Line style.
-	enum LineStyle {
+	enum class LineStyle {
 		NoLine,
 		SolidLine,
 		DashLine,
@@ -25,14 +25,14 @@ namespace ot {
 	};
 
 	//! @brief Line cap style.
-	enum LineCapStyle {
+	enum class LineCapStyle {
 		FlatCap,
 		SquareCap,
 		RoundCap
 	};
 
 	//! @brief Line join style.
-	enum LineJoinStyle {
+	enum class LineJoinStyle {
 		MiterJoin,
 		BevelJoin,
 		RoundJoin,
@@ -114,41 +114,41 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 
 		//! @brief Painter.
-		inline const Painter2D* painter(void) const { return m_painter; };
+		inline const Painter2D* getPainter(void) const { return m_painter; };
 
 		//! @brief Replaces the current painter with a default painter and returns the old painter.
 		//! The caller takes ownership of the painter.
-		Painter2D* takePainter(void);
+		Painter2D* takePainter();
 
 		//! @brief Set the line width.
 		//! @param _w Width to set.
 		inline void setWidth(int _w) { m_width = _w; };
 
 		//! @brief Line width.
-		inline int width(void) const { return m_width; };
+		inline int getWidth() const { return m_width; };
 
 		//! @brief Set the line style.
 		//! @param _style Style to set.
 		inline void setStyle(LineStyle _style) { m_style = _style; };
 
 		//! @brief Line style.
-		inline LineStyle style(void) const { return m_style; };
+		inline LineStyle getStyle() const { return m_style; };
 
 		//! @brief Set the line cap style.
 		//! @param _cap Cap style to set.
 		inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
 
 		//! @brief Cap style.
-		inline LineCapStyle cap(void) const { return m_cap; };
+		inline LineCapStyle getCap() const { return m_cap; };
 
 		//! @brief Set the line join style.
 		//! @param _style Join style to set.
 		inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
 
 		//! @brief Line join style.
-		inline LineJoinStyle joinStyle(void) const { return m_join; };
+		inline LineJoinStyle getJoinStyle() const { return m_join; };
 
-		PenFCfg toPenFCfg(void) const;
+		PenFCfg toPenFCfg() const;
 
 	private:
 		Painter2D* m_painter; //! @brief Painter.
@@ -230,41 +230,41 @@ namespace ot {
 		void setPainter(Painter2D* _painter);
 
 		//! @brief Painter.
-		inline const Painter2D* painter(void) const { return m_painter; };
+		inline const Painter2D* getPainter() const { return m_painter; };
 
 		//! @brief Replaces the current painter with a default painter and returns the old painter.
 		//! The caller takes ownership of the painter.
-		Painter2D* takePainter(void);
+		Painter2D* takePainter();
 
 		//! @brief Set the line width.
 		//! @param _w Width to set.
 		inline void setWidth(double _w) { m_width = _w; };
 
 		//! @brief Line width.
-		inline double width(void) const { return m_width; };
+		inline double getWidth() const { return m_width; };
 
 		//! @brief Set the line style.
 		//! @param _style Style to set.
 		inline void setStyle(LineStyle _style) { m_style = _style; };
 
 		//! @brief Line style.
-		inline LineStyle style(void) const { return m_style; };
+		inline LineStyle getStyle() const { return m_style; };
 
 		//! @brief Set the line cap style.
 		//! @param _cap Cap style to set.
 		inline void setCap(LineCapStyle _cap) { m_cap = _cap; };
 
 		//! @brief Cap style.
-		inline LineCapStyle cap(void) const { return m_cap; };
+		inline LineCapStyle getCap() const { return m_cap; };
 
 		//! @brief Set the line join style.
 		//! @param _style Join style to set.
 		inline void setJoinStyle(LineJoinStyle _join) { m_join = _join; };
 
 		//! @brief Line join style.
-		inline LineJoinStyle joinStyle(void) const { return m_join; };
+		inline LineJoinStyle getJoinStyle() const { return m_join; };
 
-		PenCfg toPenCfg(void) const;
+		PenCfg toPenCfg() const;
 
 	private:
 		Painter2D* m_painter; //! @brief Painter.

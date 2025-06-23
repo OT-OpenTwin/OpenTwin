@@ -1841,8 +1841,8 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	graphics->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
 	ot::PenFCfg newOutline;
 	newOutline.setWidth(.8);
-	newOutline.setCap(ot::RoundCap);
-	newOutline.setStyle(ot::DotLine);
+	newOutline.setCap(ot::LineCapStyle::RoundCap);
+	newOutline.setStyle(ot::LineStyle::DotLine);
 	graphics->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	//m_ExternalServicesComponent->service

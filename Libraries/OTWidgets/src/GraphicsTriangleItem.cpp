@@ -46,7 +46,7 @@ bool ot::GraphicsTriangleItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 QMarginsF ot::GraphicsTriangleItem::getOutlineMargins(void) const {
 	const GraphicsTriangleItemCfg* cfg = this->getItemConfiguration<GraphicsTriangleItemCfg>();
 	OTAssertNullptr(cfg);
-	double margs = cfg->getOutline().width() / 2.;
+	double margs = cfg->getOutline().getWidth() / 2.;
 	return QMarginsF(margs, margs, margs, margs);
 }
 

@@ -73,7 +73,7 @@ namespace ot {
 		//! \brief Set the line width.
 		//! The value must be greater or equal to 0.
 		void setWidth(double _width) { m_lineStyle.setWidth(_width); };
-		double getWidth(void) const { return m_lineStyle.width(); };
+		double getWidth(void) const { return m_lineStyle.getWidth(); };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -81,7 +81,7 @@ namespace ot {
 		void setPainter(Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
 
 		//! @brief Background painter.
-		const Painter2D* getPainter(void) const { return m_lineStyle.painter(); };
+		const Painter2D* getPainter(void) const { return m_lineStyle.getPainter(); };
 
 		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
 		const PenFCfg& getLineStyle(void) const { return m_lineStyle; };

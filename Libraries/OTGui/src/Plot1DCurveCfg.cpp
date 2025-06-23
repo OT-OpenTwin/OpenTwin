@@ -146,7 +146,7 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 const ot::Color& ot::Plot1DCurveCfg::getLinePenColor() const
 {
 
-	const ot::Painter2D* painter = m_linePen.painter();
+	const ot::Painter2D* painter = m_linePen.getPainter();
 	const ot::FillPainter2D* fillPainter = dynamic_cast<const ot::FillPainter2D*>(painter);
 	if (fillPainter != nullptr)
 	{

@@ -79,7 +79,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	PenFCfg borderOutline(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
 	if (m_config.getName() == _activeVersion) {
-		borderOutline.setStyle(ot::DotLine);
+		borderOutline.setStyle(LineStyle::DotLine);
 		border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 		m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
 		m_nameItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));

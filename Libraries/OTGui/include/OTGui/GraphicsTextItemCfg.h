@@ -47,7 +47,7 @@ namespace ot {
 		//! \brief Sets the text painter.
 		//! The item takes ownership of the painter.
 		void setTextPainter(Painter2D* _painter) { m_textStyle.setPainter(_painter); };
-		const Painter2D* getTextPainter(void) const { return m_textStyle.painter(); };
+		const Painter2D* getTextPainter(void) const { return m_textStyle.getPainter(); };
 
 		void setTextLineWidth(double _width) { m_textStyle.setWidth(_width); };
 

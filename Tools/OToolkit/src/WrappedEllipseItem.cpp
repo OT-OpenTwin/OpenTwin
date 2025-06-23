@@ -91,8 +91,8 @@ void WrappedEllipseItem::fillPropertyGrid(void) {
 	PropertyGroup* ellipseGroup = new PropertyGroup("Ellipse");
 	ellipseGroup->addProperty(new PropertyDouble("Radius X", this->getRadiusX(), 0., std::numeric_limits<double>::max()));
 	ellipseGroup->addProperty(new PropertyDouble("Radius Y", this->getRadiusY(), 0., std::numeric_limits<double>::max()));
-	ellipseGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	ellipseGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
+	ellipseGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
+	ellipseGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	ellipseGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 	
 	cfg.addRootGroup(ellipseGroup);

@@ -98,8 +98,8 @@ void WrappedPolygonItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 
 	PropertyGroup* polygonGroup = new PropertyGroup("Polygon");
-	polygonGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	polygonGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
+	polygonGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
+	polygonGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	polygonGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 	polygonGroup->addProperty(new PropertyBool("Fill Polygon", this->getFillPolygon()));
 

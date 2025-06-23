@@ -85,14 +85,14 @@ namespace ot {
 		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
 
 		//! @brief Outline painter.
-		const Painter2D* getOutlinePainter(void) const { return m_outline.painter(); };
+		const Painter2D* getOutlinePainter(void) const { return m_outline.getPainter(); };
 
 		//! @brief Set the outline width.
 		//! @param _w Width to set.
 		void setOutlineWidth(double _w) { m_outline.setWidth(_w); };
 
 		//! @brief Outline width.
-		double getOutlineWidth(void) const { return m_outline.width(); };
+		double getOutlineWidth(void) const { return m_outline.getWidth(); };
 
 		//! \brief Set the fill property.
 		//! \see getFillPolygon
