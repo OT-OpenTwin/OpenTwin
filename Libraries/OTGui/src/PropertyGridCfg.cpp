@@ -73,8 +73,9 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 			m_rootGroups.push_back(newGroup);
 		}
 	}
-
-	m_isModal = json::getBool(_object, "IsModal");
+	if (json::exists(_object, "IsModal")) {
+		m_isModal = json::getBool(_object, "IsModal");
+	}
 }
 
 void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, const PropertyBase::MergeMode& _mergeMode) {
