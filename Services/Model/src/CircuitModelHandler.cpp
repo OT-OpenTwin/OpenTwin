@@ -30,7 +30,7 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 	bool actionIsHandled = false;
 
 	if (_action == m_buttonAddCircuitModel.GetFullDescription()) {
-	/*	createModelDialog();*/
+		/*createModelDialog();*/
 		actionIsHandled = true;
 	}
 	else if (_action == OT_ACTION_PARAM_MODEL_AddCircuitModelToProject) {
@@ -38,16 +38,11 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 		
 		createModelTextEntity(model);
 		Model* modelComp = Application::instance()->getModel();
-		modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
-*/
+		modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);*/
+
 
 		actionIsHandled = true;
-	}
-	else if (_action == OT_ACTION_CMD_LMS_CreateConfig) {
-		//sendRequestOfDialogConfig(_doc);
-		actionIsHandled = true;
-	}
-		
+	}	
 	return actionIsHandled;
 
 }
@@ -148,6 +143,7 @@ void CircuitModelHandler::createModelTextEntity(std::string _modelName) {
 	m_forceVisible.push_back(false);
 }
 
-void CircuitModelHandler::sendRequestOfDialogConfig(ot::JsonDocument& _doc) {
-	m_libraryMangementWrapper.requestCreateConfig(_doc);
+std::string CircuitModelHandler::sendRequestOfDialogConfig(ot::JsonDocument& _doc) {
+	std::string response = m_libraryMangementWrapper.requestCreateConfig(_doc);
+	return response;
 }

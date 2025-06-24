@@ -77,6 +77,8 @@ public:
 		OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleVisualisationDataRequest, Application, OT_ACTION_CMD_MODEL_RequestVisualisationData, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleShowTable, Application, OT_ACTION_CMD_UI_TABLE_Setup, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_MODEL_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_MODEL_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
 		
 	// Versions
 
@@ -176,6 +178,7 @@ public:
 
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
 	CircuitModelHandler& getCircuitModelHandler() { return m_circuitModelHandler; }
+	LibraryManagementWrapper& getLibraryManagementWrapper() { return m_libraryManagementWrapper	; }
 
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
@@ -206,6 +209,7 @@ private:
 	ViewVisualisationHandler m_visualisationHandler;
 	CopyPasteHandler m_copyPasteHandler;
 	CircuitModelHandler m_circuitModelHandler;
+	LibraryManagementWrapper m_libraryManagementWrapper;
 
 	Application();
 	~Application();

@@ -130,6 +130,8 @@
 #define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
+#define OT_ACTION_CMD_MODEL_ModelDialogConfirmed "Model.ModelDialog.Confirmed"
+#define OT_ACTION_CMD_MODEL_ModelDialogCanceled "Model.ModelDialog.Canceled"
 
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
@@ -172,6 +174,9 @@
 #define OT_ACTION_CMD_UI_AddSettingsData "UI.AddSettingsData"
 #define OT_ACTION_CMD_UI_SettingsItemChanged "UI.SettingsData.ItemChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_ModelDialog "UI.ModelDialog"
+#define OT_ACTION_CMD_UI_ModelDialogConfirmed "UI.ModelDialog.Confirmed"
+#define OT_ACTION_CMD_UI_ModelDialogCanceled "UI.ModelDialog.Canceled"
 #define OT_ACTION_CMD_UI_MessageDialog "UI.MessageDialog"
 #define OT_ACTION_CMD_UI_MessageDialogValue "UI.MessageDialogValue"
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
@@ -340,6 +345,7 @@
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ModelType "ModelType"
+#define OT_ACTION_PARAM_ModelInfo "ModelInfo"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ElementType "ElementType"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"

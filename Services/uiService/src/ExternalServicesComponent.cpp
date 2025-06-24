@@ -30,6 +30,7 @@
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
+#include "OTGui/ModelDialogCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/MessageDialogCfg.h"
@@ -4161,6 +4162,27 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 
 	std::string response;
 	sendHttpRequest(EXECUTE, info, responseDoc, response);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleModelDialog(ot::JsonDocument& _document) {
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+
+	ot::ModelDialogCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+
 
 	return "";
 }

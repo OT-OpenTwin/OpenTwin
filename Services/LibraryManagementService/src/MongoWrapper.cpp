@@ -119,14 +119,12 @@ std::string MongoWrapper::getMetaData(const std::string& _collectionName, const 
 
     try {
         DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
- 
 
         bsoncxx::oid object_id{_value};
 
         bsoncxx::builder::basic::document filter{};
         filter.append(bsoncxx::builder::basic::kvp("_id", object_id));
 
- 
         auto result = docBase.GetDocument(filter.extract(), bsoncxx::document::view{});
 
         if (!result) {
@@ -136,10 +134,8 @@ std::string MongoWrapper::getMetaData(const std::string& _collectionName, const 
 
 
         auto view = result->view();
-
-        std::string fullDocJson = bsoncxx::to_json(view);
-
-        return fullDocJson;
+        std::string metaDataJson = bsoncxx::to_json(view);
+        return metaDataJson;
     }
     catch (std::exception) {
         OT_LOG_E("Getting document went wrong");

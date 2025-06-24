@@ -995,6 +995,32 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	return ot::ReturnMessage().toJson();
 }
 
+std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
+	std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
+	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	// First add the model entity to the Project
+	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
+
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, selectedModel);
+
+	return "";
+}
+
+std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, selectedModel);
+
+	return "";
+}
+
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter

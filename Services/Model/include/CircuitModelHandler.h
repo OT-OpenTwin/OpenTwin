@@ -39,7 +39,7 @@ private:
 
 	void createModelDialog();
 	void createModelTextEntity(std::string _modelName);
-	void sendRequestOfDialogConfig(ot::JsonDocument& _doc);
+	std::string sendRequestOfDialogConfig(ot::JsonDocument& _doc);
 	ot::MenuButtonDescription m_buttonAddCircuitModel;
 	LibraryManagementWrapper m_libraryMangementWrapper;
 

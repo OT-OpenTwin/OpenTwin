@@ -342,6 +342,7 @@ public:
 	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleModelDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_ModelDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 
 public Q_SLOTS:
 	char *performAction(const char *json, const char *senderIP);

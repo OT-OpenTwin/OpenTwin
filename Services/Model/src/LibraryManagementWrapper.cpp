@@ -3,11 +3,25 @@
 #include "stdafx.h"
 #include "LibraryManagementWrapper.h"
 #include "Application.h"
+#include "Model.h"
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "DataBase.h"
 #include "Connection/ConnectionAPI.h"
+#include "OTCore/String.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTGui/PropertyStringList.h"
+#include "OTCore/ReturnMessage.h"
+#include "EntityFileText.h"
+#include "OTCore/FolderNames.h"
+#include "OTCore/EncodingGuesser.h"
+#include "EntityResultTextData.h"
+#include "EntityBinaryData.h"
+#include "EntityBlock.h"
+
+
 
 std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 
@@ -125,13 +139,13 @@ std::string LibraryManagementWrapper::getCircuitModel(std::string _modelName) {
 	return rMsg.getWhat();	
 }
 
-std::string LibraryManagementWrapper::requestCreateConfig(ot::JsonDocument& _doc) {
+std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument& _doc) {
 	std::string lmsResonse;
 	
+	/* In case of error:
+		 Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
+		 Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min*/
 
-	// In case of error:
-		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
-		// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
 	const int maxCt = 30;
 	int ct = 1;
 	bool ok = false;
@@ -139,7 +153,7 @@ std::string LibraryManagementWrapper::requestCreateConfig(ot::JsonDocument& _doc
 	do {
 		lmsResonse.clear();
 		if (!(ok = ot::msg::send(Application::instance()->getServiceURL(), m_lmsLocalUrl, ot::EXECUTE, _doc.toJson(), lmsResonse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-			OT_LOG_E("Getting Models from LMS failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			OT_LOG_E("Requesting config failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
 
@@ -147,17 +161,91 @@ std::string LibraryManagementWrapper::requestCreateConfig(ot::JsonDocument& _doc
 	} while (!ok && ct++ <= maxCt);
 
 	if (!ok) {
-		OT_LOG_E("Failed to get Models");
+		OT_LOG_E("Failed to request config");
 		return {};
 	}
 
-	std::list<std::string> listOfModels;
+	return lmsResonse;
+}
 
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(lmsResonse);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Get Models failed: " + rMsg.getWhat());
-		return {};
+void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName) {
+
+	ot::JsonDocument circuitModelDoc;
+	circuitModelDoc.fromJson(_modelInfo);
+
+	std::string modelText = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_Content);
+	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
+	
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	ot::UID entIDData = model->createEntityUID();
+	ot::UID entIDTopo = model->createEntityUID();
+
+	// Create EntityFile Text
+	std::unique_ptr<EntityFileText> circuitModel;
+	circuitModel.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+
+	//Create the data entity
+	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	fileContent.setData(modelText.data(), modelText.size());
+	fileContent.StoreToDataBase();
+
+	//ot::EncodingGuesser guesser;
+
+	// set the data entity 
+	circuitModel->setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
+	circuitModel->setFileProperties("", "", "");
+
+	circuitModel->setTextEncoding(ot::TextEncoding::UTF8);
+
+	EntityPropertiesString* nameProp = EntityPropertiesString::createProperty("Model", "Name", _elementType, "Default", circuitModel->getProperties());
+	nameProp->setReadOnly(true);
+
+	EntityPropertiesString* modelTypeProp = EntityPropertiesString::createProperty("Model", "ModelType", modelType, "Default", circuitModel->getProperties());
+	modelTypeProp->setReadOnly(true);
+
+	circuitModel->getProperties().getProperty("Path", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("Filename", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("FileType", "Selected File")->setVisible(false);
+	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
+	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
+
+	std::list<std::string> folderEntities = model->getListOfFolderItems(ot::FolderNames::CircuitModelsFolder + "/" + _elementType, true);
+	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folder + _elementType, _modelName);
+
+	circuitModel->setName(entityName);
+
+	circuitModel->StoreToDataBase();
+	m_entityIDsTopo.push_back(entIDTopo);
+	m_entityVersionsTopo.push_back(circuitModel->getEntityStorageVersion());
+	m_entityIDsData.push_back(entIDData);
+	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
+	m_forceVisible.push_back(false);
+
+	addModelToEntites();
+}
+
+void LibraryManagementWrapper::updatePropertyOfEntity(const ot::UID& _entityID, bool _dialogConfirmed, const std::string& _propertyValue) {
+	auto entBase = Application::instance()->getModel()->getEntityByID(_entityID);
+	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(entBase));
+	auto basePropertyModel = blockEntity->getProperties().getProperty("ModelSelection");
+	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
+
+	if (_dialogConfirmed) {
+		modelProperty->addOption(_propertyValue);
+		modelProperty->setValue(_propertyValue);
+		modelProperty->setNeedsUpdate();
 	}
+	else {
+		modelProperty->setValue("");
+		modelProperty->setNeedsUpdate();
+	}
+	
 
-	return rMsg.getWhat();
+}
+
+void LibraryManagementWrapper::addModelToEntites() {
+	Model* modelComp = Application::instance()->getModel();
+	modelComp->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added file", true, false);
 }
