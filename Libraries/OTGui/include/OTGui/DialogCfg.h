@@ -20,6 +20,8 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT DialogCfg : public Serializable {
+		OT_DECL_DEFCOPY(DialogCfg)
+		OT_DECL_DEFMOVE(DialogCfg)
 	public:
 		enum DialogFlag {
 			NoFlags          = 0x00, //! @brief No dialog flags
@@ -29,17 +31,26 @@ namespace ot {
 		};
 		typedef Flags<DialogFlag> DialogFlags;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Static helper
+
 		static std::string toString(DialogFlag _flag);
 		static DialogFlag stringToFlag(const std::string& _flag);
 		static std::list<std::string> toStringList(DialogFlags _flags);
 		static DialogFlags stringListToFlags(const std::list<std::string>& _flags);
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Constructor / Destructor
+
 		DialogCfg(DialogFlags _flags = DialogFlags(NoFlags));
 		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags(NoFlags));
-		DialogCfg(const DialogCfg& _other);
 		virtual ~DialogCfg() {};
 
-		DialogCfg& operator = (const DialogCfg& _other);
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -51,6 +62,10 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
 
@@ -61,12 +76,45 @@ namespace ot {
 		void setFlags(DialogFlags _flags) { m_flags = _flags; };
 		DialogFlags getFlags(void) const { return m_flags; };
 
+		//! @brief Set the initial dialog size.
+		//! The initial dialog size will be applied when showing the dialog.
+		//! @param _width Width to set. If the width is set to -1, the setting will be ignored.
+		//! @param _height Height to set. If the height is set to -1, the setting will be ignored.
+		void setInitialSize(int _width, int _height) { this->setInitialSize(ot::Size2D(_width, _height)); };
+
+		//! @brief Set the initial dialog size.
+		//! The initial dialog size will be applied when showing the dialog.
+		//! @param _size Size to set. If the width or height is set to -1, the corresponding setting will be ignored.
+		void setInitialSize(const ot::Size2D& _size) { m_initialSize = _size; };
+
+		//! @brief Get the initial dialog size.
+		//! @ref setInitialSize(int _width, int _height)
+		const ot::Size2D& getInitialSize(void) const { return m_initialSize; };
+
+		//! @brief Set the minimal dialog size.
+		//! @param _width Width to set. If the width is set to -1, the setting will be ignored.
+		//! @param _height Height to set. If the height is set to -1, the setting will be ignored.
 		void setMinSize(int _width, int _height) { this->setMinSize(ot::Size2D(_width, _height)); };
+
+		//! @brief Set the minimal dialog size.
+		//! @param _size Size to set. If the width or height is set to -1, the corresponding setting will be ignored.
 		void setMinSize(const ot::Size2D& _size) { m_minSize = _size; };
+
+		//! @brief Get the minimal dialog size.
+		//! @ref setMinSize(int _width, int _height)
 		const ot::Size2D& getMinSize(void) const { return m_minSize; };
 
+		//! @brief Set the maximum dialog size.
+		//! @param _width Width to set. If the width is set to -1, the setting will be ignored.
+		//! @param _height Height to set. If the height is set to -1, the setting will be ignored.
 		void setMaxSize(int _width, int _height) { this->setMaxSize(ot::Size2D(_width, _height)); };
+
+		//! @brief Set the maximum dialog size.
+		//! @param _size Size to set. If the width or height is set to -1, the corresponding setting will be ignored.
 		void setMaxSize(const ot::Size2D& _size) { m_maxSize = _size; };
+
+		//! @brief Get the maximum dialog size.
+		//! @ref setMinSize(int _width, int _height)
 		const ot::Size2D& getMaxSize(void) const { return m_maxSize; };
 
 	private:
@@ -74,6 +122,7 @@ namespace ot {
 		std::string m_title;
 		DialogFlags m_flags;
 		ot::Size2D m_minSize;
+		ot::Size2D m_initialSize;
 		ot::Size2D m_maxSize;
 	};
 
