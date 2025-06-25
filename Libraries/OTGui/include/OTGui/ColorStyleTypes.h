@@ -238,6 +238,7 @@ namespace ot {
 		PlotCurve,
 		PlotCurveDimmed,
 		PlotCurveHighlight,
+		PlotCurveSymbol,
 
 		ErrorForeground,
 

@@ -99,23 +99,26 @@ namespace ot {
 		void setLinePenColor(const Color& _color) { m_linePen.setColor(_color); };
 		const PenFCfg& getLinePen() const { return m_linePen; };
 
-		void setPointSymbol(Symbol _symbol) { m_pointsSymbol = _symbol; };
-		Symbol getPointSymbol() const { return m_pointsSymbol; };
+		void setPointSymbol(Symbol _symbol) { m_pointSymbol = _symbol; };
+		Symbol getPointSymbol() const { return m_pointSymbol; };
 
-		void setPointsSize(int _size) { m_pointsSize = _size; };
-		int getPointsSize() const { return m_pointsSize; };
+		void setPointSize(int _size) { m_pointSize = _size; };
+		int getPointSize() const { return m_pointSize; };
 
-		void setPointsOutlinePen(const PenFCfg& _pen) { m_pointsOulinePen = _pen; };
-		void setPointsOutlinePenWidth(double _width) { m_pointsOulinePen.setWidth(_width); };
-		void setPointsOutlinePenColor(const Color& _color) { m_pointsOulinePen.setColor(_color); };
-		const PenFCfg& getPointsOutlinePen() const { return m_pointsOulinePen; };
+		void setPointInterval(int _interval) { m_pointInterval = _interval; };
+		int getPointInterval() const { return m_pointInterval; };
 
-		void setPointsFillColor(const Color& _color);
-		void setPointsFillPainter(Painter2D* _painter);
-		const Painter2D* getPointsFillPainter() const { return m_pointsFillPainter; };
+		void setPointOutlinePen(const PenFCfg& _pen) { m_pointOulinePen = _pen; };
+		void setPointOutlinePenWidth(double _width) { m_pointOulinePen.setWidth(_width); };
+		void setPointOutlinePenColor(const Color& _color) { m_pointOulinePen.setColor(_color); };
+		const PenFCfg& getPointOutlinePen() const { return m_pointOulinePen; };
 
-		void setQueryInformation(QueryInformation _queryInformation);
-		const QueryInformation& getQueryInformation() const;
+		void setPointFillColor(const Color& _color);
+		void setPointFillPainter(Painter2D* _painter);
+		const Painter2D* getPointFillPainter() const { return m_pointFillPainter; };
+
+		void setQueryInformation(QueryInformation _queryInformation) { m_queryInformation = _queryInformation; };
+		const QueryInformation& getQueryInformation() const { return m_queryInformation; };
 
 	private:
 		UID m_navigationId;
@@ -127,10 +130,11 @@ namespace ot {
 
 		PenFCfg m_linePen;
 		
-		int m_pointsSize;
-		Symbol m_pointsSymbol;
-		PenFCfg m_pointsOulinePen;
-		Painter2D* m_pointsFillPainter;
+		int m_pointSize;
+		int m_pointInterval;
+		Symbol m_pointSymbol;
+		PenFCfg m_pointOulinePen;
+		Painter2D* m_pointFillPainter;
 
 		QueryInformation m_queryInformation;
 	};

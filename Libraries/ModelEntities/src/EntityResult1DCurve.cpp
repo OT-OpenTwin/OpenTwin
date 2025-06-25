@@ -55,9 +55,11 @@ bool EntityResult1DCurve::updateFromProperties(void)
 void EntityResult1DCurve::createProperties(void)
 {
 	EntityPropertiesGuiPainter* colorProp = EntityPropertiesGuiPainter::createProperty("General", "Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurve), "", getProperties());
+	colorProp->setToolTip("The color of the curve line in the plot.");
 	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
 	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 1, 1, 99, "", getProperties());
+	widthProp->setToolTip("The width of the curve line in the plot.");
 	widthProp->setAllowCustomValues(false);
 
 	EntityPropertiesSelection* selectionProp = EntityPropertiesSelection::createProperty("General", "Line Style", {
@@ -68,6 +70,46 @@ void EntityResult1DCurve::createProperties(void)
 		ot::toString(ot::LineStyle::DashDotDotLine)
 		},
 		ot::toString(ot::LineStyle::SolidLine), "", getProperties());
+	selectionProp->setToolTip("The style of the curve line in the plot.");
+
+	EntityPropertiesSelection* symbolProp = EntityPropertiesSelection::createProperty("General", "Symbol", {
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Circle),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Square),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Diamond),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::TriangleUp),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::TriangleDown),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::TriangleLeft),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::TriangleRight),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Cross),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::XCross),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::HLine),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::VLine),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Star6),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Star8),
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Hexagon)
+		},
+		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol), "", getProperties());
+	symbolProp->setToolTip("The symbol that is used for the curve data points in the plot.");
+
+	EntityPropertiesInteger* symbolSizeProp = EntityPropertiesInteger::createProperty("General", "Symbol Size", 1, 1, 99, "", getProperties());
+	symbolSizeProp->setToolTip("The size of the curve data point symbols in the plot.");
+	symbolSizeProp->setAllowCustomValues(false);
+
+	EntityPropertiesInteger* symbolIntervalProp = EntityPropertiesInteger::createProperty("General", "Symbol Interval", 1, 1, 99, "", getProperties());
+	symbolIntervalProp->setToolTip("The interval of the curve data point symbols in the plot. A value of 1 means that every data point is shown, a value of 2 means that every second data point is shown, etc.");
+	symbolIntervalProp->setAllowCustomValues(false);
+
+	EntityPropertiesGuiPainter* symbolOutlineColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Outline Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
+	symbolOutlineColorProp->setToolTip("The color of the curve data point symbols outline in the plot.");
+	symbolOutlineColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
+
+	EntityPropertiesInteger* symbolOutlineWidthProp = EntityPropertiesInteger::createProperty("General", "Symbol Outline Width", 1, 1, 99, "", getProperties());
+	symbolOutlineWidthProp->setToolTip("The width of the curve data point symbols outline in the plot.");
+	symbolOutlineWidthProp->setAllowCustomValues(false);
+
+	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
+	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -83,22 +125,38 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	
 	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
 	ot::PenFCfg penCfg(painter->createCopy());
+
 	try {
 		penCfg.setWidth(static_cast<double>(PropertyHelper::getIntegerPropertyValue(this, "Line Width")));
-	}
-	catch (...) {}
-	try {
 		penCfg.setStyle(ot::stringToLineStyle(PropertyHelper::getSelectionPropertyValue(this, "Line Style")));
-	}
-	catch (...) {}
-	curveCfg.setLinePen(penCfg);
+		
+		curveCfg.setPointSymbol(ot::Plot1DCurveCfg::stringToSymbol(PropertyHelper::getSelectionPropertyValue(this, "Symbol")));
+		curveCfg.setPointSize(PropertyHelper::getIntegerPropertyValue(this, "Symbol Size"));
+		curveCfg.setPointInterval(PropertyHelper::getIntegerPropertyValue(this, "Symbol Interval"));
 
+		const ot::Painter2D* symbolOutlinePainter = PropertyHelper::getPainterPropertyValue(this, "Symbol Outline Color");
+		ot::PenFCfg symbolPenCfg(symbolOutlinePainter->createCopy());
+		symbolPenCfg.setWidth(PropertyHelper::getIntegerPropertyValue(this, "Symbol Outline Width"));
+		curveCfg.setPointOutlinePen(symbolPenCfg);
+
+		const ot::Painter2D* symbolFillPainter = PropertyHelper::getPainterPropertyValue(this, "Symbol Fill Color");
+		curveCfg.setPointFillPainter(symbolFillPainter->createCopy());
+	}
+	catch (...) {
+		// Legacy
+		penCfg.setWidth(1);
+		penCfg.setStyle(ot::LineStyle::SolidLine);
+
+		curveCfg.setPointSymbol(ot::Plot1DCurveCfg::NoSymbol);
+	}
+
+	curveCfg.setLinePen(penCfg);
+	
 	std::string curveLabel("");
 	
 	curveLabel = getName();
 	auto shortName = ot::EntityName::getSubName(curveLabel);
-	if (shortName.has_value())
-	{
+	if (shortName.has_value()) {
 		curveLabel = shortName.value();
 	}
 	else
@@ -118,20 +176,49 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
 	PropertyHelper::setPainterPropertyValue(_curve.getLinePen().getPainter(), this, "Color");
 	
 	try {
-		EntityPropertiesInteger* prop = PropertyHelper::getIntegerProperty(this, "Line Width");
-		if (prop) {
-			prop->setValue(static_cast<long>(_curve.getLinePen().getWidth()));
+		EntityPropertiesInteger* widthProp = PropertyHelper::getIntegerProperty(this, "Line Width");
+		if (widthProp) {
+			widthProp->setValue(static_cast<long>(_curve.getLinePen().getWidth()));
 		}
-	}
-	catch (...) {}
 
-	try {
-		EntityPropertiesSelection* prop = PropertyHelper::getSelectionProperty(this, "Line Style");
-		if (prop) {
-			prop->setValue(ot::toString(_curve.getLinePen().getStyle()));
+		EntityPropertiesSelection* styleProp = PropertyHelper::getSelectionProperty(this, "Line Style");
+		if (styleProp) {
+			styleProp->setValue(ot::toString(_curve.getLinePen().getStyle()));
+		}
+
+		EntityPropertiesSelection* symbolProp = PropertyHelper::getSelectionProperty(this, "Symbol");
+		if (symbolProp) {
+			symbolProp->setValue(ot::Plot1DCurveCfg::toString(_curve.getPointSymbol()));
+		}
+
+		EntityPropertiesInteger* symbolSizeProp = PropertyHelper::getIntegerProperty(this, "Symbol Size");
+		if (symbolSizeProp) {
+			symbolSizeProp->setValue(static_cast<long>(_curve.getPointSize()));
+		}
+
+		EntityPropertiesInteger* symbolIntervalProp = PropertyHelper::getIntegerProperty(this, "Symbol Interval");
+		if (symbolIntervalProp) {
+			symbolIntervalProp->setValue(static_cast<long>(_curve.getPointInterval()));
+		}
+
+		EntityPropertiesGuiPainter* symbolOutlineColorProp = PropertyHelper::getPainterProperty(this, "Symbol Outline Color");
+		if (symbolOutlineColorProp) {
+			symbolOutlineColorProp->setValue(_curve.getPointOutlinePen().getPainter());
+		}
+
+		EntityPropertiesInteger* symbolOutlineWidthProp = PropertyHelper::getIntegerProperty(this, "Symbol Outline Width");
+		if (symbolOutlineWidthProp) {
+			symbolOutlineWidthProp->setValue(static_cast<long>(_curve.getPointOutlinePen().getWidth()));
+		}
+
+		EntityPropertiesGuiPainter* symbolFillColorProp = PropertyHelper::getPainterProperty(this, "Symbol Fill Color");
+		if (symbolFillColorProp) {
+			symbolFillColorProp->setValue(_curve.getPointFillPainter());
 		}
 	}
-	catch (...) {}
+	catch (...) {
+		
+	}
 
 	m_queryInformation = _curve.getQueryInformation();
 }

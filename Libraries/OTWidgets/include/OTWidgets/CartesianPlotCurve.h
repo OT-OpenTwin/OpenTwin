@@ -39,8 +39,12 @@ namespace ot {
 		void setOutlinePen(const QPen& _pen) { m_outlinePen = _pen; };
 		const QPen& getOutlinePen() const { return m_outlinePen; };
 
+		void setPointInterval(int _interval) { m_pointInterval = _interval; };
+		int getPointInterval() const { return m_pointInterval; };
+
 	private:
 		QPen m_outlinePen;
+		int m_pointInterval;
 	};
 
 }

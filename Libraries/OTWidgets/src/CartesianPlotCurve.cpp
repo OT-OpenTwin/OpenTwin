@@ -81,7 +81,7 @@ int ot::CartesianPlotCurve::verifyRange(int _size, int& _i1, int& _i2) {
 // Constructor
 
 ot::CartesianPlotCurve::CartesianPlotCurve(const QString& _title) :
-	QwtPlotCurve(_title), m_outlinePen(Qt::NoPen)
+	QwtPlotCurve(_title), m_outlinePen(Qt::NoPen), m_pointInterval(1)
 {
 
 }

@@ -11,6 +11,10 @@
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
 #include "CoordinateFormatConverter.h"
+
+// Qwt header
+#include <qwt_symbol.h>
+
 // Qt header
 #include <QtCore/qstring.h>
 #include <QtGui/qcolor.h>
@@ -19,20 +23,31 @@
 #include <string>
 
 class QwtSymbol;
-class QwtPolarCurve;
 
 namespace ot {
 
 	class PlotBase;
 	class PolarPlotData;
+	class PolarPlotCurve;
 	class CartesianPlotCurve;
 
 	class OT_WIDGETS_API_EXPORT PlotDataset {
 		OT_DECL_NOCOPY(PlotDataset)
 		OT_DECL_NODEFAULT(PlotDataset)
 	public:
+		static QwtSymbol::Style toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol);
+		static Plot1DCurveCfg::Symbol toPlot1DCurveSymbol(QwtSymbol::Style _symbol);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Constructor / Destructor
+
 		PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data);
 		virtual ~PlotDataset();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Attach / Detach
 
 		void attach(void);
 
@@ -89,7 +104,7 @@ namespace ot {
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
 		CartesianPlotCurve* getCartesianCurve();
-		QwtPolarCurve* getPolarCurve();
+		PolarPlotCurve* getPolarCurve();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -112,10 +127,11 @@ namespace ot {
 
 		PlotDatasetData m_data;
 		CoordinateFormatConverter m_coordinateFormatConverter;
+
 		// Plot elements
 		CartesianPlotCurve* m_cartesianCurve = nullptr;
 
-		QwtPolarCurve* m_polarCurve = nullptr;
+		PolarPlotCurve* m_polarCurve = nullptr;
 		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 
 
 		QwtSymbol* m_cartesianCurvePointSymbol = nullptr;

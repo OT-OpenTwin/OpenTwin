@@ -12,6 +12,7 @@ ot::Painter2DDialogFilter ot::Painter2DDialogFilterDefaults::plotCurve() {
 	result.setPainterTypes(Painter2DDialogFilter::Fill | ot::Painter2DDialogFilter::StyleRef);
 	result.setStyleReferences(std::list<ColorStyleValueEntry> {
 		ColorStyleValueEntry::PlotCurve,
+		ColorStyleValueEntry::PlotCurveSymbol,
 		ColorStyleValueEntry::Rainbow0,
 		ColorStyleValueEntry::Rainbow1,
 		ColorStyleValueEntry::Rainbow2,
