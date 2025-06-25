@@ -41,6 +41,7 @@ namespace ot {
 		const std::string& getElementType() const { return m_elementType; }
 
 		void addMetaData(const std::string& _key, const std::string& _value);
+		bool hasMetaDataValue(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); };
 		std::string getMetaDataValue(const std::string& _key) const;
 		const std::unordered_map<std::string, std::string>& getMetaData() const { return m_metaData; };
 

@@ -28,10 +28,12 @@ namespace ot {
 		// Setter / Getter
 
 		void addModel(const LibraryModel& _model);
+		void addModel(LibraryModel&& _model);
 		void setModels(const std::list<LibraryModel>& _models) { m_models = _models; };
 		const std::list<LibraryModel>& getModels() const { return m_models; };
 
 		void addFilter(const std::string& _filter);
+		void addFilter(std::string&& _filter);
 		void setFilters(const std::list<std::string>& _filters) { m_filter = _filters; };
 		const std::list<std::string>& getFilters() const { return m_filter; };
 
