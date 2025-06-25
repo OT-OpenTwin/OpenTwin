@@ -410,6 +410,7 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::PlotCurve: return "Plot Curve";
 	case ot::ColorStyleValueEntry::PlotCurveDimmed: return "Plot Curve Dimmed";
 	case ot::ColorStyleValueEntry::PlotCurveHighlight: return "Plot Curve Highlight";
+	case ot::ColorStyleValueEntry::PlotCurveSymbol: return "Plot Curve Symbol";
 
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
@@ -499,6 +500,7 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurve)) return ColorStyleValueEntry::PlotCurve;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveDimmed)) return ColorStyleValueEntry::PlotCurveDimmed;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveHighlight)) return ColorStyleValueEntry::PlotCurveHighlight;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveSymbol)) return ColorStyleValueEntry::PlotCurveSymbol;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {

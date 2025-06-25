@@ -453,6 +453,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
@@ -662,6 +663,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
@@ -872,6 +874,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurve), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveDimmed), new PropertyPainter2D(new FillPainter2D(100, 100, 100, 100)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
