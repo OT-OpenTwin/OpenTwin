@@ -33,6 +33,8 @@ Application::Application() :
 	m_nameCounter(0)
 {
 	// Add buttons here
+	m_testButtons.push_back(ButtonInfo("Test", "UI Info", "BugRed", std::bind(&Application::uiDebugInfo, this)));
+
 	m_testButtons.push_back(ButtonInfo("Test", "Info", "Information", std::bind(&Application::testHello, this)));
 	m_testButtons.push_back(ButtonInfo("Test", "Kill", "Kill", std::bind(&Application::testKill, this)));
 	
@@ -69,6 +71,23 @@ Application::Application() :
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Button callbacks
+
+void Application::uiDebugInfo() {
+	using namespace ot;
+
+	auto ui = this->uiComponent();
+	if (!ui) {
+		OT_LOG_E("No ui? How?");
+		return;
+	}
+
+	// Create table document
+	JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_GetDebugInformation, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string resp;
+	ui->sendMessage(true, doc, resp);
+}
 
 void Application::testHello(void) {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnHello)) {

@@ -36,32 +36,32 @@
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/ModelLibraryDialogCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
-#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableView.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/MessageDialog.h"
+#include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/GraphicsViewView.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/OnePropertyDialog.h"
+#include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/ModelLibraryDialog.h"
 #include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
-#include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/MessageDialog.h"
-#include "OTWidgets/PropertyDialog.h"
-#include "OTWidgets/OnePropertyDialog.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/PropertyInput.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
@@ -3303,6 +3303,11 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	return "";
 }
 
+std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
+
+	return "";
+}
+
 // Property Grid
 
 std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
@@ -4166,7 +4171,7 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	return "";
 }
 
-std::string ExternalServicesComponent::handleModelDialog(ot::JsonDocument& _document) {
+std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _document) {
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
