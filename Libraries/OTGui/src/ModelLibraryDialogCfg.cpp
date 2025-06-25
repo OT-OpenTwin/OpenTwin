@@ -6,9 +6,19 @@
 // OpenTwin header
 #include "OTGui/ModelLibraryDialogCfg.h"
 
+ot::ModelLibraryDialogCfg::ModelLibraryDialogCfg() :
+	DialogCfg("Select Model", DialogCfg::RecenterOnF11)
+{
+	this->setMinSize(200, 300);
+	this->setInitialSize(300, 400);
+}
+
 ot::ModelLibraryDialogCfg::ModelLibraryDialogCfg(const std::list<LibraryModel>& _models, const std::list<std::string> _filter) :
-	m_models(_models), m_filter(_filter) 
-{}
+	DialogCfg("Select Model", DialogCfg::RecenterOnF11), m_models(_models), m_filter(_filter)
+{
+	this->setMinSize(200, 300);
+	this->setInitialSize(300, 400);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

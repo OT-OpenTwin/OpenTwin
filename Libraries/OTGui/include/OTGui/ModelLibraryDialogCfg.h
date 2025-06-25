@@ -19,7 +19,7 @@ namespace ot {
 			OT_DECL_DEFCOPY(ModelLibraryDialogCfg)
 			OT_DECL_DEFMOVE(ModelLibraryDialogCfg)
 	public:
-		ModelLibraryDialogCfg() = default;
+		ModelLibraryDialogCfg();
 		ModelLibraryDialogCfg(const std::list<LibraryModel>& _models,const std::list<std::string> _filter);
 		virtual ~ModelLibraryDialogCfg() = default;
 
