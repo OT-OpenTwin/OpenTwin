@@ -538,6 +538,9 @@
     <ClCompile Include="src\CartesianPlotCurve.cpp">
       <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
+    <ClCompile Include="src\ModelLibraryDialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1226,6 +1229,9 @@
       <Filter>include\Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h">
       <Filter>include\Dialogs</Filter>
     </QtMoc>
   </ItemGroup>
