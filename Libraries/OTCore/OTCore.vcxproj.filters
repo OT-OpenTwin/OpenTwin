@@ -82,9 +82,6 @@
     <ClCompile Include="src\EncodingGuesser.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\JSON.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\Logger.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -135,6 +132,27 @@
     </ClCompile>
     <ClCompile Include="src\EntityName.cpp">
       <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonDocument.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonArray.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONHelper.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JSONObject.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonString.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonNumber.cpp">
+      <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsonNullValue.cpp">
+      <Filter>src\JSON</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -261,9 +279,6 @@
     <ClInclude Include="include\OTCore\GlobalTestingFlags.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\JSON.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\LocalStateStack.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -375,6 +390,33 @@
     <ClInclude Include="include\OTCore\EntityName.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\JSON.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONTypes.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONNullValue.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONNumber.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONString.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONObject.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONArray.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONDocument.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONHelper.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -427,6 +469,12 @@
     </Filter>
     <Filter Include="include\Container">
       <UniqueIdentifier>{393d2c82-5ac9-4960-be66-6a6719f40cdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\JSON">
+      <UniqueIdentifier>{bae79a7d-8ee6-4f79-b40a-4a0c91b36dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\JSON">
+      <UniqueIdentifier>{e38094db-c82c-4d82-b234-569f50003059}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

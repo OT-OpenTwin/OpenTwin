@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\TestrJSON.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\FixtureTextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>

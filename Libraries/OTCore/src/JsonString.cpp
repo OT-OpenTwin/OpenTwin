@@ -1,16 +1,15 @@
-//! @file JSON.h
+//! @file JsonString.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date November 2023
+//! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
-
 // OpenTwin header
-#include "OTCore/JSONTypes.h"
-#include "OTCore/JSONArray.h"
-#include "OTCore/JSONNumber.h"
 #include "OTCore/JSONString.h"
-#include "OTCore/JSONObject.h"
-#include "OTCore/JSONHelper.h"
-#include "OTCore/JSONDocument.h"
-#include "OTCore/JSONNullValue.h"
+
+ot::JsonString::JsonString(const char* _cstr, JsonAllocator& _allocator) : 
+	JsonValue(_cstr, _allocator) 
+{}
+
+ot::JsonString::JsonString(const std::string& _str, JsonAllocator& _allocator) : 
+	JsonValue(_str.c_str(), _allocator) 
+{}

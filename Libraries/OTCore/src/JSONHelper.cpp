@@ -1,13 +1,11 @@
-//! @file JSON.cpp
+//! @file JSONHelper.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date November 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
-
 // OpenTwin header
-#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
+#include "OTCore/JSONHelper.h"
 
 #define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
 
@@ -76,17 +74,19 @@ namespace ot {
 			}
 
 		private:
-			JSONManager() 
-				: m_arr(rapidjson::kArrayType)
-			{}
+			JSONManager()
+				: m_arr(rapidjson::kArrayType) {
+			}
 
 			JsonDocument m_obj;
 			JsonDocument m_arr;
 		};
 	}
+
 }
 
-bool ot::json::exists(const JsonValue & _value, const char* _member) {
+
+bool ot::json::exists(const JsonValue& _value, const char* _member) {
 	return _value.HasMember(_member);
 }
 
@@ -94,7 +94,7 @@ bool ot::json::exists(const JsonValue& _value, const std::string& _member) {
 	return _value.HasMember(_member.c_str());
 }
 
-bool ot::json::exists(const ConstJsonObject & _value, const char* _member) {
+bool ot::json::exists(const ConstJsonObject& _value, const char* _member) {
 	return _value.HasMember(_member);
 }
 
@@ -122,7 +122,7 @@ bool ot::json::isNull(const ConstJsonObject& _value, const std::string& _member)
 	return _value[_member.c_str()].IsNull();
 }
 
-bool ot::json::isBool(const JsonValue & _value, const char* _member) {
+bool ot::json::isBool(const JsonValue& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsBool();
 }
