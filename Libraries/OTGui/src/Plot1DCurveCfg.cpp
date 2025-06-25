@@ -9,11 +9,62 @@
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/Painter2DFactory.h"
 
-ot::Plot1DCurveCfg::Plot1DCurveCfg() : Plot1DCurveCfg(0, 0, std::string()) {}
+std::string ot::Plot1DCurveCfg::toString(Symbol _symbol) {
+	switch (_symbol) {
+	case ot::Plot1DCurveCfg::NoSymbol: return "None";
+	case ot::Plot1DCurveCfg::Circle: return "None";
+	case ot::Plot1DCurveCfg::Square: return "None";
+	case ot::Plot1DCurveCfg::Diamond: return "None";
+	case ot::Plot1DCurveCfg::TriangleUp: return "None";
+	case ot::Plot1DCurveCfg::TriangleDown: return "None";
+	case ot::Plot1DCurveCfg::TriangleLeft: return "None";
+	case ot::Plot1DCurveCfg::TriangleRight: return "None";
+	case ot::Plot1DCurveCfg::Cross: return "None";
+	case ot::Plot1DCurveCfg::XCross: return "None";
+	case ot::Plot1DCurveCfg::HLine: return "None";
+	case ot::Plot1DCurveCfg::VLine: return "None";
+	case ot::Plot1DCurveCfg::Star6: return "None";
+	case ot::Plot1DCurveCfg::Star8: return "None";
+	case ot::Plot1DCurveCfg::Hexagon: return "None";
+	default:
+		OT_LOG_EAS("Unknown plot curve symbol (" + std::to_string(static_cast<int>(_symbol)) + ")");
+		return "None";
+	}
+}
+
+ot::Plot1DCurveCfg::Symbol ot::Plot1DCurveCfg::stringToSymbol(const std::string& _symbol) {
+	if (_symbol == toString(NoSymbol)) return NoSymbol;
+	else if (_symbol == toString(Circle)) return Circle;
+	else if (_symbol == toString(Square)) return Square;
+	else if (_symbol == toString(Diamond)) return Diamond;
+	else if (_symbol == toString(TriangleUp)) return TriangleUp;
+	else if (_symbol == toString(TriangleDown)) return TriangleDown;
+	else if (_symbol == toString(TriangleLeft)) return TriangleLeft;
+	else if (_symbol == toString(TriangleRight)) return TriangleRight;
+	else if (_symbol == toString(Cross)) return Cross;
+	else if (_symbol == toString(XCross)) return XCross;
+	else if (_symbol == toString(HLine)) return HLine;
+	else if (_symbol == toString(VLine)) return VLine;
+	else if (_symbol == toString(Star6)) return Star6;
+	else if (_symbol == toString(Star8)) return Star8;
+	else if (_symbol == toString(Hexagon)) return Hexagon;
+	else {
+		OT_LOG_EAS("Unknown plot curve symbol \"" + _symbol + "\"");
+		return NoSymbol;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructor / Destructor
+
+ot::Plot1DCurveCfg::Plot1DCurveCfg() : 
+	Plot1DCurveCfg(0, 0, std::string()) 
+{}
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _name) :
 	BasicEntityInformation(_name, _id, _version), m_navigationId(0), m_visible(true), m_dimmed(false),
-	m_linePen(1., Color(DefaultColor::Red)), m_pointsSize(5), m_pointsVisible(false), 
+	m_linePen(1., Color(DefaultColor::Red)), m_pointsSize(5), m_pointsSymbol(NoSymbol),
 	m_pointsFillPainter(new FillPainter2D(DefaultColor::Lime)), m_pointsOulinePen(1., DefaultColor::Lime)
 {}
 
@@ -29,6 +80,10 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept :
 
 ot::Plot1DCurveCfg::~Plot1DCurveCfg() {}
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Opearator
+
 ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexcept {
 	if (this != &_other) {
 		BasicEntityInformation::operator=(std::move(_other));
@@ -42,7 +97,7 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexc
 
 		m_linePen = std::move(_other.m_linePen);
 
-		m_pointsVisible = _other.m_pointsVisible;
+		m_pointsSymbol = _other.m_pointsSymbol;
 		m_pointsSize = _other.m_pointsSize;
 		m_pointsOulinePen = std::move(_other.m_pointsOulinePen);
 
@@ -73,7 +128,7 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other) 
 		
 		m_queryInformation = _other.m_queryInformation;
 
-		m_pointsVisible = _other.m_pointsVisible;
+		m_pointsSymbol = _other.m_pointsSymbol;
 		m_pointsSize = _other.m_pointsSize;
 		m_pointsOulinePen = _other.m_pointsOulinePen;
 		this->setPointsFillPainter(_other.getPointsFillPainter()->createCopy());
@@ -87,6 +142,10 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const BasicEntityInformation& 
 	return *this;
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
 void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	
 	BasicEntityInformation::addToJsonObject(_object, _allocator);
@@ -94,44 +153,31 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	OTAssertNullptr(m_pointsFillPainter);
 
 	_object.AddMember("NavID", m_navigationId, _allocator);
-
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 
 	_object.AddMember("Visible", m_visible, _allocator);
 	_object.AddMember("Dimmed", m_dimmed, _allocator);
-
-	JsonObject penObj;
-	m_linePen.addToJsonObject(penObj, _allocator);
-	_object.AddMember("LinePen", penObj, _allocator);
-
-	_object.AddMember("PointsVisible", m_pointsVisible, _allocator);
+	
+	_object.AddMember("LinePen", JsonObject(m_linePen, _allocator), _allocator);
+	_object.AddMember("PointSymbol", JsonString(Plot1DCurveCfg::toString(m_pointsSymbol), _allocator), _allocator);
 	_object.AddMember("PointsSize", m_pointsSize, _allocator);
-	JsonObject pointOutPenObj;
-	m_pointsOulinePen.addToJsonObject(pointOutPenObj, _allocator);
-	_object.AddMember("PointOutlinePen", pointOutPenObj, _allocator);
+	_object.AddMember("PointOutlinePen", JsonObject(m_pointsOulinePen, _allocator), _allocator);
+	_object.AddMember("PointFillPainter", JsonObject(m_pointsFillPainter, _allocator), _allocator);
 
-	JsonObject pointFillPainterObj;
-	m_pointsFillPainter->addToJsonObject(pointFillPainterObj, _allocator);
-	_object.AddMember("PointFillPainter", pointFillPainterObj, _allocator);
-
-	JsonObject queryInfosObj;
-	m_queryInformation.addToJsonObject(queryInfosObj, _allocator);
-	_object.AddMember("QueryInformation", queryInfosObj, _allocator);
+	_object.AddMember("QueryInformation", JsonObject(m_queryInformation, _allocator), _allocator);
 }
 
 void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	BasicEntityInformation::setFromJsonObject(_object);
 
 	m_navigationId = json::getUInt64(_object, "NavID");
-
 	m_title = json::getString(_object, "Title");
 
 	m_visible = json::getBool(_object, "Visible");
 	m_dimmed = json::getBool(_object, "Dimmed");
 
 	m_linePen.setFromJsonObject(json::getObject(_object, "LinePen"));
-
-	m_pointsVisible = json::getBool(_object, "PointsVisible");
+	m_pointsSymbol = Plot1DCurveCfg::stringToSymbol(json::getString(_object, "PointSymbol"));
 	m_pointsSize = json::getInt(_object, "PointsSize");
 	m_pointsOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
 
@@ -143,20 +189,9 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
-const ot::Color& ot::Plot1DCurveCfg::getLinePenColor() const
-{
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	const ot::Painter2D* painter = m_linePen.getPainter();
-	const ot::FillPainter2D* fillPainter = dynamic_cast<const ot::FillPainter2D*>(painter);
-	if (fillPainter != nullptr)
-	{
-		return fillPainter->getColor();
-	}
-	else
-	{
-		throw std::exception("Colour not available for this object");
-	}
-}
+// Setter / Getter
 
 void ot::Plot1DCurveCfg::setPointsFillColor(const Color& _color) {
 	this->setPointsFillPainter(new FillPainter2D(_color));

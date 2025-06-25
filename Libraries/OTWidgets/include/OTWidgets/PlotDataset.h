@@ -68,8 +68,6 @@ namespace ot {
 
 		void setCurveColor(const Color& _color, bool _repaint = true);
 
-		void setCurvePointsVisible(bool _isVisible = true, bool _repaint = true);
-
 		void setCurvePointInnerColor(const Color& _color, bool _repaint = true);
 
 		void setCurvePointOuterColor(const Color& _color, bool _repaint = true);
@@ -113,7 +111,7 @@ namespace ot {
 		bool m_isSelected = false;
 
 		PlotDatasetData m_data;
-		CoordinateFormatConverter m_CoordinateFormatConverter;
+		CoordinateFormatConverter m_coordinateFormatConverter;
 		// Plot elements
 		CartesianPlotCurve* m_cartesianCurve = nullptr;
 

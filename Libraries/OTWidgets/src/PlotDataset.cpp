@@ -120,13 +120,6 @@ void ot::PlotDataset::setCurveColor(const Color& _color, bool _repaint) {
 	}
 }
 
-void ot::PlotDataset::setCurvePointsVisible(bool _isVisible, bool _repaint) {
-	m_config.setPointsVisible(_isVisible);
-	if (_repaint) {
-		this->updateCurveVisualization();
-	}
-}
-
 void ot::PlotDataset::setCurvePointInnerColor(const Color& _color, bool _repaint) {
 	m_config.setPointsFillColor(_color);
 	if (_repaint) {
@@ -267,7 +260,7 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	}
 
 	// Setup points
-	if (m_config.getPointsVisible()) {
+	if (m_config.getPointSymbol() != Plot1DCurveCfg::NoSymbol) {
 		if (m_config.getDimmed()) {
 			if (m_cartesianCurvePointSymbol != nullptr) {
 				m_cartesianCurvePointSymbol->setPen(dimmedPen);
@@ -317,21 +310,21 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 }
 
 const ot::PointsContainer ot::PlotDataset::getDisplayedPoints() {
-	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
+	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	return points;
 }
 
 void ot::PlotDataset::buildCartesianCurve() {
 	m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_cartesianCurvePointSymbol = new QwtSymbol();
-	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
+	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 }
 
 void ot::PlotDataset::buildPolarCurve() {
 	m_polarCurve = new QwtPolarCurve(QString::fromStdString(m_config.getTitle()));
 	m_polarCurvePointSymbol = new QwtSymbol();
-	ot::PointsContainer points = m_CoordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
+	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	m_polarData = new PolarPlotData(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 	m_polarCurve->setData(m_polarData);
