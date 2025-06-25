@@ -541,6 +541,9 @@
     <ClCompile Include="src\ModelLibraryDialog.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\PolarPlotCurve.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1021,6 +1024,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotCurve.h">
       <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotCurve.h">
+      <Filter>include\Plot\Polar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
