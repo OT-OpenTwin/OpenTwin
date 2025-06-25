@@ -19,7 +19,9 @@ void ot::ModelLibraryDialogCfg::addModel(const LibraryModel& _model) {
 }
 
 void ot::ModelLibraryDialogCfg::addFilter(const std::string& _filter) {
-	m_filter.push_back(_filter);
+	if (std::find(m_filter.begin(), m_filter.end(), _filter) == m_filter.end()) {
+		m_filter.push_back(_filter);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
