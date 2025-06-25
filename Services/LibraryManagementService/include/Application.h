@@ -9,9 +9,9 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
+#include "OTGui/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTGui/ModelDialogCfg.h"
 
 
 // std header
@@ -42,13 +42,13 @@ private:
 	std::string getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
-	ot::ModelDialogCfg createModelDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+	ot::ModelLibraryDialogCfg createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
 
-	void packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelDialogCfg& _dialogCfg);
+	void packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelLibraryDialogCfg& _dialogCfg);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -1,3 +1,9 @@
+//! @file LibraryModel.cpp
+//! @author Sebastian Urmann	
+//! @date June 2025
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// OpenTwin header
 #include "OTGui/LibraryModel.h"
 
 #define OT_JSON_MEMBER_Name "Name"
@@ -8,13 +14,19 @@
 #define OT_JSON_MEMBER_Key "Key"
 #define OT_JSON_MEMBER_Value "Value"
 
+ot::LibraryModel::LibraryModel(const std::string& _name, const std::string& _fileName, const std::string& _modelType, const std::string& _elementType) 
+	: m_name(_name), m_fileName(_fileName), m_modelType(_modelType), m_elementType(_elementType)
+{}
 
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::LibraryModel::addData(const std::string& _key, const std::string& _value) {
+// Setter / Getter
+
+void ot::LibraryModel::addMetaData(const std::string& _key, const std::string& _value) {
 	m_metaData.insert_or_assign(_key, _value);
 }
 
-std::string ot::LibraryModel::getParameter(const std::string& _key) const {
+std::string ot::LibraryModel::getMetaDataValue(const std::string& _key) const {
     auto it = m_metaData.find(_key);
     if (it != m_metaData.end()) {
         return it->second;
@@ -24,9 +36,9 @@ std::string ot::LibraryModel::getParameter(const std::string& _key) const {
     return "#" + _key;
 }
 
-const std::unordered_map<std::string, std::string>& ot::LibraryModel::getMetaData() const {
-    return m_metaData;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
 
 void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
     _object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
@@ -45,19 +57,15 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 }
 
 void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
-
     m_name = json::getString(_object, OT_JSON_MEMBER_Name);
     m_fileName = json::getString(_object, OT_JSON_MEMBER_FileName);
     m_modelType = json::getString(_object, OT_JSON_MEMBER_ModelType);
     m_elementType = json::getString(_object, OT_JSON_MEMBER_ElementType);
     
-
     m_metaData.clear();
-    ConstJsonObjectList metaData = json::getObjectList(_object, OT_JSON_MEMBER_MetaData);
-    for (const ConstJsonObject& metaDataObj : metaData) {
+    for (const ConstJsonObject& metaDataObj : json::getObjectList(_object, OT_JSON_MEMBER_MetaData)) {
         std::string k = json::getString(metaDataObj, OT_JSON_MEMBER_Key);
         std::string v = json::getString(metaDataObj, OT_JSON_MEMBER_Value);
         m_metaData.insert_or_assign(k, v);
     }
-
 }

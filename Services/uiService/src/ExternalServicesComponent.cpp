@@ -30,13 +30,13 @@
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/ModelDialogCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/OnePropertyDialogCfg.h"
+#include "OTGui/ModelLibraryDialogCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
@@ -4179,7 +4179,7 @@ std::string ExternalServicesComponent::handleModelDialog(ot::JsonDocument& _docu
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	ot::ModelDialogCfg cfg;
+	ot::ModelLibraryDialogCfg cfg;
 	cfg.setFromJsonObject(cfgObj);
 
 

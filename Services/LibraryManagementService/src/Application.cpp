@@ -130,7 +130,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	return result;
 }
 
- ot::ModelDialogCfg Application::createModelDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+ ot::ModelLibraryDialogCfg Application::createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	
 	// First get model info from database
 	std::string modelInfos = getModelInformation(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
@@ -138,7 +138,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	ot::JsonDocument modelInfosDoc;
 	modelInfosDoc.fromJson(modelInfos);
 
-	ot::ModelDialogCfg dialogCfg;
+	ot::ModelLibraryDialogCfg dialogCfg;
 
 	if (modelInfosDoc.IsObject()) {
 		ot::ConstJsonObject obj = modelInfosDoc.GetConstObject();
@@ -239,7 +239,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	 return modelResponse;
  }
 
-void Application::packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelDialogCfg& _dialogCfg) {
+void Application::packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelLibraryDialogCfg& _dialogCfg) {
 	if (_doc["Parameters"] && _doc["Parameters"].type() == bsoncxx::type::k_document) {
 		auto paramsDoc = _doc["Parameters"].get_document().value;
 
@@ -249,7 +249,7 @@ void Application::packMetaData(const bsoncxx::document::view& _doc, ot::LibraryM
 				std::string value = std::to_string(element.get_double().value);
 
 				// Here we add the meta data to the model object
-				_model.addData(key, value);
+				_model.addMetaData(key, value);
 
 				// Here we add the filter options to the cfg
 				_dialogCfg.addFilter(key);
@@ -318,11 +318,11 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	ot::ModelDialogCfg modelDialogCfg;
+	ot::ModelLibraryDialogCfg modelDialogCfg;
 
 	//First check if model request is circuit model
 	if (!elementType.empty()) {
-		modelDialogCfg = createModelDialogCfg(collectionName, "ElementType", elementType, dbUserName, dbUserPassword, dbServerUrl);
+		modelDialogCfg = createModelLibraryDialogCfg(collectionName, "ElementType", elementType, dbUserName, dbUserPassword, dbServerUrl);
 		if (modelDialogCfg.getName() == "Failed") {
 			return "Failed";
 		}	

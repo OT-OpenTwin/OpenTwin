@@ -1,4 +1,4 @@
-//! @file ModelDialogCfg.h
+//! @file LibraryModel.h
 //! @author Sebastian Urmann	
 //! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -19,34 +19,34 @@ namespace ot {
 	class OT_GUI_API_EXPORT LibraryModel : public Serializable {
 		OT_DECL_DEFCOPY(LibraryModel)
 		OT_DECL_DEFMOVE(LibraryModel)
-	
-
 	public:
 		LibraryModel() = default;
-		LibraryModel(const std::string& _name, const std::string& _fileName, const std::string& _modelType, const std::string& _elementType)
-			: m_name(_name), m_fileName(_fileName), m_modelType(_modelType), m_elementType(_elementType) {}
-		~LibraryModel() = default;
+		LibraryModel(const std::string& _name, const std::string& _fileName, const std::string& _modelType, const std::string& _elementType);
+		virtual ~LibraryModel() = default;
 
-		// Setter
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		void setName(const std::string& _name) { m_name = _name; }
-		void setFileName(const std::string& _fileName) {m_fileName = _fileName; }
-		void setModelType(const std::string& _modelType) { m_modelType = _modelType; }
-		void setElementType(const std::string& _modelType) { m_elementType = m_elementType; }
+		// Setter / Getter
 
-		// Getter
+		void setName(const std::string& _name) { m_name = _name; };
+		const std::string& getName() const { return m_name; }
 
-		const std::string&  getName() const { return m_name; }
-		const std::string&  getFileName() const { return m_fileName; }
-		const std::string&  getModeltype() const { return m_modelType; }
-		const std::string&  getElementType() const { return m_elementType; }
+		void setFileName(const std::string& _fileName) { m_fileName = _fileName; };
+		const std::string& getFileName() const { return m_fileName; }
 
-		
-		// meta data map functions
-		void addData(const std::string& _key, const std::string& _value);
-		std::string  getParameter(const std::string& _key) const;
-		const std::unordered_map<std::string, std::string>&  getMetaData() const;
+		void setModelType(const std::string& _modelType) { m_modelType = _modelType; };
+		const std::string& getModeltype() const { return m_modelType; }
 
+		void setElementType(const std::string& _modelType) { m_elementType = m_elementType; };
+		const std::string& getElementType() const { return m_elementType; }
+
+		void addMetaData(const std::string& _key, const std::string& _value);
+		std::string getMetaDataValue(const std::string& _key) const;
+		const std::unordered_map<std::string, std::string>& getMetaData() const { return m_metaData; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -59,7 +59,6 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
-
 		std::string m_name;
 		std::string m_fileName;
 		std::string m_modelType;

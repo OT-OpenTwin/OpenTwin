@@ -53,7 +53,7 @@
     <ClInclude Include="include\OTGui\Grid.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
     <ClInclude Include="include\OTGui\MenuSeparatorCfg.h" />
-    <ClInclude Include="include\OTGui\ModelDialogCfg.h" />
+    <ClInclude Include="include\OTGui\ModelLibraryDialogCfg.h" />
     <ClInclude Include="include\OTGui\NavigationTreeItemIcon.h" />
     <ClInclude Include="include\OTGui\Painter2DDialogFilter.h" />
     <ClInclude Include="include\OTGui\Painter2DDialogFilterDefaults.h" />
@@ -175,7 +175,7 @@
     <ClCompile Include="src\MenuEntryCfgFactory.cpp" />
     <ClCompile Include="src\MenuButtonCfg.cpp" />
     <ClCompile Include="src\MenuSeparatorCfg.cpp" />
-    <ClCompile Include="src\ModelDialogCfg.cpp" />
+    <ClCompile Include="src\ModelLibraryDialogCfg.cpp" />
     <ClCompile Include="src\NavigationTreeItemIcon.cpp" />
     <ClCompile Include="src\Painter2DDialogFilter.cpp" />
     <ClCompile Include="src\Painter2DDialogFilterDefaults.cpp" />

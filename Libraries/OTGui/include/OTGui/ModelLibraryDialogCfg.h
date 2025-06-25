@@ -1,4 +1,4 @@
-//! @file ModelDialogCfg.h
+//! @file ModelLibraryDialogCfg.h
 //! @author Sebastian Urmann	
 //! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,40 +6,38 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/DialogCfg.h"
 #include "OTCore/OTClassHelper.h"
-
-// Service header
-#include "LibraryModel.h"
+#include "OTGui/DialogCfg.h"
+#include "OTGui/LibraryModel.h"
 
 // std header
 #include <string>
 
-
 namespace ot {
 
-	class OT_GUI_API_EXPORT ModelDialogCfg : public DialogCfg {
-			OT_DECL_DEFCOPY(ModelDialogCfg)
-			OT_DECL_DEFMOVE(ModelDialogCfg)
-
-
+	class OT_GUI_API_EXPORT ModelLibraryDialogCfg : public DialogCfg {
+			OT_DECL_DEFCOPY(ModelLibraryDialogCfg)
+			OT_DECL_DEFMOVE(ModelLibraryDialogCfg)
 	public:
-		ModelDialogCfg() = default;
-		ModelDialogCfg(const std::list<LibraryModel>& _models,const std::list<std::string> _filter);
-		~ModelDialogCfg() = default;
+		ModelLibraryDialogCfg() = default;
+		ModelLibraryDialogCfg(const std::list<LibraryModel>& _models,const std::list<std::string> _filter);
+		virtual ~ModelLibraryDialogCfg() = default;
 
-		// model list functions
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
 
 		void addModel(const LibraryModel& _model);
-		void setModelList(const std::list<LibraryModel>& _models);
+		void setModels(const std::list<LibraryModel>& _models) { m_models = _models; };
 		const std::list<LibraryModel>& getModelList(void) const { return m_models; };
 
-		// filter list functions
-
 		void addFilter(const std::string& _filter);
-		void setFilterList(const std::list<std::string>& _filters);
+		void setFilters(const std::list<std::string>& _filters) { m_filter = _filters; };
 		const std::list<std::string>& getFilterList(void) const { return m_filter; };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -50,8 +48,8 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-	private:
 
+	private:
 		std::list<LibraryModel> m_models;
 		std::list<std::string> m_filter;
 		
