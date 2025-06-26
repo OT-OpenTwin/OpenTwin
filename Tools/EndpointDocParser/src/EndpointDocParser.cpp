@@ -1,10 +1,17 @@
 // EndpointDocParser.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+// project header
+#include "Application.h"
 
+// std header
 #include <iostream>
 
 int main()
 {
+    Application application;
+
+    application.run();
+
     std::cout << "Hello World!\n";
 }
 
