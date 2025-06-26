@@ -231,18 +231,23 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	addModelToEntites();
 }
 
-void LibraryManagementWrapper::updatePropertyOfEntity(const ot::UID& _entityID, bool _dialogConfirmed, const std::string& _propertyValue) {
-	auto entBase = Application::instance()->getModel()->getEntityByID(_entityID);
-	
-	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(entBase));
-	auto basePropertyModel = blockEntity->getProperties().getProperty("ModelSelection");
+void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _dialogConfirmed, const std::string& _propertyValue) {
+	Model* model = Application::instance()->getModel();
+	auto entBase = model->getEntityByID(_entityID);
+
+	auto basePropertyModel = entBase->getProperties().getProperty("ModelSelection");
 	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
-	
 
 	if (_dialogConfirmed) {
 		modelProperty->addOption(_propertyValue);
 		modelProperty->setValue(_propertyValue);
-		//modelProperty->resetNeedsUpdate();
+		entBase->StoreToDataBase();
+		
+		const std::string comment = "Property Updated";
+		ot::UIDList topoList{entBase->getEntityID()};
+		ot::UIDList versionList{entBase->getEntityStorageVersion()};
+		model->updateTopologyEntities(topoList, versionList, comment);
+		model->updatePropertyGrid();
 	}
 	else {
 		modelProperty->setValue("");
