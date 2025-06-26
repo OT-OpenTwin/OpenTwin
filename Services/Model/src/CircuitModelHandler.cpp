@@ -30,7 +30,7 @@ bool CircuitModelHandler::handleAction(const std::string& _action, ot::JsonDocum
 	bool actionIsHandled = false;
 
 	if (_action == m_buttonAddCircuitModel.GetFullDescription()) {
-		/*createModelDialog();*/
+	/*	createModelDialog();*/
 		actionIsHandled = true;
 	}
 	else if (_action == OT_ACTION_PARAM_MODEL_AddCircuitModelToProject) {

@@ -1006,7 +1006,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
 
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, selectedModel);
+	//m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, selectedModel);
 
 	return "";
 }

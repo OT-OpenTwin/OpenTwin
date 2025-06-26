@@ -15,6 +15,10 @@ public:
 
 	virtual std::string getCircuitModel();
 
+protected:
+	virtual const std::string getCollectionType() { return "CircuitModels"; }
+	virtual const std::string getCircuitModelFolder() { return "Circuit Models/"; }
+
 private:
 
 

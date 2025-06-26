@@ -7,15 +7,14 @@
 #include "OTGui/LibraryModel.h"
 
 #define OT_JSON_MEMBER_Name "Name"
-#define OT_JSON_MEMBER_FileName "Filename"
 #define OT_JSON_MEMBER_ModelType "Modeltype"
 #define OT_JSON_MEMBER_ElementType "Elementtype"
 #define OT_JSON_MEMBER_MetaData "Metadata"
 #define OT_JSON_MEMBER_Key "Key"
 #define OT_JSON_MEMBER_Value "Value"
 
-ot::LibraryModel::LibraryModel(const std::string& _name, const std::string& _fileName, const std::string& _modelType, const std::string& _elementType) 
-	: m_name(_name), m_fileName(_fileName), m_modelType(_modelType), m_elementType(_elementType)
+ot::LibraryModel::LibraryModel(const std::string& _name, const std::string& _modelType, const std::string& _elementType) 
+	: m_name(_name), m_modelType(_modelType), m_elementType(_elementType)
 {}
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -42,7 +41,6 @@ std::string ot::LibraryModel::getMetaDataValue(const std::string& _key) const {
 
 void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
     _object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
-    _object.AddMember(OT_JSON_MEMBER_FileName, JsonString(m_fileName, _allocator), _allocator);
     _object.AddMember(OT_JSON_MEMBER_ModelType, JsonString(m_modelType, _allocator), _allocator);
     _object.AddMember(OT_JSON_MEMBER_ElementType, JsonString(m_elementType, _allocator), _allocator);
   
@@ -58,7 +56,6 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 
 void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
     m_name = json::getString(_object, OT_JSON_MEMBER_Name);
-    m_fileName = json::getString(_object, OT_JSON_MEMBER_FileName);
     m_modelType = json::getString(_object, OT_JSON_MEMBER_ModelType);
     m_elementType = json::getString(_object, OT_JSON_MEMBER_ElementType);
     

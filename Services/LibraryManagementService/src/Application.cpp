@@ -130,7 +130,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	return result;
 }
 
- ot::ModelLibraryDialogCfg Application::createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	
 	// First get model info from database
 	std::string modelInfos = getModelInformation(_collectionName, _fieldType, _value, _dbUserName, _dbUserPassword, _dbServerUrl);
@@ -147,7 +147,6 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 		for (const ot::JsonValue& val : docs) {
 			ot::ConstJsonObject doc = val.GetObject();
 			std::string name = doc["Name"].GetString();
-			std::string fileName = doc["Filename"].GetString();
 			std::string modelType = doc["ModelType"].GetString();
 			std::string elementType = doc["ElementType"].GetString();
 			std::string metaDataId;
@@ -159,9 +158,12 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 					metaDataId = metaDataIdObj["$oid"].GetString();
 				}
 			}
+			else {
+				continue;
+			}
 
 			// Create library model object
-			ot::LibraryModel model(name, fileName, modelType, elementType);
+			ot::LibraryModel model(name, modelType, elementType);
 
 			// Get the meta data
 			std::string metaDataInfos = getModelMetaData(circuitMetaDataCollection, "_id", metaDataId, _dbUserName, _dbUserPassword, _dbServerUrl);
@@ -169,16 +171,16 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	
 			// Fill object with meta data and add it to the dialogCfg
 			packMetaData(metaDoc.view(), model, dialogCfg);
-			dialogCfg.setName(_collectionName);
-			dialogCfg.setTitle(_collectionName);
-
-			return dialogCfg;
 		}
+
+		dialogCfg.setName(_collectionName);
+		dialogCfg.setTitle(_collectionName);
+
+		return dialogCfg;
 	}
 
 	OT_LOG_E("ModelInfoDoc is not an object: Failed to get model infos");
-	dialogCfg.setName("Failed");
-	return dialogCfg;
+	return std::nullopt;
 }
 
  std::string Application::sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl) {
@@ -223,7 +225,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 
 	 do {
 		 modelResponse.clear();
-		 if (!(ok = ot::msg::send(this->getServiceURL(), _modelUrl, ot::QUEUE, _doc.toJson(), modelResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		 if (!(ok = ot::msg::send(this->getServiceURL(), _modelUrl, ot::EXECUTE, _doc.toJson(), modelResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			 OT_LOG_E("Request create dialog failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			 using namespace std::chrono_literals;
 			 std::this_thread::sleep_for(500ms);
@@ -319,12 +321,14 @@ std::string Application::handleCreateDialogConfig(ot::JsonDocument& _document) {
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	ot::ModelLibraryDialogCfg modelDialogCfg;
+	std::string fieldType;
 
-	//First check if model request is circuit model
+	//First check if model request is circuit model (case for CircuitModels)
 	if (!elementType.empty()) {
-		modelDialogCfg = createModelLibraryDialogCfg(collectionName, "ElementType", elementType, dbUserName, dbUserPassword, dbServerUrl);
-		if (modelDialogCfg.getName() == "Failed") {
-			return "Failed";
+		fieldType = "ElementType";
+		auto result = createModelLibraryDialogCfg(collectionName, fieldType, elementType, dbUserName, dbUserPassword, dbServerUrl);
+		if (result) {
+			modelDialogCfg = result.value();
 		}	
 	}
 
@@ -389,7 +393,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	dialogConfirmed.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(selectedModel, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
 	
 	// Add the model info got from database
-	dialogConfirmed.AddMember(OT_ACTION_PARAM_ModelInfo, ot::JsonString(modelInfo, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
+	dialogConfirmed.AddMember(OT_ACTION_PARAM_ModelInfo, ot::JsonString(rMsg.getWhat(), dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
 	std::string response = sendMessageToModel(dialogConfirmed, modelUrl);
 
 	return response;

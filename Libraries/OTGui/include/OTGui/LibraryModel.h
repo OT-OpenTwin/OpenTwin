@@ -21,7 +21,7 @@ namespace ot {
 		OT_DECL_DEFMOVE(LibraryModel)
 	public:
 		LibraryModel() = default;
-		LibraryModel(const std::string& _name, const std::string& _fileName, const std::string& _modelType, const std::string& _elementType);
+		LibraryModel(const std::string& _name, const std::string& _modelType, const std::string& _elementType);
 		virtual ~LibraryModel() = default;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -30,9 +30,6 @@ namespace ot {
 
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName() const { return m_name; }
-
-		void setFileName(const std::string& _fileName) { m_fileName = _fileName; };
-		const std::string& getFileName() const { return m_fileName; }
 
 		void setModelType(const std::string& _modelType) { m_modelType = _modelType; };
 		const std::string& getModeltype() const { return m_modelType; }
@@ -61,7 +58,6 @@ namespace ot {
 
 	private:
 		std::string m_name;
-		std::string m_fileName;
 		std::string m_modelType;
 		std::string m_elementType;
 		std::unordered_map<std::string, std::string> m_metaData;

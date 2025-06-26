@@ -42,7 +42,7 @@ private:
 	std::string getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
-	ot::ModelLibraryDialogCfg createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);

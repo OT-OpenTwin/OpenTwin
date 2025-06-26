@@ -211,8 +211,13 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
 	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
 
-	std::list<std::string> folderEntities = model->getListOfFolderItems(ot::FolderNames::CircuitModelsFolder + "/" + _elementType, true);
-	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folder + _elementType, _modelName);
+	std::list<std::string> folderEntities = model->getListOfFolderItems(_folder, true);
+	for (const std::string& model : folderEntities) {
+		if (model == _folder + "/" + _modelName) {
+			return;
+		}
+	}
+	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folder, _modelName);
 
 	circuitModel->setName(entityName);
 
@@ -228,14 +233,16 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 
 void LibraryManagementWrapper::updatePropertyOfEntity(const ot::UID& _entityID, bool _dialogConfirmed, const std::string& _propertyValue) {
 	auto entBase = Application::instance()->getModel()->getEntityByID(_entityID);
+	
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(entBase));
 	auto basePropertyModel = blockEntity->getProperties().getProperty("ModelSelection");
 	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
+	
 
 	if (_dialogConfirmed) {
 		modelProperty->addOption(_propertyValue);
 		modelProperty->setValue(_propertyValue);
-		modelProperty->setNeedsUpdate();
+		//modelProperty->resetNeedsUpdate();
 	}
 	else {
 		modelProperty->setValue("");

@@ -35,8 +35,11 @@ std::string MongoWrapper::getDocument(const std::string& _collectionName, const 
         auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
 
         auto result = docBase.GetDocument(std::move(filterQuery), std::move(projectionQuery));
-
-        std::string responseData = bsoncxx::to_json(result->view());
+        std::string responseData;
+        if (result) {
+            responseData = bsoncxx::to_json(result->view());
+        }
+        
 
         if (responseData.empty()) {
             OT_LOG_E("Document does not exist!");
