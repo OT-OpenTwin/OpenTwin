@@ -11,8 +11,7 @@ void EntityBlockCircuitElement::createProperties(const std::string& _circuitMode
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-	EntityPropertiesEntityList::createProperty("Model-Properties", "Model", _circuitModelFolderName, _circuitModelFolderID, "", -1, "default", getProperties());
-	EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary" }, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());
 }
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
@@ -36,10 +35,10 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 }
 
 std::string EntityBlockCircuitElement::getCircuitModel() {
-	auto propertyBase = getProperties().getProperty("Model");
-	auto propertyCircuitModel = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
+	auto propertyBase = getProperties().getProperty("ModelSelection");
+	auto propertyCircuitModel = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
-	std::string value = propertyCircuitModel->getValueName();
+	std::string value = propertyCircuitModel->getValue();
 	return value;
 }
 
