@@ -4187,7 +4187,32 @@ std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument
 	ot::ModelLibraryDialogCfg cfg;
 	cfg.setFromJsonObject(cfgObj);
 
-	
+	// Prepare response doc
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(targetFolder, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(elementType, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(modelUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(dbUserName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(dbUserPassword, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	// Show dialog
+	ot::ModelLibraryDialog dia(std::move(cfg));
+	if (dia.showDialog() == ot::Dialog::Ok) {
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(dia.getSelectedName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	}
+	else {
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogCanceled, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	}
+
+	// Send response
+	std::string response;
+	if (!ot::msg::send("", lmsUrl, ot::EXECUTE, responseDoc.toJson(), response)) {
+		OT_LOG_E("Failed to send message to LMS at \"" + lmsUrl + "\"");
+	}
 
 	return "";
 }
