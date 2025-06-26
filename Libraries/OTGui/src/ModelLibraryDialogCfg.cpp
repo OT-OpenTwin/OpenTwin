@@ -56,7 +56,7 @@ void ot::ModelLibraryDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::Json
 		modelArr.PushBack(childObj, _allocator);
 	}
 	_object.AddMember("Models", modelArr, _allocator);
-	_object.AddMember("Filter", JsonArray(m_filter, _allocator), _allocator);
+	_object.AddMember("Filters", JsonArray(m_filter, _allocator), _allocator);
 }
 
 void ot::ModelLibraryDialogCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
