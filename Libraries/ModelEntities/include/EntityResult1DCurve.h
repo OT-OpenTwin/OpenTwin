@@ -21,7 +21,7 @@ public:
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	virtual void addVisualizationNodes(void) override;
-	virtual bool updateFromProperties(void) override;
+	virtual bool updateFromProperties() override;
 
 	virtual std::string getClassName(void) { return "EntityResult1DCurve_New"; };
 
@@ -33,6 +33,11 @@ public:
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 
 	const ot::QueryInformation& getQueryInformation() const { return m_queryInformation; }
+
+protected:
+	//! @brief Updates the property visibilities of the curve properties.
+	//! @return True if the visibility has changed.
+	virtual bool updatePropertyVisibilities();
 
 private:
 	ot::QueryInformation m_queryInformation;

@@ -35,8 +35,8 @@ void EntityResult1DCurve::addVisualizationNodes(void)
 	getObserver()->sendMessageToViewer(doc);
 }
 
-bool EntityResult1DCurve::updateFromProperties(void)
-{
+bool EntityResult1DCurve::updateFromProperties() {
+	// Update the curve displayed in the frontend after the property change
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
 	
@@ -49,7 +49,8 @@ bool EntityResult1DCurve::updateFromProperties(void)
 	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised,doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
-	return false;
+
+	return this->updatePropertyVisibilities();
 }
 
 void EntityResult1DCurve::createProperties(void)
@@ -95,21 +96,27 @@ void EntityResult1DCurve::createProperties(void)
 	EntityPropertiesInteger* symbolSizeProp = EntityPropertiesInteger::createProperty("General", "Symbol Size", 1, 1, 99, "", getProperties());
 	symbolSizeProp->setToolTip("The size of the curve data point symbols in the plot.");
 	symbolSizeProp->setAllowCustomValues(false);
+	symbolSizeProp->setVisible(false);
 
 	EntityPropertiesInteger* symbolIntervalProp = EntityPropertiesInteger::createProperty("General", "Symbol Interval", 1, 1, 99, "", getProperties());
 	symbolIntervalProp->setToolTip("The interval of the curve data point symbols in the plot. A value of 1 means that every data point is shown, a value of 2 means that every second data point is shown, etc.");
 	symbolIntervalProp->setAllowCustomValues(false);
+	symbolIntervalProp->setVisible(false);
 
 	EntityPropertiesGuiPainter* symbolOutlineColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Outline Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolOutlineColorProp->setToolTip("The color of the curve data point symbols outline in the plot.");
 	symbolOutlineColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
+	symbolOutlineColorProp->setVisible(false);
 
 	EntityPropertiesInteger* symbolOutlineWidthProp = EntityPropertiesInteger::createProperty("General", "Symbol Outline Width", 1, 1, 99, "", getProperties());
 	symbolOutlineWidthProp->setToolTip("The width of the curve data point symbols outline in the plot.");
 	symbolOutlineWidthProp->setAllowCustomValues(false);
+	symbolOutlineWidthProp->setVisible(false);
 
 	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
+	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
+	symbolFillColorProp->setVisible(false);
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -221,6 +228,40 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
 	}
 
 	m_queryInformation = _curve.getQueryInformation();
+}
+
+bool EntityResult1DCurve::updatePropertyVisibilities() {
+	bool visibilityChanged = false;
+
+	EntityPropertiesSelection* symbolProp = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Symbol"));
+	if (symbolProp) {
+		EntityPropertiesBase* symbolSizeProp = getProperties().getProperty("Symbol Size");
+		EntityPropertiesBase* symbolIntervalProp = getProperties().getProperty("Symbol Interval");
+		EntityPropertiesBase* symbolOutlineColorProp = getProperties().getProperty("Symbol Outline Color");
+		EntityPropertiesBase* symbolOutlineWidthProp = getProperties().getProperty("Symbol Outline Width");
+		EntityPropertiesBase* symbolFillColorProp = getProperties().getProperty("Symbol Fill Color");
+		
+		OTAssertNullptr(symbolSizeProp);
+		OTAssertNullptr(symbolIntervalProp);
+		OTAssertNullptr(symbolOutlineColorProp);
+		OTAssertNullptr(symbolOutlineWidthProp);
+		OTAssertNullptr(symbolFillColorProp);
+
+		bool symbolPropsVisible = symbolProp->getValue() != ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol);
+		
+		if (symbolSizeProp->getVisible() != symbolPropsVisible) {
+			symbolSizeProp->setVisible(symbolPropsVisible);
+			symbolIntervalProp->setVisible(symbolPropsVisible);
+			symbolOutlineColorProp->setVisible(symbolPropsVisible);
+			symbolOutlineWidthProp->setVisible(symbolPropsVisible);
+			symbolFillColorProp->setVisible(symbolPropsVisible);
+
+			visibilityChanged = true;
+			getProperties().forceResetUpdateForAllProperties();
+		}
+	}
+
+	return visibilityChanged;
 }
 
 void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document& storage)

@@ -77,7 +77,10 @@ public:
 
 	virtual void removeChild(EntityBase *child) {};
 
-	virtual bool updateFromProperties(void);
+	//! @brief Will be called whenever a property of the entity has changed.
+	//! The function needs to update the entity accordingly.
+	//! @return Returns true if the property grid needs to be updated.
+	virtual bool updateFromProperties();
 
 	void setModelState(ModelState *ms) { m_modelState = ms; };
 	ModelState *getModelState(void) { return m_modelState; };

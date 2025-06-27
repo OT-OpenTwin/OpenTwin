@@ -355,20 +355,18 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 		if (m_cartesianCurvePointSymbol) {
 			m_cartesianCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
 			m_cartesianCurvePointSymbol->setSize(m_config.getPointSize());
-			m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
 		}
 		if (m_polarCurvePointSymbol) {
 			m_polarCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
 			m_polarCurvePointSymbol->setSize(m_config.getPointSize());
-			m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 		}
 	}
 	else { // No symbol
-		if (m_cartesianCurve) {
-			m_cartesianCurve->setSymbol(nullptr);
+		if (m_cartesianCurvePointSymbol) {
+			m_cartesianCurvePointSymbol->setStyle(QwtSymbol::NoSymbol);
 		}
-		if (m_polarCurve) {
-			m_polarCurve->setSymbol(nullptr);
+		if (m_polarCurvePointSymbol) {
+			m_polarCurvePointSymbol->setStyle(QwtSymbol::NoSymbol);
 		}
 	}
 
@@ -392,6 +390,7 @@ const ot::PointsContainer ot::PlotDataset::getDisplayedPoints() {
 void ot::PlotDataset::buildCartesianCurve() {
 	m_cartesianCurve = new CartesianPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_cartesianCurvePointSymbol = new QwtSymbol();
+	m_cartesianCurve->setSymbol(m_cartesianCurvePointSymbol);
 	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	m_cartesianCurve->setRawSamples(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
 }
@@ -399,8 +398,8 @@ void ot::PlotDataset::buildCartesianCurve() {
 void ot::PlotDataset::buildPolarCurve() {
 	m_polarCurve = new PolarPlotCurve(QString::fromStdString(m_config.getTitle()));
 	m_polarCurvePointSymbol = new QwtSymbol();
+	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 	ot::PointsContainer points = m_coordinateFormatConverter.defineXYPoints(m_data, m_ownerPlot->getConfig().getAxisQuantity());
 	m_polarData = new PolarPlotData(points.m_xData->data(), points.m_yData->data(), m_data.getNumberOfDatapoints());
-	m_polarCurve->setSymbol(m_polarCurvePointSymbol);
 	m_polarCurve->setData(m_polarData);
 }
