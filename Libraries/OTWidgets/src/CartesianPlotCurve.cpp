@@ -6,9 +6,10 @@
 /*
 
 The methods:
-ot::CartesianPlotCurve::verifyRange
-and
-ot::CartesianPlotCurve::drawSeries
+    ot::CartesianPlotCurve::verifyRange,
+    ot::CartesianPlotCurve::intersectedClipRect,
+    ot::CartesianPlotCurve::drawSeries and
+    ot::CartesianPlotCurve::drawSymbols
 use the following license:
 
                              Qwt License
@@ -53,6 +54,7 @@ exceptions:
 #pragma once
 
 // OpenTwin header
+#include "OTWidgets/PlotPointMapper.h"
 #include "OTWidgets/CartesianPlotCurve.h"
 
 // Qwt header
@@ -74,6 +76,15 @@ int ot::CartesianPlotCurve::verifyRange(int _size, int& _i1, int& _i2) {
     }
 
     return (_i2 - _i1 + 1);
+}
+
+QRectF ot::CartesianPlotCurve::intersectedClipRect(const QRectF& _rect, QPainter* _painter) {
+    QRectF clipRect = _rect;
+    if (_painter->hasClipping()) {
+        clipRect &= _painter->clipBoundingRect();
+    }
+
+    return clipRect;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -123,6 +134,28 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
             _painter->save();
             this->drawSymbols(_painter, *this->symbol(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
+        }
+    }
+}
+
+void ot::CartesianPlotCurve::drawSymbols(QPainter* _painter, const QwtSymbol& _symbol, const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QRectF& _canvasRect, int _from, int _to) const {
+    PlotPointMapper mapper;
+    mapper.setFlag(QwtPointMapper::WeedOutPoints, testPaintAttribute(QwtPlotCurve::FilterPoints));
+
+    const QRectF clipRect = CartesianPlotCurve::intersectedClipRect(_canvasRect, _painter);
+    mapper.setBoundingRect(clipRect);
+
+    const int chunkSize = 500;
+
+    PlotPointMapper::IntervalInfo interval(m_pointInterval);
+
+    for (int i = _from; i <= _to; i += chunkSize) {
+        const int n = qMin(chunkSize, _to - i + 1);
+
+        const QPolygonF points = mapper.toPointsF(_xMap, _yMap, data(), i, i + n - 1, interval);
+
+        if (points.size() > 0) {
+            _symbol.drawSymbols(_painter, points);
         }
     }
 }

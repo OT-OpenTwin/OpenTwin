@@ -93,6 +93,8 @@ namespace ot {
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
+		void setPointInterval(int _interval, bool _repaint = true);
+
 		void setConfig(ot::Plot1DCurveCfg& _config) {
 			m_config = _config;
 		}
@@ -124,7 +126,7 @@ namespace ot {
 
 		bool m_isAttatched = false;
 		bool m_isSelected = false;
-
+		
 		PlotDatasetData m_data;
 		CoordinateFormatConverter m_coordinateFormatConverter;
 

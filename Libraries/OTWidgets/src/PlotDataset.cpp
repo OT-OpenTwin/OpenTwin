@@ -208,6 +208,13 @@ void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
 	}
 }
 
+void ot::PlotDataset::setPointInterval(int _interval, bool _repaint) {
+	m_config.setPointInterval(_interval);
+	if (_repaint) {
+		this->updateCurveVisualization();
+	}
+}
+
 void ot::PlotDataset::setSelected(bool _isSelected) {
 	if (_isSelected == m_isSelected) {
 		return;

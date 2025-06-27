@@ -7,7 +7,6 @@
 
 This class is a modified version of the QwtPointMapper and therefore uses the following license:
 
-
                              Qwt License
                            Version 1.0, January 1, 2003
 
@@ -64,6 +63,15 @@ namespace ot {
 		OT_DECL_NOCOPY(PlotPointMapper)
         OT_DECL_DEFMOVE(PlotPointMapper)
     public:
+        class IntervalInfo {
+        public:
+            IntervalInfo() : limit(1), count(0) {};
+			IntervalInfo(int _limit) : limit(_limit), count(0) {};
+
+            const int limit;
+            int count;
+        };
+
         PlotPointMapper();
         ~PlotPointMapper();
 
@@ -76,13 +84,13 @@ namespace ot {
 		void setBoundingRect(const QRectF& _rect) { m_boundingRect = _rect; };
         QRectF boundingRect() const { return m_boundingRect; };
 
-        QPolygonF toPolygonF(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to) const;
+        QPolygonF toPolygonF(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to, IntervalInfo& _interval) const;
 
-        QPolygon toPolygon(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to) const;
+        QPolygon toPolygon(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to, IntervalInfo& _interval) const;
 
-        QPolygon toPoints(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to) const;
+        QPolygon toPoints(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to, IntervalInfo& _interval) const;
 
-        QPolygonF toPointsF(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to) const;
+        QPolygonF toPointsF(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to, IntervalInfo& _interval) const;
 
         QImage toImage(const QwtScaleMap& _xMap, const QwtScaleMap& _yMap, const QwtSeriesData<QPointF>* _series, int _from, int _to, const QPen&, bool _antialiased, uint _numThreads) const;
 
