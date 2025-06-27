@@ -544,6 +544,9 @@
     <ClCompile Include="src\PolarPlotCurve.cpp">
       <Filter>src\Plot\Polar</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlotPointMapper.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1027,6 +1030,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h">
       <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotPointMapper.h">
+      <Filter>include\Plot\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

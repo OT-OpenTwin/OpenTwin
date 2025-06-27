@@ -113,6 +113,7 @@
     <ClCompile Include="src\ManagedPropertyLink.cpp" />
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
     <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\PlotPointMapper.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
     <ClCompile Include="src\PolarPlotCurve.cpp" />
     <ClCompile Include="src\TreeItemDelegate.cpp" />
@@ -264,6 +265,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h" />
     <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
+    <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
