@@ -403,13 +403,11 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
 	
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 
 	ot::JsonDocument dialogCanceled;
 	dialogCanceled.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogCanceled, dialogCanceled.GetAllocator()), dialogCanceled.GetAllocator());
 	dialogCanceled.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, dialogCanceled.GetAllocator());
-	dialogCanceled.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(selectedModel, dialogCanceled.GetAllocator()), dialogCanceled.GetAllocator());
 
 	std::string response = sendMessageToModel(dialogCanceled, modelUrl);
 	return response;

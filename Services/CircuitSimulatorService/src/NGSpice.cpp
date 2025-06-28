@@ -903,23 +903,37 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		if (circuitElement->type() == "VoltageSource")
 		{
 			VoltageSource* voltagesource = dynamic_cast<VoltageSource*>(circuitElement);
-			netlistElementName = voltagesource->getNetlistName();
+			
 			if (simulationType == ".dc")
 			{
 				voltagesource->setType("DC");
 				netlistVoltageSourceType = voltagesource->getType() + " ";
-				netlistValue = voltagesource->getValue() + " " + voltagesource->getModel();
+				if (modelType.empty()) {
+					netlistElementName = voltagesource->getNetlistName();
+					netlistValue = voltagesource->getValue();
+				}
+				else {
+					if (modelType == m_subcktType) {
+						netlistElementName = assignElementID("X");
+					}
+					else {
+						netlistElementName = voltagesource->getNetlistName();
+					}
+
+					netlistValue = voltagesource->getModel();
+				}
 			}
 			else if (simulationType == ".ac")
 			{
 				voltageSourceType = "AC ";
 				netlistVoltageSourceType = "DC 0 " + voltageSourceType + voltagesource->getAmplitude();
-				
+				netlistElementName = voltagesource->getNetlistName();
 			}
 			else
 			{
 				voltageSourceType = "TRAN";
 				netlistVoltageSourceType = voltagesource->getFunction();
+				netlistElementName = voltagesource->getNetlistName();
 			}
 			
 	
@@ -930,9 +944,23 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		{
 			Resistor* resistor = dynamic_cast<Resistor*>(circuitElement);
 
-			netlistElementName = resistor->getNetlistName();
+			
+			if (modelType.empty()) {
+				netlistElementName = resistor->getNetlistName();
+				netlistValue = resistor->getResistance();
+			}
+			else {
+				if (modelType == m_subcktType) {
+					netlistElementName = assignElementID("X");
+				}
+				else {
+					netlistElementName = resistor->getNetlistName();
+				}
+
+				netlistValue = resistor->getModel();
+			}
+
 			netlistLine += netlistElementName + " ";
-			netlistValue = resistor->getResistance() + " " + resistor->getModel();
 		}
 		else if (circuitElement->type() == "Diode")
 		{
@@ -941,14 +969,12 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			// Check if .model or .subckt
 			if (modelType == m_subcktType) {
 				netlistElementName = assignElementID("X");
-				netlistValue = diode->getValue() + " " + diode->getModel();
 			}
 			else {
 				netlistElementName = diode->getNetlistName();
-				netlistValue = diode->getValue() + " " + diode->getModel();
 			}
 
-
+			netlistValue = diode->getValue() + " " + diode->getModel();
 			netlistLine += netlistElementName + " ";
 			
 		}
@@ -1032,25 +1058,63 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		else if (circuitElement->type() == "Capacitor")
 		{
 			Capacitor* capacitor = dynamic_cast<Capacitor*>(circuitElement);
+
 			
-			netlistElementName = capacitor->getNetlistName();
+			if (modelType.empty()) {
+				netlistElementName = capacitor->getNetlistName();
+				netlistValue = capacitor->getCapacity();
+			}
+			else {
+				if (modelType == m_subcktType) {
+					netlistElementName = assignElementID("X");
+				}
+				else {
+					netlistElementName = capacitor->getNetlistName();
+				}
+
+				netlistValue = capacitor->getModel();
+			}
 			netlistLine += netlistElementName + " ";
-			netlistValue = capacitor->getCapacity() + " " + capacitor->getModel();
 		}
 		else if (circuitElement->type() == "Inductor")
 		{
 			Inductor* inductor = dynamic_cast<Inductor*>(circuitElement);
 
-			netlistElementName = inductor->getNetlistName();
+			if (modelType.empty()) {
+				netlistElementName = inductor->getNetlistName();
+				netlistValue = inductor->getInductance();
+			}
+			else {
+				if (modelType == m_subcktType) {
+					netlistElementName = assignElementID("X");
+				}
+				else {
+					netlistElementName = inductor->getNetlistName();
+				}
+
+				netlistValue = inductor->getModel();
+			}
 			netlistLine += netlistElementName + " ";
-			netlistValue = inductor->getInductance() + " " + inductor->getModel();
 		}
 		else if (circuitElement->type() == "TransmissionLine") 
 		{
 			TransmissionLine* transmissionLine = dynamic_cast<TransmissionLine*>(circuitElement);
-			netlistElementName = transmissionLine->getNetlistName();
+
+			if (modelType.empty()) {
+				netlistElementName = transmissionLine->getNetlistName();
+				netlistValue = transmissionLine->getImpedance() + " " + transmissionLine->getTransmissionDelay();
+			}
+			else {
+				if (modelType == m_subcktType) {
+					netlistElementName = assignElementID("X");
+				}
+				else {
+					netlistElementName = transmissionLine->getNetlistName();
+				}
+
+				netlistValue = transmissionLine->getModel();
+			}
 			netlistLine += netlistElementName + " ";
-			netlistValue = transmissionLine->getImpedance() + " " + transmissionLine->getTransmissionDelay() + " " + transmissionLine->getModel();
 		}
 		
 		

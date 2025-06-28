@@ -169,6 +169,17 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 }
 
 void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelInfo, const std::string& _folder, const std::string& _elementType, const std::string& _modelName) {
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	// Check if model alreaedy imported
+
+	std::list<std::string> folderEntities = model->getListOfFolderItems(_folder, true);
+	for (const std::string& model : folderEntities) {
+		if (model == _folder + "/" + _modelName) {
+			return;
+		}
+	}
 
 	ot::JsonDocument circuitModelDoc;
 	circuitModelDoc.fromJson(_modelInfo);
@@ -176,8 +187,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	std::string modelText = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_Content);
 	std::string modelType = ot::json::getString(circuitModelDoc, OT_ACTION_PARAM_ModelType);
 	
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
+
 
 	ot::UID entIDData = model->createEntityUID();
 	ot::UID entIDTopo = model->createEntityUID();
@@ -211,12 +221,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	circuitModel->getProperties().getProperty("Text Encoding", "Text Properties")->setVisible(false);
 	circuitModel->getProperties().getProperty("Syntax Highlight", "Text Properties")->setVisible(false);
 
-	std::list<std::string> folderEntities = model->getListOfFolderItems(_folder, true);
-	for (const std::string& model : folderEntities) {
-		if (model == _folder + "/" + _modelName) {
-			return;
-		}
-	}
+
 	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folder, _modelName);
 
 	circuitModel->setName(entityName);
@@ -241,20 +246,15 @@ void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _d
 	if (_dialogConfirmed) {
 		modelProperty->addOption(_propertyValue);
 		modelProperty->setValue(_propertyValue);
-		entBase->StoreToDataBase();
-		
-		const std::string comment = "Property Updated";
-		ot::UIDList topoList{entBase->getEntityID()};
-		ot::UIDList versionList{entBase->getEntityStorageVersion()};
-		model->updateTopologyEntities(topoList, versionList, comment);
-		model->updatePropertyGrid();
 	}
 	else {
 		modelProperty->setValue("");
-		modelProperty->setNeedsUpdate();
 	}
-	
-
+	entBase->StoreToDataBase();
+	const std::string comment = "Property Updated";
+	ot::UIDList topoList{entBase->getEntityID()};
+	ot::UIDList versionList{entBase->getEntityStorageVersion()};
+	model->updateTopologyEntities(topoList, versionList, comment);
 }
 
 void LibraryManagementWrapper::addModelToEntites() {

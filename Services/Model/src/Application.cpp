@@ -1013,11 +1013,9 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 
 std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-
+	
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, folder + "/" + selectedModel);
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "");
 
 	return "";
 }
