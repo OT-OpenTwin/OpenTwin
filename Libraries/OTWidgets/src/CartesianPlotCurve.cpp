@@ -115,19 +115,22 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
     }
 
     if (CartesianPlotCurve::verifyRange(numSamples, _from, _to) > 0) {
-        _painter->save();
-
+        
         // Draw outline if needed
 		if (m_outlinePen.style() != Qt::NoPen) {
+            _painter->save();
             _painter->setPen(m_outlinePen);
             this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
+            _painter->restore();
 		}
 
 		// Draw the curve
-        _painter->setPen(this->pen());
-        this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
-
-        _painter->restore();
+        if (this->pen().style() != Qt::NoPen) {
+            _painter->save();
+            _painter->setPen(this->pen());
+            this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
+            _painter->restore();
+        }
 
 		// Draw symbols if they are set
         if (this->symbol() && (this->symbol()->style() != QwtSymbol::NoSymbol)) {
