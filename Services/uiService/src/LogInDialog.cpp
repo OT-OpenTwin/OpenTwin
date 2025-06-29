@@ -154,7 +154,7 @@ LogInDialog::LogInDialog()
 	registerLayout->addStretch(1);
 	registerLayout->addWidget(m_toggleRegisterModeLabel);
 	registerLayout->addStretch(1);
-	this->connect(m_toggleRegisterModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleLogInAndRegisterMode);
+	this->connect(m_toggleRegisterModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleLogInAndRegisterMode);
 
 	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword);
 	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
@@ -163,7 +163,7 @@ LogInDialog::LogInDialog()
 	changePasswordLayout->addStretch(1);
 	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
 	changePasswordLayout->addStretch(1);
-	this->connect(m_toggleChangePasswordModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleChangePasswordMode);
+	this->connect(m_toggleChangePasswordModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleChangePasswordMode);
 
 	// Setup window
 	QRect newTargetRect(ot::Positioning::getCenterWidgetOnParentRect(nullptr, static_cast<QWidget*>(this)).topLeft(), QSize(350, 500));

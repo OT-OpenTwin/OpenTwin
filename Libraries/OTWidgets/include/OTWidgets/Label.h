@@ -22,12 +22,19 @@ namespace ot {
 		virtual ~Label() {};
 
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
-
-		virtual void mousePressEvent(QMouseEvent* _event) override;
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 	Q_SIGNALS:
-		void mousePressed(void);
+		void mouseClicked();
+		void mouseDoubleClicked();
+
+	protected:
+		virtual void mousePressEvent(QMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
+		virtual void mouseDoubleClickEvent(QMouseEvent* _event) override;
+
+	private:
+		bool m_mouseIsPressed;
 	};
 }
