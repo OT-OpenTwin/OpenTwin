@@ -20,7 +20,7 @@ std::string ot::toString(LineStyle _style) {
 	case LineStyle::DashDotDotLine: return "Dash Dot Dot";
 	default:
 		OT_LOG_E("Unknown line style (" + std::to_string((int)_style) + ")");
-		return "NoLine";
+		return "Solid";
 	}
 }
 
@@ -33,7 +33,7 @@ ot::LineStyle ot::stringToLineStyle(const std::string& _style) {
 	else if (_style == toString(LineStyle::DashDotDotLine)) return LineStyle::DashDotDotLine;
 	else {
 		OT_LOG_E("Unknown line style \"" + _style + "\"");
-		return LineStyle::NoLine;
+		return LineStyle::SolidLine;
 	}
 }
 
