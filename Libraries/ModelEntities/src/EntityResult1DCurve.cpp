@@ -8,12 +8,54 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Painter2DDialogFilterDefaults.h"
 
+ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _plotName, const std::string& _curveName, DefaultCurveStyle _style) {
+	ot::Plot1DCurveCfg cfg;
+
+	cfg.setEntityName(_plotName + "/" + _curveName);
+
+	switch (_style) {
+	case DefaultCurveStyle::Default:
+		cfg.setLinePenStyle(ot::LineStyle::SolidLine);
+		cfg.setLinePenColor(ot::ColorStyleValueEntry::PlotCurve);
+		cfg.setLinePenWidth(1.);
+		cfg.setPointSymbol(ot::Plot1DCurveCfg::NoSymbol);
+		cfg.setPointSize(5);
+		cfg.setPointInterval(1);
+		cfg.setPointOutlinePenColor(ot::ColorStyleValueEntry::PlotCurveSymbol);
+		cfg.setPointOutlinePenWidth(1.);
+		cfg.setPointFillColor(ot::ColorStyleValueEntry::PlotCurveSymbol);
+		break;
+
+	case DefaultCurveStyle::ScatterPlot:
+		cfg.setLinePenStyle(ot::LineStyle::NoLine);
+		cfg.setLinePenColor(ot::ColorStyleValueEntry::PlotCurve);
+		cfg.setLinePenWidth(1.);
+		cfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
+		cfg.setPointSize(10);
+		cfg.setPointInterval(1);
+		cfg.setPointOutlinePenColor(ot::ColorStyleValueEntry::PlotCurveSymbol);
+		cfg.setPointOutlinePenWidth(1.);
+		cfg.setPointFillColor(ot::ColorStyleValueEntry::PlotCurveSymbol);
+		break;
+
+	default:
+		OT_LOG_EAS("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
+		break;
+	}
+
+	return cfg;
+}
+
 EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
 {
 }
 
-void EntityResult1DCurve::addVisualizationNodes(void)
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Virtual methods
+
+void EntityResult1DCurve::addVisualizationNodes()
 {
 	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
@@ -53,26 +95,58 @@ bool EntityResult1DCurve::updateFromProperties() {
 	return this->updatePropertyVisibilities();
 }
 
-void EntityResult1DCurve::createProperties(void)
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Configuration
+
+void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 {
+	// Prepare default values depending on set style
+	std::string defaultLineStyle;
+	std::string defaultSymbol;
+	int defaultSymbolSize = 5;
+	switch (_style) {
+	case EntityResult1DCurve::Default:
+		defaultLineStyle = ot::toString(ot::LineStyle::SolidLine);
+		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol);
+		defaultSymbolSize = 5;
+		break;
+	case EntityResult1DCurve::ScatterPlot:
+		defaultLineStyle = ot::toString(ot::LineStyle::NoLine);
+		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Circle);
+		defaultSymbolSize = 10;
+		break;
+	default:
+		OT_LOG_EAS("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
+		defaultLineStyle = ot::toString(ot::LineStyle::SolidLine);
+		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol);
+		defaultSymbolSize = 5;
+		break;
+	}
+
+	// Line color
 	EntityPropertiesGuiPainter* colorProp = EntityPropertiesGuiPainter::createProperty("General", "Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurve), "", getProperties());
 	colorProp->setToolTip("The color of the curve line in the plot.");
 	colorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 
+	// Line width
 	EntityPropertiesInteger* widthProp = EntityPropertiesInteger::createProperty("General", "Line Width", 1, 1, 99, "", getProperties());
 	widthProp->setToolTip("The width of the curve line in the plot.");
 	widthProp->setAllowCustomValues(false);
 
+	// Line style
 	EntityPropertiesSelection* selectionProp = EntityPropertiesSelection::createProperty("General", "Line Style", {
+		ot::toString(ot::LineStyle::NoLine),
 		ot::toString(ot::LineStyle::SolidLine),
 		ot::toString(ot::LineStyle::DashLine),
 		ot::toString(ot::LineStyle::DotLine),
 		ot::toString(ot::LineStyle::DashDotLine),
 		ot::toString(ot::LineStyle::DashDotDotLine)
 		},
-		ot::toString(ot::LineStyle::SolidLine), "", getProperties());
+		defaultLineStyle, "", getProperties());
 	selectionProp->setToolTip("The style of the curve line in the plot.");
 
+	// Symbol style
 	EntityPropertiesSelection* symbolProp = EntityPropertiesSelection::createProperty("General", "Symbol", {
 		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol),
 		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Circle),
@@ -90,29 +164,34 @@ void EntityResult1DCurve::createProperties(void)
 		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Star8),
 		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Hexagon)
 		},
-		ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol), "", getProperties());
+		defaultSymbol, "", getProperties());
 	symbolProp->setToolTip("The symbol that is used for the curve data points in the plot.");
 
-	EntityPropertiesInteger* symbolSizeProp = EntityPropertiesInteger::createProperty("General", "Symbol Size", 1, 1, 99, "", getProperties());
+	// Symbol Size
+	EntityPropertiesInteger* symbolSizeProp = EntityPropertiesInteger::createProperty("General", "Symbol Size", defaultSymbolSize, 1, 99, "", getProperties());
 	symbolSizeProp->setToolTip("The size of the curve data point symbols in the plot.");
 	symbolSizeProp->setAllowCustomValues(false);
 	symbolSizeProp->setVisible(false);
 
+	// Symbol Interval
 	EntityPropertiesInteger* symbolIntervalProp = EntityPropertiesInteger::createProperty("General", "Symbol Interval", 1, 1, 99, "", getProperties());
 	symbolIntervalProp->setToolTip("The interval of the curve data point symbols in the plot. A value of 1 means that every data point is shown, a value of 2 means that every second data point is shown, etc.");
 	symbolIntervalProp->setAllowCustomValues(false);
 	symbolIntervalProp->setVisible(false);
 
+	// Symbol Outline Color
 	EntityPropertiesGuiPainter* symbolOutlineColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Outline Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolOutlineColorProp->setToolTip("The color of the curve data point symbols outline in the plot.");
 	symbolOutlineColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
 	symbolOutlineColorProp->setVisible(false);
 
+	// Symbol Outline Width
 	EntityPropertiesInteger* symbolOutlineWidthProp = EntityPropertiesInteger::createProperty("General", "Symbol Outline Width", 1, 1, 99, "", getProperties());
 	symbolOutlineWidthProp->setToolTip("The width of the curve data point symbols outline in the plot.");
 	symbolOutlineWidthProp->setAllowCustomValues(false);
 	symbolOutlineWidthProp->setVisible(false);
 
+	// Symbol Fill Color
 	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
@@ -120,6 +199,10 @@ void EntityResult1DCurve::createProperties(void)
 
 	getProperties().forceResetUpdateForAllProperties();
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
 
 ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 {
@@ -230,6 +313,10 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
 	m_queryInformation = _curve.getQueryInformation();
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected: Virtual methods
+
 bool EntityResult1DCurve::updatePropertyVisibilities() {
 	bool visibilityChanged = false;
 
@@ -288,29 +375,6 @@ void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document& stor
 	
 }
 
-bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription)
-{
-	bsoncxx::builder::basic::document subDocument;
-	subDocument.append(
-		bsoncxx::builder::basic::kvp("DataType", _quantityContainerEntryDescription.m_dataType),
-		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
-		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
-		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit)
-	);
-	return subDocument;
-}
-
-
-ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument)
-{
-	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
-	quantityContainerEntryDescription.m_dataType = _subDocument["DataType"].get_string();
-	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
-	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
-	quantityContainerEntryDescription.m_unit = _subDocument["Unit"].get_string();
-	return quantityContainerEntryDescription;
-}
-
 void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -330,4 +394,28 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& 
 		ot::QuantityContainerEntryDescription parameterDesc = deserialise(parameterDoc);
 		m_queryInformation.m_parameterDescriptions.push_back(parameterDesc);
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription) {
+	bsoncxx::builder::basic::document subDocument;
+	subDocument.append(
+		bsoncxx::builder::basic::kvp("DataType", _quantityContainerEntryDescription.m_dataType),
+		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
+		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
+		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit)
+	);
+	return subDocument;
+}
+
+ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document::view _subDocument) {
+	ot::QuantityContainerEntryDescription quantityContainerEntryDescription;
+	quantityContainerEntryDescription.m_dataType = _subDocument["DataType"].get_string();
+	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
+	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
+	quantityContainerEntryDescription.m_unit = _subDocument["Unit"].get_string();
+	return quantityContainerEntryDescription;
 }
