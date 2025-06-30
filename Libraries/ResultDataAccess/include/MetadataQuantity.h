@@ -8,8 +8,10 @@
 
 #include "OTCore/Variable.h"
 #include "MetadataEntry.h"
+#include "OTCore/Serializable.h"
 
-struct __declspec(dllexport) MetadataQuantityValueDescription
+
+struct __declspec(dllexport) MetadataQuantityValueDescription : public ot::Serializable
 {
 	/****************** Are set by the campaign handling class *********************/
 	ot::UID quantityIndex = 0;
@@ -32,9 +34,27 @@ struct __declspec(dllexport) MetadataQuantityValueDescription
 			this->dataTypeName == other.dataTypeName;
 		return isEqual;
 	}
+
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+	{
+		_object.AddMember("Index", quantityIndex, _allocator);
+		_object.AddMember("Label", ot::JsonString(quantityValueLabel,_allocator), _allocator);
+		_object.AddMember("Name", ot::JsonString(quantityValueName,_allocator), _allocator);
+		_object.AddMember("Type", ot::JsonString(dataTypeName,_allocator), _allocator);
+		_object.AddMember("Unit", ot::JsonString(unit,_allocator), _allocator);
+	}
+
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object)
+	{
+		quantityValueLabel =	ot::json::getString(_object, "Label");
+		quantityValueName = ot::json::getString(_object, "Name");
+		unit = ot::json::getString(_object, "Unit");
+		dataTypeName = ot::json::getString(_object, "Type");
+		quantityIndex =	ot::json::getUInt64(_object, "Index");
+	}
 };
 
-struct __declspec(dllexport) MetadataQuantity
+struct __declspec(dllexport) MetadataQuantity : ot::Serializable
 {
 	std::string quantityName = "";
 
@@ -71,5 +91,40 @@ struct __declspec(dllexport) MetadataQuantity
 	const bool operator!=(const MetadataQuantity& _other) const
 	{
 		return !(*this == _other);
+	}
+
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+	{
+		//_object.AddMember("Index", quantityIndex, _allocator);
+		//_object.AddMember("Label", ot::JsonString(quantityLabel, _allocator), _allocator);
+		//_object.AddMember("Name", ot::JsonString(quantityName, _allocator), _allocator);
+		//_object.AddMember("DependingParameterIDs", dependingParameterIds, _allocator);
+		//ot::JsonArray allValueDescriptions;
+		//for(auto& valueDescription : valueDescriptions)
+		//{ 
+		//	ot::JsonObject entry;
+		//	valueDescription.addToJsonObject(entry, _allocator);
+		//	allValueDescriptions.PushBack(entry, _allocator);
+		//}
+		//_object.AddMember("ValueDescriptions", allValueDescriptions, _allocator);
+		//_object.AddMember("Dimensions", dataDimensions, _allocator);
+	}
+
+
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object)
+	{
+		//quantityLabel = ot::json::getString(_object, "Label");
+		//quantityName = ot::json::getString(_object, "Name");
+		//quantityIndex = ot::json::getUInt64(_object, "Index");
+		//dependingParameterIds = ot::json::getUInt64Vector(_object, "DependingParameterIDs");
+		//auto allValueDesriptions =	ot::json::getArray(_object, "ValueDescriptions");
+		//for (size_t i = 0; i < allValueDesriptions.Size(); i++)
+		//{
+		//	auto entry = ot::json::getObject(allValueDesriptions, i);
+		//	MetadataQuantityValueDescription valueDescription;
+		//	valueDescription.setFromJsonObject(entry);
+		//	valueDescriptions.push_back(valueDescription);
+		//}
+		//dataDimensions = ot::json::getUIntVector(_object, "Dimensions");
 	}
 };
