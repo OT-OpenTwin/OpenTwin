@@ -8,6 +8,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/Painter2DFactory.h"
+#include "OTGui/StyleRefPainter2D.h"
 
 std::string ot::Plot1DCurveCfg::toString(Symbol _symbol) {
 	switch (_symbol) {
@@ -64,8 +65,9 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg() :
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _name) :
 	BasicEntityInformation(_name, _id, _version), m_navigationId(0), m_visible(true), m_dimmed(false),
-	m_linePen(1., Color(DefaultColor::Red)), m_pointSize(5), m_pointInterval(1), m_pointSymbol(NoSymbol),
-	m_pointFillPainter(new FillPainter2D(DefaultColor::Lime)), m_pointOulinePen(1., DefaultColor::Lime)
+	m_linePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurve)), m_pointSize(5), m_pointInterval(1), m_pointSymbol(NoSymbol),
+	m_pointFillPainter(new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol)), 
+	m_pointOulinePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol))
 {}
 
 ot::Plot1DCurveCfg::Plot1DCurveCfg(const Plot1DCurveCfg& _other) : m_pointFillPainter(nullptr) {
@@ -78,7 +80,12 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept :
 	this->operator=(std::move(_other));
 }
 
-ot::Plot1DCurveCfg::~Plot1DCurveCfg() {}
+ot::Plot1DCurveCfg::~Plot1DCurveCfg() {
+	if (m_pointFillPainter) {
+		delete m_pointFillPainter;
+		m_pointFillPainter = nullptr;
+	}
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -200,8 +207,16 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 // Setter / Getter
 
+void ot::Plot1DCurveCfg::setPointFillColor(DefaultColor _color) {
+	this->setPointFillPainter(new FillPainter2D(_color));
+}
+
 void ot::Plot1DCurveCfg::setPointFillColor(const Color& _color) {
 	this->setPointFillPainter(new FillPainter2D(_color));
+}
+
+void ot::Plot1DCurveCfg::setPointFillColor(ColorStyleValueEntry _styleReference) {
+	this->setPointFillPainter(new StyleRefPainter2D(_styleReference));
 }
 
 void ot::Plot1DCurveCfg::setPointFillPainter(Painter2D* _painter) {

@@ -8,6 +8,7 @@
 #include "OTGui/PenCfg.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
+#include "OTGui/StyleRefPainter2D.h"
 
 std::string ot::toString(LineStyle _style) {
 	switch (_style)
@@ -159,8 +160,16 @@ void ot::PenCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
+void ot::PenCfg::setColor(DefaultColor _color) {
+	this->setPainter(new FillPainter2D(_color));
+}
+
 void ot::PenCfg::setColor(const Color& _color) {
 	this->setPainter(new FillPainter2D(_color));
+}
+
+void ot::PenCfg::setColor(ColorStyleValueEntry _color) {
+	this->setPainter(new StyleRefPainter2D(_color));
 }
 
 void ot::PenCfg::setPainter(Painter2D* _painter) {
@@ -262,8 +271,16 @@ void ot::PenFCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 }
 
+void ot::PenFCfg::setColor(DefaultColor _color) {
+	this->setPainter(new FillPainter2D(_color));
+}
+
 void ot::PenFCfg::setColor(const Color& _color) {
 	this->setPainter(new FillPainter2D(_color));
+}
+
+void ot::PenFCfg::setColor(ColorStyleValueEntry _color) {
+	this->setPainter(new StyleRefPainter2D(_color));
 }
 
 void ot::PenFCfg::setPainter(Painter2D* _painter) {

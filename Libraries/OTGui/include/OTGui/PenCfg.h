@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/ColorStyleTypes.h"
 
 namespace ot {
 
@@ -106,8 +107,16 @@ namespace ot {
 
 		//! @brief Set the color.
 		//! The current painter will be replaced by a FillPainter2D.
-		void setColor(const Color& _color);
+		void setColor(DefaultColor _color);
 
+		//! @brief Set the color.
+		//! The current painter will be replaced by a FillPainter2D.
+		void setColor(const Color& _color);
+		
+		//! @brief Set the color as a style reference color.
+		//! The current painter will be replaced by a StyleRefPainter2D.
+		void setColor(ColorStyleValueEntry _color);
+		
 		//! @brief Set the painter.
 		//! The pen takes ownership of the painter.
 		//! @param _painter The painter to set.
@@ -222,7 +231,15 @@ namespace ot {
 
 		//! @brief Set the color.
 		//! The current painter will be replaced by a FillPainter2D.
+		void setColor(DefaultColor _color);
+
+		//! @brief Set the color.
+		//! The current painter will be replaced by a FillPainter2D.
 		void setColor(const Color& _color);
+
+		//! @brief Set the color as a style reference color.
+		//! The current painter will be replaced by a StyleRefPainter2D.
+		void setColor(ColorStyleValueEntry _color);
 
 		//! @brief Set the painter.
 		//! The pen takes ownership of the painter.
