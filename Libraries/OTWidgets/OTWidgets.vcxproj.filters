@@ -511,9 +511,6 @@
     <ClCompile Include="src\PlotView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\CoordinateFormatConverter.cpp">
-      <Filter>src\Plot</Filter>
-    </ClCompile>
     <ClCompile Include="src\TreeItemDelegate.cpp">
       <Filter>src\Delegates</Filter>
     </ClCompile>
@@ -546,6 +543,12 @@
     </ClCompile>
     <ClCompile Include="src\PlotPointMapper.cpp">
       <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CoordinateFormatConverter.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotLegendView.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -869,9 +872,6 @@
     <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
-      <Filter>include\Plot\Cartesian</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
@@ -1010,9 +1010,6 @@
     <ClInclude Include="include\OTWidgets\PlotView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h">
-      <Filter>include\Plot</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\TreeItemDelegate.h">
       <Filter>include\Delegates</Filter>
     </ClInclude>
@@ -1033,6 +1030,15 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PlotPointMapper.h">
       <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegendView.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
+      <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
