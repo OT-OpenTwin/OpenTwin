@@ -268,10 +268,18 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 	QPen linePen = QtFactory::toQPen(m_config.getLinePen());
 
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
+	
 	QBrush dimmedBrush = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush();
-	QPen dimmedPen(dimmedBrush, linePen.width());
+
+	QPen dimmedPen = linePen;
+	dimmedPen.setBrush(dimmedBrush);
+	dimmedPen.setWidthF(linePen.width());
+
 	QPen invisPen(QBrush(), 0., Qt::NoPen);
-	QPen outlinePen = QPen(cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush(), linePen.width() * 3.);
+
+	QPen outlinePen = linePen;
+	outlinePen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
+	outlinePen.setWidthF(linePen.width() * 3.);
 
 	// Setup outline
 	if (m_isSelected) {
