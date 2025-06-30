@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/Logger.h"
@@ -263,8 +264,8 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		}
 
 		if (_flags & msg::ExitOnFail) {
-			assert(false);
-			exit(1);
+			OTAssert(0, "Failed to send message. Exiting...");
+			exit(ot::AppExitCode::SendFailed);
 		}
 
 		return false;
