@@ -6,20 +6,19 @@
 class PortData
 {
 public:
-	PortData(const std::string& portName, const ot::GenericDataStructList& values, bool modified);
+	PortData(const std::string& portName, const std::string& _serialisedData, bool _modified);
 	PortData(PortData&& other) noexcept;
 	PortData(const PortData& other) = delete;
 	PortData& operator=(PortData&& other) noexcept;
 	PortData& operator=(const PortData& other) = delete;
 	~PortData();
-	void overrideValues(const ot::GenericDataStructList& values);
-	const ot::GenericDataStructList& getValues() const;
+	void overrideValues(const std::string& _serialisedData);
+	const ot::JsonDocument& getValues() const;
 	const bool getModified() const;
-	ot::GenericDataStructList HandDataOver();
-private:
-	std::string _portName;
-	bool _modified;
-	ot::GenericDataStructList _values;
+	const std::string& getPortName() { return m_portName; }
 
-	void FreeMemory();
+private:
+	std::string m_portName;
+	bool m_modified;
+	ot::JsonDocument m_values;
 };

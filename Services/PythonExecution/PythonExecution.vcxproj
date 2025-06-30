@@ -288,7 +288,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
-    <ClCompile Include="src\PortDataBuffer.cpp" />
+    <ClCompile Include="src\DataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
     <ClCompile Include="src\PythonException.cpp" />
@@ -307,7 +307,7 @@
     <ClInclude Include="include\CPythonObjectNew.h" />
     <ClInclude Include="include\PortData.h" />
     <ClInclude Include="include\EntityBuffer.h" />
-    <ClInclude Include="include\PortDataBuffer.h" />
+    <ClInclude Include="include\DataBuffer.h" />
     <ClInclude Include="include\PropertyPythonObjectConverter.h" />
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonException.h" />

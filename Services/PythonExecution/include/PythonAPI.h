@@ -12,8 +12,8 @@ class PythonAPI
 	friend class FixturePythonAPI;
 public:
 	PythonAPI();
-	ot::ReturnValues execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
-	ot::ReturnValues execute(const std::string& _command) noexcept(false);
+	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
+	void execute(const std::string& _command) noexcept(false);
 private:
 	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
 	PythonWrapper m_wrapper;

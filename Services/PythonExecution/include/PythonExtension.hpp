@@ -6,7 +6,7 @@
 #include "PythonLoadedModules.h"
 #include "PythonObjectBuilder.h"
 #include "EntityBuffer.h"
-#include "PortDataBuffer.h"
+#include "DataBuffer.h"
 
 #include "EntityFile.h"
 
@@ -133,7 +133,7 @@ PyObject* PythonExtensions::OT_GetPortData(PyObject* _self, PyObject* _args) {
     }
     PythonObjectBuilder pyObBuilder;
     std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    PyObject* returnValue = PortDataBuffer::instance().getPortData(portName);
+    PyObject* returnValue = DataBuffer::instance().getPortData(portName);
     return returnValue;
 }
 
@@ -146,7 +146,7 @@ PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
     PythonObjectBuilder pyObBuilder;
     std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
     CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
-    auto values = pyObBuilder.getGenericDataStructList(pvalue);
-    PortDataBuffer::instance().overridePortData(portName, std::move(values));
+    const std::string values = pyObBuilder.getStringValue(pvalue, "port data");
+    DataBuffer::instance().overridePortData(portName, std::move(values));
     return PyBool_FromLong(true);
 }

@@ -271,8 +271,8 @@
 #define OT_ACTION_CMD_PYTHON_Command "Python.Command"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
 #define OT_ACTION_CMD_PYTHON_Result "Python.Result"
-#define OT_ACTION_CMD_PYTHON_Portdata_Names "Python.Portdata.Names"
-#define OT_ACTION_CMD_PYTHON_Portdata_Data "Python.Portdata.Data"
+
+#define OT_ACTION_CMD_PYTHON_Portdata "Python.Portdata"
 
 #define OT_ACTION_CMD_LMS_GetDocument "LMS.Document.Get"
 #define OT_ACTION_CMD_LMS_GetDocumentList "LMS.DocumentList.Get"

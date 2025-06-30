@@ -1,58 +1,42 @@
 #include "PortData.h"
 
-PortData::PortData(const std::string& portName, const ot::GenericDataStructList& values, bool modified )
-	:_portName(portName), _modified(modified)
+PortData::PortData(const std::string& _portName, const std::string& _serialisedData, bool _modified )
+	:m_portName(_portName), m_modified(_modified)
 {
-	_values = (values);
+	m_values.fromJson(_serialisedData);
 }
 
 PortData::PortData(PortData&& other) noexcept
-	:_portName(other._portName), _modified(other.getModified()), _values(std::move(other._values))
+	:m_portName(other.m_portName), m_modified(other.getModified()), m_values(std::move(other.m_values))
 {
 }
 
 PortData& PortData::operator=(PortData&& other) noexcept
 {
-	_portName = (other._portName);
-	_values = (std::move(other._values));
-	_modified = other.getModified();
+	m_portName = (other.m_portName);
+	m_values = (std::move(other.m_values));
+	m_modified = other.getModified();
 	return *this;
 }
 
 PortData::~PortData()
 {
-	FreeMemory();
+	
 }
 
-void PortData::overrideValues(const ot::GenericDataStructList& values)
+void PortData::overrideValues(const std::string&  _serialisedData)
 {
-	FreeMemory();
-	_values = values;
-	_modified = true;
+	m_values.fromJson(_serialisedData);
+	m_modified = true;
 }
 
-const ot::GenericDataStructList& PortData::getValues() const
+const ot::JsonDocument& PortData::getValues() const
 {
-	return _values;
+	return m_values;
 }
 
 const bool PortData::getModified() const
 {
-	return _modified;
+	return m_modified;
 }
 
-ot::GenericDataStructList PortData::HandDataOver()
-{
-	ot::GenericDataStructList values(_values);
-	_values.clear();
-	return values;
-}
-
-void PortData::FreeMemory()
-{
-	for (ot::GenericDataStruct* value : _values)
-	{
-		delete value;
-		value = nullptr;
-	}
-}

@@ -33,7 +33,7 @@
     <ClCompile Include="src\PythonWrapper.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PortDataBuffer.cpp">
+    <ClCompile Include="src\DataBuffer.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PortData.cpp">
@@ -95,7 +95,7 @@
     <ClInclude Include="include\PythonWrapper.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\PortDataBuffer.h">
+    <ClInclude Include="include\DataBuffer.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PortData.h">

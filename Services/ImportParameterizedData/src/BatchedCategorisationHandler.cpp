@@ -114,11 +114,11 @@ void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
 				ot::Variable parameterEntityName(batchingInformation.m_selectionEntityNames);
 				std::list<ot::Variable> parameterList{ parameterEntityName };
 				const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
-				m_pythonInterface->AddScriptWithParameter(pythonScriptName, parameterList);
+				m_pythonInterface->addScriptWithParameter(pythonScriptName, parameterList);
 			}
 		}
 
-		ot::ReturnMessage returnValue = m_pythonInterface->SendExecutionOrder();
+		ot::ReturnMessage returnValue = m_pythonInterface->sendExecutionOrder();
 		if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
 		{
 			_uiComponent->displayMessage("Update of selection properties succeeded.\n");

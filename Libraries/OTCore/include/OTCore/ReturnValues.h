@@ -25,17 +25,15 @@ namespace ot
 		bool operator==(const ReturnValues& other) const;
 		bool operator!=(const ReturnValues& other) const;
 
-		void addData(const std::string& entryName, const GenericDataStructList& values);
-		void addData(const std::string& entryName, GenericDataStructList&& values);
-		const size_t getNumberOfEntries() const { return _valuesByName.size(); }
-		std::map<std::string, GenericDataStructList>& getValuesByName() { return _valuesByName; }
-
+		void addData(const std::string& _entryName, const ot::JsonDocument* _values);
+		uint64_t getNumberOfEntries() { return m_valuesByName.size(); }
+		ot::JsonDocument& getValues() { return m_valuesAsDoc; };
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
-		std::map<std::string, GenericDataStructList> _valuesByName;
-
+		std::map<std::string, const ot::JsonDocument*> m_valuesByName;
+		ot::JsonDocument m_valuesAsDoc;
 	};
 }

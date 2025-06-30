@@ -24,19 +24,19 @@ namespace ot
 	public:
 
 		using scriptParameter = std::optional<std::list<ot::Variable>>;
-		PythonServiceInterface(const std::string& pythonExecutionServiceURL);
-		void AddScriptWithParameter(const std::string& scriptName, const scriptParameter& scriptParameter);
-		void AddPortData(const std::string& portName, const ot::GenericDataStructList& data);
+		PythonServiceInterface(const std::string& _pythonExecutionServiceURL);
+		void addScriptWithParameter(const std::string& _scriptName, const scriptParameter& _scriptParameter);
+		void addPortData(const std::string& _portName, const ot::JsonDocument*  _data);
 
-		ot::ReturnMessage SendExecutionOrder();
+		ot::ReturnMessage sendExecutionOrder();
 
-		ot::ReturnMessage SendSingleExecutionCommand(const std::string& command);
+		ot::ReturnMessage sendSingleExecutionCommand(const std::string& command);
 
 	private:
-		const std::string _pythonExecutionServiceURL;
-		std::list<std::tuple<std::string, scriptParameter>> _scriptNamesWithParameter;
+		const std::string m_pythonExecutionServiceURL;
+		std::list<std::tuple<std::string, scriptParameter>> m_scriptNamesWithParameter;
 
-		std::map<std::string, ot::GenericDataStructList> _portDataByPortName;
-		ot::JsonDocument AssembleMessage();
+		std::map<std::string, const ot::JsonDocument*> m_portDataByPortName;
+		ot::JsonDocument assembleMessage();
 	};
 }

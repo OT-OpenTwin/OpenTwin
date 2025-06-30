@@ -19,7 +19,7 @@ struct PipelineData
 	const MetadataQuantityValueDescription* m_quantityDescription = nullptr;
 
 	//! @param _data Must be created with the allocator of the m_data document
-	void setData(ot::JsonArray&& _data)
+	void setData(ot::JsonValue&& _data)
 	{
 		m_data.AddMember("Data", std::move(_data), m_data.GetAllocator());
 	}
@@ -29,10 +29,31 @@ struct PipelineData
 		return ot::json::getArray(m_data, "Data");
 	}
 
-	PipelineData& operator=(const PipelineData& _pipeline)
+	PipelineData() = default;
+	~PipelineData() = default;
+
+	PipelineData(const PipelineData& _other)
 	{
-		const ot::JsonDocument& source = _pipeline.m_data;
+		const ot::JsonDocument& source = _other.m_data;
 		m_data.CopyFrom(source, m_data.GetAllocator());
+	}
+
+	PipelineData(PipelineData&& _other) noexcept
+	{
+		ot::JsonDocument& source = _other.m_data;
+		m_data.Swap(source);
+	}
+
+	PipelineData& operator=(const PipelineData& _other)
+	{
+		const ot::JsonDocument& source = _other.m_data;
+		m_data.CopyFrom(source, m_data.GetAllocator());
+	}
+
+	PipelineData& operator=(PipelineData&& _other) noexcept
+	{
+		ot::JsonDocument& source = _other.m_data;
+		m_data.Swap(source);
 		return *this;
 	}
 

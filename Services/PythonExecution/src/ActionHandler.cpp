@@ -7,7 +7,7 @@
 #include "OTCore/ReturnValues.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/GenericDataStructFactory.h"
-#include "PortDataBuffer.h"
+#include "DataBuffer.h"
 
 #include "Application.h"
 #include "DataBase.h"
@@ -41,7 +41,8 @@ ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 		OT_LOG_EAS("Action \"" + action + "\" not supported. Document: " + doc.toJson());
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
 	}
-
+	
+	DataBuffer::instance().clearData();
 	return returnMessage;
 }
 
@@ -117,11 +118,8 @@ ot::ReturnMessage ActionHandler::shutdownProcess(const ot::JsonDocument& doc) {
 }
 
 ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
-	try {
-		std::string temp = doc.toJson();
-
-		PortDataBuffer::instance().clearPortData();
-
+	try 
+	{
 		//Extract script entity names from json doc
 		std::list<std::string> scripts = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Scripts);
 		OT_LOG_D("Number of scripts being executed: " + std::to_string(scripts.size()));
@@ -147,30 +145,41 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		}
 
 		//Extract port data if existing
-		if (doc.HasMember(OT_ACTION_CMD_PYTHON_Portdata_Names)) {
-			std::list<std::string> portDataNames = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_Portdata_Names);
-			OT_LOG_D("Number of port datasets: " + std::to_string(portDataNames.size()));
-			auto portData = doc[OT_ACTION_CMD_PYTHON_Portdata_Data].GetArray();
-			auto portName = portDataNames.begin();
+		if (ot::json::exists(doc,OT_ACTION_CMD_PYTHON_Portdata))
+		{
+			auto portData = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Portdata);
+			OT_LOG_D("Number of port datasets: " + std::to_string(portData.Size()));
+			
 			for (uint32_t i = 0; i < portData.Size(); i++) {
-				auto portDataEntries = ot::json::getArray(portData, i);
-				ot::GenericDataStructList values;
-				for (const auto& jGenericDataStruct : portDataEntries) {
-					ot::GenericDataStruct* genericDataStruct = ot::GenericDataStructFactory::Create(jGenericDataStruct.GetObject());
-					values.push_back(genericDataStruct);
-				}
-
-				PortDataBuffer::instance().addNewPortData(*portName, values);
-				portName++;
+				auto portDataEntry = ot::json::getObject(portData, i);
+				
+				const std::string portName = ot::json::getString(portDataEntry,"Name");
+				ot::ConstJsonObject data = ot::json::getObject(portDataEntry,"Data");
+				DataBuffer::instance().addNewPortData(portName, ot::json::toJson(data));
 			}
 		}
 
 		//Execute
-		ot::ReturnValues result = m_pythonAPI.execute(scripts, allParameter);
-		PortDataBuffer::instance().addModifiedPortData(result);
+		m_pythonAPI.execute(scripts, allParameter);
 
-		if (result.getNumberOfEntries() != 0) {
-			return ot::ReturnMessage(std::move(result));;
+		//put modified port data in return message. The data is not serialised here!! The buffer has to keep the data until the return message is serialised
+		std::list<PortData*> modifiedPortData = DataBuffer::instance().getModifiedPortData();
+		ot::ReturnValues returnValues;
+		for (PortData* portData : modifiedPortData)
+		{
+			const std::string& portName = portData->getPortName();
+			const ot::JsonDocument& values = portData->getValues();
+			returnValues.addData(portName, &values);
+		}
+		auto& scriptReturnValues = DataBuffer::instance().getReturnDataByScriptName();
+		for (auto& scriptReturnValue : scriptReturnValues)
+		{
+			returnValues.addData(scriptReturnValue.first, &scriptReturnValue.second);
+		}
+
+
+		if (returnValues.getNumberOfEntries() != 0) {
+			return ot::ReturnMessage(std::move(returnValues));;
 		}
 		else {
 			return ot::ReturnMessage(ot::ReturnMessage::Ok);
@@ -186,9 +195,15 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 ot::ReturnMessage ActionHandler::executeCommand(const ot::JsonDocument& doc) {
 	std::string executionCommand = ot::json::getString(doc, OT_ACTION_CMD_PYTHON_Command);
 	try {
-		ot::ReturnValues result = m_pythonAPI.execute(executionCommand);
-		if (result.getNumberOfEntries() != 0) {
-			return ot::ReturnMessage(result);
+		m_pythonAPI.execute(executionCommand);
+		auto& result = DataBuffer::instance().getReturnDataByScriptName();
+		if (!result.empty()) 
+		{
+			auto resultData = result.begin();
+			
+			ot::ReturnValues returnValue;
+			returnValue.addData(resultData->first, &resultData->second);
+			return ot::ReturnMessage(returnValue);
 		}
 		else {
 			return ot::ReturnMessage(ot::ReturnMessage::Ok);

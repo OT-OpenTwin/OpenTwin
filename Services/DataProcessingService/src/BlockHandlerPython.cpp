@@ -12,7 +12,7 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const Han
 {
       ot::ServiceBase* pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
       const std::string pythonServiceURL = pythonService->getServiceURL();
-      _pythonServiceInterface = new ot::PythonServiceInterface(pythonServiceURL);
+      m_pythonServiceInterface = new ot::PythonServiceInterface(pythonServiceURL);
 
       auto allConnectorsByName = blockEntity->getAllConnectorsByName();
       for (auto& connectorByName : allConnectorsByName)
@@ -20,21 +20,21 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const Han
            ot::Connector& connector = connectorByName.second;
            if (connector.getConnectorType() == ot::ConnectorType::In)
            {
-               _requiredInput.push_back(connector.getConnectorName());
+               m_requiredInput.push_back(connector.getConnectorName());
            }
            else if (connector.getConnectorType() == ot::ConnectorType::Out)
            {
-               _outputs.push_back(connector.getConnectorName());
+               m_outputs.push_back(connector.getConnectorName());
            }
       }     
-      _entityName = blockEntity->getName();
-      _scriptName = blockEntity->getSelectedScript();
+      m_entityName = blockEntity->getName();
+      m_scriptName = blockEntity->getSelectedScript();
 }
 
 bool BlockHandlerPython::executeSpecialized()
 {
     bool allInputsComplete = true;
-   /* for (std::string& requiredPort : _requiredInput)
+    for (std::string& requiredPort : m_requiredInput)
     {
         allInputsComplete &= _dataPerPort.find(requiredPort) != _dataPerPort.end();
         if (!allInputsComplete) { break; }
@@ -43,49 +43,46 @@ bool BlockHandlerPython::executeSpecialized()
     if (allInputsComplete)
     {
         _uiComponent->displayMessage("Executing Python Block: " + _blockName);
-        ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(_entityName)} };
-        _pythonServiceInterface->AddScriptWithParameter(_scriptName, parameter);
+        ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(m_entityName)} };
+        m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
         for (auto& dataPortEntry : _dataPerPort)
         {
             const std::string portName = dataPortEntry.first;
-            PipelineData& incommingPortData  = dataPortEntry.second;
-            const PipelineDataDocumentList& portData = incommingPortData.m_data;
-            
-            std::list<ot::GenericDataStruct*> portDataPtr;
-            for (auto portDataEntry : portData)
-            {
-                portDataPtr.push_back(portDataEntry.m_quantity.get());
-            }
-
-            _pythonServiceInterface->AddPortData(portName, portDataPtr);
+            PipelineData* incommingPortData  = dataPortEntry.second;
+            const ot::JsonDocument& portData = incommingPortData->m_data;            
+            m_pythonServiceInterface->addPortData(portName, &portData);
         }
-        ot::ReturnMessage returnMessage = _pythonServiceInterface->SendExecutionOrder();
+        ot::ReturnMessage returnMessage = m_pythonServiceInterface->sendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
             _uiComponent->displayMessage("Python execution ended with state: " + returnMessage.getStatusString());
             ot::ReturnValues& returnValues = returnMessage.getValues();
-            auto& valuesByName =  returnValues.getValuesByName();
-            for (const std::string& outputName : _outputs)
+            ot::JsonDocument& values = returnValues.getValues();
+
+            for (auto valueIt = values.MemberBegin(); valueIt != values.MemberEnd();valueIt++)
             {
-                auto valuesPointer = valuesByName.find(outputName);
-                if (valuesPointer == valuesByName.end())
+                const std::string portName = valueIt->name.GetString();
+                
+                auto output = std::find(m_outputs.begin(), m_outputs.end(), portName);
+                if (output != m_outputs.end())
                 {
-                    _uiComponent->displayMessage("Output " + outputName + " was not set in the python script.");
+                    auto& portValues = valueIt->value;
+                    PipelineData pipelineData;
+                    pipelineData.setData(std::move(portValues));
+                    m_outputData.push_back(pipelineData);
+                    m_outputs.remove(portName);
                 }
                 else
                 {
-                    auto& returnValueList = valuesPointer->second;
-                    PipelineDataDocumentList returnValuesListSPtr;
-                    for (auto returnValue : returnValueList)
-                    {
-                        PipelineDataDocument document;
-                        document.m_quantity = std::shared_ptr<ot::GenericDataStruct>(returnValue);
-                        returnValuesListSPtr.push_back(document);
-                    }
-                    PipelineData outputData;
-                    outputData.m_data = std::move(returnValuesListSPtr);
-                    _dataPerPort[outputName] = outputData;
-                    valuesByName.erase(valuesPointer->first);
+                    _uiComponent->displayMessage("Port name used in python script does not match the listed ports: " + portName);
+                }
+            }
+
+            if (m_outputs.size() > 0)
+            {
+                for (const std::string& output : m_outputs)
+                {
+                    _uiComponent->displayMessage("Port was not set in python script: " + output);
                 }
             }
         }
@@ -93,7 +90,7 @@ bool BlockHandlerPython::executeSpecialized()
         {
             throw std::exception(returnMessage.getWhat().c_str());
         }
-    }*/
+    }
     return allInputsComplete;
 }
 
