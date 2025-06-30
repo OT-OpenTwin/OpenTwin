@@ -32,20 +32,23 @@ Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
 	m_nameCounter(0)
 {
-	// Add buttons here
+	// Debug buttons
 	m_testButtons.push_back(ButtonInfo("Test", "UI Info", "BugRed", std::bind(&Application::uiDebugInfo, this)));
-
 	m_testButtons.push_back(ButtonInfo("Test", "Info", "Information", std::bind(&Application::testHello, this)));
 	m_testButtons.push_back(ButtonInfo("Test", "Kill", "Kill", std::bind(&Application::testKill, this)));
 	
+	// Table tests
 	m_testButtons.push_back(ButtonInfo("Table", "Small (100k)", "GreenCircle", std::bind(&Application::testTableSmall, this)));
 	m_testButtons.push_back(ButtonInfo("Table", "Medium (1M)", "YellowCircle", std::bind(&Application::testTableMedium, this)));
 	m_testButtons.push_back(ButtonInfo("Table", "Big (10M)", "RedCircle", std::bind(&Application::testTableBig, this)));
+
+	// Plot tests
 	m_testButtons.push_back(ButtonInfo("Plots", "Single Curve", "Plot1DVisible", std::bind(&Application::createPlotOneCurve, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Two Curves", "Plot1DVisible", std::bind(&Application::createPlotTwoCurves, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P const", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3Parameter, this)));
+	m_testButtons.push_back(ButtonInfo("Plots", "Scatter Plot", "Plot1DVisible", std::bind(&Application::createPlotScatter, this)));
 
 	// Enable features (Exit)
 	
@@ -148,11 +151,8 @@ void Application::createPlotOneCurve()
 	description.setQuantityDescription(quantDesc.release());
 	description.addParameterDescription(parameterDesc);
 
-	ot::Plot1DCurveCfg curveCfg;
-	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	const std::string plotName = "Test/A_plot_Single";
-	curveCfg.setEntityName(plotName + "/A_Curve");
-
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve");
 	builder.addCurve(std::move(description), curveCfg, "SingleCurve");
 
 	//Here the shared part
@@ -425,6 +425,40 @@ void Application::createFamilyOfCurves3Parameter()
 	}
 	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3P");
 
+
+	//Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	builder.buildPlot(plotCfg);
+}
+
+void Application::createPlotScatter() {
+	const std::string collName = Application::instance()->getCollectionName();
+	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	PlotBuilder builder(extender);
+
+	//Single curve
+	DatasetDescription description;
+	MetadataParameter parameter;
+	parameter.parameterName = "Frequency";
+	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.unit = "kHz";
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+	quantDesc->setName("Magnitude");
+	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
+
+	for (int i = 0; i <= 50; i++) {
+		quantDesc->addDatapoint(ot::Variable(rand() % 100));
+		parameter.values.push_back(ot::Variable(i));
+	}
+	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+	description.setQuantityDescription(quantDesc.release());
+	description.addParameterDescription(parameterDesc);
+
+	const std::string plotName = "Test/A_plot_Scatter";
+	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "ScatterCurve", EntityResult1DCurve::ScatterPlot);
+	builder.addCurve(std::move(description), curveCfg, "Scatter");
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
