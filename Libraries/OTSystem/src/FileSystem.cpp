@@ -8,7 +8,6 @@
 #include "OTSystem/FileSystem.h"
 
 // std header
-#include <fstream>
 #include <filesystem>
 
 namespace ot {
@@ -95,7 +94,7 @@ std::list<std::string> ot::FileSystem::getFiles(const std::string& _path, const 
     return result;
 }
 
-std::list<std::string> ot::FileSystem::readLines(const std::string& _filePath) {
+std::list<std::string> ot::FileSystem::readLines(const std::string& _filePath, std::ifstream::iostate _exceptionMask) {
     std::list<std::string> lines;
     std::ifstream file(_filePath);
 
@@ -103,7 +102,7 @@ std::list<std::string> ot::FileSystem::readLines(const std::string& _filePath) {
         throw Exception::FileOpen("Failed to open fil for reading: \"" + _filePath + "\"");
     }
 
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    file.exceptions(_exceptionMask);
 
     std::string line;
     while (std::getline(file, line)) {

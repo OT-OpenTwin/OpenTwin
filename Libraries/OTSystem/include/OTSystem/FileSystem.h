@@ -12,6 +12,7 @@
 // std header
 #include <list>
 #include <string>
+#include <fstream>
 
 namespace ot {
 
@@ -43,7 +44,7 @@ namespace ot {
 		//! @param _filePath File path.
 		//! @throw ot::FileOpenException in case the file could not be opened.
 		//! @throw std::ios_base::failure in case of serious IO error.
-		static std::list<std::string> readLines(const std::string& _filePath);
+		static std::list<std::string> readLines(const std::string& _filePath, std::ifstream::iostate _exceptionMask = std::ifstream::badbit);
 	};
 
 }
