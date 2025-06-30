@@ -42,7 +42,7 @@ bool BlockHandlerPython::executeSpecialized()
     
     if (allInputsComplete)
     {
-        _uiComponent->displayMessage("Executing Python Block: " + _blockName);
+        _uiComponent->displayMessage("Executing Python Block: " + _blockName + "\n");
         ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(m_entityName)} };
         m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
         for (auto& dataPortEntry : _dataPerPort)
@@ -55,7 +55,7 @@ bool BlockHandlerPython::executeSpecialized()
         ot::ReturnMessage returnMessage = m_pythonServiceInterface->sendExecutionOrder();
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
         {
-            _uiComponent->displayMessage("Python execution ended with state: " + returnMessage.getStatusString());
+            _uiComponent->displayMessage("Python execution ended with state: " + returnMessage.getStatusString()+ "\n");
             ot::ReturnValues& returnValues = returnMessage.getValues();
             ot::JsonDocument& values = returnValues.getValues();
 

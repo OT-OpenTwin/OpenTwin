@@ -52,12 +52,12 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
-	OT_LOG_I("Executing Database Acccess Block: " + _blockName);
+	_uiComponent->displayMessage("Executing Database Acccess Block: " + _blockName + "\n");
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
-	OT_LOG_I("Executing query: " + debugQuery);
+	_uiComponent->displayMessage("Executing query: " + debugQuery + "\n");
 	
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
-	_uiComponent->displayMessage("Executing projection: " + debugProjection);
+	_uiComponent->displayMessage("Executing projection: " + debugProjection + "\n");
 
 	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, m_documentLimit);
 
@@ -72,11 +72,11 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		const uint32_t numberOfDocuments = allMongoDocuments.Size();
 		if (numberOfDocuments == 0)
 		{
-			throw std::exception("Query returned nothing.");
+			throw std::exception("Query returned nothing.\n");
 		}
 		
 		if (Application::instance()->uiComponent()) {
-			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.");
+			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.\n");
 		}
 		auto& dataDoc = m_queriedData.m_data;
 		ot::JsonArray entries;

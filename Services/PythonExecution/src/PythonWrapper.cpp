@@ -107,26 +107,15 @@ void PythonWrapper::ClosePythonInterpreter() {
 
 void PythonWrapper::InitializePythonInterpreter() {
 	std::wstring allPaths;
-	
+	std::string debugPathOverview("");
 	for (std::string& pathComponent : _pythonPath) {
 		std::wstring temp(pathComponent.begin(), pathComponent.end());
 		allPaths += temp + L";";
+		debugPathOverview += pathComponent;
 	}
-	//PyStatus status;
-	//PyConfig config;
-	//config.program_name = "OpenTwinPython";
-	//config.isolated = 1;
-	//config.dump_refs = 1; // Dump all objects which are still alive at exit
-	//config.pythonpath_env = pyhtonPath.c_str();
-	//PyConfig_InitIsolatedConfig(&config);
 
-	//status = Py_InitializeFromConfig(&config);
-	//if (PyStatus_Exception(status))
-	//{
-	//	throw std::exception(("Initialization failed: " + std::string(status.err_msg)).c_str());
-	//}
-	//PyConfig_Clear(&config);
-
+	OT_LOG_D("Python path: " + debugPathOverview);
+	
 	int errorCode = PyImport_AppendInittab("OpenTwin", PythonExtensions::PyInit_OpenTwin);
 	Py_SetPath(allPaths.c_str());
 	int skipSignalHandlerRegistration = 0; //0: Skips; 1: not skipping (equivalent to Py_Initialize())

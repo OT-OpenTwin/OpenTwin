@@ -157,6 +157,7 @@ std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
 	OT_LOG_D("Executing action: " + action);
 	
 	std::string returnMessage;
+	
 	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) {
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
 	}
