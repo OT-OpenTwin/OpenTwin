@@ -52,7 +52,7 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
-	_uiComponent->displayMessage("Executing Database Acccess Block: " + _blockName + "\n");
+	_uiComponent->displayMessage("Executing Database Acccess Block: " + m_blockName + "\n");
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
 	_uiComponent->displayMessage("Executing query: " + debugQuery + "\n");
 	
@@ -120,7 +120,7 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 	m_queriedData.m_campaign = campaign;
 	m_queriedData.m_series = series;
 
-	_dataPerPort[outputConnectorName] = &m_queriedData;
+	m_dataPerPort[outputConnectorName] = &m_queriedData;
 }
 
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()

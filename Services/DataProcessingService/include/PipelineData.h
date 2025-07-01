@@ -24,9 +24,9 @@ struct PipelineData
 		m_data.AddMember("Data", std::move(_data), m_data.GetAllocator());
 	}
 
-	ot::ConstJsonArray getData()
+	ot::JsonValue& getData()
 	{
-		return ot::json::getArray(m_data, "Data");
+		return m_data["Data"];
 	}
 
 	PipelineData() = default;

@@ -33,7 +33,7 @@ bool BlockHandlerStorage::executeSpecialized()
 		const std::string collectionName = Application::instance()->getCollectionName();
 		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
 
-		_uiComponent->displayMessage("Executing Storage Block: " + _blockName);
+		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName);
 		std::list<DatasetDescription> datasets = std::move(createDatasets());
 		const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + m_blockEntityStorage->getSeriesName();
 		std::list<std::shared_ptr<MetadataEntry>>seriesMetadata;
@@ -56,7 +56,7 @@ bool BlockHandlerStorage::allInputsAvailable()
 {
 	for (auto& connector : m_connectorsParameter)
 	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
+		if (m_dataPerPort.find(connector.getConnectorName()) == m_dataPerPort.end())
 		{
 			return false;
 		}
@@ -64,7 +64,7 @@ bool BlockHandlerStorage::allInputsAvailable()
 	
 	for (auto& connector : m_connectorsQuantity)
 	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
+		if (m_dataPerPort.find(connector.getConnectorName()) == m_dataPerPort.end())
 		{
 			return false;
 		}
@@ -72,7 +72,7 @@ bool BlockHandlerStorage::allInputsAvailable()
 
 	for (auto& connector : m_connectorsMetadata)
 	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
+		if (m_dataPerPort.find(connector.getConnectorName()) == m_dataPerPort.end())
 		{
 			return false;
 		}
@@ -276,8 +276,8 @@ void BlockHandlerStorage::extractQuantityProperties(const ot::Connector& _connec
 {
 	const std::string portLabel = _connector.getConnectorTitle();
 	const std::string quantityName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(quantityName);
-	assert(portData != _dataPerPort.end()); //Should have been checked before
+	auto portData = m_dataPerPort.find(quantityName);
+	//assert(portData != _dataPerPort.end()); //Should have been checked before
 	const MetadataQuantity* metadataQuantityFromPort = portData->second->m_quantity;
 	const MetadataQuantityValueDescription* quantityValueDescriptionFromPort = portData->second->m_quantityDescription;
 	const QuantityProperties selectedProperties = m_blockEntityStorage->getPropertiesQuantity(quantityName);

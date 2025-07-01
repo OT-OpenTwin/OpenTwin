@@ -1,9 +1,9 @@
 #include "BlockHandler.h"
 
 BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
-	:_allHandler(allHandler)
+	:m_allHandler(allHandler)
 {
-	_blockName = blockEntity->getName();
+	m_blockName = blockEntity->getName();
 }
 
 BlockHandler::~BlockHandler()
@@ -31,7 +31,7 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 	}
 	catch (const std::exception& e)
 	{
-		const std::string message = "Execution of block " + _blockName + " failed: " + e.what();
+		const std::string message = "Execution of block " + m_blockName + " failed: " + e.what();
 		throw std::exception(message.c_str());
 	}
 
@@ -43,8 +43,8 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 			const std::shared_ptr<GraphNode> nextNode = edge.first;
 			const EdgeInfo info = edge.second;
 
-			const std::shared_ptr<BlockHandler> nextHandler = _allHandler.find(nextNode)->second;
-			nextHandler->setData(_dataPerPort[info.thisNodePort], info.succeedingNodePort);
+			const std::shared_ptr<BlockHandler> nextHandler = m_allHandler.find(nextNode)->second;
+			nextHandler->setData(m_dataPerPort[info.thisNodePort], info.succeedingNodePort);
 			nextHandler->executeOwnNode(nextNode);
 		}
 	}
@@ -52,5 +52,5 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 
 void BlockHandler::setData(PipelineData* data, const std::string& targetPort)
 {
-	_dataPerPort[targetPort] =  data;
+	m_dataPerPort[targetPort] =  data;
 }

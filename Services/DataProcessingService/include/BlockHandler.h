@@ -11,19 +11,28 @@ class BlockHandler : public BusinessLogicHandler
 public:
 	using HandlerMap = std::map<std::shared_ptr<GraphNode>, std::shared_ptr<BlockHandler>>;
 
-	BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler);
+	BlockHandler(EntityBlock* _blockEntity, const HandlerMap& _allHandler);
 	virtual ~BlockHandler();
-	void executeOwnNode(std::shared_ptr<GraphNode> ownNode);
-	virtual void setData(PipelineData* data, const std::string& targetPort);
+	void executeOwnNode(std::shared_ptr<GraphNode> _ownNode);
+	virtual void setData(PipelineData* _data, const std::string& _targetPort);
 
 protected:
-	std::string _blockName;
+	std::string m_blockName;
 	virtual bool executeSpecialized() = 0;
-	std::map<std::string, PipelineData*> _dataPerPort;
+	std::map<std::string, PipelineData*> m_dataPerPort;
 
-	const std::string _errorMessageBase = "Block execution failed due to incompatible input data dimension. ";
+
+	const std::string getErrorIncompatibleDataFormat()
+	{
+		return m_blockName + " failed to execute due to incompatible input data dimension.";
+	}
+
+	const std::string getErrorDataPipelineNllptr()
+	{
+		return m_blockName + " failed to execute  because no data was set in the incomming pipeline.";
+	}
 
 private:
-	const HandlerMap& _allHandler;
+	const HandlerMap& m_allHandler;
 
 };

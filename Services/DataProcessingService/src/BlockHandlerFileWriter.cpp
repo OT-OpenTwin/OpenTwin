@@ -25,20 +25,22 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 bool BlockHandlerFileWriter::executeSpecialized()
 {
 	
-	_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
+	_uiComponent->displayMessage("Executing Filewriter Block: " + m_blockName);
 	if (!m_headline.empty())
 	{
 		m_fileStream << m_headline<<"\n";
 	}
 
-	PipelineData* incommingPortData = _dataPerPort[m_input.getConnectorName()];
-	ot::ConstJsonArray pipelineDocumentList = incommingPortData->getData();
-
-	for (auto& pipelineDocument : pipelineDocumentList)
+	PipelineData* incommingPortData = m_dataPerPort[m_input.getConnectorName()];
+	if (incommingPortData != nullptr)
 	{
-		m_fileStream <<	ot::json::toJson(pipelineDocument);
+		m_fileStream <<	ot::json::toJson(incommingPortData->getData());
 	}
-	
+	else
+	{
+		_uiComponent->displayMessage(getErrorDataPipelineNllptr() + "\n");
+	}
+		
 	createFile();
 
 	return true;
