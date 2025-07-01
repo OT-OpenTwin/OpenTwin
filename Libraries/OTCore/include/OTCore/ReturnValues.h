@@ -24,9 +24,13 @@ namespace ot
 
 		bool operator==(const ReturnValues& other) const;
 		bool operator!=(const ReturnValues& other) const;
-
+		
+		//! @brief Does not take over ownership. Document needs to stay alive until ReturnValues object gets serialised as part of a ReturnMessage
 		void addData(const std::string& _entryName, const ot::JsonDocument* _values);
 		uint64_t getNumberOfEntries() { return m_valuesByName.size(); }
+		
+		//! @brief 
+		//! @return Empty document if ReturnValues was not created by deserialisation of json object.
 		ot::JsonDocument& getValues() { return m_valuesAsDoc; };
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
