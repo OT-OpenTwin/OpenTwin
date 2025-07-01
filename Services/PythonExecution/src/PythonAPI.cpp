@@ -49,8 +49,11 @@ void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot
 			CPythonObjectNew pReturnValue = m_wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
 			try
 			{
-				const std::string returnString = pyObBuilder.getStringValue(pReturnValue, "");
-				DataBuffer::instance().addReturnData(scriptEntity.getEntityName(),returnString);
+				if (pReturnValue)
+				{
+					const std::string returnString = pyObBuilder.getStringValue(pReturnValue, "");
+					DataBuffer::instance().addReturnData(scriptEntity.getEntityName(),returnString);
+				}
 			}
 			catch (std::exception&){}
 			currentParameterSet++;

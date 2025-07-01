@@ -14,10 +14,10 @@ void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scri
 	m_scriptNamesWithParameter.push_back(std::make_tuple(_scriptName, _scriptParameter));
 }
 
-void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonDocument* _data)
+void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonValue* _data)
 {
 	assert(m_portDataByPortName.find(_portName) == m_portDataByPortName.end());
-	m_portDataByPortName.insert(std::pair<std::string,const ot::JsonDocument*>(_portName, std::move(_data)));
+	m_portDataByPortName.insert(std::pair<std::string,const ot::JsonValue*>(_portName, std::move(_data)));
 }
 
 ot::ReturnMessage ot::PythonServiceInterface::sendExecutionOrder()
@@ -83,8 +83,8 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 		{
 			ot::JsonString portName(portDataByPortName.first.c_str(), doc.GetAllocator());
 			
-			const ot::JsonDocument* portData = portDataByPortName.second;
-			ot::JsonObject portDataCopy;
+			const ot::JsonValue* portData = portDataByPortName.second;
+			ot::JsonValue portDataCopy;
 			portDataCopy.CopyFrom(*portData, doc.GetAllocator());
 			ot::JsonObject portDataEntry;
 			portDataEntry.AddMember("Name", portName, doc.GetAllocator());

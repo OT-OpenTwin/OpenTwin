@@ -152,9 +152,8 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 			
 			for (uint32_t i = 0; i < portData.Size(); i++) {
 				auto portDataEntry = ot::json::getObject(portData, i);
-				
 				const std::string portName = ot::json::getString(portDataEntry,"Name");
-				ot::ConstJsonObject data = ot::json::getObject(portDataEntry,"Data");
+				const ot::JsonValue& data = portDataEntry["Data"];
 				DataBuffer::instance().addNewPortData(portName, ot::json::toJson(data));
 			}
 		}
@@ -168,7 +167,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		for (PortData* portData : modifiedPortData)
 		{
 			const std::string& portName = portData->getPortName();
-			const ot::JsonDocument& values = portData->getValues();
+			const ot::JsonValue& values = portData->getValues();
 			returnValues.addData(portName, &values);
 		}
 		auto& scriptReturnValues = DataBuffer::instance().getReturnDataByScriptName();

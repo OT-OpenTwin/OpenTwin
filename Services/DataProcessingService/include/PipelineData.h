@@ -11,22 +11,26 @@
 #include <memory>
 #include <map>
 
-struct PipelineData
+class PipelineData
 {
-	const MetadataCampaign* m_campaign = nullptr;
-	const MetadataSeries* m_series = nullptr;
-	const MetadataQuantity* m_quantity = nullptr;
-	const MetadataQuantityValueDescription* m_quantityDescription = nullptr;
-
+public:
 	//! @param _data Must be created with the allocator of the m_data document
 	void setData(ot::JsonValue&& _data)
 	{
-		m_data.AddMember("Data", std::move(_data), m_data.GetAllocator());
+		ot::JsonValue copy(_data.Move(), m_data.GetAllocator());
+		m_data.AddMember("Data", copy,m_data.GetAllocator());
 	}
 
 	ot::JsonValue& getData()
 	{
-		return m_data["Data"];
+		if (ot::json::exists(m_data, "Data"))
+		{
+			return m_data["Data"];
+		}
+		else
+		{
+			return m_data;
+		}
 	}
 
 	PipelineData() = default;
@@ -56,6 +60,25 @@ struct PipelineData
 		m_data.Swap(source);
 		return *this;
 	}
+
+	void setMetadataCampaign(const MetadataCampaign* _campaign) { m_campaign = _campaign;}
+	void setMetadataSeries(const MetadataSeries* _series) { m_series = _series;}
+	void setMetadataQuantity(const MetadataQuantity* _quantity, const MetadataQuantityValueDescription* _quantityDescription) 
+	{ 
+		m_quantity = _quantity; 
+		m_quantityDescription = _quantityDescription;
+	}
+	const MetadataCampaign* getMetadataCampaign() { return m_campaign; }
+	const MetadataSeries* getMetadataSeries() { return m_series; }
+	const MetadataQuantity* getMetadataQuantity() { return m_quantity; }
+	const MetadataQuantityValueDescription* getMetadataValueDescription() { return m_quantityDescription; }
+
+
+private:
+	const MetadataCampaign* m_campaign = nullptr;
+	const MetadataSeries* m_series = nullptr;
+	const MetadataQuantity* m_quantity = nullptr;
+	const MetadataQuantityValueDescription* m_quantityDescription = nullptr;
 
 	ot::JsonDocument m_data;
 };

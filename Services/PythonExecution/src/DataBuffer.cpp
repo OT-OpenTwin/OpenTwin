@@ -34,8 +34,8 @@ PyObject* DataBuffer::getPortData(const std::string& _portName)
 	auto portEntry = m_portData.find(_portName);
 	PythonObjectBuilder builder;
 	if (portEntry != m_portData.end()) {
-		const ot::JsonDocument&	data = portEntry->second.getValues();
-		CPythonObjectNew pObject = builder.setString(data.toJson());
+		const ot::JsonValue& data = portEntry->second.getValues();
+		CPythonObjectNew pObject = builder.setString(ot::json::toJson(data));
 		Py_INCREF(pObject);
 		return pObject;
 	}

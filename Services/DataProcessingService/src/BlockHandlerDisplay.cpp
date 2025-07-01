@@ -21,9 +21,13 @@ bool BlockHandlerDisplay::executeSpecialized()
 		if (data.IsArray())
 		{
 			auto dataArray = data.GetArray();
-			for (uint32_t i = 0; i < data.Size(); i++)
+
+			const size_t numberOfEntries = dataArray.Size();
+			for (uint32_t i = 0; i < numberOfEntries; i++)
 			{
-				displayMessage += ot::json::toJson(ot::json::getObject(dataArray, i)) + "\n";
+				ot::JsonValue& entry = dataArray[i];
+
+				displayMessage += ot::json::toJson(entry) + "\n";
 			}
 		}
 		else

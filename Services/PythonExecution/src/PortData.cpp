@@ -4,24 +4,11 @@ PortData::PortData(const std::string& _portName, const std::string& _serialisedD
 	:m_portName(_portName), m_modified(_modified)
 {
 	m_values.fromJson(_serialisedData);
-}
-
-PortData::PortData(PortData&& other) noexcept
-	:m_portName(other.m_portName), m_modified(other.getModified()), m_values(std::move(other.m_values))
-{
-}
-
-PortData& PortData::operator=(PortData&& other) noexcept
-{
-	m_portName = (other.m_portName);
-	m_values = (std::move(other.m_values));
-	m_modified = other.getModified();
-	return *this;
-}
-
-PortData::~PortData()
-{
-	
+	if (m_values.Empty())
+	{
+		m_values.AddMember("__internal__", ot::JsonString(_serialisedData, m_values.GetAllocator()), m_values.GetAllocator());
+		m_singleValue = true;
+	}
 }
 
 void PortData::overrideValues(const std::string&  _serialisedData)
@@ -30,9 +17,17 @@ void PortData::overrideValues(const std::string&  _serialisedData)
 	m_modified = true;
 }
 
-const ot::JsonDocument& PortData::getValues() const
+const ot::JsonValue& PortData::getValues() const
 {
-	return m_values;
+	if (m_singleValue)
+	{
+		assert(ot::json::exists(m_values, "__internal__"));
+		return m_values["__internal__"];
+	}
+	else
+	{
+		return m_values;
+	}
 }
 
 const bool PortData::getModified() const

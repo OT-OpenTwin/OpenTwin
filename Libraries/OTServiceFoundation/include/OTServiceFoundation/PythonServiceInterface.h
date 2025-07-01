@@ -26,7 +26,7 @@ namespace ot
 		using scriptParameter = std::optional<std::list<ot::Variable>>;
 		PythonServiceInterface(const std::string& _pythonExecutionServiceURL);
 		void addScriptWithParameter(const std::string& _scriptName, const scriptParameter& _scriptParameter);
-		void addPortData(const std::string& _portName, const ot::JsonDocument*  _data);
+		void addPortData(const std::string& _portName, const ot::JsonValue*  _data);
 
 		ot::ReturnMessage sendExecutionOrder();
 
@@ -36,7 +36,7 @@ namespace ot
 		const std::string m_pythonExecutionServiceURL;
 		std::list<std::tuple<std::string, scriptParameter>> m_scriptNamesWithParameter;
 
-		std::map<std::string, const ot::JsonDocument*> m_portDataByPortName;
+		std::map<std::string, const ot::JsonValue*> m_portDataByPortName;
 		ot::JsonDocument assembleMessage();
 	};
 }

@@ -26,7 +26,7 @@ namespace ot
 		bool operator!=(const ReturnValues& other) const;
 		
 		//! @brief Does not take over ownership. Document needs to stay alive until ReturnValues object gets serialised as part of a ReturnMessage
-		void addData(const std::string& _entryName, const ot::JsonDocument* _values);
+		void addData(const std::string& _entryName, const ot::JsonValue* _values);
 		uint64_t getNumberOfEntries() { return m_valuesByName.size(); }
 		
 		//! @brief 
@@ -37,7 +37,7 @@ namespace ot
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
-		std::map<std::string, const ot::JsonDocument*> m_valuesByName;
+		std::map<std::string, const ot::JsonValue*> m_valuesByName;
 		ot::JsonDocument m_valuesAsDoc;
 	};
 }

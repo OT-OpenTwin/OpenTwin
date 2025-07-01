@@ -78,7 +78,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		if (Application::instance()->uiComponent()) {
 			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.\n");
 		}
-		auto& dataDoc = m_queriedData.m_data;
+		ot::JsonDocument dataDoc;
 		ot::JsonArray entries;
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
@@ -117,8 +117,8 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 	//Now we setup the datastream
 	ot::Connector outputConnector = _blockEntity->getConnectorOutput();
 	const std::string outputConnectorName = outputConnector.getConnectorName();
-	m_queriedData.m_campaign = campaign;
-	m_queriedData.m_series = series;
+	m_queriedData.setMetadataCampaign(campaign);
+	m_queriedData.setMetadataSeries(series);
 
 	m_dataPerPort[outputConnectorName] = &m_queriedData;
 }
@@ -126,7 +126,7 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 {
 	
-	const std::string selectedQuantity = m_queriedData.m_quantity->quantityLabel;
+	const std::string selectedQuantity = m_queriedData.getMetadataQuantity()->quantityLabel;
 	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
 	const MetadataQuantity* quantity = campaign.getMetadataQuantitiesByLabel().find(selectedQuantity)->second;
 	auto& allDependingParameter = campaign.getMetadataParameterByUID();
@@ -212,7 +212,6 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 	const std::string& valueDescriptionLabel = _blockEntity->getQuantityValueDescriptionSelection()->getValue();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
 	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
-	m_queriedData.m_quantity = selectedQuantity;
 
 	if (selectedQuantity == nullptr)
 	{
@@ -226,7 +225,8 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
 		{
 			valueUID = valueDescription.quantityIndex;
-			m_queriedData.m_quantityDescription = &valueDescription;
+			m_queriedData.setMetadataQuantity( selectedQuantity, &valueDescription);
+			
 		}
 	}
 	assert(valueUID != 0);

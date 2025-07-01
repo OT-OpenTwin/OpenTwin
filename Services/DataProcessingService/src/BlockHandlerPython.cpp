@@ -57,7 +57,7 @@ bool BlockHandlerPython::executeSpecialized()
             PipelineData* incommingPortData  = dataPortEntry.second;
             if (incommingPortData != nullptr)
             {
-                const ot::JsonDocument& portData = incommingPortData->m_data;            
+                const ot::JsonValue& portData = incommingPortData->getData();         
                 m_pythonServiceInterface->addPortData(portName, &portData);
             }
             else

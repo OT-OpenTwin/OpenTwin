@@ -37,7 +37,7 @@ bool ot::ReturnValues::operator!=(const ReturnValues& other) const
 	return !(*this == other);
 }
 
-void ot::ReturnValues::addData(const std::string& _entryName, const ot::JsonDocument* _values)
+void ot::ReturnValues::addData(const std::string& _entryName, const ot::JsonValue* _values)
 {
 	m_valuesByName[_entryName] = _values;
 }
@@ -50,7 +50,7 @@ void ot::ReturnValues::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 		const std::string name = element.first;
 		ot::JsonString key(name,_allocator);
 		
-		const ot::JsonDocument* values = element.second;
+		const ot::JsonValue* values = element.second;
 		ot::JsonValue data;
 		data.CopyFrom(*values, _allocator);
 

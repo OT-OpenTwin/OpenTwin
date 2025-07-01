@@ -278,8 +278,8 @@ void BlockHandlerStorage::extractQuantityProperties(const ot::Connector& _connec
 	const std::string quantityName = _connector.getConnectorName();
 	auto portData = m_dataPerPort.find(quantityName);
 	//assert(portData != _dataPerPort.end()); //Should have been checked before
-	const MetadataQuantity* metadataQuantityFromPort = portData->second->m_quantity;
-	const MetadataQuantityValueDescription* quantityValueDescriptionFromPort = portData->second->m_quantityDescription;
+	const MetadataQuantity* metadataQuantityFromPort = portData->second->getMetadataQuantity();
+	const MetadataQuantityValueDescription* quantityValueDescriptionFromPort = portData->second->getMetadataValueDescription();
 	const QuantityProperties selectedProperties = m_blockEntityStorage->getPropertiesQuantity(quantityName);
 
 	if (metadataQuantityFromPort != nullptr)
