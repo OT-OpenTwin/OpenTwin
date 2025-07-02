@@ -61,7 +61,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
-	m_sameTextHighlightingMinimum(2)
+	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -98,7 +98,10 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 }
 
 ot::TextEditor::~TextEditor() {
-
+	if (m_syntaxHighlighter) {
+		delete m_syntaxHighlighter;
+		m_syntaxHighlighter = nullptr;
+	}
 }
 
 void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
@@ -107,9 +110,7 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);
 
-	SyntaxHighlighter* newHighlighter = new SyntaxHighlighter(this->document());
-	newHighlighter->setRules(DefaultSyntaxHighlighterRules::create(_config.getDocumentSyntax()));
-	newHighlighter->blockSignals(true);
+	m_documentSyntax = _config.getDocumentSyntax();
 
 	QString newText = QString::fromStdString(_config.getPlainText());
 	newText.remove('\r');
@@ -118,13 +119,11 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	}	
 	this->setReadOnly(_config.getTextReadOnly());
 
-	this->storeSyntaxHighlighter(newHighlighter);
-
-	newHighlighter->blockSignals(false);
+	this->updateDocumentSyntax();
 	this->blockSignals(tmp);
 }
 
-int ot::TextEditor::lineNumberAreaWidth(void) const {
+int ot::TextEditor::lineNumberAreaWidth() const {
 	int digits = 1;
 	int max = qMax(1, blockCount());
 	while (max >= 10) {
@@ -173,15 +172,15 @@ void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 	}
 }
 
-void ot::TextEditor::setContentChanged(void) {
+void ot::TextEditor::setContentChanged() {
 	this->document()->setModified(true);
 }
 
-void ot::TextEditor::setContentSaved(void) {
+void ot::TextEditor::setContentSaved() {
 	this->document()->setModified(false);
 }
 
-bool ot::TextEditor::getContentChanged(void) const {
+bool ot::TextEditor::getContentChanged() const {
 	return this->document()->isModified();
 }
 
@@ -251,22 +250,11 @@ bool ot::TextEditor::saveToFile(const QString& _fileName) {
 	return result;
 }
 
-QStringList ot::TextEditor::code(void) const {
+QStringList ot::TextEditor::code() const {
 	return this->toPlainText().split("\n", Qt::KeepEmptyParts);
 }
 
-void ot::TextEditor::storeSyntaxHighlighter(SyntaxHighlighter* _highlighter) {
-	if (m_syntaxHighlighter) delete m_syntaxHighlighter;
-	m_syntaxHighlighter = _highlighter;
-}
-
-ot::SyntaxHighlighter* ot::TextEditor::takeSyntaxHighlighter(void) {
-	SyntaxHighlighter* result = m_syntaxHighlighter;
-	m_syntaxHighlighter = nullptr;
-	return result;
-}
-
-void ot::TextEditor::slotSaveRequested(void) {
+void ot::TextEditor::slotSaveRequested() {
 	if (!this->document()->isModified()) {
 		return;
 	}
@@ -363,7 +351,7 @@ void ot::TextEditor::slotUpdateLineNumberArea(const QRect & _rect, int _dy) {
 	if (_rect.contains(viewport()->rect())) slotUpdateLineNumberAreaWidth(0);
 }
 
-void ot::TextEditor::slotFindRequested(void) {
+void ot::TextEditor::slotFindRequested() {
 	if (!m_searchPopup) {
 		m_searchPopup = new TextEditorSearchPopup(this);
 		m_searchPopup->updatePosition(true);
@@ -388,12 +376,12 @@ void ot::TextEditor::slotFindRequested(void) {
 	}
 }
 
-void ot::TextEditor::slotFindClosing(void) {
+void ot::TextEditor::slotFindClosing() {
 	m_searchPopup = nullptr;
 	this->setFocus();
 }
 
-void ot::TextEditor::slotDuplicateLine(void) {
+void ot::TextEditor::slotDuplicateLine() {
 	if (!m_enableDuplicateLineShortcut) return;
 	QTextCursor cursor = this->textCursor();
 	int column = cursor.columnNumber();
@@ -405,11 +393,12 @@ void ot::TextEditor::slotDuplicateLine(void) {
 	this->insertPlainText("\n" + txt);
 }
 
-void ot::TextEditor::slotCurrentColorStyleChanged(void) {
+void ot::TextEditor::slotCurrentColorStyleChanged() {
 	this->slotHighlightCurrentLine();
+	this->updateDocumentSyntax();
 }
 
-void ot::TextEditor::slotSelectionChanged(void) {
+void ot::TextEditor::slotSelectionChanged() {
 	if (!m_enableSameTextHighlighting) return;
 	this->slotHighlightCurrentLine();
 }
@@ -467,4 +456,12 @@ void ot::TextEditor::addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _
 		this->blockSignals(false);
 	}
 	this->setExtraSelections(_selections);
+}
+
+void ot::TextEditor::updateDocumentSyntax() {
+	if (!m_syntaxHighlighter) {
+		m_syntaxHighlighter = new SyntaxHighlighter(this->document());
+	}
+	m_syntaxHighlighter->setRules(DefaultSyntaxHighlighterRules::create(m_documentSyntax));
+	m_syntaxHighlighter->rehighlight();
 }

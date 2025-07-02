@@ -55,50 +55,41 @@ namespace ot {
 		//! \param _isUpdate If true the text, name and title won't be set.
 		virtual void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate);
 
-		int lineNumberAreaWidth(void) const;
+		int lineNumberAreaWidth() const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
 
-		void setContentChanged(void);
-		void setContentSaved(void);
-		bool getContentChanged(void) const;
+		void setContentChanged();
+		void setContentSaved();
+		bool getContentChanged() const;
 
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
 
 		bool saveToFile(const QString& _fileName);
 
-		QStringList code(void) const;
-
-		//! \brief Stores the syntax highlighter.
-		//! An existing syntax highlighter will be replaced.
-		//! The TextEditor takes ownership of the highlighter.
-		void storeSyntaxHighlighter(SyntaxHighlighter* _highlighter);
+		QStringList code() const;
 
 		//! \brief Returns the current syntax highlighter.
 		//! The TextEditor keeps ownership of the highlighter.
-		SyntaxHighlighter* getSyntaxHighlighter(void) { return m_syntaxHighlighter; };
-
-		//! \brief Returns the current syntax highlighter and sets it to 0 internally.
-		//! The caller takes ownership of the highlighter.
-		SyntaxHighlighter* takeSyntaxHighlighter(void);
+		SyntaxHighlighter* getSyntaxHighlighter() { return m_syntaxHighlighter; };
 
 		void setTabSpaces(int _spaces) { m_tabSpaces = _spaces; };
-		int tabSpaces(void) const { return m_tabSpaces; };
+		int tabSpaces() const { return m_tabSpaces; };
 
 		void setNewLineWithSamePrefix(bool _enabled) { m_newLineSamePrefix = _enabled; };
-		bool newLineWithSamePrefix(void) const { return m_newLineSamePrefix; };
+		bool newLineWithSamePrefix() const { return m_newLineSamePrefix; };
 
 		void setDuplicateLineShortcutEnabled(bool _enabled) { m_enableDuplicateLineShortcut = _enabled; };
-		bool isDuplicateLineShortcutEnabled(void) const { return m_enableDuplicateLineShortcut; };
+		bool isDuplicateLineShortcutEnabled() const { return m_enableDuplicateLineShortcut; };
 
 		void setEnableSameTextHighlighting(bool _enabled) { m_enableSameTextHighlighting = _enabled; };
-		bool isSameTextHighlightingEnabled(void) const { return m_enableSameTextHighlighting; };
+		bool isSameTextHighlightingEnabled() const { return m_enableSameTextHighlighting; };
 
 	Q_SIGNALS:							
-		void saveRequested(void);
+		void saveRequested();
 
 	public Q_SLOTS:
-		void slotSaveRequested(void);
+		void slotSaveRequested();
 
 	protected:
 		virtual void keyPressEvent(QKeyEvent* _event) override;
@@ -109,17 +100,18 @@ namespace ot {
 		void slotUpdateLineNumberAreaWidth(int _newBlockCount);
 		void slotHighlightCurrentLine();
 		void slotUpdateLineNumberArea(const QRect & _rect, int _dy);
-		void slotFindRequested(void);
-		void slotFindClosing(void);
-		void slotDuplicateLine(void);
-		void slotCurrentColorStyleChanged(void);
-		void slotSelectionChanged(void);
+		void slotFindRequested();
+		void slotFindClosing();
+		void slotDuplicateLine();
+		void slotCurrentColorStyleChanged();
+		void slotSelectionChanged();
 
 	private:
 		friend class TextEditorSearchPopup;
 
 		void getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections);
 		void addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections);
+		void updateDocumentSyntax();
 
 		TextEditorSearchPopup* m_searchPopup;
 		
@@ -130,6 +122,7 @@ namespace ot {
 		int m_sameTextHighlightingMinimum;
 
 		TextEditorLineNumberArea* m_lineNumberArea;
+		DocumentSyntax            m_documentSyntax;
 		SyntaxHighlighter*		  m_syntaxHighlighter;
 	};
 }
