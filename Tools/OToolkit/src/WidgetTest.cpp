@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/RuntimeTests.h"
+
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
@@ -15,18 +16,19 @@
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/PropertyStringList.h"
+
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/MainWindow.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/StatusBarManager.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/VersionGraphManager.h"
-
-#include "OTWidgets/MainWindow.h"
-#include "OTWidgets/TabToolBar.h"
-#include "OTWidgets/StatusBarManager.h"
 #include "OTWidgets/CentralWidgetManager.h"
 
 // Qt header
@@ -90,6 +92,28 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
+	}
+	{
+		ot::TextEditor* editor = new TextEditor;
+		TextEditorCfg cfg;
+		cfg.setEntityName("Test Editor");
+		cfg.setTitle("Test Editor");
+		cfg.setDocumentSyntax(DocumentSyntax::PythonScript);
+		cfg.setPlainText(
+			"def test():\n"
+			"    print('Hello World')\n"
+			"    print(\"Hello\")\n"
+			"\n"
+			"test()\n"
+			"class TestClass:\n"
+			"    def __init__(self):\n"
+			"        self.value = 42\n"
+			"\n"
+			"# This is a comment\n"
+		);
+
+		editor->setupFromConfig(cfg, false);
+		_content.addView(this->createCentralWidgetView(editor, "Test Editor"));
 	}
 	{
 		QTableWidget* table = new QTableWidget(2, 2);
