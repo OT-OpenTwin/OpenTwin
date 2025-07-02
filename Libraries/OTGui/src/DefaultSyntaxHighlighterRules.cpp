@@ -18,13 +18,20 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(D
 	}
 }
 
-std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPython(void) {
+std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPython() {
     std::list<SyntaxHighlighterRule> result;
 
-    // Keywords
     Font font;
     font.setBold(true);
-  
+
+    // Classes
+    SyntaxHighlighterRule classRule;
+    classRule.setFont(font);
+    classRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonClass));
+    classRule.setRegularExpression("\\bclass [A-Za-z]+\\b");
+    result.push_back(classRule);
+
+    // Keywords  
     const std::list<std::string> keywordPatterns = {
         "\\bclass\\b", "\\bdef\\b",
         "\\breturn\\b","\\bif\\b",
@@ -48,13 +55,6 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
         newRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonKeyword));
         result.push_back(newRule);
     }
-
-    // Classes
-    SyntaxHighlighterRule classRule;
-    classRule.setFont(font);
-    classRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonClass));
-    classRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
-    result.push_back(classRule);
 
     // Strings
     SyntaxHighlighterRule stringRule;
