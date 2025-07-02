@@ -53,6 +53,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+out/
+
 
 __pycache__/
 
