@@ -47,5 +47,6 @@ private:
 	std::string m_responseText;
 	std::list<QString> m_commandQueue;
 	bool m_sessionIsClosing;
+	bool m_unexpectedDisconnect;
 };
 

@@ -24,7 +24,8 @@ extern "C"
 }
 
 WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
-	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), m_sessionIsClosing(false)
+	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), 
+	m_sessionIsClosing(false), m_unexpectedDisconnect(false)
 {
 	std::string wsUrl = "wss://" + _socketUrl;
 	wsUrl = ot::String::replace(wsUrl, "127.0.0.1", "localhost");
@@ -155,6 +156,7 @@ void WebsocketClient::slotSocketDisconnected() {
 
 	if (!m_sessionIsClosing) {
 		// This is an unexpected disconnect of the relay service -> we need to close the session
+		m_unexpectedDisconnect = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceConnectionLost, doc.GetAllocator()), doc.GetAllocator());
 		m_currentlyProcessingQueuedMessage = true;
@@ -262,7 +264,9 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 }
 
 bool WebsocketClient::ensureConnection(void) {
-	if (!m_isConnected && m_sessionIsClosing) return false;
+	if (!m_isConnected && (m_sessionIsClosing || m_unexpectedDisconnect)) {
+		return false;
+	}
 
 	while (!m_isConnected) {
 		if (m_webSocket.state() == QAbstractSocket::UnconnectedState) {

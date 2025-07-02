@@ -12,7 +12,8 @@ ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDia
 		MessageDialog::convertIcon(_config.getIcon()),
 		QString::fromStdString(_config.getTitle()),
 		QString::fromStdString(_config.getText()),
-		MessageDialog::convertButtons(_config.getButtons()), _parent
+		MessageDialog::convertButtons(_config.getButtons()), 
+		_parent
 	);
 	
 	QMessageBox::StandardButton btn = (QMessageBox::StandardButton)msg.exec();
