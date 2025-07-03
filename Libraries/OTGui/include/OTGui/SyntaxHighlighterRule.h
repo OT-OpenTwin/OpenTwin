@@ -26,10 +26,20 @@ namespace ot {
 		SyntaxHighlighterRule(const std::string& _regularExpression, Painter2D* _painter);
 		
 		SyntaxHighlighterRule(const SyntaxHighlighterRule& _other);
+		SyntaxHighlighterRule(SyntaxHighlighterRule&& _other) noexcept;
 		
 		virtual ~SyntaxHighlighterRule();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Operators
+
 		SyntaxHighlighterRule& operator = (const SyntaxHighlighterRule& _other);
+		SyntaxHighlighterRule& operator = (SyntaxHighlighterRule&& _other) noexcept;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+		
+		// Serialization
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -40,6 +50,10 @@ namespace ot {
 		//! \param _object The JSON object containing the information.
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
 
 		//! \brief Set the painter.
 		//! The SyntaxHighlighterRule takes ownership of the painter.

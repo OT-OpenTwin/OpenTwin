@@ -25,29 +25,64 @@ ot::SyntaxHighlighterRule::SyntaxHighlighterRule(const SyntaxHighlighterRule& _o
 	*this = _other;
 }
 
-ot::SyntaxHighlighterRule::~SyntaxHighlighterRule() {
-	OTAssertNullptr(m_painter);
-	delete m_painter;
+ot::SyntaxHighlighterRule::SyntaxHighlighterRule(SyntaxHighlighterRule&& _other) noexcept :
+	m_painter(nullptr)
+{
+	*this = std::move(_other);
 }
 
+ot::SyntaxHighlighterRule::~SyntaxHighlighterRule() {
+	if (m_painter) {
+		delete m_painter;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Operators
+
 ot::SyntaxHighlighterRule& ot::SyntaxHighlighterRule::operator = (const SyntaxHighlighterRule& _other) {
-	if (this == &_other) return *this;
+	if (this != &_other) {
+		m_regex = _other.m_regex;
+		m_font = _other.m_font;
 
-	m_regex = _other.m_regex;
-	m_font = _other.m_font;
-
-	OTAssertNullptr(_other.m_painter);
-	this->setPainter(_other.m_painter->createCopy());
+		OTAssertNullptr(_other.m_painter);
+		this->setPainter(_other.m_painter->createCopy());
+	}
 
 	return *this;
 }
 
+ot::SyntaxHighlighterRule& ot::SyntaxHighlighterRule::operator=(SyntaxHighlighterRule&& _other) noexcept {
+	if (this != &_other) {
+		if (m_painter) {
+			delete m_painter;
+		}
+		m_painter = _other.m_painter;
+		_other.m_painter = nullptr;
+
+		m_regex = std::move(_other.m_regex);
+		m_font = std::move(_other.m_font);
+	}
+
+	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Serialization
+
 void ot::SyntaxHighlighterRule::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	OTAssertNullptr(m_painter);
 	_object.AddMember("Regex", JsonString(m_regex, _allocator), _allocator);
 
 	JsonObject painterObj;
-	m_painter->addToJsonObject(painterObj, _allocator);
+	if (m_painter) {
+		m_painter->addToJsonObject(painterObj, _allocator);
+	}
+	else {
+		FillPainter2D().addToJsonObject(painterObj, _allocator);
+	}
+	
 	_object.AddMember("Painter", painterObj, _allocator);
 
 	JsonObject fontObj;
@@ -65,9 +100,19 @@ void ot::SyntaxHighlighterRule::setFromJsonObject(const ot::ConstJsonObject& _ob
 	m_font.setFromJsonObject(fontObj);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
 void ot::SyntaxHighlighterRule::setPainter(Painter2D* _painter) {
 	OTAssertNullptr(_painter);
-	if (m_painter == _painter) return;
-	if (m_painter) delete m_painter;
+	if (m_painter == _painter) {
+		return;
+	}
+	
+	if (m_painter) {
+		delete m_painter;
+	}
+
 	m_painter = _painter;
 }
