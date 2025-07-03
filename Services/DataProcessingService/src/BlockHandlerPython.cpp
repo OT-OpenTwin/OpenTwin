@@ -57,8 +57,9 @@ bool BlockHandlerPython::executeSpecialized()
             PipelineData* incommingPortData  = dataPortEntry.second;
             if (incommingPortData != nullptr)
             {
-                const ot::JsonValue& portData = incommingPortData->getData();         
-                m_pythonServiceInterface->addPortData(portName, &portData);
+                const ot::JsonValue& portData = incommingPortData->getData(); 
+                const ot::JsonValue& portMetadata   = incommingPortData->getMetadata();
+                m_pythonServiceInterface->addPortData(portName, &portData, &portMetadata);
             }
             else
             {
@@ -86,7 +87,8 @@ bool BlockHandlerPython::executeSpecialized()
                 {
                     auto& portValues = valueIt->value;
                     PipelineData pipelineData;
-                    pipelineData.setData(std::move(portValues));
+                    pipelineData.setData(std::move(portValues["Data"]));
+                    pipelineData.setMetadata(std::move(portValues["Meta"]));
                     m_outputData.push_back(pipelineData);
                     m_dataPerPort[portName] = &(m_outputData.back());
                     m_outputs.remove(portName);

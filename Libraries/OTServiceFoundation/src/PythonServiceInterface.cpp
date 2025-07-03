@@ -14,10 +14,10 @@ void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scri
 	m_scriptNamesWithParameter.push_back(std::make_tuple(_scriptName, _scriptParameter));
 }
 
-void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonValue* _data)
+void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonValue* _data, const ot::JsonValue* _metadata)
 {
 	assert(m_portDataByPortName.find(_portName) == m_portDataByPortName.end());
-	m_portDataByPortName.insert(std::pair<std::string,const ot::JsonValue*>(_portName, std::move(_data)));
+	m_portDataByPortName.insert(std::pair<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>>(_portName, std::pair(_data,_metadata)));
 }
 
 ot::ReturnMessage ot::PythonServiceInterface::sendExecutionOrder()
@@ -81,14 +81,23 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 		
 		for (auto& portDataByPortName : m_portDataByPortName)
 		{
+			ot::JsonObject portDataEntry;
 			ot::JsonString portName(portDataByPortName.first.c_str(), doc.GetAllocator());
+			portDataEntry.AddMember("Name", portName, doc.GetAllocator());
 			
-			const ot::JsonValue* portData = portDataByPortName.second;
+			const ot::JsonValue* portData = portDataByPortName.second.first;
+			assert(portData != nullptr);
 			ot::JsonValue portDataCopy;
 			portDataCopy.CopyFrom(*portData, doc.GetAllocator());
-			ot::JsonObject portDataEntry;
-			portDataEntry.AddMember("Name", portName, doc.GetAllocator());
 			portDataEntry.AddMember("Data", portDataCopy, doc.GetAllocator());
+
+
+			const ot::JsonValue* portMetaData = portDataByPortName.second.second;
+			assert(portMetaData != nullptr);
+			ot::JsonValue portMetaDataCopy;
+			portMetaDataCopy.CopyFrom(*portMetaData, doc.GetAllocator());
+			portDataEntry.AddMember("Meta", portMetaDataCopy, doc.GetAllocator());
+
 			portDataEntries.PushBack(portDataEntry, doc.GetAllocator());
 		}
 		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, portDataEntries, doc.GetAllocator());

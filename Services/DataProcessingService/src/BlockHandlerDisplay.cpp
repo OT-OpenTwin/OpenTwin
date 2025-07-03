@@ -1,5 +1,6 @@
 #include "BlockHandlerDisplay.h"
 #include "StringConverter.h"
+#include "OTCore/String.h"
 
 BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const HandlerMap& _handlerMap)
 	:BlockHandler(_blockEntity ,_handlerMap)
@@ -27,14 +28,16 @@ bool BlockHandlerDisplay::executeSpecialized()
 			{
 				ot::JsonValue& entry = dataArray[i];
 
-				displayMessage += ot::json::toJson(entry) + "\n";
+				//displayMessage += ot::json::toJson(entry) + "\n";
 			}
 		}
 		else
 		{
-			displayMessage += ot::json::toJson(data);
+			//displayMessage += ot::json::toJson(data);
 		}
 		
+		displayMessage += "\nMetadata:\n";
+		displayMessage +=  ot::json::toJson(incomming->second->getMetadata());
 		_uiComponent->displayMessage(displayMessage + "\n");
 	}
 	else
