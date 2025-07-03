@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/Painter2D.h"
 #include "OTWidgets/PlotBase.h"
 #include "OTWidgets/PolarPlot.h"
 #include "OTWidgets/QtFactory.h"
@@ -265,8 +266,16 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve(void) {
 // Data Setter / Getter
 
 void ot::PlotDataset::updateCurveVisualization(void) {
-	QPen linePen = QtFactory::toQPen(m_config.getLinePen());
+	PenFCfg linePenCfg = m_config.getLinePen();
+	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
 
+	// The line has no pen style set use the color from the points
+	if (linePenCfg.getStyle() == LineStyle::NoLine) {
+		linePenCfg.setPainter(m_config.getPointFillPainter()->createCopy());
+	}
+
+	QPen linePen = QtFactory::toQPen(linePenCfg);
+	
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	
 	QBrush dimmedBrush = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed).toBrush();
@@ -346,7 +355,7 @@ void ot::PlotDataset::updateCurveVisualization(void) {
 		else {
 			// Regular Point Pen & Brush
 
-			QPen pointOutlinePen = QtFactory::toQPen(m_config.getPointOutlinePen());
+			QPen pointOutlinePen = QtFactory::toQPen(pointOutlinePenCfg);
 			QBrush pointOutlineFillBrush = QtFactory::toQBrush(m_config.getPointFillPainter());
 
 			if (m_cartesianCurvePointSymbol) {
