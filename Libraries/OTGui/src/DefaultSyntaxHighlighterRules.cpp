@@ -29,22 +29,34 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
     classRule.setFont(font);
     classRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonClass));
     classRule.setRegularExpression("\\bclass [A-Za-z]+\\b");
-    result.push_back(classRule);
+    result.push_back(std::move(classRule));
 
     // Keywords  
     const std::list<std::string> keywordPatterns = {
-        "\\bclass\\b", "\\bdef\\b",
-        "\\breturn\\b","\\bif\\b",
-        "\\belse\\b","\\bwhile\\b",
-        "\\bfor\\b","\\bbreak\\b",
-        "\\bcontinue\\b","\\bimport\\b",
-        "\\bfrom\\b","\\bas\\b",
-        "\\bpass\\b","\\braise\\b",
-        "\\bwith\\b","\\btry\\b",
-        "\\bexcept\\b","\\bfinally\\b",
-        "\\blambda\\b","\\bNone\\b",
-        "\\bTrue\\b","\\bFalse\\b",
-        "\\band\\b","\\bor\\b",
+        "\\bclass\\b",
+        "\\bdef\\b",
+        "\\breturn\\b",
+        "\\bif\\b",
+        "\\belse\\b",
+        "\\bwhile\\b",
+        "\\bfor\\b",
+        "\\bbreak\\b",
+        "\\bcontinue\\b",
+        "\\bimport\\b",
+        "\\bfrom\\b",
+        "\\bas\\b",
+        "\\bpass\\b",
+        "\\braise\\b",
+        "\\bwith\\b",
+        "\\btry\\b",
+        "\\bexcept\\b",
+        "\\bfinally\\b",
+        "\\blambda\\b",
+        "\\bNone\\b",
+        "\\bTrue\\b",
+        "\\bFalse\\b",
+        "\\band\\b",
+        "\\bor\\b",
         "\\bnot\\b"
     };
 
@@ -53,15 +65,15 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
         newRule.setFont(font);
         newRule.setRegularExpression(pattern);
         newRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonKeyword));
-        result.push_back(newRule);
+        result.push_back(std::move(newRule));
     }
 
-    // Strings
+    // Single line strings with escape support
     SyntaxHighlighterRule stringRule;
     stringRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonString));
     stringRule.setFont(font);
-    stringRule.setRegularExpression("\".*\"|'.*'");
-    result.push_back(stringRule);
+    stringRule.setRegularExpression("\"([^\"\\\\]|\\\\.)*\"|'([^'\\\\]|\\\\.)*'");
+    result.push_back(std::move(stringRule));
 
     // Functions
     font.setItalic(true);
@@ -69,7 +81,7 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
     functionRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonFunction));
     functionRule.setFont(font);
     functionRule.setRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
-    result.push_back(functionRule);
+    result.push_back(std::move(functionRule));
 
     // Single-line comments
     font.setBold(false);
@@ -78,12 +90,12 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
     singleLineCommentRule.setFont(font);
     singleLineCommentRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonComment));
     singleLineCommentRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
-    result.push_back(singleLineCommentRule);
+    SyntaxHighlighterRule multilineCommentRule = singleLineCommentRule;
+    result.push_back(std::move(singleLineCommentRule));
 
     // Multi-line comments
-    SyntaxHighlighterRule multilineCommentRule = singleLineCommentRule;
     multilineCommentRule.setRegularExpression("#[^\n]*");
-    result.push_back(multilineCommentRule);
+    result.push_back(std::move(multilineCommentRule));
 
 	return result;
 }
