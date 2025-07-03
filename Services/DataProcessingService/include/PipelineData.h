@@ -18,12 +18,14 @@ public:
 	~PipelineData() = default;
 
 	PipelineData(const PipelineData& _other)
+		:m_campaign(_other.m_campaign),m_series(_other.m_series), m_quantity(_other.m_quantity), m_quantityDescription(_other.m_quantityDescription)
 	{
 		const ot::JsonDocument& source = _other.m_data;
 		m_data.CopyFrom(source, m_data.GetAllocator());
 	}
 
 	PipelineData(PipelineData&& _other) noexcept
+		:m_campaign(_other.m_campaign), m_series(_other.m_series), m_quantity(_other.m_quantity), m_quantityDescription(_other.m_quantityDescription)
 	{
 		ot::JsonDocument& source = _other.m_data;
 		m_data.Swap(source);

@@ -42,7 +42,6 @@ ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
 	}
 	
-	DataBuffer::instance().clearData();
 	return returnMessage;
 }
 
@@ -169,6 +168,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		{
 			const std::string& portName = portData->getPortName();
 			const ot::JsonValue& data = portData->getDataAndMetadata();
+			const std::string tt =  ot::json::toJson(data);
 			returnValues.addData(portName, &data);
 
 		}

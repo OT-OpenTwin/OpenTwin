@@ -140,16 +140,14 @@ PyObject* PythonExtensions::OT_GetPortData(PyObject* _self, PyObject* _args) {
 PyObject* PythonExtensions::OT_GetPortMetaData(PyObject* _self, PyObject* _args)
 {
     auto numberOfArguments = PyTuple_Size(_args);
-    const int expectedNumberOfArguments = 2;
+    const int expectedNumberOfArguments = 1;
     if (numberOfArguments != expectedNumberOfArguments) {
-        throw std::exception("OT_GetPortData expects two argument");
+        throw std::exception("OT_GetPortData expects one arguments");
     }
     PythonObjectBuilder pyObBuilder;
     std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
-    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
-    std::string values = pyObBuilder.getStringValue(pvalue, "port metadata");
-    DataBuffer::instance().overridePortMetaData(portName, std::move(values));
-    return PyBool_FromLong(true);
+    PyObject* returnValue = DataBuffer::instance().getPortMetaData(portName);
+    return returnValue;
 }
 
 PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
@@ -168,5 +166,15 @@ PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
 
 PyObject* PythonExtensions::OT_SetPortMetaData(PyObject* _self, PyObject* _args)
 {
-    return nullptr;
+    auto numberOfArguments = PyTuple_Size(_args);
+    const int expectedNumberOfArguments = 2;
+    if (numberOfArguments != expectedNumberOfArguments) {
+        throw std::exception("OT_GetPortData expects two argument");
+    }
+    PythonObjectBuilder pyObBuilder;
+    std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
+    CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
+    std::string values = pyObBuilder.getStringValue(pvalue, "port data");
+    DataBuffer::instance().overridePortMetaData(portName, std::move(values));
+    return PyBool_FromLong(true);
 }

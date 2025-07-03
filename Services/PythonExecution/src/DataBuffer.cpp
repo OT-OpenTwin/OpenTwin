@@ -34,7 +34,7 @@ void DataBuffer::overridePortMetaData(const std::string& _portName, const std::s
 	}
 	else
 	{
-		m_portData.find(_portName)->second.overrideData(_serialisedMetaData);
+		m_portData.find(_portName)->second.overrideMetaData(_serialisedMetaData);
 	}
 }
 void DataBuffer::clearData()

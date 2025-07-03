@@ -26,8 +26,10 @@ bool BlockHandlerDisplay::executeSpecialized()
 		displayMessage += "Data: \n" + std::string(buffer.GetString());
 
 		buffer.Clear();
+		buffer.ShrinkToFit();
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer2(buffer);
 		ot::JsonValue& metadata =incomming->second->getMetadata();
-		metadata.Accept(writer);
+		metadata.Accept(writer2);
 		displayMessage += "\nMetadata:\n" + std::string(buffer.GetString());
 		_uiComponent->displayMessage(displayMessage + "\n");
 	}

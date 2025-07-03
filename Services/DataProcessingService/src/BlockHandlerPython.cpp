@@ -87,9 +87,10 @@ bool BlockHandlerPython::executeSpecialized()
                 {
                     auto& portValues = valueIt->value;
                     PipelineData pipelineData;
+
                     pipelineData.setData(std::move(portValues["Data"]));
                     pipelineData.setMetadata(std::move(portValues["Meta"]));
-                    m_outputData.push_back(pipelineData);
+                    m_outputData.push_back(std::move(pipelineData));
                     m_dataPerPort[portName] = &(m_outputData.back());
                     m_outputs.remove(portName);
                 }

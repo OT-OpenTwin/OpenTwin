@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-
+#include "DataBuffer.h"
 // Qt header
 #include <QtCore/qeventloop.h>
 #include <QtNetwork/qlocalsocket.h>
@@ -77,6 +77,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	try {
 		ot::ReturnMessage returnMessage = ActionHandler::instance().handleAction(doc);
 		this->writeToServer(returnMessage.toJson());
+		DataBuffer::instance().clearData(); //Port data are copied as part of the serialisation of the return message, before the json port data is only passed on as pointer.
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());
