@@ -76,6 +76,7 @@ public:
 		{
 			MetadataParameter parameter;
 			parameter.setFromJsonObject(ot::json::getObject(allParameter, i));
+			m_parameter.push_back(parameter);
 		}
 
 		ot::ConstJsonArray allQuantity = ot::json::getArray(_object, "quantities");
@@ -83,6 +84,7 @@ public:
 		{
 			MetadataQuantity quantity;
 			quantity.setFromJsonObject(ot::json::getObject(allQuantity, i));
+			m_quantity.push_back(quantity);
 		}
 	}
 

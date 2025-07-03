@@ -64,6 +64,7 @@ public:
 		{
 			MetadataSeries series;
 			series.setFromJsonObject(ot::json::getObject(allSeries, i));
+			m_seriesMetadata.push_back(series);
 		}
 		updateMetadataOverview();
 	}

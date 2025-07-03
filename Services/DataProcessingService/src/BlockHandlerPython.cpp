@@ -89,6 +89,7 @@ bool BlockHandlerPython::executeSpecialized()
                     PipelineData pipelineData;
 
                     pipelineData.setData(std::move(portValues["Data"]));
+                    const std::string tt = ot::json::toJson(portValues["Meta"]);
                     pipelineData.setMetadata(std::move(portValues["Meta"]));
                     m_outputData.push_back(std::move(pipelineData));
                     m_dataPerPort[portName] = &(m_outputData.back());
