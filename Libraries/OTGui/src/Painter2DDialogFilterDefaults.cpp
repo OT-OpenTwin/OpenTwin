@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTGui/Painter2DDialogFilterDefaults.h"
 
-ot::Painter2DDialogFilter ot::Painter2DDialogFilterDefaults::plotCurve() {
+ot::Painter2DDialogFilter ot::Painter2DDialogFilterDefaults::plotCurve(bool _allowTransparent) {
 	Painter2DDialogFilter result;
 
 	result.setPainterTypes(Painter2DDialogFilter::Fill | ot::Painter2DDialogFilter::StyleRef);
@@ -24,6 +24,10 @@ ot::Painter2DDialogFilter ot::Painter2DDialogFilterDefaults::plotCurve() {
 		ColorStyleValueEntry::Rainbow8,
 		ColorStyleValueEntry::Rainbow9,
 	});
+
+	if (_allowTransparent) {
+		result.addStyleReference(ColorStyleValueEntry::Transparent);
+	}
 
 	return result;
 }

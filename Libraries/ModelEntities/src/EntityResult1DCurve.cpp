@@ -105,17 +105,20 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	std::string defaultLineStyle;
 	std::string defaultSymbol;
 	int defaultSymbolSize = 5;
+	
 	switch (_style) {
 	case EntityResult1DCurve::Default:
 		defaultLineStyle = ot::toString(ot::LineStyle::SolidLine);
 		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol);
 		defaultSymbolSize = 5;
 		break;
+
 	case EntityResult1DCurve::ScatterPlot:
 		defaultLineStyle = ot::toString(ot::LineStyle::NoLine);
 		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Circle);
 		defaultSymbolSize = 10;
 		break;
+
 	default:
 		OT_LOG_EAS("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
 		defaultLineStyle = ot::toString(ot::LineStyle::SolidLine);
@@ -171,31 +174,28 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	EntityPropertiesInteger* symbolSizeProp = EntityPropertiesInteger::createProperty("General", "Symbol Size", defaultSymbolSize, 1, 99, "", getProperties());
 	symbolSizeProp->setToolTip("The size of the curve data point symbols in the plot.");
 	symbolSizeProp->setAllowCustomValues(false);
-	symbolSizeProp->setVisible(false);
-
+	
 	// Symbol Interval
 	EntityPropertiesInteger* symbolIntervalProp = EntityPropertiesInteger::createProperty("General", "Symbol Interval", 1, 1, 99, "", getProperties());
 	symbolIntervalProp->setToolTip("The interval of the curve data point symbols in the plot. A value of 1 means that every data point is shown, a value of 2 means that every second data point is shown, etc.");
 	symbolIntervalProp->setAllowCustomValues(false);
-	symbolIntervalProp->setVisible(false);
-
+	
 	// Symbol Outline Color
 	EntityPropertiesGuiPainter* symbolOutlineColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Outline Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolOutlineColorProp->setToolTip("The color of the curve data point symbols outline in the plot.");
 	symbolOutlineColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
-	symbolOutlineColorProp->setVisible(false);
-
+	
 	// Symbol Outline Width
 	EntityPropertiesInteger* symbolOutlineWidthProp = EntityPropertiesInteger::createProperty("General", "Symbol Outline Width", 1, 1, 99, "", getProperties());
 	symbolOutlineWidthProp->setToolTip("The width of the curve data point symbols outline in the plot.");
 	symbolOutlineWidthProp->setAllowCustomValues(false);
-	symbolOutlineWidthProp->setVisible(false);
-
+	
 	// Symbol Fill Color
 	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
-	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve());
-	symbolFillColorProp->setVisible(false);
+	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve(true));
+	
+	this->updatePropertyVisibilities();
 
 	getProperties().forceResetUpdateForAllProperties();
 }
@@ -307,8 +307,10 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
 		}
 	}
 	catch (...) {
-		
+		// Legacy support
 	}
+
+	this->updatePropertyVisibilities();
 
 	m_queryInformation = _curve.getQueryInformation();
 }
@@ -319,7 +321,7 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve) {
 
 bool EntityResult1DCurve::updatePropertyVisibilities() {
 	bool visibilityChanged = false;
-
+	
 	EntityPropertiesSelection* symbolProp = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Symbol"));
 	if (symbolProp) {
 		EntityPropertiesBase* symbolSizeProp = getProperties().getProperty("Symbol Size");

@@ -51,6 +51,7 @@ namespace ot {
 		const PainterTypes& getPainterTypes() const { return m_allowedPainters; };
 
 		void setStyleReferences(const std::list<ColorStyleValueEntry>& _colorStyleValueEntries) { m_allowedReferences = _colorStyleValueEntries; };
+		void addStyleReference(ColorStyleValueEntry _entry) { m_allowedReferences.push_back(_entry); };
 		const std::list<ColorStyleValueEntry>& getStyleReferences() const { return m_allowedReferences; };
 
 	private:

@@ -15,7 +15,7 @@ namespace ot {
 	public:
 
 		//! @brief Creates the default filter used for plot curves.
-		static Painter2DDialogFilter plotCurve();
+		static Painter2DDialogFilter plotCurve(bool _allowTransparent = false);
 	};
 
 }
