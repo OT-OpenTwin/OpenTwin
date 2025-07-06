@@ -24,6 +24,8 @@ public:
 	void setEndpoints(const std::list<Endpoint>& _endpoints) { m_endpoints = _endpoints; };
 	const std::list<Endpoint>& getEndpoints() const { return m_endpoints; };
 
+	void addEndpoint(const Endpoint& _endpoint) { m_endpoints.push_back(_endpoint); };
+
 private:
 	std::string m_name;
 	std::list<Endpoint> m_endpoints;

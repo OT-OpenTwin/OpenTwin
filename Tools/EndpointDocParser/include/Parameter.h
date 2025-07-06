@@ -34,6 +34,7 @@ public:
 
 	void setDataType(DataType _dataType) { m_dataType = _dataType; };
 	DataType getDataType() const { return m_dataType; };
+	std::string getDataTypeString() const;
 
 	void setDescription(const std::string& _description) { m_description = _description; };
 	const std::string& getDescription() const { return m_description; };
