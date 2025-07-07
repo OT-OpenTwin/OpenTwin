@@ -24,16 +24,17 @@ private:
 	std::map<std::string, handlerMethod> m_handlingFunctions;
 	std::map<std::string, handlerMethod> m_checkParameterFunctions;
 	
-	handlerMethod m_noParameterCheck = [](const ot::JsonDocument& doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
+	handlerMethod m_noParameterCheck = [](const ot::JsonDocument& _doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
 	PythonAPI m_pythonAPI;
 
 	ot::ReturnMessage handlePing(const ot::JsonDocument& _doc);
-	ot::ReturnMessage shutdownProcess(const ot::JsonDocument& doc);
-	ot::ReturnMessage executeScript(const ot::JsonDocument& doc);
-	ot::ReturnMessage executeCommand(const ot::JsonDocument& doc);
-	ot::ReturnMessage initialise(const ot::JsonDocument& doc);
+	ot::ReturnMessage shutdownProcess(const ot::JsonDocument& _doc);
+	ot::ReturnMessage executeScript(const ot::JsonDocument& _doc);
+	ot::ReturnMessage executeCommand(const ot::JsonDocument& _doc);
+	ot::ReturnMessage initialise(const ot::JsonDocument& _doc);
+	ot::ReturnMessage setLogFlags(const ot::JsonDocument& _doc);
 
-	ot::ReturnMessage checkParameterExecuteScript(const ot::JsonDocument& doc);
-	ot::ReturnMessage checkParameterExecuteCommand(const ot::JsonDocument& doc);
+	ot::ReturnMessage checkParameterExecuteScript(const ot::JsonDocument& _doc);
+	ot::ReturnMessage checkParameterExecuteCommand(const ot::JsonDocument& _doc);
 
 };

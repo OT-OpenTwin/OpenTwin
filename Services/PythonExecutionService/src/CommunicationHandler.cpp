@@ -117,6 +117,10 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
+	
+	ot::JsonArray logFlags;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlags, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LogFlags, logFlags, doc.GetAllocator());
 
 	QByteArray request = QByteArray::fromStdString(doc.toJson());
 	request.append('\n');

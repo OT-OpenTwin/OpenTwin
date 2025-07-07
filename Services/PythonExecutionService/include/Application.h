@@ -105,6 +105,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
+
 	// Handler
 	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
 

@@ -62,9 +62,15 @@ ActionHandler::ActionHandler() {
 	m_checkParameterFunctions[OT_ACTION_CMD_Init] = m_noParameterCheck;
 	m_handlingFunctions[OT_ACTION_CMD_Init] = std::bind(&ActionHandler::initialise, this, arguments);
 
+	m_checkParameterFunctions[OT_ACTION_CMD_SetLogFlags] = m_noParameterCheck;
+	m_handlingFunctions[OT_ACTION_CMD_SetLogFlags] = std::bind(&ActionHandler::setLogFlags, this, arguments);
 }
 
 ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
+	if (doc.HasMember(OT_ACTION_PARAM_LogFlags)) {
+		ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(doc, OT_ACTION_PARAM_LogFlags)));
+	}
+
 	const std::string serviceName = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_NAME);
 	ot::ReturnMessage returnMessage = ot::ReturnMessage(ot::ReturnMessage::Ok, "Initialisation succeeded");
 	if (serviceName == OT_INFO_SERVICE_TYPE_DataBase) {
@@ -102,9 +108,15 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 		Application::instance().setUIServiceURL(url);
 	}
 	else {
-		returnMessage =ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported initialisation order.");
 	}
+
 	return returnMessage;
+}
+
+ot::ReturnMessage ActionHandler::setLogFlags(const ot::JsonDocument& _doc) {
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(_doc, OT_ACTION_PARAM_LogFlags)));
+	return ot::ReturnMessage();
 }
 
 ot::ReturnMessage ActionHandler::handlePing(const ot::JsonDocument& _doc) {

@@ -149,6 +149,27 @@ bool Application::settingChanged(const ot::Property * _item) {
 	return false;
 }
 
+void Application::logFlagsChanged(const ot::LogFlags& _flags) {
+	if (!m_subprocessManager) {
+		return;
+	}
+
+	if (!m_subprocessManager->isConnected()) {
+		return;
+	}
+
+	OT_LOG_D("Updating log flags");
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(_flags, flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());
+
+	std::string response;
+	m_subprocessManager->sendRequest(doc, response);
+}
+
 
 // ##################################################################################################################################################################################################################
 
