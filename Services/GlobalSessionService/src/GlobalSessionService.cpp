@@ -154,7 +154,7 @@ std::string GlobalSessionService::handleGetGlobalServicesURL(ot::JsonDocument& _
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().logFlags(), flagsArr, doc.GetAllocator());
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, doc.GetAllocator());
 
 	return doc.toJson();

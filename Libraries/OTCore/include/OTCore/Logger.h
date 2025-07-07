@@ -523,10 +523,10 @@ namespace ot {
 
 		void setLogFlag(LogFlag _flag, bool _active = true) { m_logFlags.setFlag(_flag, _active); };
 		void setLogFlags(LogFlags _flags) { m_logFlags = _flags; };
-		LogFlags logFlags(void) const { return m_logFlags; };
+		LogFlags getLogFlags(void) const { return m_logFlags; };
 
 		void setServiceName(const std::string& _name) { m_serviceName = _name; };
-		const std::string& serviceName(void) const { return m_serviceName; };
+		const std::string& getServiceName(void) const { return m_serviceName; };
 
 		void setUserName(const std::string& _name) { m_userName = _name; };
 		const std::string& getUserName(void) const { return m_userName; };

@@ -1507,7 +1507,7 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 }
 
 void AppBase::updateLogIntensityInfo(void) {
-	ot::LogFlags flags = ot::LogDispatcher::instance().logFlags();
+	ot::LogFlags flags = ot::LogDispatcher::instance().getLogFlags();
 
 	std::string info = "Currently enabled log flags:";
 
