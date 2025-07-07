@@ -126,7 +126,9 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 void BlockHandlerDatabaseAccess::createLabelFieldNameMap()
 {
 	
-	const std::string selectedQuantity = m_queriedData.getMetadataQuantity()->quantityLabel;
+	const std::string selectedQuantity = m_selectedQuantityLabel;
+
+
 	const MetadataCampaign& campaign = m_resultCollectionMetadataAccess->getMetadataCampaign();
 	const MetadataQuantity* quantity = campaign.getMetadataQuantitiesByLabel().find(selectedQuantity)->second;
 	auto& allDependingParameter = campaign.getMetadataParameterByUID();
@@ -225,7 +227,7 @@ void BlockHandlerDatabaseAccess::addQuantityQuery(EntityBlockDatabaseAccess* _bl
 		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
 		{
 			valueUID = valueDescription.quantityIndex;
-			m_queriedData.setMetadataQuantity( selectedQuantity, &valueDescription);
+			m_selectedQuantityLabel= selectedQuantity->quantityName;
 			
 		}
 	}

@@ -18,19 +18,17 @@ public:
 	~PipelineData() = default;
 
 	PipelineData(const PipelineData& _other)
-		:m_campaign(_other.m_campaign),m_series(_other.m_series), m_quantity(_other.m_quantity), m_quantityDescription(_other.m_quantityDescription)
+		:m_campaign(_other.m_campaign),m_series(_other.m_series)
 	{
 		const ot::JsonDocument& source = _other.m_data;
 		m_data.CopyFrom(source, m_data.GetAllocator());
 	}
 
 	PipelineData(PipelineData&& _other) noexcept
-		:m_campaign(_other.m_campaign), m_series(_other.m_series), m_quantity(_other.m_quantity), m_quantityDescription(_other.m_quantityDescription)
+		:m_campaign(_other.m_campaign), m_series(_other.m_series)
 	{
 		m_campaign = (_other.m_campaign);
 		m_series = (_other.m_series);
-		m_quantity = (_other.m_quantity);
-		m_quantityDescription = (_other.m_quantityDescription);
 
 		ot::JsonDocument& source = _other.m_data;
 		m_data.Swap(source);
@@ -40,8 +38,6 @@ public:
 	{
 		m_campaign = (_other.m_campaign);
 		m_series= (_other.m_series); 
-		m_quantity = (_other.m_quantity);
-		m_quantityDescription = (_other.m_quantityDescription);
 
 		const ot::JsonDocument& source = _other.m_data;
 		m_data.CopyFrom(source, m_data.GetAllocator());
@@ -65,22 +61,12 @@ public:
 
 	void setMetadataCampaign(const MetadataCampaign* _campaign) { m_campaign = _campaign;}
 	void setMetadataSeries(const MetadataSeries* _series) { m_series = _series;}
-	void setMetadataQuantity(const MetadataQuantity* _quantity, const MetadataQuantityValueDescription* _quantityDescription) 
-	{ 
-		m_quantity = _quantity; 
-		m_quantityDescription = _quantityDescription;
-	}
+	
 	const MetadataCampaign* getMetadataCampaign() { return m_campaign; }
 	const MetadataSeries* getMetadataSeries() { return m_series; }
-	const MetadataQuantity* getMetadataQuantity() { return m_quantity; }
-	const MetadataQuantityValueDescription* getMetadataValueDescription() { return m_quantityDescription; }
-
 
 private:
 	const MetadataCampaign* m_campaign = nullptr;
 	const MetadataSeries* m_series = nullptr;
-	const MetadataQuantity* m_quantity = nullptr;
-	const MetadataQuantityValueDescription* m_quantityDescription = nullptr;
-
 	ot::JsonDocument m_data;
 };

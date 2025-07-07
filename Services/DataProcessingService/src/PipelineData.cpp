@@ -50,23 +50,6 @@ ot::JsonValue& PipelineData::getMetadata()
 		m_data[memberMetaData].RemoveMember(memberSeries);
 		m_data[memberMetaData].AddMember(memberSeries, entry, m_data.GetAllocator());
 	}
-
-	if (m_quantity != nullptr)
-	{
-		ot::JsonObject entry;
-		m_quantity->addToJsonObject(entry, m_data.GetAllocator());
-		m_data[memberMetaData].RemoveMember(memberQuantity);
-		m_data[memberMetaData].AddMember(memberQuantity, entry, m_data.GetAllocator());
-	}
-
-	if (m_quantityDescription != nullptr)
-	{
-		ot::JsonObject entry;
-		m_quantityDescription->addToJsonObject(entry, m_data.GetAllocator());
-		m_data[memberMetaData].RemoveMember(memberQuantityDescription);
-		m_data[memberMetaData].AddMember(memberQuantityDescription, entry, m_data.GetAllocator());
-	}
-
 	return m_data[memberMetaData];
 }
 
@@ -86,17 +69,4 @@ void PipelineData::setMetadata(ot::JsonValue&& _metaData)
 		m_series = newSeries.release();
 	}
 
-	if (ot::json::exists(_metaData, memberQuantity))
-	{
-		std::unique_ptr<MetadataQuantity> newQuantity(new MetadataQuantity());
-		newQuantity->setFromJsonObject(ot::json::getObject(_metaData, memberQuantity));
-		m_quantity = newQuantity.release();
-	}
-
-	if (ot::json::exists(_metaData, memberQuantityDescription))
-	{
-		std::unique_ptr<MetadataQuantityValueDescription> newValueDescript(new MetadataQuantityValueDescription());
-		newValueDescript->setFromJsonObject(ot::json::getObject(_metaData, memberQuantityDescription));
-		m_quantityDescription = newValueDescript.release();
-	}
 }
