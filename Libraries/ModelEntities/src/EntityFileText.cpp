@@ -123,6 +123,8 @@ ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
+	result.setFileExtensionFilter(this->getFileFilter());
+
 	if (_includeData)
 	{
 		result.setPlainText(this->getText());

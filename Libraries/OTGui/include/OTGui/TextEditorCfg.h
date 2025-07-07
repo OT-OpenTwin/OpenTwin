@@ -46,6 +46,7 @@ namespace ot {
 		void setDocumentSyntax(DocumentSyntax _syntax) { m_syntax = _syntax; };
 		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
 
+		void setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions);
 		void setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions);
 		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
 		const std::string& getFileExtensionFilters() const { return m_fileExtensionFilter; };

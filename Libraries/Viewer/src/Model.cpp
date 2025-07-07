@@ -1524,11 +1524,13 @@ void Model::exportTableAsCSV(void) {
 		return;
 	}
 
+	ot::Table* table = view->getTable();
+
 	if (view->getViewContentModified()) {
-		view->getTable()->slotSaveRequested();
+		table->slotSaveRequested();
 	}
 
-	std::string filePath = api->getSaveFileName("Export To File", "", "CSV File (*.csv);;All Files (*.*)");
+	std::string filePath = api->getSaveFileName("Export To File", "", ot::FileExtension::toFilterString({ ot::FileExtension::CSV, ot::FileExtension::AllFiles }));
 	if (!filePath.empty()) {
 		// todo: export...
 	}

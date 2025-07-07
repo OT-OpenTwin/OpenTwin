@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTGui/TextEditorCfg.h"
 
@@ -48,6 +49,10 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_readOnly = json::getBool(_object, "ReadOnly");
 	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
 	m_fileExtensionFilter = json::getString(_object, "FileExtensionsFilter");
+}
+
+void ot::TextEditorCfg::setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions) {
+	m_fileExtensionFilter = FileExtension::toFilterString(std::list<FileExtension::DefaultFileExtension>(_extensions));
 }
 
 void ot::TextEditorCfg::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
