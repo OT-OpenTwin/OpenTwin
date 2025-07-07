@@ -11,7 +11,6 @@
 #include "ClassFactory.h"
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
-#include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
@@ -175,12 +174,6 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 		dbaBlock->createProperties();
 	}
 
-	EntityBlockDataDimensionReducer* dataAR = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
-	if (dataAR)
-	{
-		dataAR->createProperties();
-	}
-
 	EntityBlockStorage* storage = dynamic_cast<EntityBlockStorage*>(blockEntity.get());
 	if (storage)
 	{
@@ -223,9 +216,6 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
-
-	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dimensionReducer.getClassName(), dimensionReducer.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDataDimensionReducer::getIconName());
 
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());

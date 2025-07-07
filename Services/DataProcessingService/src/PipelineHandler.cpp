@@ -1,14 +1,12 @@
 #include "PipelineHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPython.h"
-#include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
 #include "EntityBlockStorage.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPython.h"
-#include "BlockHandlerDataDimensionReducer.h"
 #include "BlockHandlerDisplay.h"
 #include "BlockHandlerFileWriter.h"
 #include "BlockHandlerStorage.h"
@@ -58,12 +56,6 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	if (pythonEntity != nullptr)
 	{
 		return std::make_shared <BlockHandlerPython>(pythonEntity, _blockHandlerByGraphNode);
-	}
-
-	EntityBlockDataDimensionReducer* dataDimensionReducer = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
-	if (dataDimensionReducer != nullptr)
-	{
-		return std::make_shared <BlockHandlerDataDimensionReducer>(dataDimensionReducer,_blockHandlerByGraphNode);
 	}
 
 	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(blockEntity.get());
