@@ -60,7 +60,10 @@ const std::list<std::string> EntityBlockStorage::getInputNames()
 	std::list<std::string> inputNames;
 	for (auto& connectorByName : m_connectorsByName)
 	{
-		inputNames.push_back(connectorByName.first);
+		if (connectorByName.first != getSeriesConnectorName())
+		{
+			inputNames.push_back(connectorByName.first);
+		}
 	}
 	return inputNames;
 }
@@ -74,8 +77,8 @@ void EntityBlockStorage::createConnectors()
 {
 	const ot::ConnectorType type = ot::ConnectorType::In;
 	
-	ot::Connector seriesMetadata(ot::ConnectorType::InOptional, "SeriesMetadata", "Series Metadata");
-	m_connectorsByName["SeriesMetadata"] = seriesMetadata;
+	ot::Connector seriesMetadata(ot::ConnectorType::InOptional, getSeriesConnectorName(), "Series Metadata");
+	m_connectorsByName[getSeriesConnectorName()] = seriesMetadata;
 	
 	int32_t numberOfInputs = getNumberOfInputs();
 	for (int32_t i = 1; i <= numberOfInputs;i++)

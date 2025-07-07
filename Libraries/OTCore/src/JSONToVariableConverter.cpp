@@ -39,6 +39,39 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 }
 
+ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, const std::string _type)
+{
+
+	if (_type == ot::TypeNames::getStringTypeName())
+	{
+		return ot::Variable(value.GetString());
+	}
+	else if (_type == ot::TypeNames::getInt32TypeName())
+	{
+		return ot::Variable(value.GetInt());
+	}
+	else if (_type == ot::TypeNames::getInt64TypeName())
+	{
+		return ot::Variable(value.GetInt64());
+	}
+	else if (_type == ot::TypeNames::getFloatTypeName())
+	{
+		return ot::Variable(value.GetFloat());
+	}
+	else if (_type == ot::TypeNames::getDoubleTypeName())
+	{
+		return ot::Variable(value.GetDouble());
+	}
+	else if (_type == ot::TypeNames::getBoolTypeName())
+	{
+		return ot::Variable(value.GetBool());
+	}
+	else
+	{
+		assert(false);
+	}
+}
+
 std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArray& value)
 {
 	std::list<ot::Variable> variables;

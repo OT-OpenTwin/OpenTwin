@@ -29,6 +29,7 @@ public:
 	static const std::string getIconName() { return "Database_store.svg"; }
 
 	const std::list<std::string> getInputNames();
+	const std::string getSeriesConnectorName() { return "SeriesMetadata"; }
 private:	
 	uint32_t m_maxNbOfInputs = 40;
 

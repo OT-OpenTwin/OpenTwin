@@ -15,8 +15,8 @@ public:
 private:
 	EntityBlockStorage* m_blockEntityStorage;
 	
-	std::list<std::string> m_allInputs;
-
+	std::list<std::string> m_allDataInputs;
+	std::string m_seriesMetadataInput;
 
 	bool allInputsAvailable();
 	std::list<DatasetDescription> createDatasets();
