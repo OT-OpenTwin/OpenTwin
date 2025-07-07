@@ -111,6 +111,7 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	this->blockSignals(true);
 
 	m_documentSyntax = _config.getDocumentSyntax();
+	m_fileExtensionFilter = _config.getFileExtensionFilters();
 
 	QString newText = QString::fromStdString(_config.getPlainText());
 	newText.remove('\r');
@@ -259,6 +260,10 @@ void ot::TextEditor::slotSaveRequested() {
 		return;
 	}
 	Q_EMIT saveRequested();
+}
+
+void ot::TextEditor::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
+	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
 }
 
 void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {

@@ -52,6 +52,7 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("ReadOnly", m_readOnly, _allocator);
 	_object.AddMember("Syntax", JsonString(ot::toString(m_syntax), _allocator), _allocator);
+	_object.AddMember("FileExtensionsFilter", JsonString(m_fileExtensionFilter, _allocator), _allocator);
 }
 
 void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -62,4 +63,9 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_text = json::getString(_object, "Text");
 	m_readOnly = json::getBool(_object, "ReadOnly");
 	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
+	m_fileExtensionFilter = json::getString(_object, "FileExtensionsFilter");
+}
+
+void ot::TextEditorCfg::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
+	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
 }

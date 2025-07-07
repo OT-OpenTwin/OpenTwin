@@ -85,6 +85,10 @@ namespace ot {
 		void setEnableSameTextHighlighting(bool _enabled) { m_enableSameTextHighlighting = _enabled; };
 		bool isSameTextHighlightingEnabled() const { return m_enableSameTextHighlighting; };
 
+		void setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions);
+		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
+		const std::string& getFileExtensionFilter() const { return m_fileExtensionFilter; };
+
 	Q_SIGNALS:							
 		void saveRequested();
 
@@ -124,5 +128,7 @@ namespace ot {
 		TextEditorLineNumberArea* m_lineNumberArea;
 		DocumentSyntax            m_documentSyntax;
 		SyntaxHighlighter*		  m_syntaxHighlighter;
+
+		std::string m_fileExtensionFilter;
 	};
 }

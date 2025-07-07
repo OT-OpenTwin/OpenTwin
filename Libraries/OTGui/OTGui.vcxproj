@@ -27,6 +27,7 @@
     <ClInclude Include="include\OTGui\CopyEntityInformation.h" />
     <ClInclude Include="include\OTGui\CopyInformation.h" />
     <ClInclude Include="include\OTGui\DefaultPropertyValues.h" />
+    <ClInclude Include="include\OTGui\FileExtension.h" />
     <ClInclude Include="include\OTGui\LibraryModel.h" />
     <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\ManagedPropertyObject.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\CopyInformation.cpp" />
     <ClCompile Include="src\DefaultPropertyValues.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
+    <ClCompile Include="src\FileExtension.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />

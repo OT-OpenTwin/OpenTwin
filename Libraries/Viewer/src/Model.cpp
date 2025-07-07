@@ -1482,13 +1482,20 @@ void Model::exportTextEditor(void) {
 		return;
 	}
 
+	ot::TextEditor* edit = view->getTextEditor();
+
 	if (view->getViewContentModified()) {
-		view->getTextEditor()->slotSaveRequested();
+		edit->slotSaveRequested();
 	}
 	
-	std::string filePath = api->getSaveFileName("Export To File", "", "Text Files (*.txt);;All Files (*.*)");
+	std::string filePath = api->getSaveFileName(
+		"Export To File", 
+		"", 
+		edit->getFileExtensionFilter()
+	);
+
 	if (!filePath.empty()) {
-		if (view->getTextEditor()->saveToFile(QString::fromStdString(filePath))) {
+		if (edit->saveToFile(QString::fromStdString(filePath))) {
 			api->displayText("Exported successfully: \"" + filePath + "\"\n");
 		}
 		else {

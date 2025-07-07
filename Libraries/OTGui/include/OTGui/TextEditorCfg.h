@@ -7,9 +7,11 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/WidgetViewBase.h"
 
 // std header
+#include <list>
 #include <string>
 
 #pragma warning(disable:4251)
@@ -45,10 +47,15 @@ namespace ot {
 		void setDocumentSyntax(DocumentSyntax _syntax) { m_syntax = _syntax; };
 		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
 
+		void setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions);
+		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
+		const std::string& getFileExtensionFilters() const { return m_fileExtensionFilter; };
+
 	private:
 		std::string m_text;
 		bool m_readOnly;
 		DocumentSyntax m_syntax;
+		std::string m_fileExtensionFilter;
 	};
 
 }
