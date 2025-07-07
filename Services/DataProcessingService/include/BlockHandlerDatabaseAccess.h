@@ -29,6 +29,8 @@ private:
 	std::list< BsonViewOrValue> m_comparisons;
 	BsonViewOrValue m_query;
 	BsonViewOrValue m_projection;
+	BsonViewOrValue m_sort;
+	bool m_sortByID = false;
 	const int m_documentLimit = 0;
 
 	std::list<LabelFieldNamePair> m_labelFieldNamePairs;

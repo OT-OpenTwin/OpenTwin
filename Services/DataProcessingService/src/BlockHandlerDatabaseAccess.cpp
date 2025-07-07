@@ -59,7 +59,15 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
 	_uiComponent->displayMessage("Executing projection: " + debugProjection + "\n");
 
-	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, m_documentLimit);
+	DataStorageAPI::DataStorageResponse dbResponse;
+	if (m_sortByID)
+	{
+		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection,m_sort, m_documentLimit);
+	}
+	else
+	{
+		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, m_documentLimit);
+	}
 
 	if (dbResponse.getSuccess())
 	{
@@ -153,8 +161,14 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 	//Adding all parameter that may occur in the returned documents.
 	addParameterQueries(_blockEntity);
 
-	const bool reproducableOrder = _blockEntity->getReproducableOrder();
-
+	m_sortByID = _blockEntity->getReproducableOrder();
+	if (m_sortByID)
+	{
+		m_sort = (bsoncxx::builder::stream::document{}
+			<< "_id" << 1  // 1 for ascending, -1 for descending
+			<< bsoncxx::builder::stream::finalize);
+	}
+	
 	createLabelFieldNameMap();
 	AdvancedQueryBuilder builder;
 	m_query = builder.connectWithAND(std::move(m_comparisons));

@@ -201,6 +201,36 @@ namespace DataStorageAPI
 		}
 	}
 
+	DataStorageResponse DocumentAccess::GetAllDocuments(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort, int limit)
+	{
+
+		DataStorageResponse response;
+		try
+		{
+			auto results = docBase->GetAllDocument(std::move(_queryFilter), std::move(_projectionQuery), std::move(_sort), limit);
+			std::string responseData = "{ \"Documents\": [";
+			bool isFirst = true;
+			for (auto result : results)
+			{
+				if (!isFirst)
+				{
+					responseData += ",";
+				}
+				responseData += bsoncxx::to_json(result);
+				isFirst = false;
+			}
+			responseData += "]}";
+			response.UpdateDataStorageResponse(responseData, true, "");
+			return response;
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+			response.UpdateDataStorageResponse("", false, e.what());
+			return response;
+		}
+	}
+
 	DocumentAccess::~DocumentAccess()
 	{
 		delete docBase;

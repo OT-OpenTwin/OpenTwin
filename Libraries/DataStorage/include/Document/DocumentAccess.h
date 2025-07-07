@@ -28,6 +28,7 @@ namespace DataStorageAPI
 
 		__declspec(dllexport) DataStorageResponse GetAllDocuments(string jsonQuery, string jsonProjectionQuery, int limit);
 		__declspec(dllexport) DataStorageResponse GetAllDocuments(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, int limit);
+		__declspec(dllexport) DataStorageResponse GetAllDocuments(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort,int limit);
 
 		__declspec(dllexport) DataStorageResponse DeleteDocument(BsonViewOrValue queryFilter);
 
