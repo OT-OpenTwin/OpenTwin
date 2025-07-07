@@ -1,9 +1,7 @@
 #include "PipelineData.h"
 
 #define memberCampaign "Selected Campaign"
-#define memberSeries "Selected Series"
-#define memberQuantity "Selected Quantity"
-#define memberQuantityDescription "Selected QuantityDescription"
+#define memberSeries "Selected Series label"
 #define memberData "Data"
 #define memberMetaData "Meta"
 
@@ -31,8 +29,6 @@ ot::JsonValue& PipelineData::getMetadata()
 		m_data.AddMember(memberMetaData, empty, m_data.GetAllocator());
 		m_data[memberMetaData].AddMember(memberCampaign, empty, m_data.GetAllocator());
 		m_data[memberMetaData].AddMember(memberSeries, empty, m_data.GetAllocator());
-		m_data[memberMetaData].AddMember(memberQuantity, empty, m_data.GetAllocator());
-		m_data[memberMetaData].AddMember(memberQuantityDescription, empty, m_data.GetAllocator());
 	}
 
 	if (m_campaign != nullptr)
@@ -45,10 +41,9 @@ ot::JsonValue& PipelineData::getMetadata()
 
 	if (m_series != nullptr)
 	{
-		ot::JsonObject entry;
-		m_series->addToJsonObject(entry, m_data.GetAllocator());
+		
 		m_data[memberMetaData].RemoveMember(memberSeries);
-		m_data[memberMetaData].AddMember(memberSeries, entry, m_data.GetAllocator());
+		m_data[memberMetaData].AddMember(memberSeries, ot::JsonString(m_series->getLabel(),m_data.GetAllocator()), m_data.GetAllocator());
 	}
 	return m_data[memberMetaData];
 }
