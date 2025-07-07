@@ -89,9 +89,9 @@ void EntityBlockStorage::createConnectors()
 {
 	const ot::ConnectorType type = ot::ConnectorType::In;
 	
-	ot::Connector seriesMetadata(ot::ConnectorType::InOptional, getSeriesConnectorName(), "Series Metadata");
+	/*ot::Connector seriesMetadata(ot::ConnectorType::InOptional, getSeriesConnectorName(), "Series Metadata");
 	m_connectorsByName[getSeriesConnectorName()] = seriesMetadata;
-	
+	*/
 	int32_t numberOfInputs = getNumberOfInputs();
 	for (int32_t i = 1; i <= numberOfInputs;i++)
 	{
