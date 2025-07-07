@@ -39,6 +39,7 @@
 #include "OTSystem/OTAssert.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyColor.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -509,7 +510,7 @@ void Application::importSTEP(void)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import STEP File", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("STEP files (*.stp;*.step)", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importSTEPFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());

@@ -33,7 +33,7 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 	
 	if (_action == m_buttonFileImport.GetFullDescription())
 	{
-		const std::string fileMask = "Text files (*.csv;*.txt)";
+		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
 		const std::string fileDialogTitle = "Import Text File";
 		const std::string subsequentFunction = "ImportTextFile";
 		importFile(fileMask,fileDialogTitle,subsequentFunction);
@@ -41,7 +41,7 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 	}
 	else if (_action == m_buttonPythonImport.GetFullDescription())
 	{
-		const std::string fileMask = "Python files (*.py)";
+		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
 		const std::string fileDialogTitle = "Import Python Script";
 		const std::string subsequentFunction = "ImportPythonScript";
 		importFile(fileMask, fileDialogTitle, subsequentFunction);
@@ -96,6 +96,8 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& 
 	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
 	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+
 	assert(fileNames.size() == contents.size() && contents.size() == uncompressedDataLengths.size());
 
 	{
@@ -106,7 +108,7 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& 
 		{
 			std::string fileContent = ot::Encryption::decryptAndUnzipString(*content, *uncompressedDataLength);
 		
-			storeFileInDataBase(fileContent, fileName,_folderName);
+			storeFileInDataBase(fileContent, fileName, _folderName, fileFilter);
 			uncompressedDataLength++;
 			content++;
 		}
@@ -259,7 +261,7 @@ void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _o
 	Application::instance()->sendMessage(true, _owner, _doc, response);
 }
 
-void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderName)
+void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderName, const std::string& _fileFilter)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
@@ -291,7 +293,9 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 
 	ot::EncodingGuesser guesser;
 	textFile->setFileProperties(path, name,type);
-	
+
+	textFile->setFileFilter(_fileFilter);
+
 	std::list<std::string> folderEntities = model->getListOfFolderItems(_folderName, true);
 	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folderName, name);;
 	textFile->setName(entityName);

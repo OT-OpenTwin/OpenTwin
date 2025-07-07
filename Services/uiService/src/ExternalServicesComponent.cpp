@@ -2208,12 +2208,13 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 				nullptr,
 				dialogTitle.c_str(),
 				QDir::currentPath(),
-				QString(fileMask.c_str()) + " ;; All files (*.*)");
+				QString(fileMask.c_str()));
 
 			if (!fileNames.isEmpty()) {
 				ot::JsonDocument inDoc;
 				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
 				for (QString& fileName : fileNames)
@@ -2261,12 +2262,14 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 				nullptr,
 				dialogTitle.c_str(),
 				QDir::currentPath(),
-				QString(fileMask.c_str()) + " ;; All files (*.*)");
+				QString(fileMask.c_str()));
 
 			if (fileName != "")
 			{
 				ot::JsonDocument inDoc;
 				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				if (loadContent)
 				{
@@ -2282,7 +2285,6 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 					// We need to send the file content
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
 				}
-				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				std::string response;
@@ -2352,7 +2354,7 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 		nullptr,
 		dialogTitle.c_str(),
 		QDir::currentPath(),
-		QString(fileMask.c_str()) + " ;; All files (*.*)");
+		QString(fileMask.c_str()));
 
 	if (fileName != "")
 	{
@@ -2360,6 +2362,7 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		std::string response;
 

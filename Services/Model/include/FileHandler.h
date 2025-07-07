@@ -49,5 +49,5 @@ private:
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.
-	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderrName);
+	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderName, const std::string& _fileFilter);
 };

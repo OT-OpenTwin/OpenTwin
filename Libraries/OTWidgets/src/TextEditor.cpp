@@ -61,7 +61,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
-	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText)
+	m_sameTextHighlightingMinimum(2), m_documentSyntax(DocumentSyntax::PlainText), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles))
 {
 	this->setObjectName("OT_TextEditor");
 

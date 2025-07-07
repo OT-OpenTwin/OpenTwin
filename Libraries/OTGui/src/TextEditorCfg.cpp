@@ -23,26 +23,10 @@
 
 ot::TextEditorCfg::TextEditorCfg() :
 	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle),
-	m_syntax(DocumentSyntax::PlainText), m_readOnly(false)
-{}
-
-ot::TextEditorCfg::TextEditorCfg(const TextEditorCfg& _other)
-	: WidgetViewBase(_other), m_text(_other.m_text), m_syntax(_other.m_syntax), m_readOnly(_other.m_readOnly)
+	m_syntax(DocumentSyntax::PlainText), m_readOnly(false), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles))
 {}
 
 ot::TextEditorCfg::~TextEditorCfg() {}
-
-ot::TextEditorCfg& ot::TextEditorCfg::operator = (const TextEditorCfg& _other) {
-	WidgetViewBase::operator=(_other);
-
-	if (this != &_other) {
-		m_text = _other.m_text;
-		m_readOnly = _other.m_readOnly;
-		m_syntax = _other.m_syntax;
-	}
-	
-	return *this;
-}
 
 void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	OT_TEST_TEXTEDITORCFG_Interval("Export");

@@ -266,7 +266,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("Touchstone files (*.s*p)", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Touchstone, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());

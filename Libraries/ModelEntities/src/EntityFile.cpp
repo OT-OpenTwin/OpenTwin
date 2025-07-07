@@ -114,6 +114,7 @@ void EntityFile::AddStorageData(bsoncxx::builder::basic::document& _storage)
 		bsoncxx::builder::basic::kvp("FilePath", m_path),
 		bsoncxx::builder::basic::kvp("FileName", m_fileName),
 		bsoncxx::builder::basic::kvp("FileType", m_fileType),
+		bsoncxx::builder::basic::kvp("FileFilter", m_fileFilter),
 		bsoncxx::builder::basic::kvp("DataUID", m_dataUID),
 		bsoncxx::builder::basic::kvp("DataVersionID", m_dataVersion)
 	);
@@ -125,6 +126,7 @@ void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & _doc_vie
 	m_fileName = std::string(_doc_view["FileName"].get_utf8().value.data());
 	m_path = std::string(_doc_view["FilePath"].get_utf8().value.data());
 	m_fileType = std::string(_doc_view["FileType"].get_utf8().value.data());
+	if (_doc_view.find("FileFilter") != _doc_view.end()) { m_fileFilter = _doc_view["FileFilter"].get_utf8().value.data(); }
 	m_dataUID = _doc_view["DataUID"].get_int64();
 	m_dataVersion = _doc_view["DataVersionID"].get_int64();
 }

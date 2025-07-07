@@ -24,6 +24,10 @@ std::string ot::FileExtension::toFilterString(const std::list<DefaultFileExtensi
 	return result;
 }
 
+std::string ot::FileExtension::toFilterString(const std::initializer_list<DefaultFileExtension>& _extensions) {
+	return toFilterString(std::list<DefaultFileExtension>(_extensions));
+}
+
 
 std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 	switch (_extension) {
@@ -78,7 +82,6 @@ std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 		// Technical / Engineering
 	case FileExtension::Step: return "STEP Files (*.step *.stp)";
 	case FileExtension::Iges: return "IGES Files (*.iges *.igs)";
-	case FileExtension::Stl: return "STL Meshes (*.stl)";
 	case FileExtension::Obj: return "Wavefront OBJ (*.obj)";
 	case FileExtension::Dxf: return "DXF Drawings (*.dxf)";
 	case FileExtension::Dwg: return "DWG Drawings (*.dwg)";
@@ -94,6 +97,7 @@ std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 	case FileExtension::Spice: return "SPICE Files (*.cir *.sp)";
 	case FileExtension::Mat: return "MATLAB Data Files (*.mat)";
 	case FileExtension::Mdl: return "Simulink Model (*.mdl)";
+	case FileExtension::Touchstone: return "Touchstone files (*.s*p)";
 
 		// CST Studio Suite
 	case FileExtension::CST: return "CST Project (*.cst)";
@@ -104,6 +108,19 @@ std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 	case FileExtension::CSTSolverDb: return "CST Solver DB (*.sdb)";
 	case FileExtension::CSTMaterial: return "CST Material Catalog (*.mcs)";
 	case FileExtension::CSTTemplate: return "CST Template Control (*.tcf)";
+
+		// Mesh / Simulation Formats
+	case GmshMesh: return "Gmsh MSH (*.msh)";
+	case Diffpack: return "Diffpack 3D (*.diff)";
+	case IDeasUniversal: return "I-deas Universal (*.unv)";
+	case Med: return "MED (*.med)";
+	case INRIAMedit: return "INRIA Medit (*.mesh)";
+	case NastranBulkData: return "Nastran Bulk Data File (*.bdf)";
+	case Plot3d: return "Plot3D Structured Mesh (*.p3d)";
+	case STLSurface: return "STL Surface (*.stl)"; // already exists
+	case VRMLSurface: return "VRML Surface (*.wrl)";
+	case Vtk: return "VTK (*.vtk)";
+	case Ply2Surface: return "PLY2 Surface (*.ply2)";
 
 	default:
 		OT_LOG_E("Unknown file extension (" + std::to_string(static_cast<int>(_extension)) + ")");

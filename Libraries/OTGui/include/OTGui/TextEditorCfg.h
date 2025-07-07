@@ -19,12 +19,11 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT TextEditorCfg : public WidgetViewBase {
+		OT_DECL_DEFCOPY(TextEditorCfg)
+		OT_DECL_DEFMOVE(TextEditorCfg)
 	public:
 		TextEditorCfg();
-		TextEditorCfg(const TextEditorCfg& _other);
 		virtual ~TextEditorCfg();
-
-		TextEditorCfg& operator = (const TextEditorCfg& _other);
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
