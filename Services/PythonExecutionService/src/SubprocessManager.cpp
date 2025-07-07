@@ -117,7 +117,12 @@ void SubprocessManager::stopConnectionHandlingAfterCrash(void) {
 }
 
 bool SubprocessManager::isConnected() {
-	return this->isWorkerAlive();
+	if (m_communicationHandler) {
+		return !m_communicationHandler->isDisconnected();
+	}
+	else {
+		return false;
+	}
 }
 
 void SubprocessManager::shutdownSubprocess(void) {

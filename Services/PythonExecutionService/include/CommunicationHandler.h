@@ -34,6 +34,8 @@ public:
 
 	void cleanupAfterCrash(void);
 
+	bool isDisconnected() const { return m_clientState == ClientState::Disconnected; };
+
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);
