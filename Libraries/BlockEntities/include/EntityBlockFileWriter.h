@@ -17,6 +17,7 @@ public:
 	const std::string& getFileModeOverride() const { return m_fileModeOverride; }
 
 	static std::string getIconName(){ return "TextFile.svg"; }
+	const std::string getFileType();
 
 private:
 	ot::Connector m_inputConnector;
