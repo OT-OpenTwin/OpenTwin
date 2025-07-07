@@ -40,7 +40,7 @@ bool BlockHandlerStorage::executeSpecialized()
 
 	if (allInputsAvailable())
 	{
-		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName);
+		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName + "\n");
 
 		ot::PainterRainbowIterator colourIt;
 		std::string plotName = "Plots/";
