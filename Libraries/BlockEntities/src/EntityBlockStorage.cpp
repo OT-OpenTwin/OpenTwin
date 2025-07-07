@@ -31,6 +31,8 @@ ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
 void EntityBlockStorage::createProperties()
 {
 	EntityPropertiesInteger::createProperty("General", "Number of inputs",1,1,m_maxNbOfInputs, "default", getProperties());
+	EntityPropertiesBoolean::createProperty("General", "Create plot", false, "default", getProperties());
+	EntityPropertiesString::createProperty("General", "Plot name", "", "default", getProperties());
 	createConnectors();
 }
 
@@ -53,6 +55,16 @@ uint32_t EntityBlockStorage::getNumberOfInputs()
 {
 	int32_t nbOfInputs =	PropertyHelper::getIntegerPropertyValue(this, "Number of inputs", "General");
 	return static_cast<uint32_t>(nbOfInputs);
+}
+
+bool EntityBlockStorage::getCreatePlot()
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Create plot", "General");
+}
+
+std::string EntityBlockStorage::getPlotName()
+{
+	return PropertyHelper::getStringPropertyValue(this, "Plot name", "General");
 }
 
 const std::list<std::string> EntityBlockStorage::getInputNames()

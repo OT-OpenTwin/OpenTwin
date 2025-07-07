@@ -28,6 +28,9 @@ public:
 	uint32_t getNumberOfInputs();
 	static const std::string getIconName() { return "Database_store.svg"; }
 
+	bool getCreatePlot();
+	std::string getPlotName();
+
 	const std::list<std::string> getInputNames();
 	const std::string getSeriesConnectorName() { return "SeriesMetadata"; }
 private:	

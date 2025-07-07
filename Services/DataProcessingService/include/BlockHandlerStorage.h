@@ -17,6 +17,9 @@ private:
 	
 	std::list<std::string> m_allDataInputs;
 	std::string m_seriesMetadataInput;
+	bool m_createPlot;
+	std::string m_plotName;
+
 
 	bool allInputsAvailable();
 	std::list<DatasetDescription> createDatasets();

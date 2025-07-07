@@ -59,9 +59,22 @@ void PipelineData::setMetadata(ot::JsonValue&& _metaData)
 
 	if (ot::json::exists(_metaData, memberSeries))
 	{
-		std::unique_ptr<MetadataSeries> newSeries(new MetadataSeries());
-		newSeries->setFromJsonObject(ot::json::getObject(_metaData, memberSeries));
-		m_series = newSeries.release();
+		if (m_campaign != nullptr)
+		{
+			const std::string seriesLabel = ot::json::getString(_metaData, memberSeries);
+			const std::list<MetadataSeries>& allSeries =  m_campaign->getSeriesMetadata();
+			for (auto& series : allSeries)
+			{
+				if (series.getLabel() == seriesLabel)
+				{
+					m_series = &series;
+				}
+			}
+		}
+		else
+		{
+			assert(false); // The campaign should always be set.
+		}
 	}
 
 }

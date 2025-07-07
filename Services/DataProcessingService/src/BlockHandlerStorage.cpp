@@ -11,11 +11,23 @@
 #include "OTCore/ExplicitStringValueConverter.h"
 #include "ResultCollectionMetadataAccess.h"
 
+#include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot1DCurveCfg.h"
+#include "OTCore/EntityName.h"
+#include "OTGui/PainterRainbowIterator.h"
+#include "CurveFactory.h"
+#include "OTModelAPI/NewModelStateInformation.h"
+#include "EntityResult1DPlot.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
+
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)
 {
 	m_allDataInputs = m_blockEntityStorage->getInputNames();
 	m_seriesMetadataInput = m_blockEntityStorage->getSeriesConnectorName();
+	m_createPlot = m_blockEntityStorage->getCreatePlot();
+	m_plotName = m_blockEntityStorage->getPlotName();
 }
 
 BlockHandlerStorage::~BlockHandlerStorage()
@@ -30,11 +42,28 @@ bool BlockHandlerStorage::executeSpecialized()
 	{
 		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName);
 
+		ot::PainterRainbowIterator colourIt;
+		std::string plotName = "Plots/";
+		auto blockName = ot::EntityName::getSubName(m_blockName);
+		assert(blockName.has_value());
+		std::string blockNameShort = blockName.value();
+		if (!m_plotName.empty())
+		{
+			plotName += m_plotName;
+		}
+		else
+		{
+			
+			plotName += blockNameShort;
+		}
+		ot::NewModelStateInformation modelStateInformation;
+
 		auto& classFactory = Application::instance()->getClassFactory();
 		const auto modelComponent = Application::instance()->modelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
 		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
-				
+		resultCollectionExtender.setSaveModel(!m_createPlot);
+
 		ot::JSONToVariableConverter converter;
 		for (const std::string portName : m_allDataInputs)
 		{
@@ -45,12 +74,12 @@ bool BlockHandlerStorage::executeSpecialized()
 			PipelineData* dataPipeline = pipelineByName->second;
 
 			const MetadataCampaign* campaign = dataPipeline->getMetadataCampaign();
-			const std::map <std::string, MetadataQuantity*>& quantitiesByLabel = campaign->getMetadataQuantitiesByLabel();
+			const std::map <std::string, MetadataQuantity*>& campaignQuantitiesByLabel = campaign->getMetadataQuantitiesByLabel();
 			const std::map<std::string, MetadataParameter*>& campaignParametersByLabel = campaign->getMetadataParameterByLabel();
 
 			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
 			std::map < std::string, MetadataParameter> occurringParametersByLabel;
-
+			
 			ot::JsonValue& dataEntries = dataPipeline->getData();
 			
 			if (dataEntries.IsArray())
@@ -67,8 +96,8 @@ bool BlockHandlerStorage::executeSpecialized()
 							const std::string key = field.name.GetString();
 							const ot::JsonValue& fieldValue = field.value;
 
-							auto quantityByLabel =	quantitiesByLabel.find(key);
-							if (quantityByLabel != quantitiesByLabel.end())
+							auto quantityByLabel = campaignQuantitiesByLabel.find(key);
+							if (quantityByLabel != campaignQuantitiesByLabel.end())
 							{
 								auto datasetDescription = datasetDescriptionByQuantityLabel.find(key);
 								MetadataQuantity* quantity = quantityByLabel->second;
@@ -165,15 +194,68 @@ bool BlockHandlerStorage::executeSpecialized()
 				datasetDescr.push_back(std::move(dataset));
 
 			}
-			const std::string seriesName = "Test";
+
+			
+			const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + blockNameShort;
 			std::list<std::shared_ptr<MetadataEntry>> metadata;
 			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName,metadata);
+			
 			for (DatasetDescription& dsd : datasetDescr)
 			{
 				resultCollectionExtender.processDataPoints(&dsd, seriesID);
 			}
 			resultCollectionExtender.storeCampaignChanges();
+
+			if (m_createPlot)
+			{
+				const MetadataSeries* series = resultCollectionExtender.findMetadataSeries(seriesID);
+				
+				ot::Plot1DCurveCfg curveConfig;
+				auto painter = colourIt.getNextPainter();
+				curveConfig.setLinePen(painter.release());
+				CurveFactory::addToConfig(*series, curveConfig);
+
+				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+
+				const std::string fullNameSeries = series->getName();
+				std::optional<std::string> shortNameSeries = ot::EntityName::getSubName(fullNameSeries);
+				assert(shortNameSeries.has_value());
+
+				newCurve.setName(plotName + "/"+ shortNameSeries.value());
+				newCurve.createProperties();
+				newCurve.setCurve(curveConfig);
+				newCurve.StoreToDataBase();
+
+				modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
+				modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
+				modelStateInformation.m_forceVisible.push_back(false);
+			}
 		}
+		
+		if (m_createPlot)
+		{
+			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+			newPlot.setName(plotName);
+
+			ot::Plot1DCfg plotCfg;
+			const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);
+			plotCfg.setTitle(shortName);
+			newPlot.createProperties();
+			newPlot.setPlot(plotCfg);
+			newPlot.StoreToDataBase();
+			modelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
+			modelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
+			modelStateInformation.m_forceVisible.push_back(false);
+
+			//Store state
+			std::list<ot::UID> noDataEntities{};
+			ot::ModelServiceAPI::addEntitiesToModel(
+				modelStateInformation.m_topologyEntityIDs,
+				modelStateInformation.m_topologyEntityVersions,
+				modelStateInformation.m_forceVisible,
+				noDataEntities, noDataEntities, noDataEntities, "Created new plot for existing series metadata", true, true);
+		}
+		
 		return true;
 	}
 	else
