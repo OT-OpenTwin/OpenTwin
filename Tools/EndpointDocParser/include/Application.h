@@ -37,6 +37,8 @@ public:
 
 	bool startsWith(const std::string& _line, const std::string& _prefix);
 
+	void parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, const std::string& _parameterType);
+
 private:
 	std::list<Service> m_services;
 };

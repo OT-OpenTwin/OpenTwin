@@ -1,5 +1,6 @@
 #include "Parameter.h"
 
+// std header
 #include <iostream>
 
 std::string Parameter::getDataTypeString() const {
@@ -17,3 +18,12 @@ std::string Parameter::getDataTypeString() const {
         default:      return "Unknown";
     }
 }
+
+void Parameter::printParameter() const {
+    std::cout << "Printing Parameter: \n";
+    std::cout << "Parameter name: " << m_name << "\n";
+    std::cout << "Parameter macro: " << m_macro << "\n";
+    std::cout << "Parameter data type: " << m_dataType << "\n";
+    std::cout << "Parameter description: " << m_description << "\n";
+}
+

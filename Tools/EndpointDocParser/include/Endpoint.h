@@ -48,6 +48,11 @@ public:
 	void setResponseParameters(const std::list<Parameter>& _responseParameters) { m_responseParameters = _responseParameters; };
 	const std::list<Parameter>& getResponseParameters() const { return m_responseParameters; };
 
+	void addParameter(const Parameter& _parameter) { m_parameters.push_back(_parameter); };
+	void addResponseParameter(const Parameter& _parameter) { m_responseParameters.push_back(_parameter); };
+
+	void printEndpoint() const;
+
 private:
 	std::string m_name;
 	std::string m_action;

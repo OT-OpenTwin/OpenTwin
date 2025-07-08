@@ -242,90 +242,12 @@ void Application::parseFile(const std::string& _file) {
 			}
 			else if (startsWith(apiContent, "@param")) {
 				parameter = Parameter();
+				std::string parameterType = "Function parameter";
 
 				std::string param = apiContent.substr(7);
 				std::cout << "[PARAM] -> " << param << "\n";
-				
-				std::list<std::string> splittedParamList = ot::String::split(param, " ");
-				std::vector<std::string> splittedParamVector(splittedParamList.begin(), splittedParamList.end());
-				
-				std::string macro = splittedParamVector[0];
-				std::cout << "The first string is: " << macro << "\n";
-				std::size_t sizeOfMacroString = macro.size() + 1;
-				std::cout << sizeOfMacroString << "\n";
-				
-				parameter.setMacro(macro);
-				std::cout << "Macro set in parameter: " << parameter.getMacro() << "\n";
 
-				std::string dataType = splittedParamVector[1];
-				// data type is Unsigned Integer 64
-				if (dataType == "Unsigned") {
-					//std::string dataType2 = splittedParamVector[2];
-					//std::string dataType3 = splittedParamVector[3];
-					//std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
-					std::string unsignedInt64 = "Unsigned Integer 64";
-					std::cout << "The second string is: " << unsignedInt64 << "\n";
-
-					std::size_t sizeOfUnsignedInt64String = unsignedInt64.size() + 1;
-					std::cout << sizeOfUnsignedInt64String << "\n";
-
-					parameter.setDataType(Parameter::UnsignedInteger64);
-					std::cout << "Data type Unsigned Integer 64 set in parameter: " << parameter.getDataTypeString() << "\n";
-
-					std::string paramDescription = param.substr(sizeOfMacroString + sizeOfUnsignedInt64String);
-					std::cout << "The third string is: " << paramDescription << "\n";
-					
-					parameter.setDescription(paramDescription);
-					std::cout << "Description set in parameter: " << parameter.getDescription() << "\n";
-				}
-				else {
-					std::cout << "The second string is: " << dataType << "\n";
-
-					std::size_t sizeOfDataTypeString = dataType.size() + 1;
-					std::cout << sizeOfDataTypeString << "\n";
-
-					if (dataType == "Boolean") {
-						parameter.setDataType(Parameter::Boolean);
-						std::cout << "Data type Boolean set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Char") {
-						parameter.setDataType(Parameter::Char);
-						std::cout << "Data type Char set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Integer") {
-						parameter.setDataType(Parameter::Integer);
-						std::cout << "Data type Integer set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Float") {
-						parameter.setDataType(Parameter::Float);
-						std::cout << "Data type Float set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Double") {
-						parameter.setDataType(Parameter::Double);
-						std::cout << "Data type Double set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "String") {
-						parameter.setDataType(Parameter::String);
-						std::cout << "Data type String set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Array") {
-						parameter.setDataType(Parameter::Array);
-						std::cout << "Data type Array set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Object") {
-						parameter.setDataType(Parameter::Object);
-						std::cout << "Data type Object set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-					else if (dataType == "Enum") {
-						parameter.setDataType(Parameter::Enum);
-						std::cout << "Data type Enum set in parameter: " << parameter.getDataTypeString() << "\n";
-					}
-
-					std::string paramDescription = param.substr(sizeOfMacroString + sizeOfDataTypeString);
-					std::cout << "The third string is: " << paramDescription << "\n";
-					parameter.setDescription(paramDescription);
-					std::cout << "Description set in parameter: " << parameter.getDescription() << "\n";
-				}
+				parseParameter(parameter, param, endpoint, parameterType);
 			}
 			else if (startsWith(apiContent, "@return")) {
 				std::string response = apiContent.substr(8);
@@ -334,9 +256,14 @@ void Application::parseFile(const std::string& _file) {
 				std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
 			}
 			else if (startsWith(apiContent, "@rparam")) {
+				parameter = Parameter();
+				std::string parameterType = "Return parameter";
+
 				std::string rparam = apiContent.substr(8);
 				std::cout << "[RETURNPARAM] -> " << rparam << "\n";
-			}
+
+				parseParameter(parameter, rparam, endpoint, parameterType);
+			}	
 			else {
 				std::cout << "[UNKNOWN] -> " << apiContent << "\n";
 			}
@@ -344,6 +271,7 @@ void Application::parseFile(const std::string& _file) {
 		else {
 			if (inApiBlock) {
 				// end of api block, add endpoint to service
+				endpoint.printEndpoint();
 				service.addEndpoint(endpoint);
 				inApiBlock = false;
 				std::cout << "Detected end of api documentation block.\n";
@@ -356,4 +284,97 @@ void Application::parseFile(const std::string& _file) {
 // returns true if the line starts with "//api "
 bool Application::startsWith(const std::string& _line, const std::string& _prefix) {
 	return _line.compare(0, _prefix.size(), _prefix) == 0;
+}
+
+void Application::parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, const std::string& _parameterType) {
+	std::cout << "Parsing parameter: " << _param << "\n";
+	std::list<std::string> splittedParamList = ot::String::split(_param, " ");
+	std::vector<std::string> splittedParamVector(splittedParamList.begin(), splittedParamList.end());
+
+	std::string macro = splittedParamVector[0];
+	std::cout << "The first string is: " << macro << "\n";
+	std::size_t sizeOfMacroString = macro.size() + 1;
+	std::cout << sizeOfMacroString << "\n";
+
+	_parameter.setMacro(macro);
+	std::cout << "Macro set in parameter: " << _parameter.getMacro() << "\n";
+
+	std::string dataType = splittedParamVector[1];
+	// data type is Unsigned Integer 64
+	if (dataType == "Unsigned") {
+		//std::string dataType2 = splittedParamVector[2];
+		//std::string dataType3 = splittedParamVector[3];
+		//std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
+		std::string unsignedInt64 = "Unsigned Integer 64";
+		std::cout << "The second string is: " << unsignedInt64 << "\n";
+
+		std::size_t sizeOfUnsignedInt64String = unsignedInt64.size() + 1;
+		std::cout << sizeOfUnsignedInt64String << "\n";
+
+		_parameter.setDataType(Parameter::UnsignedInteger64);
+		std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
+
+		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfUnsignedInt64String);
+		std::cout << "The third string is: " << paramDescription << "\n";
+
+		_parameter.setDescription(paramDescription);
+		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+	}
+	else {
+		std::cout << "The second string is: " << dataType << "\n";
+
+		std::size_t sizeOfDataTypeString = dataType.size() + 1;
+		std::cout << sizeOfDataTypeString << "\n";
+
+		if (dataType == "Boolean") {
+			_parameter.setDataType(Parameter::Boolean);
+			std::cout << "Data type Boolean set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Char") {
+			_parameter.setDataType(Parameter::Char);
+			std::cout << "Data type Char set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Integer") {
+			_parameter.setDataType(Parameter::Integer);
+			std::cout << "Data type Integer set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Float") {
+			_parameter.setDataType(Parameter::Float);
+			std::cout << "Data type Float set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Double") {
+			_parameter.setDataType(Parameter::Double);
+			std::cout << "Data type Double set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "String") {
+			_parameter.setDataType(Parameter::String);
+			std::cout << "Data type String set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Array") {
+			_parameter.setDataType(Parameter::Array);
+			std::cout << "Data type Array set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Object") {
+			_parameter.setDataType(Parameter::Object);
+			std::cout << "Data type Object set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+		else if (dataType == "Enum") {
+			_parameter.setDataType(Parameter::Enum);
+			std::cout << "Data type Enum set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+
+		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfDataTypeString);
+		std::cout << "The third string is: " << paramDescription << "\n";
+		_parameter.setDescription(paramDescription);
+		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+	}
+	_parameter.printParameter();
+	if (_parameterType == "Function parameter") {
+		_endpoint.addParameter(_parameter);
+		std::cout << "Added Parameter to parameters.\n";
+	}
+	else if (_parameterType == "Return parameter") {
+		_endpoint.addResponseParameter(_parameter);
+		std::cout << "Added Parameter to response parameters.\n";
+	}
 }

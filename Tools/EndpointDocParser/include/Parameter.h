@@ -42,6 +42,8 @@ public:
 	void setMacro(const std::string& _macro) { m_macro = _macro; };
 	const std::string& getMacro() const;
 
+	void printParameter() const;
+
 private:
 	std::string m_name;
 	DataType m_dataType;
