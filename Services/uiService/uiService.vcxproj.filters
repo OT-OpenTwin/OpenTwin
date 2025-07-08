@@ -51,6 +51,9 @@
     <Filter Include="Source Files\CurveHelper">
       <UniqueIdentifier>{ebe95a16-44d8-4985-84f3-7a7054f30416}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{ab9b1e8e-c7ab-45a9-a1de-f7570a96d358}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -207,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="include\ShortParameterDescription.h">
       <Filter>Header Files\CurveHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProgressUpdater.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

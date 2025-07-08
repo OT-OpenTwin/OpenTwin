@@ -75,6 +75,7 @@
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
+#include "ProgressUpdater.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -2141,7 +2142,7 @@ std::string ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocu
 	{
 		m_modelServiceURL = s->second->getServiceURL();
 	}
-
+		
 	m_modelViewNotifier.push_back(s->second);
 
 	OT_LOG_D("Service with ID \"" + std::to_string(s->second->getServiceID()) + "\" was registered from model view events");
@@ -2217,23 +2218,43 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
-				for (QString& fileName : fileNames)
 				{
-					std::string localEncodingString = fileName.toLocal8Bit().constData();
-					const std::string utf8String = fileName.toStdString();
-
-					ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
-					fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+					std::string progressBarMessage = "Importing files";
+					std::unique_ptr<ProgressUpdater> updater(nullptr);
 					if (loadContent)
 					{
-						std::string fileContent;
-						uint64_t uncompressedDataLength{ 0 };
-						// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-						ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
-						fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
-						uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
-						fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+						updater.reset(new ProgressUpdater(progressBarMessage, fileNames.size()));
 					}
+
+					uint32_t counter(0);
+					auto startTime = std::chrono::system_clock::now();
+					for (QString& fileName : fileNames)
+					{
+						counter++;
+						std::string localEncodingString = fileName.toLocal8Bit().constData();
+						const std::string utf8String = fileName.toStdString();
+
+						ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
+						fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+						if (loadContent)
+						{
+							std::string fileContent;
+							uint64_t uncompressedDataLength{ 0 };
+							// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+							ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+							fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
+							uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
+							fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+							assert(updater != nullptr);
+							updater->triggerUpdate(counter);
+						}
+					}
+					auto endTime = std::chrono::system_clock::now();
+					uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+					//AppBase::instance()->("Import of files: " + std::to_string(millisec) + " ms\n");
+					const std::string message = ("Import of " + std::to_string(fileNames.size()) + " files: " + std::to_string(millisec) + " ms\n");
+
+					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 				}
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
 				if (loadContent) {

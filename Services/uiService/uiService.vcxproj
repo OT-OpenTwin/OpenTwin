@@ -67,6 +67,7 @@
     <ClInclude Include="include\CurveDatasetFactory.h" />
     <ClInclude Include="include\Datapoints.h" />
     <ClInclude Include="include\DownloadFile.h" />
+    <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\ViewStateCfg.h" />
