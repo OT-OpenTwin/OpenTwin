@@ -3,6 +3,10 @@
 // std header
 #include <iostream>
 
+Parameter::Parameter()
+    : m_dataType(DataType::Unknown) {
+}
+
 std::string Parameter::getDataTypeString() const {
     switch (m_dataType) {
         case Boolean:   return "Boolean";
@@ -23,7 +27,7 @@ void Parameter::printParameter() const {
     std::cout << "Printing Parameter: \n";
     std::cout << "Parameter name: " << m_name << "\n";
     std::cout << "Parameter macro: " << m_macro << "\n";
-    std::cout << "Parameter data type: " << m_dataType << "\n";
+    std::cout << "Parameter data type: " << getDataTypeString() << "\n";
     std::cout << "Parameter description: " << m_description << "\n";
 }
 

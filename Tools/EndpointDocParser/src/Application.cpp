@@ -148,15 +148,95 @@ void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory) {
 void Application::parseFile(const std::string& _file) {
 	std::cout << "Parsing file: " << _file << "\n";
 	std::string blackList = " \t\n";
-/*
+	
+	Service service;
+	Endpoint endpoint;
+	Parameter parameter;
+	bool inApiBlock = false;
+
 	// read lines from given file and parse them
 	try {
 		std::list<std::string> lines = ot::FileSystem::readLines(_file);
 		std::cout << "Read lines: " << "\n";
-		
-		for (const std::string& line : lines) {		
+
+		for (const std::string& line : lines) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
 			std::cout << trimmedLine << "\n";
+
+			if (startsWith(trimmedLine, "//api")) {
+				if (!inApiBlock) {
+					inApiBlock = true;
+					endpoint = Endpoint();  // new endpoint
+					std::cout << "Detected start of api documentation block.\n";
+				}
+
+				// remove "//api " prefix
+				std::string apiContent = trimmedLine.substr(6);
+				std::cout << apiContent << "\n";
+
+				// check which "@commando" is given
+				if (startsWith(apiContent, "@security")) {
+					std::string security = apiContent.substr(10);
+					std::cout << "[SECURITY] -> " << security << "\n";
+
+					if (security == "TLS" || security == "tls") {
+						endpoint.setMessageType(Endpoint::TLS);
+						std::cout << "Message Type TLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
+					}
+					else if (security == "mTLS" || security == "mtls") {
+						endpoint.setMessageType(Endpoint::mTLS);
+						std::cout << "Message Type mTLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
+					}
+				}
+				else if (startsWith(apiContent, "@action")) {
+					std::string action = apiContent.substr(8);
+					std::cout << "[ACTION] -> " << action << "\n";
+					endpoint.setAction(action);
+					std::cout << "Action set in endpoint: " << endpoint.getAction() << "\n";
+				}
+				else if (startsWith(apiContent, "@brief")) {
+					std::string brief = apiContent.substr(7);
+					std::cout << "[BRIEF] -> " << brief << "\n";
+					endpoint.setBriefDescription(brief);
+					std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
+				}
+				else if (startsWith(apiContent, "@param")) {
+					parameter = Parameter();
+					std::string parameterType = "Function parameter";
+
+					std::string param = apiContent.substr(7);
+					std::cout << "[PARAM] -> " << param << "\n";
+
+					parseParameter(parameter, param, endpoint, parameterType);
+				}
+				else if (startsWith(apiContent, "@return")) {
+					std::string response = apiContent.substr(8);
+					std::cout << "[RETURN] -> " << response << "\n";
+					endpoint.setResponseDescription(response);
+					std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
+				}
+				else if (startsWith(apiContent, "@rparam")) {
+					parameter = Parameter();
+					std::string parameterType = "Return parameter";
+
+					std::string rparam = apiContent.substr(8);
+					std::cout << "[RETURNPARAM] -> " << rparam << "\n";
+
+					parseParameter(parameter, rparam, endpoint, parameterType);
+				}
+				else {
+					std::cout << "[UNKNOWN] -> " << apiContent << "\n";
+				}
+			}
+			else {
+				if (inApiBlock) {
+					// end of api block, add endpoint to service
+					endpoint.printEndpoint();
+					service.addEndpoint(endpoint);
+					inApiBlock = false;
+					std::cout << "Detected end of api documentation block.\n";
+				}
+			}
 		}
 	}
 	catch (const ot::FileOpenException& e) {
@@ -165,29 +245,30 @@ void Application::parseFile(const std::string& _file) {
 	catch (const std::ios_base::failure& e) {
 		std::cerr << "IO-failure: " << e.what() << '\n';
 	}
-*/
+
+/*	// test the parser with simulated Api code documentation blocks
 	std::list<std::string> lines;
 	lines.push_back("Some text...");
 	lines.push_back("\n");
-	lines.push_back("	//api @security TLS");
+	lines.push_back("	//api @security tls");
 	lines.push_back("	//api @action OT_ACTION_CMD_MyAction");
 	lines.push_back("	//api @brief Another short brief description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam Unsigned Integer 64 My parameter description.");
+	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam unsigned integer 64 My parameter description.");
 	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam2 Float My parameter description 2.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam DataType My return parameter description.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 DataType2 My return parameter description 2.");
+	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam int My return parameter description.");
+	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 array My return parameter description 2.");
 	lines.push_back("	//api @return In case of success it will contain the project data.");
 	lines.push_back("\n");
 	lines.push_back("Some text...");
 	lines.push_back("Some text...");
 	lines.push_back("\n");
-	lines.push_back("	//api @security mTLS");
+	lines.push_back("	//api @security mtls");
 	lines.push_back("	//api @action OT_ACTION_CMD_MyAction");
 	lines.push_back("	//api @brief Another short brief description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam Integer My parameter description.");
+	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam char My parameter description.");
 	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam2 Char My parameter description 2.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam DataType My return parameter description.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 DataType2 My return parameter description 2.");
+	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam bool My return parameter description.");
+	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 obj My return parameter description 2.");
 	lines.push_back("	//api @return In case of success it will contain the project data.");
 	lines.push_back("\n");
 	lines.push_back("Some text...");
@@ -217,14 +298,12 @@ void Application::parseFile(const std::string& _file) {
 				std::string security = apiContent.substr(10);
 				std::cout << "[SECURITY] -> " << security << "\n";
 					
-				if (security == "TLS") {
+				if (security == "TLS" || security == "tls") {
 					endpoint.setMessageType(Endpoint::TLS);
-					std::cout << "Message Type TLS set in endpoint: " << endpoint.getMessageType() << "\n";
 					std::cout << "Message Type TLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
 				}
-				else if (security == "mTLS") {
+				else if (security == "mTLS" || security == "mtls") {
 					endpoint.setMessageType(Endpoint::mTLS);
-					std::cout << "Message Type mTLS set in endpoint: " << endpoint.getMessageType() << "\n";
 					std::cout << "Message Type mTLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
 				}
 			}
@@ -277,7 +356,7 @@ void Application::parseFile(const std::string& _file) {
 				std::cout << "Detected end of api documentation block.\n";
 			}
 		}
-	}
+	}*/
 }
 
 // check if the parser is in an api documentation block
@@ -301,11 +380,10 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 
 	std::string dataType = splittedParamVector[1];
 	// data type is Unsigned Integer 64
-	if (dataType == "Unsigned") {
-		//std::string dataType2 = splittedParamVector[2];
-		//std::string dataType3 = splittedParamVector[3];
-		//std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
-		std::string unsignedInt64 = "Unsigned Integer 64";
+	if (dataType == "Unsigned" || dataType == "unsigned") {
+		std::string dataType2 = splittedParamVector[2];
+		std::string dataType3 = splittedParamVector[3];
+		std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
 		std::cout << "The second string is: " << unsignedInt64 << "\n";
 
 		std::size_t sizeOfUnsignedInt64String = unsignedInt64.size() + 1;
@@ -326,39 +404,44 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 		std::size_t sizeOfDataTypeString = dataType.size() + 1;
 		std::cout << sizeOfDataTypeString << "\n";
 
-		if (dataType == "Boolean") {
+		if (dataType == "UID" || dataType == "uid") {
+			_parameter.setDataType(Parameter::UnsignedInteger64);
+			std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
+		}
+
+		else if (dataType == "Boolean" || dataType == "boolean" || dataType == "bool") {
 			_parameter.setDataType(Parameter::Boolean);
 			std::cout << "Data type Boolean set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Char") {
+		else if (dataType == "Char" || dataType == "char") {
 			_parameter.setDataType(Parameter::Char);
 			std::cout << "Data type Char set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Integer") {
+		else if (dataType == "Integer" || dataType == "integer" || dataType == "int") {
 			_parameter.setDataType(Parameter::Integer);
 			std::cout << "Data type Integer set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Float") {
+		else if (dataType == "Float" || dataType == "float") {
 			_parameter.setDataType(Parameter::Float);
 			std::cout << "Data type Float set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Double") {
+		else if (dataType == "Double" || dataType == "double") {
 			_parameter.setDataType(Parameter::Double);
 			std::cout << "Data type Double set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "String") {
+		else if (dataType == "String" || dataType == "string" || dataType == "str") {
 			_parameter.setDataType(Parameter::String);
 			std::cout << "Data type String set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Array") {
+		else if (dataType == "Array" || dataType == "array") {
 			_parameter.setDataType(Parameter::Array);
 			std::cout << "Data type Array set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Object") {
+		else if (dataType == "Object" || dataType == "object" || dataType == "obj") {
 			_parameter.setDataType(Parameter::Object);
 			std::cout << "Data type Object set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Enum") {
+		else if (dataType == "Enum" || dataType == "enum") {
 			_parameter.setDataType(Parameter::Enum);
 			std::cout << "Data type Enum set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}

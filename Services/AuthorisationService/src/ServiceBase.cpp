@@ -424,6 +424,14 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 
 // No authentication needed
 
+//api @security TLS
+//api @action OT_ACTION_LOGIN_ADMIN 
+//api @brief Processes the login of an administrator. 
+//api @param OT_PARAM_AUTH_USERNAME String User name
+//api @param OT_PARAM_AUTH_PASSWORD String User password
+//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
+//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocument) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
@@ -447,6 +455,15 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 	return json.toJson();
 }
 
+//api @security TLS
+//api @action OT_ACTION_LOGIN
+//api @brief Processes the login of a user.
+//api @param OT_PARAM_AUTH_USERNAME String User name
+//api @param OT_PARAM_AUTH_PASSWORD String User password
+//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
+//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+//api @rparam OT_PARAM_AUTH_PASSWORD String Unencrypted password (if successful)
+//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) {
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);

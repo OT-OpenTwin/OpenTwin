@@ -8,6 +8,7 @@
 class Parameter {
 public:
 	enum DataType {
+		Unknown,
 		Boolean,
 		Char,
 		Integer,
@@ -20,7 +21,8 @@ public:
 		UnsignedInteger64
 	};
 
-	Parameter() = default;
+	//Parameter() = default;
+	Parameter();
 	Parameter(const Parameter& _other) = default;
 	Parameter(Parameter&& _other) noexcept = default;
 

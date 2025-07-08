@@ -14,7 +14,7 @@ public:
 		TLS
 	};
 
-	Endpoint() = default;
+	Endpoint();
 	Endpoint(const Endpoint& _other) = default;
 	Endpoint(Endpoint&& _other) noexcept = default;
 
