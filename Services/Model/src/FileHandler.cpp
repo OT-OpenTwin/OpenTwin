@@ -12,7 +12,8 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
-
+#include "OTServiceFoundation/UILockWrapper.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 #include <assert.h>
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
@@ -49,12 +50,14 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 	}
 	else if (_action == "ImportTextFile")
 	{
-		storeTextFile(_doc, ot::FolderNames::FilesFolder);
+		std::thread worker(&FileHandler::storeTextFile,this, std::move(_doc), std::ref(ot::FolderNames::FilesFolder));
+		worker.detach();
 		actionIsHandled = true;
 	}
 	else if (_action == "ImportPythonScript")
 	{
-		storeTextFile(_doc, ot::FolderNames::PythonScriptFolder);
+		std::thread worker(&FileHandler::storeTextFile, this, std::move(_doc), std::ref(ot::FolderNames::FilesFolder));
+		worker.detach();
 		actionIsHandled = true;
 	}
 	else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
@@ -91,27 +94,39 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 }
 
 
-void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& _folderName)
+void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string& _folderName)
 {
+	auto uiComponent =	Application::instance()->uiComponent();
+	UILockWrapper uiLock(uiComponent, ot::LockModelWrite);
 	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
 	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 
 	assert(fileNames.size() == contents.size() && contents.size() == uncompressedDataLengths.size());
-
 	{
 		QueuingDatabaseWritingRAII queueDatabase;
 		auto uncompressedDataLength = uncompressedDataLengths.begin();
 		auto content = contents.begin();
+		
+		ProgressUpdater updater(uiComponent, "Importing files");
+		updater.setTotalNumberOfSteps(fileNames.size());
+		uint32_t counter(0);
+		auto start = std::chrono::system_clock::now();
 		for (std::string& fileName : fileNames)
 		{
+			counter++;
+
 			std::string fileContent = ot::Encryption::decryptAndUnzipString(*content, *uncompressedDataLength);
 		
 			storeFileInDataBase(fileContent, fileName, _folderName, fileFilter);
 			uncompressedDataLength++;
 			content++;
+			updater.triggerUpdate(counter);
 		}
+		auto end = std::chrono::system_clock::now();
+		uint64_t passedTime =	std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		uiComponent->displayMessage("Storing documents in database took " + std::to_string(passedTime) + " ms");
 	}
 
 	addTextFilesToModel();

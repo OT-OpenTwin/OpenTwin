@@ -38,7 +38,7 @@ private:
 	
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
 	//! @brief Stores the string as byte array. Content cannot be searched for but it is not necessary to guarantee UTF8 encoding
-	void storeTextFile(ot::JsonDocument& _doc, const std::string& _folderName);
+	void storeTextFile(ot::JsonDocument&& _doc, const std::string& _folderName);
 	void addTextFilesToModel();
 	void clearBuffer();
 
