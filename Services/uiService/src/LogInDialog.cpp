@@ -572,7 +572,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		OT_LOG_E("Unknown worker error (" + std::to_string((int)_error) + ")");
 		break;
 	}
-
+	msg += "\nDetailed error:\n" + m_curlErrorMessage;
 	// Display error message and unlock controls
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
 	msgBox.exec();
@@ -725,6 +725,7 @@ void LogInDialog::loginWorkerStart(void) {
 	// Check the version compatiblity
 	currentError = this->workerCheckVersionCompatibility();
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -732,6 +733,7 @@ void LogInDialog::loginWorkerStart(void) {
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -741,6 +743,7 @@ void LogInDialog::loginWorkerStart(void) {
 	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
 	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
 	if (!userManager.checkConnectionAuthorizationService()) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
 		return;
 	}
@@ -748,11 +751,13 @@ void LogInDialog::loginWorkerStart(void) {
 	// Attempt to log in the user
 	currentError = this->workerLogin(userManager);
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
 
 	if (!m_loginData.isValid()) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
 		return;
 	}

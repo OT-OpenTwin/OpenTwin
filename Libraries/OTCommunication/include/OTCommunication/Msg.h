@@ -29,6 +29,9 @@ namespace ot {
 		};
 		typedef ot::Flags<RequestFlag> RequestFlags;
 
+		
+		OT_COMMUNICATION_API_EXPORT const std::string getLastError();
+
 		//! @brief Will send the provided message to the microservice framework. Returns true if succeeded
 		//! @param _senderIP The sender IP address
 		//! @param _receiverIP The receiver IP address

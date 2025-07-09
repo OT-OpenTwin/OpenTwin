@@ -120,6 +120,8 @@ private Q_SLOTS:
 	// Private helper
 
 private:
+	std::string  m_curlErrorMessage = "";
+
 	void saveUserSettings(void) const;
 
 	LogInGSSEntry findCurrentGssEntry(void);

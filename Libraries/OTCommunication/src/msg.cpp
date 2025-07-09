@@ -26,6 +26,9 @@
 #include <iostream>
 #include <fstream>
 
+static std::string g_lastError;
+std::mutex g_errorState;
+
 namespace ot {
 	namespace intern {
 
@@ -101,6 +104,14 @@ std::string get_env_var(std::string const& key)
 		sizeof(buffer) - 1, key.c_str());
 
 	return std::string(buffer);
+}
+
+
+
+const std::string ot::msg::getLastError()
+{
+	std::lock_guard<std::mutex> guard(g_errorState);
+	return g_lastError;
 }
 
 bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, std::string& _response, int _timeout, const RequestFlags& _flags) {
@@ -256,11 +267,12 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	}
 	else {
 		if (_flags & msg::CreateLogMessage) {
-			OT_LOG_E("Message sent failed: { \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
-				"\", \"Error buffer\": \"" + errbuf + 
+			g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
+				"\", \"Error buffer\": \"" + errbuf +
 				"\", \"Receiver\": \"" + _receiverIP +
 				"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
-				" }");
+				" }";
+			OT_LOG_E("Message sent failed: " + g_lastError );
 		}
 
 		if (_flags & msg::ExitOnFail) {
