@@ -161,7 +161,7 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	OT_LOG_D("Updating log flags");
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(_flags, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());

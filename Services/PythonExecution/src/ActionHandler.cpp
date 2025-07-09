@@ -21,7 +21,7 @@ ActionHandler& ActionHandler::instance(void) {
 ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	
-	ot::ReturnMessage returnMessage ;
+	ot::ReturnMessage returnMessage;
 
 	std::string action = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
 	if (m_handlingFunctions.find(action) != m_handlingFunctions.end()) {
