@@ -2252,7 +2252,7 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 					auto endTime = std::chrono::system_clock::now();
 					uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 					//AppBase::instance()->("Import of files: " + std::to_string(millisec) + " ms\n");
-					const std::string message = ("Import of " + std::to_string(fileNames.size()) + " files: " + std::to_string(millisec) + " ms\n");
+					const std::string message = ("Import of " + std::to_string(fileNames.size()) + " file(s): " + std::to_string(millisec) + " ms\n");
 
 					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 				}
