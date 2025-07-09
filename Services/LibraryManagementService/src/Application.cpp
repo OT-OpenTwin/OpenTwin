@@ -422,4 +422,7 @@ Application::Application() :
 
 }
 
-Application::~Application() {}
+Application::~Application() {
+	delete db;
+	db = nullptr;
+}
