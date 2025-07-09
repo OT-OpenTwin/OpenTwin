@@ -3,6 +3,7 @@
 
 #include "OTCore/TypeNames.h"
 #include "OTCommunication/ActionTypes.h"
+#include "PropertyHelper.h"
 
 EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 	:EntityBase(ID,parent,obs,ms,factory,owner)
@@ -49,6 +50,8 @@ bool EntityTableSelectedRanges::updateFromProperties(void)
 
 void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType)
 {
+	EntityPropertiesBoolean::createProperty("General", "Consider for data import", true, "default", getProperties());
+
 	std::string sourceFileGroup = "Source file";
 
 	auto tableName = new EntityPropertiesString("Table name", "");
@@ -98,6 +101,8 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	EntityPropertiesInteger* executionPriority = new EntityPropertiesInteger("Execution priority", 0);
 	executionPriority->setMin(0);
 	getProperties().createProperty(executionPriority, updateStrategyGroup);
+
+	
 }
 
 void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation) {
@@ -106,6 +111,17 @@ void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::U
 	tableNameEnt->setValue(_tableName);
 	headerPosEnt->setValue(_tableOrientation);
 	_tableID = _tableID;
+	setModified();
+}
+
+bool EntityTableSelectedRanges::getConsiderForImport()
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Consider for data import", "General");
+}
+
+void EntityTableSelectedRanges::setConsiderForImport(bool _considerForImport)
+{
+	PropertyHelper::setBoolPropertyValue(_considerForImport, this, "Consider for data import", "General");
 	setModified();
 }
 

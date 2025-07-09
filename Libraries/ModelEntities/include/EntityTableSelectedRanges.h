@@ -17,6 +17,8 @@ public:
 	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType);
 	void setTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation);
 
+	bool getConsiderForImport();
+	void setConsiderForImport(bool _considerForImport);
 	std::string getSelectedType();
 	std::string getTableName();
 	ot::TableCfg::TableHeaderMode getTableHeaderMode();

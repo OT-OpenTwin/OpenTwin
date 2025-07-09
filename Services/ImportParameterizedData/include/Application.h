@@ -151,7 +151,7 @@ private:
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
-	ResultCollectionMetadataAccess* m_resultAccess = nullptr;
+	
 	RangeSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
 	BatchedCategorisationHandler m_batchedCategorisationHandler;
 	void HandleSelectionChanged();
