@@ -113,13 +113,17 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		updater.setTotalNumberOfSteps(fileNames.size());
 		uint32_t counter(0);
 		auto start = std::chrono::system_clock::now();
+		
+		Model* model = Application::instance()->getModel();
+		assert(model != nullptr);
+		std::list<std::string> folderContent = model->getListOfFolderItems(_folderName, false);
 		for (std::string& fileName : fileNames)
 		{
 			counter++;
 
 			std::string fileContent = ot::Encryption::decryptAndUnzipString(*content, *uncompressedDataLength);
 		
-			storeFileInDataBase(fileContent, fileName, _folderName, fileFilter);
+			storeFileInDataBase(fileContent, fileName, folderContent,_folderName, fileFilter);
 			uncompressedDataLength++;
 			content++;
 			updater.triggerUpdate(counter);
@@ -279,7 +283,7 @@ void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _o
 	Application::instance()->sendMessage(true, _owner, _doc, response);
 }
 
-void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderName, const std::string& _fileFilter)
+void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
@@ -314,10 +318,10 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 
 	textFile->setFileFilter(_fileFilter);
 
-	std::list<std::string> folderEntities = model->getListOfFolderItems(_folderName, true);
-	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folderName, name);;
+	const std::string entityName = CreateNewUniqueTopologyName(_folderContent, _folderName, name);;
 	textFile->setName(entityName);
-	
+	_folderContent.push_back(entityName);
+
 	textFile->setTextEncoding(guesser(_text.data(), _text.size()));
 	textFile->StoreToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
