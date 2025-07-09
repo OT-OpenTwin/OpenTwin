@@ -20,6 +20,7 @@ public:
 	void setTable(const ot::GenericDataStructMatrix& _table) override;
 	ot::TableCfg getTableConfig(bool _includeData) override;
 	bool visualiseTable() override;
+	virtual bool updateFromProperties(void) override;
 	ot::ContentChangedHandling getTableContentChangedHandling() override;
 
 	ot::TableCfg::TableHeaderMode getHeaderMode(void) override;
