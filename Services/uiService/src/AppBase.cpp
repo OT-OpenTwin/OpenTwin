@@ -1910,7 +1910,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	this->setupNewCentralView(newEditor);
 
 	ot::TextEditor* textEdit = newEditor->getTextEditor();
-	textEdit->setupFromConfig(_config, false);
+	textEdit->setupFromConfig(_config, true);
 
 	this->lockManager()->uiElementCreated(_serviceInfo, textEdit, ot::LockAll | ot::LockModelWrite);
 
@@ -1937,7 +1937,6 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName) {
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName());
 	if (v) {
-		v->getTextEditor()->setupFromConfig(_config, true);
 		return v;
 	}
 

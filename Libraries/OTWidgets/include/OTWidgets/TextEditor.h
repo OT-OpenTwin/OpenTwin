@@ -52,8 +52,8 @@ namespace ot {
 
 		//! \brief Setup the TextEditor.
 		//! \param _config The config.
-		//! \param _isUpdate If true the text, name and title won't be set.
-		virtual void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate);
+		//! \param _replaceText If true the text will be replaced.
+		virtual void setupFromConfig(const TextEditorCfg& _config, bool _replaceText = true);
 
 		int lineNumberAreaWidth() const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);

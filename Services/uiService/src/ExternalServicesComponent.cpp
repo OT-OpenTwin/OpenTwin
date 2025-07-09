@@ -3727,17 +3727,14 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
 	if (editor) {
-		if (overwriteContent)
-		{
-			editor->getTextEditor()->setupFromConfig(config, true);
+		editor->getTextEditor()->setupFromConfig(config, overwriteContent);
 
-			if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
-				AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
-			}
+		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
+			AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
 		}
 	}
 	else {
-		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
+		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags);
 	}
 	
 	editor->getTextEditor()->setContentSaved();

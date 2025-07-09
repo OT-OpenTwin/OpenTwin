@@ -104,24 +104,24 @@ ot::TextEditor::~TextEditor() {
 	}
 }
 
-void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
+void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _replaceText) {
 	OT_TEST_TEXTEDITOR_Interval("Setup from config");
-
-	bool tmp = this->signalsBlocked();
-	this->blockSignals(true);
-
+	QSignalBlocker sigBlock(this);
+	
 	m_documentSyntax = _config.getDocumentSyntax();
 	m_fileExtensionFilter = _config.getFileExtensionFilters();
 
-	QString newText = QString::fromStdString(_config.getPlainText());
-	newText.remove('\r');
-	if (newText != this->toPlainText()) {
-		this->setCode(newText);
-	}	
+	if (_replaceText) {
+		QString newText = QString::fromStdString(_config.getPlainText());
+		newText.remove('\r');
+		if (newText != this->toPlainText()) {
+			this->setCode(newText);
+		}
+	}
+
 	this->setReadOnly(_config.getTextReadOnly());
 
 	this->updateDocumentSyntax();
-	this->blockSignals(tmp);
 }
 
 int ot::TextEditor::lineNumberAreaWidth() const {
