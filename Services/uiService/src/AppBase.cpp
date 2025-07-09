@@ -2876,6 +2876,9 @@ void AppBase::slotCreateProject(void) {
 		}
 	}
 
+	UserManagement userManager(m_loginData);
+	assert(userManager.checkConnection()); // Failed to connect
+
 	// Create new project dialog
 	ot::CreateProjectDialog newProjectDialog(this->mainWindow());
 
@@ -2887,6 +2890,8 @@ void AppBase::slotCreateProject(void) {
 	// Initialize data
 	newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
 	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getCurrentProjectFilter());
+
+	newProjectDialog.selectProjectType(userManager.restoreSetting("CreateProject.Type"), userManager.restoreSetting("CreateProject.Template"));
 
 	this->connect(&newProjectDialog, &ot::CreateProjectDialog::createProject, &newProjectDialog, &ot::CreateProjectDialog::closeOk);
 
@@ -2912,7 +2917,7 @@ void AppBase::slotCreateProject(void) {
 
 		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
 
-		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) == ot::MessageDialogCfg::Ok) {
+		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
 			return;
 		}
 
@@ -2928,10 +2933,9 @@ void AppBase::slotCreateProject(void) {
 	}
 
 	projectManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
-
-	UserManagement manager(m_loginData);
-	assert(manager.checkConnection()); // Failed to connect
-	manager.addRecentProject(currentName);
+	userManager.addRecentProject(currentName);
+	userManager.storeSetting("CreateProject.Type", projectType);
+	userManager.storeSetting("CreateProject.Template", templateName);
 
 	// Close project
 	if (m_currentProjectName.length() > 0) {
