@@ -38,10 +38,10 @@ public:
 
 	void setControlsEnabled(bool _enabled);
 
-	const LoginData& getLoginData(void) const { return m_loginData; };
+	const LoginData& getLoginData() const { return m_loginData; };
 
 protected:
-	virtual bool mayCloseDialogWindow(void) override;
+	virtual bool mayCloseDialogWindow() override;
 
 private:
 	enum class LogInStateFlag {
@@ -102,17 +102,17 @@ private:
 	// Private slots
 
 private Q_SLOTS:
-	void slotLogIn(void);
-	void slotRegister(void);
-	void slotChangePassword(void);
-	void slotToggleLogInAndRegisterMode(void);
-	void slotToggleChangePasswordMode(void);
-	void slotGSSChanged(void);
-	void slotPasswordChanged(void);
+	void slotLogIn();
+	void slotRegister();
+	void slotChangePassword();
+	void slotToggleLogInAndRegisterMode();
+	void slotToggleChangePasswordMode();
+	void slotGSSChanged();
+	void slotPasswordChanged();
 	
-	void slotLogInSuccess(void);
-	void slotRegisterSuccess(void);
-	void slotChangePasswordSuccess(void);
+	void slotLogInSuccess();
+	void slotRegisterSuccess();
+	void slotChangePasswordSuccess();
 	void slotWorkerError(WorkerError _error);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -122,11 +122,12 @@ private Q_SLOTS:
 private:
 	std::string  m_curlErrorMessage = "";
 
-	void saveUserSettings(void) const;
+	void saveUserSettings() const;
+	void saveGSSOptions() const;
 
-	LogInGSSEntry findCurrentGssEntry(void);
+	LogInGSSEntry findCurrentGssEntry();
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
-	void updateGssOptions(void);
+	void updateGssOptions();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -134,11 +135,11 @@ private:
 
 	void stopWorkerWithError(WorkerError _error);
 
-	void loginWorkerStart(void);
-	void registerWorkerStart(void);
-	void changePasswordWorkerStart(void);
-	WorkerError workerCheckVersionCompatibility(void);
-	WorkerError workerConnectToGSS(void);
+	void loginWorkerStart();
+	void registerWorkerStart();
+	void changePasswordWorkerStart();
+	WorkerError workerCheckVersionCompatibility();
+	WorkerError workerConnectToGSS();
 	WorkerError workerLogin(const UserManagement& _userManager);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
