@@ -127,19 +127,13 @@ ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	result.setTitle(this->getName());
 	result.setFileExtensionFilter(this->getFileFilter());
 
-	if (_includeData)
-	{
+	if (_includeData) {
 		result.setPlainText(this->getText());
 	}
 
-	const std::string fileType = getFileType();
-	if (fileType == "py")
-	{
-		result.setDocumentSyntax(ot::DocumentSyntax::PythonScript);
-	}
-	else
-	{
-		result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
+	EntityPropertiesSelection* highlightProp = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Syntax Highlight", "Text Properties"));
+	if (highlightProp) {
+		result.setDocumentSyntax(ot::stringToDocumentSyntax(highlightProp->getValue()));
 	}
 
 	return result;
