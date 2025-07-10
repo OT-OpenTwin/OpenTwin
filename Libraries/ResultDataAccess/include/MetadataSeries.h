@@ -41,15 +41,31 @@ public:
 
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 	{
-		_object.AddMember("Index", m_index, _allocator);
 		_object.AddMember("Label", ot::JsonString(m_label, _allocator), _allocator);
 		_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
 
 		ot::JsonArray allQuantities;
 		for (const MetadataQuantity& quantity : m_quantity)
 		{
+
 			ot::JsonObject object;
 			quantity.addToJsonObject(object, _allocator);
+
+			ot::JsonArray dependingParameterLabels;
+			for (ot::UID dependingParameter : quantity.dependingParameterIds)
+			{
+				for (const MetadataParameter& param : m_parameter)
+				{
+					if (param.parameterUID == dependingParameter)
+					{
+						dependingParameterLabels.PushBack(ot::JsonString(param.parameterLabel, _allocator), _allocator);
+					}
+				}
+			}
+			object.RemoveMember("DependingParametersIDs");
+			object.RemoveMember("DependingParametersLabels");
+			object.AddMember("DependingParametersLabels", dependingParameterLabels, _allocator);
+
 			allQuantities.PushBack(object, _allocator);
 		}
 		_object.AddMember("quantities", allQuantities, _allocator);
@@ -67,7 +83,6 @@ public:
 
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object)
 	{
-		m_index = ot::json::getUInt64(_object, "Index");
 		m_label = ot::json::getString(_object, "Label");
 		m_name = ot::json::getString(_object, "Name");
 		

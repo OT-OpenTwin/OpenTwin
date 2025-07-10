@@ -37,7 +37,6 @@ struct __declspec(dllexport) MetadataQuantityValueDescription : public ot::Seria
 
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 	{
-		_object.AddMember("Index", quantityIndex, _allocator);
 		_object.AddMember("Label", ot::JsonString(quantityValueLabel,_allocator), _allocator);
 		_object.AddMember("Name", ot::JsonString(quantityValueName,_allocator), _allocator);
 		_object.AddMember("Type", ot::JsonString(dataTypeName,_allocator), _allocator);
@@ -50,7 +49,6 @@ struct __declspec(dllexport) MetadataQuantityValueDescription : public ot::Seria
 		quantityValueName = ot::json::getString(_object, "Name");
 		unit = ot::json::getString(_object, "Unit");
 		dataTypeName = ot::json::getString(_object, "Type");
-		quantityIndex =	ot::json::getUInt64(_object, "Index");
 	}
 };
 
@@ -71,6 +69,7 @@ struct __declspec(dllexport) MetadataQuantity : ot::Serializable
 	//E.g. {3,3} for a 3x3 Matrix
 	std::vector<uint32_t> dataDimensions;
 
+	std::vector<std::string> dependingParameterLabels;
 	std::vector<ot::UID> dependingParameterIds;
 	std::list<MetadataQuantityValueDescription> valueDescriptions;
 
@@ -95,10 +94,10 @@ struct __declspec(dllexport) MetadataQuantity : ot::Serializable
 
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 	{
-		_object.AddMember("Index", quantityIndex, _allocator);
 		_object.AddMember("Label", ot::JsonString(quantityLabel, _allocator), _allocator);
 		_object.AddMember("Name", ot::JsonString(quantityName, _allocator), _allocator);
-		_object.AddMember("DependingParameterIDs", ot::JsonArray(dependingParameterIds,_allocator), _allocator);
+		_object.AddMember("DependingParametersIDs", ot::JsonArray(dependingParameterIds,_allocator), _allocator);
+		_object.AddMember("DependingParametersLabels", ot::JsonArray(dependingParameterLabels,_allocator), _allocator);
 		ot::JsonArray allValueDescriptions;
 		for(auto& valueDescription : valueDescriptions)
 		{ 
@@ -115,8 +114,8 @@ struct __declspec(dllexport) MetadataQuantity : ot::Serializable
 	{
 		quantityLabel = ot::json::getString(_object, "Label");
 		quantityName = ot::json::getString(_object, "Name");
-		quantityIndex = ot::json::getUInt64(_object, "Index");
 		dependingParameterIds = ot::json::getUInt64Vector(_object, "DependingParameterIDs");
+		dependingParameterLabels = ot::json::getStringVector(_object, "DependingParametersLabels");
 		auto allValueDesriptions =	ot::json::getArray(_object, "ValueDescriptions");
 		for (rapidjson::SizeType i = 0; i < allValueDesriptions.Size(); i++)
 		{

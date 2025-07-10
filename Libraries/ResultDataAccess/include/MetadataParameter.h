@@ -56,7 +56,6 @@ struct __declspec(dllexport) MetadataParameter : public ot::Serializable
 
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 	{
-		_object.AddMember("Index", parameterUID, _allocator);
 		_object.AddMember("Label", ot::JsonString(parameterLabel, _allocator), _allocator);
 		_object.AddMember("Name", ot::JsonString(parameterName, _allocator), _allocator);
 		_object.AddMember("Type", ot::JsonString(typeName, _allocator), _allocator);
@@ -72,7 +71,6 @@ struct __declspec(dllexport) MetadataParameter : public ot::Serializable
 		parameterName = ot::json::getString(_object, "Name");
 		unit = ot::json::getString(_object, "Unit");
 		typeName = ot::json::getString(_object, "Type");
-		parameterUID = ot::json::getUInt64(_object, "Index");
 		ot::ConstJsonArray array = ot::json::getArray(_object, "Values");
 		ot::JSONToVariableConverter converter;
 		values = converter(array);
