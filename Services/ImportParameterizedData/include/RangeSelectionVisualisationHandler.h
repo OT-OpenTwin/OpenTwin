@@ -6,7 +6,7 @@
 #include "OTGui/TableRange.h"
 #include "EntityTableSelectedRanges.h"
 #include "OTCore/Color.h"
-#include "EntityTableSelectedRanges.h"
+
 
 class RangeSelectionVisualisationHandler
 {

@@ -87,8 +87,6 @@ void Application::run(void)
 	{
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
-	// Add code that should be executed when the service is started and may start its work
-	//_parametrizedDataHandler->Init();
 }
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
