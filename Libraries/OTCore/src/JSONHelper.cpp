@@ -6,6 +6,8 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/JSONHelper.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 #define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
 
@@ -1437,5 +1439,14 @@ std::string ot::json::toJson(const ConstJsonArray& _arr) {
 	doc.Accept(writer);
 
 	// Return JSON string
+	return std::string(buffer.GetString());
+}
+
+OT_CORE_API_EXPORT std::string ot::json::toPrettyString(JsonValue& _value)
+{
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);  // PrettyWriter = indented JSON
+	_value.Accept(writer);
+
 	return std::string(buffer.GetString());
 }

@@ -76,6 +76,7 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
+#include "MetadataEntityInterface.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -2987,6 +2988,8 @@ void Model::showSelectedShapeInformation(void)
 
 	std::list<EntityGeometry *> geometryEntities;
 
+	std::string additionalInformation("");
+
 	for (auto entity : selectedEntities)
 	{
 		double lxmin = 0.0, lxmax = 0.0, lymin = 0.0, lymax = 0.0, lzmin = 0.0, lzmax = 0.0;
@@ -3041,8 +3044,22 @@ void Model::showSelectedShapeInformation(void)
 			// Add the entity to the list for determining the number of triangles
 			geometryEntities.push_back(geometry);
 		}
-	}
+	
+		EntityMetadataSeries* series =	dynamic_cast<EntityMetadataSeries*>(entity);
+		
+		if (series != nullptr)
+		{
+			MetadataEntityInterface metadataInterface;
+			MetadataSeries seriesMetadata=	metadataInterface.createSeries(series);
+			
+			ot::JsonDocument document;
+			seriesMetadata.addToJsonObject(document, document.GetAllocator());
+			
+			additionalInformation += ot::json::toPrettyString(document);
+		}
 
+	}
+	
 	std::string message;
 	message = "____________________________________________________________\n\n";
 	message += "Selected object information: \n\n";
@@ -3077,6 +3094,11 @@ void Model::showSelectedShapeInformation(void)
 
 			message += "\n";
 		}
+	}
+
+	if (!additionalInformation.empty())
+	{
+		message += additionalInformation;
 	}
 
 	if (boxSet)

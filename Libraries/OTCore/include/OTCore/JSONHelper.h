@@ -558,6 +558,9 @@ namespace ot {
 
 		//! @brief Returns the serialized json array.
 		OT_CORE_API_EXPORT std::string toJson(const ConstJsonArray& _arr);
+		
+		
+		OT_CORE_API_EXPORT std::string toPrettyString(JsonValue& _value);
 
 	} // namespace json
 

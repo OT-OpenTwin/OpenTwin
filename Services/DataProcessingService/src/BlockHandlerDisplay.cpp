@@ -1,8 +1,7 @@
 #include "BlockHandlerDisplay.h"
 #include "StringConverter.h"
 #include "OTCore/String.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
+
 
 BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const HandlerMap& _handlerMap)
 	:BlockHandler(_blockEntity ,_handlerMap)
@@ -20,17 +19,14 @@ bool BlockHandlerDisplay::executeSpecialized()
 	if (incomming->second != nullptr)
 	{
 		ot::JsonValue& data = incomming->second->getData();
-		rapidjson::StringBuffer buffer;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);  // PrettyWriter = indented JSON
-		data.Accept(writer);
-		displayMessage += "Data: \n" + std::string(buffer.GetString());
+		const std::string dataPretty = ot::json::toPrettyString(data);
+		
+		displayMessage += "Data: \n" + dataPretty;
 
-		buffer.Clear();
-		buffer.ShrinkToFit();
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer2(buffer);
+		
 		ot::JsonValue& metadata =incomming->second->getMetadata();
-		metadata.Accept(writer2);
-		displayMessage += "\nMetadata:\n" + std::string(buffer.GetString());
+		const std::string metaDataPretty = ot::json::toPrettyString(metadata);
+		displayMessage += "\nMetadata:\n" + metaDataPretty;
 		_uiComponent->displayMessage(displayMessage + "\n");
 	}
 	else
