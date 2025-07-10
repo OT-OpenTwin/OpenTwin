@@ -11,6 +11,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableItemDelegate.h"
 #include "OTWidgets/SignalBlockWrapper.h"
+#include "OTCore/String.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -82,6 +83,8 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	OT_TEST_TABLE_Interval("Setup from config: Total");
 
 	SignalBlockWrapper blocker(this);
+	m_headerBuffer.clear();
+	m_headerBuffer.reserve(0);
 
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Clear");
@@ -104,7 +107,21 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		for (int r = 0; r < _config.getRowCount(); r++) {
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
 			if (headerItem) {
-				this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
+				if (m_headerBuffer.capacity() == 0)
+				{
+					m_headerBuffer.reserve(_config.getRowCount());
+				}
+				std::string headerContent = headerItem->getText();
+				m_headerBuffer.push_back(headerContent); //Here we store the original value
+				
+				//Here we create the beautified version to display
+				headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+				headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
+				if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
+				{
+					headerContent = headerContent.substr(1, headerContent.size() -2);
+				}
+				this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerContent)));
 			}
 		}
 	}
@@ -113,8 +130,25 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		QHeaderView* header = this->horizontalHeader();
 		for (int c = 0; c < _config.getColumnCount(); c++) {
 			const TableHeaderItemCfg* headerItem = _config.getColumnHeader(c);
-			if (headerItem) {
-				this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
+			if (headerItem) 
+			{
+				if (m_headerBuffer.capacity() == 0)
+				{
+					m_headerBuffer.reserve(_config.getColumnCount());
+				}
+
+				std::string headerContent = headerItem->getText();
+				m_headerBuffer.push_back(headerContent); //Here we store the original value
+
+				//Here we create the beautified version to display
+				headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+				headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
+				if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
+				{
+					headerContent = headerContent.substr(1, headerContent.size() - 2);
+				}
+
+				this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerContent)));
 			}
 		}
 	}
@@ -152,7 +186,7 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		if (item != nullptr) {
 			hasColumnHeader = true;
 
-			const std::string text = item->text().toStdString();
+			const std::string text = m_headerBuffer[column]; //We take the value from the buffer, not the displayed value. The displayed value is beautified.
 			cfg.setColumnHeader(column, text);
 		}
 	}
@@ -162,8 +196,8 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		const auto item = verticalHeaderItem(row);
 		if (item != nullptr) {
 			hasRowHeader = true;
-
-			const std::string text = item->text().toStdString();
+			
+			const std::string text = m_headerBuffer[row]; //We take the value from the buffer, not the displayed value. The displayed value is beautified.
 			cfg.setRowHeader(row, text);
 		}
 
