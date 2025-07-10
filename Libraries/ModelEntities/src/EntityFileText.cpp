@@ -131,10 +131,9 @@ ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 		result.setPlainText(this->getText());
 	}
 
-	EntityPropertiesSelection* highlightProp = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Syntax Highlight", "Text Properties"));
-	if (highlightProp) {
-		result.setDocumentSyntax(ot::stringToDocumentSyntax(highlightProp->getValue()));
-	}
+	const std::string highlight = PropertyHelper::getSelectionPropertyValue(this, "Syntax Highlight", "Text Properties");
+	result.setDocumentSyntax(ot::stringToDocumentSyntax(highlight));
+	
 
 	return result;
 }

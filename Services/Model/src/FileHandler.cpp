@@ -56,7 +56,7 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 	}
 	else if (_action == "ImportPythonScript")
 	{
-		std::thread worker(&FileHandler::storeTextFile, this, std::move(_doc), std::ref(ot::FolderNames::FilesFolder));
+		std::thread worker(&FileHandler::storeTextFile, this, std::move(_doc), std::ref(ot::FolderNames::PythonScriptFolder));
 		worker.detach();
 		actionIsHandled = true;
 	}
