@@ -301,7 +301,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			for (auto& curve : familyOfCurves) {
 				std::string complexName = curve.first;
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-				std::string simpleName =  + " (" + notConstParameterName;
+				std::string simpleName = simpleNameBase + " (" + notConstParameterName;
 				for (const ShortParameterDescription& description : additionalParameterDescription)
 				{
 					if (description.m_label == notConstParameterName)
