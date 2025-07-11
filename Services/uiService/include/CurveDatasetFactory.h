@@ -12,7 +12,7 @@ public:
 	
 	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions);
 
-	const std::vector<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
+	const std::list<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
 private:
 
 	enum class CurveType : uint32_t
@@ -21,7 +21,7 @@ private:
 		m_familyCurve = 1
 	};
 
-	std::vector<std::string> m_curveIDDescriptions;
+	std::list<std::string> m_curveIDDescriptions;
 	std::list<std::string> m_skippedValueComparisions;
 	DataStorageAPI::ResultDataStorageAPI m_dataAccess;
 

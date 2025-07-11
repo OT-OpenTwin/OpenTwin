@@ -3591,6 +3591,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
 		std::list<ot::PlotDataset*> dataSets;
+		std::list<std::string> curveIDDescriptions;
 
 		const std::string xAxisParameter = plotConfig.getXAxisParameter();
 		const std::list<ValueComparisionDefinition>& queries = plotConfig.getQueries();
@@ -3619,13 +3620,11 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 			if (curveHasDataToVisualise) {
 				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(plotConfig, curveCfg, xAxisParameter, queries);
-
-				for (const std::string& message : curveFactory.getCurveIDDescriptions()) {
-					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-				}
-
 				dataSets.splice(dataSets.begin(), newCurveDatasets);
-
+				
+				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+				curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
+								
 				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
 					break;
 				}
@@ -3639,15 +3638,21 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		//Now we add the data sets to the plot and visualise them
 		int32_t curveCounter(1);
 		plot->setConfig(plotConfig);
+		std::string displayMessage("");
+		auto curveIDDescription = curveIDDescriptions.begin();
+
 		for (ot::PlotDataset* dataSet : dataSets) {
-
-
 			if (!useLimitedNbOfCurves || (useLimitedNbOfCurves && curveCounter <= limitOfCurves))
 			{
 				dataSet->setOwnerPlot(plot);
 				dataSet->updateCurveVisualization();
 				plot->addDatasetToCache(dataSet);
 				dataSet->attach();
+				if (curveIDDescription != curveIDDescriptions.end() && !curveIDDescription->empty())
+				{
+					displayMessage += *curveIDDescription;
+					curveIDDescription++;
+				}
 			}
 			else
 			{
@@ -3655,6 +3660,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 				dataSet = nullptr;
 			}
 			curveCounter++;
+		}
+		if (!displayMessage.empty())
+		{
+			AppBase::instance()->appendInfoMessage(QString::fromStdString(displayMessage));
 		}
 	}
 	else

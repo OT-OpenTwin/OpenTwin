@@ -179,6 +179,7 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCfg& _plotCfg,
 	}
 
 	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(std::move(dataX),dataY.release()));
+	m_curveIDDescriptions.push_back("");
 	return singleCurve;
 }
 
