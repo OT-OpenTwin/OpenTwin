@@ -84,13 +84,13 @@ ot::PlotDataset::~PlotDataset() {
 	if (m_polarCurve != nullptr) {
 		delete m_polarCurve;
 		m_polarCurve = nullptr;
-		// point and data is deleted by the polar curve
+		// point and data is deleted by the polar curve 
+		// I dont think so. The description dies nit say anything about ownership transfer:https://qwt.sourceforge.io/class_qwt_polar_curve.html
+		// The symbols do not need the be kept as members, there are getter
 	}
 	if (m_cartesianCurve != nullptr) {
 		delete m_cartesianCurve;
 		m_cartesianCurve = nullptr;
-		delete m_cartesianCurvePointSymbol;
-		m_cartesianCurvePointSymbol = nullptr;
 	}	
 }
 

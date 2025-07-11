@@ -136,7 +136,7 @@ namespace ot {
 		PolarPlotCurve* m_polarCurve = nullptr;
 		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 
 
-		QwtSymbol* m_cartesianCurvePointSymbol = nullptr;
+		QwtSymbol* m_cartesianCurvePointSymbol = nullptr; //Ownership is taken by the QwtPlotCurve that get the symbol set in setSymbol
 		QwtSymbol* m_polarCurvePointSymbol = nullptr;
 
 		// Config
