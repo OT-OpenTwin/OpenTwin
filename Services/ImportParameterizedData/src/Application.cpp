@@ -245,8 +245,8 @@ void Application::modelSelectionChanged(void)
 
 	uiComponent()->setControlsEnabledState(enabled, disabled);
 
-	//std::thread handler(&Application::HandleSelectionChanged,this);
-	//handler.detach();
+	std::thread handler(&Application::HandleSelectionChanged,this);
+	handler.detach();
 }
 
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
