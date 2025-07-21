@@ -36,7 +36,7 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 	//2) Series metadata require a selected series metadata
 	//2a) None selected: Create a new one
 	//3a) One or more selected: remember that EntityParameterizedDataCategorization
-	std::list<EntityBase*> selectedEntities;
+	std::list<std::unique_ptr<EntityBase>> selectedEntities;
 	try
 	{
 		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
@@ -44,7 +44,7 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 		{
 			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityInfo.getEntityID());
 			EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
-			selectedEntities.push_back(baseEnt);
+			selectedEntities.emplace_back(std::unique_ptr<EntityBase>(baseEnt));
 		}
 		std::string tableName("");
 		if (isValidSelection(selectedEntities))
@@ -54,11 +54,6 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 			setBackgroundColour(_category);
 		}
 
-		for (EntityBase*& selectedEntity : selectedEntities)
-		{
-			delete selectedEntity;
-			selectedEntity = nullptr;
-		}
 		if (tableName != "")
 		{
 			requestRangeSelection(tableName);
@@ -69,22 +64,18 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 	{
 		const std::string message = "Failed to create table selection due to error: " + std::string(e.what());
 		OT_LOG_E(message);
-		for (EntityBase*& entity : selectedEntities)
-		{
-			delete entity;
-			entity = nullptr;
-		}
+
 		return false;
 	}
 }
 
-bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _selectedEntities)
+bool DataCategorizationHandler::isValidSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	
 	uint32_t selectedTables(0);
-	for (EntityBase* entity : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			selectedTables++;
@@ -101,12 +92,12 @@ bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _select
 	}
 }
 
-std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBase*>& _selectedEntities)
+std::string DataCategorizationHandler::getTableFromSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	std::string tableEntityName("");
-	for (EntityBase* entity : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			tableEntityName = entity->getName();
@@ -118,7 +109,7 @@ std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBas
 	return tableEntityName;
 }
 
-void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
@@ -137,7 +128,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<Entit
 		{
 			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
-				addSMDEntries(_selectedEntities);
+				addSMDEntries (_selectedEntities);
 			}
 			else
 			{
@@ -204,11 +195,11 @@ void DataCategorizationHandler::clearBufferedMetadata()
 	m_markedForStorringEntities.clear();
 }
 
-bool DataCategorizationHandler::checkForCategorisationEntity(std::list<EntityBase*>& _selectedEntities)
+bool DataCategorizationHandler::checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
-	for (EntityBase* entityBase : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entityBase : _selectedEntities)
 	{
-		auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(entityBase);
+		auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get());
 		if (categorizationEnt != nullptr)
 		{
 			return true;
@@ -217,12 +208,12 @@ bool DataCategorizationHandler::checkForCategorisationEntity(std::list<EntityBas
 	return false;
 }
 
-void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedEntities)
+void DataCategorizationHandler::addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	// Now we search the selected entities for the series metadata categorisations that correspond to the selection and add them to the buffer
-	for (auto entityBase : _selectedEntities)
+	for (auto& entityBase : _selectedEntities)
 	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
 		
 		if (categorizationEntity != nullptr)
 		{
@@ -251,13 +242,13 @@ void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedE
 	}
 }
 
-void DataCategorizationHandler::addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	std::list<EntityParameterizedDataCategorization*> seriesCategorisations, quantityOrParameterCategorisations; //or Parameterentity. Depeding on the parameter.
 	// First we sort the selected entities into series metadata and quantity/parameter
-	for (auto entityBase : _selectedEntities)
+	for (auto& entityBase : _selectedEntities)
 	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
 		if (categorizationEntity != nullptr)
 		{		
 			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)

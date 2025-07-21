@@ -58,14 +58,14 @@ private:
 
 
 
-	bool isValidSelection(std::list<EntityBase*>& _selectedEntities);
-	std::string getTableFromSelection(std::list<EntityBase*>& _selectedEntities);
-	void bufferCorrespondingMetadataNames(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
+	bool isValidSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
+	std::string getTableFromSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
+	void bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void setBackgroundColour(EntityParameterizedDataCategorization::DataCategorie _category);
 	void clearBufferedMetadata();
-	bool checkForCategorisationEntity(std::list<EntityBase*>& _selectedEntities);
-	void addSMDEntries(std::list<EntityBase*>& _selectedEntities);
-	void addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
+	bool checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
+	void addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
+	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 	void requestRangeSelection(const std::string& _tableName);
 

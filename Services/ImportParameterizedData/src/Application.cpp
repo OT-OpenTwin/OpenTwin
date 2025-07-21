@@ -275,8 +275,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (action == m_buttonCreateRMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
+				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
 				 bool success =_parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
 				 if (!success)
 				 {
@@ -287,8 +286,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (action == m_buttonCreateMSMDEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
+				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
 				if (!success)
 				{
@@ -299,8 +297,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (action == m_buttonCreateParameterEntry.GetFullDescription())
 			{			
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
+				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
 				if (!success)
 				{
@@ -311,8 +308,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities);
+				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
 				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
 				if (!success)
 				{
