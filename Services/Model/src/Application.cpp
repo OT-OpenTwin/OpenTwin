@@ -1207,9 +1207,6 @@ void Application::addButtons()
 
 	m_materialHandler.addButtons(uiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_materialHandler);
-
-	m_circuitModelHandler.addButtons(uiComponent(), pageName);
-
 }
 
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
@@ -1332,11 +1329,7 @@ Application::Application()
 	m_fileHandler.setNextHandler(&m_materialHandler);
 
 	m_plotHandler.setDontDeleteHandler();
-	m_materialHandler.setNextHandler(&m_plotHandler);
-
-	m_circuitModelHandler.setDontDeleteHandler();
-	m_plotHandler.setNextHandler(&m_circuitModelHandler);
-	
+	m_materialHandler.setNextHandler(&m_plotHandler);	
 }
 
 Application::~Application() {

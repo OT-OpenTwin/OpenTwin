@@ -14,7 +14,7 @@
 #include "CopyPasteHandler.h"
 #include "PlotHandler.h"
 #include "MaterialHandler.h"
-#include "CircuitModelHandler.h"
+#include "LibraryManagementWrapper.h"
 
 // std header
 #include <list>
@@ -177,7 +177,6 @@ public:
 	void addButtons();
 
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
-	CircuitModelHandler& getCircuitModelHandler() { return m_circuitModelHandler; }
 	LibraryManagementWrapper& getLibraryManagementWrapper() { return m_libraryManagementWrapper	; }
 
 private:
@@ -208,7 +207,6 @@ private:
 	MaterialHandler m_materialHandler;
 	ViewVisualisationHandler m_visualisationHandler;
 	CopyPasteHandler m_copyPasteHandler;
-	CircuitModelHandler m_circuitModelHandler;
 	LibraryManagementWrapper m_libraryManagementWrapper;
 
 	Application();

@@ -333,7 +333,6 @@
     </ClCompile>
     <ClCompile Include="src\ActionAndFunctionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\CircuitModelHandler.cpp" />
     <ClCompile Include="src\CopyPasteHandler.cpp" />
     <ClCompile Include="src\CheckGeometry.cpp" />
     <ClCompile Include="src\ClassFactoryModel.cpp" />
@@ -366,7 +365,6 @@
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ActionAndFunctionHandler.h" />
-    <ClInclude Include="include\CircuitModelHandler.h" />
     <ClInclude Include="include\CopyPasteHandler.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
