@@ -369,6 +369,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
+				m_uiComponent->displayMessage("Storing table range categorisations.");
 				try
 				{
 					auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
