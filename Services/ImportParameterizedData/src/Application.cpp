@@ -294,7 +294,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					category = EntityParameterizedDataCategorization::quantity;
 				}
 				//This action involves a queued message to the ui, to receive the selected table range. Until the subsequent function is performed, the ui remains locked.
-				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
+				std::list<ot::EntityInformation> selectedEntities;
+				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities); //buffered selected entities won't do, since text files belong to the model service now.
+
 				bool success =m_parametrizedDataHandler->markSelectionForStorage(selectedEntities,category);
 				if (!success)
 				{
