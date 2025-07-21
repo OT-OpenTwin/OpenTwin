@@ -40,6 +40,7 @@ public:
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 
 	inline void ensureEssentials();
+	void clearBufferedMetadata();
 
 private:
 	const std::string m_tableFolder;
@@ -62,11 +63,12 @@ private:
 	std::string getTableFromSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
 	void bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void setBackgroundColour(EntityParameterizedDataCategorization::DataCategorie _category);
-	void clearBufferedMetadata();
 	bool checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
 	void addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
 	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
+	
+	//! @brief Queued request that sets the colour of the selection and returns the selected table ranges. Subsequently executed function: storeSelectionRanges
 	void requestRangeSelection(const std::string& _tableName);
 
 	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType);

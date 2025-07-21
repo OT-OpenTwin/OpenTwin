@@ -148,7 +148,7 @@ private:
 	ot::UID _visualizationModel = -1;
 	   
 	TableHandler* _tableHandler = nullptr;
-	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
+	DataCategorizationHandler* m_parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
 	

@@ -4067,6 +4067,7 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(ot::JsonDocument& _document) {
+	
 	// Get parameters
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
@@ -4096,6 +4097,9 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 		clearSelectionAfter = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelectionAfter);
 	}
 
+	OT_LOG_D("Set Table range background optionals: callback=" + std::to_string(callback) + " ,callback url=" + callbackUrl + " ,callback function=" + callbackFunction + 
+		" ,clearSelection=" + std::to_string(clearSelection) + " ,clear selection after=" + std::to_string(clearSelectionAfter));
+
 	std::vector<ot::TableRange> ranges;
 	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) {
 		ot::ConstJsonObjectList rangesList = ot::json::getObjectList(_document, OT_ACTION_PARAM_Ranges);
@@ -4109,6 +4113,11 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 
 	// Get table
 	ot::TableView* table = AppBase::instance()->findTable(tableName);
+
+	//!! Needs to be executed before, since the callback unlocks the ui lock
+	if (callback) {
+		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
+	}
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -4125,11 +4134,6 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	
 	// Apply color
 	table->getTable()->setSelectedCellsBackground(color);
-
-	// Callback if required
-	if (callback) {
-		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
-	}
 
 	if (clearSelectionAfter) {
 		table->getTable()->clearSelection();
@@ -4301,18 +4305,20 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
+	if (_table != nullptr)
+	{
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
 
-	ot::JsonArray rangesArray;
-	for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
-		ot::JsonObject rangeObject;
-		ot::TableRange range = ot::QtFactory::toTableRange(qrange);
-		range.addToJsonObject(rangeObject, doc.GetAllocator());
-		rangesArray.PushBack(rangeObject, doc.GetAllocator());
+		ot::JsonArray rangesArray;
+		for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
+			ot::JsonObject rangeObject;
+			ot::TableRange range = ot::QtFactory::toTableRange(qrange);
+			range.addToJsonObject(rangeObject, doc.GetAllocator());
+			rangesArray.PushBack(rangeObject, doc.GetAllocator());
+		}
+		doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
 	}
-	doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
-
 	std::string response;
 	sendHttpRequest(EXECUTE, _serviceUrl, doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {

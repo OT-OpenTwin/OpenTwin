@@ -56,7 +56,7 @@ Application::Application()
 {
 	
 	_tableHandler = new TableHandler( _tableFolder);
-	_parametrizedDataHandler = new DataCategorizationHandler( _tableFolder, _previewTableNAme);
+	m_parametrizedDataHandler = new DataCategorizationHandler( _tableFolder, _previewTableNAme);
 	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_datasetFolder, _tableFolder);
 	_touchstoneToResultdata = new TouchstoneToResultdata();
 }
@@ -107,7 +107,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	const std::string pageName = "Import Parameterized Data";
 
 	_tableHandler->setUIComponent(_ui);
-	_parametrizedDataHandler->setUIComponent(_ui);
+	m_parametrizedDataHandler->setUIComponent(_ui);
 	_tabledataToResultdataHandler->setUIComponent(_ui);
 	_touchstoneToResultdata->setUIComponent(_ui);
 	m_batchedCategorisationHandler.setUIComponent(_ui);
@@ -163,9 +163,8 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui)
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-
 	_tableHandler->setModelComponent(_model);
-	_parametrizedDataHandler->setModelComponent(_model);
+	m_parametrizedDataHandler->setModelComponent(_model);
 	_tabledataToResultdataHandler->setModelComponent(_model);
 	_touchstoneToResultdata->setModelComponent(_model);
 	m_batchedCategorisationHandler.setModelComponent(_model);
@@ -258,6 +257,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			assert(m_buttonCreateRMDEntry.GetGroupName() == m_buttonCreateMSMDEntry.GetGroupName() && m_buttonCreateParameterEntry.GetGroupName() == m_buttonCreateQuantityEntry.GetGroupName() && m_buttonCreateMSMDEntry.GetGroupName() == m_buttonCreateQuantityEntry.GetGroupName());
+
 			if (action == m_buttonImportTouchstone.GetFullDescription())
 			{
 				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
@@ -272,48 +273,36 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
 			}
-			else if (action == m_buttonCreateRMDEntry.GetFullDescription())
+			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()))
 			{
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
-				 bool success =_parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
-				 if (!success)
-				 {
-					 delete m_twoPartsAction;
-					 m_twoPartsAction = nullptr;
-				 }
-			}
-			else if (action == m_buttonCreateMSMDEntry.GetFullDescription())
-			{
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
-				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
-				if (!success)
+
+				EntityParameterizedDataCategorization::DataCategorie category = EntityParameterizedDataCategorization::DataCategorie::UNKNOWN;
+				if (action == m_buttonCreateMSMDEntry.GetFullDescription())
 				{
-					delete m_twoPartsAction;
-					m_twoPartsAction = nullptr;
+					category = EntityParameterizedDataCategorization::researchMetadata;
 				}
-			}
-			else if (action == m_buttonCreateParameterEntry.GetFullDescription())
-			{			
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
-				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
-				if (!success)
+				else if (action == m_buttonCreateRMDEntry.GetFullDescription())
 				{
-					delete m_twoPartsAction;
-					m_twoPartsAction = nullptr;
+					category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
 				}
-			}
-			else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
-			{
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+				else if (action == m_buttonCreateParameterEntry.GetFullDescription())
+				{
+					category = EntityParameterizedDataCategorization::parameter;
+				}
+				else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
+				{
+					category = EntityParameterizedDataCategorization::quantity;
+				}
+				//This action involves a queued message to the ui, to receive the selected table range. Until the subsequent function is performed, the ui remains locked.
 				std::list<ot::EntityInformation> selectedEntities = m_selectedEntityInfos;
-				bool success = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
+				bool success =m_parametrizedDataHandler->markSelectionForStorage(selectedEntities,category);
 				if (!success)
 				{
-					delete m_twoPartsAction;
-					m_twoPartsAction = nullptr;
+					m_parametrizedDataHandler->clearBufferedMetadata();
+				}
+				else
+				{
+					m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				}
 			}
 			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
@@ -378,18 +367,29 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
-				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
-				std::vector<ot::TableRange> ranges;
-				ranges.reserve(listOfSerializedRanges.size());
-				for (auto range : listOfSerializedRanges)
+				try
 				{
-					ot::TableRange tableRange;
-					tableRange.setFromJsonObject(range);
-					ranges.push_back(tableRange);
+					auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
+					std::vector<ot::TableRange> ranges;
+					ranges.reserve(listOfSerializedRanges.size());
+					for (auto range : listOfSerializedRanges)
+					{
+						ot::TableRange tableRange;
+						tableRange.setFromJsonObject(range);
+						ranges.push_back(tableRange);
+					}
+					m_parametrizedDataHandler->storeSelectionRanges(ranges);
 				}
-				_parametrizedDataHandler->storeSelectionRanges(ranges);
-				delete m_twoPartsAction;
-				m_twoPartsAction = nullptr;
+				catch (std::exception& _e)
+				{
+					OT_LOG_E("Failed to store selection range: " + std::string(_e.what()));
+				}
+
+				if (m_twoPartsAction != nullptr)
+				{
+					delete m_twoPartsAction;
+					m_twoPartsAction = nullptr;
+				}
 			}
 			else
 			{
