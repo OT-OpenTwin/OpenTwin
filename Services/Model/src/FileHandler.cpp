@@ -112,6 +112,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		ProgressUpdater updater(uiComponent, "Importing files");
 		updater.setTotalNumberOfSteps(fileNames.size());
 		uint32_t counter(0);
+		uiComponent->displayMessage("Storing document(s) in database: ");
 		auto start = std::chrono::system_clock::now();
 		
 		Model* model = Application::instance()->getModel();
@@ -130,14 +131,14 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		}
 		auto end = std::chrono::system_clock::now();
 		uint64_t passedTime =	std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		uiComponent->displayMessage("Storing document(s) in database: " + std::to_string(passedTime) + " ms\n");
+		uiComponent->displayMessage(std::to_string(passedTime) + " ms\nModel update: ");
 	}
 	auto start = std::chrono::system_clock::now();
 	addTextFilesToModel();
 	clearBuffer();
 	auto end = std::chrono::system_clock::now();
 	uint64_t passedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	uiComponent->displayMessage("Model update: " + std::to_string(passedTime) + " ms\n");
+	uiComponent->displayMessage(std::to_string(passedTime) + " ms\n");
 }
 
 void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
