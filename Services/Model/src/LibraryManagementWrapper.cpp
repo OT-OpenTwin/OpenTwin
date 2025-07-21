@@ -209,7 +209,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 
 	circuitModel->setTextEncoding(ot::TextEncoding::UTF8);
 
-	EntityPropertiesString* nameProp = EntityPropertiesString::createProperty("Model", "Name", _elementType, "Default", circuitModel->getProperties());
+	EntityPropertiesString* nameProp = EntityPropertiesString::createProperty("Model", "ElementType", _elementType, "Default", circuitModel->getProperties());
 	nameProp->setReadOnly(true);
 
 	EntityPropertiesString* modelTypeProp = EntityPropertiesString::createProperty("Model", "ModelType", modelType, "Default", circuitModel->getProperties());
