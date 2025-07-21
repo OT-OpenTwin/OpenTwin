@@ -72,6 +72,7 @@
 #include "OTCommunication/Msg.h"
 
 #include "CurveDatasetFactory.h"
+#include "OTCore/String.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
@@ -98,6 +99,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+
+#include "OTCore/EntityName.h"
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
@@ -3704,7 +3707,21 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 
 		for (ot::PlotDataset* dataSet : allDatasets) {
 			if (dataSet->getEntityName() == config.getEntityName()) {
-				dataSet->setConfig(config);
+				const std::string curveNameBase =  dataSet->getCurveNameBase();
+				
+				const std::string newNameFull = dataSet->getConfig().getEntityName();
+				const std::string newNameShort = ot::EntityName::getSubName(newNameFull).value();
+
+				std::string curveTitle = dataSet->getConfig().getTitle();
+				
+				curveTitle = ot::String::replace(curveTitle, curveNameBase, newNameShort);
+
+				ot::Plot1DCurveCfg curveCfg = dataSet->getConfig();
+				curveCfg.setTitle(curveTitle);
+				
+				dataSet->setConfig(curveCfg);
+				dataSet->setCurveNameBase(newNameShort);
+
 				dataSet->updateCurveVisualization();
 			}
 		}

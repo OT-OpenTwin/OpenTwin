@@ -116,8 +116,13 @@ namespace ot {
 		const PointsContainer getDisplayedPoints();
 		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 
+		void setCurveNameBase(const std::string& _curveNameBase) { m_curveNameBase = _curveNameBase; }
+		const std::string& getCurveNameBase() { return m_curveNameBase; }
+
 	private:
 		friend class PlotBase;
+
+		std::string m_curveNameBase = "";
 
 		void buildCartesianCurve();
 		void buildPolarCurve();

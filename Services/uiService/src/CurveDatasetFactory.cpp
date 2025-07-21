@@ -9,6 +9,7 @@
 #include "Datapoints.h"
 #include "ShortParameterDescription.h"
 #include "AppBase.h"
+#include "OTCore/EntityName.h"
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
@@ -179,6 +180,9 @@ ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCfg& _plotCfg,
 	}
 
 	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(std::move(dataX),dataY.release()));
+	
+	const std::string curveNameBase = ot::EntityName::getSubName(_curveCfg.getEntityName()).value();
+	singleCurve->setCurveNameBase(curveNameBase);
 	m_curveIDDescriptions.push_back("");
 	return singleCurve;
 }
@@ -276,7 +280,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	
 	//In this case we need to make the names better readable. Since we have more then one parameter in the name 	
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
-	std::string simpleNameBase = _curveCfg.getTitle();
+	const std::string simpleNameBase = _curveCfg.getTitle();
 
 	if (numberOfParameter > 2)
 	{	
@@ -399,6 +403,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 
 		ot::PlotDatasetData datasetData(std::move(singleCurve.second.m_xData), yData.release());
 		auto dataset = new ot::PlotDataset (nullptr, newCurveCfg, std::move(datasetData));
+		dataset->setCurveNameBase(simpleNameBase);
 		dataSets.push_back(dataset);
 	}
 
