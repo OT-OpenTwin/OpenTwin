@@ -893,6 +893,10 @@ void Viewer::settingsItemChanged(const ot::Property* _item) {
 		refresh(true);
 		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
 	}
+	else if (snappingSettingsItemChanged(logicalName, _item, updateRequired)) {
+		refresh(true);
+		updateRequired = true;  // We always need to store these settings right away, since they will not be stored later.
+	}
 	else if (axisCrossSettingsItemChanged(logicalName, _item, updateRequired)) {
 		if (axisCross) { axisCross->refreshAfterSettingsChange(); }
 		if (axisCenterCross) { axisCenterCross->refreshAfterSettingsChange(); }
@@ -1042,6 +1046,37 @@ bool Viewer::axisCrossSettingsItemChanged(const std::string& _logicalName, const
 	return false;
 }
 
+bool Viewer::snappingSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
+	ViewerSettings* settings = ViewerSettings::instance();
+
+	// Check the name (Group:Subgroup:...:Item)
+	if (_logicalName == "Snapping/Dimension Snapping") {
+		const ot::PropertyBool* actualItem = dynamic_cast<const ot::PropertyBool*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->dimensionSnapping = actualItem->getValue();
+		return true;
+	}
+	else if (_logicalName == "Snapping/Snap Size") {
+		const ot::PropertyDouble* actualItem = dynamic_cast<const ot::PropertyDouble*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->snapSize = actualItem->getValue();
+		return true;
+	}
+	else if (_logicalName == "Snapping/Angle Snapping") {
+		const ot::PropertyBool* actualItem = dynamic_cast<const ot::PropertyBool*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->angleSnapping = actualItem->getValue();
+		return true;
+	}
+	else if (_logicalName == "Snapping/Snap Angle") {
+		const ot::PropertyDouble* actualItem = dynamic_cast<const ot::PropertyDouble*>(_item);
+		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
+		settings->snapAngle = actualItem->getValue();
+		return true;
+	}
+	return false;
+}
+
 bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings *settings = ViewerSettings::instance();
 
@@ -1147,6 +1182,11 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	const ot::PropertyInt * workingPlaneGridLineWidth = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Grid Line Width"));
 	const ot::PropertyInt * workingPlaneGridWideLineWidth = dynamic_cast<const ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Wide Grid Line Width"));
 
+	const ot::PropertyBool* snapDimensionFlag = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Snapping/Dimension Snapping"));
+	const ot::PropertyDouble* snapDimensionValue = dynamic_cast<const ot::PropertyDouble*>(_dataset.findPropertyByPath("Snapping/Snap Size"));
+	const ot::PropertyBool* snapAngleFlag = dynamic_cast<const ot::PropertyBool*>(_dataset.findPropertyByPath("Snapping/Angle Snapping"));
+	const ot::PropertyDouble* snapAngleValue = dynamic_cast<const ot::PropertyDouble*>(_dataset.findPropertyByPath("Snapping/Snap Angle"));
+
 	const ot::PropertyColor *axisCrossColorX = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color X-Axis"));
 	const ot::PropertyColor *axisCrossColorY = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Y-Axis"));
 	const ot::PropertyColor *axisCrossColorZ = dynamic_cast<const ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Z-Axis"));
@@ -1176,6 +1216,11 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	if (workingPlaneGridHighlightStep) { settings->workingPlaneHighlightEveryStep = workingPlaneGridHighlightStep->getValue(); }
 	if (workingPlaneGridLineWidth) { settings->workingPlaneGridLineWidth = workingPlaneGridLineWidth->getValue(); }
 	if (workingPlaneGridWideLineWidth) { settings->workingPlaneWideGridLineWidth = workingPlaneGridWideLineWidth->getValue(); }
+
+	if (snapDimensionFlag) { settings->dimensionSnapping = snapDimensionFlag->getValue(); }
+	if (snapDimensionValue) { settings->snapSize = snapDimensionValue->getValue(); }
+	if (snapAngleFlag) { settings->angleSnapping = snapAngleFlag->getValue(); }
+	if (snapAngleValue) { settings->snapAngle = snapAngleValue->getValue(); }
 
 	if (axisCrossColorX) { settings->axisXColor = axisCrossColorX->getValue(); }
 	if (axisCrossColorY) { settings->axisYColor = axisCrossColorY->getValue(); }
@@ -1300,6 +1345,22 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 
 		config.addRootGroup(workingPlane);
 	}
+	// Snapping
+	{
+		PropertyGroup* snapping = new ot::PropertyGroup("Snapping");
+
+		PropertyBool* snapDimensionFlag = new PropertyBool("Dimension Snapping", settings->dimensionSnapping);
+		PropertyDouble* snapDimensionValue = new PropertyDouble("Snap Size", settings->snapSize, 0, 99999999);
+		PropertyBool* snapAngleFlag = new PropertyBool("Angle Snapping", settings->angleSnapping);
+		PropertyDouble* snapAngleValue = new PropertyDouble("Snap Angle", settings->snapAngle, 0, 180);
+
+		snapping->addProperty(snapDimensionFlag);
+		snapping->addProperty(snapDimensionValue);
+		snapping->addProperty(snapAngleFlag);
+		snapping->addProperty(snapAngleValue);
+
+		config.addRootGroup(snapping);
+	}
 	// Axis cross
 	{
 		PropertyGroup* axisCross = new ot::PropertyGroup("Axis Cross");
@@ -1321,7 +1382,6 @@ ot::PropertyGridCfg Viewer::createSettings(void) {
 
 		config.addRootGroup(axisCross);
 	}
-
 	// ## Geometry ##
 	{
 		// Data#
@@ -1661,3 +1721,44 @@ void Viewer::setCursorText(const std::string& text)
 		refresh();
 	}
 }
+
+double Viewer::snapDimension(double value)
+{
+	ViewerSettings* settings = ViewerSettings::instance();
+
+	if (!settings->dimensionSnapping) return value;
+
+	if (settings->snapSize <= 0.0) return value;
+
+	if (value >= 0.0)
+	{
+		return (int)(value / settings->snapSize + 0.5) * settings->snapSize;
+	}
+	else
+	{
+		return (int)(value / settings->snapSize - 0.5) * settings->snapSize;
+	}
+
+	return value;
+}
+
+double Viewer::snapAngle(double value)
+{
+	ViewerSettings* settings = ViewerSettings::instance();
+
+	if (!settings->angleSnapping) return value;
+
+	if (settings->snapAngle <= 0.0) return value;
+
+	if (value >= 0.0)
+	{
+		return (int)(value / settings->snapAngle + 0.5) * settings->snapAngle;
+	}
+	else
+	{
+		return (int)(value / settings->snapAngle - 0.5) * settings->snapAngle;
+	}
+
+	return value;
+}
+

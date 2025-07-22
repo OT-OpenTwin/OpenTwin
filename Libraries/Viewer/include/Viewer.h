@@ -75,6 +75,7 @@ public:
 
 	bool workingPlaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool axisCrossSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
+	bool snappingSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
 	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 	bool displaySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 
@@ -114,6 +115,9 @@ public:
 
 	void setFreezeWorkingPlane(bool flag) { freezeWorkingPlane = flag; }
 	bool getFreezeWorkingPlane() { return freezeWorkingPlane; }
+
+	double snapDimension(double value);
+	double snapAngle(double value);
 
 private Q_SLOTS:
 	void slotColorStyleChanged(void);

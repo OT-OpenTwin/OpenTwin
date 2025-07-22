@@ -4,6 +4,8 @@
 
 #include <osg/Geode>
 
+class Viewer;
+
 class HandleArrow : public HandlerBase
 {
 public:
@@ -14,7 +16,7 @@ public:
 	virtual osg::Node *getNode(void) override;
 
 	virtual void mouseOver(bool flag) override;
-	virtual void setInteraction(int intersectionIndex, double intersectionRatio) override;
+	virtual void setInteraction(Viewer* viewer, int intersectionIndex, double intersectionRatio) override;
 	virtual void setInteractionReference(int intersectionIndex, double intersectionRatio) override;
 
 	void setPosition(osg::Vec3d pos);
