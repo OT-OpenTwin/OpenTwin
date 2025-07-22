@@ -128,7 +128,7 @@ void PythonWrapper::InitializePythonInterpreter() {
 	_interpreterSuccessfullyInitialized = true;
 	int numpyErrorCode = initiateNumpy();
 	if (numpyErrorCode == 0) {
-		throw PythonException("Numpy Initialization failed: ");
+		throw PythonException("Numpy Initialization failed. Make sure that the file numpy/ndarrayobject.h exists. Details: ");
 	}
 
 	const std::string numpyVersion = checkNumpyVersion();
