@@ -12,7 +12,7 @@ namespace osgViewer
 
 class ViewerObjectSelectionHandler : public osgGA::GUIEventHandler {
 public:
-	ViewerObjectSelectionHandler(Viewer * _creator) : active(false), creator(_creator) {};
+	ViewerObjectSelectionHandler(Viewer * _creator) : active(false), creator(_creator), lastHeight(0.0) {};
 	virtual bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa) override;
 	void setModel(Model *m) { model = m; };
 	void setActive(bool a) { active = a; };
@@ -29,4 +29,5 @@ private:
 	bool   active;
 	Viewer * creator;
 	osg::Vec3 lastPointInPlane;
+	double lastHeight;
 };
