@@ -4123,6 +4123,20 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 			delete oldEntity;
 		}
 	}
+	std::set<std::string> newEntitiesNames;
+	for (EntityBase* newEntity : entityList)
+	{
+		const std::string entityName = newEntity->getName();
+		if (newEntitiesNames.find(entityName) == newEntitiesNames.end())
+		{
+			newEntitiesNames.insert(entityName);
+		}
+		else
+		{
+			OT_LOG_E("Tried to store an entity with the same name twice.");
+			return;
+		}
+	}
 
 	// Remove the "old" elements from the display
 	if (!removeFromDisplay.empty())
