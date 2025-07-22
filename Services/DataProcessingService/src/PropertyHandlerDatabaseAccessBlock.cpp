@@ -70,6 +70,17 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 			parameterList = dependingParameterLables;
 		}
 
+		int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+		for (int32_t i = 1; i <= numberOfQueries; i++)
+		{
+			auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
+			auto selectedValueInList = std::find(parameterList.begin(), parameterList.end(), queryValueCharacteristics.m_label->getValue());
+			if (selectedValueInList == parameterList.end())
+			{
+				queryValueCharacteristics.m_label->setValue(m_selectedValueNone);
+			}
+			updateParameterIfNecessary(*resultCollectionAccess.get(), queryValueCharacteristics, newProperties);
+		}
 	}
 	allQuantityLabels.push_front(m_selectedValueNone);
 	allSeriesLabels.push_front(m_selectedValueNone);
