@@ -114,8 +114,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuPage(pageName);
 
-	const std::string groupNameImport = "Import";
-	const std::string groupNameParameterizedDataCreation = "Creation of Parameterized Data Collection";
+	const std::string groupNameImport = "Data Import";
+	const std::string groupNameParameterizedDataCreation = "Table Selection Characterisation";
 	const std::string subgroupNameTableHandlingRow = "Row";
 	const std::string subgroupNameTableHandlingColumn = "Column";
 	const std::string subgroupNameTableHandlingState = "State";
@@ -125,17 +125,15 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	m_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
+	m_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameImport, "Auto Create Series Metadata");
+	m_buttonAddBatchCreator.SetDescription(pageName, groupNameImport, "Add Batch Importer");
+	m_buttonCreateDataCollection.SetDescription(pageName, groupNameImport, "Create Data Collection");
 
 	m_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
 	m_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
 	m_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
 	m_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
 	
-	m_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameParameterizedDataCreation, "Auto Create Series Metadata");
-	
-	m_buttonAddBatchCreator.SetDescription(pageName, groupNameParameterizedDataCreation, "Add Batch Importer");
-
-	m_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
 	_ui->addMenuButton(m_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(m_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
@@ -273,17 +271,17 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
 			}
-			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()))
+			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()) != std::string::npos)
 			{
 
 				EntityParameterizedDataCategorization::DataCategorie category = EntityParameterizedDataCategorization::DataCategorie::UNKNOWN;
 				if (action == m_buttonCreateMSMDEntry.GetFullDescription())
 				{
-					category = EntityParameterizedDataCategorization::researchMetadata;
+					category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
 				}
 				else if (action == m_buttonCreateRMDEntry.GetFullDescription())
 				{
-					category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
+					category = EntityParameterizedDataCategorization::researchMetadata;
 				}
 				else if (action == m_buttonCreateParameterEntry.GetFullDescription())
 				{
