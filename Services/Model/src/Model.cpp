@@ -4133,7 +4133,8 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 		}
 		else
 		{
-			OT_LOG_E("Tried to store an entity with the same name twice.");
+			OT_LOG_E("Tried to store an entity with the same name twice. Entity name: " + entityName);
+			assert(0);
 			return;
 		}
 	}
