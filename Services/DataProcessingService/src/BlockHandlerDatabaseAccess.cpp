@@ -181,8 +181,21 @@ void BlockHandlerDatabaseAccess::buildQuery(EntityBlockDatabaseAccess* _blockEnt
 void BlockHandlerDatabaseAccess::addParameterQueries(EntityBlockDatabaseAccess* _blockEntity)
 {
 	std::list<ValueComparisionDefinition> queries =	_blockEntity->getAdditionalQueries();
-	for (const ValueComparisionDefinition& query : queries)
+	const auto& parametersByLabel =	m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
+	for (ValueComparisionDefinition& query : queries)
 	{
+		const std::string parameterLabel = query.getName();
+		auto parameterByLabel	= parametersByLabel.find(parameterLabel);
+		if (parameterByLabel == parametersByLabel.end())
+		{
+			OT_LOG_E("Trying to query for: " + parameterLabel + " which was not found in the campaign.");
+			assert(0);
+		}
+		else
+		{
+			const std::string parameterID = std::to_string(parameterByLabel->second->parameterUID);
+			query.setName(parameterID);
+		}
 		addComparision(query);
 	}
 }
