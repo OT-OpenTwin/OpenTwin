@@ -346,9 +346,10 @@ const ValueComparisionDefinition EntityBlockDatabaseAccess::getSelectedQuantityD
 
 const std::list<ValueComparisionDefinition> EntityBlockDatabaseAccess::getAdditionalQueries()
 {
-	std::list<ValueComparisionDefinition> valueComparisionDefinitions;
 	
-	for (int i = 1; i <= getMaxNumberOfQueries(); i++)
+	std::list<ValueComparisionDefinition> valueComparisionDefinitions;
+	int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(this, m_propertyNumberOfQueries);
+	for (int i = 1; i <= numberOfQueries; i++)
 	{
 		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);
 		const std::string dataType = PropertyHelper::getStringPropertyValue(this, m_propertyDataType, groupName);
