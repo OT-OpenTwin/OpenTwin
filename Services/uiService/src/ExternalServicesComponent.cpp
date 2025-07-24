@@ -4103,10 +4103,10 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	OT_LOG_D("Set Table range background optionals: callback=" + std::to_string(callback) + " ,callback url=" + callbackUrl + " ,callback function=" + callbackFunction + 
 		" ,clearSelection=" + std::to_string(clearSelection) + " ,clear selection after=" + std::to_string(clearSelectionAfter));
 
-	AppBase::instance()->appendInfoMessage(QString::fromStdString("Loading table ranges.\n"));
 
 	std::vector<ot::TableRange> ranges;
-	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) {
+	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) 
+	{
 		ot::ConstJsonObjectList rangesList = ot::json::getObjectList(_document, OT_ACTION_PARAM_Ranges);
 		ranges.reserve(rangesList.size());
 		for (const ot::ConstJsonObject& rangeObject : rangesList) {
@@ -4314,7 +4314,8 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	{
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
-
+		
+		AppBase::instance()->appendInfoMessage(QString::fromStdString("Loading table ranges.\n"));
 		ot::JsonArray rangesArray;
 		for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
 			ot::JsonObject rangeObject;

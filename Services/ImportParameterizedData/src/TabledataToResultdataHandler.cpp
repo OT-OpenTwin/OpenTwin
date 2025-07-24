@@ -49,7 +49,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 	if (allMetadataAssembliesByNames.size() == 0)
 	{
-		_uiComponent->displayInformationPrompt("No range selections found for creating a dataset.\n");
+		_uiComponent->displayMessage("No range selections found for creating a dataset.\n");
 		return;
 	}
 
@@ -310,7 +310,6 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 	//If the rmd has no selection, we still require a corresponding entry in the output.
 	if (!rmdHasSelections) {
 		if (_allRangeEntities.empty()) {
-			OT_LOG_W("No entities selected.");
 			return;
 		}
 		auto firstSelectionRange = *_allRangeEntities.begin();
