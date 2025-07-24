@@ -27,8 +27,7 @@ namespace DataStorageAPI
 		auto builder = bsoncxx::builder::basic::document{};
 		if (variable.isConstCharPtr())
 		{
-			value bsonVal = DataStorageAPI::BsonValuesHelper::getStringValue(variable.getConstCharPtr());
-			builder.append(kvp(fieldName, bsonVal));
+			builder.append(kvp(fieldName, variable.getConstCharPtr()));
 		}
 		else if (variable.isDouble())
 		{
@@ -65,8 +64,7 @@ namespace DataStorageAPI
 		{
 			if (variable.isConstCharPtr())
 			{
-				value bsonVal = DataStorageAPI::BsonValuesHelper::getStringValue(variable.getConstCharPtr());
-				arrBuilder.append(bsonVal);
+				arrBuilder.append(variable.getConstCharPtr());
 			}
 			else if (variable.isDouble())
 			{

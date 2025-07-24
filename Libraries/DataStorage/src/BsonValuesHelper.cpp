@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\include\Helper\BsonValuesHelper.h"
 #include "bsoncxx/types/bson_value/make_value.hpp"
+#include "bsoncxx/string/view_or_value.hpp"
 
 namespace DataStorageAPI
 {
@@ -24,11 +25,6 @@ namespace DataStorageAPI
 	int64_t BsonValuesHelper::getInt64FromBsonValue(value value)
 	{
 		return value.get_int64().value;
-	}
-
-	value BsonValuesHelper::getStringValue(const std::string& value)
-	{
-		return bsoncxx::types::value{ bsoncxx::types::b_utf8{bsoncxx::stdx::string_view{value}} };
 	}
 
 	std::string BsonValuesHelper::getStringFromBsonValue(value value)

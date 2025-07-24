@@ -16,7 +16,6 @@ namespace DataStorageAPI
 		static value getInt64BsonValue(int64_t value);
 		static int64_t getInt64FromBsonValue(value value);
 
-		static value getStringValue(const std::string& value);
 		static std::string getStringFromBsonValue(value value);
 
 		static value getBoolValue(bool value);
