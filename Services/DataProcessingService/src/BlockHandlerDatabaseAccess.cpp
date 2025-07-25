@@ -278,6 +278,10 @@ void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition
 {
 	if (!_definition.getComparator().empty() && !_definition.getValue().empty())
 	{
+		if (_definition.getType() == ot::TypeNames::getStringTypeName() && _definition.getComparator()!= "=")
+		{
+			throw std::exception(("Query for " + _definition.getName() + " targets a string value with a not supported comparator. Only equality queries are currently supported.").c_str());
+		}
 		AdvancedQueryBuilder builder;
 		BsonViewOrValue query =	builder.createComparison(_definition);
 		m_comparisons.push_back(query);
