@@ -11,10 +11,10 @@
 class GenericBsonDocument : public GenericDocument
 {
 public:
-	void AddAllFieldsToDocument(bsoncxx::builder::basic::document& storage) const;
+	void addAllFieldsToDocument(bsoncxx::builder::basic::document& _storage) const;
 
 private:
-	std::vector<char> _forbiddenFieldNameContent{ '$', '.' };
+	std::vector<char> m_forbiddenFieldNameContent{ '$', '.' };
 	
 	//virtual void CheckForIlligalName(std::string fieldName) override;
 };

@@ -1,13 +1,13 @@
 #include "GenericDocument.h"
 
-void GenericDocument::InsertInDocumentField(const std::string& fieldName, const std::list<ot::Variable>& values)
+void GenericDocument::insertInDocumentField(const std::string& _fieldName, const std::list<ot::Variable>& _values)
 {
 	//CheckForIlligalName(fieldName);
-	_fields[fieldName].insert(_fields[fieldName].begin(), values.begin(), values.end());
+	m_fields[_fieldName].insert(m_fields[_fieldName].begin(), _values.begin(), _values.end());
 }
 
-void GenericDocument::InsertInDocumentField(const std::string& fieldName, std::list<ot::Variable>&& values)
+void GenericDocument::insertInDocumentField(const std::string& _fieldName, std::list<ot::Variable>&& _values)
 {
 	//CheckForIlligalName(fieldName);
-	_fields[fieldName].insert(_fields[fieldName].begin(), values.begin(), values.end());
+	m_fields[_fieldName].insert(m_fields[_fieldName].begin(), _values.begin(), _values.end());
 }

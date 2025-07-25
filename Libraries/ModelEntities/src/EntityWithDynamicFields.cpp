@@ -22,7 +22,7 @@ void EntityWithDynamicFields::InsertInField(std::string fieldName, std::list<ot:
 		newDocument.setDocumentName(documentName);
 		_bsonDocumentsByName.insert({ documentName, newDocument });
 	}
-	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+	_bsonDocumentsByName[documentName].insertInDocumentField(fieldName, values);
 
 	setModified();
 }
@@ -39,7 +39,7 @@ void EntityWithDynamicFields::InsertInField(std::string fieldName, const std::li
 		newDocument.setDocumentName(documentName);
 		_bsonDocumentsByName.insert({ documentName, newDocument });
 	}
-	_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+	_bsonDocumentsByName[documentName].insertInDocumentField(fieldName, values);
 
 	setModified();
 }
@@ -122,8 +122,9 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 
 	std::list<std::string> documentNames;
 
-	for (const auto& document : _bsonDocumentsByName)
+	for (auto& document : _bsonDocumentsByName)
 	{
+		document.second.clearSubDocuments();
 		documentNames.push_back(document.first);
 	}
 
@@ -137,7 +138,7 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 		//Root document
 		if ((currentDocumentName) == "/")
 		{
-			_bsonDocumentsByName[(*it)].setDocumentName("DynamicFields");
+			_bsonDocumentsByName[currentDocumentName].setDocumentName("DynamicFields");
 		}
 		else
 		{
@@ -174,7 +175,7 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 			//Add 
 			std::string trimmedDocumentName = (currentDocumentName).substr((currentDocumentName).find_last_of('/') + 1, (currentDocumentName).size());
 			_bsonDocumentsByName[(currentDocumentName)].setDocumentName(trimmedDocumentName);
-			_bsonDocumentsByName[parentName].AddSubDocument(&_bsonDocumentsByName[(currentDocumentName)]);
+			_bsonDocumentsByName[parentName].addSubDocument(&_bsonDocumentsByName[(currentDocumentName)]);
 		}
 
 		it++;
@@ -183,7 +184,7 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 
 void EntityWithDynamicFields::AddGenericDocumentToBsonDocument(const GenericBsonDocument* genericDocument, bsoncxx::builder::basic::document& bsonDocument)
 {
-	genericDocument->AddAllFieldsToDocument(bsonDocument);
+	genericDocument->addAllFieldsToDocument(bsonDocument);
 
 	for (auto genericSubDocument : genericDocument->getSubDocuments())
 	{
@@ -229,12 +230,12 @@ void EntityWithDynamicFields::ExtractElementValues(const bsoncxx::document::elem
 			{
 				values.push_back(converter(arrayElement));
 			}
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, values);
+			_bsonDocumentsByName[documentName].insertInDocumentField(fieldName, values);
 		}
 		else
 		{
 			std::list<ot::Variable> field{ converter(element) };
-			_bsonDocumentsByName[documentName].InsertInDocumentField(fieldName, field);
+			_bsonDocumentsByName[documentName].insertInDocumentField(fieldName, field);
 		}
 	}
 

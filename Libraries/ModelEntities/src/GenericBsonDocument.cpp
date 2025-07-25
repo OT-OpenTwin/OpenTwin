@@ -1,16 +1,16 @@
 #include "GenericBsonDocument.h"
 #include "VariableToBSONConverter.h"
-void GenericBsonDocument::AddAllFieldsToDocument(bsoncxx::builder::basic::document& storage) const
+void GenericBsonDocument::addAllFieldsToDocument(bsoncxx::builder::basic::document& _storage) const
 {
 	VariableToBSONConverter converter;
-	for (auto mapEntry : _fields)
+	for (auto mapEntry : m_fields)
 	{
 		std::list<ot::Variable>& fieldValues = mapEntry.second;
 		const std::string fieldName = mapEntry.first;
 		if (fieldValues.size() == 1)
 		{
 			const auto& value = *fieldValues.begin();
-			converter(storage,value,fieldName);
+			converter(_storage,value,fieldName);
 		}
 		else
 		{
@@ -19,7 +19,7 @@ void GenericBsonDocument::AddAllFieldsToDocument(bsoncxx::builder::basic::docume
 			{
 				converter(valueArray, fieldValue);
 			}
-			storage.append(bsoncxx::builder::basic::kvp(fieldName, valueArray));
+			_storage.append(bsoncxx::builder::basic::kvp(fieldName, valueArray));
 		}
 	}
 }
