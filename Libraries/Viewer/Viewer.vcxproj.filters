@@ -157,6 +157,9 @@
     <ClCompile Include="src\FaceSelection.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\RangeVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -326,6 +329,9 @@
     </ClInclude>
     <ClInclude Include="include\EdgeSelection.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RangeVisualiser.h">
+      <Filter>include\Visualiser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

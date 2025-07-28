@@ -49,6 +49,7 @@
 #include "TableVisualiser.h"
 #include "PlotVisualiser.h"
 #include "CurveVisualiser.h"
+#include "RangeVisualiser.h"
 
 #include <QtWidgets/qheaderview.h>
 
@@ -394,6 +395,11 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	{
 		auto curveVis = new CurveVisualiser(containerNode);
 		containerNode->addVisualiser(curveVis);
+	}
+
+	if (_visualisationTypes.visualiseAsRange()) {
+		auto rangeVis = new RangeVisualiser(containerNode);
+		containerNode->addVisualiser(rangeVis);
 	}
 
 	// Get the parent scene node
@@ -772,6 +778,11 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	{
 		auto curveVis = new CurveVisualiser(sceneNode);
 		sceneNode->addVisualiser(curveVis);
+	}
+
+	if (_visualisationTypes.visualiseAsRange()) {
+		auto rangeVis = new RangeVisualiser(sceneNode);
+		sceneNode->addVisualiser(rangeVis);
 	}
 
 	// Get the parent scene node

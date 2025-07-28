@@ -19,11 +19,13 @@ namespace ot
 		void addTableVisualisation();
 		void addPlot1DVisualisation();
 		void addCurveVisualisation();
+		void addRangeVisualisation();
 
 		bool visualiseAsText() const;
 		bool visualiseAsTable() const;
 		bool visualiseAsPlot1D() const;
 		bool visualiseAsCurve() const;
+		bool visualiseAsRange() const;
 
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
@@ -34,5 +36,6 @@ namespace ot
 		const uint32_t m_visualisationAsTable = 1;
 		const uint32_t m_visualisationAsPlot1D = 2;
 		const uint32_t m_visualisationAsCurve = 3;
+		const uint32_t m_visualisationAsRange = 4;
 	};
 }

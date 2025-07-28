@@ -27,6 +27,10 @@ void EntityTableSelectedRanges::addVisualizationNodes()
 
 		treeIcons.addToJsonDoc(doc);
 
+		ot::VisualisationTypes visTypes;
+		visTypes.addRangeVisualisation();
+		visTypes.addToJsonObject(doc, doc.GetAllocator());
+
 		getObserver()->sendMessageToViewer(doc);
 	}
 
