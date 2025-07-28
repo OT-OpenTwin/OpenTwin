@@ -78,6 +78,8 @@
 
 #include "MetadataEntityInterface.h"
 
+#include "OTServiceFoundation/UILockWrapper.h"
+
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
 { 
@@ -2403,7 +2405,12 @@ void Model::updateEntities(bool itemsVisible)
 
 void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible)
 {
-	ProgressReport::setUILock(true, ProgressReport::MODEL_CHANGE);
+	ot::LockTypeFlags lockFlag;
+	lockFlag.setFlag(ot::LockModelWrite);
+	lockFlag.setFlag(ot::LockNavigationWrite);
+	lockFlag.setFlag(ot::LockViewWrite);
+	lockFlag.setFlag(ot::LockProperties);
+	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
 
 	for (auto serviceUpdate : otherServicesUpdate)
 	{
@@ -2445,8 +2452,6 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	// Now we need to notify the model service that the update operation is completed
 	refreshAllViews();
 	modelChangeOperationCompleted("shape properties changed");
-
-	ProgressReport::setUILock(false, ProgressReport::MODEL_CHANGE);
 }
 
 void Model::updateEntity(EntityBase *entity)
@@ -4571,9 +4576,6 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 		assert(0); // Unknown type
 		return;
 	}
-
-	ProgressReport::setUILock(true, ProgressReport::MODEL_CHANGE);
-
 	assert(visEntity != nullptr);
 	
 	std::list<ot::UID> entityIDs;
@@ -4590,6 +4592,13 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 
 void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
 {
+	ot::LockTypeFlags lockFlag;
+	lockFlag.setFlag(ot::LockModelWrite);
+	lockFlag.setFlag(ot::LockNavigationWrite);
+	lockFlag.setFlag(ot::LockViewWrite);
+	lockFlag.setFlag(ot::LockProperties);
+	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+
 	ot::JsonDocument notify;
 	ot::JsonArray changedEntitiesInfos;
 	for (ot::UID& entityID : entityIDs)
@@ -4611,7 +4620,6 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 
 	Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
 
-	ProgressReport::setUILock(false, ProgressReport::MODEL_CHANGE);
 }
 
 void Model::getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions)
