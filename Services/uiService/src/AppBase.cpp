@@ -7,6 +7,7 @@
 #include "AppBase.h"
 #include "ToolBar.h"
 #include "DevLogger.h"
+#include "UITestLogs.h"
 #include "LogInDialog.h"
 #include "ManageOwner.h"
 #include "ManageAccess.h"
@@ -1748,11 +1749,15 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
+	OT_SLECTION_TEST_LOG("Auto close unpinned views");
+
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
 		true
 	);
+
+	OT_SLECTION_TEST_LOG(">> Auto close unpinned views completed");
 }
 
 // ##############################################################################################
@@ -2352,6 +2357,8 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 }
 
 void AppBase::slotGraphicsSelectionChanged(void) {
+	OT_SLECTION_TEST_LOG("Graphics selection changed");
+
 	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
 	if (scene == nullptr) {
 		OT_LOG_E("GraphicsScene cast failed");
@@ -2394,6 +2401,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		}
 	}
 
+	OT_SLECTION_TEST_LOG(">> Graphics selection change completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
@@ -2638,6 +2646,9 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 }
 
 void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {
+	OT_SLECTION_TEST_LOG("View focus changed. { \"Previous\": \"" + (_previousView ? _previousView->getViewData().getEntityName() : "<None>") +
+		"\", \"Focused\": " + (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") + "\" }");
+
 	if (_previousView) {
 		m_navigationManager.slotViewDeselected();
 	}
@@ -2664,16 +2675,19 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
 			{
-				ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+				ak::aTreeWidget* tree = m_projectNavigation->getTree();
+				QSignalBlocker sigBlock(tree);
 
 				// Reset current selection
-				m_projectNavigation->getTree()->deselectAllItems(false);
+				tree->deselectAllItems(false);
 
 				bool restoreSelection = true;
 				std::list<ot::UID> viewSelection = _focusedView->getSelectionInformation().getSelectedNavigationItems();
 
 				// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
 				if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
+					OT_SLECTION_TEST_LOG("+ View focus changed: Adding selection diff");
+
 					// The diff contains newly selected items that were selected during the last selection change
 					std::list<UID> diff = ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft);
 
@@ -2682,18 +2696,19 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 					// Select the diff items
 					for (UID id : diff) {
-						m_projectNavigation->getTree()->setItemSelected(id, true);
+						tree->setItemSelected(id, true);
 					}
 				}
 
 				// If the selection of the view still needs to be restored do so
 				if (restoreSelection) {
+					OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
 					for (ot::UID uid : viewSelection) {
-						m_projectNavigation->getTree()->setItemSelected(uid, true);
+						tree->setItemSelected(uid, true);
 					}
 				}
 
-				m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+				m_navigationManager.setSelectedItems(tree->selectedItems());
 				_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 			}
 
@@ -2701,11 +2716,13 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			m_lastFocusedCentralView = _focusedView;
 
 			if (!m_navigationManager.isSelectionHandlingRunning()) {
+				OT_SLECTION_TEST_LOG("+ View focus changed: Running selection handling");
 				// Run selection handling if currently no selection handling is running
 				this->runSelectionHandling(ot::SelectionOrigin::View);
 			}
 		}
 
+		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 
 		AppBase::instance()->autoCloseUnpinnedViews();
@@ -2713,6 +2730,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	else {
 		m_lastFocusedView = nullptr;
 	}
+
+	OT_SLECTION_TEST_LOG(">> View focus changed completed");
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
@@ -2756,6 +2775,8 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 		return;
 	}
 
+	OT_SLECTION_TEST_LOG("View tab clicked");
+
 	// Update graphics picker content
 
 	// Forward focus events of central views to the viewer component
@@ -2780,10 +2801,13 @@ void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
 			}
 			// Notify if needed
 			if (changed) {
+				OT_SLECTION_TEST_LOG("+ View tab clicked: Run selection handling");
 				this->runSelectionHandling(ot::SelectionOrigin::View);
 			}
 		}
 	}
+
+	OT_SLECTION_TEST_LOG(">> View tab clicked completed");
 }
 
 void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
@@ -3291,7 +3315,9 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
+	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
+	OT_SLECTION_TEST_LOG(">> Tree item selection changed completed");
 }
 
 void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
@@ -3318,6 +3344,8 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 }
 
 void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin) {
+	OT_SLECTION_TEST_LOG("Handle selection has changed");
+
 	// If true is returned a new view was requested
 	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
 	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
@@ -3333,6 +3361,8 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	for (auto& graphics : m_graphicsViews) {
 		graphics.second->getGraphicsView()->setSelectedElements(selectedUids);
 	}
+
+	OT_SLECTION_TEST_LOG(">> Handle selection has changed completed");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3340,6 +3370,7 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 // Private: Plot slots
 
 void AppBase::slotPlotResetItemSelectionRequest() {
+	OT_SLECTION_TEST_LOG("Plot reset item selection request");
 	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
 	if (!plot) {
 		OT_LOG_EA("Plot cast failed");
@@ -3356,10 +3387,13 @@ void AppBase::slotPlotResetItemSelectionRequest() {
 		OT_LOG_E(_e.what());
 	}
 
+	OT_SLECTION_TEST_LOG(">> Plot reset item selection request completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier) {
+	OT_SLECTION_TEST_LOG("Plot curve double clicked");
+
 	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
 	if (!plot) {
 		OT_LOG_EA("Plot cast failed");
@@ -3412,6 +3446,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 		OT_LOG_E(_e.what());
 	}
 
+	OT_SLECTION_TEST_LOG(">> Plot curve double clicked completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
@@ -3462,13 +3497,17 @@ void AppBase::setupNewCentralView(ot::WidgetView* _view) {
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
+	OT_SLECTION_TEST_LOG("Running selection handling");
+
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
 	if (selectionResult & ot::SelectionHandlingEvent::NewViewRequested) {
+		OT_SLECTION_TEST_LOG(">> Selection handling completed with new view requested");
 		// A new view was requested while handling the selection, ignore selection update
 		return;
 	}
 	else if ((selectionResult | ot::SelectionHandlingEvent::NoViewChangeRequestedMask) == ot::SelectionHandlingEvent::NoViewChangeRequestedMask) {
+		OT_SLECTION_TEST_LOG(">> Selection handling completed without view change");
 		// No view change requested, but selection changed, update selection information stored for the view
 		if (m_lastFocusedCentralView) {
 			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());

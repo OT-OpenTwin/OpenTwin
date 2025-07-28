@@ -70,6 +70,7 @@
     <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\ProjectInformation.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
+    <ClInclude Include="include\UITestLogs.h" />
     <ClInclude Include="include\ViewStateCfg.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="include\CopyProjectDialog.h" />

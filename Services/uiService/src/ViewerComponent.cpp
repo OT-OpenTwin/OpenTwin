@@ -11,6 +11,7 @@
 #include <ExternalServicesComponent.h>		// Model Component
 #include "AppBase.h"
 #include "ToolBar.h"
+#include "UITestLogs.h"
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
@@ -143,7 +144,10 @@ void ViewerComponent::removeTreeItems(std::list<ot::UID> treeItemIDList)
 void ViewerComponent::selectTreeItem(ot::UID treeItemID)
 {
 	try {
-		try { AppBase::instance()->setNavigationTreeItemSelected(treeItemID, true); }
+		try {
+			OT_SLECTION_TEST_LOG("Select item from viewer");
+			AppBase::instance()->setNavigationTreeItemSelected(treeItemID, true); 
+		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::selectTreeItem()"); }
 		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::selectTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectTreeItem()"); }
@@ -154,7 +158,10 @@ void ViewerComponent::selectTreeItem(ot::UID treeItemID)
 void ViewerComponent::selectSingleTreeItem(ot::UID treeItemID)
 {
 	try {
-		try { AppBase::instance()->setSingleNavigationTreeItemSelected(treeItemID, true); }
+		try {
+			OT_SLECTION_TEST_LOG("Select single item from viewer");
+			AppBase::instance()->setSingleNavigationTreeItemSelected(treeItemID, true); 
+		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::selectSingleTreeItem()"); }
 		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::selectSingleTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectSingleTreeItem()"); }
@@ -188,6 +195,7 @@ bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID) {
 void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) {
 	try {
 		try { 
+			OT_SLECTION_TEST_LOG("Toggle item selection from viewer");
 			AppBase::instance()->toggleNavigationTreeItemSelection(treeItemID, considerChilds);
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::toggleTreeItemSelection()"); }
@@ -199,7 +207,10 @@ void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerC
 
 void ViewerComponent::clearTreeSelection(void) {
 	try {
-		try { AppBase::instance()->clearNavigationTreeSelection(); }
+		try {
+			OT_SLECTION_TEST_LOG("Clear item selection from viewer");
+			AppBase::instance()->clearNavigationTreeSelection();
+		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::clearTreeSelection()"); }
 		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::clearTreeSelection()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::clearTreeSelection()"); }
