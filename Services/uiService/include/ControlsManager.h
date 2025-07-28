@@ -103,6 +103,8 @@ public:
 
 	int lockLevel(ot::LockTypeFlag _type);
 
+	std::string printLockState();
+
 private:
 	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;
 	LockManagerElement * uiElement(ot::UID _uid);
