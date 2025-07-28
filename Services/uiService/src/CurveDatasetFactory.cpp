@@ -319,7 +319,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 		}
 
 		//Get quantity value
-		if (!ot::json::isObject(singleMongoDocument, quantityInformation.m_fieldName))
+		
+		if (ot::json::isArray(singleMongoDocument, quantityInformation.m_fieldName))
 		{
 			throw std::exception("Quantity in family of curves is a matrix. Not supported at the moment.");
 		}
