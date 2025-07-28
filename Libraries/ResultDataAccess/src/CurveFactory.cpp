@@ -22,6 +22,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 	quantityInformation.m_label = quantities.begin()->quantityName;
 	quantityInformation.m_unit = quantity->unit;
 	quantityInformation.m_dataType = quantity->dataTypeName;
+	quantityInformation.m_dimension = quantities.begin()->dataDimensions;
 	queryInformation.m_quantityDescription = quantityInformation;
 
 	const std::list<MetadataParameter>& parameters = _series.getParameter();

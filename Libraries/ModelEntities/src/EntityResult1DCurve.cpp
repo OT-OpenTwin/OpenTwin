@@ -404,11 +404,18 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view& 
 
 bsoncxx::builder::basic::document EntityResult1DCurve::serialise(ot::QuantityContainerEntryDescription& _quantityContainerEntryDescription) {
 	bsoncxx::builder::basic::document subDocument;
+
+	bsoncxx::builder::basic::array quantityDimensions;
+	for (uint32_t dimension : _quantityContainerEntryDescription.m_dimension)
+	{
+		quantityDimensions.append(static_cast<int32_t>(dimension));
+	}
 	subDocument.append(
 		bsoncxx::builder::basic::kvp("DataType", _quantityContainerEntryDescription.m_dataType),
 		bsoncxx::builder::basic::kvp("FieldName", _quantityContainerEntryDescription.m_fieldName),
 		bsoncxx::builder::basic::kvp("Label", _quantityContainerEntryDescription.m_label),
-		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit)
+		bsoncxx::builder::basic::kvp("Unit", _quantityContainerEntryDescription.m_unit),
+		bsoncxx::builder::basic::kvp("Dimension", quantityDimensions)
 	);
 	return subDocument;
 }
@@ -419,5 +426,10 @@ ot::QuantityContainerEntryDescription EntityResult1DCurve::deserialise(bsoncxx::
 	quantityContainerEntryDescription.m_fieldName = _subDocument["FieldName"].get_string();
 	quantityContainerEntryDescription.m_label = _subDocument["Label"].get_string();
 	quantityContainerEntryDescription.m_unit = _subDocument["Unit"].get_string();
+	auto quantityDimension = _subDocument["Dimension"].get_array();
+	for (auto& element : quantityDimension.value)
+	{
+		quantityContainerEntryDescription.m_dimension.push_back(static_cast<uint32_t>(element.get_int32()));
+	}
 	return quantityContainerEntryDescription;
 }
