@@ -17,6 +17,18 @@
 #include <exception>
 #include <filesystem>
 
+#define OT_LOGGER_USE_MUTEX false
+
+#if OT_LOGGER_USE_MUTEX==true
+#include <mutex>
+namespace ot {
+	namespace intern {
+		static std::atomic_bool g_logInitialized(false);
+		static std::mutex g_logMutex;
+	}
+}
+#endif
+
 #define OT_ACTION_PARAM_LOG_Service "Log.Service"
 #define OT_ACTION_PARAM_LOG_Function "Log.Function"
 #define OT_ACTION_PARAM_LOG_Message "Log.Message"
@@ -320,6 +332,14 @@ void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _f
 }
 
 void ot::LogDispatcher::dispatch(const LogMessage& _message) {
+#if OT_LOGGER_USE_MUTEX==true
+	if (!intern::g_logInitialized) {
+		intern::g_logInitialized = true;
+		OT_LOG_W("Mutex in use for LogDispatcher!");
+	}
+	std::lock_guard<std::mutex> lock(intern::g_logMutex);
+#endif
+
 	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) {
 		return;
 	}
