@@ -7,6 +7,7 @@
 void Service::printService() const {
     std::cout << "\nPrinting Service: " << m_name << "\n";
     std::cout << "================== \n";
+    std::cout << "Number of endpoints in service: " << getEndpoints().size() << std::endl;
     std::cout << "Endpoint actions:\n";
     for (const Endpoint& endpoint : m_endpoints) {
         std::cout << endpoint.getAction() << "\n";

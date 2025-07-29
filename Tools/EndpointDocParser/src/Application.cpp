@@ -22,9 +22,10 @@ void Application::run(void) {
 void Application::searchForServices(void) {
 	std::cout << "Searching for Services.\n";
 
-/*
 	// search in Open Twin Services
 	const std::string path = "C:\\OT\\OpenTwin\\Services";
+	
+	std::list<Service> services;
 
 	try {
 		std::list<std::string> allServices = ot::FileSystem::getFiles(path, { ".vcxproj" }, ot::FileSystem::FileSystemOption::Recursive);
@@ -47,14 +48,23 @@ void Application::searchForServices(void) {
 			searchIncludeAndSrcDirectoryFiles(file, service);
 
 			service.printService();
+
+			// add the service to the list of services if it has endpoints
+			if (!service.getEndpoints().empty()) {
+				addService(service);
+			}
 		}
 		// output: Services\...
 	}
 	catch (const std::filesystem::filesystem_error& e) {
 		std::cerr << "Error by getFiles: " << e.what() << "\n";
 	}
-*/
-
+	// print the list of services
+	std::cout << "\n" << m_services.size() << " Services added to List of services: \n";
+	for (const Service& service : m_services) {
+		service.printService();
+	}
+/*
 		// search in one Service
 		const std::string pathToAuthorisationService = "C:\\OT\\OpenTwin\\Services\\AuthorisationService";
 
@@ -83,7 +93,7 @@ void Application::searchForServices(void) {
 		}
 		catch (const std::filesystem::filesystem_error& e) {
 			std::cerr << "Error by getFiles: " << e.what() << "\n";
-		}
+		}*/
 }
 
 void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service) {
@@ -156,7 +166,6 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	std::cout << "Parsing file: " << _file << "\n";
 	std::string blackList = " \t\n";
 	
-	//Service service;
 	Endpoint endpoint;
 	Parameter parameter;
 	bool inApiBlock = false;
@@ -168,12 +177,13 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 
 		for (const std::string& line : lines) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
-			std::cout << trimmedLine << "\n";
+			//std::cout << trimmedLine << "\n";
 
 			if (startsWith(trimmedLine, "//api")) {
 				if (!inApiBlock) {
 					inApiBlock = true;
 					endpoint = Endpoint();  // new endpoint
+					std::cout << "-----------------------------------------------------------------------------------\n";
 					std::cout << "Detected start of api documentation block.\n";
 				}
 
@@ -238,18 +248,17 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 			else {
 				if (inApiBlock) {
 					// end of api block, add endpoint to service
+					std::cout << "The parsed endpoint is: \n";
 					endpoint.printEndpoint();				
+					
 					std::cout << "The service is " << _service.getName() << ". \n";
 					_service.addEndpoint(endpoint);
-					
-					std::cout << "Endpoints in service: " << _service.getEndpoints().size() << std::endl;
-					for (const Endpoint& ep : _service.getEndpoints()) {
-						ep.printEndpoint();
-					}
-
+					std::cout << "Added endpoint to service. \n";
 					_service.printService();
+
 					inApiBlock = false;
 					std::cout << "Detected end of api documentation block.\n";
+					std::cout << "-----------------------------------------------------------------------------------\n";
 				}
 			}
 		}
@@ -370,5 +379,10 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 		_endpoint.addResponseParameter(_parameter);
 		std::cout << "Added Parameter to response parameters.\n";
 	}
+}
+
+void Application::addService(const Service& _service) {
+	std::cout << "Adding Service " << _service.getName() << " to List of Services.\n";
+	m_services.push_back(_service);
 }
 

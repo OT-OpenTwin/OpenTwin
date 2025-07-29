@@ -39,6 +39,8 @@ public:
 
 	void parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, const std::string& _parameterType);
 
+	void addService(const Service& _service);
+
 private:
 	std::list<Service> m_services;
 };
