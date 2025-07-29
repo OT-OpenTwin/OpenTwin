@@ -102,3 +102,23 @@ TEST(ContainerTests, SubsetVector) {
 	EXPECT_TRUE(ot::ContainerHelper::isSubset(sub, list));
 	EXPECT_FALSE(ot::ContainerHelper::isSubset(invalid, list));
 }
+
+TEST(ContainerTests, IntersectsList) {
+	std::list<int> l1 = { 1, 2 };
+	std::list<int> l2 = { 2, 3 };
+	std::list<int> l3 = { 3, 4 };
+
+	EXPECT_TRUE(ot::ContainerHelper::hasIntersection(l1, l2));
+	EXPECT_TRUE(ot::ContainerHelper::hasIntersection(l2, l3));
+	EXPECT_FALSE(ot::ContainerHelper::hasIntersection(l1, l3));
+}
+
+TEST(ContainerTests, IntersectsVector) {
+	std::vector<int> l1 = { 1, 2 };
+	std::vector<int> l2 = { 2, 3 };
+	std::vector<int> l3 = { 3, 4 };
+
+	EXPECT_TRUE(ot::ContainerHelper::hasIntersection(l1, l2));
+	EXPECT_TRUE(ot::ContainerHelper::hasIntersection(l2, l3));
+	EXPECT_FALSE(ot::ContainerHelper::hasIntersection(l1, l3));
+}
