@@ -154,3 +154,24 @@ bool ot::ContainerHelper::isSubset(const std::vector<T>& _subset, const std::vec
 
 	return true;
 }
+
+template<typename T>
+inline bool ot::ContainerHelper::hasIntersection(const std::list<T>& _list1, const std::list<T>& _list2) {
+	for (const auto& item : _list1) {
+		if (std::find(_list2.begin(), _list2.end(), item) != _list2.end()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T>
+inline bool ot::ContainerHelper::hasIntersection(const std::vector<T>& _vector1, const std::vector<T>& _vector2) {
+	std::unordered_set<T> set1(_vector1.begin(), _vector1.end());
+	for (const auto& item : _vector2) {
+		if (set1.find(item) != set1.end()) {
+			return true;
+		}
+	}
+	return false;
+}
