@@ -1,10 +1,7 @@
-/*
- * ControlsManager.cpp
- *
- *  Created on: February 20, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file ControlsManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "ControlsManager.h"
 #include "AppBase.h"

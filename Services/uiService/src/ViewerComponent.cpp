@@ -64,9 +64,7 @@ ViewerComponent::ViewerComponent()
 
 ViewerComponent::~ViewerComponent() {}
 
-// #####################################################################################################################################
-
-// Extern calls
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Tree
 
@@ -297,6 +295,10 @@ void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _enti
 	plot->refresh();
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Views
+
 void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
 	switch (_viewType) {
 	case ot::WidgetViewBase::ViewText:
@@ -353,6 +355,22 @@ bool ViewerComponent::getCurrentViewIsModified(void) {
 		return false;
 	}
 }
+
+void ViewerComponent::addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	if (view) {
+		view->addVisualizingItem(_treeItemId);
+	}
+}
+
+void ViewerComponent::removeVisualizingEntityFromView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	if (view) {
+		view->removeVisualizingItem(_treeItemId);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Menu/Widgets
 
@@ -633,6 +651,8 @@ std::string ViewerComponent::getSaveFileName(const std::string& _title, const st
 	).toStdString();
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
 void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 {
 	if (flag)
@@ -658,7 +678,7 @@ void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 	}
 }
 
-// #####################################################################################################################################
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // Intern calls
 

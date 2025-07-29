@@ -2681,35 +2681,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				// Reset current selection
 				tree->deselectAllItems(false);
 
-				bool restoreSelection = true;
-				std::list<ot::UID> viewSelection = _focusedView->getSelectionInformation().getSelectedNavigationItems();
-
-				// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
-				if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
-					OT_SLECTION_TEST_LOG("+ View focus changed: Adding selection diff");
-
-					// The diff contains newly selected items that were selected during the last selection change
-					std::list<UID> diff = ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft);
-
-					// If the diff is a subset of the views selection information we will not restore the selection
-					restoreSelection = diff.empty() || !ot::ContainerHelper::isSubset(diff, viewSelection);
-
-					// Select the diff items
-					for (UID id : diff) {
-						tree->setItemSelected(id, true);
-					}
-				}
-
-				// If the selection of the view still needs to be restored do so
-				if (restoreSelection) {
-					OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
-					for (ot::UID uid : viewSelection) {
-						tree->setItemSelected(uid, true);
-					}
+				OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
+				for (ot::UID uid : _focusedView->getVisualizingItems().getSelectedNavigationItems()) {
+					tree->setItemSelected(uid, true);
 				}
 
 				m_navigationManager.setSelectedItems(tree->selectedItems());
-				_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
 			}
 
 			// Update focus information
@@ -2758,9 +2735,9 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
 	// Deselect navigation item if exists
-	const ot::SelectionInformation& viewSelectionInfo = _view->getSelectionInformation();
+	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
 	{
-		ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
 		for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
 			m_projectNavigation->getTree()->setItemSelected(uid, false);
 		}
@@ -3493,7 +3470,7 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 }
 
 void AppBase::setupNewCentralView(ot::WidgetView* _view) {
-	_view->setSelectionInformation(this->getSelectedNavigationTreeItems());
+	
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
@@ -3503,14 +3480,8 @@ void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
 
 	if (selectionResult & ot::SelectionHandlingEvent::NewViewRequested) {
 		OT_SLECTION_TEST_LOG(">> Selection handling completed with new view requested");
-		// A new view was requested while handling the selection, ignore selection update
-		return;
 	}
 	else if ((selectionResult | ot::SelectionHandlingEvent::NoViewChangeRequestedMask) == ot::SelectionHandlingEvent::NoViewChangeRequestedMask) {
 		OT_SLECTION_TEST_LOG(">> Selection handling completed without view change");
-		// No view change requested, but selection changed, update selection information stored for the view
-		if (m_lastFocusedCentralView) {
-			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
-		}
 	}
 }

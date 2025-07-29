@@ -51,6 +51,10 @@ public:
 
 	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) { return false; };
 
+	virtual void addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+
+	virtual void removeVisualizingEntityFromView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+
 	virtual unsigned long long addMenuPage(const std::string& pageName) { return 0; };
 	virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string& groupName) { return 0; };
 	virtual unsigned long long addMenuSubGroup(unsigned long long _menuGroupID, const std::string& _subGroupName) { return 0; };

@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -566,42 +567,41 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 
 void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 	std::list<WidgetView*> views;
+	// Iterate trough all views
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
 		OTAssertNullptr(dock);
+
+		// Check if the view matches the auto close flags and is not pinned
 		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
 			bool concider = true;
+
+			// If ignore current is set, do not close the last focused view
 			if (m_autoCloseInfo.ignoreCurrent) {
 				concider = !(view.second == m_focusInfo.last ||
 					view.second == m_focusInfo.lastCentral ||
 					view.second == m_focusInfo.lastSide ||
 					view.second == m_focusInfo.lastTool);
-
-
 			}
 
-			if (concider && !m_autoCloseInfo.activeSelection.getSelectedNavigationItems().empty()) {
-				for (const UID& active : m_autoCloseInfo.activeSelection.getSelectedNavigationItems()) {
-					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
-						if (active == viewSelection) {
-							concider = false;
-							break;
-						}
-					}
+			// If the active selection is set, do not close views that are selected in the active selection
+			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
 
-					if (!concider) {
-						break;
-					}
+			if (concider && !activeSel.empty()) {
+				// Check if the view is selected in the active selection
+				if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
+					concider = false;
 				}
 			}
 
+			// If the view matches all criteria, add it to the list of views to close
 			if (concider) {
 				views.push_back(view.second);
 			}
-
 		}
 	}
 
+	// Request to close all matching views
 	for (WidgetView* view : views) {
 		this->handleViewCloseRequest(view);
 	}
