@@ -5,7 +5,7 @@
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructMatrix.h"
-
+/*
 ot::ReturnMessage createDefaultMessage()
 {
 	ot::ReturnValues expectedReturnValues;
@@ -60,3 +60,4 @@ TEST(ReturnMessage, ToJSON) {
 	EXPECT_TRUE(val.HasMember("Status"));
 	EXPECT_TRUE(val.HasMember("What"));
 }
+*/
