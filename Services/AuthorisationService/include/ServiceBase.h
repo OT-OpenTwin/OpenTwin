@@ -48,7 +48,25 @@ private:
 
 	// No authentication needed
 
+	//api @security TLS
+	//api @action OT_ACTION_LOGIN_ADMIN 
+	//api @brief Processes the login of an administrator. 
+	//api @param OT_PARAM_AUTH_USERNAME String User name
+	//api @param OT_PARAM_AUTH_PASSWORD String User password
+	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
+	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
+	
+	//api @security TLS
+	//api @action OT_ACTION_LOGIN
+	//api @brief Processes the login of a user.
+	//api @param OT_PARAM_AUTH_USERNAME String User name
+	//api @param OT_PARAM_AUTH_PASSWORD String User password
+	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
+	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+	//api @rparam OT_PARAM_AUTH_PASSWORD String Unencrypted password (if successful)
+	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);

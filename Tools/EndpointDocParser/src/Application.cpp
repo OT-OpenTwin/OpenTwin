@@ -45,6 +45,8 @@ void Application::searchForServices(void) {
 			std::cout << "Created Service " << service.getName() << ".\n";
 
 			searchIncludeAndSrcDirectoryFiles(file, service);
+
+			service.printService();
 		}
 		// output: Services\...
 	}
@@ -71,10 +73,11 @@ void Application::searchForServices(void) {
 				// create the service
 				Service service;
 				service.setName(serviceName);
-
 				std::cout << "Created Service " << service.getName() << ".\n";
 
 				searchIncludeAndSrcDirectoryFiles(file, service);
+				
+				service.printService();
 			}
 			// output: C:\OT\OpenTwin\Services\AuthorisationService\AuthorisationService.vcxproj
 		}
@@ -83,7 +86,7 @@ void Application::searchForServices(void) {
 		}
 }
 
-void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, const Service& _service) {
+void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service) {
 	std::cout << "Searching for include und src directories of the given file: " << _file << "\n";
 	std::cout << "The service is " << _service.getName() << ". \n";
 
@@ -100,7 +103,7 @@ void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, co
 	std::cout << "Path to include directory is: " << includeDir << "\n";
 
 	if (fs::exists(includeDir) && fs::is_directory(includeDir)) {
-		searchIncludeDirectoryFiles(includeDir.string());
+		searchIncludeDirectoryFiles(includeDir.string(), _service);
 	}
 
 	// get the path to the src-directory
@@ -109,18 +112,19 @@ void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, co
 	std::cout << "Path to src directory is: " << srcDir << "\n";
 
 	if (fs::exists(srcDir) && fs::is_directory(srcDir)) {
-		searchSrcDirectoryFiles(srcDir.string());
+		searchSrcDirectoryFiles(srcDir.string(), _service);
 	}
 }
 
-void Application::searchIncludeDirectoryFiles(const std::string& _includeDirectory) {
+void Application::searchIncludeDirectoryFiles(const std::string& _includeDirectory, Service& _service) {
+	std::cout << "The service is " << _service.getName() << ". \n";
 	try {
 		std::list<std::string>  includeFiles = ot::FileSystem::getFiles(_includeDirectory, {});
 		std::cout << "Collected Files in include-directory\n";
 
 		for (const std::string& file : includeFiles) {
 			std::cout << "  " << file << "\n";
-			parseFile(file);
+			parseFile(file, _service);
 		}
 		// output: Collected Files in include-directory 
 	}
@@ -129,14 +133,15 @@ void Application::searchIncludeDirectoryFiles(const std::string& _includeDirecto
 	}
 }
 
-void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory) {
+void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service) {
+	std::cout << "The service is " << _service.getName() << ". \n";
 	try {
 		std::list<std::string> srcFiles = ot::FileSystem::getFiles(_srcDirectory, {});
 		std::cout << "Collected Files in src-directory\n";
 
 		for (const std::string& file : srcFiles) {
 			std::cout << "  " << file << "\n";
-			parseFile(file);
+			parseFile(file, _service);
 		}
 		// output: Collected Files in src-directory C:\OT\OpenTwin\Services\AuthorisationService\src\dllmain.cpp
 	}
@@ -145,11 +150,13 @@ void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory) {
 	}
 }
 
-void Application::parseFile(const std::string& _file) {
+void Application::parseFile(const std::string& _file, Service& _service) {
+	std::cout << "The service is " << _service.getName() << ". \n";
+	
 	std::cout << "Parsing file: " << _file << "\n";
 	std::string blackList = " \t\n";
 	
-	Service service;
+	//Service service;
 	Endpoint endpoint;
 	Parameter parameter;
 	bool inApiBlock = false;
@@ -231,8 +238,16 @@ void Application::parseFile(const std::string& _file) {
 			else {
 				if (inApiBlock) {
 					// end of api block, add endpoint to service
-					endpoint.printEndpoint();
-					service.addEndpoint(endpoint);
+					endpoint.printEndpoint();				
+					std::cout << "The service is " << _service.getName() << ". \n";
+					_service.addEndpoint(endpoint);
+					
+					std::cout << "Endpoints in service: " << _service.getEndpoints().size() << std::endl;
+					for (const Endpoint& ep : _service.getEndpoints()) {
+						ep.printEndpoint();
+					}
+
+					_service.printService();
 					inApiBlock = false;
 					std::cout << "Detected end of api documentation block.\n";
 				}
@@ -245,118 +260,6 @@ void Application::parseFile(const std::string& _file) {
 	catch (const std::ios_base::failure& e) {
 		std::cerr << "IO-failure: " << e.what() << '\n';
 	}
-
-/*	// test the parser with simulated Api code documentation blocks
-	std::list<std::string> lines;
-	lines.push_back("Some text...");
-	lines.push_back("\n");
-	lines.push_back("	//api @security tls");
-	lines.push_back("	//api @action OT_ACTION_CMD_MyAction");
-	lines.push_back("	//api @brief Another short brief description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam unsigned integer 64 My parameter description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam2 Float My parameter description 2.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam int My return parameter description.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 array My return parameter description 2.");
-	lines.push_back("	//api @return In case of success it will contain the project data.");
-	lines.push_back("\n");
-	lines.push_back("Some text...");
-	lines.push_back("Some text...");
-	lines.push_back("\n");
-	lines.push_back("	//api @security mtls");
-	lines.push_back("	//api @action OT_ACTION_CMD_MyAction");
-	lines.push_back("	//api @brief Another short brief description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam char My parameter description.");
-	lines.push_back("	//api @param OT_ACTION_PARAM_MyParam2 Char My parameter description 2.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam bool My return parameter description.");
-	lines.push_back("	//api @rparam OT_ACTION_PARAM_MyParam2 obj My return parameter description 2.");
-	lines.push_back("	//api @return In case of success it will contain the project data.");
-	lines.push_back("\n");
-	lines.push_back("Some text...");
-
-	Service service;
-	Endpoint endpoint;
-	Parameter parameter;
-	bool inApiBlock = false;
-
-	for (const std::string& line : lines) {
-		std::string trimmedLine = ot::String::removePrefix(line, blackList);
-		std::cout << trimmedLine << "\n";
-
-		if (startsWith(trimmedLine, "//api")) {
-			if (!inApiBlock) {
-				inApiBlock = true;
-				endpoint = Endpoint();  // new endpoint
-				std::cout << "Detected start of api documentation block.\n";
-			}
-
-			// remove "//api " prefix
-			std::string apiContent = trimmedLine.substr(6);
-			std::cout << apiContent << "\n";
-
-			// check which "@commando" is given
-			if (startsWith(apiContent, "@security")) {
-				std::string security = apiContent.substr(10);
-				std::cout << "[SECURITY] -> " << security << "\n";
-					
-				if (security == "TLS" || security == "tls") {
-					endpoint.setMessageType(Endpoint::TLS);
-					std::cout << "Message Type TLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
-				}
-				else if (security == "mTLS" || security == "mtls") {
-					endpoint.setMessageType(Endpoint::mTLS);
-					std::cout << "Message Type mTLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
-				}
-			}
-			else if (startsWith(apiContent, "@action")) {
-				std::string action = apiContent.substr(8);
-				std::cout << "[ACTION] -> " << action << "\n";
-				endpoint.setAction(action);
-				std::cout << "Action set in endpoint: " << endpoint.getAction() << "\n";
-			}
-			else if (startsWith(apiContent, "@brief")) {
-				std::string brief = apiContent.substr(7);
-				std::cout << "[BRIEF] -> " << brief << "\n";
-				endpoint.setBriefDescription(brief);
-				std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
-			}
-			else if (startsWith(apiContent, "@param")) {
-				parameter = Parameter();
-				std::string parameterType = "Function parameter";
-
-				std::string param = apiContent.substr(7);
-				std::cout << "[PARAM] -> " << param << "\n";
-
-				parseParameter(parameter, param, endpoint, parameterType);
-			}
-			else if (startsWith(apiContent, "@return")) {
-				std::string response = apiContent.substr(8);
-				std::cout << "[RETURN] -> " << response << "\n";
-				endpoint.setResponseDescription(response);
-				std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
-			}
-			else if (startsWith(apiContent, "@rparam")) {
-				parameter = Parameter();
-				std::string parameterType = "Return parameter";
-
-				std::string rparam = apiContent.substr(8);
-				std::cout << "[RETURNPARAM] -> " << rparam << "\n";
-
-				parseParameter(parameter, rparam, endpoint, parameterType);
-			}	
-			else {
-				std::cout << "[UNKNOWN] -> " << apiContent << "\n";
-			}
-		}
-		else {
-			if (inApiBlock) {
-				// end of api block, add endpoint to service
-				endpoint.printEndpoint();
-				service.addEndpoint(endpoint);
-				inApiBlock = false;
-				std::cout << "Detected end of api documentation block.\n";
-			}
-		}
-	}*/
 }
 
 // check if the parser is in an api documentation block
@@ -379,8 +282,15 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 	std::cout << "Macro set in parameter: " << _parameter.getMacro() << "\n";
 
 	std::string dataType = splittedParamVector[1];
+
+	// Convert all characters to lowercase
+	std::transform(dataType.begin(), dataType.end(), dataType.begin(), [](unsigned char c) {
+		return std::tolower(c); 
+		});
+	std::cout << "Lowercase string: " << dataType << std::endl;
+
 	// data type is Unsigned Integer 64
-	if (dataType == "Unsigned" || dataType == "unsigned") {
+	if (dataType == "unsigned") {
 		std::string dataType2 = splittedParamVector[2];
 		std::string dataType3 = splittedParamVector[3];
 		std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
@@ -404,44 +314,44 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 		std::size_t sizeOfDataTypeString = dataType.size() + 1;
 		std::cout << sizeOfDataTypeString << "\n";
 
-		if (dataType == "UID" || dataType == "uid") {
+		if (dataType == "uid") {
 			_parameter.setDataType(Parameter::UnsignedInteger64);
 			std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 
-		else if (dataType == "Boolean" || dataType == "boolean" || dataType == "bool") {
+		else if (dataType == "boolean" || dataType == "bool") {
 			_parameter.setDataType(Parameter::Boolean);
 			std::cout << "Data type Boolean set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Char" || dataType == "char") {
+		else if (dataType == "char" || dataType == "character") {
 			_parameter.setDataType(Parameter::Char);
 			std::cout << "Data type Char set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Integer" || dataType == "integer" || dataType == "int") {
+		else if (dataType == "integer" || dataType == "int") {
 			_parameter.setDataType(Parameter::Integer);
 			std::cout << "Data type Integer set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Float" || dataType == "float") {
+		else if (dataType == "float") {
 			_parameter.setDataType(Parameter::Float);
 			std::cout << "Data type Float set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Double" || dataType == "double") {
+		else if (dataType == "double") {
 			_parameter.setDataType(Parameter::Double);
 			std::cout << "Data type Double set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "String" || dataType == "string" || dataType == "str") {
+		else if (dataType == "string" || dataType == "str") {
 			_parameter.setDataType(Parameter::String);
 			std::cout << "Data type String set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Array" || dataType == "array") {
+		else if (dataType == "array") {
 			_parameter.setDataType(Parameter::Array);
 			std::cout << "Data type Array set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Object" || dataType == "object" || dataType == "obj") {
+		else if (dataType == "object" || dataType == "obj") {
 			_parameter.setDataType(Parameter::Object);
 			std::cout << "Data type Object set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
-		else if (dataType == "Enum" || dataType == "enum") {
+		else if (dataType == "enum") {
 			_parameter.setDataType(Parameter::Enum);
 			std::cout << "Data type Enum set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
@@ -461,3 +371,4 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 		std::cout << "Added Parameter to response parameters.\n";
 	}
 }
+

@@ -26,6 +26,8 @@ public:
 
 	void addEndpoint(const Endpoint& _endpoint) { m_endpoints.push_back(_endpoint); };
 
+	void printService() const;
+
 private:
 	std::string m_name;
 	std::list<Endpoint> m_endpoints;

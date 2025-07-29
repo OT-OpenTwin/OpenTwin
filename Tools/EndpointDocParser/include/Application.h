@@ -27,13 +27,13 @@ public:
 
 	void searchForServices(void);
 
-	void searchIncludeAndSrcDirectoryFiles(const std::string& _file, const Service& _service);
+	void searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
 
-	void searchSrcDirectoryFiles(const std::string& _srcDirectory);
+	void searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service);
 
-	void searchIncludeDirectoryFiles(const std::string& _includeDirectory);
+	void searchIncludeDirectoryFiles(const std::string& _includeDirectory, Service& _service);
 
-	void parseFile(const std::string& _file);
+	void parseFile(const std::string& _file, Service& _service);
 
 	bool startsWith(const std::string& _line, const std::string& _prefix);
 
