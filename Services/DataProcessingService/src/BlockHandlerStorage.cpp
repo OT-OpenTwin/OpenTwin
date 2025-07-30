@@ -104,30 +104,74 @@ bool BlockHandlerStorage::executeSpecialized()
 								if (datasetDescription == datasetDescriptionByQuantityLabel.end())
 								{
 									DatasetDescription newDatasetDescription;
-									std::unique_ptr<QuantityDescriptionCurve> curve(new QuantityDescriptionCurve());
-									curve->setMetadataQuantity(*quantity);
+									std::unique_ptr<QuantityDescription> quantityDescription;
+									if (quantity->dataDimensions.size() > 1) // We got a matrix
+									{
+										ot::MatrixEntryPointer matrixDimensions;
+										matrixDimensions.m_row = quantity->dataDimensions[0];
+										matrixDimensions.m_column= quantity->dataDimensions[1];
+
+										quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
+									}
+									else
+									{
+										quantityDescription.reset(new QuantityDescriptionCurve());
+
+									}
+
+									quantityDescription->setMetadataQuantity(*quantity);
 									//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
-									curve->getMetadataQuantity().dependingParameterIds.clear();
-									curve->getMetadataQuantity().quantityIndex = 0;
-									for (auto& valueDescription : curve->getMetadataQuantity().valueDescriptions)
+									quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
+									quantityDescription->getMetadataQuantity().quantityIndex = 0;
+									for (auto& valueDescription : quantityDescription->getMetadataQuantity().valueDescriptions)
 									{
 										valueDescription.quantityIndex = 0;
 									}
-									newDatasetDescription.setQuantityDescription(curve.release());
+									newDatasetDescription.setQuantityDescription(quantityDescription.release());
 									datasetDescriptionByQuantityLabel[key] = std::move(newDatasetDescription);
 									datasetDescription = datasetDescriptionByQuantityLabel.find(key);
 								}
+								
 								const std::string& dataType = quantity->valueDescriptions.begin()->dataTypeName;
-								QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
-								if (dataType != "")
+								if (quantity->dataDimensions.size() > 1) // Here the data is a matrix
 								{
-									ot::Variable value = converter(fieldValue, dataType);
-									curve->addDatapoint(std::move(value));
+									QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
+									ot::MatrixEntryPointer matrixDimensions;
+									matrixDimensions.m_row = quantity->dataDimensions[0];
+									matrixDimensions.m_column = quantity->dataDimensions[1];
+
+									ot::GenericDataStructMatrix matrixValues(matrixDimensions);
+									ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
+									std::list<ot::Variable> values;
+									for (auto& entry : linearMatrix)
+									{
+										if (dataType != "")
+										{
+											const ot::Variable value = converter(entry, dataType);
+											values.push_back(value);
+										}
+										else
+										{
+											const ot::Variable value = converter(entry);
+											values.push_back(value);
+										}
+									}
+									matrixValues.setValues(values);
+									matrix->addToValues(matrixValues);
 								}
 								else
 								{
-									ot::Variable value = converter(fieldValue);
-									curve->addDatapoint(std::move(value));
+									QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
+									if (dataType != "")
+									{
+										ot::Variable value = converter(fieldValue, dataType);
+										curve->addDatapoint(std::move(value));
+									}
+									else
+									{
+										ot::Variable value = converter(fieldValue);
+										curve->addDatapoint(std::move(value));
+									}
 								}
 							}
 							else
