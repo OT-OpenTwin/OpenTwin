@@ -20,7 +20,7 @@
 
 ServiceManager::ServiceManager()
 	: m_isShuttingDown(false), m_threadServiceStarter(nullptr), m_threadServiceInitializer(nullptr), m_threadHealthCheck(nullptr),
-	m_threadServiceStopper(nullptr), m_generalWait(false)
+	m_threadServiceStopper(nullptr), m_generalWait(false), m_serviceCheckAliveFrequency(1)
 {
 	
 }
@@ -717,34 +717,36 @@ void ServiceManager::workerHealthCheck(void) {
 				bool erased = false;
 				// Itereate through every service in every session
 				for (auto& session : m_services) {
-					for (auto it = session.second->begin(); it != session.second->end(); it++) {
+					std::vector<Service>*  servicesRunningInSession = session.second;
+					for (auto serviceIt = servicesRunningInSession->begin(); serviceIt != servicesRunningInSession->end(); serviceIt++) {
 
 						// Check if service crashed
-						ot::RunResult result = it->checkAlive();
+						ot::RunResult result = serviceIt->checkAlive();
 						if (!result.isOk()) {
+							OT_LOG_D("Service " + serviceIt->getInfo().getName() + " is not running anymore");
 							// Service died
-							if (it->isShuttingDown()) {
+							if (serviceIt->isShuttingDown()) {
 								// The shutdown was intentional
 
-								OT_LOG_D("Service shutdown completed { \"Name\": \"" + it->getInfo().getName() +
-									"\", \"Type\": \"" + it->getInfo().getType() + "\", \"Url\": \"" + it->getUrl() + "\" }");
+								OT_LOG_D("Service shutdown completed { \"Name\": \"" + serviceIt->getInfo().getName() +
+									"\", \"Type\": \"" + serviceIt->getInfo().getType() + "\", \"Url\": \"" + serviceIt->getUrl() + "\" }");
 
 								// Notify LSS about shutdown completed
-								this->notifyServiceShutdownCompleted(*it);
+								this->notifyServiceShutdownCompleted(*serviceIt);
 
 								// Remove the service from the session list
 								std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
-								m_stoppingServices.push_back(std::move(*session.second->erase(it)));
+								m_stoppingServices.push_back(std::move(*servicesRunningInSession->erase(serviceIt)));
 							}
 							else {
 								OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 								
-								ot::RunResult result = it->shutdown();
+								ot::RunResult result = serviceIt->shutdown();
 								OT_LOG_E("Shuting service down with error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
 
-								if (it->getStartCounter() < it->getInfo().getMaxCrashRestarts()) {
+								if (serviceIt->getStartCounter() < serviceIt->getInfo().getMaxCrashRestarts()) {
 									// Attempt to restart service, if successful the list did not change and we can continue the health check.
-									if (this->restartServiceAfterCrash(*it)) {
+									if (this->restartServiceAfterCrash(*serviceIt)) {
 										continue;
 									}
 								}
@@ -752,7 +754,7 @@ void ServiceManager::workerHealthCheck(void) {
 								// Either the restart failed or the restart counter reached its max value.
 								// We notify the session service, clean up the lists and cancel the current health check.
 								// Health check will not be terminated just the current loop will be cancelled.
-								this->notifySessionEmergencyShutdown(*it);
+								this->notifySessionEmergencyShutdown(*serviceIt);
 							}
 
 							erased = true;
@@ -768,9 +770,8 @@ void ServiceManager::workerHealthCheck(void) {
 			} // !services.empty
 		} // mutex lock scope
 
-		// sleep for one second
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(1s);
+		// sleep until next service is checked
+		std::this_thread::sleep_for(m_serviceCheckAliveFrequency);
 
 	}
 }

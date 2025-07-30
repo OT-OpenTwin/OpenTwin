@@ -170,7 +170,7 @@ void GlobalDirectoryService::healthCheck(void) {
 		// Check connection
 		std::string response;
 		// todo: scr: code rm line !current 1
-		OT_LOG_D("!!!! ######################################################################################");
+		OT_LOG_D("Health check on: " + m_serviceName);
 		if (ot::msg::send(m_sessionService->getUrl(), m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				if (m_connectionStatus == CheckingNewConnection) {

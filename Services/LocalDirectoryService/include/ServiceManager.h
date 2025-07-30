@@ -139,6 +139,8 @@ private:
 
 	std::atomic_bool                                     m_generalWait;
 
+	std::chrono::seconds								 m_serviceCheckAliveFrequency;
+
 	std::map<SessionInformation, std::vector<Service>*>  m_services;
 	std::mutex                                           m_mutexServices;
 
