@@ -400,16 +400,19 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
 	auto service = serviceLockLevel(_serviceInfo);
 	OT_LOG_D("Unlock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
+	std::string state = printLockState();
+	OT_LOG_D("Log state before unlock:\n" + state);
 	// Get old value
 	auto oldLevel = service->find(_type);
-	int v = 0;
+	int lockFlagCount = 0;
 	if (oldLevel != service->end()) {
-		v = oldLevel->second;
+		lockFlagCount = oldLevel->second;
 	}
-
+	OT_LOG_D("Unlock old value found");
 	// Store data
-	if (v > 0) {
-		service->insert_or_assign(_type, v - 1);
+	if (lockFlagCount > 0) {
+		OT_LOG_D("Unlocking. Lock count larger then 0");
+		service->insert_or_assign(_type, lockFlagCount - 1);
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(1, _type);
 		}
@@ -419,13 +422,14 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::Lo
 		}
 	}
 	else {
-		service->insert_or_assign(_type, v);
+		OT_LOG_D("Unlocking. Lock count is 0");
+		service->insert_or_assign(_type, lockFlagCount);
 	}
 
 	if (_type & ot::LockAll) {
 		if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 	}
-	const std::string state = printLockState();
+	state = printLockState();
 	OT_LOG_D("Log state after unlock:\n" + state);
 }
 
