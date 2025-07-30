@@ -5,6 +5,7 @@
 
 // std header
 #include <list>
+#include <map>
 
 class Application {
 public:
@@ -41,6 +42,11 @@ public:
 
 	void addService(const Service& _service);
 
+	void searchInLibrary(void);
+
+	void parseMacroDefinition(const std::string& _content);
+
 private:
 	std::list<Service> m_services;
+	std::map<std::string, std::string> m_actionMacros;
 };

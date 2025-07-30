@@ -17,6 +17,7 @@ namespace fs = std::filesystem;
 void Application::run(void) {
 	std::cout << "Application is running.\n";
 	searchForServices();
+	searchInLibrary();
 }
 
 void Application::searchForServices(void) {
@@ -63,6 +64,10 @@ void Application::searchForServices(void) {
 	std::cout << "\n" << m_services.size() << " Services added to List of services: \n";
 	for (const Service& service : m_services) {
 		service.printService();
+		// print the endpoints contained in the service
+		for (const Endpoint& endpoint : service.getEndpoints()) {
+			endpoint.printEndpoint();
+		}
 	}
 /*
 		// search in one Service
@@ -179,6 +184,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
 			//std::cout << trimmedLine << "\n";
 
+			// check if the parser is in an api documentation block
 			if (startsWith(trimmedLine, "//api")) {
 				if (!inApiBlock) {
 					inApiBlock = true;
@@ -271,8 +277,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	}
 }
 
-// check if the parser is in an api documentation block
-// returns true if the line starts with "//api "
+// returns true if the line starts with the given prefix
 bool Application::startsWith(const std::string& _line, const std::string& _prefix) {
 	return _line.compare(0, _prefix.size(), _prefix) == 0;
 }
@@ -292,6 +297,7 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 
 	std::string dataType = splittedParamVector[1];
 
+	// TODO: replace with toLower method from String.h
 	// Convert all characters to lowercase
 	std::transform(dataType.begin(), dataType.end(), dataType.begin(), [](unsigned char c) {
 		return std::tolower(c); 
@@ -384,5 +390,75 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 void Application::addService(const Service& _service) {
 	std::cout << "Adding Service " << _service.getName() << " to List of Services.\n";
 	m_services.push_back(_service);
+}
+
+void Application::searchInLibrary(void) {
+	// search in ActionTypes.h in Open Twin OTCommunication Library
+	const std::string pathToActionTypesHeaderFile = "C:\\OT\\OpenTwin\\Libraries\\OTCommunication\\include\\OTCommunication\\ActionTypes.h";
+	std::string blackList = " \t\n";
+
+	// read lines from given file and parse them
+	try {
+		std::list<std::string> lines = ot::FileSystem::readLines(pathToActionTypesHeaderFile);
+		std::cout << "Read lines: " << "\n";
+
+		for (const std::string& line : lines) {
+			std::string trimmedLine = ot::String::removePrefix(line, blackList);
+			std::cout << trimmedLine << "\n";
+
+			// detect Macro-definition
+			if (startsWith(trimmedLine, "#define")) {
+				// remove "#define " prefix
+				std::string content = trimmedLine.substr(8);
+				std::cout << content << "\n";
+
+				parseMacroDefinition(content);
+			}
+		}
+
+		std::cout << "The parsed map of macro-name and -definition is :\n";
+		for (const auto macro : m_actionMacros) {
+			std::cout << macro.first << " : " << macro.second << "\n";
+		}
+	}
+	catch (const ot::FileOpenException& e) {
+		std::cerr << "Error by readLines: " << e.what() << "\n";
+	}
+	catch (const std::ios_base::failure& e) {
+		std::cerr << "IO-failure: " << e.what() << '\n';
+	}
+}
+
+void Application::parseMacroDefinition(const std::string& _content) {
+	std::cout << "Parsing content: " << _content << "\n";
+	std::string blackList = "\"";
+	
+	std::list<std::string> splittedContentList = ot::String::split(_content, " ");
+	std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
+
+	std::string macroName = splittedContentVector[0];
+	std::cout << "The first string is: " << macroName << "\n";
+	
+	std::string macroDefinition = splittedContentVector[1];
+	// special case: Macro-name as Macro-definition for passwords
+	if (macroDefinition == "OT_ACTION_PASSWORD_SUBTEXT") {
+		macroDefinition = "Password";
+	}
+	else {
+		macroDefinition = ot::String::removePrefixSuffix(macroDefinition, blackList);
+	}
+	std::cout << "The second string is: " << macroDefinition << "\n";
+
+	// special case: three-part Macro-definition for passwords
+	if (splittedContentVector.size() > 2) {
+		std::string secondMacroName = splittedContentVector[2];
+		std::cout << "The third string is: " << secondMacroName << "\n";
+		if (secondMacroName == "OT_ACTION_PASSWORD_SUBTEXT") {
+			macroDefinition = macroDefinition + "Password";
+			std::cout << "The new second string is: " << macroDefinition << "\n";
+		}
+	}
+
+	m_actionMacros[macroName] = macroDefinition;
 }
 
