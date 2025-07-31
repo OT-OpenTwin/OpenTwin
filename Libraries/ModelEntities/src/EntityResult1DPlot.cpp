@@ -59,6 +59,18 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
 	
+	auto showFullMatrixProp =	PropertyHelper::getBoolProperty(this,"Show full matrix");
+	requiresDataToBeFetched |= showFullMatrixProp->needsUpdate();
+
+	if (!showFullMatrixProp->getValue())
+	{
+		auto showMatrixRowProp = PropertyHelper::getIntegerProperty(this, "Show matrix row entry");
+		requiresDataToBeFetched |= showMatrixRowProp->needsUpdate();
+
+		auto showMatrixColumnProp = PropertyHelper::getIntegerProperty(this, "Show matrix column entry");
+		requiresDataToBeFetched |= showMatrixColumnProp->needsUpdate();
+	}
+
 	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->needsUpdate();
 
 	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, true, requiresDataToBeFetched);
@@ -160,6 +172,9 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
 	EntityPropertiesBoolean::createProperty("Y axis", "Automatic label", true, "", getProperties());
 	EntityPropertiesString::createProperty("Y axis", "Label override", "", "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Show full matrix", true, "", getProperties());
+	EntityPropertiesInteger::createProperty("Y axis", "Show matrix row entry", 1,1,60, "", getProperties());
+	EntityPropertiesInteger::createProperty("Y axis", "Show matrix column entry", 1,1,60, "", getProperties());
 
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
@@ -213,6 +228,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
 	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
 
+	const bool showEntireMatrix = PropertyHelper::getBoolPropertyValue(this, "Show full matrix");
+	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
+	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
+
 	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
 	ot::Plot1DCfg config;
@@ -242,6 +261,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setYAxisIsAutoScale(autoScaleY);
 	config.setYAxisMin(minY);
 	config.setYAxisMax(maxY);
+
+	config.setShowEntireMatrix(showEntireMatrix);
+	config.setShowMatrixColumnEntry(showMatrixColumnValue);
+	config.setShowMatrixRowEntry(showMatrixRowValue);
 
 	config.setYLabelAxisAutoDetermine(automaticLabelY);
 	config.setXLabelAxisAutoDetermine(automaticLabelX);

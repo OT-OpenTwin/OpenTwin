@@ -101,6 +101,10 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
 	_object.AddMember("NbCurveLimit", m_curveLimit, _allocator);
 
+	_object.AddMember("ShowEntireMatrix", m_showEntireMatrix, _allocator);
+	_object.AddMember("ShowMatrixRow", m_showMatrixRowEntry, _allocator);
+	_object.AddMember("ShowMatrixColumn", m_showMatrixColumnEntry, _allocator);
+
 	JsonArray allQueries;
 	for(const ValueComparisionDefinition& query : m_queries)
 	{
@@ -132,6 +136,10 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
 
 	m_xAxisParameter = ot::json::getString(_object, "XAxisParameter");
+
+	m_showEntireMatrix = ot::json::getBool(_object, "ShowEntireMatrix");
+	m_showMatrixRowEntry = ot::json::getInt(_object, "ShowMatrixRow");
+	m_showMatrixColumnEntry = ot::json::getInt(_object, "ShowMatrixColumn");
 
 	const auto& allQueries = ot::json::getArray(_object, "Queries");
 	for (uint32_t i = 0; i < allQueries.Size(); i++)
