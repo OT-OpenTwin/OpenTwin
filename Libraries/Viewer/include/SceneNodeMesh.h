@@ -53,7 +53,7 @@ public:
 
 	void ensureDataLoaded(void);
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 	double getNodeX(size_t index) { return coordX[index]; }
 	double getNodeY(size_t index) { return coordY[index]; }

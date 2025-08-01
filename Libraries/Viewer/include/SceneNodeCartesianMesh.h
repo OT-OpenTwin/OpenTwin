@@ -55,7 +55,7 @@ public:
 
 	void ensureDataLoaded(void);
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 	virtual void setTransparent(bool t) override;
 	virtual void setWireframe(bool w) override;
