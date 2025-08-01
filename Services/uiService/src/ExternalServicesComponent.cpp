@@ -3448,10 +3448,12 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities; // = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualizingEntities);
 
 	return "";
 }
@@ -3463,8 +3465,10 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities; // = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
 
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
@@ -3493,7 +3497,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags, {});
 
 		if (editor) {
 			for (auto itemUID : itemUids) {
@@ -3522,8 +3526,10 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities;// = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
 
 	for (const auto& connection : pckg.connections()) {
 		editor->getGraphicsView()->addConnectionIfConnectedItemsExist(connection);
@@ -3544,7 +3550,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 	if (!pckg.name().empty()) {
 		// Specific editor
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, {});
 
 		for (auto connection : pckg.connections()) {
 			editor->getGraphicsView()->removeConnection(connection.getUid());
@@ -3582,7 +3588,9 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags);
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags, visualizingEntities);
 	ot::Plot* plot = plotView->getPlot();
 
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
@@ -3699,7 +3707,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
+
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName, visualizingEntities);
 
 	if (plotView != nullptr)
 	{
@@ -3754,7 +3765,10 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
+
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName(), visualizingEntities);
 	if (editor) {
 		editor->getTextEditor()->setupFromConfig(config, overwriteContent);
 
@@ -3763,7 +3777,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 		}
 	}
 	else {
-		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags);
+		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags, visualizingEntities);
 	}
 	
 	editor->getTextEditor()->setContentSaved();
@@ -3777,7 +3791,10 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
+
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, {});
 
 	if (editor) {
 		editor->getTextEditor()->setContentSaved();
@@ -3788,7 +3805,7 @@ std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument
 
 std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, {});
 
 	if (editor) {
 		editor->getTextEditor()->setContentChanged();
@@ -3844,9 +3861,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags | AppBase::ViewHandlingConfig::SkipEntitySelection);
 	}
 
-	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
+	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName(), visualizingEntities);
 	if (table == nullptr) {
-		table = AppBase::instance()->createNewTable(config, info, insertFlags);
+		table = AppBase::instance()->createNewTable(config, info, insertFlags, visualizingEntities);
 	}
 	else if (overrideCurrentContent) {
 		table->getTable()->setupFromConfig(config);
@@ -3869,7 +3888,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3882,7 +3901,7 @@ std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _do
 std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3895,7 +3914,7 @@ std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& 
 std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3913,7 +3932,7 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3931,7 +3950,7 @@ std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocume
 std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3949,7 +3968,7 @@ std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _d
 std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3967,7 +3986,7 @@ std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocu
 std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3985,7 +4004,7 @@ std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDoc
 std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -4030,7 +4049,7 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 	}
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -4057,7 +4076,7 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -4117,7 +4136,7 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	}
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	//!! Needs to be executed before, since the callback unlocks the ui lock
 	if (callback) {

@@ -103,6 +103,7 @@ namespace ot {
 
 		void addVisualizingItem(UID _itemId) { m_visualizingItems.addSelectedNavigationItem(_itemId); };
 		void removeVisualizingItem(UID _itemId) { m_visualizingItems.removeSelectedNavigationItem(_itemId); };
+		void clearVisualizingItems() { m_visualizingItems.setSelectedNavigationItems(UIDList()); };
 		const SelectionInformation& getVisualizingItems() const { return m_visualizingItems; };
 
 	Q_SIGNALS:

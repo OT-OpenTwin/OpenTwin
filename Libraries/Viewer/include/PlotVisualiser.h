@@ -13,6 +13,9 @@ public:
 	void setViewIsOpen(bool _viewIsOpen) override;
 
 private:
+	ot::UIDList getVisualizingUIDs(const VisualiserState& _state) const;
+	std::list<SceneNodeBase*> getVisualizingEntities(const VisualiserState& _state) const;
+
 	bool m_alreadyRequestedVisualisation = false;
 };
 

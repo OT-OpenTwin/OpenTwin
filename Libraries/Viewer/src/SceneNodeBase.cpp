@@ -28,7 +28,7 @@ SceneNodeBase::~SceneNodeBase() {
 	}
 }
 
-ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection)
+ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
@@ -42,6 +42,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 		state.m_singleSelection = _singleSelection;
 		state.m_selectionOrigin = _selectionOrigin;
 		state.m_anyVisualiserHasFocus = false;
+		state.m_selectedNodes = _selectedNodes;
 
 		// Check if any visualiser has focus
 		for (Visualiser* visualiser : visualisers) {
@@ -67,6 +68,8 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 					if (!state.m_anyVisualiserHasFocus) {
 						
 						FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+						FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
+
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 
 						state.m_anyVisualiserHasFocus = true;

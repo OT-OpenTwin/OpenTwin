@@ -399,9 +399,9 @@ void SceneNodeGeometry::setEdgeHighlight(unsigned long long faceId, bool h, doub
 	}
 }
 
-ot::SelectionHandlingResult SceneNodeGeometry::setSelected(bool selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection)
+ot::SelectionHandlingResult SceneNodeGeometry::setSelected(bool selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
 {
-	ot::SelectionHandlingResult result = SceneNodeBase::setSelected(selected, _selectionOrigin,_singleSelection);
+	ot::SelectionHandlingResult result = SceneNodeBase::setSelected(selected, _selectionOrigin,_singleSelection, _selectedNodes);
 
 	// Handle visibility state
 	if (showWhenSelected)

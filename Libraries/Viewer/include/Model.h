@@ -82,6 +82,7 @@ public:
 	void updateVTKNode(unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
 	void setEntityName(unsigned long long modelEntityID, const std::string &newName);
+	std::string getEntityName(unsigned long long modelEntityID) const;
 	void renameEntityPath(const std::string &oldPath, const std::string &newPath);
 
 	void updateObjectColor(unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective);

@@ -912,6 +912,16 @@ void Model::setEntityName(unsigned long long modelEntityID, const std::string &n
 	}
 }
 
+std::string Model::getEntityName(unsigned long long modelEntityID) const {
+	const auto it = modelItemToSceneNodesMap.find(modelEntityID);
+	if (it != modelItemToSceneNodesMap.end()) {
+		return it->second->getName();
+	}
+	else {
+		return "";
+	}
+}
+
 void Model::renameEntityPath(const std::string &oldPath, const std::string &newPath)
 {
 	std::map<std::string, SceneNodeBase *> entityMap = m_nameToSceneNodesMap;
@@ -1055,7 +1065,8 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected());
+	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected(), {});
+	root->setSelectionHandled(false);
 
 	for (auto child : root->getChildren())
 	{
@@ -1088,7 +1099,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 
 	_selectedModelItems.clear();
 
-	// Set the selection flag for all nodes to false
+	// Set the selection and selection handled flags for all nodes to false
 	resetSelection(sceneNodesRoot);
 
 	if (_selectedTreeItems.empty()) {
@@ -1101,6 +1112,13 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 		ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
+
+		// Clear visualizing entities for last central view
+		ot::WidgetView* view = FrontendAPI::instance()->getLastFocusedCentralView();
+		if (view) {
+			view->clearVisualizingItems();
+		}
+
 		return result;
 	}
 
@@ -1111,20 +1129,35 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 
 	bool isItem3DSelected = false;
 
-	// First set the selected state for all selected nodes
+	// First gather information about all selected nodes
+	std::list<SceneNodeBase*> selectedNodes;
+	
 	for (ot::UID item : _selectedTreeItems) {
-		SceneNodeBase *sceneNode = treeItemToSceneNodesMap[item];
+		SceneNodeBase* node = treeItemToSceneNodesMap[item];
+		if (node != nullptr) {
+			selectedNodes.push_back(node);
+		}
+	}
 
-		if (sceneNode != nullptr) {
-			isItem3DSelected |= sceneNode->isItem3D();
+	// Now set the selected state for all selected nodes
+	
+	for (SceneNodeBase* node : selectedNodes) {
+		assert(node != nullptr);
 
-			assert(sceneNode != nullptr);
-			result |= sceneNode->setSelected(true, _selectionOrigin, isSingleItemSelected());
-			_selectedModelItems.push_back(sceneNode->getModelEntityID());
-
-			if (sceneNode->isVisible()) {
-				_selectedVisibleModelItems.push_back(sceneNode->getModelEntityID());
+		if (node->isItem3D()) {
+			if (!isItem3DSelected) {
+				FrontendAPI::instance()->clearVisualizingEntitesFromView("3D", ot::WidgetViewBase::View3D);
+				isItem3DSelected = true;
 			}
+			
+			FrontendAPI::instance()->addVisualizingEntityToView(node->getTreeItemID(), "3D", ot::WidgetViewBase::View3D);
+		}
+		
+		result |= node->setSelected(true, _selectionOrigin, isSingleItemSelected(), selectedNodes);
+		_selectedModelItems.push_back(node->getModelEntityID());
+
+		if (node->isVisible()) {
+			_selectedVisibleModelItems.push_back(node->getModelEntityID());
 		}
 	}
 

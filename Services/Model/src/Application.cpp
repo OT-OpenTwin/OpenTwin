@@ -982,9 +982,11 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
 	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
 	try
 	{
-		m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType,setViewAsActive);
+		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities);
 	}
 	catch (std::exception& e)
 	{
