@@ -29,7 +29,7 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 	ReturnMessage msg(ot::ReturnMessage::Failed);
 
 	JsonDocument doc;
-	if (!doc.fromJson(_json)) {
+	if (!doc.fromJson(_json) || doc.HasParseError()) {
 		msg = "Failed to deserialize return message \"" + _json + "\": Document is not an object";
 		return msg;
 	}
@@ -131,6 +131,7 @@ void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allo
 }
 
 void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
+	
 	m_what = json::getString(_object, "What");
 	m_status = stringToStatus(json::getString(_object, "Status"));
 	m_values.setFromJsonObject(_object);
