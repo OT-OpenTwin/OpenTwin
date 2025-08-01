@@ -266,12 +266,13 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		return true;
 	}
 	else {
+		g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
+			"\", \"Error buffer\": \"" + errbuf +
+			"\", \"Receiver\": \"" + _receiverIP +
+			"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
+			" }";
+
 		if (_flags & msg::CreateLogMessage) {
-			g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
-				"\", \"Error buffer\": \"" + errbuf +
-				"\", \"Receiver\": \"" + _receiverIP +
-				"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
-				" }";
 			OT_LOG_E("Message sent failed: " + g_lastError );
 		}
 
