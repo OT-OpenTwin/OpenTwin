@@ -66,6 +66,142 @@ ViewerComponent::~ViewerComponent() {}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// General
+
+void ViewerComponent::addKeyShortcut(const std::string& keySequence) {
+	KeyboardCommandHandler* newHandler = new KeyboardCommandHandler(nullptr, AppBase::instance(), keySequence.c_str());
+	newHandler->setAsViewerHandler(true);
+	AppBase::instance()->shortcutManager()->addHandler(newHandler);
+}
+
+void ViewerComponent::lockSelectionAndModification(bool flag) {
+	AppBase::instance()->lockSelectionAndModification(flag);
+}
+
+void ViewerComponent::removeViewer(ot::UID viewerID) {
+	for (auto pos = m_viewers.begin(); pos != m_viewers.end(); pos++) {
+		if (*pos == viewerID) {
+			m_viewers.erase(pos);
+			return;
+		}
+	}
+}
+
+void ViewerComponent::removeUIElements(std::list<ViewerUIDtype>& itemIDList) {
+	try {
+		try {
+			std::vector<ViewerUIDtype> i;
+			for (auto itm : itemIDList) { i.push_back(itm); }
+			AppBase* app = AppBase::instance();
+			app->destroyObjects(i);
+			for (auto itm : i) {
+				app->controlsManager()->uiControlWasDestroyed(itm);
+				app->lockManager()->uiElementDestroyed(itm);
+			}
+
+			AppBase::instance()->shortcutManager()->clearViewerHandler();
+		}
+		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::removeUIElements()"); }
+		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::removeUIElements()"); }
+		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::removeUIElements()"); }
+	}
+	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
+}
+
+void ViewerComponent::displayText(const std::string& text) {
+	AppBase::instance()->appendInfoMessage(QString::fromStdString(text));
+}
+
+void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, bool _resetDisabledCounterForEnabledControls, const ot::UIDList& _disabledControls) {
+	try {
+		try {
+			LockManager* lockManager = AppBase::instance()->lockManager();
+			OTAssertNullptr(lockManager);
+
+			ot::BasicServiceInformation bsi = this->getBasicServiceInformation();
+
+			for (ot::UID objectID : _enabledControls) {
+				lockManager->enable(bsi, objectID, _resetDisabledCounterForEnabledControls);
+			}
+			for (ot::UID objectID : _disabledControls) {
+				lockManager->disable(bsi, objectID);
+			}
+		}
+		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::enableDisableControls()"); }
+		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::enableDisableControls()"); }
+		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::enableDisableControls()"); }
+	}
+	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
+}
+
+void ViewerComponent::entitiesSelected(ot::serviceID_t replyTo, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues) {
+	try {
+		try {
+			AppBase::instance()->getExternalServicesComponent()->entitiesSelected(ViewerAPI::getActiveDataModel(), replyTo, selectionAction, selectionInfo, optionNames, optionValues);
+		}
+		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::entitiesSelected()"); }
+		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::entitiesSelected()"); }
+		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::entitiesSelected()"); }
+	}
+	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
+}
+
+void ViewerComponent::rubberbandFinished(ot::serviceID_t creatorId, const std::string& note, const std::string& pointJson, const std::vector<double>& transform) {
+	AppBase::instance()->getExternalServicesComponent()->sendRubberbandResultsToService(creatorId, note, pointJson, transform);
+}
+
+void ViewerComponent::updateSettings(const ot::PropertyGridCfg& _config) {
+	UserSettings::instance().addSettings(VIEWER_SETTINGS_NAME, _config);
+}
+
+void ViewerComponent::loadSettings(ot::PropertyGridCfg& _config) {
+	ot::PropertyGridCfg oldConfig = AppBase::instance()->getSettingsFromDataBase(VIEWER_SETTINGS_NAME);
+	_config.mergeWith(oldConfig, ot::PropertyBase::MergeValues | ot::PropertyBase::AddMissing);
+}
+
+void ViewerComponent::saveSettings(const ot::PropertyGridCfg& _config) {
+	AppBase::instance()->storeSettingToDataBase(_config, VIEWER_SETTINGS_NAME);
+}
+
+void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID) {
+	AppBase::instance()->getExternalServicesComponent()->requestUpdateVTKEntity(modelEntityID);
+}
+
+void ViewerComponent::messageModelService(const std::string& _message) {
+	std::string response;
+	AppBase::instance()->getExternalServicesComponent()->sendToModelService(_message, response);
+}
+
+void ViewerComponent::removeGraphicsElements(ot::UID _modelID) {
+	//If entity is has a block item associated, it gets removed from all editors.
+	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
+	for (auto view : views) {
+		view->getGraphicsView()->removeItem(_modelID, true);
+		view->getGraphicsView()->removeConnection(_modelID);
+	}
+
+}
+
+std::string ViewerComponent::getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
+	return QFileDialog::getOpenFileName(
+		AppBase::instance()->mainWindow(),
+		QString::fromStdString(_title),
+		QString::fromStdString(_path),
+		QString::fromStdString(_filters)
+	).toStdString();
+}
+
+std::string ViewerComponent::getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
+	return QFileDialog::getSaveFileName(
+		AppBase::instance()->mainWindow(),
+		QString::fromStdString(_title),
+		QString::fromStdString(_path),
+		QString::fromStdString(_filters)
+	).toStdString();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Tree
 
 void ViewerComponent::clearTree(void)
@@ -220,11 +356,9 @@ void ViewerComponent::refreshSelection(void) {
 	this->handleSelectionChanged(ot::SelectionOrigin::Custom, AppBase::instance()->getSelectedNavigationTreeItems());
 }
 
-void ViewerComponent::addKeyShortcut(const std::string &keySequence) {
-	KeyboardCommandHandler * newHandler = new KeyboardCommandHandler(nullptr, AppBase::instance(), keySequence.c_str());
-	newHandler->setAsViewerHandler(true);
-	AppBase::instance()->shortcutManager()->addHandler(newHandler);
-}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Property Grid
 
 void ViewerComponent::fillPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	AppBase::instance()->setupPropertyGrid(_configuration);
@@ -263,24 +397,13 @@ double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, co
 	return inp->getValue();
 }
 
-void ViewerComponent::lockSelectionAndModification(bool flag) {
-	AppBase::instance()->lockSelectionAndModification(flag);
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-void ViewerComponent::removeViewer(ot::UID viewerID) {
-	for (auto pos = m_viewers.begin(); pos != m_viewers.end(); pos++)
-	{
-		if (*pos == viewerID)
-		{
-			m_viewers.erase(pos);
-			return;
-		}
-	}
-}
+// Plot
 
 void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed)
 {
-	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName);
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName, {});
 	if (!plotView) {
 		OT_LOG_E("Plot not found \"" + _plotName + "\"");
 		return;
@@ -342,20 +465,6 @@ bool ViewerComponent::hasViewFocus(const std::string& _entityName, ot::WidgetVie
 	}
 }
 
-ot::WidgetView* ViewerComponent::getCurrentView(void) {
-	return ot::WidgetViewManager::instance().getCurrentlyFocusedView();
-}
-
-bool ViewerComponent::getCurrentViewIsModified(void) {
-	ot::WidgetView* view = this->getCurrentView();
-	if (view) {
-		return view->getViewContentModified();
-	}
-	else {
-		return false;
-	}
-}
-
 void ViewerComponent::addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
 	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
 	if (view) {
@@ -370,9 +479,100 @@ void ViewerComponent::removeVisualizingEntityFromView(ot::UID _treeItemId, const
 	}
 }
 
+void ViewerComponent::clearVisualizingEntitesFromView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().findView(_entityName, _viewType);
+	if (view) {
+		view->clearVisualizingItems();
+	}
+}
+
+ot::WidgetView* ViewerComponent::getCurrentView(void) {
+	return ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+}
+
+ot::WidgetView* ViewerComponent::getLastFocusedCentralView(void) {
+	return ot::WidgetViewManager::instance().getLastFocusedCentralView();
+}
+
+bool ViewerComponent::getCurrentViewIsModified(void) {
+	ot::WidgetView* view = this->getCurrentView();
+	if (view) {
+		return view->getViewContentModified();
+	}
+	else {
+		return false;
+	}
+}
+
+void ViewerComponent::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	AppBase::instance()->setCurrentVisualizationTabFromEntityName(_entityName, _viewType);
+}
+
+void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
+	AppBase::instance()->setCurrentVisualizationTabFromTitle(_tabTitle);
+}
+
+std::string ViewerComponent::getCurrentVisualizationTabTitle(void) {
+	return AppBase::instance()->getCurrentVisualizationTabTitle();
+}
+
+void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
+	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	if (!view) {
+		OT_LOG_W("No view focused");
+		return;
+	}
+
+	if (!(view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral)) {
+		OT_LOG_E("Non central view in focus");
+		return;
+	}
+
+	switch (view->getViewData().getViewType()) {
+	case ot::WidgetViewBase::View3D:
+		break;
+	case ot::WidgetViewBase::View1D:
+		break;
+	case ot::WidgetViewBase::ViewText:
+	{
+		ot::TextEditorView* actualView = dynamic_cast<ot::TextEditorView*>(view);
+		if (!actualView) {
+			OT_LOG_E("View cast failed");
+			return;
+		}
+		actualView->getTextEditor()->slotSaveRequested();
+	}
+	break;
+	case ot::WidgetViewBase::ViewTable:
+	{
+		ot::TableView* actualView = dynamic_cast<ot::TableView*>(view);
+		if (!actualView) {
+			OT_LOG_E("View cast failed");
+			return;
+		}
+		actualView->getTable()->slotSaveRequested();
+	}
+	break;
+	case ot::WidgetViewBase::ViewVersion:
+		break;
+	case ot::WidgetViewBase::ViewGraphics:
+		break;
+	case ot::WidgetViewBase::ViewGraphicsPicker:
+		break;
+	case ot::WidgetViewBase::ViewProperties:
+		break;
+	case ot::WidgetViewBase::ViewNavigation:
+		break;
+	case ot::WidgetViewBase::CustomView:
+		break;
+	default:
+		break;
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Menu/Widgets
+// ToolBar
 
 ViewerUIDtype ViewerComponent::addMenuPage(const std::string &pageName)
 {
@@ -458,197 +658,6 @@ void ViewerComponent::setCurrentMenuPage(const std::string& _pageName) {
 
 std::string ViewerComponent::getCurrentMenuPage(void) {
 	return AppBase::instance()->getCurrentMenuTab();
-}
-
-void ViewerComponent::removeUIElements(std::list<ViewerUIDtype> &itemIDList)
-{
-	try {
-		try {
-			std::vector<ViewerUIDtype> i;
-			for (auto itm : itemIDList) { i.push_back(itm); }
-			AppBase * app = AppBase::instance();
-			app->destroyObjects(i);
-			for (auto itm : i) {
-				app->controlsManager()->uiControlWasDestroyed(itm);
-				app->lockManager()->uiElementDestroyed(itm);
-			}
-
-			AppBase::instance()->shortcutManager()->clearViewerHandler();
-		}
-		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::removeUIElements()"); }
-		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::removeUIElements()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::removeUIElements()"); }
-	}
-	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
-}
-
-void ViewerComponent::displayText(const std::string &text)
-{
-	AppBase::instance()->appendInfoMessage(QString::fromStdString(text));
-}
-
-void ViewerComponent::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	AppBase::instance()->setCurrentVisualizationTabFromEntityName(_entityName, _viewType);
-}
-
-void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {
-	AppBase::instance()->setCurrentVisualizationTabFromTitle(_tabTitle);
-}
-
-std::string ViewerComponent::getCurrentVisualizationTabTitle(void)
-{
-	return AppBase::instance()->getCurrentVisualizationTabTitle();
-}
-
-void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
-	if (!view) {
-		OT_LOG_W("No view focused");
-		return;
-	}
-
-	if (!(view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral)) {
-		OT_LOG_E("Non central view in focus");
-		return;
-	}
-
-	switch (view->getViewData().getViewType()) {
-	case ot::WidgetViewBase::View3D:
-		break;
-	case ot::WidgetViewBase::View1D:
-		break;
-	case ot::WidgetViewBase::ViewText:
-	{
-		ot::TextEditorView* actualView = dynamic_cast<ot::TextEditorView*>(view);
-		if (!actualView) {
-			OT_LOG_E("View cast failed");
-			return;
-		}
-		actualView->getTextEditor()->slotSaveRequested();
-	}
-		break;
-	case ot::WidgetViewBase::ViewTable:
-	{
-		ot::TableView* actualView = dynamic_cast<ot::TableView*>(view);
-		if (!actualView) {
-			OT_LOG_E("View cast failed");
-			return;
-		}
-		actualView->getTable()->slotSaveRequested();
-	}
-	break;
-	case ot::WidgetViewBase::ViewVersion:
-		break;
-	case ot::WidgetViewBase::ViewGraphics:
-		break;
-	case ot::WidgetViewBase::ViewGraphicsPicker:
-		break;
-	case ot::WidgetViewBase::ViewProperties:
-		break;
-	case ot::WidgetViewBase::ViewNavigation:
-		break;
-	case ot::WidgetViewBase::CustomView:
-		break;
-	default:
-		break;
-	}
-}
-
-void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, bool _resetDisabledCounterForEnabledControls, const ot::UIDList& _disabledControls)
-{
-	try {
-		try {
-			LockManager* lockManager = AppBase::instance()->lockManager();
-			OTAssertNullptr(lockManager);
-
-			ot::BasicServiceInformation bsi = this->getBasicServiceInformation();
-
-			for (ot::UID objectID : _enabledControls) {
-				lockManager->enable(bsi, objectID, _resetDisabledCounterForEnabledControls);
-			}
-			for (ot::UID objectID : _disabledControls) {
-				lockManager->disable(bsi, objectID);
-			}
-		}
-		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::enableDisableControls()"); }
-		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::enableDisableControls()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::enableDisableControls()"); }
-	}
-	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
-}
-
-void ViewerComponent::entitiesSelected(ot::serviceID_t replyTo, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues)
-{
-	try {
-		try {
-			AppBase::instance()->getExternalServicesComponent()->entitiesSelected(ViewerAPI::getActiveDataModel(), replyTo, selectionAction, selectionInfo, optionNames, optionValues);
-		}
-		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::entitiesSelected()"); }
-		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::entitiesSelected()"); }
-		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::entitiesSelected()"); }
-	}
-	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
-}
-
-void ViewerComponent::rubberbandFinished(ot::serviceID_t creatorId, const std::string &note, const std::string &pointJson, const std::vector<double> &transform)
-{
-	AppBase::instance()->getExternalServicesComponent()->sendRubberbandResultsToService(creatorId, note, pointJson, transform);
-}
-
-void ViewerComponent::updateSettings(const ot::PropertyGridCfg& _config)
-{
-	UserSettings::instance().addSettings(VIEWER_SETTINGS_NAME, _config);
-}
-
-void ViewerComponent::loadSettings(ot::PropertyGridCfg& _config)
-{
-	ot::PropertyGridCfg oldConfig = AppBase::instance()->getSettingsFromDataBase(VIEWER_SETTINGS_NAME);
-	_config.mergeWith(oldConfig, ot::PropertyBase::MergeValues | ot::PropertyBase::AddMissing);
-}
-
-void ViewerComponent::saveSettings(const ot::PropertyGridCfg& _config)
-{
-	AppBase::instance()->storeSettingToDataBase(_config, VIEWER_SETTINGS_NAME);
-}
-
-void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID)
-{
-	AppBase::instance()->getExternalServicesComponent()->requestUpdateVTKEntity(modelEntityID);
-}
-
-void ViewerComponent::messageModelService(const std::string& _message)
-{
-	std::string response;
-	AppBase::instance()->getExternalServicesComponent()->sendToModelService(_message, response);
-}
-
-void ViewerComponent::removeGraphicsElements(ot::UID _modelID)
-{
-	//If entity is has a block item associated, it gets removed from all editors.
-	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
-	for (auto view : views) {
-		view->getGraphicsView()->removeItem(_modelID, true);
-		view->getGraphicsView()->removeConnection(_modelID);
-	}
-
-}
-
-std::string ViewerComponent::getOpenFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
-	return QFileDialog::getOpenFileName(
-		AppBase::instance()->mainWindow(),
-		QString::fromStdString(_title),
-		QString::fromStdString(_path),
-		QString::fromStdString(_filters)
-	).toStdString();
-}
-
-std::string ViewerComponent::getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) {
-	return QFileDialog::getSaveFileName(
-		AppBase::instance()->mainWindow(),
-		QString::fromStdString(_title),
-		QString::fromStdString(_path),
-		QString::fromStdString(_filters)
-	).toStdString();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
