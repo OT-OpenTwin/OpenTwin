@@ -554,6 +554,17 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 
 		lss->second.sessionClosed(sessionID);
 
+		// Notify GDS
+		ot::JsonDocument gdsDoc;
+		gdsDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gdsDoc.GetAllocator()), gdsDoc.GetAllocator());
+		gdsDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(sessionID, gdsDoc.GetAllocator()), gdsDoc.GetAllocator());
+		gdsDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lss->second.getUrl(), gdsDoc.GetAllocator()), gdsDoc.GetAllocator());
+
+		std::string response;
+		if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, gdsDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to Global Directory Service (url = " + m_globalDirectoryUrl + ")");
+		}
+		
 		m_sessionMap.erase(sessionID);
 	}
 
