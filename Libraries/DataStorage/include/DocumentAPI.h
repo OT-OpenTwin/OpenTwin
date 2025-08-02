@@ -23,6 +23,8 @@ namespace DataStorageAPI
 		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length);
 		__declspec(dllexport) value InsertDocumentUsingGridFs(bsoncxx::document::view docView, std::string fileName, Document &metaDoc);
 		__declspec(dllexport) void GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, std::string fileName);
+		__declspec(dllexport) value InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, std::string fileName);
+
 
 		/*
 		__declspec(dllexport) value InsertDocumentToFileStorage(std::ifstream* source, std::string fileName);
