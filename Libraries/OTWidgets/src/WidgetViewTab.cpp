@@ -102,3 +102,7 @@ void ot::WidgetViewTab::slotClose(void) {
 void ot::WidgetViewTab::slotTogglePinned(void) {
 	this->setIsPinned(!m_isPinned);
 }
+
+void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
+	Q_EMIT tabPressed();
+}

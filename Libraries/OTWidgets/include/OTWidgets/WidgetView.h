@@ -109,6 +109,7 @@ namespace ot {
 	Q_SIGNALS:
 		void closeRequested();
 		void viewDataModifiedChanged();
+		void pinnedChanged(bool _isPinned);
 
 	protected:
 
@@ -120,6 +121,7 @@ namespace ot {
 		void slotCloseRequested();
 		void slotToggleVisible();
 		void slotPinnedChanged(bool _isPinned);
+		void slotTabPressed();
 
 	private:
 		friend class WidgetViewManager;

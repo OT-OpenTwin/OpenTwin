@@ -2651,6 +2651,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	OT_SLECTION_TEST_LOG("View focus changed. { \"Previous\": \"" + (_previousView ? _previousView->getViewData().getEntityName() : "<None>") +
 		"\", \"Focused\": " + (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") + "\" }");
 
+	OT_LOG_T("View focus changed. Previous " + ot::String::numberToHexString<size_t>((size_t)_previousView) + ", Focused " + ot::String::numberToHexString<size_t>((size_t)_focusedView));
+
 	if (_previousView) {
 		m_navigationManager.slotViewDeselected();
 	}
@@ -2750,7 +2752,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
-	
+	_view->setAsCurrentViewTab();
 }
 
 void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
@@ -3439,6 +3441,16 @@ void AppBase::addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UI
 	if (_visualizingEntities.empty()) {
 		return;
 	}
+
+	std::string entities;
+	for (const UID& uid : _visualizingEntities) {
+		std::string uidstr = std::to_string(uid);
+		if (!entities.empty()) {
+			entities += ", ";
+		}
+		entities += uidstr;
+	}
+	OT_LOG_T("Adding visualizing entities to view " + ot::String::numberToHexString<size_t>((size_t)_view) + ": [" + entities + "]");
 
 	_view->clearVisualizingItems();
 

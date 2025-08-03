@@ -224,6 +224,7 @@ namespace ot {
 		void slotViewTabClicked();
 		void slotViewDataModifiedChanged();
 		void slotCloseUnpinnedViews();
+		void slotViewPinnedChanged(bool _pinned);
 
 	private:
 		enum ManagerState {

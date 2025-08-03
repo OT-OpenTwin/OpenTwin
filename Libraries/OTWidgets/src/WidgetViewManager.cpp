@@ -219,6 +219,7 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	this->disconnect(view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
 	this->disconnect(view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
 	this->disconnect(view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->disconnect(view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
 	if (view->getViewDockWidget()->tabWidget()) {
 		this->disconnect(view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
 	}
@@ -611,6 +612,17 @@ void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 	}
 }
 
+void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
+	WidgetView* view = dynamic_cast<WidgetView*>(sender());
+	if (!view) {
+		OT_LOG_E("View cast failed");
+		return;
+	}
+
+	view->setAsCurrentViewTab();
+	view->getViewDockWidget()->setFocus();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
@@ -719,6 +731,14 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	newViewEntry.second = _view;
 	m_views.push_back(newViewEntry);
 
+	// Connect signals
+	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->connect(_view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+
 	// Update focus information or reset the current focus depending on the insert mode
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
 		for (WidgetView* view : focusedViews) {
@@ -728,17 +748,14 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 	else {
 		m_state |= InsertViewState;
+		OT_LOG_T("Custom active");
+		_view->setAsCurrentViewTab();
+		OT_LOG_T("Custom focus");
 		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+		OT_LOG_T("Focus done");
 		m_state &= (~InsertViewState);
 	}
 
-	// Connect signals
-	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
-	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
-	if (_view->getViewDockWidget()->tabWidget()) {
-		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
-	}
-	
 	return true;
 }
 
