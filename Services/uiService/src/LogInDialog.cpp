@@ -243,11 +243,17 @@ void LogInDialog::slotLogIn() {
 
 	m_logInAttempt++;
 
-	// Run worker
 	this->setControlsEnabled(false);
 
 	m_loginData.setGss(gssData);
 
+	// Store settings
+	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
+	settings->setValue("SessionServiceURL", gssData.getName());
+	settings->setValue("LogInPos.X", this->pos().x());
+	settings->setValue("LogInPos.Y", this->pos().y());
+
+	// Run worker
 	m_state |= LogInStateFlag::WorkerRunning;
 
 	std::thread worker(&LogInDialog::loginWorkerStart, this);
@@ -603,10 +609,6 @@ void LogInDialog::saveUserSettings() const {
 	}
 
 	settings->setValue("LastSavePassword", m_savePassword->isChecked());
-	settings->setValue("SessionServiceURL", m_loginData.getGss().getName());
-
-	settings->setValue("LogInPos.X", this->pos().x());
-	settings->setValue("LogInPos.Y", this->pos().y());
 
 	this->saveGSSOptions();
 }
