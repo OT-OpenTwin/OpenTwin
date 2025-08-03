@@ -156,6 +156,7 @@ std::string GlobalSessionService::handleGetGlobalServicesURL(ot::JsonDocument& _
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GlobalLoggerUrl, ot::JsonString(ot::ServiceLogNotifier::instance().loggingServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	return doc.toJson();
 }

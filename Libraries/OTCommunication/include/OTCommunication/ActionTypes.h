@@ -449,6 +449,7 @@
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
 #define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
+#define OT_ACTION_PARAM_GlobalLoggerUrl "Global.LoggerUrl"
 
 #define OT_ACTION_PARAM_GLOBAL_CPU_LOAD "Global.CPU.Load"
 #define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"

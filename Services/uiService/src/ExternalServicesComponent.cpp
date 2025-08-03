@@ -66,10 +66,11 @@
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 #include "CurveDatasetFactory.h"
 #include "OTCore/String.h"
@@ -1160,6 +1161,11 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		responseDoc.fromJson(response);
 
 		// ##################################################################
+
+		if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
+			std::string globalLoggerURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl);
+			ot::ServiceLogNotifier::instance().setLoggingServiceURL(globalLoggerURL);
+		}
 
 		if (responseDoc.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::ConstJsonArray logData = ot::json::getArray(responseDoc, OT_ACTION_PARAM_LogFlags);

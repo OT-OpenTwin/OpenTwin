@@ -22,6 +22,7 @@
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -893,6 +894,14 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 
 	m_loginData.setDatabaseUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_DBURL));
 	m_loginData.setAuthorizationUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
+
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
+		if (!responseDoc[OT_ACTION_PARAM_GlobalLoggerUrl].IsString()) {
+			return WorkerError::InvalidGssResponseSyntax;
+		}
+
+		ot::ServiceLogNotifier::instance().setLoggingServiceURL(ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
+	}
 
 	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
 		if (!responseDoc[OT_ACTION_PARAM_GlobalLogFlags].IsArray()) {
