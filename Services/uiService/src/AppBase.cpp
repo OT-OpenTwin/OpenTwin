@@ -1547,10 +1547,10 @@ bool AppBase::checkForContinue(const std::string& _title) {
 
 		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
-		if (result == ot::MessageDialogCfg::Cancel) {
+		if (result & ot::MessageDialogCfg::Cancel) {
 			return false;
 		}
-		else if (result == ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
+		else if (result & ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
 			m_ExternalServicesComponent->saveProject();
 		}
 	}

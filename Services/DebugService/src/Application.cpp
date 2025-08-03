@@ -49,6 +49,7 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P const", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3Parameter, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Scatter Plot", "Plot1DVisible", std::bind(&Application::createPlotScatter, this)));
+	m_testButtons.push_back(ButtonInfo("Plots", "Single Value Curve", "Plot1DVisible", std::bind(&Application::createPlotSinglePoint, this)));
 
 	// Enable features (Exit)
 	
@@ -461,6 +462,68 @@ void Application::createPlotScatter() {
 	builder.addCurve(std::move(description), curveCfg, "Scatter");
 
 	//Here the shared part
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setEntityName(plotName);
+	builder.buildPlot(plotCfg);
+}
+
+void Application::createPlotSinglePoint() {
+	const std::string collName = Application::instance()->getCollectionName();
+	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	PlotBuilder builder(extender);
+
+	// First curve
+	DatasetDescription description;
+	MetadataParameter parameter;
+	parameter.parameterName = "Frequency";
+	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.unit = "kHz";
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+	quantDesc->setName("Magnitude");
+	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
+
+	for (int i = 0; i < 1; i++) {
+		quantDesc->addDatapoint(ot::Variable(i));
+		parameter.values.push_back(ot::Variable(i));
+	}
+	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+	description.setQuantityDescription(quantDesc.release());
+	description.addParameterDescription(parameterDesc);
+
+	ot::Plot1DCurveCfg curveCfg;
+	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
+	const std::string plotName = "Test/A_plot_SingleValue";
+	curveCfg.setEntityName(plotName + "/SingleValueCurve1");
+
+	builder.addCurve(std::move(description), curveCfg, "SingleValueCurve1");
+
+	// Second curve
+	DatasetDescription description2;
+	MetadataParameter parameter2;
+	parameter2.parameterName = "Frequency";
+	parameter2.typeName = ot::TypeNames::getInt32TypeName();
+	parameter2.unit = "kHz";
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
+	quantDesc2->setName("Magnitude");
+	quantDesc2->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
+
+	for (int i = 0; i < 1; i++) {
+		quantDesc2->addDatapoint(ot::Variable(-i));
+		parameter2.values.push_back(ot::Variable(i));
+	}
+	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
+
+	description2.setQuantityDescription(quantDesc2.release());
+	description2.addParameterDescription(parameterDesc2);
+
+	ot::Plot1DCurveCfg curveCfg2;
+	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
+	curveCfg2.setEntityName(plotName + "/SingleValueCurve2");
+
+	builder.addCurve(std::move(description2), curveCfg2, "SingleValueCurve2");
+
+	// Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
