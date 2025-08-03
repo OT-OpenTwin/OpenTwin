@@ -71,6 +71,9 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& getText(void) const { return m_text; };
 
+		void setDetailedText(const std::string& _text) { m_detailedText = _text; };
+		const std::string& getDetailedText(void) const { return m_detailedText; };
+
 		void setButton(BasicButton _button, bool _active = true) { m_buttons.setFlag(_button, _active); };
 		void setButtons(BasicButtons _buttons) { m_buttons = _buttons; };
 		const BasicButtons& getButtons(void) const { return m_buttons; };
@@ -80,6 +83,7 @@ namespace ot {
 
 	private:
 		std::string m_text;
+		std::string m_detailedText;
 		BasicButtons m_buttons;
 		BasicIcon m_icon;
 	};

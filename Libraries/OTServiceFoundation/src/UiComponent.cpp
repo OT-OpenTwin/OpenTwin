@@ -531,37 +531,34 @@ void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& 
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response, _requestFlags);
 }
 
-void ot::components::UiComponent::displayErrorPrompt(
-	const std::string &				_message
-) const {
+void ot::components::UiComponent::displayErrorPrompt(const std::string& _message, const std::string& _detailedMessage) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportError, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 }
 
-void ot::components::UiComponent::displayWarningPrompt(
-	const std::string &				_message
-) const {
+void ot::components::UiComponent::displayWarningPrompt(const std::string& _message, const std::string& _detailedMessage) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportWarning, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 }
 
-void ot::components::UiComponent::displayInformationPrompt(
-	const std::string &				_message
-) const {
+void ot::components::UiComponent::displayInformationPrompt(const std::string& _message, const std::string& _detailedMessage) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportInformation, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);

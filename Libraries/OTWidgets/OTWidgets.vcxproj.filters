@@ -406,12 +406,6 @@
     <ClCompile Include="src\ContextMenuManager.cpp">
       <Filter>src\ContextMenu</Filter>
     </ClCompile>
-    <ClCompile Include="src\MessageBoxHandler.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MessageBoxManager.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\WidgetViewDockManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -549,6 +543,12 @@
     </ClCompile>
     <ClCompile Include="src\CartesianPlotLegendView.cpp">
       <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxHandler.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxManager.cpp">
+      <Filter>src\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -926,12 +926,6 @@
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h">
       <Filter>include\ContextMenu</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -1039,6 +1033,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
       <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
+      <Filter>include\Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

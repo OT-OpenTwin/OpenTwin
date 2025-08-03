@@ -356,8 +356,6 @@ public Q_SLOTS:
 	void setProgressValue(int percentage);
 	void lockGui(void);
 	void unlockGui(void);
-	void showError(const char* message);
-	void showInformation(const char* message);
 	void activateModelVersion(const char* version);
 	void keepAlive();
 

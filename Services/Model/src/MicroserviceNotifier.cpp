@@ -231,28 +231,31 @@ void MicroserviceNotifier::displayMessage(const std::string &message)
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::reportError(const std::string &message)
+void MicroserviceNotifier::reportError(const std::string& _message, const std::string& _detailedMessage)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportError);
-	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(_message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_Detailed, rapidjson::Value(_detailedMessage.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::reportWarning(const std::string &message)
+void MicroserviceNotifier::reportWarning(const std::string& _message, const std::string& _detailedMessage)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportWarning);
-	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(_message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_Detailed, rapidjson::Value(_detailedMessage.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::reportInformation(const std::string &message)
+void MicroserviceNotifier::reportInformation(const std::string& _message, const std::string& _detailedMessage)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_ReportInformation);
-	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(_message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_Detailed, rapidjson::Value(_detailedMessage.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);

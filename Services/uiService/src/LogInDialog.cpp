@@ -573,9 +573,11 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		OT_LOG_E("Unknown worker error (" + std::to_string((int)_error) + ")");
 		break;
 	}
-	msg += "\nDetailed error:\n" + m_curlErrorMessage;
 	// Display error message and unlock controls
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
+	if (!m_curlErrorMessage.empty()) {
+		msgBox.setDetailedText(QString::fromStdString(m_curlErrorMessage));
+	}
 	msgBox.exec();
 
 	m_loginData.clear();

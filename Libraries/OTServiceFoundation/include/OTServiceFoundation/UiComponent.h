@@ -340,21 +340,15 @@ namespace ot {
 
 			//! @brief Will display a message in a error prompt dialog
 			//! @param _message The message to display
-			void displayErrorPrompt(
-				const std::string &				_message
-			) const;
+			void displayErrorPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will display a message in a warning prompt dialog
 			//! @param _message The message to display
-			void displayWarningPrompt(
-				const std::string &				_message
-			) const;
+			void displayWarningPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will display a message in a information prompt dialog
 			//! @param _message The message to display
-			void displayInformationPrompt(
-				const std::string &				_message
-			) const;
+			void displayInformationPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will add the control name of the item that is located at the menu
 			//! @param _list The list to add the item to

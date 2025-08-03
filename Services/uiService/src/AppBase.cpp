@@ -472,7 +472,7 @@ bool AppBase::closeEvent() {
 			m_currentProjectName + 
 			"\".\nDo you want to save them now?\nUnsaved changes will be lost.");
 
-		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
 		if (result == ot::MessageDialogCfg::Cancel) {
 			return false;
@@ -568,7 +568,7 @@ void AppBase::downloadInstaller(QString gssUrl)
 	else
 	{
 		// Error in downloading the installer
-		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok | QMessageBox::Cancel);
+		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok);
 		msgBox.exec();
 	}
 }
@@ -664,7 +664,7 @@ void AppBase::exportLogs(void) {
 
 	if (ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
 		OT_LOG_E("Logger service url empty");
-		this->showErrorPrompt("No logger service not found", "Export Log");
+		this->showErrorPrompt("Logger service not found", "", "Export Log");
 		return;
 	}
 
@@ -675,7 +675,7 @@ void AppBase::exportLogs(void) {
 
 	std::string response;
 	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		this->showErrorPrompt("Failed to send request to Logger Service.", "Error");
+		this->showErrorPrompt("Failed to send request to Logger Service.", "", "Error");
 		return;
 	}
 
@@ -684,14 +684,14 @@ void AppBase::exportLogs(void) {
 
 	if (responseMessage != ot::ReturnMessage::Ok) {
 		OT_LOG_E("Invalid response: " + responseMessage.getWhat());
-		this->showErrorPrompt("Invalid response from logger service", "Export Log");
+		this->showErrorPrompt("Invalid response from logger service", "Received response: " + response , "Export Log");
 		return;
 	}
 
 	ot::JsonDocument messagesDoc;
 	if (!messagesDoc.fromJson(responseMessage.getWhat())) {
 		OT_LOG_E("Invalid response syntax");
-		this->showErrorPrompt("Invalid response syntax from logger service", "Export Log");
+		this->showErrorPrompt("Invalid response syntax from logger service", "Received response: " + response, "Export Log");
 		return;
 	}
 
@@ -703,7 +703,7 @@ void AppBase::exportLogs(void) {
 	}
 
 	if (messages.empty()) {
-		this->showInfoPrompt("No log messages to export", "Export Log");
+		this->showInfoPrompt("No log messages to export", "", "Export Log");
 		return;
 	}
 
@@ -719,7 +719,7 @@ void AppBase::exportLogs(void) {
 	QFile file(exportName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		OT_LOG_E("Failed to open file for writing");
-		this->showErrorPrompt("Failed to open file for writing.\nFile: \"" + exportName.toStdString() + "\"", "Export Log");
+		this->showErrorPrompt("Failed to open log file for writing.", "File: \"" + exportName.toStdString() + "\"", "Export Log");
 		return;
 	}
 
@@ -728,7 +728,7 @@ void AppBase::exportLogs(void) {
 
 	settings->setValue("ExportLogPath", exportName);
 
-	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "Export Log");
+	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "", "Export Log");
 }
 
 void AppBase::importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName)
@@ -1177,7 +1177,7 @@ void AppBase::createUi(void) {
 		}
 	}
 	catch (const std::exception & e) {
-		this->showErrorPrompt(e.what(), "Critical Error");
+		this->showErrorPrompt("UI setup failed", e.what(), "Critical Error");
 	}
 }
 
@@ -1545,7 +1545,7 @@ bool AppBase::checkForContinue(const std::string& _title) {
 			m_currentProjectName + 
 			"\"?\nUnsaved changes will be lost.");
 
-		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
 		if (result == ot::MessageDialogCfg::Cancel) {
 			return false;
@@ -2108,9 +2108,10 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg
 	}
 }
 
-ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
 	ot::MessageDialogCfg config;
 	config.setText(_message);
+	config.setDetailedText(_detailedMessage);
 	config.setTitle(_title);
 	config.setButtons(_buttons);
 	config.setIcon(_icon);
@@ -2118,16 +2119,16 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _messag
 	return this->showPrompt(config);
 }
 
-void AppBase::showInfoPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
+void AppBase::showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showWarningPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
+void AppBase::showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showErrorPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
+void AppBase::showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
 }
 
 // #######################################################################################################################
@@ -2838,7 +2839,7 @@ void AppBase::slotCreateProject(void) {
 			msg.append(projectUser.c_str());
 			msg.append("\".");
 
-			this->showErrorPrompt(msg, "Create New Project");
+			this->showErrorPrompt(msg, "", "Create New Project");
 			return;
 		}
 	}
@@ -2878,13 +2879,13 @@ void AppBase::slotCreateProject(void) {
 	if (projectManager.projectExists(currentName, canBeDeleted)) {
 		if (!canBeDeleted) {
 			// Notify that the project already exists and can not be deleted
-			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "Create New Project");
+			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "", "Create New Project");
 			return;
 		}
 
 		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
 
-		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
+		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
 			return;
 		}
 
@@ -2934,14 +2935,14 @@ void AppBase::slotOpenProject(void) {
 		if (projectManager.projectExists(selectedProjectName, canBeDeleted)) {
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
-				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "Open Project");
+				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "", "Open Project");
 				return;
 			}
 			else {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "Open Project");
+					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
 					return;
 				}
 			}
@@ -2954,7 +2955,7 @@ void AppBase::slotOpenProject(void) {
 			assert(userManager.checkConnection()); // Failed to connect
 
 			if (!projectManager.canAccessProject(projectCollection)) {
-				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
+				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "", "Open Project");
 
 				userManager.removeRecentProject(selectedProjectName);
 				m_welcomeScreen->refreshProjectList();
@@ -2979,7 +2980,7 @@ void AppBase::slotOpenProject(void) {
 			UserManagement userManager(m_loginData);
 			assert(userManager.checkConnection()); // Failed to connect
 
-			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project");
+			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
 			m_welcomeScreen->refreshProjectList();
@@ -3064,7 +3065,7 @@ void AppBase::slotRenameProject(void) {
 			msg.append("\" is currently opened by user: \"");
 			msg.append(projectUser);
 			msg.append("\".");
-			this->showErrorPrompt(msg, "Rename Project");
+			this->showErrorPrompt(msg, "", "Rename Project");
 
 			return;
 		}
@@ -3131,7 +3132,7 @@ void AppBase::slotDeleteProject(void) {
 				msg.append("\" is currently opened by user: \"");
 				msg.append(projectUser);
 				msg.append("\".");
-				this->showErrorPrompt(msg, "Delete Project");
+				this->showErrorPrompt(msg, "", "Delete Project");
 
 				continue;
 			}

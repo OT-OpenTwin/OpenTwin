@@ -452,14 +452,14 @@ public:
 
 	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config) override;
 
-	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
+	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
 public Q_SLOTS:
-	void showInfoPrompt(const std::string& _message, const std::string& _title);
+	void showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showWarningPrompt(const std::string& _message, const std::string& _title);
+	void showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showErrorPrompt(const std::string& _message, const std::string& _title);
+	void showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
 public:
 

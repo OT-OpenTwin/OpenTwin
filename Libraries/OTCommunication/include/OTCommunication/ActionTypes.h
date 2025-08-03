@@ -342,6 +342,7 @@
 #define OT_ACTION_PARAM_Content "Content"
 #define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ModelType "ModelType"

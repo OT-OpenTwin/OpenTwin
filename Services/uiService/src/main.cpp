@@ -208,7 +208,7 @@ bool initializeAssets(void) {
 	if (iconPathCounter == 0) {
 		OTAssert(0, "No icon path was found!");
 		OT_LOG_E("No icon path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -216,7 +216,7 @@ bool initializeAssets(void) {
 	// Check if at least one style directory was found
 	if (stylePathCounter == 0) {
 		OT_LOG_EA("No color style path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -224,7 +224,7 @@ bool initializeAssets(void) {
 	// Check if at least one graphics item directory was found
 	if (graphicsPathCounter == 0) {
 		OT_LOG_EA("No graphics item path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -240,7 +240,7 @@ bool initializeAssets(void) {
 	}
 	else {
 		OT_LOG_EA("Bright style not found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
