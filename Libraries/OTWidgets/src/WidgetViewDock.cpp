@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -13,6 +14,10 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
 {
 	m_tab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (m_tab) {
+		OT_LOG_T("Dock created " + String::numberToHexString<size_t>((size_t)this) +
+			" with tab " + String::numberToHexString<size_t>((size_t)m_tab) +
+			" for view " + String::numberToHexString<size_t>((size_t)m_view));
+
 		this->connect(m_tab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
 		this->connect(m_tab, &WidgetViewTab::viewPinnedChanged, this, &WidgetViewDock::slotPinnedChanged);
 	}
@@ -27,7 +32,7 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
 }
 
 ot::WidgetViewDock::~WidgetViewDock() {
-
+	OT_LOG_T("Dock destroyed " + String::numberToHexString<size_t>((size_t)this));
 }
 
 void ot::WidgetViewDock::openView(void) {

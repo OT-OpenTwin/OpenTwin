@@ -600,9 +600,6 @@
     <Filter Include="src\ImagePainter">
       <UniqueIdentifier>{0e9b2589-bc0a-4599-b9fa-8d27745cf007}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\Syntax">
-      <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Syntax">
       <UniqueIdentifier>{91ca5e3c-5ab5-4d44-ab48-85002edea2d8}</UniqueIdentifier>
     </Filter>
@@ -665,6 +662,9 @@
     </Filter>
     <Filter Include="include\PropertyLink">
       <UniqueIdentifier>{a0da90b9-c9a0-439e-8ff9-058154e0488e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Syntax">
+      <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

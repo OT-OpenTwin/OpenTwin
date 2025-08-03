@@ -5,6 +5,8 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/QWidgetInterface.h"
@@ -27,6 +29,8 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType) :
 	m_isPermanent(false), m_isDeletedByManager(false),
 	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
 {
+	OT_LOG_T("View created " + String::numberToHexString<size_t>((size_t)this));
+	
 	m_dockWidget = new WidgetViewDock(this);
 
 	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
@@ -34,6 +38,8 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType) :
 }
 
 ot::WidgetView::~WidgetView() {
+	OT_LOG_T("View destroying " + String::numberToHexString<size_t>((size_t)this));
+
 	m_dockWidget->takeWidget();
 
 	if (!m_isDeletedByManager) {
@@ -44,6 +50,8 @@ ot::WidgetView::~WidgetView() {
 	if (adsManager) {
 		adsManager->removeDockWidget(m_dockWidget);
 	}
+
+	OT_LOG_T("View destroyed " + String::numberToHexString<size_t>((size_t)this));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -51,8 +59,7 @@ ot::WidgetView::~WidgetView() {
 // Setter/Getter
 
 QAction* ot::WidgetView::getViewToggleAction(void) const {
-	if (!m_dockWidget) return nullptr;
-	else return m_dockWidget->toggleViewAction();
+	return (m_dockWidget ? m_dockWidget->toggleViewAction() : nullptr);
 }
 
 void ot::WidgetView::setViewWidgetFocus(void) {
@@ -73,6 +80,8 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_dockWidget->setPinButtonVisible(_data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
+
+	OT_LOG_T("View data setup " + String::numberToHexString<size_t>((size_t)this) + " { \"Entity\": \"" + m_data.getEntityName() + "\", \"ViewType\": \"" + WidgetViewBase::toString(m_data.getViewType()) + "\" }");
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {

@@ -117,12 +117,12 @@ void ot::CartesianPlotCurve::drawSeries(QPainter* _painter, const QwtScaleMap& _
     if (CartesianPlotCurve::verifyRange(numSamples, _from, _to) > 0) {
         
         // Draw outline if needed
-		if (m_outlinePen.style() != Qt::NoPen) {
+		/*if (m_outlinePen.style() != Qt::NoPen) {
             _painter->save();
             _painter->setPen(m_outlinePen);
             this->drawCurve(_painter, this->style(), _xMap, _yMap, _canvasRect, _from, _to);
             _painter->restore();
-		}
+		}*/
 
 		// Draw the curve
         if (this->pen().style() != Qt::NoPen) {

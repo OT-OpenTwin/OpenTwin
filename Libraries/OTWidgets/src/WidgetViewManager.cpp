@@ -127,6 +127,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 		return;
 	}
 
+	OT_LOG_T("Closing view " + String::numberToHexString<size_t>((size_t)_view));
+
 	auto bck = m_state;
 	m_state |= CloseViewState;
 
@@ -140,11 +142,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->getViewDockWidget()->blockSignals(true);
 	_view->blockSignals(true);
 
-	// Remove the dock widget itself
-	m_dockManager->removeDockWidget(_view->getViewDockWidget());
-
-	// Finally destroy the view
-	delete _view;
+	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
+	_view->deleteLater();
 
 	m_state = bck;
 }
@@ -218,6 +217,11 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	
 	// Disconnect signals
 	this->disconnect(view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	if (view->getViewDockWidget()->tabWidget()) {
+		this->disconnect(view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
 
 	// If the view is the current central, set current central to 0
 	if (view == m_focusInfo.last) m_focusInfo.last = nullptr;
@@ -801,9 +805,11 @@ ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findOrCreateView
 
 void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view) {
 	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
+		OT_LOG_T("Toggle view " + String::numberToHexString<size_t>((size_t)_view));
 		_view->getViewDockWidget()->toggleView(_view->getViewDockWidget()->isClosed());
 	}
 	else {
+		OT_LOG_T("View close request " + String::numberToHexString<size_t>((size_t)_view));
 		Q_EMIT viewCloseRequested(_view);
 	}
 }
