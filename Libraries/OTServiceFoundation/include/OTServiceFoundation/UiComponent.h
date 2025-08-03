@@ -10,6 +10,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTCore/Logger.h"
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -337,6 +338,10 @@ namespace ot {
 			//! \brief Will display a styled text message in the Frontends output window.
 			//! \param _builder StyledTextBuilder containing the message
 			void displayStyledMessage(const StyledTextBuilder& _builder, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags) const;
+
+			//! @brief Will display a log message in the Frontends output window.
+			//! @param _message The log message to display.
+			void displayLogMessage(const LogMessage& _message) const;
 
 			//! @brief Will display a message in a error prompt dialog
 			//! @param _message The message to display

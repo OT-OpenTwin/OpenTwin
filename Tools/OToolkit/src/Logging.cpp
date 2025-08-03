@@ -13,6 +13,7 @@
 #include "LogVisualizationItemViewDialog.h"
 
 // OT header
+#include "OTSystem/DateTime.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTWidgets/Splitter.h"
@@ -71,7 +72,7 @@ enum tableColumns {
 Logging::Logging()
 	: m_warningCount(0), m_errorCount(0), m_filterView(nullptr), m_columnWidthTimer(nullptr), m_autoConnect(nullptr),
 	m_autoScrollToBottom(nullptr), m_connectButton(nullptr), m_errorCountLabel(nullptr), m_exportButton(nullptr),
-	m_ignoreNewMessages(nullptr), m_importButton(nullptr), m_messageCountLabel(nullptr), m_table(nullptr),
+	m_ignoreNewMessages(nullptr), m_convertToLocalTime(nullptr), m_importButton(nullptr), m_messageCountLabel(nullptr), m_table(nullptr),
 	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr)
 {
 	m_columnWidthTimer = new QTimer(this);
@@ -110,6 +111,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
+	m_convertToLocalTime = new QCheckBox("Convert to Local Time");
 	m_ignoreNewMessages = new QCheckBox("Ignore new messages");
 	m_autoScrollToBottom = new QCheckBox("Auto scroll to bottom");
 
@@ -135,6 +137,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	centralLayout->addLayout(buttonLayout);
 
 	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(m_convertToLocalTime, 0);
 	buttonLayout->addWidget(m_ignoreNewMessages, 0);
 	buttonLayout->addWidget(m_autoScrollToBottom, 0);
 	buttonLayout->addWidget(btnClear, 0);
@@ -168,6 +171,8 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	this->connect(m_filterView, &LoggingFilterView::filterChanged, this, &Logging::slotFilterChanged);
 
 	// Connect checkbox color signals
+	connect(m_convertToLocalTime, &QCheckBox::stateChanged, this, &Logging::slotUpdateCheckboxColors);
+	connect(m_convertToLocalTime, &QCheckBox::stateChanged, this, &Logging::slotRefillData);
 	connect(m_ignoreNewMessages, &QCheckBox::stateChanged, this, &Logging::slotUpdateCheckboxColors);
 	connect(m_autoScrollToBottom, &QCheckBox::stateChanged, this, &Logging::slotUpdateCheckboxColors);
 
@@ -195,6 +200,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 }
 
 void Logging::restoreToolSettings(QSettings& _settings) {
+	m_convertToLocalTime->setChecked(_settings.value("Logging.ConvertToLocal", false).toBool());
 	m_autoScrollToBottom->setChecked(_settings.value("Logging.AutoScrollToBottom", true).toBool());
 	m_columnWidthTmp = _settings.value("Logging.Table.ColumnWidth", "").toString();
 	
@@ -211,6 +217,7 @@ void Logging::restoreToolSettings(QSettings& _settings) {
 }
 
 bool Logging::prepareToolShutdown(QSettings& _settings) {
+	_settings.setValue("Logging.ConvertToLocal", m_convertToLocalTime->isChecked());
 	_settings.setValue("Logging.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
 
 	QString tableColumnWidths;
@@ -296,6 +303,15 @@ void Logging::slotExport(void) {
 	LOGVIS_LOG("Log Messages successfully exported to file \"" + fn + "\"");
 }
 
+void Logging::slotRefillData(void) {
+	std::list<ot::LogMessage> messages = std::move(m_messages);
+	this->slotClear();
+
+	for (const ot::LogMessage& msg : messages) {
+		this->appendLogMessage(msg);
+	}
+}
+
 void Logging::slotClear(void) {
 	m_table->setRowCount(0);
 	m_messages.clear();
@@ -339,10 +355,12 @@ void Logging::slotAutoScrollToBottomChanged(void) {
 
 void Logging::slotUpdateCheckboxColors(void) {
 	QString red("QCheckBox { color: #c02020; }");
+	QString green("QCheckBox { color: #20c020; }");
 	QString def("");
 
+	m_convertToLocalTime->setStyleSheet(m_convertToLocalTime->isChecked() ? green : def);
 	m_ignoreNewMessages->setStyleSheet(m_ignoreNewMessages->isChecked() ? red : def);
-	m_autoScrollToBottom->setStyleSheet(m_autoScrollToBottom->isChecked() ? red : def);
+	m_autoScrollToBottom->setStyleSheet(m_autoScrollToBottom->isChecked() ? green : def);
 }
 
 void Logging::slotToggleAutoConnect(void) {
@@ -382,7 +400,17 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 	m_table->insertRow(r);
 
 	QString serviceName = QString::fromStdString(_msg.getServiceName());
-
+	QString lclTime;
+	QString globalTime;
+	if (m_convertToLocalTime->isChecked()) {
+		lclTime = QString::fromStdString(ot::DateTime::timestampFromMsec(_msg.getLocalSystemTime(), ot::DateTime::Simple));
+		globalTime = QString::fromStdString(ot::DateTime::timestampFromMsec(_msg.getGlobalSystemTime(), ot::DateTime::Simple));
+	}
+	else {
+		lclTime = QString::fromStdString(ot::DateTime::timestampFromMsec(_msg.getLocalSystemTime(), ot::DateTime::SimpleUTC));
+		globalTime = QString::fromStdString(ot::DateTime::timestampFromMsec(_msg.getGlobalSystemTime(), ot::DateTime::SimpleUTC));
+	}
+	
 	QTableWidgetItem* iconItm = new QTableWidgetItem("");
 	if (_msg.getFlags() & ot::WARNING_LOG) {
 		iconItm->setIcon(QIcon(":/images/Warning.png"));
@@ -401,10 +429,9 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 	}
 	this->iniTableItem(r, tIcon, iconItm);
 
-
 	this->iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
-	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.getGlobalSystemTime())));
-	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.getLocalSystemTime())));
+	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(globalTime));
+	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(lclTime));
 	this->iniTableItem(r, tUser, new QTableWidgetItem(QString::fromStdString(_msg.getUserName())));
 	this->iniTableItem(r, tProject, new QTableWidgetItem(QString::fromStdString(_msg.getProjectName())));
 	this->iniTableItem(r, tService, new QTableWidgetItem(serviceName));

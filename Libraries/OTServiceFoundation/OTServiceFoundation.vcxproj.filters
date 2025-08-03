@@ -40,7 +40,7 @@
     <ClCompile Include="src\ProgressUpdater.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp">
+    <ClCompile Include="src\FrontendLogNotifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,7 +96,7 @@
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\ErrorWarningLogFrontendNotifier.h">
+    <ClInclude Include="include\OTServiceFoundation\FrontendLogNotifier.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h">

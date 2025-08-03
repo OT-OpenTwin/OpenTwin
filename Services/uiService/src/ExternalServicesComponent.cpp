@@ -2064,6 +2064,29 @@ std::string ExternalServicesComponent::handleDisplayStyledMessage(ot::JsonDocume
 	return "";
 }
 
+std::string ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument& _document) {
+	ot::LogMessage log;
+	log.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_MESSAGE));
+
+	ot::StyledTextBuilder message;
+
+	message << "[";
+	if (log.getFlags() & ot::ERROR_LOG) {
+		message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
+	}
+	else if (log.getFlags() & ot::WARNING_LOG) {
+		message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
+	}
+	else if (log.getFlags() & ot::TEST_LOG) {
+		message << ot::StyledText::Highlight << ot::StyledText::Bold << "TEST" << ot::StyledText::ClearStyle;
+	}
+	message << "] [" << log.getServiceName() << "] " << log.getText();
+
+	AppBase::instance()->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+
+	return "";
+}
+
 std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);

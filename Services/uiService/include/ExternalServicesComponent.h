@@ -201,6 +201,7 @@ public:
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayLogMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayLogMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportInformation, ot::MessageType::ALL_MESSAGE_TYPES)

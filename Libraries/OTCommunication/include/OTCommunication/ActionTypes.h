@@ -140,6 +140,7 @@
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
 #define OT_ACTION_CMD_UI_DisplayMessage "UI.DisplayMessage"
 #define OT_ACTION_CMD_UI_DisplayStyledMessage "UI.DisplayStyledMessage"
+#define OT_ACTION_CMD_UI_DisplayLogMessage "UI.DisplayLogMessage"
 #define OT_ACTION_CMD_UI_ReportError "UI.ReportError"
 #define OT_ACTION_CMD_UI_ReportWarning "UI.ReportWarning"
 #define OT_ACTION_CMD_UI_ReportInformation "UI.ReportInformation"
