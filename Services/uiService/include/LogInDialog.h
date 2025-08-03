@@ -70,7 +70,6 @@ private:
 	};
 
 	LogInState m_state;
-	int m_logInAttempt;
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 

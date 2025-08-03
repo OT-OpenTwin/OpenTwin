@@ -38,8 +38,6 @@
 
 #define LOG_IN_RESTOREDPASSWORD_PLACEHOLDER "******"
 
-#define MAX_LOGIN_ATTEMPTS 5
-
 #define EDIT_GSS_TEXT "< Edit >"
 
 #define TOGGLE_MODE_LABEL_SwitchToLogIn "Switch to Login"
@@ -47,7 +45,7 @@
 #define TOGGLE_MODE_LABEL_SwitchToChangePassword "Change Password"
 
 LogInDialog::LogInDialog() 
-	: m_state(LogInStateFlag::NoState), m_logInAttempt(0)
+	: m_state(LogInStateFlag::NoState)
 {
 	using namespace ot;
 
@@ -241,8 +239,6 @@ void LogInDialog::slotLogIn() {
 		return;
 	}
 
-	m_logInAttempt++;
-
 	this->setControlsEnabled(false);
 
 	m_loginData.setGss(gssData);
@@ -291,8 +287,6 @@ void LogInDialog::slotRegister() {
 		return;
 	}
 
-	m_logInAttempt++;
-
 	// Run worker
 	this->setControlsEnabled(false);
 
@@ -334,8 +328,6 @@ void LogInDialog::slotChangePassword() {
 		QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the new password", m_passwordConfirm, QRect(), 3000);
 		return;
 	}
-
-	m_logInAttempt++;
 
 	// Run worker
 	this->setControlsEnabled(false);
@@ -503,12 +495,6 @@ void LogInDialog::slotChangePasswordSuccess() {
 
 void LogInDialog::slotWorkerError(WorkerError _error) {
 	m_state &= (~LogInStateFlag::WorkerRunning);
-
-	// Check for max login attempt
-	if (m_logInAttempt >= MAX_LOGIN_ATTEMPTS) {
-		this->closeDialog(ot::Dialog::Cancel);
-		return;
-	}
 
 	// Create error message
 	QString msg;
