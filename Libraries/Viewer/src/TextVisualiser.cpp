@@ -20,8 +20,6 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 		{
 			if(_state.m_selected)
 			{
-				OT_LOG_T("Reqesting text");
-
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, doc.GetAllocator());

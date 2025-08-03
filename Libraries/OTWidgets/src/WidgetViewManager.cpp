@@ -127,8 +127,6 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 		return;
 	}
 
-	OT_LOG_T("Closing view " + String::numberToHexString<size_t>((size_t)_view));
-
 	auto bck = m_state;
 	m_state |= CloseViewState;
 
@@ -748,11 +746,8 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 	else {
 		m_state |= InsertViewState;
-		OT_LOG_T("Custom active");
 		_view->setAsCurrentViewTab();
-		OT_LOG_T("Custom focus");
 		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
-		OT_LOG_T("Focus done");
 		m_state &= (~InsertViewState);
 	}
 
@@ -822,11 +817,9 @@ ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findOrCreateView
 
 void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view) {
 	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
-		OT_LOG_T("Toggle view " + String::numberToHexString<size_t>((size_t)_view));
 		_view->getViewDockWidget()->toggleView(_view->getViewDockWidget()->isClosed());
 	}
 	else {
-		OT_LOG_T("View close request " + String::numberToHexString<size_t>((size_t)_view));
 		Q_EMIT viewCloseRequested(_view);
 	}
 }

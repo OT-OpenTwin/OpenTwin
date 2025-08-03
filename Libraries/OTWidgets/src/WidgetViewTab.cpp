@@ -34,7 +34,7 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
-	OT_LOG_T("Tab destroyed " + String::numberToHexString<size_t>((size_t)this));
+	
 }
 
 void ot::WidgetViewTab::setIsPinned(bool _pinned) {

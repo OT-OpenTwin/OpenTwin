@@ -3753,8 +3753,6 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 // Text Editor
 
 std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _document) {
-	OT_LOG_T("Setup text editor");
-
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
@@ -3835,8 +3833,6 @@ std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocumen
 // Table
 
 std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
-	OT_LOG_T("Setup table");
-
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 

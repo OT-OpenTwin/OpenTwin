@@ -35,7 +35,7 @@
 // C++ header
 #include <exception>
 
-#define OT_UI_USE_CUSTOM_DELETE true
+#define OT_UI_USE_CUSTOM_DELETE false
 
 #if OT_UI_USE_CUSTOM_DELETE == true
 
