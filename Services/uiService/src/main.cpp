@@ -35,6 +35,54 @@
 // C++ header
 #include <exception>
 
+#define OT_UI_USE_CUSTOM_DELETE false
+
+#if OT_UI_USE_CUSTOM_DELETE == true
+
+namespace ot {
+
+	namespace intern {
+
+		static std::atomic_bool loggerInitialized = false;
+
+		static void notifyCustomDelete() {
+			static std::atomic_bool customDeleteNotified = false;
+
+			if (!customDeleteNotified && loggerInitialized) {
+				customDeleteNotified = true;
+				OT_LOG_W("Custom delete operators are used!");
+			}
+		}
+
+	}
+}
+
+// Global operator delete override
+void operator delete(void* ptr) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Global operator delete[] override
+void operator delete[](void* ptr) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Matching sized delete operators (C++ 14+)
+void operator delete(void* ptr, std::size_t) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Matching sized delete operators (C++ 14+)
+void operator delete[](void* ptr, std::size_t) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+#endif
+
 void initializeLogging(void) {
 	// Get logging URL
 	QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");
@@ -44,6 +92,10 @@ void initializeLogging(void) {
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), true);
 	#else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
+	#endif
+
+	#if OT_UI_USE_CUSTOM_DELETE == true
+		ot::intern::loggerInitialized = true;
 	#endif
 }
 
