@@ -3431,7 +3431,10 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities; // = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
@@ -3448,7 +3451,10 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities; // = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
@@ -3509,7 +3515,10 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities;// = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
@@ -3571,7 +3580,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags, visualizingEntities);
 	ot::Plot* plot = plotView->getPlot();
@@ -3691,7 +3703,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName, visualizingEntities);
 
@@ -3749,7 +3764,10 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
 
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName(), visualizingEntities);
 	if (editor) {
@@ -3774,8 +3792,6 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
 
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, {});
 
@@ -3844,7 +3860,10 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags | AppBase::ViewHandlingConfig::SkipEntitySelection);
 	}
 
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName(), visualizingEntities);
 	if (table == nullptr) {
