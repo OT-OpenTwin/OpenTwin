@@ -404,13 +404,12 @@ void Application::searchInLibrary(void) {
 
 		for (const std::string& line : lines) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
-			std::cout << trimmedLine << "\n";
+			//std::cout << trimmedLine << "\n";
 
 			// detect Macro-definition
 			if (startsWith(trimmedLine, "#define")) {
 				// remove "#define " prefix
 				std::string content = trimmedLine.substr(8);
-				std::cout << content << "\n";
 
 				parseMacroDefinition(content);
 			}
@@ -429,36 +428,112 @@ void Application::searchInLibrary(void) {
 	}
 }
 
-void Application::parseMacroDefinition(const std::string& _content) {
-	std::cout << "Parsing content: " << _content << "\n";
-	std::string blackList = "\"";
+/*
+// testing special cases
+void Application::searchInLibrary(void) {
+	// search in ActionTypes.h in Open Twin OTCommunication Library
+	const std::string pathToActionTypesHeaderFile = "C:\\OT\\OpenTwin\\Libraries\\OTCommunication\\include\\OTCommunication\\ActionTypes.h";
+	std::string blackList = " \t\n";
 	
-	std::list<std::string> splittedContentList = ot::String::split(_content, " ");
-	std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
+	std::list<std::string> lines;
+	lines.push_back("	#define OT_ACTION_PASSWORD_SUBTEXT \"Password\"");
+	lines.push_back("	#define OT_ACTION_RETURN_INDICATOR_Error \"ERROR: \"");
+	lines.push_back("	#define OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE \"CST Studio Suite\"");
+	lines.push_back("	#define OT_ACTION_RETURN_UnknownError OT_ACTION_RETURN_INDICATOR_Error \"Unknown error\"");
+	lines.push_back("	#define OT_PARAM_AUTH_PASSWORD OT_ACTION_PASSWORD_SUBTEXT");
+	lines.push_back("	#define OT_ACTION_CMD_PROJ_Save \"Project.Save\"");
+	lines.push_back("	#define OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD \"LoggedInUser\" OT_ACTION_PASSWORD_SUBTEXT");
 
-	std::string macroName = splittedContentVector[0];
-	std::cout << "The first string is: " << macroName << "\n";
-	
-	std::string macroDefinition = splittedContentVector[1];
-	// special case: Macro-name as Macro-definition for passwords
-	if (macroDefinition == "OT_ACTION_PASSWORD_SUBTEXT") {
-		macroDefinition = "Password";
-	}
-	else {
-		macroDefinition = ot::String::removePrefixSuffix(macroDefinition, blackList);
-	}
-	std::cout << "The second string is: " << macroDefinition << "\n";
+	std::cout << "Read lines: " << "\n";
 
-	// special case: three-part Macro-definition for passwords
-	if (splittedContentVector.size() > 2) {
-		std::string secondMacroName = splittedContentVector[2];
-		std::cout << "The third string is: " << secondMacroName << "\n";
-		if (secondMacroName == "OT_ACTION_PASSWORD_SUBTEXT") {
-			macroDefinition = macroDefinition + "Password";
-			std::cout << "The new second string is: " << macroDefinition << "\n";
+	for (const std::string& line : lines) {
+		std::string trimmedLine = ot::String::removePrefix(line, blackList);
+		std::cout << trimmedLine << "\n";
+
+		// detect Macro-definition
+		if (startsWith(trimmedLine, "#define")) {
+			// remove "#define " prefix
+			std::string content = trimmedLine.substr(8);
+
+			parseMacroDefinition(content);
 		}
 	}
 
-	m_actionMacros[macroName] = macroDefinition;
-}
+	std::cout << "The parsed map of macro-name and -definition is :\n";
+	for (const auto macro : m_actionMacros) {
+		std::cout << macro.first << " : " << macro.second << "\n";
+	}
 
+}
+*/
+
+void Application::parseMacroDefinition(const std::string& _content) {
+	std::cout << "Parsing content: " << _content << "\n";
+	std::string blackList = " ";
+
+	// macro definition contains macro definition in quotes
+	if (_content.find("\"") != std::string::npos) {
+		std::list<std::string> splittedContentList = ot::String::split(_content, "\"");
+		std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
+		
+		std::string macroName = ot::String::removeSuffix(splittedContentVector[0], blackList);
+		std::string macroDefinition = splittedContentVector[1];
+		std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+
+		// macro definition contains two macro names at the beginning
+		if (macroName.find(" ") != std::string::npos) {
+			std::list<std::string> splittedMacroNameList = ot::String::split(macroName, " ");
+			std::vector<std::string> splittedMacroNameVector(splittedMacroNameList.begin(), splittedMacroNameList.end());
+			
+			macroName = splittedMacroNameVector[0];
+
+			std::cout << ">>" << macroName << "<<:>>" << splittedMacroNameVector[1] << "<<:>>" << macroDefinition << "<<" << "\n";
+			
+			// second macro name is OT_ACTION_RETURN_INDICATOR_Error, replace with "Error: "
+			if (splittedMacroNameVector[1] == "OT_ACTION_RETURN_INDICATOR_Error") {
+				macroDefinition = "Error: " + macroDefinition;
+
+				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+				
+				m_actionMacros[macroName] = macroDefinition;
+				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+			}
+		}
+		// macro definition contains OT_ACTION_PASSWORD_SUBTEXT at the end, replace with "Password"
+		else if (splittedContentVector.size() > 2 && splittedContentVector[2] != "") {
+			splittedContentVector[2] = ot::String::removePrefix(splittedContentVector[2], blackList);
+			std::cout << splittedContentVector[2] << "\n";
+			
+			if (splittedContentVector[2] == "OT_ACTION_PASSWORD_SUBTEXT") {
+				macroDefinition = splittedContentVector[1] + "Password";
+
+				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+
+				m_actionMacros[macroName] = macroDefinition;
+				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+			}	
+		}
+		else {
+			m_actionMacros[macroName] = macroDefinition;
+			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+		}
+	}
+	// macro definition contains no macro definition in quotes
+	else {
+		std::list<std::string> splittedContentList = ot::String::split(_content, " ");
+		std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
+		
+		std::string macroName = splittedContentVector[0];
+		std::cout << ">>" << macroName << "<<:>>" << splittedContentVector[1] << "<<" "\n";
+
+		// macro definition contains OT_ACTION_PASSWORD_SUBTEXT at the end, replace with "Password"
+		if (splittedContentVector[1] == "OT_ACTION_PASSWORD_SUBTEXT") {
+			std::string macroDefinition = "Password";
+
+			std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+
+			m_actionMacros[macroName] = macroDefinition;
+			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+		}
+	}
+}
