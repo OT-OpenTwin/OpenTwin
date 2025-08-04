@@ -105,6 +105,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
+
 	// Handler
 	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
 
@@ -117,6 +119,10 @@ public:
 	void runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity);
 	void deleteSingleSolverResults(EntityBase* solverEntity);
 	std::string problemTypeScript(EntityBase* solverEntity);
+
+	void addScalarResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
+	void addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
+
 
 private:
 	SubprocessManager*		m_subprocessManager;

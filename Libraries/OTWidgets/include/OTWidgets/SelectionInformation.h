@@ -25,9 +25,10 @@ namespace ot {
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void addSelectedNavigationItem(UID _uid) { m_uids.push_back(_uid); };
-		void addSelectedNavigationItems(UIDList&& _uids) { m_uids.splice(m_uids.end(), std::move(_uids)); };
-		void setSelectedNavigationItems(const UIDList& _uids) { m_uids = _uids; };
+		void addSelectedNavigationItem(UID _uid) { m_uids.push_back(_uid); m_uids.unique(); };
+		void addSelectedNavigationItems(UIDList&& _uids) { m_uids.splice(m_uids.end(), std::move(_uids)); m_uids.unique(); };
+		void setSelectedNavigationItems(const UIDList& _uids) { m_uids = _uids; m_uids.unique(); };
+		void removeSelectedNavigationItem(UID _uid);
 		const UIDList& getSelectedNavigationItems(void) const { return m_uids; };
 
 	private:

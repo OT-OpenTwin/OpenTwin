@@ -17,6 +17,18 @@
 #include <exception>
 #include <filesystem>
 
+#define OT_LOGGER_USE_MUTEX false
+
+#if OT_LOGGER_USE_MUTEX==true
+#include <mutex>
+namespace ot {
+	namespace intern {
+		static std::atomic_bool g_logInitialized(false);
+		static std::mutex g_logMutex;
+	}
+}
+#endif
+
 #define OT_ACTION_PARAM_LOG_Service "Log.Service"
 #define OT_ACTION_PARAM_LOG_Function "Log.Function"
 #define OT_ACTION_PARAM_LOG_Message "Log.Message"
@@ -60,45 +72,29 @@ ot::LogFlags ot::logFlagsFromJsonArray(const ConstJsonArray& _flagsArray) {
 	return result;
 }
 
-ot::LogMessage::LogMessage() : m_flags(ot::NO_LOG) {}
+ot::LogMessage::LogMessage() : m_flags(ot::NO_LOG), m_localSystemTime(0), m_globalSystemTime(0) {}
 
 ot::LogMessage::LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags)
-	: m_serviceName(_serviceName), m_functionName(_functionName), m_text(_text), m_flags(_flags)
+	: m_serviceName(_serviceName), m_functionName(_functionName), m_text(_text), m_flags(_flags), m_localSystemTime(0), m_globalSystemTime(0)
 {}
-
-ot::LogMessage::LogMessage(const LogMessage& _other) 
-	: m_serviceName(_other.m_serviceName), m_functionName(_other.m_functionName), m_text(_other.m_text), m_userName(_other.m_userName),
-	m_projectName(_other.m_projectName), m_flags(_other.m_flags), m_localSystemTime(_other.m_localSystemTime), m_globalSystemTime(_other.m_globalSystemTime) {}
 
 ot::LogMessage::~LogMessage() {}
 
-ot::LogMessage& ot::LogMessage::operator = (const LogMessage& _other) {
-	m_serviceName = _other.m_serviceName;
-	m_functionName = _other.m_functionName;
-	m_userName = _other.m_userName;
-	m_projectName = _other.m_projectName;
-	m_text = _other.m_text;
-	m_flags = _other.m_flags;
-	m_localSystemTime = _other.m_localSystemTime;
-	m_globalSystemTime = _other.m_globalSystemTime;
-	return *this;
-}
-
 void ot::LogMessage::setCurrentTimeAsLocalSystemTime(void) {
-	m_localSystemTime = DateTime::currentTimestamp(DateTime::SimpleUTC);
+	m_localSystemTime = DateTime::msSinceEpoch();
 }
 
 void ot::LogMessage::setCurrentTimeAsGlobalSystemTime(void) {
-	m_globalSystemTime = DateTime::currentTimestamp(DateTime::SimpleUTC);
+	m_globalSystemTime = DateTime::msSinceEpoch();
 }
 
 void ot::LogMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_ACTION_PARAM_LOG_Service, JsonString(m_serviceName, _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_Function, JsonString(m_functionName, _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_Message, JsonString(m_text, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Local, JsonString(m_localSystemTime, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Global, JsonString(m_globalSystemTime, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_LOG_DataVersion, JsonString("1.0", _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Local, m_localSystemTime, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Global, m_globalSystemTime, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_DataVersion, JsonString("1.1", _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_User, JsonString(m_userName, _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_Project, JsonString(m_projectName, _allocator), _allocator);
 
@@ -111,14 +107,36 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	// Check version
 	
 	std::string versionString = json::getString(_object, OT_ACTION_PARAM_LOG_DataVersion);
-	if (versionString != "1.0") throw std::exception("Invalid log version");
+	if (versionString != "1.1") {
+		if (versionString == "1.0") {
+			// Version 1.0 is deprecated, but we can still read it
+			this->setFromVersion1_0(_object);
+			return;
+		}
+		else {
+			throw std::exception("Invalid log version");
+		}
+	}
 
 	// Get values
 	m_serviceName = json::getString(_object, OT_ACTION_PARAM_LOG_Service);
 	m_functionName = json::getString(_object, OT_ACTION_PARAM_LOG_Function);
 	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
-	m_localSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Local);
-	m_globalSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Global);
+	m_localSystemTime = json::getUInt64(_object, OT_ACTION_PARAM_LOG_Time_Local);
+	m_globalSystemTime = json::getUInt64(_object, OT_ACTION_PARAM_LOG_Time_Global);
+	m_userName = json::getString(_object, OT_ACTION_PARAM_LOG_User);
+	m_projectName = json::getString(_object, OT_ACTION_PARAM_LOG_Project);
+
+	ConstJsonArray flagsArr = json::getArray(_object, OT_ACTION_PARAM_LOG_Flags);
+	m_flags = logFlagsFromJsonArray(flagsArr);
+}
+
+void ot::LogMessage::setFromVersion1_0(const ConstJsonObject& _object) {
+	m_serviceName = json::getString(_object, OT_ACTION_PARAM_LOG_Service);
+	m_functionName = json::getString(_object, OT_ACTION_PARAM_LOG_Function);
+	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
+	m_localSystemTime = 0; // Version 1.0 did have string date format
+	m_globalSystemTime = 0; // Version 1.0 did have string date format
 	m_userName = json::getString(_object, OT_ACTION_PARAM_LOG_User);
 	m_projectName = json::getString(_object, OT_ACTION_PARAM_LOG_Project);
 
@@ -128,11 +146,11 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 
 std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 	// General Message Information
-	if (_msg.m_globalSystemTime.empty()) {
-		_stream << "[" << _msg.m_localSystemTime << "] [" << _msg.m_serviceName << "] ";
+	if (_msg.m_globalSystemTime == 0) {
+		_stream << "[" << ot::DateTime::timestampFromMsec(_msg.m_localSystemTime, ot::DateTime::Simple) << "] [" << _msg.m_serviceName << "] ";
 	}
 	else {
-		_stream << "[" << _msg.m_globalSystemTime << "] [" << _msg.m_serviceName << "] ";
+		_stream << "[" << ot::DateTime::timestampFromMsec(_msg.m_globalSystemTime, ot::DateTime::Simple) << "] [" << _msg.m_serviceName << "] ";
 	}
 
 	// General Log Type
@@ -320,6 +338,14 @@ void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _f
 }
 
 void ot::LogDispatcher::dispatch(const LogMessage& _message) {
+#if OT_LOGGER_USE_MUTEX==true
+	if (!intern::g_logInitialized) {
+		intern::g_logInitialized = true;
+		OT_LOG_W("Mutex in use for LogDispatcher!");
+	}
+	std::lock_guard<std::mutex> lock(intern::g_logMutex);
+#endif
+
 	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) {
 		return;
 	}

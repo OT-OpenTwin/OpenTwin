@@ -97,7 +97,7 @@ m_timerShowMainWindow(nullptr)
 	// Create status label
 	m_statusLabel = new QLabel;
 	m_statusLabel->setMinimumWidth(250);
-	m_statusLabel->setMaximumWidth(250);
+	m_statusLabel->setMaximumWidth(500);
 	m_statusLabel->setText(QString());
 
 	m_window->statusBar()->addPermanentWidget(m_progressBar);
@@ -244,7 +244,10 @@ bool ak::aWindowManager::getStatusBarContinuous(void) const { return m_progressB
 
 void ak::aWindowManager::setStatusLabelText(
 	const QString &														_status
-) { m_statusLabel->setText(_status); }
+) {
+	m_statusLabel->setText(_status);
+	m_statusLabel->setToolTip(_status);
+}
 
 void ak::aWindowManager::setStatusLabelVisible(
 	bool																_visible,

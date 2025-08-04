@@ -9,11 +9,46 @@
 ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, ComplexNumberContainer* _complexNumberContainer)
 	: m_dataX(std::move(_dataX)), m_dataY(_complexNumberContainer)
 {
+	initiate();
+	_complexNumberContainer = nullptr;
+}
+
+ot::PlotDatasetData::PlotDatasetData(std::vector<double>& _dataX, ComplexNumberContainer* _complexNumberContainer)
+	: m_dataX(_dataX), m_dataY(_complexNumberContainer)
+{
+	initiate();
+	_complexNumberContainer = nullptr;
+}
+
+ot::PlotDatasetData::~PlotDatasetData()
+{
+	if (m_dataY != nullptr)
+	{
+		delete m_dataY;
+		m_dataY = nullptr;
+	}
+}
+
+ot::PlotDatasetData::PlotDatasetData(PlotDatasetData&& _other) noexcept
+	:m_dataX(std::move(_other.m_dataX)), m_dataY(_other.m_dataY), m_numberOfDatapoints(_other.m_numberOfDatapoints)
+{
+	_other.m_dataY = nullptr;
+}
+
+void ot::PlotDatasetData::overrideDataY(ComplexNumberContainer* _complexNumberContainer)
+{
+	delete m_dataY;
+	m_dataY = _complexNumberContainer;
+	_complexNumberContainer = nullptr;
+}
+
+void ot::PlotDatasetData::initiate()
+{
 	if (m_dataX.size() == 0)
 	{
 		throw std::exception("Plot data set without x- axis values is not allowed.");
 	}
-	_complexNumberContainer = nullptr;
+	
 	ComplexNumberContainerCartesian* cartesianData = dynamic_cast<ComplexNumberContainerCartesian*>(m_dataY);
 	if (cartesianData != nullptr)
 	{
@@ -42,27 +77,5 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, ComplexNumber
 		}
 	}
 	m_numberOfDatapoints = m_dataX.size();
-}
-
-ot::PlotDatasetData::~PlotDatasetData()
-{
-	if (m_dataY != nullptr)
-	{
-		delete m_dataY;
-		m_dataY = nullptr;
-	}
-}
-
-ot::PlotDatasetData::PlotDatasetData(PlotDatasetData&& _other) noexcept
-	:m_dataX(std::move(_other.m_dataX)), m_dataY(_other.m_dataY), m_numberOfDatapoints(_other.m_numberOfDatapoints)
-{
-	_other.m_dataY = nullptr;
-}
-
-void ot::PlotDatasetData::overrideDataY(ComplexNumberContainer* _complexNumberContainer)
-{
-	delete m_dataY;
-	m_dataY = _complexNumberContainer;
-	_complexNumberContainer = nullptr;
 }
 

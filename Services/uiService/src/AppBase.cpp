@@ -7,6 +7,7 @@
 #include "AppBase.h"
 #include "ToolBar.h"
 #include "DevLogger.h"
+#include "UITestLogs.h"
 #include "LogInDialog.h"
 #include "ManageOwner.h"
 #include "ManageAccess.h"
@@ -40,7 +41,8 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
+#include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ReturnMessage.h"
@@ -61,6 +63,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -189,6 +192,7 @@ AppBase::AppBase() :
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
 	m_logIntensity(nullptr),
+	m_lastFocusedView(nullptr),
 	m_lastFocusedCentralView(nullptr),
 	m_defaultView(nullptr),
 	m_loginDialog(nullptr)
@@ -468,7 +472,7 @@ bool AppBase::closeEvent() {
 			m_currentProjectName + 
 			"\".\nDo you want to save them now?\nUnsaved changes will be lost.");
 
-		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
 		if (result == ot::MessageDialogCfg::Cancel) {
 			return false;
@@ -564,7 +568,7 @@ void AppBase::downloadInstaller(QString gssUrl)
 	else
 	{
 		// Error in downloading the installer
-		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok | QMessageBox::Cancel);
+		QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok);
 		msgBox.exec();
 	}
 }
@@ -660,7 +664,7 @@ void AppBase::exportLogs(void) {
 
 	if (ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
 		OT_LOG_E("Logger service url empty");
-		this->showErrorPrompt("No logger service not found", "Export Log");
+		this->showErrorPrompt("Logger service not found", "", "Export Log");
 		return;
 	}
 
@@ -671,7 +675,7 @@ void AppBase::exportLogs(void) {
 
 	std::string response;
 	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		this->showErrorPrompt("Failed to send request to Logger Service.", "Error");
+		this->showErrorPrompt("Failed to send request to Logger Service.", "", "Error");
 		return;
 	}
 
@@ -680,14 +684,14 @@ void AppBase::exportLogs(void) {
 
 	if (responseMessage != ot::ReturnMessage::Ok) {
 		OT_LOG_E("Invalid response: " + responseMessage.getWhat());
-		this->showErrorPrompt("Invalid response from logger service", "Export Log");
+		this->showErrorPrompt("Invalid response from logger service", "Received response: " + response , "Export Log");
 		return;
 	}
 
 	ot::JsonDocument messagesDoc;
 	if (!messagesDoc.fromJson(responseMessage.getWhat())) {
 		OT_LOG_E("Invalid response syntax");
-		this->showErrorPrompt("Invalid response syntax from logger service", "Export Log");
+		this->showErrorPrompt("Invalid response syntax from logger service", "Received response: " + response, "Export Log");
 		return;
 	}
 
@@ -699,7 +703,7 @@ void AppBase::exportLogs(void) {
 	}
 
 	if (messages.empty()) {
-		this->showInfoPrompt("No log messages to export", "Export Log");
+		this->showInfoPrompt("No log messages to export", "", "Export Log");
 		return;
 	}
 
@@ -715,7 +719,7 @@ void AppBase::exportLogs(void) {
 	QFile file(exportName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		OT_LOG_E("Failed to open file for writing");
-		this->showErrorPrompt("Failed to open file for writing.\nFile: \"" + exportName.toStdString() + "\"", "Export Log");
+		this->showErrorPrompt("Failed to open log file for writing.", "File: \"" + exportName.toStdString() + "\"", "Export Log");
 		return;
 	}
 
@@ -724,7 +728,7 @@ void AppBase::exportLogs(void) {
 
 	settings->setValue("ExportLogPath", exportName);
 
-	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "Export Log");
+	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "", "Export Log");
 }
 
 void AppBase::importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName)
@@ -843,6 +847,84 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 void AppBase::setWaitingAnimationVisible(bool flag)
 {
 	ak::uiAPI::window::setWaitingAnimationVisible(m_mainWindow, flag);
+}
+
+void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toPath) {
+	// Ensure a change has occured
+	if (_fromPath == _toPath) {
+		return;
+	}
+
+	// Update views in view manager
+	ot::WidgetViewManager::instance().renameView(_fromPath, _toPath);
+
+	// Update views in local map
+
+	// Graphics
+	auto graphicsIt = m_graphicsViews.find(_fromPath);
+	if (graphicsIt != m_graphicsViews.end()) {
+		auto check = m_graphicsViews.find(_toPath);
+		if (check != m_graphicsViews.end()) {
+			OT_LOG_EAS("A graphics view with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_graphicsViews.insert_or_assign(_toPath, graphicsIt->second);
+			m_graphicsViews.erase(_fromPath);
+		}
+	}
+
+	// Items in graphics view
+	for (auto& it : m_graphicsViews) {
+		it.second->getGraphicsView()->renameItem(_fromPath, _toPath);
+	}
+
+	// TextEdit
+	auto textIt = m_textEditors.find(_fromPath);
+	if (textIt != m_textEditors.end()) {
+		auto check = m_textEditors.find(_toPath);
+		if (check != m_textEditors.end()) {
+			OT_LOG_EAS("A text edit with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_textEditors.insert_or_assign(_toPath, textIt->second);
+			m_textEditors.erase(_fromPath);
+		}
+	}
+
+	// Tables
+	auto tableIt = m_tables.find(_fromPath);
+	if (tableIt != m_tables.end()) {
+		auto check = m_tables.find(_toPath);
+		if (check != m_tables.end()) {
+			OT_LOG_EAS("A table with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_tables.insert_or_assign(_toPath, tableIt->second);
+			m_tables.erase(_fromPath);
+		}
+	}
+
+	// Plots
+	auto plotIt = m_plots.find(_fromPath);
+	if (plotIt != m_plots.end()) {
+		auto check = m_plots.find(_toPath);
+		if (check != m_plots.end()) {
+			OT_LOG_EAS("A plot with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+		}
+		else {
+			m_plots.insert_or_assign(_toPath, plotIt->second);
+			m_plots.erase(_fromPath);
+		}
+	}
+
+	// Update curve names in plots
+	for (auto& it : m_plots) {
+		it.second->getPlot()->renameDataset(_fromPath, _toPath);
+	}
+
+	// Finally update entity path in viewer
+	ViewerAPI::renameEntityPath(_fromPath, _toPath);
+
 }
 
 // ##############################################################################################
@@ -1095,17 +1177,13 @@ void AppBase::createUi(void) {
 		}
 	}
 	catch (const std::exception & e) {
-		this->showErrorPrompt(e.what(), "Critical Error");
+		this->showErrorPrompt("UI setup failed", e.what(), "Critical Error");
 	}
 }
 
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
-
-void AppBase::registerSession(const std::string& _projectName, const std::string& _collectionName) {
-
-}
 
 ModelUIDtype AppBase::createModel() {
 	ViewerUIDtype view = m_viewerComponent->createModel();
@@ -1136,7 +1214,6 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::View3D, ot::WidgetViewBase::ViewIsCentral));
-		this->setupNewCentralView(wv);
 
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
@@ -1149,7 +1226,6 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::View1D, ot::WidgetViewBase::ViewIsCentral));
-		this->setupNewCentralView(wv);
 
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
@@ -1430,7 +1506,7 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 }
 
 void AppBase::updateLogIntensityInfo(void) {
-	ot::LogFlags flags = ot::LogDispatcher::instance().logFlags();
+	ot::LogFlags flags = ot::LogDispatcher::instance().getLogFlags();
 
 	std::string info = "Currently enabled log flags:";
 
@@ -1469,12 +1545,12 @@ bool AppBase::checkForContinue(const std::string& _title) {
 			m_currentProjectName + 
 			"\"?\nUnsaved changes will be lost.");
 
-		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
-		if (result == ot::MessageDialogCfg::Cancel) {
+		if (result & ot::MessageDialogCfg::Cancel) {
 			return false;
 		}
-		else if (result == ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
+		else if (result & ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
 			m_ExternalServicesComponent->saveProject();
 		}
 	}
@@ -1575,6 +1651,11 @@ bool AppBase::isTreeItemExpanded(ot::UID _itemID) {
 	return m_projectNavigation->getTree()->isItemExpanded(_itemID);
 }
 
+bool AppBase::isTreeItemSelected(ot::UID _itemID) {
+	const ot::UIDList& lst = m_projectNavigation->getTree()->selectedItems(); 
+	return std::find(lst.begin(), lst.end(), _itemID) != lst.end();
+}
+
 void AppBase::toggleNavigationTreeItemSelection(ot::UID _itemID, bool _considerChilds) {
 	bool autoConsiderChilds = m_projectNavigation->getTree()->getAutoSelectAndDeselectChildrenEnabled();
 
@@ -1587,7 +1668,7 @@ void AppBase::removeNavigationTreeItems(const std::vector<ot::UID> & itemIds) {
 	m_projectNavigation->getTree()->deleteItems(itemIds);
 }
 
-void AppBase::clearNavigationTreeSelection(void) {
+void AppBase::clearNavigationTreeSelection() {
 	m_projectNavigation->getTree()->deselectAllItems(true);
 }
 
@@ -1601,6 +1682,14 @@ const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems(void) {
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	OTAssertNullptr(m_propertyGrid);
+
+	if (m_propertyGrid->getPropertyGrid()->getIsModal()) {
+		if (_configuration.getIsModal()) {
+			OT_LOG_W("Ignoring request for modal property grid since current property grid is modal");
+		}
+
+		return;
+	}
 
 	// Properties with the "ProjectList" special type need to get the project list set by the frontend
 	std::list<ot::Property*> projListProps = _configuration.findPropertiesBySpecialType("ProjectList");
@@ -1616,6 +1705,15 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	}
 
 	m_propertyGrid->getPropertyGrid()->setupGridFromConfig(_configuration);
+}
+
+void AppBase::clearModalPropertyGrid() {
+	if (!m_propertyGrid->getPropertyGrid()->getIsModal()) {
+		OT_LOG_W("Attempting to clear modal property grid while property grid is not modal. Ignoring...");
+		return;
+	}
+
+	m_propertyGrid->getPropertyGrid()->clear();
 }
 
 void AppBase::focusPropertyGridItem(const std::string& _group, const std::string& _name) {
@@ -1649,11 +1747,15 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
+	OT_SLECTION_TEST_LOG("Auto close unpinned views");
+
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
 		true
 	);
+
+	OT_SLECTION_TEST_LOG(">> Auto close unpinned views completed");
 }
 
 // ##############################################################################################
@@ -1715,8 +1817,8 @@ void AppBase::clearGraphicsPickerData(void) {
 	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
-ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName);
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizingEntities);
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
@@ -1728,8 +1830,8 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
-	this->setupNewCentralView(newEditor);
+	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle/* | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable*/));
+	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
 
 	ot::GraphicsView* graphics = newEditor->getGraphicsView();
 
@@ -1742,8 +1844,8 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	graphics->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
 	ot::PenFCfg newOutline;
 	newOutline.setWidth(.8);
-	newOutline.setCap(ot::RoundCap);
-	newOutline.setStyle(ot::DotLine);
+	newOutline.setCap(ot::LineCapStyle::RoundCap);
+	newOutline.setStyle(ot::LineStyle::DotLine);
 	graphics->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	//m_ExternalServicesComponent->service
@@ -1765,37 +1867,38 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	return newEditor;
 }
 
-ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName) {
+ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities) {
 	auto it = m_graphicsViews.find(_entityName);
 	if (it == m_graphicsViews.end()) {
 		return nullptr;
 	}
 	else {
+		this->addVisualizingEntityInfoToView(it->second, _visualizingEntities);
 		return it->second;
 	}
 }
 
-ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName);
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName, _visualizingEntities);
 	if (v) {
 		return v;
 	}
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _entityName + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
-	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags);
+	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags, _visualizingEntities);
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
-	return std::move(ot::ContainerHelper::listFromMapValues(m_graphicsViews));
+	return ot::ContainerHelper::getValues(m_graphicsViews);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Text Editor
 
-ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName());
+ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName(), _visualizingEntities);
 	if (newEditor != nullptr) {
 		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
@@ -1808,10 +1911,10 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setViewData(_config);
-	this->setupNewCentralView(newEditor);
+	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
 
 	ot::TextEditor* textEdit = newEditor->getTextEditor();
-	textEdit->setupFromConfig(_config, false);
+	textEdit->setupFromConfig(_config, true);
 
 	this->lockManager()->uiElementCreated(_serviceInfo, textEdit, ot::LockAll | ot::LockModelWrite);
 
@@ -1825,29 +1928,29 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	return newEditor;
 }
 
-ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName) {
+ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities) {
 	auto it = m_textEditors.find(_entityName);
 	if (it == m_textEditors.end()) {
 		return nullptr;
 	}
 	else {
+		this->addVisualizingEntityInfoToView(it->second, _visualizingEntities);
 		return it->second;
 	}
 }
 
-ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName());
+ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName(), _visualizingEntities);
 	if (v) {
-		v->getTextEditor()->setupFromConfig(_config, true);
 		return v;
 	}
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewTextEditor(_config, _serviceInfo, _viewInsertFlags);
+	return this->createNewTextEditor(_config, _serviceInfo, _viewInsertFlags, _visualizingEntities);
 }
 
 void AppBase::closeTextEditor(const std::string& _entityName) {
-	ot::TextEditorView* view = this->findTextEditor(_entityName);
+	ot::TextEditorView* view = this->findTextEditor(_entityName, {});
 	if (!view) {
 		return;
 	}
@@ -1866,8 +1969,8 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 
 // Table
 
-ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::TableView* newTable = this->findTable(_config.getEntityName());
+ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::TableView* newTable = this->findTable(_config.getEntityName(), _visualizingEntities);
 	if (newTable != nullptr) {
 		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newTable;
@@ -1880,7 +1983,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setViewData(_config);
-	this->setupNewCentralView(newTable);
+	this->addVisualizingEntityInfoToView(newTable, _visualizingEntities);
 
 	newTable->getTable()->setMultilineCells(true);
 	newTable->getTable()->setupFromConfig(_config);
@@ -1897,29 +2000,30 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	return newTable;
 }
 
-ot::TableView* AppBase::findTable(const std::string& _entityName) {
+ot::TableView* AppBase::findTable(const std::string& _entityName, const ot::UIDList& _visualizingEntities) {
 	auto it = m_tables.find(_entityName);
 	if (it == m_tables.end()) {
 		return nullptr;
 	}
 	else {
+		this->addVisualizingEntityInfoToView(it->second, _visualizingEntities);
 		return it->second;
 	}
 }
 
-ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::TableView* v = this->findTable(_config.getEntityName());
+ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::TableView* v = this->findTable(_config.getEntityName(), _visualizingEntities);
 	if (v) {
 		v->getTable()->setupFromConfig(_config);
 		return v;
 	}
 
 	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewTable(_config, _serviceInfo, _viewInsertFlags);
+	return this->createNewTable(_config, _serviceInfo, _viewInsertFlags, _visualizingEntities);
 }
 
 void AppBase::closeTable(const std::string& _entityName) {
-	ot::TableView* view = this->findTable(_entityName);
+	ot::TableView* view = this->findTable(_entityName, {});
 	if (!view) {
 		return;
 	}
@@ -1932,8 +2036,8 @@ void AppBase::closeTable(const std::string& _entityName) {
 
 // Plot
 
-ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::PlotView* newPlot = this->findPlot(_config.getEntityName());
+ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::PlotView* newPlot = this->findPlot(_config.getEntityName(), _visualizingEntities);
 	if (newPlot != nullptr) {
 		OT_LOG_D("Plot already exists { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newPlot;
@@ -1946,40 +2050,44 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Bas
 
 	newPlot = new ot::PlotView;
 	newPlot->setViewData(_config);
-	this->setupNewCentralView(newPlot);
+	this->addVisualizingEntityInfoToView(newPlot, _visualizingEntities);
 
 	this->lockManager()->uiViewCreated(_serviceInfo, newPlot, ot::LockAll | ot::LockModelWrite);
 
 	m_plots.insert_or_assign(_config.getEntityName(), newPlot);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newPlot, _viewInsertFlags);
+	
+	this->connect(newPlot->getPlot(), &ot::Plot::resetItemSelectionRequest, this, &AppBase::slotPlotResetItemSelectionRequest);
+	this->connect(newPlot->getPlot(), &ot::Plot::curveDoubleClicked, this, &AppBase::slotPlotCurveDoubleClicked);
 
 	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newPlot;
 }
 
-ot::PlotView* AppBase::findPlot(const std::string& _entityName) {
+ot::PlotView* AppBase::findPlot(const std::string& _entityName, const ot::UIDList& _visualizingEntities) {
 	auto it = m_plots.find(_entityName);
 	if (it == m_plots.end()) {
 		return nullptr;
 	}
 	else {
+		this->addVisualizingEntityInfoToView(it->second, _visualizingEntities);
 		return it->second;
 	}
 }
 
-ot::PlotView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
-	ot::PlotView* v = this->findPlot(_config.getEntityName());
+ot::PlotView* AppBase::findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
+	ot::PlotView* v = this->findPlot(_config.getEntityName(), _visualizingEntities);
 	if (v) {
 		return v;
 	}
 
 	OT_LOG_D("Plot does not exist. Creating new plot. { \"Plot.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewPlot(_config, _serviceInfo, _viewInsertFlags);
+	return this->createNewPlot(_config, _serviceInfo, _viewInsertFlags, _visualizingEntities);
 }
 
 void AppBase::closePlot(const std::string& _name) {
-	ot::PlotView* view = this->findPlot(_name);
+	ot::PlotView* view = this->findPlot(_name, {});
 	if (!view) {
 		return;
 	}
@@ -2000,9 +2108,10 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg
 	}
 }
 
-ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
 	ot::MessageDialogCfg config;
 	config.setText(_message);
+	config.setDetailedText(_detailedMessage);
 	config.setTitle(_title);
 	config.setButtons(_buttons);
 	config.setIcon(_icon);
@@ -2010,16 +2119,16 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _messag
 	return this->showPrompt(config);
 }
 
-void AppBase::showInfoPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
+void AppBase::showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showWarningPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
+void AppBase::showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showErrorPrompt(const std::string& _message, const std::string& _title) {
-	this->showPrompt(_message, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
+void AppBase::showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
 }
 
 // #######################################################################################################################
@@ -2251,6 +2360,8 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 }
 
 void AppBase::slotGraphicsSelectionChanged(void) {
+	OT_SLECTION_TEST_LOG("Graphics selection changed");
+
 	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
 	if (scene == nullptr) {
 		OT_LOG_E("GraphicsScene cast failed");
@@ -2265,37 +2376,36 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		return;
 	}
 
-	for (auto selectedItem : selectedItems) 
-	{
+	for (auto selectedItem : selectedItems) {
 		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
-		if (selectedGraphicsItem) 
-		{
+		if (selectedGraphicsItem) {
 			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
 			continue;
 		}
 		
 		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
-		if (selectedConnection) 
-		{
+		if (selectedConnection) {
 			selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
 			continue;
 		}
 
-		if(selectedConnection == nullptr && selectedGraphicsItem == nullptr)
-		{
-			// Unknown selected
-			OTAssert(0, "Unknown graphics item selected");
-		}
+		OTAssert(0, "Unknown graphics element selected");
 	}
 	
 	m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-	clearNavigationTreeSelection();
-	
-	for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
+
 	{
-		ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
-		setNavigationTreeItemSelected(treeID, true);	
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		clearNavigationTreeSelection();
+
+		for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs) {
+			ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
+			setNavigationTreeItemSelected(treeID, true);
+		}
 	}
+
+	OT_SLECTION_TEST_LOG(">> Graphics selection change completed. Running selection handling");
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections) {
@@ -2539,12 +2649,21 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 }
 
 void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {
+	OT_SLECTION_TEST_LOG("View focus changed. { \"Previous\": \"" + (_previousView ? _previousView->getViewData().getEntityName() : "<None>") +
+		"\", \"Focused\": " + (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") + "\" }");
+
 	if (_previousView) {
 		m_navigationManager.slotViewDeselected();
 	}
 
 	// Newly focused (focus in)
 	if (_focusedView) {
+		// Avoid focus change to same view
+		if (_focusedView == m_lastFocusedView) {
+			return;
+		}
+		m_lastFocusedView = _focusedView;
+
 		m_navigationManager.slotViewSelected();
 
 		// Update graphics picker content
@@ -2558,40 +2677,41 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-			const ot::SelectionInformation& viewSelectionInfo = _focusedView->getSelectionInformation();
+			{
+				ak::aTreeWidget* tree = m_projectNavigation->getTree();
+				QSignalBlocker sigBlock(tree);
 
-			ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+				// Reset current selection
+				tree->deselectAllItems(false);
 
-			m_projectNavigation->getTree()->deselectAllItems(false);
-			for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
-				m_projectNavigation->getTree()->setItemSelected(uid, true);
-			}
-
-			// If the view change occured during selection change handling we add the newly selected item(s) to the selection.
-			if (m_navigationManager.isSelectionHandlingRunning() && m_navigationManager.getCurrentSelectionOrigin() == ot::SelectionOrigin::User) {
-				bool added = false;
-				for (UID id : ot::ContainerHelper::createDiff(m_navigationManager.getPreviouslySelectedItems(), m_navigationManager.getSelectedItems(), ot::ContainerHelper::MissingLeft)) {
-					m_projectNavigation->getTree()->setItemSelected(id, true);
-					added = true;
+				OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
+				for (ot::UID uid : _focusedView->getVisualizingItems().getSelectedNavigationItems()) {
+					tree->setItemSelected(uid, true);
 				}
-			}
 
-			m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-			_focusedView->setSelectionInformation(m_navigationManager.getSelectionInformation());
+				m_navigationManager.setSelectedItems(tree->selectedItems());
+			}
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
 
 			if (!m_navigationManager.isSelectionHandlingRunning()) {
+				OT_SLECTION_TEST_LOG("+ View focus changed: Running selection handling");
 				// Run selection handling if currently no selection handling is running
 				this->runSelectionHandling(ot::SelectionOrigin::View);
 			}
 		}
 
+		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
+
+		AppBase::instance()->autoCloseUnpinnedViews();
+	}
+	else {
+		m_lastFocusedView = nullptr;
 	}
 
-	AppBase::instance()->autoCloseUnpinnedViews();
+	OT_SLECTION_TEST_LOG(">> View focus changed completed");
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
@@ -2618,9 +2738,9 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
 	// Deselect navigation item if exists
-	const ot::SelectionInformation& viewSelectionInfo = _view->getSelectionInformation();
+	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
 	{
-		ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
 		for (ot::UID uid : viewSelectionInfo.getSelectedNavigationItems()) {
 			m_projectNavigation->getTree()->setItemSelected(uid, false);
 		}
@@ -2631,38 +2751,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
-	if (!_view) {
-		return;
-	}
-
-	// Update graphics picker content
-
-	// Forward focus events of central views to the viewer component
-	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-		if (m_viewHandling & ViewHandlingConfig::SkipEntitySelection) {
-			return;
-		}
-
-		ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(_view->getViewData().getEntityName()), '/');
-
-		// Change item selection according to focused view
-		if (itemToSelect) {
-			bool changed = false;
-
-			// Select
-			if (itemToSelect) {
-				if (!itemToSelect->isSelected()) {
-					ot::SignalBlockWrapper sigBlock(m_projectNavigation->getTree());
-					itemToSelect->setSelected(true);
-					changed = true;
-				}
-			}
-			// Notify if needed
-			if (changed) {
-				this->runSelectionHandling(ot::SelectionOrigin::View);
-			}
-		}
-	}
+	_view->setAsCurrentViewTab();
 }
 
 void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
@@ -2750,10 +2839,13 @@ void AppBase::slotCreateProject(void) {
 			msg.append(projectUser.c_str());
 			msg.append("\".");
 
-			this->showErrorPrompt(msg, "Create New Project");
+			this->showErrorPrompt(msg, "", "Create New Project");
 			return;
 		}
 	}
+
+	UserManagement userManager(m_loginData);
+	assert(userManager.checkConnection()); // Failed to connect
 
 	// Create new project dialog
 	ot::CreateProjectDialog newProjectDialog(this->mainWindow());
@@ -2766,6 +2858,8 @@ void AppBase::slotCreateProject(void) {
 	// Initialize data
 	newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
 	newProjectDialog.setCurrentProjectName(m_welcomeScreen->getCurrentProjectFilter());
+
+	newProjectDialog.selectProjectType(userManager.restoreSetting("CreateProject.Type"), userManager.restoreSetting("CreateProject.Template"));
 
 	this->connect(&newProjectDialog, &ot::CreateProjectDialog::createProject, &newProjectDialog, &ot::CreateProjectDialog::closeOk);
 
@@ -2785,13 +2879,13 @@ void AppBase::slotCreateProject(void) {
 	if (projectManager.projectExists(currentName, canBeDeleted)) {
 		if (!canBeDeleted) {
 			// Notify that the project already exists and can not be deleted
-			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "Create New Project");
+			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "", "Create New Project");
 			return;
 		}
 
 		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
 
-		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) == ot::MessageDialogCfg::Ok) {
+		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
 			return;
 		}
 
@@ -2807,10 +2901,9 @@ void AppBase::slotCreateProject(void) {
 	}
 
 	projectManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
-
-	UserManagement manager(m_loginData);
-	assert(manager.checkConnection()); // Failed to connect
-	manager.addRecentProject(currentName);
+	userManager.addRecentProject(currentName);
+	userManager.storeSetting("CreateProject.Type", projectType);
+	userManager.storeSetting("CreateProject.Template", templateName);
 
 	// Close project
 	if (m_currentProjectName.length() > 0) {
@@ -2842,14 +2935,14 @@ void AppBase::slotOpenProject(void) {
 		if (projectManager.projectExists(selectedProjectName, canBeDeleted)) {
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
-				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "Open Project");
+				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "", "Open Project");
 				return;
 			}
 			else {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "Open Project");
+					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
 					return;
 				}
 			}
@@ -2862,7 +2955,7 @@ void AppBase::slotOpenProject(void) {
 			assert(userManager.checkConnection()); // Failed to connect
 
 			if (!projectManager.canAccessProject(projectCollection)) {
-				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
+				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "", "Open Project");
 
 				userManager.removeRecentProject(selectedProjectName);
 				m_welcomeScreen->refreshProjectList();
@@ -2887,7 +2980,7 @@ void AppBase::slotOpenProject(void) {
 			UserManagement userManager(m_loginData);
 			assert(userManager.checkConnection()); // Failed to connect
 
-			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project");
+			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
 			m_welcomeScreen->refreshProjectList();
@@ -2972,7 +3065,7 @@ void AppBase::slotRenameProject(void) {
 			msg.append("\" is currently opened by user: \"");
 			msg.append(projectUser);
 			msg.append("\".");
-			this->showErrorPrompt(msg, "Rename Project");
+			this->showErrorPrompt(msg, "", "Rename Project");
 
 			return;
 		}
@@ -3039,7 +3132,7 @@ void AppBase::slotDeleteProject(void) {
 				msg.append("\" is currently opened by user: \"");
 				msg.append(projectUser);
 				msg.append("\".");
-				this->showErrorPrompt(msg, "Delete Project");
+				this->showErrorPrompt(msg, "", "Delete Project");
 
 				continue;
 			}
@@ -3166,7 +3259,9 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
+	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
+	OT_SLECTION_TEST_LOG(">> Tree item selection changed completed");
 }
 
 void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
@@ -3193,8 +3288,110 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 }
 
 void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result, ot::SelectionOrigin _eventOrigin) {
+	OT_SLECTION_TEST_LOG("Handle selection has changed");
+
 	// If true is returned a new view was requested
-	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, this->getSelectedNavigationTreeItems()));
+	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
+	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
+
+	// Notifiy views about selection change
+	ot::UIDList selectedUids;
+	m_viewerComponent->getSelectedModelEntityIDs(selectedUids);
+
+	for (auto& plot : m_plots) {
+		plot.second->getPlot()->setSelectedCurves(selectedUids);
+	}
+
+	for (auto& graphics : m_graphicsViews) {
+		graphics.second->getGraphicsView()->setSelectedElements(selectedUids);
+	}
+
+	OT_SLECTION_TEST_LOG(">> Handle selection has changed completed");
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Plot slots
+
+void AppBase::slotPlotResetItemSelectionRequest() {
+	OT_SLECTION_TEST_LOG("Plot reset item selection request");
+	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
+	if (!plot) {
+		OT_LOG_EA("Plot cast failed");
+		return;
+	}
+	
+	try {
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+
+		// Set plot selection
+		this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), true);
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+
+	OT_SLECTION_TEST_LOG(">> Plot reset item selection request completed. Running selection handling");
+	this->runSelectionHandling(ot::SelectionOrigin::User);
+}
+
+void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier) {
+	OT_SLECTION_TEST_LOG("Plot curve double clicked");
+
+	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
+	if (!plot) {
+		OT_LOG_EA("Plot cast failed");
+		return;
+	}
+	
+	try {
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+
+		ot::UID treeId = ViewerAPI::getTreeIDFromModelEntityID(_entityID);
+
+		if (_hasControlModifier) {
+			this->toggleNavigationTreeItemSelection(treeId, false);
+
+			// Check if any curve will be visible after the operation
+			bool hasSelection = false;
+			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
+				if (data->getEntityID() == _entityID && !this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
+					hasSelection = true;
+					break;
+				}
+				else if (this->isTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()))) {
+					hasSelection = true;
+					break;
+				}
+			}
+
+			// If no more curve is selected we select the plot itself and therefore all the curves
+			if (!hasSelection) {
+				this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), true);
+			}
+
+		}
+		else {
+			// Remove plot selection
+			this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(plot->getConfig().getEntityID()), false);
+
+			// Reset selection for other curves in plot
+			for (const ot::PlotDataset* data : plot->getAllDatasets()) {
+				if (data->getEntityID() != _entityID) {
+					this->setNavigationTreeItemSelected(ViewerAPI::getTreeIDFromModelEntityID(data->getEntityID()), false);
+				}
+			}
+
+			// Set curve selection
+			this->setNavigationTreeItemSelected(treeId, true);
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+
+	OT_SLECTION_TEST_LOG(">> Plot curve double clicked completed. Running selection handling");
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
@@ -3217,19 +3414,19 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	ot::PlotView* plot = dynamic_cast<ot::PlotView*>(_view);
 	if (graphics) {
-		ot::ContainerHelper::removeFromMapByValue(m_graphicsViews, graphics);
+		ot::ContainerHelper::removeByValue(m_graphicsViews, graphics);
 		this->lockManager()->uiElementDestroyed(graphics->getGraphicsView());
 	}
 	if (txt) {
-		ot::ContainerHelper::removeFromMapByValue(m_textEditors, txt);
+		ot::ContainerHelper::removeByValue(m_textEditors, txt);
 		this->lockManager()->uiElementDestroyed(txt->getTextEditor());
 	}
 	if (table) {
-		ot::ContainerHelper::removeFromMapByValue(m_tables, table);
+		ot::ContainerHelper::removeByValue(m_tables, table);
 		this->lockManager()->uiViewDestroyed(table);
 	}
 	if (plot) {
-		ot::ContainerHelper::removeFromMapByValue(m_plots, plot);
+		ot::ContainerHelper::removeByValue(m_plots, plot);
 		this->lockManager()->uiViewDestroyed(plot);
 	}
 
@@ -3239,21 +3436,32 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	
 }
 
-void AppBase::setupNewCentralView(ot::WidgetView* _view) {
-	_view->setSelectionInformation(this->getSelectedNavigationTreeItems());
+void AppBase::addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UIDList& _visualizingEntities) {
+	if (_visualizingEntities.empty()) {
+		return;
+	}
+	
+	_view->clearVisualizingItems();
+
+	for (UID uid : _visualizingEntities) {
+		std::string entityName = ViewerAPI::getEntityName(uid);
+
+		auto treeItem = m_projectNavigation->getTree()->itemFromPath(QString::fromStdString(entityName), '/');
+		if (treeItem) {
+			_view->addVisualizingItem(treeItem->id());
+		}
+	}
 }
 
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
+	OT_SLECTION_TEST_LOG("Running selection handling");
+
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
 	if (selectionResult & ot::SelectionHandlingEvent::NewViewRequested) {
-		// A new view was requested while handling the selection, ignore selection update
-		return;
+		OT_SLECTION_TEST_LOG(">> Selection handling completed with new view requested");
 	}
 	else if ((selectionResult | ot::SelectionHandlingEvent::NoViewChangeRequestedMask) == ot::SelectionHandlingEvent::NoViewChangeRequestedMask) {
-		// No view change requested, but selection changed, update selection information stored for the view
-		if (m_lastFocusedCentralView) {
-			m_lastFocusedCentralView->setSelectionInformation(m_navigationManager.getSelectionInformation());
-		}
+		OT_SLECTION_TEST_LOG(">> Selection handling completed without view change");
 	}
 }

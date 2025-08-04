@@ -20,16 +20,23 @@ public:
 	//! @brief Setting a text will change the underlying data entity. If the modelstate is set, the data entity is directly stored and added to the modelstate.
 	void setText(const std::string& _text) override;
 	bool visualiseText() override { return true; }
-	ot::TextEditorCfg createConfig() override;
+	ot::TextEditorCfg createConfig(bool _includeData) override;
 	ot::ContentChangedHandling getTextContentChangedHandling() override;
+
+	bool updateFromProperties() override;
 
 	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
 protected:
 	void setSpecializedProperties() override;
+	
+	//! @brief Must be called after updateFromProperties
+	bool requiresDataUpdate();
+	
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
+	bool m_requiresDataUpdate = false;
 	ot::ContentChangedHandling m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSaves;
 	ot::TextEncoding::EncodingStandard m_encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };

@@ -21,6 +21,10 @@ void ot::VisualisationTypes::addCurveVisualisation()
 	m_visualisations.push_back(m_visualisationAsCurve);
 }
 
+void ot::VisualisationTypes::addRangeVisualisation() {
+	m_visualisations.push_back(m_visualisationAsRange);
+}
+
 bool ot::VisualisationTypes::visualiseAsText() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsText);
@@ -42,6 +46,11 @@ bool ot::VisualisationTypes::visualiseAsPlot1D() const
 bool ot::VisualisationTypes::visualiseAsCurve() const
 {
 	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsCurve);
+	return entryIt != m_visualisations.end();
+}
+
+bool ot::VisualisationTypes::visualiseAsRange() const {
+	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsRange);
 	return entryIt != m_visualisations.end();
 }
 

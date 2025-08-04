@@ -12,7 +12,6 @@
 // std header
 #include <list>
 #include <string>
-#include <optional>
 
 namespace ot {
 
@@ -32,13 +31,16 @@ namespace ot {
 		//! @brief Changes the provided string to the lower case.
 		static std::string toLower(const std::string& _string);
 
-		//! @brief Evaluates any escape characters in this string.
-		static std::string evaluateEscapeCharacters(const std::string& _string);
+		//! @brief Changes the provided string to the upper case.
+		static std::string toUpper(const std::string& _string);
 
-		//! @brief Extract a name from the full topology entity name
-		//! @param _topologyLvl 0 = root folder, 1 = next level container .... n = short name of entity (default)
-		//! @return 
-		static std::optional<std::string> getEntitySubName(const std::string& _fullEntityName, int32_t _topologyLvl = -1);
+		//! @brief Finds the index of the characters n-th occurance in the string.
+		//! The result when searching for the second occurance of '/' in "A/BB/CCC" will be 4.
+		//! @param _string String to search in.
+		//! @param _character Character to find.
+		//! @param _occurance Occurance to find.
+		//! @return Index of the character or std::string::npos if the n-th character was not found.
+		static size_t findOccurance(const std::string& _string, char _character, int _occurance = 1);
 
 		//! @brief Split the provided string
 		//! @param _str String to split
@@ -64,17 +66,11 @@ namespace ot {
 		//! @param _skipEmpty If true, all empty parts will be skipped
 		static std::list<std::wstring> split(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty = false);
 
-		static std::list<std::string> smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters = true, bool _skipEmpty = false);
-
-		//! @brief Replaces all valid escape character sequence with the corresponding sequence.
-		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
-		static std::string addEscapeCharacters(const std::string& _str);
-
-		//! \brief Replaces all what occurances in the provided string and returns the result.
+		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::string& _str, const std::string& _what, const std::string& _with);
 		static std::string replace(const std::string& _str, const std::string& _what, const std::string& _with);
 
-		//! \brief Replaces all what occurances in the provided string and returns the result.
+		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 		static std::wstring replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 
@@ -128,10 +124,10 @@ namespace ot {
 		//! @return Trimmed string.
 		static std::string removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist = std::string());
 
-		//! \brief Creates a C-String copy of the provided C++ String
+		//! @brief Creates a C-String copy of the provided C++ String
 		static char* getCStringCopy(const std::string& _str);
 
-		//! \brief Creates a C-String copy of the provided C++ String
+		//! @brief Creates a C-String copy of the provided C++ String
 		static wchar_t* getCStringCopy(const std::wstring& _str);
 
 		//! @brief Convert the provided string to a number
@@ -144,13 +140,20 @@ namespace ot {
 		//! @param _string Number string.
 		template <class T> static inline bool isNumber(const std::string& _string);
 
-		//! \brief Returns a hex string representing the provided number.
-		//! \param _number Number to convert.
-		//! \param _fill Fill character.
-		//! \param _length Output string length.
+		//! @brief Returns a hex string representing the provided number.
+		//! @param _number Number to convert.
+		//! @param _fill Fill character.
+		//! @param _length Output string length.
 		template <class T> static inline std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
 
+		//! @brief Evaluates any escape characters in this string.
+		static std::string evaluateEscapeCharacters(const std::string& _string);
 
+		static std::list<std::string> smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters = true, bool _skipEmpty = false);
+
+		//! @brief Replaces all valid escape character sequence with the corresponding sequence.
+		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
+		static std::string addEscapeCharacters(const std::string& _str);
 
 	};
 }

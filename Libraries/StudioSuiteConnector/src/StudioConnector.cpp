@@ -532,6 +532,10 @@ void StudioConnector::startSubprocess() {
 	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, 0, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, 0, doc.GetAllocator());   
 
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());
+
 	ot::ReturnMessage returnMessage = send(doc.toJson());
 
 	if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed) {

@@ -105,7 +105,7 @@ public:
 	// Add your custom functions/ members here
 
 	void EnsureVisualizationModelIDKnown(void);
-
+	void propertyChanged(ot::JsonDocument& _doc) override;
 private:
 	void updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, bool itemsVisible);
 	void updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bool itemsVisible);

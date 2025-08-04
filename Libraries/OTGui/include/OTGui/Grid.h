@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/Color.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/Serializable.h"

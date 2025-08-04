@@ -24,10 +24,18 @@ namespace DataStorageAPI
 		return documentAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
 	}
 
-	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, int limit)
+	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
 	{
-		return documentAccess.GetAllDocuments(queryFilter, projectionQuery, limit);
+		return documentAccess.GetAllDocuments(_queryFilter, _projectionQuery, _limit);
+
 	}
+
+	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort, int _limit)
+	{
+		return documentAccess.GetAllDocuments(_queryFilter, _projectionQuery, _sort, _limit);
+	}
+
+	
 
 	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(const std::string& queryFilter, const std::string& projectionQuery, int limit)
 	{

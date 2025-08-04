@@ -39,13 +39,21 @@ ot::Font ot::QtFactory::toFont(const QFont& _font) {
 }
 
 QPen ot::QtFactory::toQPen(const PenCfg& _outline) {
-    if (_outline.width() <= 0) return QPen(Qt::NoPen);
-    else return QPen(toQBrush(_outline.painter()), (qreal)_outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
+    if (_outline.getWidth() <= 0) {
+        return QPen(Qt::NoPen);
+    }
+    else {
+        return QPen(toQBrush(_outline.getPainter()), (qreal)_outline.getWidth(), toQPenStyle(_outline.getStyle()), toQPenCapStyle(_outline.getCap()), toQPenJoinStyle(_outline.getJoinStyle()));
+    }
 }
 
 QPen ot::QtFactory::toQPen(const PenFCfg& _outline) {
-    if (_outline.width() <= 0.) return QPen(Qt::NoPen);
-    else return QPen(toQBrush(_outline.painter()), _outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
+    if (_outline.getWidth() <= 0.) {
+        return QPen(Qt::NoPen);
+    }
+    else {
+        return QPen(toQBrush(_outline.getPainter()), _outline.getWidth(), toQPenStyle(_outline.getStyle()), toQPenCapStyle(_outline.getCap()), toQPenJoinStyle(_outline.getJoinStyle()));
+    }
 }
 
 Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
@@ -174,12 +182,12 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 Qt::PenStyle ot::QtFactory::toQPenStyle(LineStyle _style) {
 	switch (_style)
 	{
-	case ot::NoLine: return Qt::NoPen;
-	case ot::SolidLine: return Qt::SolidLine;
-	case ot::DashLine: return Qt::DashLine;
-	case ot::DotLine: return Qt::DotLine;
-	case ot::DashDotLine: return Qt::DashDotLine;
-	case ot::DashDotDotLine: return Qt::DashDotDotLine;
+	case LineStyle::NoLine: return Qt::NoPen;
+	case LineStyle::SolidLine: return Qt::SolidLine;
+	case LineStyle::DashLine: return Qt::DashLine;
+	case LineStyle::DotLine: return Qt::DotLine;
+	case LineStyle::DashDotLine: return Qt::DashDotLine;
+	case LineStyle::DashDotDotLine: return Qt::DashDotDotLine;
 	default:
 		OT_LOG_E("Unknown line style (" + std::to_string((int)_style) + ")");
 		return Qt::NoPen;
@@ -189,9 +197,9 @@ Qt::PenStyle ot::QtFactory::toQPenStyle(LineStyle _style) {
 Qt::PenCapStyle ot::QtFactory::toQPenCapStyle(LineCapStyle _style) {
 	switch (_style)
 	{
-	case ot::FlatCap: return Qt::FlatCap;
-	case ot::SquareCap: return Qt::SquareCap;
-	case ot::RoundCap: return Qt::RoundCap;
+	case LineCapStyle::FlatCap: return Qt::FlatCap;
+	case LineCapStyle::SquareCap: return Qt::SquareCap;
+	case LineCapStyle::RoundCap: return Qt::RoundCap;
 	default:
 		OT_LOG_E("Unknown cap style (" + std::to_string((int)_style) + ")");
 		return Qt::SquareCap;
@@ -201,10 +209,10 @@ Qt::PenCapStyle ot::QtFactory::toQPenCapStyle(LineCapStyle _style) {
 Qt::PenJoinStyle ot::QtFactory::toQPenJoinStyle(LineJoinStyle _style) {
 	switch (_style)
 	{
-	case ot::MiterJoin: return Qt::MiterJoin;
-	case ot::BevelJoin: return Qt::BevelJoin;
-	case ot::RoundJoin: return Qt::RoundJoin;
-	case ot::SvgMiterJoin: return Qt::SvgMiterJoin;
+	case LineJoinStyle::MiterJoin: return Qt::MiterJoin;
+	case LineJoinStyle::BevelJoin: return Qt::BevelJoin;
+	case LineJoinStyle::RoundJoin: return Qt::RoundJoin;
+	case LineJoinStyle::SvgMiterJoin: return Qt::SvgMiterJoin;
 	default:
 		OT_LOG_E("Unknown join style (" + std::to_string((int)_style) + ")");
 		return Qt::BevelJoin;

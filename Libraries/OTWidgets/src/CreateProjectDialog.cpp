@@ -162,6 +162,32 @@ void ot::CreateProjectDialog::setCurrentProjectName(const QString& _name) {
 	m_name->setText(_name);
 }
 
+void ot::CreateProjectDialog::selectProjectType(const std::string& _projectType, const std::string& _templateName) {
+	QSignalBlocker sigBlock(m_list);
+	m_list->clearSelection();
+
+	for (QListWidgetItem* itm : m_list->findItems("*", Qt::MatchFlag::MatchWildcard)) {
+		CreateProjectDialogEntry* entry = dynamic_cast<CreateProjectDialogEntry*>(itm);
+		if (entry) {
+			const ProjectTemplateInformation& info = entry->getInfo();
+			if (info.getProjectType() == _projectType) {
+				if (info.getIsDefault() && _templateName.empty()) {
+					entry->setSelected(true);
+					this->slotShowInfo();
+					break;
+				}
+				else if (!info.getIsDefault() && info.getName() == _templateName) {
+					entry->setSelected(true);
+					this->slotShowInfo();
+					break;
+				}
+			}
+		}
+	}
+
+
+}
+
 std::string ot::CreateProjectDialog::getProjectType(void) const {
 	QList<QListWidgetItem*> items = m_list->selectedItems();
 	if (items.count() == 1) {
@@ -186,8 +212,12 @@ std::string ot::CreateProjectDialog::getTemplateName(bool _emptyIfDefault) const
 			OT_LOG_EA("Item cast failed");
 			return std::string();
 		}
-		if (_emptyIfDefault && actualItem->getInfo().getIsDefault()) return std::string();
-		else return actualItem->getInfo().getName();
+		if (_emptyIfDefault && actualItem->getInfo().getIsDefault()) {
+			return std::string();
+		}
+		else {
+			return actualItem->getInfo().getName();
+		}
 	}
 	else if (!items.isEmpty()) {
 		OT_LOG_E("Invalid selection");

@@ -6,9 +6,10 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Serializable.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GuiTypes.h"
-#include "OTCore/Serializable.h"
 
 // std header
 #include <string>
@@ -18,16 +19,24 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT Font : public Serializable {
+		OT_DECL_DEFCOPY(Font)
+		OT_DECL_DEFMOVE(Font)
 	public:
 		Font();
 		Font(FontFamily _fontFamily, int _sizePx = 12, bool _isBold = false, bool _isItalic = false);
 		Font(const std::string& _fontFamily, int _sizePx = 12, bool _isBold = false, bool _isItalic = false);
-		Font(const Font& _other);
 		virtual ~Font();
 
-		Font& operator = (const Font& _other);
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Operators
+
 		bool operator == (const Font& _other) const;
 		bool operator != (const Font& _other) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -38,6 +47,10 @@ namespace ot {
 		//! @param _object The JSON object containing the information
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
 
 		void setFamily(const std::string& _fontFamily) { m_family = _fontFamily; };
 		void setFamily(FontFamily _fontFamily);

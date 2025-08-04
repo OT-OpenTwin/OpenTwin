@@ -9,7 +9,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
+#include "OTCore/Logger.h"
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -338,23 +339,21 @@ namespace ot {
 			//! \param _builder StyledTextBuilder containing the message
 			void displayStyledMessage(const StyledTextBuilder& _builder, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags) const;
 
+			//! @brief Will display a log message in the Frontends output window.
+			//! @param _message The log message to display.
+			void displayLogMessage(const LogMessage& _message) const;
+
 			//! @brief Will display a message in a error prompt dialog
 			//! @param _message The message to display
-			void displayErrorPrompt(
-				const std::string &				_message
-			) const;
+			void displayErrorPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will display a message in a warning prompt dialog
 			//! @param _message The message to display
-			void displayWarningPrompt(
-				const std::string &				_message
-			) const;
+			void displayWarningPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will display a message in a information prompt dialog
 			//! @param _message The message to display
-			void displayInformationPrompt(
-				const std::string &				_message
-			) const;
+			void displayInformationPrompt(const std::string& _message, const std::string& _detailedMessage = std::string()) const;
 
 			//! @brief Will add the control name of the item that is located at the menu
 			//! @param _list The list to add the item to

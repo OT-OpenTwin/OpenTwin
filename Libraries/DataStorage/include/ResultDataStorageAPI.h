@@ -35,7 +35,8 @@ namespace DataStorageAPI
 		~ResultDataStorageAPI() = default;
 
 		DataStorageResponse InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
-		DataStorageResponse SearchInResultCollection(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, int limit);
+		DataStorageResponse SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);
+		DataStorageResponse SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort, int _limit);
 		DataStorageResponse SearchInResultCollection(const std::string& queryFilter, const std::string& projectionQuery, int limit);
 		void FlushQueuedData();
 

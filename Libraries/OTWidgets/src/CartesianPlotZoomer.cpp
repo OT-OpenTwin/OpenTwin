@@ -33,8 +33,6 @@ void ot::CartesianPlotZoomer::widgetMouseDoubleClickEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::MouseButton::LeftButton) {
 		QwtPlotZoomer::widgetMouseDoubleClickEvent(_event);
 	}
-	int pointId;
-	m_plot->getOwner()->datasetSelectionChanged(m_plot->getOwner()->findDataset(m_plot->findNearestCurve(_event->pos(), pointId)));
 }
 
 void ot::CartesianPlotZoomer::widgetMouseMoveEvent(QMouseEvent* _event) {

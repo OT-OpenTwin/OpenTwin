@@ -10,6 +10,8 @@
 #include "DataBase.h"
 #include "EntityHandler.h"
 #include "OTWidgets/PlotDataset.h"
+#include "OTWidgets/PolarPlotCurve.h"
+#include "OTWidgets/CartesianPlotCurve.h"
 
 ot::PlotManager::PlotManager() {
 

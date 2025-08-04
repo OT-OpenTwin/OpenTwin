@@ -72,7 +72,7 @@ namespace ot {
 		ConnectionShape getLineShape(void) const { return m_lineShape; };
 
 		void setLineWidth(double _width) { m_lineStyle.setWidth(_width); };
-		double getLineWidth(void) const { return m_lineStyle.width(); };
+		double getLineWidth(void) const { return m_lineStyle.getWidth(); };
 
 		void setLineColor(const ot::Color& _color) { m_lineStyle.setColor(_color); };
 
@@ -82,7 +82,7 @@ namespace ot {
 
 		//! \brief Returns the current painter.
 		//! The item keeps ownership of the painter.
-		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.painter(); };
+		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.getPainter(); };
 
 		void setLineStyle(LineStyle _style) { m_lineStyle.setStyle(_style); };
 		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };

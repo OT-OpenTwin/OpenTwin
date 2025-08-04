@@ -11,6 +11,7 @@ public:
 	{
 		if (m_uiComponent)
 		{
+			OT_LOG_D("Applying UI lock.");
 			m_uiComponent->lockUI(m_lockFlag);
 		}
 	}
@@ -18,6 +19,7 @@ public:
 	{
 		if (m_uiComponent)
 		{
+			OT_LOG_D("Release UI lock.");
 			m_uiComponent->unlockUI(m_lockFlag);
 		}
 	}

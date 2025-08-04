@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
@@ -18,6 +18,7 @@
 #include <ads/DockWidget.h>
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qbytearray.h>
 
@@ -68,13 +69,13 @@ namespace ot {
 		typedef Flags<ManagerConfigFlag> ManagerConfigFlags;
 
 		//! @brief Return the clobal instance
-		static WidgetViewManager& instance(void);
+		static WidgetViewManager& instance();
 
 		//! @brief Must be called upon startup, if no dock manager is provided a new one will be created
 		void initialize(WidgetViewDockManager* _dockManager = nullptr);
 
 		//! @brief Returns the dock manager that is managed by this widget view manager
-		ads::CDockManager* getDockManager(void) const { return m_dockManager; };
+		ads::CDockManager* getDockManager() const { return m_dockManager; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -120,7 +121,7 @@ namespace ot {
 
 		//! @brief Close all widget views.
 		//! Widget views that are protected will be ignored.
-		void closeViews(void);
+		void closeViews();
 
 		//! @brief Emits a close request for all unpinned views that match the criteria.
 		//! @param _flags Flags that must be set at the view.
@@ -137,6 +138,9 @@ namespace ot {
 		//! The caller takes ownership of the view.
 		//! @param _entityName Widget view name.
 		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
+
+		//! @brief Renames the view with the given name.
+		void renameView(const std::string& _oldEntityName, const std::string _newEntityName);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -160,11 +164,11 @@ namespace ot {
 
 		//! @brief Restore the stored initial state.
 		//! An initial state is save the first time a state is saved or restored.
-		void applyInitialState(void);
+		void applyInitialState();
 
 		void setConfigFlag(ManagerConfigFlag _flag, bool _active = true) { m_config.setFlag(_flag, _active); };
 		void setConfigFlags(const ManagerConfigFlags& _flags) { m_config = _flags; };
-		const ManagerConfigFlags& getConfigFlags(void) const { return m_config; };
+		const ManagerConfigFlags& getConfigFlags() const { return m_config; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -193,17 +197,17 @@ namespace ot {
 		std::list<std::string> getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const;
 
 		//! \brief Returns true if the content of any of the views is modified.
-		bool getAnyViewContentModified(void);
+		bool getAnyViewContentModified();
 
 		//! @brief Return the dock toggle action
-		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
+		QAction* getDockToggleAction() const { return m_dockToggleRoot; };
 
-		WidgetView* getCurrentlyFocusedView(void) const;
+		WidgetView* getCurrentlyFocusedView() const;
 
-		WidgetView* getLastFocusedView(void) const { return m_focusInfo.last; };
-		WidgetView* getLastFocusedSideView(void) const { return m_focusInfo.lastSide; };
-		WidgetView* getLastFocusedToolView(void) const { return m_focusInfo.lastTool; };
-		WidgetView* getLastFocusedCentralView(void) const { return m_focusInfo.lastCentral; };
+		WidgetView* getLastFocusedView() const { return m_focusInfo.last; };
+		WidgetView* getLastFocusedSideView() const { return m_focusInfo.lastSide; };
+		WidgetView* getLastFocusedToolView() const { return m_focusInfo.lastTool; };
+		WidgetView* getLastFocusedCentralView() const { return m_focusInfo.lastCentral; };
 
 	Q_SIGNALS:
 		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
@@ -215,10 +219,12 @@ namespace ot {
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
 
 	private Q_SLOTS:
-		void slotViewCloseRequested(void);
-		void slotUpdateViewVisibility(void);
-		void slotViewTabClicked(void);
-		void slotViewDataModifiedChanged(void);
+		void slotViewCloseRequested();
+		void slotUpdateViewVisibility();
+		void slotViewTabClicked();
+		void slotViewDataModifiedChanged();
+		void slotCloseUnpinnedViews();
+		void slotViewPinnedChanged(bool _pinned);
 
 	private:
 		enum ManagerState {
@@ -234,6 +240,12 @@ namespace ot {
 			WidgetView* lastCentral;
 			WidgetView* lastSide;
 			WidgetView* lastTool;
+		};
+
+		struct AutoCloseInfo {
+			WidgetViewBase::ViewFlags flags;
+			SelectionInformation activeSelection;
+			bool ignoreCurrent;
 		};
 
 		WidgetViewManager();
@@ -259,14 +271,17 @@ namespace ot {
 
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
-		
+		QTimer m_autoCloseTimer;
+
 		ManagerStateFlags m_state;
 		ManagerConfigFlags m_config;
 		std::string m_initialState;
 		int m_initialStateVersion;
 
 		FocusInfo        m_focusInfo;
-		
+
+		AutoCloseInfo    m_autoCloseInfo;
+
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
 

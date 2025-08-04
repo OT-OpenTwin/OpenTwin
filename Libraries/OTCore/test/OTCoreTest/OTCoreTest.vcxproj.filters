@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\TestrJSON.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\FixtureTextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -43,6 +40,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TestReturnMessage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestEntityName.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

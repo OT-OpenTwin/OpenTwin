@@ -28,6 +28,7 @@ public:
 
 	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
+	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
 	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) {};
 
 };
@@ -76,7 +77,10 @@ public:
 
 	virtual void removeChild(EntityBase *child) {};
 
-	virtual bool updateFromProperties(void);
+	//! @brief Will be called whenever a property of the entity has changed.
+	//! The function needs to update the entity accordingly.
+	//! @return Returns true if the property grid needs to be updated.
+	virtual bool updateFromProperties();
 
 	void setModelState(ModelState *ms) { m_modelState = ms; };
 	ModelState *getModelState(void) { return m_modelState; };

@@ -119,6 +119,8 @@ public:
 
 	virtual void modelSelectionChanged(void) override;
 	virtual ~Application();
+
+	void propertyChanged(ot::JsonDocument& _doc) override;
 private:
 	Application();
 
@@ -146,10 +148,10 @@ private:
 	ot::UID _visualizationModel = -1;
 	   
 	TableHandler* _tableHandler = nullptr;
-	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
+	DataCategorizationHandler* m_parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
-	ResultCollectionMetadataAccess* m_resultAccess = nullptr;
+	
 	RangeSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
 	BatchedCategorisationHandler m_batchedCategorisationHandler;
 	void HandleSelectionChanged();

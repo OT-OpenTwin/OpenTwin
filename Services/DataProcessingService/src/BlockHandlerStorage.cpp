@@ -2,20 +2,32 @@
 #include "BlockHandlerStorage.h"
 #include "Application.h"
 
-#include "OTCore/GenericDataStructSingle.h"
-#include "OTCore/GenericDataStructVector.h"
-#include "OTCore/GenericDataStructMatrix.h"
-
 #include "QuantityDescriptionMatrix.h"
 #include "QuantityDescriptionCurve.h"
+#include "MetadataQuantity.h"
+#include <map>
 #include "OTCore/FolderNames.h"
+#include "OTCore/JSONToVariableConverter.h"
+#include "OTCore/ExplicitStringValueConverter.h"
+#include "ResultCollectionMetadataAccess.h"
+
+#include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot1DCurveCfg.h"
+#include "OTCore/EntityName.h"
+#include "OTGui/PainterRainbowIterator.h"
+#include "CurveFactory.h"
+#include "OTModelAPI/NewModelStateInformation.h"
+#include "EntityResult1DPlot.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+
 
 BlockHandlerStorage::BlockHandlerStorage(EntityBlockStorage* blockEntityStorage, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntityStorage,handlerMap),m_blockEntityStorage(blockEntityStorage)
 {
-	m_connectorsQuantity = blockEntityStorage->getConnectorsQuantity();
-	m_connectorsParameter = blockEntityStorage->getConnectorsParameter();
-	m_connectorsMetadata = blockEntityStorage->getConnectorsMetadata();
+	m_allDataInputs = m_blockEntityStorage->getInputNames();
+	m_seriesMetadataInput = m_blockEntityStorage->getSeriesConnectorName();
+	m_createPlot = m_blockEntityStorage->getCreatePlot();
+	m_plotName = m_blockEntityStorage->getPlotName();
 }
 
 BlockHandlerStorage::~BlockHandlerStorage()
@@ -28,22 +40,266 @@ bool BlockHandlerStorage::executeSpecialized()
 
 	if (allInputsAvailable())
 	{
+		_uiComponent->displayMessage("Executing Storage Block: " + m_blockName + "\n");
+
+		ot::PainterRainbowIterator colourIt;
+		std::string plotName = "Plots/";
+		auto blockName = ot::EntityName::getSubName(m_blockName);
+		assert(blockName.has_value());
+		std::string blockNameShort = blockName.value();
+		if (!m_plotName.empty())
+		{
+			plotName += m_plotName;
+		}
+		else
+		{
+			
+			plotName += blockNameShort;
+		}
+		ot::NewModelStateInformation modelStateInformation;
+
 		auto& classFactory = Application::instance()->getClassFactory();
 		const auto modelComponent = Application::instance()->modelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
 		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		resultCollectionExtender.setSaveModel(!m_createPlot);
 
-		_uiComponent->displayMessage("Executing Storage Block: " + _blockName);
-		std::list<DatasetDescription> datasets = std::move(createDatasets());
-		const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + m_blockEntityStorage->getSeriesName();
-		std::list<std::shared_ptr<MetadataEntry>>seriesMetadata;
-		ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
-		
-		for (DatasetDescription& dataset : datasets)
+		ot::JSONToVariableConverter converter;
+		for (const std::string portName : m_allDataInputs)
 		{
-			resultCollectionExtender.processDataPoints(&dataset, seriesID);
+
+			const std::string portInvalidData = "Port " + portName + " received data in an invalid format. The input needs to be an array of json objects.";
+
+			auto pipelineByName = m_dataPerPort.find(portName);
+			PipelineData* dataPipeline = pipelineByName->second;
+
+			const MetadataCampaign* campaign = dataPipeline->getMetadataCampaign();
+			const std::map <std::string, MetadataQuantity*>& campaignQuantitiesByLabel = campaign->getMetadataQuantitiesByLabel();
+			const std::map<std::string, MetadataParameter*>& campaignParametersByLabel = campaign->getMetadataParameterByLabel();
+
+			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
+			std::map < std::string, MetadataParameter> occurringParametersByLabel;
+			
+			ot::JsonValue& dataEntries = dataPipeline->getData();
+			
+			if (dataEntries.IsArray())
+			{
+				auto dataArray = dataEntries.GetArray();
+				for (const auto& entry : dataArray)
+				{
+					if (entry.IsObject())
+					{
+						//Until here we check if the format is as expected
+						auto entryObject = entry.GetObject();
+						for (auto& field : entryObject) //Here we extract the fields of the documents and store them as quantity or parameter, depending on the metadata definitions.
+						{
+							const std::string key = field.name.GetString();
+							const ot::JsonValue& fieldValue = field.value;
+
+							auto quantityByLabel = campaignQuantitiesByLabel.find(key);
+							if (quantityByLabel != campaignQuantitiesByLabel.end())
+							{
+								auto datasetDescription = datasetDescriptionByQuantityLabel.find(key);
+								MetadataQuantity* quantity = quantityByLabel->second;
+								if (datasetDescription == datasetDescriptionByQuantityLabel.end())
+								{
+									DatasetDescription newDatasetDescription;
+									std::unique_ptr<QuantityDescription> quantityDescription;
+									if (quantity->dataDimensions.size() > 1) // We got a matrix
+									{
+										ot::MatrixEntryPointer matrixDimensions;
+										matrixDimensions.m_row = quantity->dataDimensions[0];
+										matrixDimensions.m_column= quantity->dataDimensions[1];
+
+										quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
+									}
+									else
+									{
+										quantityDescription.reset(new QuantityDescriptionCurve());
+
+									}
+
+									quantityDescription->setMetadataQuantity(*quantity);
+									//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
+									quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
+									quantityDescription->getMetadataQuantity().quantityIndex = 0;
+									for (auto& valueDescription : quantityDescription->getMetadataQuantity().valueDescriptions)
+									{
+										valueDescription.quantityIndex = 0;
+									}
+									newDatasetDescription.setQuantityDescription(quantityDescription.release());
+									datasetDescriptionByQuantityLabel[key] = std::move(newDatasetDescription);
+									datasetDescription = datasetDescriptionByQuantityLabel.find(key);
+								}
+								
+								const std::string& dataType = quantity->valueDescriptions.begin()->dataTypeName;
+								if (quantity->dataDimensions.size() > 1) // Here the data is a matrix
+								{
+									QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
+									ot::MatrixEntryPointer matrixDimensions;
+									matrixDimensions.m_row = quantity->dataDimensions[0];
+									matrixDimensions.m_column = quantity->dataDimensions[1];
+
+									ot::GenericDataStructMatrix matrixValues(matrixDimensions);
+									ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
+									std::list<ot::Variable> values;
+									for (auto& entry : linearMatrix)
+									{
+										if (dataType != "")
+										{
+											const ot::Variable value = converter(entry, dataType);
+											values.push_back(value);
+										}
+										else
+										{
+											const ot::Variable value = converter(entry);
+											values.push_back(value);
+										}
+									}
+									matrixValues.setValues(values);
+									matrix->addToValues(matrixValues);
+								}
+								else
+								{
+									QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
+									if (dataType != "")
+									{
+										ot::Variable value = converter(fieldValue, dataType);
+										curve->addDatapoint(std::move(value));
+									}
+									else
+									{
+										ot::Variable value = converter(fieldValue);
+										curve->addDatapoint(std::move(value));
+									}
+								}
+							}
+							else
+							{
+								auto occurringParameterByLabel = occurringParametersByLabel.find(key);
+								if (occurringParameterByLabel == occurringParametersByLabel.end())
+								{
+									auto campaignParameterByLabel = campaignParametersByLabel.find(key);
+									if (campaignParameterByLabel == campaignParametersByLabel.end())
+									{
+										//Error case
+										assert(false);
+									}
+									else
+									{
+										MetadataParameter campaignParameter= *campaignParameterByLabel->second;
+										campaignParameter.values.clear();
+										occurringParametersByLabel[key] = std::move(campaignParameter);
+										occurringParameterByLabel = occurringParametersByLabel.find(key);
+									}
+								}
+
+								MetadataParameter& param = occurringParameterByLabel->second;
+								const std::string typeName = param.typeName;
+								if (typeName != "")
+								{
+									param.values.push_back(converter(fieldValue, typeName));
+								}
+								else
+								{
+									param.values.push_back(converter(fieldValue));
+								}
+							}
+						
+						}
+					}
+					else
+					{
+						throw std::exception(portInvalidData.c_str());
+					}
+				}
+			}
+			else
+			{
+				throw std::exception(portInvalidData.c_str());
+			}
+
+			std::list <std::shared_ptr<ParameterDescription>> paramDescriptions;
+			for (auto& parameterByLabel : occurringParametersByLabel)
+			{
+				MetadataParameter& parameter =	parameterByLabel.second;
+				
+				bool constInDataset = false; // Here we ignore the possibility of const parameter in a dataset, because we actually got already all our parameter values.
+				
+				std::shared_ptr<ParameterDescription> paramDescription(new ParameterDescription(parameter, constInDataset));
+				paramDescriptions.push_back(paramDescription);
+			}
+
+			std::list<DatasetDescription> datasetDescr;
+			for (auto& datasetByLabel : datasetDescriptionByQuantityLabel)
+			{
+				DatasetDescription& dataset = datasetByLabel.second;
+				dataset.addParameterDescriptions(paramDescriptions);
+				datasetDescr.push_back(std::move(dataset));
+
+			}
+
+			
+			const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + blockNameShort;
+			std::list<std::shared_ptr<MetadataEntry>> metadata;
+			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName,metadata);
+			
+			for (DatasetDescription& dsd : datasetDescr)
+			{
+				resultCollectionExtender.processDataPoints(&dsd, seriesID);
+			}
+			resultCollectionExtender.storeCampaignChanges();
+
+			if (m_createPlot)
+			{
+				const MetadataSeries* series = resultCollectionExtender.findMetadataSeries(seriesID);
+				
+				ot::Plot1DCurveCfg curveConfig;
+				auto painter = colourIt.getNextPainter();
+				curveConfig.setLinePen(painter.release());
+				CurveFactory::addToConfig(*series, curveConfig);
+
+				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+
+				const std::string fullNameSeries = series->getName();
+				std::optional<std::string> shortNameSeries = ot::EntityName::getSubName(fullNameSeries);
+				assert(shortNameSeries.has_value());
+
+				newCurve.setName(plotName + "/"+ shortNameSeries.value());
+				newCurve.createProperties();
+				newCurve.setCurve(curveConfig);
+				newCurve.StoreToDataBase();
+
+				modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
+				modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
+				modelStateInformation.m_forceVisible.push_back(false);
+			}
 		}
-		resultCollectionExtender.storeCampaignChanges();
+		
+		if (m_createPlot)
+		{
+			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+			newPlot.setName(plotName);
+
+			ot::Plot1DCfg plotCfg;
+			const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);
+			plotCfg.setTitle(shortName);
+			newPlot.createProperties();
+			newPlot.setPlot(plotCfg);
+			newPlot.StoreToDataBase();
+			modelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
+			modelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
+			modelStateInformation.m_forceVisible.push_back(false);
+
+			//Store state
+			std::list<ot::UID> noDataEntities{};
+			ot::ModelServiceAPI::addEntitiesToModel(
+				modelStateInformation.m_topologyEntityIDs,
+				modelStateInformation.m_topologyEntityVersions,
+				modelStateInformation.m_forceVisible,
+				noDataEntities, noDataEntities, noDataEntities, "Created new plot for existing series metadata", true, true);
+		}
+		
 		return true;
 	}
 	else
@@ -54,290 +310,20 @@ bool BlockHandlerStorage::executeSpecialized()
 
 bool BlockHandlerStorage::allInputsAvailable()
 {
-	for (auto& connector : m_connectorsParameter)
+	for (auto& input: m_allDataInputs)
 	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
+		if (m_dataPerPort.find(input) == m_dataPerPort.end())
 		{
 			return false;
 		}
 	}
-	
-	for (auto& connector : m_connectorsQuantity)
-	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
-		{
-			return false;
-		}
-	}
-
-	for (auto& connector : m_connectorsMetadata)
-	{
-		if (_dataPerPort.find(connector.getConnectorName()) == _dataPerPort.end())
-		{
-			return false;
-		}
-	}
-
 	return true;
-}
-
-std::list<std::shared_ptr<ParameterDescription>> BlockHandlerStorage::createAllParameter()
-{
-	std::list<std::shared_ptr<ParameterDescription>> allParameter;
-	for (auto& connector : m_connectorsParameter)
-	{
-		
-		MetadataParameter newParameter = extractParameter(connector);
-		const std::string parameterName = connector.getConnectorName();
-
-		auto portData = _dataPerPort.find(parameterName);
-		assert(portData != _dataPerPort.end()); //Should have been checked before
-		const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
-		const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName);
-		const std::string portLabel = connector.getConnectorTitle();		
-		
-		auto& pipelineDocumentList = portData->second.m_data;
-		
-		if (pipelineDocumentList.size() == 0)
-		{
-			const std::string errorMessageNoValuesReceived = "The parameter port " + portLabel + " has not received any values.";
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
-		
-		for (auto& pipelineDocument : pipelineDocumentList)
-		{
-			if (pipelineDocument.m_parameter.size()> 1)
-			{
-				throw std::exception(("The parameter port " + portLabel + " has a dimension that is not supported.").c_str());
-			}
-			else
-			{
-				const ot::Variable& value = pipelineDocument.m_parameter.begin()->second;
-				newParameter.values.push_back(value);
-			}
-		}
-		
-		allParameter.push_back(std::make_shared< ParameterDescription>(newParameter, selectedProperties.m_propertyConstParameter));
-	}
-	
-	return allParameter;
-}
-
-MetadataParameter BlockHandlerStorage::extractParameter(const ot::Connector& _connector)
-{
-	const std::string parameterName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(parameterName);
-	assert(portData != _dataPerPort.end()); //Should have been checked before
-	const MetadataParameter* metadataParameterFromPort = portData->second.m_parameter;
-	const ParameterProperties selectedProperties = m_blockEntityStorage->getPropertiesParameter(parameterName); //Parameter settings that are set in the properties
-
-	MetadataParameter newParameter;
-	if (metadataParameterFromPort != nullptr)
-	{
-		//Data stream carries relevant meta data with it. The user has the option to overwrite these meta data via the entity properties.
-
-		if (selectedProperties.m_propertyName == "")
-		{
-			newParameter.parameterName = metadataParameterFromPort->parameterName;
-		}
-		else
-		{
-			newParameter.parameterName = selectedProperties.m_propertyName;
-		}
-
-		if (selectedProperties.m_propertyUnit == "")
-		{
-			newParameter.unit = metadataParameterFromPort->unit;
-		}
-		else
-		{
-			newParameter.unit = selectedProperties.m_propertyUnit;
-		}
-	}
-	else
-	{
-		if (selectedProperties.m_propertyName == "" || selectedProperties.m_propertyUnit == "")
-		{
-			const std::string errorMessagePropertyMustBeSet = _connector.getConnectorTitle() + " did not receive meta data from the processing pipeline. All properties for this quantity have to be set manually, which is currently not the case.";
-			throw std::exception(errorMessagePropertyMustBeSet.c_str());
-		}
-		newParameter.parameterName = selectedProperties.m_propertyName;
-		newParameter.unit = selectedProperties.m_propertyUnit;
-	}
-	return newParameter;
 }
 
 std::list<DatasetDescription> BlockHandlerStorage::createDatasets()
 {
-	auto allParameter = createAllParameter();
+	
 	std::list<DatasetDescription> allDataDescriptions;
 
-	for (auto& connector : m_connectorsQuantity)
-	{
-
-		std::string valueName(""), unit(""), name(""), dataTypeName("");
-		extractQuantityProperties(connector, name, unit, valueName);
-		QuantityDescription* quantityDescription = extractQuantityDescription(connector, dataTypeName);
-		
-		
-		quantityDescription->setName(name);
-		quantityDescription->addValueDescription(valueName, dataTypeName, unit);
-
-		DatasetDescription dataset;
-		dataset.setQuantityDescription(quantityDescription);
-		dataset.addParameterDescriptions(allParameter);
-		allDataDescriptions.push_back(std::move(dataset));
-	}
 	return allDataDescriptions;
-}
-
-QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::Connector& _connector, std::string& _outTypeName)
-{
-	const std::string portLabel = _connector.getConnectorTitle();
-	const std::string quantityName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(quantityName);
-
-	//Now we assign the parameter values and check if the characteristics are matching.
-	const std::string errorMessageNoValuesReceived = "The quantity port " + portLabel + " has not received any values.";
-
-	auto& pipelineData = portData->second.m_data;
-	auto firstDataEntry = pipelineData.begin()->m_quantity;
-	assert(firstDataEntry != nullptr);
-	if (pipelineData.size() == 0)
-	{
-		throw std::exception(errorMessageNoValuesReceived.c_str());
-	}
-
-	QuantityDescription* quantityDescription = nullptr;
-	ot::GenericDataStructSingle* singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(firstDataEntry.get());
-	if (singleEntry != nullptr)
-	{
-		_outTypeName = singleEntry->getValue().getTypeName();
-		auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
-		for (auto dataEntry : pipelineData)
-		{
-			singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.m_quantity.get());
-			ot::Variable value = singleEntry->getValue();
-			quantityDescriptionCurve->addDatapoint(std::move(value));
-		}
-		quantityDescription = quantityDescriptionCurve.release();
-	}
-
-	ot::GenericDataStructVector* vectorEntry = dynamic_cast<ot::GenericDataStructVector*>(firstDataEntry.get());
-	if (vectorEntry != nullptr)
-	{
-		if (vectorEntry->getNumberOfEntries() == 0)
-		{
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
-
-		if ((pipelineData.size() > 1 && vectorEntry->getNumberOfEntries() > 1)) //Essentially a matrix of entries
-		{
-			assert(false); //Should not be.
-		}
-
-		std::vector<ot::Variable> values = vectorEntry->getValues();
-		_outTypeName = values.begin()->getTypeName();
-		auto quantityDescriptionCurve = std::make_unique<QuantityDescriptionCurve>();
-		quantityDescriptionCurve->setDataPoints({ values.begin(), values.end() });
-		quantityDescription = quantityDescriptionCurve.release();
-	}
-
-	ot::GenericDataStructMatrix* matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(firstDataEntry.get());
-	if (matrixEntry != nullptr)
-	{
-		if (matrixEntry->getNumberOfEntries() == 0)
-		{
-			throw std::exception(errorMessageNoValuesReceived.c_str());
-		}
-		ot::MatrixEntryPointer pointer;
-		pointer.m_column = 0;
-		pointer.m_row = 0;
-		const ot::Variable& value = matrixEntry->getValue(pointer);
-		const uint32_t numberOfRows = matrixEntry->getNumberOfColumns();
-		const uint32_t numberOfColumns = matrixEntry->getNumberOfRows();
-		ot::MatrixEntryPointer matrixDimension;
-		matrixDimension.m_column = numberOfColumns;
-		matrixDimension.m_row= numberOfRows;
-		_outTypeName = value.getTypeName();
-		auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>(matrixDimension, pipelineData.size()));
-		for (auto dataEntry : pipelineData)
-		{
-			matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.m_quantity.get());
-			quantityDescriptionMatrix->addToValues(*matrixEntry);
-			quantityDescription = quantityDescriptionMatrix.release();
-		}
-	}
-	assert(quantityDescription != nullptr);
-	return quantityDescription;
-}
-
-void BlockHandlerStorage::extractQuantityProperties(const ot::Connector& _connector, std::string& _outName, std::string& _outUnit, std::string& _outValueName)
-{
-	const std::string portLabel = _connector.getConnectorTitle();
-	const std::string quantityName = _connector.getConnectorName();
-	auto portData = _dataPerPort.find(quantityName);
-	assert(portData != _dataPerPort.end()); //Should have been checked before
-	const MetadataQuantity* metadataQuantityFromPort = portData->second.m_quantity;
-	const MetadataQuantityValueDescription* quantityValueDescriptionFromPort = portData->second.m_quantityDescription;
-	const QuantityProperties selectedProperties = m_blockEntityStorage->getPropertiesQuantity(quantityName);
-
-	if (metadataQuantityFromPort != nullptr)
-	{
-		assert(quantityValueDescriptionFromPort != nullptr);
-		if (selectedProperties.m_propertyName == "")
-		{
-			_outName = (metadataQuantityFromPort->quantityName);
-		}
-		else
-		{
-			_outName = (selectedProperties.m_propertyName);
-		}
-
-		if (selectedProperties.m_propertyType == "")
-		{
-			_outValueName = quantityValueDescriptionFromPort->quantityValueName;
-		}
-		else
-		{
-			_outValueName = selectedProperties.m_propertyType;
-		}
-
-		if (selectedProperties.m_propertyUnit == "")
-		{
-			_outUnit = quantityValueDescriptionFromPort->unit;
-		}
-		else
-		{
-			_outUnit = selectedProperties.m_propertyUnit;
-		}
-	}
-	else
-	{
-		if (selectedProperties.m_propertyName == "")
-		{
-			const std::string errorMessagePropertyMustBeSet = portLabel + " did not receive meta data from the processing pipeline. All properties for this quantity have to be set manually, which is currently not the case.";
-			throw std::exception(errorMessagePropertyMustBeSet.c_str());
-		}
-		_outName = selectedProperties.m_propertyName;
-
-		if (selectedProperties.m_propertyUnit == "")
-		{
-			_outUnit = " ";
-		}
-		else
-		{
-			_outUnit = selectedProperties.m_propertyUnit;
-		}
-		if (selectedProperties.m_propertyType == "")
-		{
-			_outValueName = " ";
-		}
-		else
-		{
-			_outValueName = selectedProperties.m_propertyType;
-		}
-	}
-
-
 }

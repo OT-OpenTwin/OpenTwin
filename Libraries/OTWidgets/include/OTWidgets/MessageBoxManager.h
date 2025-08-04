@@ -21,13 +21,13 @@ namespace ot {
 
 		static MessageDialogCfg::BasicButton showPrompt(const MessageDialogCfg& _config);
 
-		static MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons);
+		static MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, MessageDialogCfg::BasicIcon _icon, const MessageDialogCfg::BasicButtons& _buttons);
 
-		static MessageDialogCfg::BasicButton showInfoPrompt(const std::string& _message, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
 
-		static MessageDialogCfg::BasicButton showWarningPrompt(const std::string& _message, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
 
-		static MessageDialogCfg::BasicButton showErrorPrompt(const std::string& _message, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
+		static MessageDialogCfg::BasicButton showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, const MessageDialogCfg::BasicButtons& _buttons = MessageDialogCfg::Ok);
 
 		void setHandler(MessageBoxHandler* _handler) { m_handler = _handler; };
 

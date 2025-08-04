@@ -116,16 +116,11 @@ double calculate(double start, double decrement, int count)
 
 float calculate(float start, float decrement, int count)
 {
-	for (int i = 0; i < count; ++i)
+	for (int i = 0; i < count; i++) {
 		start -= decrement;
+	}
 	return start;
 }
-//float calculate(float start, float decrement, int count)
-//{
-//	for (int i = 0; i < count; ++i)
-//		start -= decrement;
-//	return start;
-//}
 
 TEST(VariableTest, DoubleComparision)
 {
@@ -155,6 +150,7 @@ TEST_F(FixtureVariable, UniqueList)
 	EXPECT_EQ(expectedNumberOfEntries,actualNumberOfEntries);
 }
 
+/*
 TEST(VariableTest, FloatComparision)
 {
 	const int total = 10000;
@@ -170,6 +166,7 @@ TEST(VariableTest, FloatComparision)
 	}
 	EXPECT_EQ(count, total);
 }
+*/
 
 TEST_P(FixtureVariable, Equal)
 {

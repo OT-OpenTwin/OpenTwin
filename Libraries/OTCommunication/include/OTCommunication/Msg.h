@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"
 
@@ -28,6 +28,9 @@ namespace ot {
 			DefaultFlags       = DefaultFlagsNoExit | ExitOnFail
 		};
 		typedef ot::Flags<RequestFlag> RequestFlags;
+
+		
+		OT_COMMUNICATION_API_EXPORT const std::string getLastError();
 
 		//! @brief Will send the provided message to the microservice framework. Returns true if succeeded
 		//! @param _senderIP The sender IP address

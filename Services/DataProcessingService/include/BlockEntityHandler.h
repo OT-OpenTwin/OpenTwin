@@ -20,7 +20,6 @@ public:
 	void UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory *classFactory);
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 
-	static std::string getQueryForRangeSelection() { return "Range"; }
 private:
 	const std::string _blockFolder = ot::FolderNames::BlockFolder;
 	const std::string _connectionFolder = "Connections";

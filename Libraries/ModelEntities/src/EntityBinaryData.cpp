@@ -2,6 +2,7 @@
 #include "EntityBinaryData.h"
 #include "DataBase.h"
 #include "OldTreeIcon.h"
+#include "DocumentAPI.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -29,14 +30,31 @@ void EntityBinaryData::AddStorageData(bsoncxx::builder::basic::document &storage
 
 	// Now add the actual data array
 
-	bsoncxx::types::b_binary bin_data;
-	bin_data.size = data.size();
-	bin_data.bytes = (uint8_t *)(data.data());
+	if (data.size() > DataStorageAPI::DocumentManager::MaxDocumentLength)
+	{
+		// The data is too large and needs to be stored in GridFS
+		DataStorageAPI::DocumentAPI doc;
 
-	storage.append(
-		bsoncxx::builder::basic::kvp("size", (long long) data.size()),
-		bsoncxx::builder::basic::kvp("data", bin_data)
-	);
+		bsoncxx::types::value result = doc.InsertBinaryDataUsingGridFs((uint8_t*)(data.data()), data.size(), DataBase::GetDataBase()->getProjectName());
+		std::string fileId = result.get_oid().value.to_string();
+
+		storage.append(
+			bsoncxx::builder::basic::kvp("size", (long long)data.size()),
+			bsoncxx::builder::basic::kvp("file", fileId)
+		);
+	}
+	else
+	{
+		// The data is small enough and can be stored directly in the document
+		bsoncxx::types::b_binary bin_data;
+		bin_data.size = data.size();
+		bin_data.bytes = (uint8_t*)(data.data());
+
+		storage.append(
+			bsoncxx::builder::basic::kvp("size", (long long)data.size()),
+			bsoncxx::builder::basic::kvp("data", bin_data)
+		);
+	}
 }
 
 void EntityBinaryData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
@@ -50,13 +68,32 @@ void EntityBinaryData::readSpecificDataFromDataBase(bsoncxx::document::view &doc
 
 	// Now load the data from the storage
 
-	auto bin_data = doc_view["data"].get_binary();
-
-	data.reserve(bin_data.size);
-
-	for (unsigned long index = 0; index < bin_data.size; index++)
+	if (doc_view.find("file") != doc_view.end())
 	{
-		data.push_back(bin_data.bytes[index]);
+		// The storage is separate in GridFS
+		DataStorageAPI::DocumentAPI doc;
+		uint8_t* buffer = nullptr;
+		size_t length = 0;
+
+		std::string file = doc_view["file"].get_utf8().value.data();
+		bsoncxx::oid oid_obj{ file };
+		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+
+		doc.GetDocumentUsingGridFs(id, buffer, length, DataBase::GetDataBase()->getProjectName());
+
+		data.insert(data.end(), buffer, buffer + length);
+	}
+	else
+	{
+		// The storage is directly in the entity
+		auto bin_data = doc_view["data"].get_binary();
+
+		data.reserve(bin_data.size);
+
+		for (unsigned long index = 0; index < bin_data.size; index++)
+		{
+			data.push_back(bin_data.bytes[index]);
+		}
 	}
 
 	resetModified();

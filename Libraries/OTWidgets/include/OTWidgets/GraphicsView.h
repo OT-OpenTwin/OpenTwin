@@ -5,8 +5,8 @@
 
 #pragma once
 
-// OpenTwin header
-#include "OTCore/Flags.h"
+// OpenTwin header	
+#include "OTSystem/Flags.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
@@ -55,67 +55,95 @@ namespace ot {
 		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
 		virtual ~GraphicsView();
 
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		void resetView(void);
-		void ensureViewInBounds(void);
+		// Virtual methods
+
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
-		bool getMouseWheelEnabled(void) const { return m_wheelEnabled; };
+		bool getMouseWheelEnabled() const { return m_wheelEnabled; };
 
 		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
-		const BasicServiceInformation& getOwner(void) const { return m_owner; };
+		const BasicServiceInformation& getOwner() const { return m_owner; };
 
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
-		const GraphicsViewFlags& getGraphicsViewFlags(void) const { return m_viewFlags; };
-
-		void setGraphicsScene(GraphicsScene* _scene);
-		GraphicsScene* getGraphicsScene(void) { return m_scene; };
-		const GraphicsScene* getGraphicsScene(void) const { return m_scene; };
-		
-		GraphicsItem* getItem(const ot::UID& _itemUid);
-		GraphicsConnectionItem* getConnection(const ot::UID& _connectionUid);
-		
-		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
+		const GraphicsViewFlags& getGraphicsViewFlags() const { return m_viewFlags; };
 
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
-		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
-		const std::string& getGraphicsViewName(void) const { return m_viewName; };
+		void setGraphicsViewName(const std::string& _name);
+		const std::string& getGraphicsViewName() const { return m_viewName; };
 
-		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
-		std::list<ot::UID> getSelectedItemUIDs(void) const;
-		std::list<GraphicsItem*> getSelectedGraphicsItems(void) const;
+		void setReadOnly(bool _isReadOnly) { m_viewStateFlags.setFlag(ViewStateFlag::ReadOnlyState, _isReadOnly); };
+		bool isReadOnly() const { return m_viewStateFlags.flagIsSet(ViewStateFlag::ReadOnlyState); };
+
+		void setGraphicsScene(GraphicsScene* _scene);
+		GraphicsScene* getGraphicsScene() { return m_scene; };
+		const GraphicsScene* getGraphicsScene() const { return m_scene; };
 
 		void setSceneMargins(const QMarginsF& _margins) { m_sceneMargins = _margins; };
-		const QMarginsF& getSceneMargins(void) const { return m_sceneMargins; };
+		const QMarginsF& getSceneMargins() const { return m_sceneMargins; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// View handling
+
+		void resetView();
+		void ensureViewInBounds();
 
 		void setGraphicsSceneRect(double _posX, double _posY, double _sizeX, double _sizeY) { this->setGraphicsSceneRect(QRectF(QPointF(_posX, _posY), QSizeF(_sizeX, _sizeY))); };
 		void setGraphicsSceneRect(const QPointF& _pos, const QSize& _size) { this->setGraphicsSceneRect(QRectF(_pos, _size)); };
 		void setGraphicsSceneRect(const QRectF& _rect);
 
+		QRectF getVisibleSceneRect() const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Item handling
+		
+		GraphicsItem* getItem(const ot::UID& _itemUid);
+		GraphicsConnectionItem* getConnection(const ot::UID& _connectionUid);
+		
+		//! @brief Will rename the item if it exists.
+		//! @param _oldEntityName Old item entity name.
+		//! @param _newEntityName New item entity name.
+		void renameItem(const std::string& _oldEntityName, const std::string& _newEntityName);
+
+		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
+
+		void addItem(ot::GraphicsItem* _item);
+		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
+		
+		//! @brief Selects the item with the given UID.
+		//! Items not in the list will be deselected.
+		//! During this operation no signals will be emitted.
+		//! @param _uids List of item UIDs to select.
+		void setSelectedElements(const ot::UIDList& _uids);
+
+		std::list<ot::UID> getSelectedItemUIDs() const;
+		std::list<GraphicsItem*> getSelectedGraphicsItems() const;
+
 		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
-		ot::UIDList getSelectedConnectionUIDs(void) const;
-		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
+		ot::UIDList getSelectedConnectionUIDs() const;
+		std::list<GraphicsConnectionItem*> getSelectedConnectionItems() const;
 
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 
 		void requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Callback handling
+
 		void notifyItemMoved(const ot::GraphicsItem* _item);
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
-
-		QRectF getVisibleSceneRect(void) const;
-
-		void setReadOnly(bool _isReadOnly) { m_viewStateFlags.setFlag(ViewStateFlag::ReadOnlyState, _isReadOnly); };
-		bool isReadOnly(void) const { return m_viewStateFlags.flagIsSet(ViewStateFlag::ReadOnlyState); };
 
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
@@ -142,6 +170,10 @@ namespace ot {
 		  
 		void pasteRequested(CopyInformation& _info);
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Events
+
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
@@ -155,20 +187,31 @@ namespace ot {
 		virtual void dropEvent(QDropEvent* _event) override;
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Slots
+
 	private Q_SLOTS:
 		void slotCopy(void);
 		void slotPaste(void);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
 
 	private:
 		//! \brief Begins the item move handling if needed.
 		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is set the function instantly returns.
 		//! All currently selected items will update their move start point.
-		void beginItemMove(void);
+		void beginItemMove();
 
 		//! \brief Ends the item move handling if needed.
 		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is not set the function instantly returns.
 		//! All currently selected items will notify a move change and configuration change if their position has changed.
-		void endItemMove(void);
+		void endItemMove();
+
+		void addConnection(const GraphicsConnectionCfg& _config);
+		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 
 		BasicServiceInformation m_owner;
 
@@ -188,9 +231,6 @@ namespace ot {
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
 		std::list<GraphicsConnectionCfg> m_connectionCreationBuffer;
 		std::list<GraphicsConnectionCfg> m_itemRemovalConnectionBuffer;
-
-		void addConnection(const GraphicsConnectionCfg& _config);
-		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 	};
 
 }

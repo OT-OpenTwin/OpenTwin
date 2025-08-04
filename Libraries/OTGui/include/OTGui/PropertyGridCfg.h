@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyBase.h"
@@ -31,6 +31,10 @@ namespace ot {
 		PropertyGridCfg& operator = (const PropertyGridCfg& _other);
 		PropertyGridCfg& operator = (PropertyGridCfg&& _other) noexcept;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Serialization
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
 		//! @param _allocator Allocator
@@ -41,6 +45,10 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Data handling
+
 		//! @brief Adds the contents of the other configuration to this configuration.
 		//! @param _other Other configuration to merge into this.
 		//! @param _mergeMode Merge mode to use.
@@ -50,6 +58,18 @@ namespace ot {
 		void addRootGroup(PropertyGroup* _group);
 		std::list<PropertyGroup*>& getRootGroups(void) { return m_rootGroups; };
 		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_rootGroups; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
+		//! @brief Sets the modal option.
+		//! If a proeprty grid is filled with the modal option all further fill requests for the property grid will be ignored until the modal option is explicitly unset.
+		//! @param _isModal Modal option.
+		void setIsModal(bool _isModal = true) { m_isModal = _isModal; };
+
+		//! @ref setIsModal
+		bool getIsModal() const { return m_isModal; };
 
 		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false);
 		const PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
@@ -83,6 +103,7 @@ namespace ot {
 	private:
 		void clear(void);
 
+		bool m_isModal;
 		std::list<PropertyGroup*> m_rootGroups;
 	};
 

@@ -27,6 +27,11 @@ public:
 	int			workingPlaneDefaultSize;
 	int			workingPlaneSize;
 
+	bool		dimensionSnapping;
+	double		snapSize;
+	bool		angleSnapping;
+	double		snapAngle;
+
 	ot::Color	axisXColor;
 	ot::Color	axisYColor;
 	ot::Color	axisZColor;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "HandleArrow.h"
+#include "Viewer.h"
 
 #include <osg/Switch>
 #include <osg/ShapeDrawable>
@@ -153,12 +154,14 @@ void HandleArrow::setInteractionReference(int intersectionIndex, double intersec
 	referenceOffset = intersectionLineLength * (intersectionRatio - 0.5);
 }
 
-void HandleArrow::setInteraction(int intersectionIndex, double intersectionRatio)
+void HandleArrow::setInteraction(Viewer *viewer, int intersectionIndex, double intersectionRatio)
 {
 	// Calculate the new position
 	assert(intersectionIndex == 0);
 
 	double offset = intersectionLineLength * (intersectionRatio - 0.5) - referenceOffset;
+
+	offset = viewer->snapDimension(offset);
 
 	osg::Vec3d newPos = position + direction * offset;
 

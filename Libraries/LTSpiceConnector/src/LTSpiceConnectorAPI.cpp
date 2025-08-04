@@ -47,7 +47,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string fileName = getLTSpiceFileNameForCommit(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
@@ -77,7 +77,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-		if (ot::MessageDialogCfg::Yes != ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\nDo you really want to continue?", "Get")) 
+		if (ot::MessageDialogCfg::Yes != ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\nDo you really want to continue?", "", "Get")) 
 		{
 			return "";
 		}
@@ -85,7 +85,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string fileName = getLTSpiceFileNameForGet(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
@@ -194,13 +194,13 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 			if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 			{
 				errorMessage += "\n\nThe local file name has not been changed.";
-				ot::MessageBoxManager::showErrorPrompt(errorMessage, "Set LTSpice File");
+				ot::MessageBoxManager::showErrorPrompt(errorMessage, "", "Set LTSpice File");
 				return "";
 			}
 
 			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, ltSpiceServiceURL, mainObject);
 
-			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "Set LTSpice File");
+			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "", "Set LTSpice File");
 		}
 	}
 

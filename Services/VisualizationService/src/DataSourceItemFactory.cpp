@@ -21,6 +21,10 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	{
 		return new DataSourceUnstructuredMesh;
 	}
+	else if (resultEntity->getClassName() == "EntityResultUnstructuredMeshVtk")
+	{
+		return new DataSourceUnstructuredMesh;
+	}
 	else
 	{
 		assert(0); // Unknown data type

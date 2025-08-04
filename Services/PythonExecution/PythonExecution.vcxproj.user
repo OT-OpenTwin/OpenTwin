@@ -33,27 +33,27 @@
     <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLR);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2025-03-14T11:46:22.0986071Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-07T08:08:23.7172173Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
-    <QtLastBackgroundBuild>2025-03-14T11:46:22.1449071Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-07T08:08:24.2057330Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <QtLastBackgroundBuild>2025-03-14T11:46:22.2112528Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-07T08:08:24.4074276Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2025-03-14T11:46:22.2686593Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-07T08:08:24.6061531Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2025-03-14T11:46:22.3227863Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-07T08:08:24.7807404Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>

@@ -34,6 +34,17 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		flushQuantityContainer();
 		return;
 	}
+
+	auto matrixParameterDescription = dynamic_cast<QuantityDescriptionMatrix*>(_quantityDescription);
+	if (matrixParameterDescription != nullptr)
+	{
+		m_logger.log("Storing data points as matrix");
+		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, matrixParameterDescription);
+		flushQuantityContainer();
+		return;
+	}
+
+	throw std::exception("Failed to store data points");
 }
 
 void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, uint64_t _numberOfParameterValues, QuantityDescriptionCurve* _quantityDescription)
@@ -204,6 +215,44 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription.quantityIndex, quantityValueEntry);
 		}
 	}
+}
+
+void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionMatrix* _quantityDescription)
+{
+	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
+	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt = quantityMetadata.valueDescriptions.begin();;
+	
+	m_logger.log("Storing " + std::to_string(_numberOfParameterValues) + " documents");
+
+	m_bucketSize = 1;
+	for (uint32_t dimension : quantityMetadata.dataDimensions)
+	{
+		m_bucketSize *= dimension;
+	}
+	
+	std::vector<ot::GenericDataStructMatrix> quantityValueMatrices = _quantityDescription->getValues();
+	for (size_t i = 0; i < _numberOfParameterValues; i++)
+	{
+		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+		for (auto& changingParameterValueIt : _changingParameterValues)
+		{
+			currentParameterValues.push_back(*changingParameterValueIt);
+			if (i != _numberOfParameterValues - 1)
+			{
+				changingParameterValueIt++;
+			}
+		}
+
+		ot::GenericDataStructMatrix& quantityValueMatrix = quantityValueMatrices[i];
+		
+		const ot::Variable* quantityValueMatrixEntry = quantityValueMatrix.getValues();
+		for (uint32_t j = 0; j < quantityValueMatrix.getNumberOfEntries(); j++)
+		{
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, valueDescriptionIt->quantityIndex, quantityValueMatrixEntry[j]);
+		}
+		
+	}
+
 }
 
 void QuantityContainerSerialiser::flushQuantityContainer()

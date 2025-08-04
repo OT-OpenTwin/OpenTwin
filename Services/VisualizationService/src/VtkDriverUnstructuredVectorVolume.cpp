@@ -425,13 +425,20 @@ void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input
 		glyph->SetScaleModeToScaleByScalar();
 		glyph->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
+
+		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
+		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+
+		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
+
 		if (normalization != 0)
 		{
-			glyph->SetScaleFactor(visData->GetArrowScale() / normalization);
+			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale() / normalization);
 		}
 		else
 		{
-			glyph->SetScaleFactor(visData->GetArrowScale());
+			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale());
 		}
 		glyph->OrientOn();
 		glyph->Update();
@@ -443,13 +450,20 @@ void VtkDriverUnstructuredVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input
 		hedgehog->SetInputConnection(downSampling->GetOutputPort());
 		hedgehog->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
+
+		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
+		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+
+		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
+
 		if (normalization != 0)
 		{
-			hedgehog->SetScaleFactor(visData->GetArrowScale() / normalization);
+			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale() / normalization);
 		}
 		else
 		{
-			hedgehog->SetScaleFactor(visData->GetArrowScale());
+			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale());
 		}
 		hedgehog->Update();
 

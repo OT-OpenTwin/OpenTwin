@@ -185,7 +185,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 			int intersectionIndex = firstHit.indexList.front();
 			double intersectionRatio = firstHit.ratio;
 
-			creator->getCurrentHandler()->setInteraction(intersectionIndex, intersectionRatio);
+			creator->getCurrentHandler()->setInteraction(creator, intersectionIndex, intersectionRatio);
 		}
 	}
 	else if (ea.getButtonMask() == 0)
@@ -216,6 +216,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 				rbeWrapper::RubberbandOsgWrapper * osgEngine = rubberband->engine();
 				if (osgEngine) {
 					if (osgEngine->currentStep() == 0) {
+						lastHeight = 0.0;
 						processRubberbandUpdate(viewer, ea.getX(), ea.getY(), IN_PLANE, n, p);
 					}
 					else {
@@ -288,13 +289,15 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 
 			// Calculate the intersection of the plane and the line
 			osg::Vec3 ip;
-			if (intersectLinePlane(n, p, rayStart, rayEnd, ip))
+			if (intersectLinePlane(n, p + n * lastHeight, rayStart, rayEnd, ip))
 			{
 				osg::Matrix transform = model->getCurrentWorkingPlaneTransformTransposedInverse();
 				ip = ip * transform;
 
+				ip.set(creator->snapDimension(ip.x()), creator->snapDimension(ip.y()), creator->snapDimension(ip.z()));
+
 				// We have an intersection of the ray with the plane
-				assert(fabs(ip.z()) < 1e-5);
+				//assert(fabs(ip.z()) < 1e-5);
 				creator->getRubberband()->updateCurrentPosition(ip.x(), ip.y(), 0.0);
 				lastPointInPlane = ip;
 			}
@@ -329,6 +332,9 @@ void ViewerObjectSelectionHandler::processRubberbandUpdate(osgViewer::Viewer *vi
 				// Now we need to determine the projection of the new point along the original plane normal
 				osg::Vec3 d = ip - lastPointInPlane;
 				double height = d * n;
+
+				height = creator->snapDimension(height);
+				lastHeight = height;
 
 				creator->getRubberband()->updateCurrentPosition(referencePoint.x(), referencePoint.y(), height);
 			}

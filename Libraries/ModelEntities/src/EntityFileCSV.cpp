@@ -7,7 +7,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "CSVProperties.h"
 #include <string>
-
+#include "PropertyHelper.h"
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
 #elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
@@ -24,6 +24,30 @@
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
+
+bool EntityFileCSV::updateFromProperties(void)
+{
+	assert(getProperties().anyPropertyNeedsUpdate());
+
+	setModified();	
+	bool requiresDataToBeFetched = false;
+	requiresDataToBeFetched |= PropertyHelper::getStringProperty(this, "Row Delimiter", "CSV Properties")->needsUpdate();
+	requiresDataToBeFetched |= PropertyHelper::getStringProperty(this, "Column Delimiter", "CSV Properties")->needsUpdate();
+	requiresDataToBeFetched |= PropertyHelper::getBoolProperty(this, "Evaluate Escape Characters", "CSV Properties")->needsUpdate();
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Header position", "Table header")->needsUpdate();
+
+	//Needs to be executed after the csvFile properties are investigated. Otherwise the properties are already reset.
+	bool refreshGrid =	EntityFileText::updateFromProperties();
+	//If the text file requires a data update, the table also needs one, since it uses the same data
+	requiresDataToBeFetched |= requiresDataUpdate();
+	if (requiresDataToBeFetched)
+	{
+		getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_UI_TABLE_Setup, true, requiresDataToBeFetched);
+	}
+
+	getProperties().forceResetUpdateForAllProperties();
+	return refreshGrid;
+}
 
 void EntityFileCSV::setRowDelimiter(std::string _delimiter)
 {
@@ -183,12 +207,16 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 	setText(csvTableText);
 }
 
-ot::TableCfg EntityFileCSV::getTableConfig()
+ot::TableCfg EntityFileCSV::getTableConfig(bool _includeData)
 {
-	OT_TEST_ENTITYFILECSV_Interval("Get table config");
-	ot::GenericDataStructMatrix matrix = getTable();
-	ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
-	ot::TableCfg tableCfg(matrix, headerMode);
+	ot::TableCfg tableCfg;
+	if (_includeData)
+	{
+		OT_TEST_ENTITYFILECSV_Interval("Get table config");
+		ot::GenericDataStructMatrix matrix = getTable();
+		ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
+		tableCfg = ot::TableCfg(matrix, headerMode);
+	}
 	tableCfg.setEntityName(getName());
 	tableCfg.setTitle(getName());
 	return tableCfg;

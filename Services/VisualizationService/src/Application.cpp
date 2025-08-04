@@ -72,16 +72,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	
 		assert(0); // Unhandled button action
 	}
-	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-	{
-		std::list<ot::UID> entityIDs      = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		bool itemsVisible			      = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
-
-		updateEntities(entityIDs, entityVersions, itemsVisible);
-
-		ot::ModelServiceAPI::modelChangeOperationCompleted("visualization item created / updated");
-	}
 	else {
 		return OT_ACTION_RETURN_UnknownAction;
 	}
@@ -159,6 +149,17 @@ void Application::EnsureVisualizationModelIDKnown(void)
 	
 	// The visualization model isnot known yet -> get it from the model
 	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
+}
+
+void Application::propertyChanged(ot::JsonDocument& _doc)
+{
+	std::list<ot::UID> entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	bool itemsVisible = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
+
+	updateEntities(entityIDs, entityVersions, itemsVisible);
+
+	ot::ModelServiceAPI::modelChangeOperationCompleted("visualization item created / updated");
 }
 
 void Application::updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, bool itemsVisible)

@@ -22,6 +22,7 @@
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -37,8 +38,6 @@
 
 #define LOG_IN_RESTOREDPASSWORD_PLACEHOLDER "******"
 
-#define MAX_LOGIN_ATTEMPTS 5
-
 #define EDIT_GSS_TEXT "< Edit >"
 
 #define TOGGLE_MODE_LABEL_SwitchToLogIn "Switch to Login"
@@ -46,7 +45,7 @@
 #define TOGGLE_MODE_LABEL_SwitchToChangePassword "Change Password"
 
 LogInDialog::LogInDialog() 
-	: m_state(LogInStateFlag::NoState), m_logInAttempt(0)
+	: m_state(LogInStateFlag::NoState)
 {
 	using namespace ot;
 
@@ -154,7 +153,7 @@ LogInDialog::LogInDialog()
 	registerLayout->addStretch(1);
 	registerLayout->addWidget(m_toggleRegisterModeLabel);
 	registerLayout->addStretch(1);
-	this->connect(m_toggleRegisterModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleLogInAndRegisterMode);
+	this->connect(m_toggleRegisterModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleLogInAndRegisterMode);
 
 	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword);
 	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
@@ -163,7 +162,7 @@ LogInDialog::LogInDialog()
 	changePasswordLayout->addStretch(1);
 	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
 	changePasswordLayout->addStretch(1);
-	this->connect(m_toggleChangePasswordModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleChangePasswordMode);
+	this->connect(m_toggleChangePasswordModeLabel, &Label::mouseClicked, this, &LogInDialog::slotToggleChangePasswordMode);
 
 	// Setup window
 	QRect newTargetRect(ot::Positioning::getCenterWidgetOnParentRect(nullptr, static_cast<QWidget*>(this)).topLeft(), QSize(350, 500));
@@ -210,7 +209,7 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_exitButton->setEnabled(_enabled);
 }
 
-bool LogInDialog::mayCloseDialogWindow(void) {
+bool LogInDialog::mayCloseDialogWindow() {
 	return !(m_state & LogInStateFlag::WorkerRunning);
 }
 
@@ -218,7 +217,7 @@ bool LogInDialog::mayCloseDialogWindow(void) {
 
 // Private slots
 
-void LogInDialog::slotLogIn(void) {
+void LogInDialog::slotLogIn() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
@@ -240,20 +239,24 @@ void LogInDialog::slotLogIn(void) {
 		return;
 	}
 
-	m_logInAttempt++;
-
-	// Run worker
 	this->setControlsEnabled(false);
 
 	m_loginData.setGss(gssData);
 
+	// Store settings
+	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
+	settings->setValue("SessionServiceURL", gssData.getName());
+	settings->setValue("LogInPos.X", this->pos().x());
+	settings->setValue("LogInPos.Y", this->pos().y());
+
+	// Run worker
 	m_state |= LogInStateFlag::WorkerRunning;
 
 	std::thread worker(&LogInDialog::loginWorkerStart, this);
 	worker.detach();
 }
 
-void LogInDialog::slotRegister(void) {
+void LogInDialog::slotRegister() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
@@ -284,8 +287,6 @@ void LogInDialog::slotRegister(void) {
 		return;
 	}
 
-	m_logInAttempt++;
-
 	// Run worker
 	this->setControlsEnabled(false);
 
@@ -297,7 +298,7 @@ void LogInDialog::slotRegister(void) {
 	worker.detach();
 }
 
-void LogInDialog::slotChangePassword(void) {
+void LogInDialog::slotChangePassword() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
@@ -328,8 +329,6 @@ void LogInDialog::slotChangePassword(void) {
 		return;
 	}
 
-	m_logInAttempt++;
-
 	// Run worker
 	this->setControlsEnabled(false);
 
@@ -341,7 +340,7 @@ void LogInDialog::slotChangePassword(void) {
 	worker.detach();
 }
 
-void LogInDialog::slotToggleLogInAndRegisterMode(void) {
+void LogInDialog::slotToggleLogInAndRegisterMode() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
 
 	if (m_state & LogInStateFlag::RegisterMode) {
@@ -372,7 +371,7 @@ void LogInDialog::slotToggleLogInAndRegisterMode(void) {
 	this->update();
 }
 
-void LogInDialog::slotToggleChangePasswordMode(void) {
+void LogInDialog::slotToggleChangePasswordMode() {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
 
 	if (m_state & LogInStateFlag::ChangePasswordMode) {
@@ -407,7 +406,7 @@ void LogInDialog::slotToggleChangePasswordMode(void) {
 	this->update();
 }
 
-void LogInDialog::slotGSSChanged(void) {
+void LogInDialog::slotGSSChanged() {
 	if (m_gss->currentText() != EDIT_GSS_TEXT) {
 		return;
 	}
@@ -421,13 +420,14 @@ void LogInDialog::slotGSSChanged(void) {
 	if (result == ot::Dialog::Ok) {
 		m_gssData = dialog.getEntries();
 		this->updateGssOptions();
+		this->saveGSSOptions();
 	}
 
 	m_gss->setCurrentIndex(0);
 	m_gss->blockSignals(false);
 }
 
-void LogInDialog::slotPasswordChanged(void) {
+void LogInDialog::slotPasswordChanged() {
 	if (!(m_state & LogInStateFlag::RestoredPassword)) {
 		return;
 	}
@@ -462,13 +462,13 @@ void LogInDialog::slotPasswordChanged(void) {
 	m_password->setText(newTxt);
 }
 
-void LogInDialog::slotLogInSuccess(void) {
+void LogInDialog::slotLogInSuccess() {
 	m_state &= (~LogInStateFlag::WorkerRunning);
 	this->saveUserSettings();
 	this->closeDialog(ot::Dialog::Ok);
 }
 
-void LogInDialog::slotRegisterSuccess(void) {
+void LogInDialog::slotRegisterSuccess() {
 	m_state &= (~LogInStateFlag::WorkerRunning);
 
 	QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was created successfully.", QMessageBox::Ok);
@@ -480,7 +480,7 @@ void LogInDialog::slotRegisterSuccess(void) {
 	this->setControlsEnabled(true);
 }
 
-void LogInDialog::slotChangePasswordSuccess(void) {
+void LogInDialog::slotChangePasswordSuccess() {
 	m_state &= (~LogInStateFlag::WorkerRunning);
 
 	QMessageBox msgBox(QMessageBox::Information, "Change Password", "The password was updated successfully.", QMessageBox::Ok);
@@ -495,12 +495,6 @@ void LogInDialog::slotChangePasswordSuccess(void) {
 
 void LogInDialog::slotWorkerError(WorkerError _error) {
 	m_state &= (~LogInStateFlag::WorkerRunning);
-
-	// Check for max login attempt
-	if (m_logInAttempt >= MAX_LOGIN_ATTEMPTS) {
-		this->closeDialog(ot::Dialog::Cancel);
-		return;
-	}
 
 	// Create error message
 	QString msg;
@@ -572,9 +566,11 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		OT_LOG_E("Unknown worker error (" + std::to_string((int)_error) + ")");
 		break;
 	}
-
 	// Display error message and unlock controls
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
+	if (!m_curlErrorMessage.empty()) {
+		msgBox.setDetailedText(QString::fromStdString(m_curlErrorMessage));
+	}
 	msgBox.exec();
 
 	m_loginData.clear();
@@ -585,7 +581,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 
 // Private helper
 
-void LogInDialog::saveUserSettings(void) const {
+void LogInDialog::saveUserSettings() const {
 	OTAssert(m_loginData.isValid(), "Invalid login data");
 	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 
@@ -599,7 +595,12 @@ void LogInDialog::saveUserSettings(void) const {
 	}
 
 	settings->setValue("LastSavePassword", m_savePassword->isChecked());
-	settings->setValue("SessionServiceURL", m_loginData.getGss().getName());
+
+	this->saveGSSOptions();
+}
+
+void LogInDialog::saveGSSOptions() const {
+	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 
 	QJsonArray gssOptionsArr;
 	for (const LogInGSSEntry& entry : m_gssData) {
@@ -612,13 +613,9 @@ void LogInDialog::saveUserSettings(void) const {
 
 	QJsonDocument gssOptionsDoc(gssOptionsArr);
 	settings->setValue("SessionServiceJSON", gssOptionsDoc.toJson(QJsonDocument::Compact));
-
-	settings->setValue("LogInPos.X", this->pos().x());
-	settings->setValue("LogInPos.Y", this->pos().y());
-
 }
 
-LogInGSSEntry LogInDialog::findCurrentGssEntry(void) {
+LogInGSSEntry LogInDialog::findCurrentGssEntry() {
 	int index = m_gss->currentIndex();
 	if (index < 0 || index >= m_gssData.size()) {
 		return LogInGSSEntry();
@@ -695,7 +692,7 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 	}
 }
 
-void LogInDialog::updateGssOptions(void) {
+void LogInDialog::updateGssOptions() {
 	QStringList options;
 	for (const LogInGSSEntry& entry : m_gssData) {
 		options.append(entry.getDisplayText());
@@ -719,12 +716,13 @@ void LogInDialog::stopWorkerWithError(WorkerError _error) {
 	QMetaObject::invokeMethod(this, "slotWorkerError", Qt::QueuedConnection, Q_ARG(WorkerError, _error));
 }
 
-void LogInDialog::loginWorkerStart(void) {
+void LogInDialog::loginWorkerStart() {
 	WorkerError currentError = WorkerError::NoError;
 
 	// Check the version compatiblity
 	currentError = this->workerCheckVersionCompatibility();
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -732,6 +730,7 @@ void LogInDialog::loginWorkerStart(void) {
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -741,6 +740,7 @@ void LogInDialog::loginWorkerStart(void) {
 	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
 	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
 	if (!userManager.checkConnectionAuthorizationService()) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
 		return;
 	}
@@ -748,11 +748,13 @@ void LogInDialog::loginWorkerStart(void) {
 	// Attempt to log in the user
 	currentError = this->workerLogin(userManager);
 	if (currentError != WorkerError::NoError) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
 
 	if (!m_loginData.isValid()) {
+		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
 		return;
 	}
@@ -760,7 +762,7 @@ void LogInDialog::loginWorkerStart(void) {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotLogInSuccess, Qt::QueuedConnection);
 }
 
-void LogInDialog::registerWorkerStart(void) {
+void LogInDialog::registerWorkerStart() {
 	WorkerError currentError = WorkerError::NoError;
 
 	// Get data from GSS
@@ -790,7 +792,7 @@ void LogInDialog::registerWorkerStart(void) {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotRegisterSuccess, Qt::QueuedConnection);
 }
 
-void LogInDialog::changePasswordWorkerStart(void) {
+void LogInDialog::changePasswordWorkerStart() {
 	WorkerError currentError = WorkerError::NoError;
 
 	// Get data from GSS
@@ -820,7 +822,7 @@ void LogInDialog::changePasswordWorkerStart(void) {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotChangePasswordSuccess, Qt::QueuedConnection);
 }
 
-LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility(void) {
+LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, doc.GetAllocator()), doc.GetAllocator());
 
@@ -842,7 +844,7 @@ LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility(void) {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
+LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetGlobalServicesUrl, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
@@ -880,6 +882,14 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
 
 	m_loginData.setDatabaseUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_DBURL));
 	m_loginData.setAuthorizationUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
+
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
+		if (!responseDoc[OT_ACTION_PARAM_GlobalLoggerUrl].IsString()) {
+			return WorkerError::InvalidGssResponseSyntax;
+		}
+
+		ot::ServiceLogNotifier::instance().setLoggingServiceURL(ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
+	}
 
 	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
 		if (!responseDoc[OT_ACTION_PARAM_GlobalLogFlags].IsArray()) {

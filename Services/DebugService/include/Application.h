@@ -31,13 +31,23 @@ public:
 
 	// Button callbacks
 
-	void testHello(void);
-	void testKill(void);
+	void uiDebugInfo();
 
-	void testTableSmall(void);
-	void testTableMedium(void);
-	void testTableBig(void);
+	void testHello();
+	void testKill();
+
+	void testTableSmall();
+	void testTableMedium();
+	void testTableBig();
 	
+	void createPlotOneCurve();
+	void createPlotTwoCurves();
+	void createFamilyOfCurves();
+	void createFamilyOfCurves3ParameterConst();
+	void createFamilyOfCurves3Parameter();
+	void createPlotScatter();
+	void createPlotSinglePoint();
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Helper

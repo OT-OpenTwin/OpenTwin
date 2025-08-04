@@ -124,6 +124,19 @@ namespace ot {
 		std::string getXAxisParameter() const { return m_xAxisParameter; }
 		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; }
 
+		bool getXLabelAxisAutoDetermine() const {return m_xAxis.getAutoDetermineAxisLabel(); }
+		void setXLabelAxisAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); }
+
+		bool getYLabelAxisAutoDetermine() const { return m_yAxis.getAutoDetermineAxisLabel(); }
+		void setYLabelAxisAutoDetermine(bool _autoDetermine) { m_yAxis.setAutoDetermineAxisLabel(_autoDetermine); }
+
+		const std::string& getAxisLabelY() const {return m_yAxis.getAxisLabel(); }
+		void setAxisLabelY(const std::string& _label) { m_yAxis.setAxisLabel(_label); }
+
+		const std::string& getAxisLabelX() const { return m_xAxis.getAxisLabel(); }
+		void setAxisLabelX(const std::string& _label) {m_xAxis.setAxisLabel(_label);}
+
+
 		const std::list<ValueComparisionDefinition>& getQueries() { return m_queries; }
 		void setQueries(std::list<ValueComparisionDefinition>& _queries);
 
@@ -132,6 +145,15 @@ namespace ot {
 
 		void setLimitOfCurves(int32_t _curveLimit) { m_curveLimit = _curveLimit; }
 		int32_t getLimitOfCurves() const { return m_curveLimit; }
+
+		void setShowEntireMatrix(bool _showEntireMatrix) { m_showEntireMatrix = _showEntireMatrix; }
+		bool getShowEntireMatrix() const { return m_showEntireMatrix; }
+
+		void setShowMatrixColumnEntry(int32_t _columnEntry) { m_showMatrixColumnEntry = _columnEntry; }
+		int32_t getShowMatrixColumnEntry() { return m_showMatrixColumnEntry; }
+		
+		void setShowMatrixRowEntry(int32_t _rowEntry) { m_showMatrixRowEntry = _rowEntry; }
+		int32_t getShowMatrixRowEntry() { return m_showMatrixRowEntry; }
 
 	private:
 		std::string m_projectName;
@@ -143,6 +165,11 @@ namespace ot {
 		bool m_gridVisible = true;
 		ot::Color m_gridColor;
 		double m_gridWidth = 1.;
+
+		bool m_showEntireMatrix = true;
+		int32_t m_showMatrixColumnEntry = 1;
+		int32_t m_showMatrixRowEntry = 1;
+
 
 		bool m_isHidden = false;
 		bool m_legendVisible = true;

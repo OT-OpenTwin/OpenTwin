@@ -2,6 +2,8 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTServiceFoundation/UserCredentials.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 
 // std header
 #include <iostream>
@@ -137,8 +139,16 @@ bool setPermanentEnvironmentVariable(const char *value, const char *data)
 	return false;
 }
 
-void setAdminPassword(const std::string& password, const std::string& jsFile)
+void setAdminPassword(std::string& password, const std::string& jsFile)
 {
+	ot::EncodingGuesser guesser;
+	ot::TextEncoding::EncodingStandard textEncoding =	guesser(password.c_str(), password.size());
+	if (textEncoding == ot::TextEncoding::EncodingStandard::ANSI)
+	{
+		ot::EncodingConverter_ISO88591ToUTF8 converter;
+		password = converter(password);
+	}
+
 	std::ifstream inFile(jsFile);
 	std::list<std::string> inputFileContent;
 

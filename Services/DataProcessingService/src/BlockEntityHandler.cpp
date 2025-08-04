@@ -11,7 +11,6 @@
 #include "ClassFactory.h"
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
-#include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
@@ -33,7 +32,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->SetGraphicsScenePackageName(_packageName);
-	
+	blockEntity->setEditable(true);
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->StoreToDataBase();
@@ -172,16 +171,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	EntityBlockDatabaseAccess* dbaBlock = dynamic_cast<EntityBlockDatabaseAccess*>(blockEntity.get());
 	if (dbaBlock != nullptr)
 	{
-		auto comparators = ot::ComparisionSymbols::g_comparators;
-		comparators.push_back(getQueryForRangeSelection());
-		comparators.push_back(" ");
-		dbaBlock->createProperties(comparators);
-	}
-
-	EntityBlockDataDimensionReducer* dataAR = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
-	if (dataAR)
-	{
-		dataAR->createProperties();
+		dbaBlock->createProperties();
 	}
 
 	EntityBlockStorage* storage = dynamic_cast<EntityBlockStorage*>(blockEntity.get());
@@ -226,9 +216,6 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
-
-	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dimensionReducer.getClassName(), dimensionReducer.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDataDimensionReducer::getIconName());
 
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());

@@ -59,6 +59,10 @@ namespace ot {
     };
     namespace Exception { typedef ot::InvalidArgumentException InvalidArgument; }
 
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+    // Files
+
     //! @brief Basic file exception.
     class FileException : public GeneralException {
     public:
@@ -67,6 +71,33 @@ namespace ot {
         explicit FileException(const char* _message) : GeneralException(_message) {};
     };
     namespace Exception { typedef ot::FileException File; }
+
+    //! @brief Basic file open exception.
+    class FileOpenException : public FileException {
+    public:
+        explicit FileOpenException() : FileException("File open exception") {};
+        explicit FileOpenException(const std::string& _message) : FileException(_message) {};
+        explicit FileOpenException(const char* _message) : FileException(_message) {};
+    };
+    namespace Exception { typedef ot::FileOpenException FileOpen; }
+
+    //! @brief Basic file read exception.
+    class FileReadException : public FileException {
+    public:
+        explicit FileReadException() : FileException("File read exception") {};
+        explicit FileReadException(const std::string& _message) : FileException(_message) {};
+        explicit FileReadException(const char* _message) : FileException(_message) {};
+    };
+    namespace Exception { typedef ot::FileReadException FileRead; }
+
+    //! @brief Basic file write exception.
+    class FileWriteException : public FileException {
+    public:
+        explicit FileWriteException() : FileException("File write exception") {};
+        explicit FileWriteException(const std::string& _message) : FileException(_message) {};
+        explicit FileWriteException(const char* _message) : FileException(_message) {};
+    };
+    namespace Exception { typedef ot::FileWriteException FileWrite; }
 
     // ###########################################################################################################################################################################################################################################################################################################################
 

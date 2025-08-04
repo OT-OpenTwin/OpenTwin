@@ -16,7 +16,9 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) {
+ot::PropertyGrid::PropertyGrid(QObject* _parentObject) :
+	QObject(_parentObject), m_isModal(false)
+{
 	m_tree = new PropertyGridTree;
 	m_tree->setColumnCount(2);
 	m_tree->setHeaderLabels({ "Name", "Value" });
@@ -48,8 +50,10 @@ ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->clear();
 
-	this->blockSignals(true);
-	m_tree->blockSignals(true);
+	QSignalBlocker thisBlock(this);
+	QSignalBlocker treeBlock(m_tree);
+
+	m_isModal = _config.getIsModal();
 
 	for (const PropertyGroup* group : _config.getRootGroups()) {
 		PropertyGridGroup* newGroup = new PropertyGridGroup;
@@ -58,9 +62,6 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 		newGroup->finishSetup();
 		newGroup->updateStateIcon();
 	}
-
-	m_tree->blockSignals(false);
-	this->blockSignals(false);
 }
 
 ot::PropertyGridCfg ot::PropertyGrid::createGridConfig(void) const {
@@ -121,6 +122,7 @@ void ot::PropertyGrid::clear(void) {
 	this->blockSignals(true);
 	m_tree->blockSignals(true);
 	m_tree->clear();
+	m_isModal = false;
 	m_tree->blockSignals(false);
 	this->blockSignals(false);
 }

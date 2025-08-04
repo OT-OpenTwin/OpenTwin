@@ -90,8 +90,8 @@ void WrappedRectItem::fillPropertyGrid(void) {
 	PropertyGroup* rectangleGroup = new PropertyGroup("Rectangle");
 	rectangleGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().width(), 0., std::numeric_limits<double>::max()));
 	rectangleGroup->addProperty(new PropertyDouble("Height", this->getRectangleSize().height(), 0., std::numeric_limits<double>::max()));
-	rectangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	rectangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
+	rectangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
+	rectangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	rectangleGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 	rectangleGroup->addProperty(new PropertyInt("Corner Radius", this->getCornerRadius(), 0, 9999));
 

@@ -7,9 +7,11 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/WidgetViewBase.h"
 
 // std header
+#include <list>
 #include <string>
 
 #pragma warning(disable:4251)
@@ -17,12 +19,11 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT TextEditorCfg : public WidgetViewBase {
+		OT_DECL_DEFCOPY(TextEditorCfg)
+		OT_DECL_DEFMOVE(TextEditorCfg)
 	public:
 		TextEditorCfg();
-		TextEditorCfg(const TextEditorCfg& _other);
 		virtual ~TextEditorCfg();
-
-		TextEditorCfg& operator = (const TextEditorCfg& _other);
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -45,10 +46,16 @@ namespace ot {
 		void setDocumentSyntax(DocumentSyntax _syntax) { m_syntax = _syntax; };
 		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
 
+		void setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions);
+		void setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions);
+		void setFileExtensionFilter(const std::string& _filter) { m_fileExtensionFilter = _filter; };
+		const std::string& getFileExtensionFilters() const { return m_fileExtensionFilter; };
+
 	private:
 		std::string m_text;
 		bool m_readOnly;
 		DocumentSyntax m_syntax;
+		std::string m_fileExtensionFilter;
 	};
 
 }

@@ -52,6 +52,8 @@ namespace ot {
 		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);
 		void setCurrentProjectName(const QString& _name);
 
+		void selectProjectType(const std::string& _projectType, const std::string& _templateName);
+
 		std::string getProjectType(void) const;
 		std::string getTemplateName(bool _emptyIfDefault) const;
 		std::string getProjectName(void) const;

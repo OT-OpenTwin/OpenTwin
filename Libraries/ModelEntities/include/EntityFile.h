@@ -32,6 +32,9 @@ public:
 	std::string getFileName() const { return m_fileName; }
 	std::string getFileType() const { return m_fileType; }
 
+	void setFileFilter(const std::string& _filter) { m_fileFilter = _filter; };
+	std::string getFileFilter() const { return m_fileFilter; };
+
 protected:
 	virtual void setSpecializedProperties() {};
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
@@ -44,6 +47,7 @@ private:
 	std::string m_path ="";
 	std::string m_fileName ="";
 	std::string m_fileType ="";
+	std::string m_fileFilter;
 
 	std::shared_ptr<EntityBinaryData> m_data = nullptr;
 

@@ -35,6 +35,54 @@
 // C++ header
 #include <exception>
 
+#define OT_UI_USE_CUSTOM_DELETE false
+
+#if OT_UI_USE_CUSTOM_DELETE == true
+
+namespace ot {
+
+	namespace intern {
+
+		static std::atomic_bool loggerInitialized = false;
+
+		static void notifyCustomDelete() {
+			static std::atomic_bool customDeleteNotified = false;
+
+			if (!customDeleteNotified && loggerInitialized) {
+				customDeleteNotified = true;
+				OT_LOG_W("Custom delete operators are used!");
+			}
+		}
+
+	}
+}
+
+// Global operator delete override
+void operator delete(void* ptr) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Global operator delete[] override
+void operator delete[](void* ptr) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Matching sized delete operators (C++ 14+)
+void operator delete(void* ptr, std::size_t) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+// Matching sized delete operators (C++ 14+)
+void operator delete[](void* ptr, std::size_t) noexcept {
+	ot::intern::notifyCustomDelete();
+	std::free(ptr);
+}
+
+#endif
+
 void initializeLogging(void) {
 	// Get logging URL
 	QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");
@@ -44,6 +92,10 @@ void initializeLogging(void) {
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), true);
 	#else
 		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
+	#endif
+
+	#if OT_UI_USE_CUSTOM_DELETE == true
+		ot::intern::loggerInitialized = true;
 	#endif
 }
 
@@ -156,7 +208,7 @@ bool initializeAssets(void) {
 	if (iconPathCounter == 0) {
 		OTAssert(0, "No icon path was found!");
 		OT_LOG_E("No icon path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -164,7 +216,7 @@ bool initializeAssets(void) {
 	// Check if at least one style directory was found
 	if (stylePathCounter == 0) {
 		OT_LOG_EA("No color style path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -172,7 +224,7 @@ bool initializeAssets(void) {
 	// Check if at least one graphics item directory was found
 	if (graphicsPathCounter == 0) {
 		OT_LOG_EA("No graphics item path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}
@@ -188,7 +240,7 @@ bool initializeAssets(void) {
 	}
 	else {
 		OT_LOG_EA("Bright style not found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application", QMessageBox::Ok);
+		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application.", QMessageBox::Ok);
 		msgBox.exec();
 		return false;
 	}

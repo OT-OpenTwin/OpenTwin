@@ -6,7 +6,7 @@
 #include "OldTreeIcon.h"
 #include "PropertyBundlePlane.h"
 #include "PropertyBundleScaling.h"
-#include "PropertyBundleVisUnstructuredVector.h"
+#include "PropertyBundleVisUnstructuredVectorVolume.h"
 
 #include <list>
 
@@ -31,7 +31,7 @@ protected:
 private:
 	PropertyBundlePlane propertyBundlePlane;
 	PropertyBundleScaling propertyBundleScaling;
-	PropertyBundleVisUnstructuredVector propertyBundleVisUnstructuredVector;
+	PropertyBundleVisUnstructuredVectorVolume propertyBundleVisUnstructuredVector;
 	// Temporary
 	//EntityResultBase *source;
 };

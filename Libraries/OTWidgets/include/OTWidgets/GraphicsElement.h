@@ -7,7 +7,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -57,16 +57,16 @@ namespace ot {
 		// Setter / Getter
 
 		//! \brief Returns the QGraphicsItem.
-		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
+		virtual QGraphicsItem* getQGraphicsItem() = 0;
 
 		//! \brief Returns the const QGraphicsItem.
-		virtual const QGraphicsItem* getQGraphicsItem(void) const = 0;
+		virtual const QGraphicsItem* getQGraphicsItem() const = 0;
 
 		//! \brief Set the GraphicsScene this element is placed at.
 		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 
 		//! \brief Returns the GraphicsScene this item is placed at.
-		virtual GraphicsScene* getGraphicsScene(void) const { return m_scene; };
+		virtual GraphicsScene* getGraphicsScene() const { return m_scene; };
 
 		//! \brief Sets the provided state flag.
 		//! \see GraphicsItem, GraphicsItemState
@@ -80,13 +80,13 @@ namespace ot {
 
 		//! \brief Returns the current GraphicsItemStateFlags set.
 		//! \see GraphicsItem, GraphicsItemStateFlags
-		const GraphicsElementStateFlags& getGraphicsElementState(void) const { return m_state; };
+		const GraphicsElementStateFlags& getGraphicsElementState() const { return m_state; };
 
 		//! \brief Returns all graphics elements nested in this element.
 		//! The result contains this element and all of its childs.
-		virtual std::list<GraphicsElement*> getAllGraphicsElements(void);
+		virtual std::list<GraphicsElement*> getAllGraphicsElements();
 
-		virtual std::list<GraphicsElement*> getAllDirectChildElements(void);
+		virtual std::list<GraphicsElement*> getAllDirectChildElements();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

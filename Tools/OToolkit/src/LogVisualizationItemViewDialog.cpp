@@ -9,6 +9,7 @@
 #include "LogVisualizationItemViewDialog.h"
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTWidgets/Positioning.h"
 
 // Qt header
@@ -27,47 +28,53 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	: ot::Dialog(_parent), m_msg(_msg) 
 {
 	// Create layouts
-	m_centralLayout = new QVBoxLayout;
-	m_dataLayout = new QGridLayout;
-	m_bigVLayout = new QVBoxLayout;
-	m_messageTitleLayout = new QHBoxLayout;
-	m_buttonLayout = new QHBoxLayout;
+	QVBoxLayout* centralLayout = new QVBoxLayout;
+	QGridLayout* dataLayout = new QGridLayout;
+	QHBoxLayout* timeLayout = new QHBoxLayout;
+	QHBoxLayout* localTimeLayout = new QHBoxLayout;
+	QVBoxLayout* bigVLayout = new QVBoxLayout;
+	QHBoxLayout* messageTitleLayout = new QHBoxLayout;
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	m_timeL = new QLabel("Time (Global):");
-	m_time = new QLineEdit(QString::fromStdString(m_msg.getGlobalSystemTime()));
+	QLabel* timeL = new QLabel("Time (Global):");
+	m_time = new QLineEdit;
 	m_time->setReadOnly(true);
-
-	m_timeLocalL = new QLabel("Time (Local):");
-	m_timeLocal = new QLineEdit(QString::fromStdString(m_msg.getLocalSystemTime()));
+	m_time->setToolTip("Time where the message was received by the logger service");
+	m_timeUTC = new QCheckBox("UTC");
+	
+	QLabel* timeLocalL = new QLabel("Time (Local):");
+	m_timeLocal = new QLineEdit;
+	m_timeLocal->setToolTip("Time where the message was generated in the sending service");
 	m_timeLocal->setReadOnly(true);
+	m_timeLocalUTC = new QCheckBox("UTC");
 
-	m_userNameL = new QLabel("User Name:");
-	m_userName = new QLineEdit(QString::fromStdString(m_msg.getUserName()));
-	m_userName->setReadOnly(true);
+	QLabel* userNameL = new QLabel("User Name:");
+	QLineEdit* userName = new QLineEdit(QString::fromStdString(m_msg.getUserName()));
+	userName->setReadOnly(true);
 
-	m_projectNameL = new QLabel("Project Name:");
-	m_projectName = new QLineEdit(QString::fromStdString(m_msg.getProjectName()));
-	m_projectName->setReadOnly(true);
+	QLabel* projectNameL = new QLabel("Project Name:");
+	QLineEdit* projectName = new QLineEdit(QString::fromStdString(m_msg.getProjectName()));
+	projectName->setReadOnly(true);
 
-	m_senderNameL = new QLabel("Sender:");
-	m_senderName = new QLineEdit(QString::fromStdString(m_msg.getServiceName()));
-	m_senderName->setReadOnly(true);
+	QLabel* senderNameL = new QLabel("Sender:");
+	QLineEdit* senderName = new QLineEdit(QString::fromStdString(m_msg.getServiceName()));
+	senderName->setReadOnly(true);
 
-	m_messageTypeL = new QLabel("Type:");
-	m_messageType = new QLineEdit(Logging::logMessageTypeString(m_msg));
-	m_messageType->setReadOnly(true);
+	QLabel* messageTypeL = new QLabel("Type:");
+	QLineEdit* messageType = new QLineEdit(Logging::logMessageTypeString(m_msg));
+	messageType->setReadOnly(true);
 
-	m_functionL = new QLabel("Function:");
-	m_function = new QLineEdit(QString::fromStdString(m_msg.getFunctionName()));
-	m_function->setReadOnly(true);
+	QLabel* functionL = new QLabel("Function:");
+	QLineEdit* function = new QLineEdit(QString::fromStdString(m_msg.getFunctionName()));
+	function->setReadOnly(true);
 
 	m_findMessageSyntax = new QCheckBox("Syntax check");
 	m_findMessageSyntax->setToolTip("If active, a syntax check on the message will be performed.\n"
 		"If for example a JSON document was found inside the message, the json document will be displayed indented.");
 
 
-	m_messageL = new QLabel("Message text:");
+	QLabel* messageL = new QLabel("Message text:");
 	m_message = new QPlainTextEdit(QString::fromStdString(m_msg.getText()));
 	m_message->setReadOnly(true);
 
@@ -83,37 +90,45 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::slotRecenter);
 
 	// Setup layouts
-	this->setLayout(m_centralLayout);
-	m_centralLayout->addLayout(m_dataLayout, 0);
-	m_centralLayout->addLayout(m_bigVLayout, 1);
-	m_centralLayout->addLayout(m_buttonLayout, 0);
+	this->setLayout(centralLayout);
+	centralLayout->addLayout(dataLayout, 0);
+	centralLayout->addLayout(bigVLayout, 1);
+	centralLayout->addLayout(buttonLayout, 0);
 
-	m_dataLayout->addWidget(m_timeL, 0, 0);
-	m_dataLayout->addWidget(m_time, 0, 1);
-	m_dataLayout->addWidget(m_timeLocalL, 1, 0);
-	m_dataLayout->addWidget(m_timeLocal, 1, 1);
-	m_dataLayout->addWidget(m_userNameL, 2, 0);
-	m_dataLayout->addWidget(m_userName, 2, 1);
-	m_dataLayout->addWidget(m_projectNameL, 3, 0);
-	m_dataLayout->addWidget(m_projectName, 3, 1);
-	m_dataLayout->addWidget(m_senderNameL, 4, 0);
-	m_dataLayout->addWidget(m_senderName, 4, 1);
-	m_dataLayout->addWidget(m_messageTypeL, 5, 0);
-	m_dataLayout->addWidget(m_messageType, 5, 1);
-	m_dataLayout->addWidget(m_findMessageSyntax, 6, 1);
+	dataLayout->addWidget(timeL, 0, 0);
+	dataLayout->addLayout(timeLayout, 0, 1);
+	dataLayout->addWidget(timeLocalL, 1, 0);
+	dataLayout->addLayout(localTimeLayout, 1, 1);
+	dataLayout->addWidget(userNameL, 2, 0);
+	dataLayout->addWidget(userName, 2, 1);
+	dataLayout->addWidget(projectNameL, 3, 0);
+	dataLayout->addWidget(projectName, 3, 1);
+	dataLayout->addWidget(senderNameL, 4, 0);
+	dataLayout->addWidget(senderName, 4, 1);
+	dataLayout->addWidget(messageTypeL, 5, 0);
+	dataLayout->addWidget(messageType, 5, 1);
+	dataLayout->addWidget(m_findMessageSyntax, 6, 1);
 
-	m_messageTitleLayout->addWidget(m_messageL, 0);
-	m_messageTitleLayout->addStretch(1);
-	m_messageTitleLayout->addWidget(m_findMessageSyntax, 0);
+	timeLayout->setContentsMargins(0, 0, 0, 0);
+	timeLayout->addWidget(m_time, 1);
+	timeLayout->addWidget(m_timeUTC, 0);
 
-	m_bigVLayout->addWidget(m_functionL, 0);
-	m_bigVLayout->addWidget(m_function, 0);
-	m_bigVLayout->addLayout(m_messageTitleLayout, 0);
-	m_bigVLayout->addWidget(m_message, 1);
+	localTimeLayout->setContentsMargins(0, 0, 0, 0);
+	localTimeLayout->addWidget(m_timeLocal, 1);
+	localTimeLayout->addWidget(m_timeLocalUTC, 0);
 
-	m_buttonLayout->addStretch(1);
-	m_buttonLayout->addWidget(m_okButton);
-	m_buttonLayout->addStretch(1);
+	messageTitleLayout->addWidget(messageL, 0);
+	messageTitleLayout->addStretch(1);
+	messageTitleLayout->addWidget(m_findMessageSyntax, 0);
+
+	bigVLayout->addWidget(functionL, 0);
+	bigVLayout->addWidget(function, 0);
+	bigVLayout->addLayout(messageTitleLayout, 0);
+	bigVLayout->addWidget(m_message, 1);
+
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(m_okButton);
+	buttonLayout->addStretch(1);
 
 	// Setup window
 	this->setWindowTitle("MessageViewer (Message #" + QString::number(_index) + ") | OToolkit");
@@ -136,11 +151,16 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->resize(newRect.size());
 
 	m_findMessageSyntax->setChecked(settings->value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
+	m_timeUTC->setChecked(settings->value("LogVisualizationItemViewDialog.TimeUTC", true).toBool());
+	m_timeLocalUTC->setChecked(settings->value("LogVisualizationItemViewDialog.TimeLocalUTC", true).toBool());
 
 	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());
+	this->slotUpdateTimestamps();
 
 	// Connect signals
 	this->connect(m_findMessageSyntax, &QCheckBox::stateChanged, this, &LogVisualizationItemViewDialog::slotDisplayMessageText);
+	this->connect(m_timeUTC, &QCheckBox::stateChanged, this, &LogVisualizationItemViewDialog::slotUpdateTimestamps);
+	this->connect(m_timeLocalUTC, &QCheckBox::stateChanged, this, &LogVisualizationItemViewDialog::slotUpdateTimestamps);
 }
 
 LogVisualizationItemViewDialog::~LogVisualizationItemViewDialog() {
@@ -154,6 +174,8 @@ void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
 	settings->setValue("LogVisualizationItemViewDialog.W", size().width());
 	settings->setValue("LogVisualizationItemViewDialog.H", size().height());
 	settings->setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
+	settings->setValue("LogVisualizationItemViewDialog.TimeUTC", m_timeUTC->isChecked());
+	settings->setValue("LogVisualizationItemViewDialog.TimeLocalUTC", m_timeLocalUTC->isChecked());
 
 	ot::Dialog::closeEvent(_event);
 }
@@ -204,6 +226,22 @@ void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
 	}
 	else {
 		m_message->setPlainText(str);
+	}
+}
+
+void LogVisualizationItemViewDialog::slotUpdateTimestamps() {
+	if (m_timeUTC->isChecked()) {
+		m_time->setText(QString::fromStdString(ot::DateTime::timestampFromMsec(m_msg.getGlobalSystemTime(), ot::DateTime::SimpleUTC)));
+	}
+	else {
+		m_time->setText(QString::fromStdString(ot::DateTime::timestampFromMsec(m_msg.getGlobalSystemTime(), ot::DateTime::Simple)));
+	}
+
+	if (m_timeLocalUTC->isChecked()) {
+		m_timeLocal->setText(QString::fromStdString(ot::DateTime::timestampFromMsec(m_msg.getLocalSystemTime(), ot::DateTime::SimpleUTC)));
+	}
+	else {
+		m_timeLocal->setText(QString::fromStdString(ot::DateTime::timestampFromMsec(m_msg.getLocalSystemTime(), ot::DateTime::Simple)));
 	}
 }
 

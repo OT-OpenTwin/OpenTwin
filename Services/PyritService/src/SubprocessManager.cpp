@@ -227,3 +227,12 @@ void SubprocessManager::endLogging(std::string& logText)
 		logText.append(text);
 	}
 }
+
+bool SubprocessManager::isConnected() {
+	if (m_communicationHandler) {
+		return !m_communicationHandler->isDisconnected();
+	}
+	else {
+		return false;
+	}
+}

@@ -27,5 +27,5 @@ private:
 	std::list<EntityResult1DPlot*> getSelectedPlots();
 	std::string getFreePlotName();
 
-	std::list<ot::Plot1DCurveCfg> createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase);
+	void createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase);
 };

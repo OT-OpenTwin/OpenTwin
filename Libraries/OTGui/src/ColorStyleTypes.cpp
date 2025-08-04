@@ -407,7 +407,10 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::PythonFunction: return "Python Function";
 	case ot::ColorStyleValueEntry::PythonComment: return "Python Comment";
 
+	case ot::ColorStyleValueEntry::PlotCurve: return "Plot Curve";
 	case ot::ColorStyleValueEntry::PlotCurveDimmed: return "Plot Curve Dimmed";
+	case ot::ColorStyleValueEntry::PlotCurveHighlight: return "Plot Curve Highlight";
+	case ot::ColorStyleValueEntry::PlotCurveSymbol: return "Plot Curve Symbol";
 
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
@@ -494,7 +497,10 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonFunction)) return ColorStyleValueEntry::PythonFunction;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonComment)) return ColorStyleValueEntry::PythonComment;
 
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurve)) return ColorStyleValueEntry::PlotCurve;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveDimmed)) return ColorStyleValueEntry::PlotCurveDimmed;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveHighlight)) return ColorStyleValueEntry::PlotCurveHighlight;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveSymbol)) return ColorStyleValueEntry::PlotCurveSymbol;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
@@ -503,10 +509,18 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	}
 }
 
-std::list<std::string> ot::getAllColorStyleValueEntries(void) {
+std::list<std::string> ot::getAllColorStyleValueEntryStrings() {
 	std::list<std::string> ret;
 	for (int i = 0; i < (int)ColorStyleValueEntry::ColorStyleValueEntry_End; i++) {
 		ret.push_back(toString((ColorStyleValueEntry)i));
+	}
+	return ret;
+}
+
+std::list<ot::ColorStyleValueEntry> ot::getAllColorStyleValueEntries() {
+	std::list<ot::ColorStyleValueEntry> ret;
+	for (int i = 0; i < (int)ColorStyleValueEntry::ColorStyleValueEntry_End; i++) {
+		ret.push_back((ColorStyleValueEntry)i);
 	}
 	return ret;
 }

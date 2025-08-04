@@ -3,6 +3,7 @@
 
 // OpenTwin header
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Painter2DDialogFilter.h"
 #include "OldTreeIcon.h"
 
 // std header
@@ -304,7 +305,7 @@ public:
 
 	void clearOptions() { m_options.clear(); };
 	void addOption(const std::string &option) { assert(std::find(m_options.begin(), m_options.end(), option) == m_options.end());  m_options.push_back(option); }
-	void resetOptions(std::list<std::string>& _options);
+	void resetOptions(const std::list<std::string>& _options);
 	const std::vector<std::string> &getOptions(void) { return m_options; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
@@ -496,6 +497,9 @@ public:
 	//! The entity keeps ownership of the painter
 	const ot::Painter2D* getValue(void) const { return m_painter; };
 
+	void setFilter(const ot::Painter2DDialogFilter& _filter) { m_filter = _filter; };
+	const ot::Painter2DDialogFilter& getFilter() const { return m_filter; };
+
 	virtual bool hasSameValue(EntityPropertiesBase* other) override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
@@ -510,4 +514,5 @@ public:
 
 private:
 	ot::Painter2D* m_painter;
+	ot::Painter2DDialogFilter m_filter;
 };

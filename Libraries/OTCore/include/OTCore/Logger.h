@@ -11,9 +11,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTSystem/OTAssert.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/CoreAPIExport.h"
@@ -357,13 +357,12 @@ namespace ot {
 
 	//! \brief Contains information about the origin and the content of a log message.
 	class OT_CORE_API_EXPORT LogMessage : public Serializable {
+		OT_DECL_DEFCOPY(LogMessage)
+		OT_DECL_DEFMOVE(LogMessage)
 	public:
 		LogMessage();
 		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags = LogFlags(ot::INFORMATION_LOG));
-		LogMessage(const LogMessage& _other);
 		virtual ~LogMessage();
-
-		LogMessage& operator = (const LogMessage& _other);
 
 		void setServiceName(const std::string& _serviceName) { m_serviceName = _serviceName; };
 		const std::string& getServiceName(void) const { return m_serviceName; };
@@ -378,18 +377,16 @@ namespace ot {
 		const LogFlags& getFlags(void) const { return m_flags; };
 
 		//! @see getLocalSystemTime
-		void setLocalSystemTime(const std::string& _timeString) { m_localSystemTime = _timeString; };
+		void setLocalSystemTime(int64_t _msSinceEpoch) { m_localSystemTime = _msSinceEpoch; };
 
-		//! @brief String representation of the system timestamp at message creation.
-		//! @ref ot::DateTime::DateFormat::SimpleUTC
-		const std::string& getLocalSystemTime(void) const { return m_localSystemTime; };
+		//! @brief Milliseconds since epoch when the message was created.
+		int64_t getLocalSystemTime(void) const { return m_localSystemTime; };
 
 		//! @see getGlobalSystemTime
-		void setGlobalSystemTime(const std::string& _timeString) { m_globalSystemTime = _timeString; };
+		void setGlobalSystemTime(int64_t _msSinceEpoch) { m_globalSystemTime = _msSinceEpoch; };
 
-		//! @brief String representation of the system timestamp at when the message was received by the Logger Service.
-		//! @ref ot::DateTime::DateFormat::SimpleUTC
-		const std::string& getGlobalSystemTime(void) const { return m_globalSystemTime; };
+		//! @brief Milliseconds since epoch when the message was received by the logger service.
+		int64_t getGlobalSystemTime(void) const { return m_globalSystemTime; };
 
 		//! @brief Set the current system time as message creation timestamp.
 		void setCurrentTimeAsLocalSystemTime(void);
@@ -414,14 +411,16 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 	private:
+		void setFromVersion1_0(const ConstJsonObject& _object);
+
 		friend OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
 
 		std::string m_serviceName;			//! @brief Name of the message creator.
 		std::string m_functionName;			//! @brief Name of the function that created the message.
 		std::string m_text;					//! @brief The message text.
 		LogFlags    m_flags;				//! @brief Log flags tha describe the type of the message.
-		std::string m_localSystemTime;		//! @brief Message creation timestamp.
-		std::string m_globalSystemTime;		//! @brief Message received by LoggerService timestamp.
+		int64_t m_localSystemTime;		    //! @brief Message creation timestamp (ms since epoch).
+		int64_t m_globalSystemTime;		    //! @brief Message received by LoggerService timestamp (ms since epoch).
 		std::string m_userName;             //! @brief Current user when this message was generated.
 		std::string m_projectName;          //! @brief Project in which this message was generated.
 	};
@@ -523,10 +522,10 @@ namespace ot {
 
 		void setLogFlag(LogFlag _flag, bool _active = true) { m_logFlags.setFlag(_flag, _active); };
 		void setLogFlags(LogFlags _flags) { m_logFlags = _flags; };
-		LogFlags logFlags(void) const { return m_logFlags; };
+		LogFlags getLogFlags(void) const { return m_logFlags; };
 
 		void setServiceName(const std::string& _name) { m_serviceName = _name; };
-		const std::string& serviceName(void) const { return m_serviceName; };
+		const std::string& getServiceName(void) const { return m_serviceName; };
 
 		void setUserName(const std::string& _name) { m_userName = _name; };
 		const std::string& getUserName(void) const { return m_userName; };

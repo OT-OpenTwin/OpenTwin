@@ -25,9 +25,13 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitDiode::createProperties(const ot::UID& _circuitModelFolderID)
+void EntityBlockCircuitDiode::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)
 {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
+}
+
+std::string EntityBlockCircuitDiode::getFolderName() {
+	return "Diode";
 }
 
 const double EntityBlockCircuitDiode::getRotation() {
@@ -49,23 +53,14 @@ const std::string EntityBlockCircuitDiode::getFlip() {
 bool EntityBlockCircuitDiode::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+
 	return refresh;
-}
-
-
-std::string EntityBlockCircuitDiode::getElementType()
-{
-	auto propertyBase = getProperties().getProperty("Model");
-	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(elementType != nullptr);
-
-	return elementType->getValue();
 }
 
 std::string EntityBlockCircuitDiode::getTypeAbbreviation() {

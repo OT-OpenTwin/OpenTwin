@@ -42,13 +42,13 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
 	EntityPropertiesGuiPainter* color = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
-	color->setValue(connectionCfg.getLineStyle().painter()->createCopy());
+	color->setValue(connectionCfg.getLineStyle().getPainter()->createCopy());
 
 	EntityPropertiesDouble* lineWidth = dynamic_cast<EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
-	lineWidth->setValue(connectionCfg.getLineStyle().width());
+	lineWidth->setValue(connectionCfg.getLineStyle().getWidth());
 
 	EntityPropertiesSelection* lineStyle = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
-	lineStyle->setValue(ot::toString(connectionCfg.getLineStyle().style()));
+	lineStyle->setValue(ot::toString(connectionCfg.getLineStyle().getStyle()));
 	
 	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(connectionCfg.getLineShape()));

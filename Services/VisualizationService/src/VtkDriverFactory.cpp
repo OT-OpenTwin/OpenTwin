@@ -9,6 +9,7 @@
 #include "VtkDriverUnstructuredScalarSurface.h"
 #include "VtkDriverUnstructuredScalarVolume.h"
 #include "VtkDriverUnstructuredVectorVolume.h"
+#include "VtkDriverUnstructuredVectorSurface.h"
 
 VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 {
@@ -31,6 +32,10 @@ VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 	else if (visEntity->getClassName() == "EntityVisUnstructuredVectorVolume") 
 	{
 		return new VtkDriverUnstructuredVectorVolume;
+	}
+	else if (visEntity->getClassName() == "EntityVisUnstructuredVectorSurface")
+	{
+		return new VtkDriverUnstructuredVectorSurface;
 	}
 	else
 	{

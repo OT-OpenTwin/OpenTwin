@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTCore/CoreAPIExport.h"
-#include "OTCore/Flags.h"
 
 // std header
 #include <list>

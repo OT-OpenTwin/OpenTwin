@@ -25,37 +25,16 @@ public:
 	void createProperties();
 	virtual bool updateFromProperties() override;
 
-	int32_t getNumberOfQuantities();
-	int32_t getNumberOfParameters();
-	int32_t getNumberOfMetaData();
-
+	uint32_t getNumberOfInputs();
 	static const std::string getIconName() { return "Database_store.svg"; }
 
-	const std::list<ot::Connector> getConnectorsQuantity();
-	const std::list<ot::Connector> getConnectorsParameter();
-	const std::list<ot::Connector> getConnectorsMetadata();
+	bool getCreatePlot();
+	std::string getPlotName();
 
-	const ParameterProperties getPropertiesParameter(const std::string& _parameterName) ;
-	const QuantityProperties getPropertiesQuantity(const std::string& _quantityName) ;
-
-	std::string getSeriesName();
+	const std::list<std::string> getInputNames();
+	const std::string getSeriesConnectorName() { return "SeriesMetadata"; }
 private:	
-	std::list<ot::Connector*> m_quantityInputs;
-	const std::string m_quantityInputNameBase = "Quantity";
-	std::list<ot::Connector*> m_parameterInputs;
-	const std::string m_parameterInputNameBase = "Parameter";
-	std::list<ot::Connector*> m_metaDataInputs;
-	const std::string m_metaDataInputNameBase = "Meta data";
-
-	const std::string m_propertyNbOfQuantities = "Number of quantities";
-	const std::string m_propertyNbOfParameter = "Number of parameters";
-	const std::string m_propertyNbOfMetaData = "Number of meta data";
-	const std::string m_groupGeneral = "General";
-
-	const std::string m_propertyConstParameter = "Is constant";
-	const std::string m_propertyName = "Name";
-	const std::string m_propertyUnit = "Unit";
-	const std::string m_propertyType = "Type";
+	uint32_t m_maxNbOfInputs = 40;
 
 	void createParameterProperties(const std::string& _groupName);
 

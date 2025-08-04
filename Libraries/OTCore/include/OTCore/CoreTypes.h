@@ -1,8 +1,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTSystem/ArchitectureInfo.h"
-#include "OTCore/Flags.h"
 
 // std header
 #include <list>
@@ -24,9 +24,11 @@ namespace ot {
 #ifdef OT_OS_64Bit
 	//! @brief Unique identifier (64 bit unsigned integer)
 	typedef unsigned long long UID;
+
 #else
 	//! @brief Unique identifier (32 bit unsigned integer)
 	typedef unsigned long UID;
+
 #endif // DEBUG
 
 	//! @brief Unique identifier list

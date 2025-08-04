@@ -32,7 +32,7 @@ namespace ot {
 
 		// QGraphicsItem
 
-		virtual QRectF boundingRect(void) const override;
+		virtual QRectF boundingRect() const override;
 		virtual void paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
@@ -50,10 +50,10 @@ namespace ot {
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 
 		//! \brief Returns the QGraphicsItem.
-		virtual QGraphicsItem* getQGraphicsItem(void) override;
+		virtual QGraphicsItem* getQGraphicsItem() override;
 
 		//! \brief Returns the const QGraphicsItem.
-		virtual const QGraphicsItem* getQGraphicsItem(void) const override;
+		virtual const QGraphicsItem* getQGraphicsItem() const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -62,13 +62,13 @@ namespace ot {
 		bool setConfiguration(const ot::GraphicsConnectionCfg& _cfg);
 
 		//! @brief Creates a configuration object containing the items origin and destination information
-		const GraphicsConnectionCfg& getConfiguration(void) const { return m_config; };
+		const GraphicsConnectionCfg& getConfiguration() const { return m_config; };
 
 		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); this->update(); };
-		GraphicsConnectionCfg::ConnectionShape getLineShape(void) const { return m_config.getLineShape(); };
+		GraphicsConnectionCfg::ConnectionShape getLineShape() const { return m_config.getLineShape(); };
 
 		void setLineWidth(double _width) { m_config.setLineWidth(_width); this->update(); };
-		double getLineWidth(void) const { return m_config.getLineWidth(); };
+		double getLineWidth() const { return m_config.getLineWidth(); };
 
 		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
 
@@ -78,15 +78,15 @@ namespace ot {
 
 		//! \brief Returns the current line painter.
 		//! The item keeps ownership of the painter.
-		const ot::Painter2D* getLinePainter(void) const { return m_config.getLinePainter(); };
+		const ot::Painter2D* getLinePainter() const { return m_config.getLinePainter(); };
 
 		void setLineStyle(const PenFCfg& _style) { m_config.setLineStyle(_style); this->update(); };
-		const PenFCfg& getLineStyle(void) const { return m_config.getLineStyle(); };
+		const PenFCfg& getLineStyle() const { return m_config.getLineStyle(); };
 
 		void setHandleState(bool _handlesState);
-		bool getHandleState(void) const;
+		bool getHandleState() const;
 
-		void updateConnectionView(void);
+		void updateConnectionView();
 
 		//! \brief Sets the origin and destination items.
 		//! Will call GraphicsItem::storeConnection for every connected item.
@@ -96,7 +96,7 @@ namespace ot {
 		//! \brief Unsets the origin and destination items.
 		//! Will call GraphicsItem::forgetConnection for every connected item.
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
-		void disconnectItems(void);
+		void disconnectItems();
 
 		//! \brief Sets the origin and/or destination to null.
 		//! If the item is the origin item, origin will be set to null.
@@ -104,13 +104,13 @@ namespace ot {
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
 		void forgetItem(const GraphicsItem* _item);
 
-		GraphicsItem* originItem(void) const { return m_origin; };
-		GraphicsItem* destItem(void) const { return m_dest; };
+		GraphicsItem* originItem() const { return m_origin; };
+		GraphicsItem* destItem() const { return m_dest; };
 
 		//! \brief Updates the configuration according to the origin and/or destination item.
 		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
 		//! Same applies to the destination.
-		void updateConnectionInformation(void);
+		void updateConnectionInformation();
 
 	protected:
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) override;
@@ -129,9 +129,9 @@ namespace ot {
 		qreal calculateShortestDistanceToPointYX(const QPointF& _pt) const;
 		qreal calculateShortestDistanceToPointAutoXY(const QPointF& _pt) const;
 
-		GraphicsConnectionCfg::ConnectionShape calculateAutoXYShape(void) const;
+		GraphicsConnectionCfg::ConnectionShape calculateAutoXYShape() const;
 
-		ot::Alignment calculateConnectionDirectionAlignment(void) const;
+		ot::Alignment calculateConnectionDirectionAlignment() const;
 
 		GraphicsConnectionCfg m_config;
 

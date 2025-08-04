@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Painter2DDialogFilter.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
@@ -33,22 +34,26 @@ namespace ot{
 
 		virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
 
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
-		PushButton* getPushButton(void) const { return m_btn; };
+		PushButton* getPushButton() const { return m_btn; };
 
 		void setPainter(Painter2D* _painter);
 		void setPainter(const Painter2D* _painter);
-		const Painter2D* getPainter(void) { return m_painter; };
+		const Painter2D* getPainter() { return m_painter; };
+
+		void setFilter(const Painter2DDialogFilter& _filter) { m_filter = _filter; };
+		const Painter2DDialogFilter& getFilter() const { return m_filter; };
 
 	Q_SIGNALS:
-		void painter2DChanged(void);
+		void painter2DChanged();
 
 	private Q_SLOTS:
-		void slotClicked(void);
+		void slotClicked();
 
 	private:
+		Painter2DDialogFilter m_filter;
 		Painter2D* m_painter;
 		PushButton* m_btn;
 		QString m_btnTip;

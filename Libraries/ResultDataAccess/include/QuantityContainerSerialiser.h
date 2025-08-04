@@ -9,6 +9,7 @@
 #include "QuantityDescriptionCurve.h"
 #include "QuantityDescriptionCurveComplex.h"
 #include "QuantityDescriptionSParameter.h"
+#include "QuantityDescriptionMatrix.h"
 
 class QuantityContainerSerialiser
 {
@@ -24,6 +25,7 @@ private:
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurve* _quantityDescription);
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurveComplex* _quantityDescription);
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionSParameter* _quantityDescription);
+	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionMatrix* _quantityDescription);
 
 	ResultImportLogger& m_logger;
 	uint64_t m_bucketSize = 1;

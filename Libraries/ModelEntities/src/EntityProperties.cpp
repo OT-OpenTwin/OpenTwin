@@ -131,14 +131,14 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 		}
 		else
 		{
-			//Find first of name
-			for (auto property : m_properties)
+			// Find first of name
+			for (auto& property : m_properties)
 			{
 				const std::string& keyOfCurrentProperty = property.first;
 				const std::string name = extractNameFromKey(keyOfCurrentProperty);
 				if (name == _name)
 				{
-					return m_properties[keyOfCurrentProperty];
+					return property.second;
 				}
 			}
 		}
@@ -148,18 +148,19 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 	else
 	{
 		const std::string key =	createKey(_name, _groupName);
-		if (m_properties.count(key) == 0) {
+		auto it = m_properties.find(key);
+		if (it == m_properties.end()) {
 			return nullptr;
 		}
 		else {
-			return m_properties[key];
+			return it->second;
 		}
 	}
 }
 
 bool EntityProperties::propertyExists(const std::string &_name, const std::string& _groupName)
 {
-	EntityPropertiesBase* base =	getProperty(_name, _groupName);
+	EntityPropertiesBase* base = getProperty(_name, _groupName);
 	return (base != nullptr);
 }
 

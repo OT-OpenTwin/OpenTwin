@@ -25,15 +25,15 @@
     <LocalDebuggerEnvironment>PATH=$(OT_DEFAULT_SERVICE_DLLR);%PATH%</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
-    <QtLastBackgroundBuild>2025-03-19T15:35:07.9722336Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-01T07:52:46.6742979Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
-    <QtLastBackgroundBuild>2025-03-19T15:35:08.0564470Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-01T07:52:47.4531550Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2025-03-19T15:35:08.1300045Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-01T07:52:48.0689663Z</QtLastBackgroundBuild>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2025-03-19T15:35:08.1981541Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-07-01T07:52:48.4482287Z</QtLastBackgroundBuild>
   </PropertyGroup>
 </Project>

@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTGui/TextEditorCfg.h"
 
@@ -22,27 +23,11 @@
 #endif
 
 ot::TextEditorCfg::TextEditorCfg() :
-	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable),
-	m_syntax(DocumentSyntax::PlainText), m_readOnly(false)
-{}
-
-ot::TextEditorCfg::TextEditorCfg(const TextEditorCfg& _other)
-	: WidgetViewBase(_other), m_text(_other.m_text), m_syntax(_other.m_syntax), m_readOnly(_other.m_readOnly)
+	WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle),
+	m_syntax(DocumentSyntax::PlainText), m_readOnly(false), m_fileExtensionFilter(FileExtension::toFilterString(FileExtension::AllFiles))
 {}
 
 ot::TextEditorCfg::~TextEditorCfg() {}
-
-ot::TextEditorCfg& ot::TextEditorCfg::operator = (const TextEditorCfg& _other) {
-	WidgetViewBase::operator=(_other);
-
-	if (this != &_other) {
-		m_text = _other.m_text;
-		m_readOnly = _other.m_readOnly;
-		m_syntax = _other.m_syntax;
-	}
-	
-	return *this;
-}
 
 void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	OT_TEST_TEXTEDITORCFG_Interval("Export");
@@ -52,6 +37,7 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("ReadOnly", m_readOnly, _allocator);
 	_object.AddMember("Syntax", JsonString(ot::toString(m_syntax), _allocator), _allocator);
+	_object.AddMember("FileExtensionsFilter", JsonString(m_fileExtensionFilter, _allocator), _allocator);
 }
 
 void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -62,4 +48,13 @@ void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_text = json::getString(_object, "Text");
 	m_readOnly = json::getBool(_object, "ReadOnly");
 	m_syntax = stringToDocumentSyntax(json::getString(_object, "Syntax"));
+	m_fileExtensionFilter = json::getString(_object, "FileExtensionsFilter");
+}
+
+void ot::TextEditorCfg::setFileExtensionFilter(const std::initializer_list<FileExtension::DefaultFileExtension>& _extensions) {
+	m_fileExtensionFilter = FileExtension::toFilterString(std::list<FileExtension::DefaultFileExtension>(_extensions));
+}
+
+void ot::TextEditorCfg::setFileExtensionFilter(const std::list<FileExtension::DefaultFileExtension>& _extensions) {
+	m_fileExtensionFilter = FileExtension::toFilterString(_extensions);
 }

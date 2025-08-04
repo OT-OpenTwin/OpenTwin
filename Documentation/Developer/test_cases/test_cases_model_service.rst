@@ -1,7 +1,7 @@
 Model Service
-==============
-This documentation outlines the test cases for the Model service of our project.
+=============
 
+This documentation outlines the test cases for the Model service of our project.
 
 Import of text files
 --------------------

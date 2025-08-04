@@ -9,6 +9,7 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
+#include "OTGui/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
@@ -35,11 +36,28 @@ public:
 
 private:
 
+	std::string getModelInformation(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	std::string getModelMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value,
+		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
+	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
+
+	void packMetaData(const bsoncxx::document::view& _doc, ot::LibraryModel& _model, ot::ModelLibraryDialogCfg& _dialogCfg);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action handler
 	OT_HANDLER(handleGetDocument, Application, OT_ACTION_CMD_LMS_GetDocument, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleGetListOfDocuments, Application, OT_ACTION_CMD_LMS_GetDocumentList, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleCreateDialogConfig, Application, OT_ACTION_CMD_LMS_CreateConfig, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_UI_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_UI_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
@@ -49,5 +67,7 @@ private:
 	Application();
 	virtual ~Application();
 
+	std::string circuitMetaDataCollection = "CircuitMetaData";
+	std::string circuitMetaParameters = "Parameters";
 	
 };

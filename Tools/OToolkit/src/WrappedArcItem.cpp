@@ -87,8 +87,8 @@ void WrappedArcItem::fillPropertyGrid(void) {
 	arcGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight(), 0., std::numeric_limits<double>::max()));
 	arcGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16., 0., std::numeric_limits<double>::max()));
 	arcGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16., 0., std::numeric_limits<double>::max()));
-	arcGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	arcGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., std::numeric_limits<double>::max()));
+	arcGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().getPainter()));
+	arcGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().getWidth(), 0., std::numeric_limits<double>::max()));
 	
 	cfg.addRootGroup(arcGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);

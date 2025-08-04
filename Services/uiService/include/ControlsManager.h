@@ -1,10 +1,7 @@
-/*
- * ControlsManager.h
- *
- *  Created on: February 20, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file ControlsManager.h
+//! @author Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
@@ -12,7 +9,7 @@
 #include <akCore/globalDataTypes.h>
 
 // Open twin header
-#include "OTCore/Flags.h"
+#include "OTSystem/Flags.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 
@@ -102,6 +99,8 @@ public:
 	void cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement = true, bool _eraseUiElement = false);
 
 	int lockLevel(ot::LockTypeFlag _type);
+
+	std::string printLockState();
 
 private:
 	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;

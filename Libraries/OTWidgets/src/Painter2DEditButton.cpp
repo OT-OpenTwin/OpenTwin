@@ -65,8 +65,8 @@ void ot::Painter2DEditButton::setPainter(const Painter2D* _painter) {
 	this->updateText();
 }
 
-void ot::Painter2DEditButton::slotClicked(void) {
-	Painter2DEditDialog dia(m_painter);
+void ot::Painter2DEditButton::slotClicked() {
+	Painter2DEditDialog dia(m_filter, m_painter);
 	
 	m_btn->setSelectedProperty();
 	Dialog::DialogResult result = dia.showDialog();
@@ -81,7 +81,7 @@ void ot::Painter2DEditButton::slotClicked(void) {
 	}
 }
 
-void ot::Painter2DEditButton::ini(void) {
+void ot::Painter2DEditButton::ini() {
 	QHBoxLayout* rootLay = new QHBoxLayout(this);
 	rootLay->setContentsMargins(QMargins(0, 0, 0, 0));
 	
@@ -102,7 +102,7 @@ void ot::Painter2DEditButton::ini(void) {
 	this->connect(m_btn, &PushButton::clicked, this, &Painter2DEditButton::slotClicked);
 }
 
-void ot::Painter2DEditButton::updateText(void) {
+void ot::Painter2DEditButton::updateText() {
 	OTAssertNullptr(m_painter);
 	if (m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		FillPainter2D* actualPainter = dynamic_cast<FillPainter2D*>(m_painter);

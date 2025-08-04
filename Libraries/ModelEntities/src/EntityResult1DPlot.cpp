@@ -4,6 +4,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include <algorithm>
+#include "OTCore/EntityName.h"
+#include "EntityResult1DCurve.h"
 
 EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -56,15 +58,21 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
+	
+	auto showFullMatrixProp =	PropertyHelper::getBoolProperty(this,"Show full matrix");
+	requiresDataToBeFetched |= showFullMatrixProp->needsUpdate();
 
-	auto titleProperty = PropertyHelper::getStringProperty(this, "Title", "General");
-	if (titleProperty->needsUpdate())
+	if (!showFullMatrixProp->getValue())
 	{
-		const std::string newTitle = titleProperty->getValue();
-		const std::string fullEntityName =	getName();
-		const std::string entityNameTrunk = fullEntityName.substr(0, fullEntityName.find_last_of("/"));
-		setName(entityNameTrunk + newTitle);
+		auto showMatrixRowProp = PropertyHelper::getIntegerProperty(this, "Show matrix row entry");
+		requiresDataToBeFetched |= showMatrixRowProp->needsUpdate();
+
+		auto showMatrixColumnProp = PropertyHelper::getIntegerProperty(this, "Show matrix column entry");
+		requiresDataToBeFetched |= showMatrixColumnProp->needsUpdate();
 	}
+
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->needsUpdate();
+
 	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, true, requiresDataToBeFetched);
 
 	getProperties().forceResetUpdateForAllProperties();
@@ -125,9 +133,26 @@ bool EntityResult1DPlot::updatePropertyVisibilities(void)
 	return updatePropertiesGrid;
 }
 
+void EntityResult1DPlot::addChild(EntityBase* _child)
+{
+	EntityContainer::addChild(_child);
+	setQuerySelections();
+}
+
+void EntityResult1DPlot::removeChild(EntityBase* _child)
+{
+	EntityContainer::removeChild(_child);
+	setQuerySelections();
+}
+
 void EntityResult1DPlot::createProperties(void)
 {
-	EntityPropertiesString::createProperty("General", "Title", "", "", getProperties());
+	//Query options are set in the addChild and removeChild methods
+	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", {}, "", "default", getProperties());
+	std::list<std::string> allQueryOptions{ "" };
+	m_querySettings.setQueryDefinitions(allQueryOptions);
+	m_querySettings.setProperties(this);
+
 	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot quantity", { "Magnitude", "Phase", "Real", "Imaginary" }, "Real", "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
@@ -138,11 +163,18 @@ void EntityResult1DPlot::createProperties(void)
 	EntityPropertiesBoolean::createProperty("X axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("X axis", "Max", 0.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("X axis", "Automatic label", true, "", getProperties());
+	EntityPropertiesString::createProperty("X axis", "Label override", "", "", getProperties());
 
 	EntityPropertiesBoolean::createProperty("Y axis", "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty("Y axis", "Autoscale", true, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Min", 0.0, "", getProperties());
 	EntityPropertiesDouble::createProperty("Y axis", "Max", 0.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Automatic label", true, "", getProperties());
+	EntityPropertiesString::createProperty("Y axis", "Label override", "", "", getProperties());
+	EntityPropertiesBoolean::createProperty("Y axis", "Show full matrix", true, "", getProperties());
+	EntityPropertiesInteger::createProperty("Y axis", "Show matrix row entry", 1,1,60, "", getProperties());
+	EntityPropertiesInteger::createProperty("Y axis", "Show matrix column entry", 1,1,60, "", getProperties());
 
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
@@ -152,24 +184,24 @@ void EntityResult1DPlot::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-void EntityResult1DPlot::setFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
-{
-	EntityPropertiesSelection::createProperty("Curve set", "X axis parameter", _parameterNames, *_parameterNames.begin(), "default", getProperties());
-	
-	std::list<std::string> allQueryOptions{""};
-	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
-	
-	m_querySettings.setQueryDefinitions(allQueryOptions);
-	m_querySettings.setProperties(this);
-
-	getProperties().forceResetUpdateForAllProperties();
-}
 
 const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
 	
 	const ot::Color gridColour = PropertyHelper::getColourPropertyValue(this,"Grid color");
-	const std::string title = PropertyHelper::getStringPropertyValue(this, "Title");
+	
+	const std::string entityName = getName();
+	auto shortName = ot::EntityName::getSubName(entityName);
+	std::string title ("");
+	if (shortName.has_value())
+	{
+		title = shortName.value();
+	}
+	else
+	{
+		assert(false);
+	}
+
 	const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type");
 	const std::string plotQuantity = PropertyHelper::getSelectionPropertyValue(this, "Plot quantity");
 
@@ -190,6 +222,15 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter","Curve set");
+
+	const bool automaticLabelX = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "X axis");
+	const bool automaticLabelY = PropertyHelper::getBoolPropertyValue(this, "Automatic label", "Y axis");
+	const std::string labelY = PropertyHelper::getStringPropertyValue(this, "Label override", "Y axis");
+	const std::string labelX = PropertyHelper::getStringPropertyValue(this, "Label override", "X axis");
+
+	const bool showEntireMatrix = PropertyHelper::getBoolPropertyValue(this, "Show full matrix");
+	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
+	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
 
 	std::list<ValueComparisionDefinition> queries = m_querySettings.getValueComparisionDefinitions(this);
 
@@ -221,6 +262,16 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setYAxisMin(minY);
 	config.setYAxisMax(maxY);
 
+	config.setShowEntireMatrix(showEntireMatrix);
+	config.setShowMatrixColumnEntry(showMatrixColumnValue);
+	config.setShowMatrixRowEntry(showMatrixRowValue);
+
+	config.setYLabelAxisAutoDetermine(automaticLabelY);
+	config.setXLabelAxisAutoDetermine(automaticLabelX);
+	config.setAxisLabelY(labelY);
+	config.setAxisLabelX(labelX);
+
+
 	config.setQueries(queries);
 
 	config.setLimitOfCurves(maxNbOfCurves);
@@ -234,19 +285,31 @@ bool EntityResult1DPlot::visualisePlot()
 	return true;
 }
 
-void EntityResult1DPlot::updateFamilyOfCurveProperties(std::list<std::string>& _parameterNames, std::list<std::string>& _quantityNames)
+void EntityResult1DPlot::setQuerySelections()
 {
-	EntityPropertiesSelection* xAxisProp = PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set");
-	std::list<std::string> allQueryOptions, selectionOptions = { xAxisProp->getOptions().begin(),xAxisProp->getOptions().end() };
-	std::merge(_parameterNames.begin(), _parameterNames.end(), _quantityNames.begin(), _quantityNames.end(), std::back_inserter(allQueryOptions));
-	allQueryOptions.unique();
-	if (allQueryOptions != selectionOptions)
+	std::list<std::string> filterOptions, parameterOptions;
+	for (EntityBase* child : getChildrenList())
 	{
-		m_querySettings.setQueryDefinitions(allQueryOptions);
-		m_querySettings.setProperties(this);
-
-		getProperties().forceResetUpdateForAllProperties();
+		auto curve = dynamic_cast<EntityResult1DCurve*>(child);
+		if (curve != nullptr)
+		{
+			const ot::QueryInformation& queryInformation = curve->getQueryInformation();
+			filterOptions.push_back(queryInformation.m_quantityDescription.m_label);
+			for (auto& parameterDescr : queryInformation.m_parameterDescriptions)
+			{
+				filterOptions.push_back(parameterDescr.m_label);
+				parameterOptions.push_back(parameterDescr.m_label);
+			}
+		}
 	}
+	filterOptions.push_back("");
+	filterOptions.sort();
+	filterOptions.unique();
+	parameterOptions.sort();
+	parameterOptions.unique();
+
+	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->resetOptions(parameterOptions);
+	m_querySettings.updateQuerySettings(this, filterOptions);
 }
 
 void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document& storage)
@@ -264,7 +327,6 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view& d
 void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 {
 	PropertyHelper::setColourPropertyValue(_config.getGridColor(), this, "Grid color");
-	PropertyHelper::setStringPropertyValue(_config.getTitle(), this, "Title");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::plotTypeToString(_config.getPlotType()), this, "Plot type");
 	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::axisQuantityToString(_config.getAxisQuantity()), this, "Plot quantity");
 	
@@ -280,6 +342,12 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", "Y axis");
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", "Y axis");
+
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelX(), this, "Label override", "X axis");
+	PropertyHelper::setBoolPropertyValue(_config.getXLabelAxisAutoDetermine(), this, "Automatic label", "X axis");
+	
+	PropertyHelper::setStringPropertyValue(_config.getAxisLabelY(), this, "Label override", "Y axis");
+	PropertyHelper::setBoolPropertyValue(_config.getYLabelAxisAutoDetermine(), this, "Automatic label", "Y axis");
 }
 
 

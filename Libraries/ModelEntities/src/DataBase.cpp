@@ -123,18 +123,20 @@ bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, un
 {
 	assert(version != 1); // This is for testing whether still some old version convention is being used somewhere
 
-	if (prefetchedDocuments.count(entityID) > 0)
 	{
-		// We have prefetched this document
-		bsoncxx::builder::basic::document *prefetchedDoc = prefetchedDocuments[entityID];
+		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
+		if (m_prefetchedDocuments.count(entityID) > 0)
+		{
+			// We have prefetched this document
+			bsoncxx::builder::basic::document* prefetchedDoc = m_prefetchedDocuments[entityID];
 
-		doc.append(bsoncxx::builder::basic::kvp("Found", prefetchedDoc->view()));
+			doc.append(bsoncxx::builder::basic::kvp("Found", prefetchedDoc->view()));
 
-		RemovePrefetchedDocument(entityID);
+			RemovePrefetchedDocument(entityID);
 
-		return true;
+			return true;
+		}
 	}
-	
 	std::cout << "Restoring document directly (no prefetching)" << std::endl;
 
 	assert(isConnected);
@@ -243,7 +245,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	}
 
 	auto queryBuilderDoc = bsoncxx::builder::basic::document{};
-	queryBuilderDoc.append(kvp("$and", queryArray));
+	queryBuilderDoc.append(kvp("$or", queryArray));
 
 	BsonViewOrValue filterQuery = queryBuilderDoc.extract();
 	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
@@ -259,22 +261,26 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 		/*auto tempQueryView = filterQuery.view();
 		std::string filterString =	bsoncxx::to_json(tempQueryView);*/
 	}
-	for (; resultPointer != results.end(); resultPointer++)
+
 	{
-		auto insertType = (*resultPointer)["InsertType"].get_int32().value;
-		if (InsertType(insertType) == InsertType::Database)
+		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
+		for (; resultPointer != results.end(); resultPointer++)
 		{
-			bsoncxx::builder::basic::document *doc = new bsoncxx::builder::basic::document{};
-			doc->append(bsoncxx::builder::concatenate(*resultPointer));
+			auto insertType = (*resultPointer)["InsertType"].get_int32().value;
+			if (InsertType(insertType) == InsertType::Database)
+			{
+				bsoncxx::builder::basic::document* doc = new bsoncxx::builder::basic::document{};
+				doc->append(bsoncxx::builder::concatenate(*resultPointer));
 
-			unsigned long long entityID = (*resultPointer)["EntityID"].get_int64();
+				unsigned long long entityID = (*resultPointer)["EntityID"].get_int64();
 
-			prefetchedDocuments[entityID] = doc;
-			numberPrefetchedDocs++;
-		}
-		else
-		{
-			std::cout << "Document not prefetched, since it is not entirely stored in data base" << std::endl;
+				m_prefetchedDocuments[entityID] = doc;
+				numberPrefetchedDocs++;
+			}
+			else
+			{
+				std::cout << "Document not prefetched, since it is not entirely stored in data base" << std::endl;
+			}
 		}
 	}
 
@@ -283,7 +289,8 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 
 void DataBase::RemovePrefetchedDocument(unsigned long long entityID)
 {
-	prefetchedDocuments.erase(entityID);
+	std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
+	m_prefetchedDocuments.erase(entityID);
 }
 
 bool DataBase::GetAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value> &filterPairs, std::vector<std::string> &columnNames, bsoncxx::builder::basic::document &doc)

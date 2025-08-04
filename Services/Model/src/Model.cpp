@@ -76,6 +76,9 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
+#include "MetadataEntityInterface.h"
+
+#include "OTServiceFoundation/UILockWrapper.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -1454,6 +1457,8 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 		}
 	}
 
+
+
 	// Check whether we have encountered an error in one of the previous operations
 	if (!error.empty())
 	{
@@ -1514,6 +1519,15 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+
+	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity);
+	if (blockEntity != nullptr)
+	{
+		blockEntity->CreateBlockItem();
+	}
+
+	Application::instance()->getVisualisationHandler().handleRenaming(entityID);
+
 }
 
 void Model::keySequenceActivated(const std::string &keySequence) {
@@ -2391,12 +2405,18 @@ void Model::updateEntities(bool itemsVisible)
 
 void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible)
 {
-	ProgressReport::setUILock(true, ProgressReport::MODEL_CHANGE);
+	ot::LockTypeFlags lockFlag;
+	lockFlag.setFlag(ot::LockModelWrite);
+	lockFlag.setFlag(ot::LockNavigationWrite);
+	lockFlag.setFlag(ot::LockViewWrite);
+	lockFlag.setFlag(ot::LockProperties);
+	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
 
 	for (auto serviceUpdate : otherServicesUpdate)
 	{
 		std::list<ot::UID> entityIDs, entityVersions, brepVersions;
-
+		ot::JsonArray changedEntitiesInfos;
+		ot::JsonDocument notify;
 		for (auto entity : serviceUpdate.second)
 		{
 			ot::UID brepVersion = 0;
@@ -2410,10 +2430,17 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 			entityIDs.push_back(entity.first);
 			entityVersions.push_back(entity.second);
 			brepVersions.push_back(brepVersion);
+			auto changedEntityByID = entityMap.find(entity.first);
+			assert(changedEntityByID != entityMap.end());
+			ot::EntityInformation entityInfo(changedEntityByID->second);
+			ot::JsonObject entityInfoSerialised;
+			entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
+			changedEntitiesInfos.PushBack(entityInfoSerialised, notify.GetAllocator());
 		}
 
-		ot::JsonDocument notify;
+
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, changedEntitiesInfos, notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
@@ -2425,8 +2452,6 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	// Now we need to notify the model service that the update operation is completed
 	refreshAllViews();
 	modelChangeOperationCompleted("shape properties changed");
-
-	ProgressReport::setUILock(false, ProgressReport::MODEL_CHANGE);
 }
 
 void Model::updateEntity(EntityBase *entity)
@@ -2968,6 +2993,8 @@ void Model::showSelectedShapeInformation(void)
 
 	std::list<EntityGeometry *> geometryEntities;
 
+	std::string additionalInformation("");
+
 	for (auto entity : selectedEntities)
 	{
 		double lxmin = 0.0, lxmax = 0.0, lymin = 0.0, lymax = 0.0, lzmin = 0.0, lzmax = 0.0;
@@ -3022,8 +3049,22 @@ void Model::showSelectedShapeInformation(void)
 			// Add the entity to the list for determining the number of triangles
 			geometryEntities.push_back(geometry);
 		}
-	}
+	
+		EntityMetadataSeries* series =	dynamic_cast<EntityMetadataSeries*>(entity);
+		
+		if (series != nullptr)
+		{
+			MetadataEntityInterface metadataInterface;
+			MetadataSeries seriesMetadata=	metadataInterface.createSeries(series);
+			
+			ot::JsonDocument document;
+			seriesMetadata.addToJsonObject(document, document.GetAllocator());
+			
+			additionalInformation += ot::json::toPrettyString(document);
+		}
 
+	}
+	
 	std::string message;
 	message = "____________________________________________________________\n\n";
 	message += "Selected object information: \n\n";
@@ -3058,6 +3099,11 @@ void Model::showSelectedShapeInformation(void)
 
 			message += "\n";
 		}
+	}
+
+	if (!additionalInformation.empty())
+	{
+		message += additionalInformation;
 	}
 
 	if (boxSet)
@@ -3867,6 +3913,23 @@ void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::U
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
 }
 
+void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {
+	ot::JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _entityID, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(_targetFolder, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(_elementType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->uiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	/*Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);*/
+}
+
 void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
 {
 	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationType, _setAsActiveView, _overrideContent);
@@ -4063,6 +4126,21 @@ void Model::addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::li
 			// Remove the entity from the entity map and also from the model state
 			removeEntityFromMap(oldEntity, false, false);
 			delete oldEntity;
+		}
+	}
+	std::set<std::string> newEntitiesNames;
+	for (EntityBase* newEntity : entityList)
+	{
+		const std::string entityName = newEntity->getName();
+		if (newEntitiesNames.find(entityName) == newEntitiesNames.end())
+		{
+			newEntitiesNames.insert(entityName);
+		}
+		else
+		{
+			OT_LOG_E("Tried to store an entity with the same name twice. Entity name: " + entityName);
+			assert(0);
+			return;
 		}
 	}
 
@@ -4498,9 +4576,6 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 		assert(0); // Unknown type
 		return;
 	}
-
-	ProgressReport::setUILock(true, ProgressReport::MODEL_CHANGE);
-
 	assert(visEntity != nullptr);
 	
 	std::list<ot::UID> entityIDs;
@@ -4517,8 +4592,27 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 
 void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService)
 {
+	ot::LockTypeFlags lockFlag;
+	lockFlag.setFlag(ot::LockModelWrite);
+	lockFlag.setFlag(ot::LockNavigationWrite);
+	lockFlag.setFlag(ot::LockViewWrite);
+	lockFlag.setFlag(ot::LockProperties);
+	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+
 	ot::JsonDocument notify;
+	ot::JsonArray changedEntitiesInfos;
+	for (ot::UID& entityID : entityIDs)
+	{
+		auto changedEntityByID = entityMap.find(entityID);
+		assert(changedEntityByID != entityMap.end());
+		ot::EntityInformation entityInfo(changedEntityByID->second);
+		ot::JsonObject entityInfoSerialised;
+		entityInfo.addToJsonObject(entityInfoSerialised, notify.GetAllocator());
+		changedEntitiesInfos.PushBack(entityInfoSerialised, notify.GetAllocator());
+	}
+
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, changedEntitiesInfos, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
@@ -4526,7 +4620,6 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 
 	Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
 
-	ProgressReport::setUILock(false, ProgressReport::MODEL_CHANGE);
 }
 
 void Model::getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions)

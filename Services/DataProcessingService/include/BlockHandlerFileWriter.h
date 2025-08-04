@@ -13,8 +13,8 @@ private:
 	ot::Connector m_input;
 	std::string m_headline;
 	std::string m_fileName;
+	std::string m_fileType;
 
 	std::stringstream m_fileStream;
 	void createFile();
-	void streamVariable(std::stringstream& stream, const ot::Variable& value);
 };

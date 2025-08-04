@@ -45,9 +45,6 @@
     <ClInclude Include="include\EntityBlockCircuitResistor.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityBlockDataDimensionReducer.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntityBlockStorage.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -114,9 +111,6 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockCircuitResistor.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBlockStorage.cpp">

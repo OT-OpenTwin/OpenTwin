@@ -82,15 +82,68 @@ bool PropertyBundleQuerySettings::requiresUpdate(EntityBase* _thisObject)
 	for (int32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
 	{
 		std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
-		const bool visible = i <= numberOfQueries;
-		if (PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->getVisible() != visible)
+		if (PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->getVisible())
 		{
-			updateRequired |= 
-			PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->needsUpdate() |
-			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate() |
-			PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->needsUpdate() ;
+			auto selectedComparator =	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName);
+			auto queryValue = PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName);
+
+			updateRequired |=
+				selectedComparator->needsUpdate() | //If a query could be performed we check now if the properties have changed
+				queryValue->needsUpdate() |
+				PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate();
 		}
 	}
 	return updateRequired;
+}
+
+EntityPropertiesInteger* PropertyBundleQuerySettings::getNumberOfQueriesProperty(EntityBase* _thisObject)
+{
+	return PropertyHelper::getIntegerProperty(_thisObject, m_propertyNbOfComparisions, m_groupQuerySettings);
+}
+
+void PropertyBundleQuerySettings::updateQuerySettings(EntityBase* _thisObject, const std::list<std::string>& _queryOptions)
+{
+
+	if (m_selectionOptions != _queryOptions)
+	{
+		std::list<std::string> comparisionSymbols = ot::ComparisionSymbols::g_comparators;
+		m_selectionOptions = _queryOptions;
+
+		PropertyHelper::getIntegerProperty(_thisObject, m_propertyNbOfComparisions, m_groupQuerySettings)->setMax(_queryOptions.size());
+
+		for (int32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
+		{
+			std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->resetOptions(m_selectionOptions);
+		}
+		if (_queryOptions.size() > m_maxNumberOfQueryDefinitions)
+		{
+			for (int i = m_maxNumberOfQueryDefinitions + 1; i <= _queryOptions.size(); i++)
+			{
+				std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
+
+				EntityPropertiesSelection::createProperty(groupName, m_propertyName, m_selectionOptions, "", "default", _thisObject->getProperties());
+				EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparisionSymbols, "", "default", _thisObject->getProperties());
+				EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", _thisObject->getProperties());
+
+				PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);
+				PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
+				PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(false);
+			}
+
+			m_maxNumberOfQueryDefinitions = _queryOptions.size();
+		}
+		else if(_queryOptions.size() < m_maxNumberOfQueryDefinitions)
+		{
+			for (int i = m_maxNumberOfQueryDefinitions; i > _queryOptions.size(); i--)
+			{
+				std::string groupName = m_groupQueryDefinition + "_" + std::to_string(i);
+				_thisObject->getProperties().deleteProperty(m_propertyName, groupName);
+				_thisObject->getProperties().deleteProperty(m_propertyComparator, groupName);
+				_thisObject->getProperties().deleteProperty(m_propertyValue, groupName);
+			}
+			m_maxNumberOfQueryDefinitions = _queryOptions.size();
+		}
+	}
 }
 

@@ -42,7 +42,7 @@ public:
 	double getColorG(void) { return colorRGB[1]; };
 	double getColorB(void) { return colorRGB[2]; };
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 	void setFacesList(std::vector<int> &faces);
 	void setColor(double r, double g, double b) { colorRGB[0] = r; colorRGB[1] = g; colorRGB[2] = b; }

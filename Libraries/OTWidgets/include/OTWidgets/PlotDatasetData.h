@@ -26,6 +26,7 @@ namespace ot {
 	public:
 		//! @brief Takes over ownership over ComplexNumberContainer
 		PlotDatasetData(std::vector<double>&& _dataX, ComplexNumberContainer* _complexNumberContainer);
+		PlotDatasetData(std::vector<double>& _dataX, ComplexNumberContainer* _complexNumberContainer);
 		~PlotDatasetData();
 
 		PlotDatasetData(PlotDatasetData&& _other) noexcept;
@@ -43,5 +44,7 @@ namespace ot {
 		std::vector<double> m_dataX;
 		ComplexNumberContainer* m_dataY = nullptr;
 		size_t m_numberOfDatapoints = 0;
+
+		void initiate();
 	};
 }

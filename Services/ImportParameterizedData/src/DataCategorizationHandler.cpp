@@ -16,7 +16,7 @@
 
 #include <algorithm>
 #include <bitset>
-
+#include "EntityResultText.h"
 
 DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, std::string _previewTableName)
 	:m_tableFolder(_tableFolder), m_previewTableName(_previewTableName)
@@ -36,7 +36,7 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 	//2) Series metadata require a selected series metadata
 	//2a) None selected: Create a new one
 	//3a) One or more selected: remember that EntityParameterizedDataCategorization
-	std::list<EntityBase*> selectedEntities;
+	std::list<std::unique_ptr<EntityBase>> selectedEntities;
 	try
 	{
 		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
@@ -44,7 +44,7 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 		{
 			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityInfo.getEntityID());
 			EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
-			selectedEntities.push_back(baseEnt);
+			selectedEntities.emplace_back(std::unique_ptr<EntityBase>(baseEnt));
 		}
 		std::string tableName("");
 		if (isValidSelection(selectedEntities))
@@ -54,11 +54,6 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 			setBackgroundColour(_category);
 		}
 
-		for (EntityBase*& selectedEntity : selectedEntities)
-		{
-			delete selectedEntity;
-			selectedEntity = nullptr;
-		}
 		if (tableName != "")
 		{
 			requestRangeSelection(tableName);
@@ -69,22 +64,18 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 	{
 		const std::string message = "Failed to create table selection due to error: " + std::string(e.what());
 		OT_LOG_E(message);
-		for (EntityBase*& entity : selectedEntities)
-		{
-			delete entity;
-			entity = nullptr;
-		}
+
 		return false;
 	}
 }
 
-bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _selectedEntities)
+bool DataCategorizationHandler::isValidSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	
 	uint32_t selectedTables(0);
-	for (EntityBase* entity : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			selectedTables++;
@@ -101,12 +92,12 @@ bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _select
 	}
 }
 
-std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBase*>& _selectedEntities)
+std::string DataCategorizationHandler::getTableFromSelection(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	std::string tableEntityName("");
-	for (EntityBase* entity : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			tableEntityName = entity->getName();
@@ -118,7 +109,7 @@ std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBas
 	return tableEntityName;
 }
 
-void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
@@ -137,7 +128,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<Entit
 		{
 			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
-				addSMDEntries(_selectedEntities);
+				addSMDEntries (_selectedEntities);
 			}
 			else
 			{
@@ -204,11 +195,11 @@ void DataCategorizationHandler::clearBufferedMetadata()
 	m_markedForStorringEntities.clear();
 }
 
-bool DataCategorizationHandler::checkForCategorisationEntity(std::list<EntityBase*>& _selectedEntities)
+bool DataCategorizationHandler::checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
-	for (EntityBase* entityBase : _selectedEntities)
+	for (std::unique_ptr<EntityBase>& entityBase : _selectedEntities)
 	{
-		auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(entityBase);
+		auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get());
 		if (categorizationEnt != nullptr)
 		{
 			return true;
@@ -217,12 +208,12 @@ bool DataCategorizationHandler::checkForCategorisationEntity(std::list<EntityBas
 	return false;
 }
 
-void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedEntities)
+void DataCategorizationHandler::addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	// Now we search the selected entities for the series metadata categorisations that correspond to the selection and add them to the buffer
-	for (auto entityBase : _selectedEntities)
+	for (auto& entityBase : _selectedEntities)
 	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
 		
 		if (categorizationEntity != nullptr)
 		{
@@ -251,13 +242,13 @@ void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedE
 	}
 }
 
-void DataCategorizationHandler::addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	std::list<EntityParameterizedDataCategorization*> seriesCategorisations, quantityOrParameterCategorisations; //or Parameterentity. Depeding on the parameter.
 	// First we sort the selected entities into series metadata and quantity/parameter
-	for (auto entityBase : _selectedEntities)
+	for (auto& entityBase : _selectedEntities)
 	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
 		if (categorizationEntity != nullptr)
 		{		
 			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
@@ -378,13 +369,8 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		return;
 	}
 	std::unique_ptr<IVisualisationTable> tableEntPtr(tableEntity);
-
-	std::list<ot::UID> topologyEntityIDList;
-	std::list<ot::UID> topologyEntityVersionList;
-	std::list<bool> topologyEntityForceVisible;
-	std::list<ot::UID> dataEntityIDList{ };
-	std::list<ot::UID> dataEntityVersionList{ };
-	std::list<ot::UID> dataEntityParentList{ };
+	ot::NewModelStateInformation entityInfos;
+	
 	std::list<std::string> takenNames;
 
 	
@@ -396,8 +382,10 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	{
 		matrixRanges.push_back(ot::TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderMode()));
 	}
-
-	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
+	
+	std::map<std::string, std::string> logMessagesByErrorType;
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges, logMessagesByErrorType);
+	logWarnings(logMessagesByErrorType, entityInfos);
 
 	const ot::GenericDataStructMatrix table = tableEntPtr->getTable();
 	uint32_t totalNumberOfColumns =	table.getNumberOfColumns();
@@ -494,9 +482,9 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			tableRange->setName(name);
 
 			tableRange->StoreToDataBase();
-			topologyEntityIDList.push_back(tableRange->getEntityID());
-			topologyEntityVersionList.push_back(tableRange->getEntityStorageVersion());
-			topologyEntityForceVisible.push_back(false);
+			entityInfos.m_topologyEntityIDs.push_back(tableRange->getEntityID());
+			entityInfos.m_topologyEntityVersions.push_back(tableRange->getEntityStorageVersion());
+			entityInfos.m_forceVisible.push_back(false);
 		}
 	}
 
@@ -504,50 +492,77 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	for (auto categoryEntity : m_markedForStorringEntities)
 	{
 		categoryEntity->StoreToDataBase();
-		topologyEntityIDList.push_back(categoryEntity->getEntityID());
-		topologyEntityVersionList.push_back(categoryEntity->getEntityStorageVersion());
-		topologyEntityForceVisible.push_back(false);
+		entityInfos.m_topologyEntityIDs.push_back(categoryEntity->getEntityID());
+		entityInfos.m_topologyEntityVersions.push_back(categoryEntity->getEntityStorageVersion());
+		entityInfos.m_forceVisible.push_back(false);
 	}
 
-	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
+	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "added new table selection range");
 }
 
-std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges)
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType)
 {
 	ot::StringToVariableConverter converter;
-	std::bitset<5> dataType;
+	std::bitset<5> dataTypeOverall;
+
+	char decimalDelimiter =_table->getDecimalDelimiter();
+	char thousandsDelimiter;
+	if (decimalDelimiter == '.')
+	{
+		thousandsDelimiter = ',';
+	}
+	else
+	{
+		thousandsDelimiter = '.';
+	}
+
 	//If one filed value is detected that is definately a string, we end the search.
-	bool stringDetected = false;
 	auto rangeIt = _selectedRanges.begin();
 	ot::MatrixEntryPointer matrixPointer;
-	
+
 	ot::GenericDataStructMatrix tableContent = _table->getTable();
-	char decimalDelimiter =	_table->getDecimalDelimiter();
-	while (!stringDetected && rangeIt != _selectedRanges.end())
+	
+	while (rangeIt != _selectedRanges.end())
 	{
 		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
-		while(!stringDetected && matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
+		while(matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
 		{
 			matrixPointer.m_column = static_cast<uint32_t>(rangeIt->getLeftColumn());
-			while(!stringDetected && matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
+			while( matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
 			{
 				const ot::Variable& cellValue = tableContent.getValue(matrixPointer);
 				assert(cellValue.isConstCharPtr());
 				std::string value = cellValue.getConstCharPtr();
 				if (value != "")
 				{
+					
+					if (value.find(thousandsDelimiter) != std::string::npos && _logMessagesByErrorType.find("Thousands delimiter was found") == _logMessagesByErrorType.end())
+					{
+						_logMessagesByErrorType["Thousands delimiter was found"] = "Make sure that the decimal character is not: \"" + std::string(1, thousandsDelimiter) + "\". String to numeric value cast may lead to unwanted results.\n";
+					}
 					ot::Variable variable = converter(value, decimalDelimiter);
 				
-					dataType[0] = dataType[0] || variable.isInt32();
-					dataType[1] = dataType[1] || variable.isInt64();
-					dataType[2] = dataType[2] || variable.isFloat();
-					dataType[3] = dataType[3] || variable.isDouble();
-					dataType[4] = dataType[4] || variable.isConstCharPtr();
+					std::bitset<5> dataTypeField;
+					dataTypeField[0]= variable.isInt32();
+					dataTypeField[1] = variable.isInt64();
+					dataTypeField[2] = variable.isFloat();
+					dataTypeField[3] = variable.isDouble();
+					dataTypeField[4] = variable.isConstCharPtr();
+
+					dataTypeOverall[0] = dataTypeOverall[0] || dataTypeField[0];
+					dataTypeOverall[1] = dataTypeOverall[1] || dataTypeField[1];
+					dataTypeOverall[2] = dataTypeOverall[2] || dataTypeField[2];
+					dataTypeOverall[3] = dataTypeOverall[3] || dataTypeField[3];
+					dataTypeOverall[4] = dataTypeOverall[4] || dataTypeField[4];
 				
-					if (dataType[4] == 1)
+					if (dataTypeField[4] == 1)
 					{
-						stringDetected = true;
+						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."]  += "row " + std::to_string(matrixPointer.m_row) + " column " + std::to_string(matrixPointer.m_column) + "\n";
 					}
+				}
+				else
+				{
+					_logMessagesByErrorType["Empty field detected. If a numerical value is selected, empty fields are interpreted with a default (0 or 0.0)"] += "row " + std::to_string(matrixPointer.m_row) + " column " + std::to_string(matrixPointer.m_column) + "\n";
 				}
 				matrixPointer.m_column++;
 			}
@@ -558,23 +573,23 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 	//Now we get the common denominator of all detected datypes
 	//Dominance is as following (Strong to weak) : String, Double, Float, Int64, Int32
 	std::string typeName("");
-	if (dataType[4])
+	if (dataTypeOverall[4])
 	{
 		typeName = ot::TypeNames::getStringTypeName();;
 	}
-	else if (dataType[3])
+	else if (dataTypeOverall[3])
 	{
 		typeName = ot::TypeNames::getDoubleTypeName();
 	}
-	else if (dataType[2])
+	else if (dataTypeOverall[2])
 	{
 		typeName = ot::TypeNames::getFloatTypeName();
 	}
-	else if (dataType[1])
+	else if (dataTypeOverall[1])
 	{
 		typeName = ot::TypeNames::getInt64TypeName();
 	}
-	else if (dataType[0])
+	else if (dataTypeOverall[0])
 	{
 		typeName = ot::TypeNames::getInt32TypeName();
 	}
@@ -583,6 +598,34 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 		typeName = ot::TypeNames::getStringTypeName(); //Default, happens when all entries were empty, i.e. ""
 	}
 	return typeName;
+}
+
+void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInformation& _entityInfos)
+{	
+	if (!_logMessagesByErrorType.empty())
+	{
+		EntityResultText logText(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		logText.createProperties();
+	
+		std::string message("");
+		for (auto& entry : _logMessagesByErrorType)
+		{
+			message += entry.first+ "\n" + entry.second + "\n";
+		}
+		logText.setText(message);
+
+		const std::string logFileName = ot::FolderNames::DataCategorisationFolder + "/Table cells analysation log";
+		logText.setName(logFileName);
+		logText.StoreToDataBase();
+		_entityInfos.m_dataEntityIDs.push_back(logText.getTextDataStorageId());
+		_entityInfos.m_dataEntityVersions.push_back(logText.getTextDataStorageVersion());
+		_entityInfos.m_dataEntityParentIDs.push_back(logText.getEntityID());
+		_entityInfos.m_topologyEntityIDs.push_back(logText.getEntityID());
+		_entityInfos.m_topologyEntityVersions.push_back(logText.getEntityStorageVersion());
+		_entityInfos.m_forceVisible.push_back(false);
+
+		OT_LOG_W("While analysing the table selection classifications, certain issues were detected. Details are listed in the file: \"Table cells analysation log\"");
+	}
 }
 
 std::map<std::string, ot::UID> DataCategorizationHandler::getAllScripts()

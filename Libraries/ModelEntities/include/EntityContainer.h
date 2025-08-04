@@ -17,7 +17,7 @@ public:
 	 * 
 	 * \param child
 	 */
-	void addChild(EntityBase *child);
+	virtual void addChild(EntityBase *child);
 	/**
 	 * Only for model service.
 	 *

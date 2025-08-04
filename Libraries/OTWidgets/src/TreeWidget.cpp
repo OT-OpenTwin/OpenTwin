@@ -8,6 +8,7 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/TreeItemDelegate.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -16,6 +17,8 @@ ot::TreeWidget::TreeWidget(QWidget * _parentWidget)
 	: QTreeWidget(_parentWidget) 
 {
 	this->setObjectName("OT_Tree");
+	this->setItemDelegate(new TreeItemDelegate);
+
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleAboutToChange, this, &TreeWidget::slotColorStyleAboutToChange);
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TreeWidget::slotColorStyleChanged);
 }

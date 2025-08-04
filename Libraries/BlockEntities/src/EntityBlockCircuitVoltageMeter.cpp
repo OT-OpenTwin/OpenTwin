@@ -25,14 +25,18 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitVoltageMeter::createProperties(const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+void EntityBlockCircuitVoltageMeter::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
 std::string EntityBlockCircuitVoltageMeter::getTypeAbbreviation() {
 	return "VM";
+}
+
+std::string EntityBlockCircuitVoltageMeter::getFolderName() {
+	return "Voltage Meter";
 }
 
 double EntityBlockCircuitVoltageMeter::getRotation() {
@@ -138,12 +142,13 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg() {
 bool EntityBlockCircuitVoltageMeter::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 

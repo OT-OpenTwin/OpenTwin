@@ -15,6 +15,7 @@ namespace osg
 #include <list>
 
 class HandlerBase;
+class Viewer;
 
 class HandlerNotifier
 {
@@ -39,7 +40,7 @@ public:
 
 	osg::Drawable *getSelectorDrawable(void) { return selectorDrawable; }
 
-	virtual void setInteraction(int intersectionIndex, double intersectionRatio) = 0;
+	virtual void setInteraction(Viewer *viewer, int intersectionIndex, double intersectionRatio) = 0;
 	virtual void setInteractionReference(int intersectionIndex, double intersectionRatio) = 0;
 
 	void beginInteraction(void);

@@ -4,8 +4,8 @@
 #include "DataBaseInfo.h"
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/OTClassHelper.h"
 
 // Qt header
@@ -32,6 +32,8 @@ public:
 	bool sendConfigToClient(void);
 
 	void cleanupAfterCrash(void);
+
+	bool isDisconnected() const { return m_clientState == ClientState::Disconnected; };
 
 private Q_SLOTS:
 	void slotNewConnection(void);

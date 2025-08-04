@@ -6,6 +6,7 @@ void ot::QuantityContainerEntryDescription::addToJsonObject(ot::JsonValue& _obje
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Unit", JsonString(m_unit, _allocator), _allocator);
 	_object.AddMember("DataType", JsonString(m_dataType, _allocator), _allocator);
+	_object.AddMember("DataDimension", JsonArray(m_dimension, _allocator), _allocator);
 }
 
 void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -14,6 +15,7 @@ void ot::QuantityContainerEntryDescription::setFromJsonObject(const ot::ConstJso
 	m_label = ot::json::getString(_object, "Label");;
 	m_unit = ot::json::getString(_object, "Unit");;
 	m_dataType = ot::json::getString(_object, "DataType");;
+	m_dimension = ot::json::getUIntVector(_object, "DataDimension");
 }
 
 

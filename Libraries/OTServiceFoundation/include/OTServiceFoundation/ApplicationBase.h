@@ -120,7 +120,12 @@ namespace ot {
 		//! Returns an empty string in case of an error
 		virtual std::string deploymentPath(void) const;
 
-		virtual void modelSelectionChanged(void) {};
+		virtual void modelSelectionChanged() {};
+		virtual void propertyChanged(ot::JsonDocument& _doc) {};
+
+		//! @brief Will be called whenever the log flags have been changed.
+		//! @param _flags Newly set flags.
+		virtual void logFlagsChanged(const ot::LogFlags& _flags) {};
 
 		// ####################################################################################################################################################################################################################################################################################
 

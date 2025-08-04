@@ -28,8 +28,8 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 
 }
 
-void EntityBlockCircuitVoltageSource::createProperties(const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+void EntityBlockCircuitVoltageSource::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName,_circuitModelFolderID);
 	createDCProperties();
 	createTRANProperties();
 	createACProperties();
@@ -323,6 +323,7 @@ std::string EntityBlockCircuitVoltageSource::getAmplitude()
 bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	auto baseProperty = getProperties().getProperty("TRAN");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
@@ -348,7 +349,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 		getProperties().forceResetUpdateForAllProperties();
 		
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 
@@ -374,6 +375,10 @@ std::string EntityBlockCircuitVoltageSource::getFunction()
 
 std::string EntityBlockCircuitVoltageSource::getTypeAbbreviation() {
 	return "V";
+}
+
+std::string EntityBlockCircuitVoltageSource::getFolderName() {
+	return "Voltage Source";
 }
 
 

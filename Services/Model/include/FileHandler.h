@@ -38,10 +38,10 @@ private:
 	
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
 	//! @brief Stores the string as byte array. Content cannot be searched for but it is not necessary to guarantee UTF8 encoding
-	void storeTextFile(ot::JsonDocument& _doc, const std::string& _folderName);
+	void storeTextFile(ot::JsonDocument&& _doc, const std::string& _folderName);
 	void addTextFilesToModel();
 	void clearBuffer();
-
+	
 	void handleChangedText(ot::JsonDocument& _doc);
 	void handleChangedTable(ot::JsonDocument& _doc);
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
@@ -49,5 +49,5 @@ private:
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.
-	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderrName);
+	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
 };

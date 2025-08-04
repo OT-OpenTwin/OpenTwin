@@ -29,7 +29,7 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 	ReturnMessage msg(ot::ReturnMessage::Failed);
 
 	JsonDocument doc;
-	if (!doc.fromJson(_json)) {
+	if (!doc.fromJson(_json) || doc.HasParseError()) {
 		msg = "Failed to deserialize return message \"" + _json + "\": Document is not an object";
 		return msg;
 	}
@@ -127,24 +127,14 @@ bool ot::ReturnMessage::operator != (const ReturnMessage& _other) const {
 void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("Status", JsonString(this->statusToString(m_status), _allocator), _allocator);
 	_object.AddMember("What", JsonString(m_what, _allocator), _allocator);
-	if (m_values.getNumberOfEntries() != 0)
-	{
-		ot::JsonValue values;
-		values.SetObject();
-		m_values.addToJsonObject(values, _allocator);
-		_object.AddMember(ot::JsonValue("Values",_allocator), std::move(values), _allocator);
-	}
+	m_values.addToJsonObject(_object, _allocator);
 }
 
 void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
+	
 	m_what = json::getString(_object, "What");
 	m_status = stringToStatus(json::getString(_object, "Status"));
-	
-	if(_object.HasMember("Values")) {
-		const auto& temp = _object["Values"];
-		m_values.setFromJsonObject(temp.GetObject());
-	}
-
+	m_values.setFromJsonObject(_object);
 }
 
 std::string ot::ReturnMessage::getStatusString(void) const {

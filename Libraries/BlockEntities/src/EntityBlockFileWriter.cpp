@@ -1,5 +1,6 @@
 #include "EntityBlockFileWriter.h"
 #include "SharedResources.h"
+#include "PropertyHelper.h"
 
 EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID,parent,obs,ms,factory,owner)
@@ -17,6 +18,7 @@ void EntityBlockFileWriter::createProperties()
 	//sEntityPropertiesString::createProperty("File Properties", "Path", "", "default", getProperties());
 	EntityPropertiesString::createProperty("File Properties", "File Name", "", "default", getProperties());
 	
+	EntityPropertiesSelection::createProperty("File Properties", "File type", { "txt", "json", "csv"}, "txt", "default", getProperties());
 	//EntityPropertiesSelection::createProperty("File Properties", "Mode", { m_fileModeAppend, m_fileModeOverride }, m_fileModeAppend,"default",getProperties());
 }
 
@@ -55,5 +57,10 @@ ot::GraphicsItemCfg* EntityBlockFileWriter::CreateBlockCfg()
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
+}
+
+const std::string EntityBlockFileWriter::getFileType()
+{
+	return PropertyHelper::getSelectionPropertyValue(this, "File type");
 }
 

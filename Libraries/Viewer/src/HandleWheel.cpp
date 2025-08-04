@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "HandleWheel.h"
 #include "ViewerSettings.h"
+#include "Viewer.h"
 
 #include <osg/Switch>
 #include <osg/ShapeDrawable>
@@ -245,10 +246,12 @@ void HandleWheel::setInteractionReference(int intersectionIndex, double intersec
 	referenceAngleDeg = calculateAngle(intersectionIndex, intersectionRatio);
 }
 
-void HandleWheel::setInteraction(int intersectionIndex, double intersectionRatio)
+void HandleWheel::setInteraction(Viewer *viewer, int intersectionIndex, double intersectionRatio)
 {
 	// Calculate the new angle
 	rotationAngleDeg = calculateAngle(intersectionIndex, intersectionRatio) - referenceAngleDeg + wheelRotationAngleDeg;
+
+	rotationAngleDeg = viewer->snapAngle(rotationAngleDeg);
 
 	reportInteraction();
 }

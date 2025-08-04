@@ -45,6 +45,8 @@ public:
 	void addLogText(const std::string& text);
 	void endLogging(std::string &logText);
 
+	bool isConnected();
+
 private:
 	void shutdownSubprocess(void);
 

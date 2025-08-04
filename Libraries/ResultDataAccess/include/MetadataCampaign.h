@@ -9,7 +9,9 @@
 #include "MetadataEntry.h"
 #include "OTCore/CoreTypes.h"
 
-class __declspec(dllexport) MetadataCampaign
+#include "OTCore/Serializable.h"
+
+class __declspec(dllexport) MetadataCampaign : public ot::Serializable
 {
 public:
 	MetadataCampaign() = default;
@@ -37,6 +39,36 @@ public:
 	void updateMetadataOverviewFromLastAddedSeries();
 	
 	void reset();
+
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+	{
+
+		_object.AddMember("Name", ot::JsonString(m_campaignName, _allocator), _allocator);
+
+		ot::JsonArray allSeries;
+		for (const MetadataSeries& series : m_seriesMetadata)
+		{
+			ot::JsonObject object;
+			series.addToJsonObject(object, _allocator);
+			allSeries.PushBack(object, _allocator);
+		}
+		_object.AddMember("series", allSeries, _allocator);
+	}
+
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object)
+	{
+		m_campaignName = ot::json::getString(_object, "Name");
+
+		ot::ConstJsonArray allSeries = ot::json::getArray(_object, "series");
+		for (rapidjson::SizeType i = 0; i < allSeries.Size(); i++)
+		{
+			MetadataSeries series;
+			series.setFromJsonObject(ot::json::getObject(allSeries, i));
+			m_seriesMetadata.push_back(series);
+		}
+		updateMetadataOverview();
+	}
+
 private:
 	std::list<MetadataSeries> m_seriesMetadata;
 	

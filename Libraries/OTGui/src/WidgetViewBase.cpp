@@ -17,6 +17,7 @@ std::string ot::WidgetViewBase::toString(ViewFlag _flag) {
 	case WidgetViewBase::ViewIsCentral: return "ViewIsCentral";
 	case WidgetViewBase::ViewIsSide: return "ViewIsSide";
 	case WidgetViewBase::ViewIsTool: return "ViewIsTool";
+	case WidgetViewBase::ViewNameAsTitle: return "NameAsTitle";
 	default:
 		OT_LOG_EAS("Unknown view flag (" + std::to_string((int)_flag) + ")");
 		return "<null>";
@@ -29,6 +30,7 @@ ot::WidgetViewBase::ViewFlag ot::WidgetViewBase::stringToViewFlag(const std::str
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsCentral)) return WidgetViewBase::ViewIsCentral;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsSide)) return WidgetViewBase::ViewIsSide;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsTool)) return WidgetViewBase::ViewIsTool;
+	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewNameAsTitle)) return WidgetViewBase::ViewNameAsTitle;
 	else {
 		OT_LOG_EAS("Unknown view flag \"" + _flag + "\"");
 		return NoViewFlags;
@@ -42,7 +44,8 @@ std::list<std::string> ot::WidgetViewBase::toStringList(ViewFlags _flags) {
 	if (_flags & WidgetViewBase::ViewIsCentral) ret.push_back(toString(WidgetViewBase::ViewIsCentral));
 	if (_flags & WidgetViewBase::ViewIsSide) ret.push_back(toString(WidgetViewBase::ViewIsSide));
 	if (_flags & WidgetViewBase::ViewIsTool) ret.push_back(toString(WidgetViewBase::ViewIsTool));
-
+	if (_flags & WidgetViewBase::ViewNameAsTitle) ret.push_back(toString(WidgetViewBase::ViewNameAsTitle));
+	
 	return ret;
 }
 

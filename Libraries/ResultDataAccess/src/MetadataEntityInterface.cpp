@@ -242,6 +242,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		const std::string name = newSeriesMetadata->getName();
 		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, nullptr, m_ownerServiceName);
 		entitySeries.setName(name);
+		entitySeries.setEditable(true);
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
 		{
 			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);

@@ -65,6 +65,8 @@ namespace ot {
 
 		void resetView(void);
 
+		void renameDataset(const std::string& _oldEntityPath, const std::string& _newEntityPath);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data handling
@@ -76,8 +78,6 @@ namespace ot {
 		void refresh(void);
 
 		void clear(bool _clearCache);
-
-		void datasetSelectionChanged(PlotDataset* _selectedDataset);
 
 		//! \brief Returns the dataset for the given plot curve.
 		//! Returns NULL if the dataset does not exist.
@@ -99,9 +99,17 @@ namespace ot {
 		//! @brief Returns all datasets.
 		virtual std::list<PlotDataset*> getAllDatasets(void) const = 0;
 
+		//! @brief Sets the selected state of the curves in the plot.
+		//! Curves not in the list will be deselected.
+		//! @param _selectedCurves List of selected curves (by UID).
+		void setSelectedCurves(const UIDList& _selectedCurves);
+
+		void requestResetItemSelection();
+		void requestCurveDoubleClicked(UID _treeItemUid, bool _hasControlModifier);
+
 	Q_SIGNALS:
-		void resetItemSelectionRequest(void);
-		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
+		void resetItemSelectionRequest();
+		void curveDoubleClicked(UID _entityID, bool _hasControlModifier);
 
 	protected:
 		virtual void clearCache(void) = 0;

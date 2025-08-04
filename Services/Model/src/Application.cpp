@@ -982,9 +982,11 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
 	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+
 	try
 	{
-		m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType,setViewAsActive);
+		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities);
 	}
 	catch (std::exception& e)
 	{
@@ -993,6 +995,31 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	}
 
 	return ot::ReturnMessage().toJson();
+}
+
+std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
+	std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
+	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	// First add the model entity to the Project
+	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
+
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder + "/" + selectedModel);
+
+	return "";
+}
+
+std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "");
+
+	return "";
 }
 
 // ##################################################################################################################################################################################################################
@@ -1182,9 +1209,6 @@ void Application::addButtons()
 
 	m_materialHandler.addButtons(uiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_materialHandler);
-
-	m_circuitModelHandler.addButtons(uiComponent(), pageName);
-
 }
 
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
@@ -1307,11 +1331,7 @@ Application::Application()
 	m_fileHandler.setNextHandler(&m_materialHandler);
 
 	m_plotHandler.setDontDeleteHandler();
-	m_materialHandler.setNextHandler(&m_plotHandler);
-
-	m_circuitModelHandler.setDontDeleteHandler();
-	m_plotHandler.setNextHandler(&m_circuitModelHandler);
-	
+	m_materialHandler.setNextHandler(&m_plotHandler);	
 }
 
 Application::~Application() {

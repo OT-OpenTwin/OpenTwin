@@ -8,29 +8,41 @@
 #include "bsoncxx/json.hpp"
 #include "Datapoints.h"
 #include "ShortParameterDescription.h"
+#include "AppBase.h"
+#include "OTCore/EntityName.h"
+#include "OTGui/PainterRainbowIterator.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
 	m_curveIDDescriptions.clear();
 	auto queryInformation = _config.getQueryInformation();
 
 	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisions);
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
-	
+	if (allMongoDocuments.Size() == 0)
+	{
+		AppBase::instance()->appendInfoMessage(QString(("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n ").c_str()));
+		return {};
+	}
+
 	CurveType curveType = determineCurveType(queryInformation);
 	
 	std::list<ot::PlotDataset*> dataSets;
 	if (curveType == CurveType::m_single)
 	{
-		ot::PlotDataset* dataset = createSingleCurve(_config, allMongoDocuments);
-		dataSets.push_back(dataset);
+		dataSets = createSingleCurve(_plotCfg,_config, allMongoDocuments);
 	}
 	else
 	{
 		assert(curveType == CurveType::m_familyCurve);
-		dataSets = createCurveFamily(_config, _xAxisParameter, allMongoDocuments);
+		dataSets = createCurveFamily(_plotCfg, _config, _xAxisParameter, allMongoDocuments);
 	}
 	return dataSets;
+}
+
+std::string CurveDatasetFactory::createAxisLabel(const std::string& _title, const std::string& _unit)
+{
+	return _title + " [" + _unit +"]";
 }
 
 ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ValueComparisionDefinition>& _valueComparisions)
@@ -130,49 +142,129 @@ CurveDatasetFactory::CurveType CurveDatasetFactory::determineCurveType(const ot:
 	}
 }
 
-ot::PlotDataset* CurveDatasetFactory::createSingleCurve(ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
+
 	const ot::QueryInformation& queryInformation =_curveCfg.getQueryInformation();
 	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.m_quantityDescription;
 	assert(queryInformation.m_parameterDescriptions.size() == 1); // For a single curve there should be only one parameter
 
-	std::unique_ptr<ot::ComplexNumberContainerCartesian> dataY(new ot::ComplexNumberContainerCartesian());
+	std::vector<uint32_t> quantityDimensions =	quantityInformation.m_dimension;
+	uint32_t numberOfQuantityEntries(1);
+	for (uint32_t quantityDimension : quantityDimensions)
+	{
+		numberOfQuantityEntries *= quantityDimension;
+	}
+
+
+	std::vector<std::unique_ptr<ot::ComplexNumberContainerCartesian>> dataY; 
+	dataY.resize(numberOfQuantityEntries);
+	for (size_t i = 0; i < numberOfQuantityEntries; i++)
+	{
+		dataY[i].reset(new ot::ComplexNumberContainerCartesian());
+		dataY[i]->m_real.reserve(numberOfDocuments);
+	}
+	
+	
 	std::vector<double>dataX;
-	dataY->m_real.reserve(numberOfDocuments);
 	dataX.reserve(numberOfDocuments);
 
 	auto entryDescription = queryInformation.m_parameterDescriptions.begin();
+
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
 
 		//Get quantity value
-		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
-		dataY->m_real.push_back(quantityValue);
-		
+		if (numberOfQuantityEntries == 1)
+		{
+			const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
+			dataY[0]->m_real.push_back(quantityValue);
+		}
+		else
+		{
+			ot::ConstJsonArray matrix = ot::json::getArray(singleMongoDocument, quantityInformation.m_fieldName);
+			assert(matrix.Size() == numberOfQuantityEntries);
+			for (uint32_t j = 0; j < numberOfQuantityEntries; j++)
+			{
+				const rapidjson::Value& matrixEntry = matrix[j];
+				const double quantityValue = jsonToDouble(matrixEntry, quantityInformation.m_dataType);
+				dataY[j]->m_real.push_back(quantityValue);
+			}
+		}
 		//Get parameter value
 		
 		double parameterValue = jsonToDouble(entryDescription->m_fieldName, singleMongoDocument, entryDescription->m_dataType);
 		dataX.push_back(parameterValue);
 	}
 	
-	if (_curveCfg.getXAxisUnit().empty())
+	if (_plotCfg.getXLabelAxisAutoDetermine())
 	{
-		_curveCfg.setXAxisUnit(entryDescription->m_unit); //Could be overwritten be the calling code, the default is the parameter unit.
+		_plotCfg.setAxisLabelX(createAxisLabel(entryDescription->m_label, entryDescription->m_unit));
+	}
+	if (_plotCfg.getYLabelAxisAutoDetermine())
+	{
+		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, quantityInformation.m_unit));
+	}
+	
+	const std::string curveNameBase = ot::EntityName::getSubName(_curveCfg.getEntityName()).value();
+	std::list<ot::PlotDataset*> allCurves;
+	ot::PainterRainbowIterator rainBowIt;
+
+	bool showEntireMatrix = _plotCfg.getShowEntireMatrix();
+	int32_t showMatrixRowEntry = _plotCfg.getShowMatrixRowEntry() - 1;
+	int32_t showMatrixColumnEntry = _plotCfg.getShowMatrixColumnEntry() - 1;
+
+
+	for (uint32_t j = 0; j < numberOfQuantityEntries; j++)
+	{
+		if (numberOfQuantityEntries == 1)
+		{
+			ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(dataX, dataY[j].release()));
+			singleCurve->setCurveNameBase(curveNameBase);
+			allCurves.push_back(singleCurve);
+		}
+		else if(quantityDimensions.size() == 1) // Vector
+		{
+			ot::PlotDataset* familyOfCurves= new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(dataX, dataY[j].release()));
+			
+			auto painter = rainBowIt.getNextPainter();
+			_curveCfg.setLinePen(painter.release());
+			_curveCfg.setTitle(curveNameBase + " (" + std::to_string(j + 1) + ")");
+
+			familyOfCurves->setConfig(_curveCfg);
+			familyOfCurves->setCurveNameBase(curveNameBase);
+			allCurves.push_back(familyOfCurves);
+		}
+		else if (quantityDimensions.size() == 2)
+		{
+			//Assumption csr matrix:
+			uint32_t column = j/ quantityDimensions[1];
+			uint32_t row = j - column * quantityDimensions[1];
+			if (showEntireMatrix || showMatrixColumnEntry == column && showMatrixRowEntry == row)
+			{
+				ot::PlotDataset* familyOfCurves = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(dataX, dataY[j].release()));
+
+				auto painter = rainBowIt.getNextPainter();
+				_curveCfg.setLinePen(painter.release());
+				_curveCfg.setTitle(curveNameBase + " (" + std::to_string(row + 1) + "," + std::to_string(column + 1) + ")");
+
+				familyOfCurves->setConfig(_curveCfg);
+				familyOfCurves->setCurveNameBase(curveNameBase);
+				allCurves.push_back(familyOfCurves);
+			}
+		}
+		else
+		{
+			throw std::exception("Tensors not supported in 1D plot yet");
+		}
 	}
 
-	if (_curveCfg.getTitle().empty())
-	{
-		const std::string entityName = _curveCfg.getEntityName();
-		const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
-		_curveCfg.setTitle(shortName);
-	}
-
-	ot::PlotDataset* singleCurve = new ot::PlotDataset(nullptr, _curveCfg, ot::PlotDatasetData(std::move(dataX),dataY.release()));
-	return singleCurve;
+	m_curveIDDescriptions.push_back("");
+	return allCurves;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	std::list<ot::PlotDataset*> dataSets;
 
@@ -181,7 +273,6 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	const ot::QuantityContainerEntryDescription& quantityInformation = queryInformation.m_quantityDescription;
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
-	
 	std::string xAxisParameterLabel = _xAxisParameter;
 	//Auto selection
 	if (xAxisParameterLabel == "")
@@ -200,7 +291,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	assert(xAxisParameter != nullptr); 
 
 
-	std::map<std::string, Datapoints> familyOfCurves;
+	std::map<std::string, std::list<Datapoints>> familyOfCurves;
 	std::map<std::string, std::list<ShortParameterDescription>> additionalParameterDescByCurveName;
 	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
 
@@ -236,23 +327,61 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		{
 			Datapoints dataPoints;
 			dataPoints.reserve(numberOfDocuments - i);
-			familyOfCurves.insert(std::make_pair(curveName, std::move(dataPoints)));
+			familyOfCurves[curveName].push_back(std::move(dataPoints));
 			additionalParameterDescByCurveName[curveName] = additionalParameterInfos;
 			curve = familyOfCurves.find(curveName);
 		}
 
 		//Get quantity value
-		const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
-		(curve->second).m_yData.push_back(quantityValue);
+		std::list<Datapoints>& dataPoints = curve->second;
+		if (dataPoints.size() == 0)
+		{
+			dataPoints.push_back(Datapoints());
+		}
+
+		if (ot::json::isArray(singleMongoDocument, quantityInformation.m_fieldName))
+		{
+			//Get x-axis value
+			const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
+			
+			auto dataVector = ot::json::getArray(singleMongoDocument, quantityInformation.m_fieldName);
+			auto nextDatapointsContainer = dataPoints.begin();
+			for (auto& data : dataVector)
+			{
+				if (nextDatapointsContainer == dataPoints.end())
+				{
+					dataPoints.push_back(Datapoints());
+					nextDatapointsContainer = std::prev(dataPoints.end());
+				}
+				const double quantityValue = jsonToDouble(data, quantityInformation.m_dataType);
+				
+				nextDatapointsContainer->m_yData.push_back(quantityValue);
+				nextDatapointsContainer->m_xData.push_back(xAxisParameterValue);
+
+				nextDatapointsContainer++;
+			}
+		}
+		else
+		{
+			
+			const double quantityValue = jsonToDouble(quantityInformation.m_fieldName, singleMongoDocument, quantityInformation.m_dataType);
+			dataPoints.front().m_yData.push_back(quantityValue);
+
+			//Get x-axis value
+			const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
+			dataPoints.front().m_xData.push_back(xAxisParameterValue);
+		}
 		
-		//Get x-axis value
-		const double xAxisParameterValue = jsonToDouble(xAxisParameter->m_fieldName, singleMongoDocument, xAxisParameter->m_dataType);
-		(curve->second).m_xData.push_back(xAxisParameterValue);
 	}
 
 	for (auto& curve : familyOfCurves)
 	{
-		curve.second.shrinkToFit();
+		
+		std::list<Datapoints>& dataPointLists = curve.second;
+		for (Datapoints& dataPoints : dataPointLists)
+		{
+			dataPoints.shrinkToFit();
+		}
 	}
 	
 	
@@ -264,44 +393,53 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 	// 2c) All but one parameter are constant -> FoC: name of each curve shows the value of the not-constant parameter. The other parameter values of each curve are communicated
 
 	
-	//In this case we need to make the names better readable. Since we have more then one parameter in the name 
-
-	const std::string entityName = _curveCfg.getEntityName();
-	const std::string shortName = entityName.substr(entityName.find_last_of("/") + 1);
-
+	//In this case we need to make the names better readable. Since we have more then one parameter in the name 	
 	size_t numberOfParameter =	queryInformation.m_parameterDescriptions.size();
+	const std::string simpleNameBase = _curveCfg.getTitle();
+
 	if (numberOfParameter > 2)
 	{	
 		//Naming case 1b and 2c
 		std::list<std::string> nonConstParameter;
 		for (auto& parameterValues : parameterValuesByParameterName)
 		{
+			parameterValues.second.sort();
 			parameterValues.second.unique();
 			if (parameterValues.second.size() != 1)
 			{
 				nonConstParameter.push_back(parameterValues.first) ;
 			}
 		}
-		std::map<std::string, Datapoints> familyOfCurvesSimplerNames;
-
+		std::map<std::string,std::list<Datapoints>> familyOfCurvesSimplerNames;
+	
 		if (nonConstParameter.size() == 1)
 		{
 			const std::string notConstParameterName = *nonConstParameter.begin();
+			std::string message = simpleNameBase + ":\n";
+			bool firstParameterDescription = true;
 			for (auto& curve : familyOfCurves) {
 				std::string complexName = curve.first;
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
-				std::string simpleName = shortName + " (" + notConstParameterName;
+				std::string simpleName = simpleNameBase + " (" + notConstParameterName;
 				for (const ShortParameterDescription& description : additionalParameterDescription)
 				{
 					if (description.m_label == notConstParameterName)
 					{
 						simpleName += "=" + description.m_value + " " + description.m_unit + ")";
 					}
+					else if(firstParameterDescription)
+					{
+						message +=
+							"	" + description.m_label + " = " + description.m_value + " " + description.m_unit + "\n";
+						firstParameterDescription = false;
+					}
 				}
 
 				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
-				curve.second = Datapoints();
+				curve.second = std::list<Datapoints>();
 			}
+			m_curveIDDescriptions.push_back(message);
+
 		}
 		else if (nonConstParameter.size() == 0)
 		{
@@ -309,10 +447,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			assert(familyOfCurves.size() == 1); 
 			auto singleCurve = familyOfCurves.begin();
 
-			familyOfCurvesSimplerNames.insert({ shortName,std::move(singleCurve->second)});
+			familyOfCurvesSimplerNames.insert({ simpleNameBase,std::move(singleCurve->second)});
 			
 			std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[singleCurve->first];
-			std::string message = shortName +":\n";
+			std::string message = simpleNameBase +":\n";
 			for (auto entry : additionalParameterDescription) 
 			{
 				message += "	" + entry.m_label + " = " + entry.m_value + " " + entry.m_unit + "\n";
@@ -330,11 +468,11 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 			for (auto& curve : familyOfCurves) {
 
 				std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
-				const std::string simpleName = shortName + " (curve " + curveNumber + ")";
+				const std::string simpleName = simpleNameBase + " (curve " + curveNumber + ")";
 				counter++;
 
 				familyOfCurvesSimplerNames.insert({ simpleName,std::move(curve.second) });
-				curve.second = Datapoints();
+				curve.second = std::list<Datapoints>();
 				std::list<ShortParameterDescription>& additionalParameterDescription = additionalParameterDescByCurveName[curve.first];
 				std::string message =
 					simpleName + ":\n";
@@ -348,42 +486,80 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCur
 		familyOfCurves = std::move(familyOfCurvesSimplerNames);
 	}
 	
-	uint32_t colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
 	
+	ot::PainterRainbowIterator rainBowIt;
 	for (auto& singleCurve : familyOfCurves) {
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
-		auto pen = newCurveCfg.getLinePen();
+		auto pen = newCurveCfg.getLinePen();		
+		newCurveCfg.setLinePen(rainBowIt.getNextPainter().release());
 
-		ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(colourIndex);
-		auto stylePainter = new ot::StyleRefPainter2D(styleEntry);
-		newCurveCfg.setLinePen(stylePainter);
-		
-		if (colourIndex < static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowLast))
-		{
-			colourIndex++;
-		}
-		else
-		{
-			colourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst); //Restart the rainbow
-		}
-
+		std::string curveTitle = "";
 		if (numberOfParameter == 2)
 		{
-			newCurveCfg.setTitle(shortName + " " + singleCurve.first);
+			curveTitle = (simpleNameBase + " " + singleCurve.first);
 		}
 		else
 		{
-			newCurveCfg.setTitle(singleCurve.first);
+			curveTitle = (singleCurve.first);
 		}
-		newCurveCfg.setXAxisUnit(xAxisParameter->m_unit);
-		newCurveCfg.setXAxisTitle(xAxisParameter->m_label);
-				
-		std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
-		yData->m_real = std::move(singleCurve.second.m_yData);
 
-		ot::PlotDatasetData datasetData(std::move(singleCurve.second.m_xData), yData.release());
-		auto dataset = new ot::PlotDataset (nullptr, newCurveCfg, std::move(datasetData));
-		dataSets.push_back(dataset);
+		if (singleCurve.second.size() == 1)
+		{
+			Datapoints& curveData =	*singleCurve.second.begin();
+			newCurveCfg.setTitle(curveTitle);
+			std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
+			yData->m_real = std::move(curveData.m_yData);
+
+			ot::PlotDatasetData datasetData(std::move(curveData.m_xData), yData.release());
+			auto dataset = new ot::PlotDataset (nullptr, newCurveCfg, std::move(datasetData));
+			dataset->setCurveNameBase(simpleNameBase);
+			dataSets.push_back(dataset);
+		}
+		else
+		{
+			//Matrices
+
+			std::list<Datapoints>& curveDataList = singleCurve.second;
+			const std::vector<uint32_t>& quantityDimensions = queryInformation.m_quantityDescription.m_dimension;
+			uint32_t j(0);
+			bool showEntireMatrix = _plotCfg.getShowEntireMatrix();
+			int32_t showMatrixRowEntry = _plotCfg.getShowMatrixRowEntry() - 1;
+			int32_t showMatrixColumnEntry = _plotCfg.getShowMatrixColumnEntry() - 1;
+
+			for (Datapoints& curveData : curveDataList)
+			{
+				uint32_t row = j / quantityDimensions[1];
+				uint32_t column = j - row * quantityDimensions[1];
+				if (showEntireMatrix || showMatrixColumnEntry == column && showMatrixRowEntry == row)
+				{
+					auto painter = rainBowIt.getNextPainter();
+
+					const std::string curveTitleWithIndex = curveTitle + " (" + std::to_string(row + 1) + "," + std::to_string(column + 1) + ")";
+					ot::Plot1DCurveCfg newCurveCfgSub = newCurveCfg;
+					newCurveCfgSub.setLinePen(painter.release());
+					newCurveCfg.setTitle(curveTitleWithIndex);
+					std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
+					yData->m_real = std::move(curveData.m_yData);
+
+					ot::PlotDatasetData datasetData(std::move(curveData.m_xData), yData.release());
+					auto dataset = new ot::PlotDataset(nullptr, newCurveCfg, std::move(datasetData));
+					dataset->setCurveNameBase(simpleNameBase);
+					dataSets.push_back(dataset);
+				}
+				j++;
+
+			}
+		}	
+	}
+
+
+	if (_plotCfg.getYLabelAxisAutoDetermine())
+	{
+		_plotCfg.setAxisLabelY(createAxisLabel(quantityInformation.m_label, quantityInformation.m_unit));
+	}
+	if (_plotCfg.getXLabelAxisAutoDetermine())
+	{
+		_plotCfg.setAxisLabelX(createAxisLabel(xAxisParameter->m_label, xAxisParameter->m_unit));
 	}
 
 	return dataSets;
@@ -444,6 +620,32 @@ double CurveDatasetFactory::jsonToDouble(const std::string& _memberName, ot::Con
 	else
 	{
 		throw std::invalid_argument("Curve data has not supported type: "+ _dataType);
+	}
+
+	return value;
+}
+
+double CurveDatasetFactory::jsonToDouble(const rapidjson::Value& _jsonEntry, const std::string& _dataType)
+{
+	double value;
+	if (_dataType == ot::TypeNames::getFloatTypeName()) {
+		float serialisedVal = _jsonEntry.GetFloat();
+		value = static_cast<double>(serialisedVal);
+	}
+	else if (_dataType == ot::TypeNames::getDoubleTypeName()) {
+		value = _jsonEntry.GetDouble();
+	}
+	else if (_dataType == ot::TypeNames::getInt32TypeName()) {
+		int32_t serialisedVal = _jsonEntry.GetInt();
+		value = static_cast<double>(serialisedVal);
+	}
+	else if (_dataType == ot::TypeNames::getInt64TypeName()) {
+		int64_t serialisedVal = _jsonEntry.GetInt64();
+		value = static_cast<double>(serialisedVal);
+	}
+	else
+	{
+		throw std::invalid_argument("Curve data has not supported type: " + _dataType);
 	}
 
 	return value;

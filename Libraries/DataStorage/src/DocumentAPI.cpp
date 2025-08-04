@@ -178,6 +178,30 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
+	value DocumentAPI::InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, std::string fileName)
+	{
+		try
+		{
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
+			bucketOptions.bucket_name(fileName);
+			auto bucket = db.gridfs_bucket(bucketOptions);
+
+			mongocxx::options::gridfs::upload options{};
+
+			auto uploader = bucket.open_upload_stream(fileName, options);
+			uploader.write(dataBuffer, dataSize);
+
+			auto upload = uploader.close();
+
+			return upload.id();
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+			throw e;
+		}
+	}
 	std::vector<std::string_view> DocumentAPI::insertElementsToMetadata(bsoncxx::document::view docView, Document & metaDoc)
 	{
 		std::set<std::pair<size_t, std::string_view>> elemKeyValues;

@@ -32,6 +32,10 @@ namespace ot {
 		void setEntityType(std::string _type) { m_type = _type; };
 		const std::string& getEntityType(void) const { return m_type; };
 
+		bool operator==(const EntityInformation& _other) const 
+		{
+			return BasicEntityInformation::operator==(_other) && _other.m_type == this->m_type;
+		}
 	private:
 		std::string m_type;
 	};

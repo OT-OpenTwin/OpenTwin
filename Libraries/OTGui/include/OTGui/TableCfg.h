@@ -27,7 +27,7 @@ namespace ot {
 		static std::string toString(TableHeaderMode _headerMode);
 		static TableHeaderMode stringToHeaderMode(const std::string& _headerMode);
 
-		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable));
+		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle));
 		TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode);
 		TableCfg(const TableCfg& _other);
 		TableCfg(TableCfg&& _other) noexcept;
@@ -81,15 +81,14 @@ namespace ot {
 		void initialize(void);
 		void initialize(int _rows, int _columns);
 
-		int m_rows;
-		int m_columns;
-		bool m_sortingEnabled;
-		bool m_sortingClearable;
+		int m_rows = 0;
+		int m_columns = 0;
+		bool m_sortingEnabled = false;
+		bool m_sortingClearable = false;
 
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;
 		std::vector<std::vector<std::string>> m_data;
-
 	};
 
 }

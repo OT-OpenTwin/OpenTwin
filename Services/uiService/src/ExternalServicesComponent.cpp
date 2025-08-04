@@ -39,41 +39,45 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
-#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableView.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/PropertyInput.h"
+#include "OTWidgets/MessageDialog.h"
+#include "OTWidgets/GraphicsPicker.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/GraphicsViewView.h"
+#include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/OnePropertyDialog.h"
+#include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/ModelLibraryDialog.h"
 #include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
-#include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/GraphicsViewView.h"
-#include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/TextEditor.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/MessageDialog.h"
-#include "OTWidgets/PropertyDialog.h"
-#include "OTWidgets/OnePropertyDialog.h"
-#include "OTWidgets/PropertyGrid.h"
-#include "OTWidgets/PropertyInput.h"
-#include "OTWidgets/PropertyGridItem.h"
-#include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 #include "CurveDatasetFactory.h"
+#include "OTCore/String.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
+#include "ProgressUpdater.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -96,6 +100,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+
+#include "OTCore/EntityName.h"
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
@@ -464,11 +470,11 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 				// Check if response is an error or warning
 				OT_ACTION_IF_RESPONSE_ERROR(response) {
 					assert(0); // ERROR
-					AppBase::instance()->showErrorPrompt(response, "Error");
+					AppBase::instance()->showErrorPrompt("Notification failed due to error response.", response, "Error");
 				}
 				else OT_ACTION_IF_RESPONSE_WARNING(response) {
 					assert(0); // WARNING
-					AppBase::instance()->showWarningPrompt(response, "Warning");
+					AppBase::instance()->showWarningPrompt("Notification failed due to warning response", response, "Warning");
 				}
 			}
 			else { executeAction(AppBase::instance()->getViewerComponent()->getActiveDataModel(), _senderId); }
@@ -850,12 +856,12 @@ bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandH
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
-		AppBase::instance()->showErrorPrompt(response, "Error");
+		AppBase::instance()->showErrorPrompt("Callback failed due to error response", response, "Error");
 		return false;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
-		AppBase::instance()->showWarningPrompt(response, "Warning");
+		AppBase::instance()->showWarningPrompt("Callback failed due to error response", response, "Warning");
 		return false;
 	}
 	return true;
@@ -1021,20 +1027,20 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	
 	if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
 		assert(0); // Failed to send
-		OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
-		app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
+		OT_LOG_E("Failed to send \"" OT_ACTION_CMD_GetListOfProjectTemplates "\" request to the global session service");
+		app->showErrorPrompt("Failed to send request to the global session service", "", "Error");
 		return result;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
 		OT_LOG_E(response);
-		app->showErrorPrompt(response, "Error");
+		app->showErrorPrompt("Callback failed due to error response", response, "Error");
 		return result;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
 		OT_LOG_W(response);
-		app->showWarningPrompt(response, "Warning");
+		app->showWarningPrompt("Callback failed due to warning response", response, "Warning");
 		return result;
 	}
 	
@@ -1081,14 +1087,14 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
 		if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
-			OT_LOG_EA("Failed to send \"Create new session\" request to the global session service");
-			app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
+			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
+			app->showErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
 		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 		if (responseMessage != ot::ReturnMessage::Ok) {
-			app->showErrorPrompt(responseMessage.getWhat(), "Error");
+			app->showErrorPrompt(responseMessage.getWhat(), "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
@@ -1133,19 +1139,19 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		response.clear();
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
-			app->showErrorPrompt("Failed to send http request to Local Session Service", "Connection Error");
+			app->showErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + response, "Error");
+			app->showErrorPrompt("Failed to create session. ", response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + response, "Error");
+			app->showErrorPrompt("Failed to create session.", response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
@@ -1155,6 +1161,11 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		responseDoc.fromJson(response);
 
 		// ##################################################################
+
+		if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
+			std::string globalLoggerURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl);
+			ot::ServiceLogNotifier::instance().setLoggingServiceURL(globalLoggerURL);
+		}
 
 		if (responseDoc.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::ConstJsonArray logData = ot::json::getArray(responseDoc, OT_ACTION_PARAM_LogFlags);
@@ -1283,7 +1294,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 	}
 	catch (const std::exception & e) {
 		OT_LOG_EAS(e.what());
-		app->showErrorPrompt(e.what(), "Error");
+		app->showErrorPrompt("Open project failed due to exception.", e.what(), "Error");
 		ot::LogDispatcher::instance().setProjectName("");
 		return false;
 	}
@@ -1557,6 +1568,9 @@ void ExternalServicesComponent::queueAction(const char* json, const char* sender
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);
+
+		QEventLoop loop;
+		loop.processEvents();
 	}
 
 	lock = true;
@@ -1581,7 +1595,7 @@ void ExternalServicesComponent::deallocateData(const char *data)
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
-	AppBase::instance()->showErrorPrompt("The session service has died unexpectedly. The application will be closed now.", "Error");
+	AppBase::instance()->showErrorPrompt("The Local Session Service has died unexpectedly. The application will be closed now.", "", "Error");
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
 }
@@ -1644,26 +1658,6 @@ void ExternalServicesComponent::unlockGui(void)
 	lockFlags.setFlag(ot::LockModelRead);
 
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
-}
-
-void ExternalServicesComponent::showError(const char* message)
-{
-	AppBase* app = AppBase::instance();
-	assert(app != nullptr);
-	if (app != nullptr) app->showErrorPrompt(message, "Error");
-
-	delete[] message;
-	message = nullptr;
-}
-
-void ExternalServicesComponent::showInformation(const char* message)
-{
-	AppBase* app = AppBase::instance();
-	assert(app != nullptr);
-	if (app != nullptr) app->showInfoPrompt(message, "Success");
-
-	delete[] message;
-	message = nullptr;
 }
 
 void ExternalServicesComponent::activateModelVersion(const char* version)
@@ -1930,7 +1924,7 @@ std::string ExternalServicesComponent::handleMessage(ot::JsonDocument& _document
 
 std::string ExternalServicesComponent::handleShutdown(ot::JsonDocument& _document) {
 	OT_LOG_D("Showdown received");
-	AppBase::instance()->showErrorPrompt("Shutdown requested by session service.", "Error");
+	AppBase::instance()->showErrorPrompt("Shutdown requested by Local Session Service.", "", "Error");
 	
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::Success);
 	exitThread.detach();
@@ -1945,7 +1939,7 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
-	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
+	AppBase::instance()->showErrorPrompt("An unexpected error has occurred and the session needs to be closed.", "", "Error");
 	
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::EmergencyShutdown);
 	exitThread.detach();
@@ -1954,7 +1948,7 @@ std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleConnectionLoss(ot::JsonDocument& _document) {
-	AppBase::instance()->showErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "Error");
+	AppBase::instance()->showErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "", "Error");
 
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
@@ -2070,23 +2064,49 @@ std::string ExternalServicesComponent::handleDisplayStyledMessage(ot::JsonDocume
 	return "";
 }
 
+std::string ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument& _document) {
+	ot::LogMessage log;
+	log.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_MESSAGE));
+
+	ot::StyledTextBuilder message;
+
+	message << "[";
+	if (log.getFlags() & ot::ERROR_LOG) {
+		message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
+	}
+	else if (log.getFlags() & ot::WARNING_LOG) {
+		message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
+	}
+	else if (log.getFlags() & ot::TEST_LOG) {
+		message << ot::StyledText::Highlight << ot::StyledText::Bold << "TEST" << ot::StyledText::ClearStyle;
+	}
+	message << "] [" << log.getServiceName() << "] " << log.getText();
+
+	AppBase::instance()->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+
+	return "";
+}
+
 std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	AppBase::instance()->showErrorPrompt(message, "Open Twin");
+	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
+	AppBase::instance()->showErrorPrompt(message, detailedMessage, "OpenTwin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportWarning(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	AppBase::instance()->showWarningPrompt(message, "Open Twin");
+	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
+	AppBase::instance()->showWarningPrompt(message, detailedMessage, "OpenTwin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportInformation(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	AppBase::instance()->showInfoPrompt(message, "Open Twin");
+	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
+	AppBase::instance()->showInfoPrompt(message, detailedMessage, "OpenTwin");
 
 	return "";
 }
@@ -2137,7 +2157,7 @@ std::string ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocu
 	{
 		m_modelServiceURL = s->second->getServiceURL();
 	}
-
+		
 	m_modelViewNotifier.push_back(s->second);
 
 	OT_LOG_D("Service with ID \"" + std::to_string(s->second->getServiceID()) + "\" was registered from model view events");
@@ -2204,31 +2224,55 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 				nullptr,
 				dialogTitle.c_str(),
 				QDir::currentPath(),
-				QString(fileMask.c_str()) + " ;; All files (*.*)");
+				QString(fileMask.c_str()));
 
 			if (!fileNames.isEmpty()) {
 				ot::JsonDocument inDoc;
 				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
-				for (QString& fileName : fileNames)
 				{
-					std::string localEncodingString = fileName.toLocal8Bit().constData();
-					const std::string utf8String = fileName.toStdString();
-
-					ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
-					fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+					std::string progressBarMessage = "Importing files";
+					std::unique_ptr<ProgressUpdater> updater(nullptr);
 					if (loadContent)
 					{
-						std::string fileContent;
-						uint64_t uncompressedDataLength{ 0 };
-						// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-						ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
-						fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
-						uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
-						fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+						updater.reset(new ProgressUpdater(progressBarMessage, fileNames.size()));
 					}
+
+					uint32_t counter(0);
+					std::string message = ("Import of " + std::to_string(fileNames.size()) + " file(s): ");
+					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+
+					auto startTime = std::chrono::system_clock::now();
+					for (QString& fileName : fileNames)
+					{
+						counter++;
+						std::string localEncodingString = fileName.toLocal8Bit().constData();
+						const std::string utf8String = fileName.toStdString();
+
+						ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
+						fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+						if (loadContent)
+						{
+							std::string fileContent;
+							uint64_t uncompressedDataLength{ 0 };
+							// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+							ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+							fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
+							uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
+							fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+							assert(updater != nullptr);
+							updater->triggerUpdate(counter);
+						}
+					}
+					auto endTime = std::chrono::system_clock::now();
+					uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+					//AppBase::instance()->("Import of files: " + std::to_string(millisec) + " ms\n");
+					message = (std::to_string(millisec) + " ms\n");
+
+					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
 				}
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
 				if (loadContent) {
@@ -2257,12 +2301,14 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 				nullptr,
 				dialogTitle.c_str(),
 				QDir::currentPath(),
-				QString(fileMask.c_str()) + " ;; All files (*.*)");
+				QString(fileMask.c_str()));
 
 			if (fileName != "")
 			{
 				ot::JsonDocument inDoc;
 				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				if (loadContent)
 				{
@@ -2278,7 +2324,6 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 					// We need to send the file content
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
 				}
-				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 				std::string response;
@@ -2333,7 +2378,7 @@ std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _
 	decodedString = nullptr;
 
 	// Show a success message
-	AppBase::instance()->showInfoPrompt("The file has been successfully saved:\n" + fileName, dialogTitle);
+	AppBase::instance()->showInfoPrompt("The file has been successfully saved.\nFile: \"" + fileName + "\"", "", dialogTitle);
 	
 	return "";
 }
@@ -2348,7 +2393,7 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 		nullptr,
 		dialogTitle.c_str(),
 		QDir::currentPath(),
-		QString(fileMask.c_str()) + " ;; All files (*.*)");
+		QString(fileMask.c_str()));
 
 	if (fileName != "")
 	{
@@ -2356,6 +2401,7 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		std::string response;
 
@@ -3235,7 +3281,7 @@ std::string ExternalServicesComponent::handleRenameEntity(ot::JsonDocument& _doc
 	std::string fromPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_FROM);
 	std::string toPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_To);
 
-	ViewerAPI::renameEntityPath(fromPath, toPath);
+	AppBase::instance()->renameEntity(fromPath, toPath);
 
 	return "";
 }
@@ -3299,6 +3345,11 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	return "";
 }
 
+std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
+
+	return "";
+}
+
 // Property Grid
 
 std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
@@ -3306,6 +3357,11 @@ std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	cfg.setFromJsonObject(cfgObj);
 	AppBase::instance()->setupPropertyGrid(cfg);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleClearModalPropertyGrid(ot::JsonDocument& _document) {
+	AppBase::instance()->clearModalPropertyGrid();
 	return "";
 }
 
@@ -3404,10 +3460,15 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualizingEntities);
 
 	return "";
 }
@@ -3419,8 +3480,13 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
 
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
@@ -3449,7 +3515,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags, {});
 
 		if (editor) {
 			for (auto itemUID : itemUids) {
@@ -3478,8 +3544,13 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
 
 	for (const auto& connection : pckg.connections()) {
 		editor->getGraphicsView()->addConnectionIfConnectedItemsExist(connection);
@@ -3500,7 +3571,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 	if (!pckg.name().empty()) {
 		// Specific editor
 		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
+		ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, {});
 
 		for (auto connection : pckg.connections()) {
 			editor->getGraphicsView()->removeConnection(connection.getUid());
@@ -3537,10 +3608,14 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	// Get/create plot view that matches the plot config 
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
 
-	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags);
+	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags, visualizingEntities);
 	ot::Plot* plot = plotView->getPlot();
-	plot->setConfig(plotConfig);
 
 	// If the data needs to be refreshed, all curves are newly build. Other changes can be performed on already loaded curves.
 	if (refreshData)
@@ -3554,6 +3629,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 
 		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
 		std::list<ot::PlotDataset*> dataSets;
+		std::list<std::string> curveIDDescriptions;
 
 		const std::string xAxisParameter = plotConfig.getXAxisParameter();
 		const std::list<ValueComparisionDefinition>& queries = plotConfig.getQueries();
@@ -3581,35 +3657,40 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 			}
 
 			if (curveHasDataToVisualise) {
-				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(curveCfg, xAxisParameter, queries);
-
-				for (const std::string& message : curveFactory.getCurveIDDescriptions()) {
-					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-				}
-
+				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(plotConfig, curveCfg, xAxisParameter, queries);
 				dataSets.splice(dataSets.begin(), newCurveDatasets);
-
+				
+				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+				curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
+								
 				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
 					break;
 				}
 			}
 			else
 			{
-				OT_LOG_W("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter);
+				AppBase::instance()->appendInfoMessage(QString(("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n").c_str()));
 			}
 		}
 
 		//Now we add the data sets to the plot and visualise them
 		int32_t curveCounter(1);
+		plot->setConfig(plotConfig);
+		std::string displayMessage("");
+		auto curveIDDescription = curveIDDescriptions.begin();
+
 		for (ot::PlotDataset* dataSet : dataSets) {
-
-
 			if (!useLimitedNbOfCurves || (useLimitedNbOfCurves && curveCounter <= limitOfCurves))
 			{
 				dataSet->setOwnerPlot(plot);
 				dataSet->updateCurveVisualization();
 				plot->addDatasetToCache(dataSet);
 				dataSet->attach();
+				if (curveIDDescription != curveIDDescriptions.end() && !curveIDDescription->empty())
+				{
+					displayMessage += *curveIDDescription;
+					curveIDDescription++;
+				}
 			}
 			else
 			{
@@ -3618,8 +3699,24 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 			}
 			curveCounter++;
 		}
+		if (!displayMessage.empty())
+		{
+			AppBase::instance()->appendInfoMessage(QString::fromStdString(displayMessage));
+		}
 	}
-
+	else
+	{
+		const ot::Plot1DCfg& oldConfig = plot->getPlot()->getConfiguration();
+		if (plotConfig.getXLabelAxisAutoDetermine())
+		{
+			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
+		}
+		if (plotConfig.getYLabelAxisAutoDetermine())
+		{
+			plotConfig.setAxisLabelY(oldConfig.getAxisLabelY());
+		}
+		plot->setConfig(plotConfig);
+	}
 	// Now we refresh the plot visualisation.
 	plot->refresh();
 	plot->resetView();
@@ -3633,24 +3730,40 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 }
 
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName);
+
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName, visualizingEntities);
+
 	if (plotView != nullptr)
 	{
 		ot::Plot1DCurveCfg config;
 		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 		ot::Plot* plot = plotView->getPlot();
-		std::list<ot::PlotDataset*> allDatasets = plot->getAllDatasets();
-		for (ot::PlotDataset* dataSet : allDatasets)
-		{
-			if (dataSet->getEntityName() == config.getEntityName())
-			{
-				dataSet->setConfig(config);
+		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
+
+		for (ot::PlotDataset* dataSet : allDatasets) {
+			if (dataSet->getEntityName() == config.getEntityName()) {
+				const std::string curveNameBase =  dataSet->getCurveNameBase();
+				
+				const std::string newNameFull = dataSet->getConfig().getEntityName();
+				const std::string newNameShort = ot::EntityName::getSubName(newNameFull).value();
+
+				std::string curveTitle = dataSet->getConfig().getTitle();
+				
+				curveTitle = ot::String::replace(curveTitle, curveNameBase, newNameShort);
+
+				ot::Plot1DCurveCfg curveCfg = dataSet->getConfig();
+				curveCfg.setTitle(curveTitle);
+				
+				dataSet->setConfig(curveCfg);
+				dataSet->setCurveNameBase(newNameShort);
+
 				dataSet->updateCurveVisualization();
-				break;
 			}
 		}
 		
@@ -3678,20 +3791,26 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
+	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
+
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName(), visualizingEntities);
 	if (editor) {
-		editor->getTextEditor()->setupFromConfig(config, true);
-		
+		editor->getTextEditor()->setupFromConfig(config, overwriteContent);
+
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
 			AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
 		}
 	}
 	else {
-		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
+		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags, visualizingEntities);
 	}
 
 	editor->getTextEditor()->setContentSaved();
-	
 	const std::string& name = editor->getViewData().getEntityName();
 	const auto& viewerType = editor->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
@@ -3702,7 +3821,8 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
+
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, {});
 
 	if (editor) {
 		editor->getTextEditor()->setContentSaved();
@@ -3713,7 +3833,7 @@ std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument
 
 std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName, {});
 
 	if (editor) {
 		editor->getTextEditor()->setContentChanged();
@@ -3769,9 +3889,14 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags | AppBase::ViewHandlingConfig::SkipEntitySelection);
 	}
 
-	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
+	ot::UIDList visualizingEntities;
+	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
+		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
+	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName(), visualizingEntities);
 	if (table == nullptr) {
-		table = AppBase::instance()->createNewTable(config, info, insertFlags);
+		table = AppBase::instance()->createNewTable(config, info, insertFlags, visualizingEntities);
 	}
 	else if (overrideCurrentContent) {
 		table->getTable()->setupFromConfig(config);
@@ -3794,7 +3919,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3807,7 +3932,7 @@ std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _do
 std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3820,7 +3945,7 @@ std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& 
 std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3838,7 +3963,7 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3856,7 +3981,7 @@ std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocume
 std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3874,7 +3999,7 @@ std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _d
 std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3892,7 +4017,7 @@ std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocu
 std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3910,7 +4035,7 @@ std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDoc
 std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument& _document) {
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
 		OT_LOG_EAS("Table \"" + tableName + "\" not found");
 		return "";
@@ -3955,7 +4080,7 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 	}
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -3982,7 +4107,7 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -3995,6 +4120,7 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(ot::JsonDocument& _document) {
+	
 	// Get parameters
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
@@ -4024,8 +4150,13 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 		clearSelectionAfter = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelectionAfter);
 	}
 
+	OT_LOG_D("Set Table range background optionals: callback=" + std::to_string(callback) + " ,callback url=" + callbackUrl + " ,callback function=" + callbackFunction + 
+		" ,clearSelection=" + std::to_string(clearSelection) + " ,clear selection after=" + std::to_string(clearSelectionAfter));
+
+
 	std::vector<ot::TableRange> ranges;
-	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) {
+	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) 
+	{
 		ot::ConstJsonObjectList rangesList = ot::json::getObjectList(_document, OT_ACTION_PARAM_Ranges);
 		ranges.reserve(rangesList.size());
 		for (const ot::ConstJsonObject& rangeObject : rangesList) {
@@ -4036,7 +4167,12 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	}
 
 	// Get table
-	ot::TableView* table = AppBase::instance()->findTable(tableName);
+	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
+
+	//!! Needs to be executed before, since the callback unlocks the ui lock
+	if (callback) {
+		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
+	}
 
 	if (!table) {
 		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
@@ -4053,11 +4189,6 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	
 	// Apply color
 	table->getTable()->setSelectedCellsBackground(color);
-
-	// Callback if required
-	if (callback) {
-		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
-	}
 
 	if (clearSelectionAfter) {
 		table->getTable()->clearSelection();
@@ -4146,6 +4277,52 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	return "";
 }
 
+std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _document) {
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string targetFolder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	std::string modelUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
+	std::string lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+
+	ot::ModelLibraryDialogCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+	// Prepare response doc
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, entityID, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(targetFolder, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(elementType, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(modelUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(dbUserName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(dbUserPassword, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(dbServerUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	// Show dialog
+	ot::ModelLibraryDialog dia(std::move(cfg));
+	if (dia.showDialog() == ot::Dialog::Ok) {
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(dia.getSelectedName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	}
+	else {
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogCanceled, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	}
+
+	// Send response
+	std::string response;
+	if (!ot::msg::send("", lmsUrl, ot::EXECUTE, responseDoc.toJson(), response)) {
+		OT_LOG_E("Failed to send message to LMS at \"" + lmsUrl + "\"");
+	}
+
+	return "";
+}
+
 // ###################################################################################################
 
 // Private functions
@@ -4183,18 +4360,21 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
-
-	ot::JsonArray rangesArray;
-	for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
-		ot::JsonObject rangeObject;
-		ot::TableRange range = ot::QtFactory::toTableRange(qrange);
-		range.addToJsonObject(rangeObject, doc.GetAllocator());
-		rangesArray.PushBack(rangeObject, doc.GetAllocator());
+	if (_table != nullptr)
+	{
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
+		
+		AppBase::instance()->appendInfoMessage(QString::fromStdString("Loading table ranges.\n"));
+		ot::JsonArray rangesArray;
+		for (const QTableWidgetSelectionRange& qrange : _table->getTable()->selectedRanges()) {
+			ot::JsonObject rangeObject;
+			ot::TableRange range = ot::QtFactory::toTableRange(qrange);
+			range.addToJsonObject(rangeObject, doc.GetAllocator());
+			rangesArray.PushBack(rangeObject, doc.GetAllocator());
+		}
+		doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
 	}
-	doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
-
 	std::string response;
 	sendHttpRequest(EXECUTE, _serviceUrl, doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {

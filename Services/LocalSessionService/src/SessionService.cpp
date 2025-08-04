@@ -16,6 +16,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 // std header
 #include <fstream>
@@ -611,6 +612,8 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		OT_LOG_D("Adding ToolBar Tab order to the response document");
 		responseDoc.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(newSession.getToolBarTabOrder(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
+
+	responseDoc.AddMember(OT_ACTION_PARAM_GlobalLoggerUrl, ot::JsonString(ot::ServiceLogNotifier::instance().loggingServiceURL(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	if (m_logModeManager.getGlobalLogFlagsSet()) {
 		ot::JsonArray logData;

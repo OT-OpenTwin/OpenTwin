@@ -35,7 +35,7 @@ ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullp
 	this->slotGlobalStyleChanged();
 
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridItem::slotGlobalStyleChanged);
-	this->connect(m_deleteLabel, &Label::mousePressed, this, &PropertyGridItem::slotDeleteRequested);
+	this->connect(m_deleteLabel, &Label::mouseClicked, this, &PropertyGridItem::slotDeleteRequested);
 }
 
 ot::PropertyGridItem::~PropertyGridItem() {

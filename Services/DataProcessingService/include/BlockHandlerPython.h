@@ -10,9 +10,10 @@ public:
 	virtual bool executeSpecialized() override;
 
 private:
-	std::list<std::string> _requiredInput;
-	std::list<std::string> _outputs;
-	std::string _scriptName;
-	std::string _entityName;
-	ot::PythonServiceInterface* _pythonServiceInterface = nullptr;
+	std::list<std::string> m_requiredInput;
+	std::list<std::string> m_outputs;
+	std::list<PipelineData> m_outputData;
+	std::string m_scriptName;
+	std::string m_entityName;
+	ot::PythonServiceInterface* m_pythonServiceInterface = nullptr;
 };

@@ -18,7 +18,7 @@ namespace ot {
 	public:
 		static std::list<SyntaxHighlighterRule> create(DocumentSyntax _syntax);
 
-		static std::list<SyntaxHighlighterRule> createPython(void);
+		static std::list<SyntaxHighlighterRule> createPython();
 
 	private:
 		DefaultSyntaxHighlighterRules() {};

@@ -44,16 +44,25 @@ void Result1DData::setData(const std::string& data)
 		if (xRead && xValues.capacity() == 0)
 		{
 			xValues.reserve(numberOfDataPoints);
+
+			// In case that there were already some data point without this quantity, add zeros until this point
+			for (size_t fill = 0; fill < index; fill++) xValues.push_back(0.0);
 		}
 
 		if (yreRead && yreValues.capacity() == 0)
 		{
 			yreValues.reserve(numberOfDataPoints);
+
+			// In case that there were already some data point without this quantity, add zeros until this point
+			for (size_t fill = 0; fill < index; fill++) yreValues.push_back(0.0);
 		}
 
 		if (yimRead && yimValues.capacity() == 0)
 		{
 			yimValues.reserve(numberOfDataPoints);
+
+			// In case that there were already some data point without this quantity, add zeros until this point
+			for (size_t fill = 0; fill < index; fill++) yimValues.push_back(0.0);
 		}
 
 		if (xRead)

@@ -49,6 +49,7 @@
 #include "TableVisualiser.h"
 #include "PlotVisualiser.h"
 #include "CurveVisualiser.h"
+#include "RangeVisualiser.h"
 
 #include <QtWidgets/qheaderview.h>
 
@@ -141,6 +142,10 @@ void Model::activateModel(void)
 void Model::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
 {
 	FrontendAPI::instance()->fillPropertyGrid(_configuration);
+}
+
+void Model::clearModalPropertyGrid() {
+	FrontendAPI::instance()->clearModalPropertyGrid();
 }
 
 void Model::setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value)
@@ -390,6 +395,11 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	{
 		auto curveVis = new CurveVisualiser(containerNode);
 		containerNode->addVisualiser(curveVis);
+	}
+
+	if (_visualisationTypes.visualiseAsRange()) {
+		auto rangeVis = new RangeVisualiser(containerNode);
+		containerNode->addVisualiser(rangeVis);
 	}
 
 	// Get the parent scene node
@@ -770,6 +780,11 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 		sceneNode->addVisualiser(curveVis);
 	}
 
+	if (_visualisationTypes.visualiseAsRange()) {
+		auto rangeVis = new RangeVisualiser(sceneNode);
+		sceneNode->addVisualiser(rangeVis);
+	}
+
 	// Get the parent scene node
 	SceneNodeBase* parentNode = getParentNode(_treeName);
 	assert(parentNode != nullptr); // We assume that the parent node already exists
@@ -894,6 +909,16 @@ void Model::setEntityName(unsigned long long modelEntityID, const std::string &n
 		item->setName(newName);
 
 		FrontendAPI::instance()->setTreeItemText(item->getTreeItemID(), newText);
+	}
+}
+
+std::string Model::getEntityName(unsigned long long modelEntityID) const {
+	const auto it = modelItemToSceneNodesMap.find(modelEntityID);
+	if (it != modelItemToSceneNodesMap.end()) {
+		return it->second->getName();
+	}
+	else {
+		return "";
 	}
 }
 
@@ -1040,7 +1065,8 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected());
+	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected(), {});
+	root->setSelectionHandled(false);
 
 	for (auto child : root->getChildren())
 	{
@@ -1073,7 +1099,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 
 	_selectedModelItems.clear();
 
-	// Set the selection flag for all nodes to false
+	// Set the selection and selection handled flags for all nodes to false
 	resetSelection(sceneNodesRoot);
 
 	if (_selectedTreeItems.empty()) {
@@ -1086,6 +1112,13 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 		ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
+
+		// Clear visualizing entities for last central view
+		ot::WidgetView* view = FrontendAPI::instance()->getLastFocusedCentralView();
+		if (view) {
+			view->clearVisualizingItems();
+		}
+
 		return result;
 	}
 
@@ -1096,20 +1129,35 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 
 	bool isItem3DSelected = false;
 
-	// First set the selected state for all selected nodes
+	// First gather information about all selected nodes
+	std::list<SceneNodeBase*> selectedNodes;
+	
 	for (ot::UID item : _selectedTreeItems) {
-		SceneNodeBase *sceneNode = treeItemToSceneNodesMap[item];
+		SceneNodeBase* node = treeItemToSceneNodesMap[item];
+		if (node != nullptr) {
+			selectedNodes.push_back(node);
+		}
+	}
 
-		if (sceneNode != nullptr) {
-			isItem3DSelected |= sceneNode->isItem3D();
+	// Now set the selected state for all selected nodes
+	
+	for (SceneNodeBase* node : selectedNodes) {
+		assert(node != nullptr);
 
-			assert(sceneNode != nullptr);
-			result |= sceneNode->setSelected(true, _selectionOrigin, isSingleItemSelected());
-			_selectedModelItems.push_back(sceneNode->getModelEntityID());
-
-			if (sceneNode->isVisible()) {
-				_selectedVisibleModelItems.push_back(sceneNode->getModelEntityID());
+		if (node->isItem3D()) {
+			if (!isItem3DSelected) {
+				FrontendAPI::instance()->clearVisualizingEntitesFromView("3D", ot::WidgetViewBase::View3D);
+				isItem3DSelected = true;
 			}
+			
+			FrontendAPI::instance()->addVisualizingEntityToView(node->getTreeItemID(), "3D", ot::WidgetViewBase::View3D);
+		}
+		
+		result |= node->setSelected(true, _selectionOrigin, isSingleItemSelected(), selectedNodes);
+		_selectedModelItems.push_back(node->getModelEntityID());
+
+		if (node->isVisible()) {
+			_selectedVisibleModelItems.push_back(node->getModelEntityID());
 		}
 	}
 
@@ -1478,13 +1526,20 @@ void Model::exportTextEditor(void) {
 		return;
 	}
 
+	ot::TextEditor* edit = view->getTextEditor();
+
 	if (view->getViewContentModified()) {
-		view->getTextEditor()->slotSaveRequested();
+		edit->slotSaveRequested();
 	}
 	
-	std::string filePath = api->getSaveFileName("Export To File", "", "Text Files (*.txt);;All Files (*.*)");
+	std::string filePath = api->getSaveFileName(
+		"Export To File", 
+		"", 
+		edit->getFileExtensionFilter()
+	);
+
 	if (!filePath.empty()) {
-		if (view->getTextEditor()->saveToFile(QString::fromStdString(filePath))) {
+		if (edit->saveToFile(QString::fromStdString(filePath))) {
 			api->displayText("Exported successfully: \"" + filePath + "\"\n");
 		}
 		else {
@@ -1513,11 +1568,13 @@ void Model::exportTableAsCSV(void) {
 		return;
 	}
 
+	ot::Table* table = view->getTable();
+
 	if (view->getViewContentModified()) {
-		view->getTable()->slotSaveRequested();
+		table->slotSaveRequested();
 	}
 
-	std::string filePath = api->getSaveFileName("Export To File", "", "CSV File (*.csv);;All Files (*.*)");
+	std::string filePath = api->getSaveFileName("Export To File", "", ot::FileExtension::toFilterString({ ot::FileExtension::CSV, ot::FileExtension::AllFiles }));
 	if (!filePath.empty()) {
 		// todo: export...
 	}

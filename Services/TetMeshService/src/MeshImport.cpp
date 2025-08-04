@@ -9,6 +9,7 @@
 #include "Database.h"
 #include "MeshWriter.h"
 
+#include "OTGui/FileExtension.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -24,18 +25,20 @@
 
 std::string MeshImport::getFileExtensions(void)
 {
-	return
-		"Gmsh MSH(*.msh);;"
-		"Diffpack 3D (.diff);;"
-		"I-deas Universal (*.unv);;"
-		"MED (*.med);;"
-		"INRIA Medit (*.mesh);;"
-		"Nastran Bulk Data File (*.bdf);;"
-		"Plot3D Structured Mesh (*.p3d);;"
-		"STL Surface (*.stl);;"
-		"VRML Surface (*.wrl);;"
-		"VTK (*.vtk);;"
-		"PLY2 Surface (*.ply2)";
+	return ot::FileExtension::toFilterString({
+		ot::FileExtension::GmshMesh,
+		ot::FileExtension::Diffpack,
+		ot::FileExtension::IDeasUniversal,
+		ot::FileExtension::Med,
+		ot::FileExtension::INRIAMedit,
+		ot::FileExtension::NastranBulkData,
+		ot::FileExtension::Plot3d,
+		ot::FileExtension::STLSurface,
+		ot::FileExtension::VRMLSurface,
+		ot::FileExtension::Vtk,
+		ot::FileExtension::Ply2Surface,
+		ot::FileExtension::AllFiles
+		});
 }
 
 void MeshImport::importMesh(const std::string& meshName, const std::string& originalName, const std::string& content, ot::UID uncompressedDataLength)

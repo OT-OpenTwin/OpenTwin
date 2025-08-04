@@ -1,10 +1,7 @@
-/*
- * ControlsManager.cpp
- *
- *  Created on: February 20, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file ControlsManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "ControlsManager.h"
 #include "AppBase.h"
@@ -141,6 +138,8 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on UID uiElementCreated");
+
 				uiElement->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -156,6 +155,8 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on TeeWidget uiElementCreated");
+
 				newTree->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -171,6 +172,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on propGrid uiElementCreated");
 				newProp->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -186,6 +188,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on graphicsView uiElementCreated");
 				newGraphics->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -201,6 +204,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on textEditor uiElementCreated");
 				newText->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -216,6 +220,8 @@ void LockManager::uiViewCreated(const ot::BasicServiceInformation& _serviceInfo,
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on View created");
+
 				newView->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -231,6 +237,8 @@ void LockManager::registerLockable(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				OT_LOG_D("Log applied on register lockable");
+
 				newLockable->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -308,6 +316,7 @@ void LockManager::deregisterLockable(LockableWidget* _lockable) {
 }
 
 void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
+	OT_LOG_D("Lock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
 	auto service = serviceLockLevel(_serviceInfo);
 
 	// Get old value
@@ -328,10 +337,15 @@ void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, ot::Lock
 		specialElement->lock(1, _type);
 	}
 
-	if (_type == ot::LockAll) { m_owner->setWaitingAnimationVisible(true); }
+	if (_type & ot::LockAll) 
+	{ 
+		m_owner->setWaitingAnimationVisible(true); 
+	}
 }
 
 void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags) {
+
+	
 	if (_typeFlags.flagIsSet(ot::LockAll)) {
 		lock(_serviceInfo, ot::LockAll);
 	} 
@@ -360,6 +374,7 @@ void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, const ot
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 	auto service = serviceLockLevel(_serviceInfo);
+	OT_LOG_D("Unlock applied on request from: " + _serviceInfo.serviceName());
 
 	for (auto lockVal : *service) {
 		for (auto itm : m_uiElements) {
@@ -374,21 +389,27 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 	}
 
 	if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
+
+	const std::string state = printLockState();
+	OT_LOG_D("Log state after unlock:\n" + state);
 }
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
 	auto service = serviceLockLevel(_serviceInfo);
-
+	OT_LOG_D("Unlock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
+	std::string state = printLockState();
+	OT_LOG_D("Log state before unlock:\n" + state);
 	// Get old value
 	auto oldLevel = service->find(_type);
-	int v = 0;
+	int lockFlagCount = 0;
 	if (oldLevel != service->end()) {
-		v = oldLevel->second;
+		lockFlagCount = oldLevel->second;
 	}
-
+	OT_LOG_D("Unlock old value found");
 	// Store data
-	if (v > 0) {
-		service->insert_or_assign(_type, v - 1);
+	if (lockFlagCount > 0) {
+		OT_LOG_D("Unlocking. Lock count larger then 0");
+		service->insert_or_assign(_type, lockFlagCount - 1);
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(1, _type);
 		}
@@ -398,12 +419,15 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::Lo
 		}
 	}
 	else {
-		service->insert_or_assign(_type, v);
+		OT_LOG_D("Unlocking. Lock count is 0");
+		service->insert_or_assign(_type, lockFlagCount);
 	}
 
 	if (_type & ot::LockAll) {
 		if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 	}
+	state = printLockState();
+	OT_LOG_D("Log state after unlock:\n" + state);
 }
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags) {
@@ -478,7 +502,7 @@ void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ot::UI
 void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement, bool _eraseUiElements) {
 	auto serviceE = serviceEnabledLevel(_serviceInfo);
 	auto serviceL = serviceLockLevel(_serviceInfo);
-
+	OT_LOG_D("clean service due to: " + _serviceInfo.serviceName() + " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
 	for (auto e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
 			LockManagerElement* element = this->uiElement(e.first);
@@ -494,7 +518,7 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 			}
 		}
 	}
-
+	OT_LOG_D("Clean service unlocks");
 	for (auto l : *serviceL) {
 		if (l.second > 0 && _reenableElement) {
 			for (auto itm : m_uiElements) {
@@ -506,6 +530,8 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 			}
 		}
 	}
+	const std::string state =	printLockState();
+	OT_LOG_D(state);
 
 	delete serviceE;
 	delete serviceL;
@@ -525,6 +551,23 @@ int LockManager::lockLevel(ot::LockTypeFlag _type) {
 		}
 	}
 	return ret;
+}
+
+std::string LockManager::printLockState()
+{
+	std::string state("");
+	for (auto flagCountByLogFlagByService : m_serviceToUiLockLevel)
+	{
+		state += "Service: " + flagCountByLogFlagByService.first.serviceName() + "\n";
+		auto flagCountsByLogFlags = flagCountByLogFlagByService.second;
+		for (auto& flagCountsByLogFlag : *flagCountsByLogFlags)
+		{
+			state += "	Flag: " + ot::toString(flagCountsByLogFlag.first) + " lock count: " + std::to_string(flagCountsByLogFlag.second) + "\n";
+		}
+		state += "\n";
+	}
+
+	return state;
 }
 
 // #######################################################################################################################

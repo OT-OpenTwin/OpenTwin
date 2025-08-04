@@ -6,7 +6,7 @@
 class BlockHandlerDisplay : public BlockHandler
 {
 public:
-	BlockHandlerDisplay(EntityBlockDisplay* blockEntity, const HandlerMap& handlerMap);
+	BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const HandlerMap& _handlerMap);
 	virtual bool executeSpecialized() override;
 
 private:

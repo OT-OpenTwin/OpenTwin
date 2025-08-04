@@ -111,7 +111,7 @@ extern "C"
 			AppBase::instance().setServiceURL(_serviceURL);
 
 			// Initialize log message cache
-			AppBase::instance().updateBufferSizeFromLogFlags(ot::LogDispatcher::instance().logFlags());
+			AppBase::instance().updateBufferSizeFromLogFlags(ot::LogDispatcher::instance().getLogFlags());
 
 			// Set log flags for the logger service
 #ifdef _DEBUG

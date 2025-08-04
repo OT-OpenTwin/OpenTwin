@@ -86,8 +86,8 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	PropertyDouble* y2Prop = new PropertyDouble("Y2", this->getLine().y2(), 0., std::numeric_limits<double>::max());
 	y2Prop->setPropertyTip("The Y2 line position relative to the item's Y position.");
 	lineGroup->addProperty(y2Prop);
-	lineGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	lineGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., std::numeric_limits<double>::max()));
+	lineGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().getPainter()));
+	lineGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().getWidth(), 0., std::numeric_limits<double>::max()));
 	
 	cfg.addRootGroup(lineGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);

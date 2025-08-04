@@ -26,8 +26,12 @@ namespace PythonExtensions {
     static PyObject* OT_GetTableCell(PyObject* _self, PyObject* _args);
     
     static PyObject* OT_GetPortData(PyObject* _self, PyObject* _args);
+    
+    static PyObject* OT_GetPortMetaData(PyObject* _self, PyObject* _args);
 
     static PyObject* OT_SetPortData(PyObject* _self, PyObject* _args);
+    
+    static PyObject* OT_SetPortMetaData(PyObject* _self, PyObject* _args);
 
     static PyMethodDef OTMethods[] = {
 
@@ -38,7 +42,9 @@ namespace PythonExtensions {
         {"FlushEntity", OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},
         {"GetPythonScript", OT_GetScript, METH_VARARGS, "Executes another python script that is stored within OpenTwin."},
         {"GetPortData", OT_GetPortData, METH_VARARGS, "For Block Items. Gets datachunks from the ingoing ports."},
+        {"GetPortMetaData", OT_GetPortMetaData, METH_VARARGS, "For Block Items. Gets meta data from the ingoing ports."},
         {"SetPortData", OT_SetPortData, METH_VARARGS, "For Block Items. Sets datachunks from the outgoing ports."},
+        {"SetPortMetaData", OT_SetPortMetaData, METH_VARARGS, "For Block Items. Sets metadata of the outgoing ports."},
         {NULL, NULL, 0, NULL}        // Sentinel
     };
 

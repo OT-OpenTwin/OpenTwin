@@ -9,6 +9,11 @@
 BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDefinition& _valueComparision)
 {
 	const std::string comparator = _valueComparision.getComparator();
+	if (comparator == ot::ComparisionSymbols::g_rangeComparator)
+	{
+		return buildRangeQuery(_valueComparision);
+	}
+
 	auto mongoComparator = m_mongoDBComparators.find(comparator);
 	if (mongoComparator == m_mongoDBComparators.end())
 	{
@@ -26,10 +31,6 @@ BsonViewOrValue AdvancedQueryBuilder::createComparison(const ValueComparisionDef
 		std::list<ot::Variable> values = getVariableListFromValue(_valueComparision);
 		auto compare = createComparisionEqualNoneOf(values);
 		return GenerateFilterQuery(_valueComparision.getName(), std::move(compare));
-	}
-	else if (comparator == ot::ComparisionSymbols::g_rangeComparator)
-	{
-		return buildRangeQuery(_valueComparision);
 	}
 	else
 	{

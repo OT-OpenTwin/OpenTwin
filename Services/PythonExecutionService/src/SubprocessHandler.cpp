@@ -44,8 +44,12 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 
 	// Create start args
 	std::string subprocessPath = this->findSubprocessPath();
-	std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
-
+	const std::string arg0_ExecutablePath = "\"" + subprocessPath + "\"";
+	const std::string arg1_ServerName = "\"" + _serverName + "\"";
+	const std::string arg2_sitePackages = "\"\"";
+	const std::string arg3_RedirectOurput = "\"1\"";
+	std::string commandLine = arg0_ExecutablePath + " " + arg1_ServerName + " " + arg2_sitePackages + " " + arg3_RedirectOurput;
+	OT_LOG_D("Commandline: " + commandLine);
 	// Run sub
 	ot::RunResult result = ot::SystemProcess::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle);
 	if (!result.isOk()) {

@@ -41,6 +41,8 @@ public:
 	//! @brief Stops the connection handler.
 	void stopConnectionHandlingAfterCrash(void);
 
+	bool isConnected();
+
 private:
 	void shutdownSubprocess(void);
 

@@ -11,6 +11,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qregularexpression.h>
 #include <QtGui/qsyntaxhighlighter.h>
 
 // std header
@@ -25,16 +26,34 @@ namespace ot {
 		SyntaxHighlighter(QTextDocument* _document);
 		virtual ~SyntaxHighlighter();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter
+
 		void addRule(const SyntaxHighlighterRule& _rule);
 		void addRules(const std::list<SyntaxHighlighterRule>& _rules);
-		void setRules(const std::list<SyntaxHighlighterRule>& _rules) { m_rules = _rules; };
-		const std::list<SyntaxHighlighterRule>& getRules(void) const { return m_rules; };
+		void setRules(const std::list<SyntaxHighlighterRule>& _rules);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Virtual methods
 
 	protected:
 		virtual void highlightBlock(const QString& text) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
+
 	private:
-		std::list<SyntaxHighlighterRule> m_rules;
+		struct RuleEntry {
+			QRegularExpression regex;
+			QTextCharFormat charFormat;
+
+		};
+		std::list<RuleEntry> m_rules;
+
+		RuleEntry toRuleEntry(const SyntaxHighlighterRule& _rule);
 
 	};
 

@@ -43,6 +43,7 @@ namespace MongoRoleFunctions
 	bool createInitialProjectsLargeDataRole(mongocxx::client& adminClient);
 	bool createInitialSystemDbRole(mongocxx::client& adminClient);
 	bool createInitialSettingsDbRole(mongocxx::client& adminClient);
+	bool createInitialLibrariesDbRole(mongocxx::client& adminClient);
 
 	bool createAllAccessibleRole(std::string dbName, std::string roleName, mongocxx::client& adminClient);
 

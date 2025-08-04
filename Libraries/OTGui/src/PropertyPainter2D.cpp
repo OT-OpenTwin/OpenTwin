@@ -6,11 +6,11 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTGui/PropertyFactoryRegistrar.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
 #include "OTGui/PropertyPainter2D.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(ot::PropertyPainter2D::propertyTypeString());
 
@@ -19,6 +19,7 @@ ot::PropertyPainter2D::PropertyPainter2D(const PropertyPainter2D* _other)
 {
 	OTAssertNullptr(_other->m_painter);
 	this->setPainter(_other->m_painter->createCopy());
+	m_filter = _other->m_filter;
 }
 
 ot::PropertyPainter2D::PropertyPainter2D(const PropertyBase& _base)
@@ -84,6 +85,10 @@ void ot::PropertyPainter2D::getPropertyData(ot::JsonValue& _object, ot::JsonAllo
 	JsonObject painterObj;
 	m_painter->addToJsonObject(painterObj, _allocator);
 	_object.AddMember("Value", painterObj, _allocator);
+
+	JsonObject filterObj;
+	m_filter.addToJsonObject(filterObj, _allocator);
+	_object.AddMember("Filter", filterObj, _allocator);
 }
 
 void ot::PropertyPainter2D::setPropertyData(const ot::ConstJsonObject& _object) {
@@ -92,6 +97,8 @@ void ot::PropertyPainter2D::setPropertyData(const ot::ConstJsonObject& _object) 
 	if (newPainter) {
 		this->setPainter(newPainter);
 	}
+
+	m_filter.setFromJsonObject(json::getObject(_object, "Filter"));
 }
 
 void ot::PropertyPainter2D::setPainter(Painter2D* _painter) {

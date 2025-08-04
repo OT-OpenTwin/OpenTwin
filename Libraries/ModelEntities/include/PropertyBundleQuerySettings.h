@@ -11,8 +11,13 @@ public:
 	void reload(EntityBase* _thisObject);
 
 	std::list<ValueComparisionDefinition> getValueComparisionDefinitions(EntityBase* _thisObject);
-
+	
+	//! @brief Checks if parameter that determine the query have changed.
 	bool requiresUpdate(EntityBase* _thisObject);
+
+	EntityPropertiesInteger* getNumberOfQueriesProperty(EntityBase* _thisObject);
+
+	void updateQuerySettings(EntityBase* _thisObject,const std::list<std::string>& _queryOptions);
 
 private:
 	const std::string m_groupQuerySettings = "Query settings";

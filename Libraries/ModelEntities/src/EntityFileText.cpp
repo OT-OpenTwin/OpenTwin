@@ -11,6 +11,8 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
 
+#include "PropertyHelper.h"
+
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
 #elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
@@ -117,23 +119,21 @@ void EntityFileText::setText(const std::string& _text)
 	}
 }
 
-ot::TextEditorCfg EntityFileText::createConfig(void) {
+ot::TextEditorCfg EntityFileText::createConfig(bool _includeData) {
 	OT_TEST_ENTITYFILETEXT_Interval("Create config");
 
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
-	result.setPlainText(this->getText());
+	result.setFileExtensionFilter(this->getFileFilter());
 
-	const std::string fileType = getFileType();
-	if (fileType == "py")
-	{
-		result.setDocumentSyntax(ot::DocumentSyntax::PythonScript);
+	if (_includeData) {
+		result.setPlainText(this->getText());
 	}
-	else
-	{
-		result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
-	}
+
+	const std::string highlight = PropertyHelper::getSelectionPropertyValue(this, "Syntax Highlight", "Text Properties");
+	result.setDocumentSyntax(ot::stringToDocumentSyntax(highlight));
+	
 
 	return result;
 }
@@ -141,6 +141,23 @@ ot::TextEditorCfg EntityFileText::createConfig(void) {
 ot::ContentChangedHandling EntityFileText::getTextContentChangedHandling()
 {
 	return m_contentChangedHandlingText;
+}
+
+bool EntityFileText::updateFromProperties()
+{
+	assert(getProperties().anyPropertyNeedsUpdate());
+	setModified();
+
+	m_requiresDataUpdate = PropertyHelper::getSelectionProperty(this, "Text Encoding", "Text Properties")->needsUpdate();
+	bool needsVisualisationUpdate = PropertyHelper::getSelectionProperty(this, "Syntax Highlight", "Text Properties")->needsUpdate();
+	if (m_requiresDataUpdate || needsVisualisationUpdate)
+	{
+		getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_UI_TEXTEDITOR_Setup, true, m_requiresDataUpdate);
+	}
+
+	getProperties().forceResetUpdateForAllProperties();
+
+	return false;
 }
 
 void EntityFileText::setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling)
@@ -183,6 +200,13 @@ void EntityFileText::setSpecializedProperties()
 		"default",
 		this->getProperties()
 		);
+}
+
+bool EntityFileText::requiresDataUpdate()
+{
+	bool temp = m_requiresDataUpdate;
+	m_requiresDataUpdate = false;
+	return temp;
 }
 
 void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& _storage)

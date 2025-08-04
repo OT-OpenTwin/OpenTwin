@@ -18,6 +18,7 @@
 #include "MetadataEntry.h"
 #include "DatasetDescription.h"
 #include "IVisualisationTable.h"
+#include "OTModelAPI/NewModelStateInformation.h"
 
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {
@@ -42,6 +43,8 @@ private:
 	void extractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 	void extractAllParameter(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 	void extractAllQuantities(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
+
+	void unsetConsiderForImport(MetadataAssemblyData& _metadataAssemblyData);
 
 	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData);
 

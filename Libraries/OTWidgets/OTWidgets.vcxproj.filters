@@ -406,12 +406,6 @@
     <ClCompile Include="src\ContextMenuManager.cpp">
       <Filter>src\ContextMenu</Filter>
     </ClCompile>
-    <ClCompile Include="src\MessageBoxHandler.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MessageBoxManager.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\WidgetViewDockManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -511,8 +505,50 @@
     <ClCompile Include="src\PlotView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\TreeItemDelegate.cpp">
+      <Filter>src\Delegates</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogGradientBase.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogLinearGradientEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogRadialGradientEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DEditDialogReferenceEntry.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotCurve.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelLibraryDialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotCurve.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotPointMapper.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
     <ClCompile Include="src\CoordinateFormatConverter.cpp">
-      <Filter>src\Plot</Filter>
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotLegendView.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxHandler.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxManager.cpp">
+      <Filter>src\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -563,9 +599,6 @@
     </Filter>
     <Filter Include="src\ImagePainter">
       <UniqueIdentifier>{0e9b2589-bc0a-4599-b9fa-8d27745cf007}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\Syntax">
-      <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Syntax">
       <UniqueIdentifier>{91ca5e3c-5ab5-4d44-ab48-85002edea2d8}</UniqueIdentifier>
@@ -629,6 +662,9 @@
     </Filter>
     <Filter Include="include\PropertyLink">
       <UniqueIdentifier>{a0da90b9-c9a0-439e-8ff9-058154e0488e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Syntax">
+      <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -836,9 +872,6 @@
     <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
-      <Filter>include\Plot\Cartesian</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
@@ -892,12 +925,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h">
       <Filter>include\ContextMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
-      <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h">
       <Filter>include\WidgetView</Filter>
@@ -977,8 +1004,41 @@
     <ClInclude Include="include\OTWidgets\PlotView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\TreeItemDelegate.h">
+      <Filter>include\Delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogFillEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogLinearGradientEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotCurve.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotCurve.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotPointMapper.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegendView.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h">
-      <Filter>include\Plot</Filter>
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
+      <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
+      <Filter>include\Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1179,6 +1239,18 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ImagePreview.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogGradientBase.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h">
+      <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h">
+      <Filter>include\Dialogs</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

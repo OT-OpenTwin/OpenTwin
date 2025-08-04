@@ -15,21 +15,22 @@
 #include "PythonModuleAPI.h"
 #include "EntityBuffer.h"
 #include "EntityFileText.h"
+#include "DataBuffer.h"
 
 PythonAPI::PythonAPI()
 {
 	m_wrapper.InitializePythonInterpreter();
 }
 
-ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
+void PythonAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
 {
 	assert(_scripts.size() == _parameterSet.size());
 	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts);
 	auto currentParameterSet = _parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
-	ot::ReturnValues returnValues;
 	EntityBuffer::instance().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
+	
 	for (ot::EntityInformation& scriptEntity : scriptEntities)
 	{
 		try
@@ -46,7 +47,15 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 
 			OT_LOG_D("Execute script " + scriptEntity.getEntityName());
 			CPythonObjectNew pReturnValue = m_wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
-			returnValues.addData(scriptEntity.getEntityName(), pyObBuilder.getGenericDataStructList(pReturnValue));
+			try
+			{
+				if (pReturnValue)
+				{
+					const std::string returnString = pyObBuilder.getStringValue(pReturnValue, "");
+					DataBuffer::instance().addReturnData(scriptEntity.getEntityName(),returnString);
+				}
+			}
+			catch (std::exception&){}
 			currentParameterSet++;
 			OT_LOG_D("Script execution succeeded");
 		}
@@ -57,17 +66,21 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 		}
 	}
 	EntityBuffer::instance().saveChangedEntities();
-	return returnValues;
 }
 
-ot::ReturnValues PythonAPI::execute(const std::string& command) noexcept(false)
+void PythonAPI::execute(const std::string& command) noexcept(false)
 {
 	std::string moduleName = std::to_string(EntityBase::getUidGenerator()->getUID());
 	CPythonObjectNew pReturnValue = m_wrapper.execute(command,moduleName);
 	ot::ReturnValues returnValues;
 	PythonObjectBuilder pyObBuilder;
-	returnValues.addData("", pyObBuilder.getGenericDataStructList(pReturnValue));
-	return returnValues;
+	try
+	{
+		const std::string returnString = pyObBuilder.getStringValue(pReturnValue, "");
+		DataBuffer::instance().addReturnData("", returnString);
+	}
+	catch (std::exception&) { 
+	}
 }
 
 std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts)

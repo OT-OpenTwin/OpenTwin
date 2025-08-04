@@ -14,7 +14,7 @@
 #include "CopyPasteHandler.h"
 #include "PlotHandler.h"
 #include "MaterialHandler.h"
-#include "CircuitModelHandler.h"
+#include "LibraryManagementWrapper.h"
 
 // std header
 #include <list>
@@ -77,6 +77,8 @@ public:
 		OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleVisualisationDataRequest, Application, OT_ACTION_CMD_MODEL_RequestVisualisationData, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleShowTable, Application, OT_ACTION_CMD_UI_TABLE_Setup, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_MODEL_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_MODEL_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
 		
 	// Versions
 
@@ -175,6 +177,7 @@ public:
 	void addButtons();
 
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
+	LibraryManagementWrapper& getLibraryManagementWrapper() { return m_libraryManagementWrapper	; }
 
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
@@ -204,7 +207,7 @@ private:
 	MaterialHandler m_materialHandler;
 	ViewVisualisationHandler m_visualisationHandler;
 	CopyPasteHandler m_copyPasteHandler;
-	CircuitModelHandler m_circuitModelHandler;
+	LibraryManagementWrapper m_libraryManagementWrapper;
 
 	Application();
 	~Application();

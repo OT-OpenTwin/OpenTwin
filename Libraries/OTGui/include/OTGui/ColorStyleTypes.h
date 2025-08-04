@@ -235,7 +235,10 @@ namespace ot {
 		PythonFunction,
 		PythonComment,
 
+		PlotCurve,
 		PlotCurveDimmed,
+		PlotCurveHighlight,
+		PlotCurveSymbol,
 
 		ErrorForeground,
 
@@ -278,7 +281,8 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(ColorStyleValueEntry _colorStyleValueEntry);
 	OT_GUI_API_EXPORT ColorStyleValueEntry stringToColorStyleValueEntry(const std::string& _colorStyleValueEntry);
-	OT_GUI_API_EXPORT std::list<std::string> getAllColorStyleValueEntries(void);
+	OT_GUI_API_EXPORT std::list<ColorStyleValueEntry> getAllColorStyleValueEntries();
+	OT_GUI_API_EXPORT std::list<std::string> getAllColorStyleValueEntryStrings();
 
 	OT_GUI_API_EXPORT std::string toString(ColorStyleIntegerEntry _colorStyleIntegerEntry);
 	OT_GUI_API_EXPORT ColorStyleIntegerEntry stringToColorStyleIntegerEntry(const std::string& _colorStyleIntegerEntry);

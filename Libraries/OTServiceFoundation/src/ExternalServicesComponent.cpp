@@ -239,6 +239,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 
 		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
+			m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 		}
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
@@ -343,6 +344,7 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
+			m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 		}
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
@@ -384,6 +386,7 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 		bool hasHandler{ false };
 		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, _messageType);
 
+		std::lock_guard<std::mutex> guard (m_actionDispatching);
 		// Prode the 
 		if (!hasHandler && action == OT_ACTION_CMD_GetSystemInformation)
 		{
@@ -476,6 +479,7 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
 	ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(logFlagsFromJsonArray(flags));
+	m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }

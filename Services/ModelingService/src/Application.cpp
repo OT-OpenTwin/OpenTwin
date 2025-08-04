@@ -39,6 +39,7 @@
 #include "OTSystem/OTAssert.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyColor.h"
+#include "OTGui/FileExtension.h"
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -149,19 +150,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 		std::vector<double> transform = ot::json::getDoubleVector(_doc, OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform);
 
 		getPrimitiveManager()->createFromRubberbandJson(note, json, transform);
-	}
-	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-	{
-		std::list<ot::UID> entityIDs      = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		std::list<ot::UID> brepVersions   = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
-		bool itemsVisible			  = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
-
-		std::list<ot::UID> modifiedEntities = getUpdateManager()->updateEntities(entityIDs, entityVersions, brepVersions, itemsVisible);
-
-		getUpdateManager()->checkParentUpdates(modifiedEntities);
-
-		entityCache.shrinkCache();
 	}
 	else if (_action == OT_ACTION_CMD_MODEL_EntitiesSelected)
 	{
@@ -322,6 +310,20 @@ void Application::modelSelectionChanged(void)
 
 	// We need to call the handler in the base class
 	ApplicationBase::modelSelectionChanged();
+}
+
+void Application::propertyChanged(ot::JsonDocument& _doc)
+{
+	std::list<ot::UID> entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	std::list<ot::UID> brepVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
+	bool itemsVisible = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
+
+	std::list<ot::UID> modifiedEntities = getUpdateManager()->updateEntities(entityIDs, entityVersions, brepVersions, itemsVisible);
+
+	getUpdateManager()->checkParentUpdates(modifiedEntities);
+
+	entityCache.shrinkCache();
 }
 
 
@@ -508,7 +510,7 @@ void Application::importSTEP(void)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import STEP File", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("STEP files (*.stp;*.step)", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Step, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importSTEPFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());

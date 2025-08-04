@@ -129,6 +129,8 @@
 #define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
+#define OT_ACTION_CMD_MODEL_ModelDialogConfirmed "Model.ModelDialog.Confirmed"
+#define OT_ACTION_CMD_MODEL_ModelDialogCanceled "Model.ModelDialog.Canceled"
 
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
@@ -137,6 +139,7 @@
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
 #define OT_ACTION_CMD_UI_DisplayMessage "UI.DisplayMessage"
 #define OT_ACTION_CMD_UI_DisplayStyledMessage "UI.DisplayStyledMessage"
+#define OT_ACTION_CMD_UI_DisplayLogMessage "UI.DisplayLogMessage"
 #define OT_ACTION_CMD_UI_ReportError "UI.ReportError"
 #define OT_ACTION_CMD_UI_ReportWarning "UI.ReportWarning"
 #define OT_ACTION_CMD_UI_ReportInformation "UI.ReportInformation"
@@ -151,6 +154,7 @@
 #define OT_ACTION_CMD_UI_SaveFileContent "UI.SaveFileContent"
 #define OT_ACTION_CMD_UI_FocusPropertyGridItem "UI.FocusPropertyGridItem"
 #define OT_ACTION_CMD_UI_FillPropertyGrid "UI.FillPropertyGrid"
+#define OT_ACTION_CMD_UI_ClearModalPropertyGrid "UI.ClearModalPropertyGrid"
 #define OT_ACTION_CMD_UI_AddMenuPage "UI.TTB.AddPage"
 #define OT_ACTION_CMD_UI_AddMenuGroup "UI.TTB.AddGroup"
 #define OT_ACTION_CMD_UI_AddMenuSubgroup "UI.TTB.AddSubgroup"
@@ -170,6 +174,9 @@
 #define OT_ACTION_CMD_UI_AddSettingsData "UI.AddSettingsData"
 #define OT_ACTION_CMD_UI_SettingsItemChanged "UI.SettingsData.ItemChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_ModelDialog "UI.ModelDialog"
+#define OT_ACTION_CMD_UI_ModelDialogConfirmed "UI.ModelDialog.Confirmed"
+#define OT_ACTION_CMD_UI_ModelDialogCanceled "UI.ModelDialog.Canceled"
 #define OT_ACTION_CMD_UI_MessageDialog "UI.MessageDialog"
 #define OT_ACTION_CMD_UI_MessageDialogValue "UI.MessageDialogValue"
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
@@ -264,12 +271,13 @@
 #define OT_ACTION_CMD_PYTHON_Command "Python.Command"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
 #define OT_ACTION_CMD_PYTHON_Result "Python.Result"
-#define OT_ACTION_CMD_PYTHON_Portdata_Names "Python.Portdata.Names"
-#define OT_ACTION_CMD_PYTHON_Portdata_Data "Python.Portdata.Data"
+
+#define OT_ACTION_CMD_PYTHON_Portdata "Python.Portdata"
 
 #define OT_ACTION_CMD_LMS_GetDocument "LMS.Document.Get"
 #define OT_ACTION_CMD_LMS_GetDocumentList "LMS.DocumentList.Get"
 #define OT_ACTION_CMD_LMS_AddDocument "LMS.Document.Add"
+#define OT_ACTION_CMD_LMS_CreateConfig "LMS.Config.Create"
 
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor "UI.GraphicsEditor.Create"
@@ -336,20 +344,23 @@
 #define OT_ACTION_PARAM_Content "Content"
 #define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_Requested "Requested"
 #define OT_ACTION_PARAM_ModelType "ModelType"
+#define OT_ACTION_PARAM_ModelInfo "ModelInfo"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
+#define OT_ACTION_PARAM_ElementType "ElementType"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
+#define OT_ACTION_PARAM_VisualizingEntities "VisualizingEntities"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
-
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"
@@ -445,6 +456,7 @@
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
 #define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
+#define OT_ACTION_PARAM_GlobalLoggerUrl "Global.LoggerUrl"
 
 #define OT_ACTION_PARAM_GLOBAL_CPU_LOAD "Global.CPU.Load"
 #define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"

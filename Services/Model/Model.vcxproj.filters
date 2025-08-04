@@ -108,9 +108,6 @@
     <ClCompile Include="src\MaterialHandler.cpp">
       <Filter>Source Files\Handler</Filter>
     </ClCompile>
-    <ClCompile Include="src\CircuitModelHandler.cpp">
-      <Filter>Source Files\Handler</Filter>
-    </ClCompile>
     <ClCompile Include="src\LibraryManagementWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -192,9 +189,6 @@
       <Filter>Header Files\Observer</Filter>
     </ClInclude>
     <ClInclude Include="include\MaterialHandler.h">
-      <Filter>Header Files\Handler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CircuitModelHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\LibraryManagementWrapper.h">

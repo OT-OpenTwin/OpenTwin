@@ -35,6 +35,7 @@ public:
 	}
 
 	MetadataQuantity& getMetadataQuantity() { return m_metadataQuantity; }
+	void setMetadataQuantity(const MetadataQuantity& _metadataQuantity) { m_metadataQuantity = _metadataQuantity; }
 	
 	//! @brief Depending on the chosen value format. Typical settings (ValueFormatSetter class) for the first value are real value, the magnitude or the decible value.
 	ot::UID getFirstValueQuantityIndex() const;

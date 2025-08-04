@@ -6,8 +6,8 @@
 class ViewVisualisationHandler
 {
 public:
-	void handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true);
-
+	void handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true, const ot::UIDList& _visualizingEntities = ot::UIDList());
+	void handleRenaming(ot::UID _entityID);
 private:
 	void setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView);
 };

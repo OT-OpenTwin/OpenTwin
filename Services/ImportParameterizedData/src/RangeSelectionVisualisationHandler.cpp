@@ -37,13 +37,20 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 	this->bufferSelectionEntities(selectionEntities);
 
 	std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
+	
+	// Determine which selected entities are visualizing the tables
+	std::map<std::string, ot::UIDList> visualizingEntitiesByTableName;
+	for (const auto& entity : selectionEntities) {
+		const std::string tableName = entity->getTableName();
+		visualizingEntitiesByTableName[tableName].push_back(entity->getEntityID());
+	}
 
 	if (!selectionsThatNeedVisualisation.empty())
 	{
 		{
 			OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval("Select range: Gather ranges");
 
-			for (auto selectionEntity : selectionsThatNeedVisualisation) {
+			for (auto& selectionEntity : selectionsThatNeedVisualisation) {
 				//First we get the selected range
 				ot::TableRange userRange = selectionEntity->getSelectedRange();
 				ot::TableRange selectionRange = ot::TableIndexSchemata::userRangeToSelectionRange(userRange);
@@ -87,7 +94,7 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 			for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames) {
 				const std::string tableName = rangesByColourIDByTableName.first;
 				auto& rangesByColourIDs = rangesByColourIDByTableName.second;
-				bool tableExisting = requestToOpenTable(tableName);
+				bool tableExisting = requestToOpenTable(tableName, visualizingEntitiesByTableName[tableName]);
 				if (!tableExisting) {
 					OT_LOG_E("Selection has a not existing table listed.");
 				}
@@ -140,7 +147,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisatio
 
 	//First we do a preselection on the base of the name. 
 	ot::UIDList relevantIDs, relevantVersions;
-	for (auto entityInfo : selectedEntityInfo)
+	for (auto& entityInfo : selectedEntityInfo)
 	{
 		std::string name = entityInfo.getEntityName();
 		if (name.find(CategorisationFolderNames::getRootFolderName()) != std::string::npos)
@@ -186,7 +193,7 @@ const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisual
 	return selectionThatNeedVisualisation;
 }
 
-bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
+bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName, const ot::UIDList& _visualizingEntities)
 {
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(_tableName, entityInfo);
@@ -204,8 +211,10 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_OverwriteContent, false, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
 
-	ot::TableCfg tableCfg = table->getTableConfig();;
+	const bool loadContent = true;
+	ot::TableCfg tableCfg = table->getTableConfig(true);;
 	ot::JsonObject cfgObj;
 	tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
 

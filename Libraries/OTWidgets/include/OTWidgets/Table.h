@@ -99,6 +99,8 @@ namespace ot {
 		bool m_contentChanged;
 		std::vector<int> m_columnWidthBuffer;
 		std::vector<int> m_rowHeightBuffer;
+
+		std::vector<std::string> m_headerBuffer; //The displayed strings are not correct, they don't correspond with the text file. This is because the displayed headers are freed of "-characters
 	};
 
 }

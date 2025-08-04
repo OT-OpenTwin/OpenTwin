@@ -108,8 +108,8 @@ void WrappedTriangleItem::fillPropertyGrid(void) {
 		triangleGroup->addProperty(new PropertyStringList("Direction", GraphicsTriangleItemCfg::triangleDirectionToString(this->getTrianlgeDirection()), possibleSelection));
 	}
 
-	triangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	triangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
+	triangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().getPainter()));
+	triangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().getWidth(), 0., std::numeric_limits<double>::max()));
 	triangleGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 
 	cfg.addRootGroup(triangleGroup);

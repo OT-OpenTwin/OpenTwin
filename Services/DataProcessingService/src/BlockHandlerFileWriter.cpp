@@ -20,22 +20,28 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 	m_input = blockEntity->getConnectorInput();
 	m_fileName = blockEntity->getFileName();
 	m_headline = blockEntity->getHeadline();
+	m_fileType =blockEntity->getFileType();
 }
 
 bool BlockHandlerFileWriter::executeSpecialized()
 {
-	_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
-
-	m_fileStream << m_headline<<"\n";
-
-	PipelineData& incommingPortData = _dataPerPort[m_input.getConnectorName()];
-	PipelineDataDocumentList& pipelineDocumentList = incommingPortData.m_data;
-
-	for (auto& pipelineDocument : pipelineDocumentList)
-	{
-		m_fileStream <<	ot::toString(pipelineDocument);
-	}
 	
+	_uiComponent->displayMessage("Executing Filewriter Block: " + m_blockName + "\n");
+	if (!m_headline.empty())
+	{
+		m_fileStream << m_headline<<"\n";
+	}
+
+	PipelineData* incommingPortData = m_dataPerPort[m_input.getConnectorName()];
+	if (incommingPortData != nullptr)
+	{
+		m_fileStream <<	ot::json::toJson(incommingPortData->getData());
+	}
+	else
+	{
+		_uiComponent->displayMessage(getErrorDataPipelineNllptr() + "\n");
+	}
+		
 	createFile();
 
 	return true;
@@ -48,7 +54,7 @@ void BlockHandlerFileWriter::createFile()
 	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
 	textFile.setName(fileName);
 
-	textFile.setFileProperties("", m_fileName, "txt");
+	textFile.setFileProperties("", m_fileName, m_fileType);
 	
 	EntityBinaryData data(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
 	const std::string fileContent = m_fileStream.str();

@@ -48,7 +48,7 @@ public:
 
 	std::string getDocument(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getDocumentList(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
-
+	std::string getMetaData(const std::string& _collectionName, const std::string& _fieldType, const std::string& _value, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 private:
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
 

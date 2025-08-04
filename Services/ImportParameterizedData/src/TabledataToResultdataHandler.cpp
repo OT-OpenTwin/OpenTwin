@@ -28,6 +28,7 @@
 #include "ParameterDescription.h"
 
 #include "CategorisationFolderNames.h"
+#include "OTCore/EntityName.h"
 
 TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder)
 	: m_datasetFolder(_datasetFolder), m_tableFolder(_tableFolder)
@@ -48,7 +49,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 	if (allMetadataAssembliesByNames.size() == 0)
 	{
-		_uiComponent->displayInformationPrompt("No range selections found for creating a dataset.\n");
+		_uiComponent->displayMessage("No range selections found for creating a dataset.\n");
 		return;
 	}
 
@@ -130,8 +131,8 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	std::list<const std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
-	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
+	std::list<std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
+	for (auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
 		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
 		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
@@ -148,72 +149,71 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 		std::string seriesName = metadataAssemblyByName->first;
 		seriesName = seriesName.substr(seriesName.find_last_of('/') + 1, seriesName.size());
-		seriesName = m_datasetFolder + "/" + seriesName;
-		auto seriesMetadata = resultCollectionExtender.findMetadataSeries(seriesName);
-		if (seriesMetadata != nullptr)
+		std::list<std::string> additionalTakenNames;
+		seriesName = CreateNewUniqueTopologyNamePlainPossible(ot::FolderNames::DatasetFolder, seriesName, additionalTakenNames);
+
+		_uiComponent->displayMessage("Create " + seriesName + ":\n");
+		KeyValuesExtractor seriesMetaDataRangeSelections;
+		std::list<DatasetDescription> datasets; 
+		try
 		{
-			_uiComponent->displayMessage("Skipped " + seriesName + "\n");
+			datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+		}
+		catch (std::exception& e)
+		{
+			_uiComponent->displayMessage("Failed to extract data from tables. " + std::string(e.what()) + "\n" + Documentation::INSTANCE()->GetFullDocumentation());
+			return;
+		}
+
+		std::list<std::shared_ptr<MetadataEntry>> additionalMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
+		if (datasets.empty())
+		{
+			_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
+			_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+			fullReport += Documentation::INSTANCE()->GetFullDocumentation();
+			Documentation::INSTANCE()->ClearDocumentation();
 		}
 		else
 		{
 			_uiComponent->displayMessage("Create " + seriesName + ":\n");
-			KeyValuesExtractor seriesMetaDataRangeSelections;
-			std::list<DatasetDescription> datasets; 
+			ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, additionalMetadata);
+			
+			unsetConsiderForImport(metadataAssemblyByName->second);
+
+			fullReport += logger.getLog();
+			logger.clearLog();
+			_uiComponent->displayMessage("Storing quantity container\n");
+
+			//Now we store the datapoints
+			size_t numberOfDatasets = datasets.size();
+			uint32_t counter(0);
+			ProgressUpdater updater(_uiComponent, "Storing quantity container");
+			updater.setTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
 			try
 			{
-				datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+				for (DatasetDescription& dataset : datasets)
+				{
+					resultCollectionExtender.processDataPoints(&dataset, seriesUID);
+					const std::string extensionLog = logger.getLog();
+					_uiComponent->displayMessage(extensionLog);
+					fullReport += logger.getLog();
+					logger.clearLog();
+					updater.triggerUpdate(counter);
+					counter++;
+				}
 			}
 			catch (std::exception& e)
 			{
-				_uiComponent->displayMessage("Failed to extract data from tables. " + std::string(e.what()) + "\n" + Documentation::INSTANCE()->GetFullDocumentation());
-				return;
+				std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
+				"Creation of series \"" + seriesName +"\" failed.";
+				_uiComponent->displayMessage(exceptionMessage);
+				bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
+				assert(seriesRemoved); //Otherwise panic!
 			}
-			std::list<std::shared_ptr<MetadataEntry>> seriesMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
-			if (datasets.empty())
-			{
-				_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
-				_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-				fullReport += Documentation::INSTANCE()->GetFullDocumentation();
-				Documentation::INSTANCE()->ClearDocumentation();
-			}
-			else
-			{
-				_uiComponent->displayMessage("Create " + seriesName + ":\n");
-				ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
-				fullReport += logger.getLog();
-				logger.clearLog();
-				_uiComponent->displayMessage("Storing quantity container\n");
-
-				//Now we store the datapoints
-				size_t numberOfDatasets = datasets.size();
-				uint32_t counter(0);
-				ProgressUpdater updater(_uiComponent, "Storing quantity container");
-				updater.setTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
-				try
-				{
-					for (DatasetDescription& dataset : datasets)
-					{
-						resultCollectionExtender.processDataPoints(&dataset, seriesUID);
-						const std::string extensionLog = logger.getLog();
-						_uiComponent->displayMessage(extensionLog);
-						fullReport += logger.getLog();
-						logger.clearLog();
-						updater.triggerUpdate(counter);
-						counter++;
-					}
-				}
-				catch (std::exception& e)
-				{
-					std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
-					"Creation of series \"" + seriesName +"\" failed.";
-					_uiComponent->displayMessage(exceptionMessage);
-					bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
-					assert(seriesRemoved); //Otherwise panic!
-				}
-			}
-			resultCollectionExtender.storeCampaignChanges();
-			newDataHasBeenAdded = true;
 		}
+		resultCollectionExtender.storeCampaignChanges();
+		newDataHasBeenAdded = true;
+
 	}
 
 	if (newDataHasBeenAdded)
@@ -251,10 +251,13 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAll
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
-		allRangeEntities.push_back(rangeEntity);
+		if (rangeEntity->getConsiderForImport())
+		{
+			allRangeEntities.push_back(rangeEntity);
+		}
 	}
 
-	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges.\n");
+	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges considered for import.\n");
 
 	//Sort the range selection entities as rmd, msmd, parameter or quantity, depending on the topology level in their name
 	std::map<std::string, MetadataAssemblyData> allMetadataAssembliesByName;
@@ -307,7 +310,6 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 	//If the rmd has no selection, we still require a corresponding entry in the output.
 	if (!rmdHasSelections) {
 		if (_allRangeEntities.empty()) {
-			OT_LOG_W("No entities selected.");
 			return;
 		}
 		auto firstSelectionRange = *_allRangeEntities.begin();
@@ -390,6 +392,49 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 		}
 		_allMetadataAssembliesByName[parameterName].m_next = &_allMetadataAssembliesByName[containerName];
 	}
+}
+
+void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& _metadataAssemblyData)
+{
+	ot::NewModelStateInformation newModelEntities;
+
+	for (auto range : _metadataAssemblyData.m_allSelectionRanges)
+	{
+		range->setConsiderForImport(false);
+		range->StoreToDataBase();
+		newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
+		newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
+		newModelEntities.m_forceVisible.push_back(false);
+	}
+
+	if (_metadataAssemblyData.m_next != nullptr)
+	{
+		MetadataAssemblyData* quantity = _metadataAssemblyData.m_next;
+		
+		for (auto range : quantity->m_allSelectionRanges)
+		{
+			range->setConsiderForImport(false);
+			range->StoreToDataBase();
+			newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
+			newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
+			newModelEntities.m_forceVisible.push_back(false);
+		}
+
+		if (quantity->m_next != nullptr)
+		{
+			MetadataAssemblyData* parameter = quantity->m_next;
+			for (auto range : parameter->m_allSelectionRanges)
+			{
+				range->setConsiderForImport(false);
+				range->StoreToDataBase();
+				newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
+				newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
+				newModelEntities.m_forceVisible.push_back(false);
+			}
+		}
+	}
+
+	ot::ModelServiceAPI::addEntitiesToModel(newModelEntities, "Unset the consider for storage", true, false);
 }
 
 //! @brief Turning the selection ranges in a generic format, holding different options of data structures

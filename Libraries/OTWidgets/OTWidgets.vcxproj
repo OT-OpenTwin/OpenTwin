@@ -27,8 +27,10 @@
     <ClCompile Include="src\BasicWidgetView.cpp" />
     <ClCompile Include="src\CartesianPlot.cpp" />
     <ClCompile Include="src\CartesianPlotAxis.cpp" />
+    <ClCompile Include="src\CartesianPlotCurve.cpp" />
     <ClCompile Include="src\CartesianPlotGrid.cpp" />
     <ClCompile Include="src\CartesianPlotLegend.cpp" />
+    <ClCompile Include="src\CartesianPlotLegendView.cpp" />
     <ClCompile Include="src\CartesianPlotMagnifier.cpp" />
     <ClCompile Include="src\CartesianPlotCrossMarker.cpp" />
     <ClCompile Include="src\CartesianPlotPanner.cpp" />
@@ -67,6 +69,13 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\ModelLibraryDialog.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogGradientBase.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogLinearGradientEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogRadialGradientEntry.cpp" />
+    <ClCompile Include="src\Painter2DEditDialogReferenceEntry.cpp" />
     <ClCompile Include="src\PathBrowseEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GlobalShortcutWrapper.cpp" />
@@ -105,7 +114,10 @@
     <ClCompile Include="src\ManagedPropertyLink.cpp" />
     <ClCompile Include="src\ManagedWidgetPropertyObject.cpp" />
     <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\PlotPointMapper.cpp" />
     <ClCompile Include="src\PlotView.cpp" />
+    <ClCompile Include="src\PolarPlotCurve.cpp" />
+    <ClCompile Include="src\TreeItemDelegate.cpp" />
     <ClCompile Include="src\WidgetPropertyManager.cpp" />
     <ClCompile Include="src\PlotDatasetData.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
@@ -231,6 +243,8 @@
     <ClInclude Include="include\OTWidgets\AbstractStatusBar.h" />
     <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
     <ClInclude Include="include\OTWidgets\BasicValidator.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotCurve.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegendView.h" />
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h" />
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
     <QtMoc Include="include\OTWidgets\WidgetViewTab.h" />
@@ -245,8 +259,18 @@
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
     <ClInclude Include="include\OTWidgets\ManagedWidgetPropertyObject.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogGradientBase.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogEntry.h" />
+    <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogFillEntry.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogLinearGradientEntry.h" />
+    <QtMoc Include="include\OTWidgets\Painter2DEditDialogRadialGradientEntry.h" />
+    <ClInclude Include="include\OTWidgets\Painter2DEditDialogReferenceEntry.h" />
     <ClInclude Include="include\OTWidgets\Plot.h" />
+    <ClInclude Include="include\OTWidgets\PlotPointMapper.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotCurve.h" />
+    <ClInclude Include="include\OTWidgets\TreeItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\WidgetPropertyManager.h" />
     <ClInclude Include="include\OTWidgets\PlotDatasetData.h" />
     <QtMoc Include="include\OTWidgets\PropertyManagerGridLink.h" />
@@ -514,7 +538,7 @@
       <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_TT_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;QWT_DLL;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -537,7 +561,7 @@
       <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_TT_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;QWT_DLL;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -557,7 +581,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_TT_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;QWT_DLL;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -578,7 +602,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_TT_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;QWT_DLL;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>

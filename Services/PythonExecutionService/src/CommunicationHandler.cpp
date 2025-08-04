@@ -2,7 +2,7 @@
 #include "Timeouts.h"
 #include "Application.h"
 #include "CommunicationHandler.h"
-
+#include "OTServiceFoundation/UiComponent.h"
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/ReturnMessage.h"
@@ -117,6 +117,10 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
+	
+	ot::JsonArray logFlags;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlags, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LogFlags, logFlags, doc.GetAllocator());
 
 	QByteArray request = QByteArray::fromStdString(doc.toJson());
 	request.append('\n');
@@ -283,6 +287,13 @@ bool CommunicationHandler::waitForClient(void) {
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG_D("Message from client: \"" + _message + "\"");
+
+	while (_message.substr(0, 7) == "OUTPUT:")
+	{
+		std::string text = _message.substr(7, _message.length() - 1 - 7); // There is always an additional \n at the end of the message which needs to be removed here
+		Application::instance()->uiComponent()->displayMessage(text);
+		return;
+	}
 
 	// Check state
 	if (getClientState() == ClientState::WaitForPing) {

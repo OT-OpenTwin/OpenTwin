@@ -259,6 +259,11 @@ vtkAlgorithmOutput* VtkDriverUnstructuredScalarVolume::ApplyCutplane(osg::Node* 
 		dynamic_cast<osg::Switch*>(parent)->addChild(planeNode);
 	}
 
+	planeCut->Update();
+	int arrays = planeCut->GetOutput()->GetPointData()->GetNumberOfArrays();
+	vtkDataArray* data1 = planeCut->GetOutput()->GetPointData()->GetScalars();
+	vtkDataArray* data2 = planeCut->GetOutput()->GetPointData()->GetScalars("energy_density");
+
 	return planeCut->GetOutputPort();
 }
 
@@ -357,13 +362,20 @@ void VtkDriverUnstructuredScalarVolume::AddNodePoints(osg::Node* parent)
 	glyph->SetColorModeToColorByScalar();
 	glyph->SetScaleModeToScaleByScalar();
 	double normalization = std::abs(scalarRange[1]);
+
+	double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
+	double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
+	double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+
+	double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
+
 	if (normalization != 0)
 	{
-		glyph->SetScaleFactor(visData->GetPointScale() / normalization);
+		glyph->SetScaleFactor(pointRadius * visData->GetPointScale() / normalization);
 	}
 	else
 	{
-		glyph->SetScaleFactor(visData->GetPointScale());
+		glyph->SetScaleFactor(pointRadius * visData->GetPointScale());
 	}
 	glyph->OrientOn();
 	glyph->Update();

@@ -58,10 +58,12 @@
 #include "EntityCoordinates2D.h"
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
+#include "EntityResultUnstructuredMeshVtk.h"
 #include "EntitySolverCircuitSimulator.h"
 #include "EntityVisUnstructuredScalarSurface.h"
 #include "EntityVisUnstructuredScalarVolume.h"
 #include "EntityVisUnstructuredVectorVolume.h"
+#include "EntityVisUnstructuredVectorSurface.h"
 #include "EntityBatchImporter.h"
 
 #include "OTCore/TypeNames.h"
@@ -320,6 +322,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	{
 		return new EntityVisUnstructuredVectorVolume(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
+	else if (entityType == "EntityVisUnstructuredVectorSurface")
+	{
+		return new EntityVisUnstructuredVectorSurface(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
 	else if (entityType == "EntityResultUnstructuredMesh")
 	{
 		return new EntityResultUnstructuredMesh(0, nullptr, nullptr, nullptr, nullptr, "");
@@ -327,6 +333,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityResultUnstructuredMeshData")
 	{
 		return new EntityResultUnstructuredMeshData(0, nullptr, nullptr, nullptr, nullptr, "");
+	}
+	else if (entityType == "EntityResultUnstructuredMeshVtk")
+	{
+		return new EntityResultUnstructuredMeshVtk(0, nullptr, nullptr, nullptr, nullptr, "");
 	}
 	else if (entityType == "EntitySolverCircuitSimulator")
 	{

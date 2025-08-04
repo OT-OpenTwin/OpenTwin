@@ -440,8 +440,20 @@
     <ClInclude Include="include\OTGui\PainterRainbowIterator.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\Painter2DEditDialogWhitelist.h">
+    <ClInclude Include="include\OTGui\Painter2DDialogFilter.h">
       <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Painter2DDialogFilterDefaults.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\ModelLibraryDialogCfg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\LibraryModel.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\FileExtension.h">
+      <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -781,8 +793,20 @@
     <ClCompile Include="src\PainterRainbowIterator.cpp">
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
-    <ClCompile Include="src\Painter2DEditDialogWhitelist.cpp">
+    <ClCompile Include="src\Painter2DDialogFilter.cpp">
       <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Painter2DDialogFilterDefaults.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelLibraryDialogCfg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibraryModel.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileExtension.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

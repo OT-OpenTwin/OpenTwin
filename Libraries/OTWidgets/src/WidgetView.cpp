@@ -5,6 +5,8 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/QWidgetInterface.h"
@@ -51,8 +53,7 @@ ot::WidgetView::~WidgetView() {
 // Setter/Getter
 
 QAction* ot::WidgetView::getViewToggleAction(void) const {
-	if (!m_dockWidget) return nullptr;
-	else return m_dockWidget->toggleViewAction();
+	return (m_dockWidget ? m_dockWidget->toggleViewAction() : nullptr);
 }
 
 void ot::WidgetView::setViewWidgetFocus(void) {
@@ -64,6 +65,7 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
 	
 	m_dockWidget->setObjectName(QString::fromStdString(WidgetView::createStoredViewName(m_data)));
+	m_dockWidget->setWindowTitle(QString::fromStdString(m_data.getTitle()));
 
 	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.getTitle()));
 	m_dockWidget->toggleViewAction()->setVisible(_data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
@@ -127,5 +129,10 @@ void ot::WidgetView::slotToggleVisible(void) {
 }
 
 void ot::WidgetView::slotPinnedChanged(bool _isPinned) {
+	Q_EMIT pinnedChanged(_isPinned);
+}
 
+void ot::WidgetView::slotTabPressed(void) {
+	this->setAsCurrentViewTab();
+	this->getViewDockWidget()->setFocus();
 }

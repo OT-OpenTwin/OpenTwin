@@ -180,7 +180,6 @@
     <ClInclude Include="include\EntityBlockCircuitResistor.h" />
     <ClInclude Include="include\EntityBlockConnection.h" />
     <ClInclude Include="include\EntityBlockDatabaseAccess.h" />
-    <ClInclude Include="include\EntityBlockDataDimensionReducer.h" />
     <ClInclude Include="include\EntityBlockDisplay.h" />
     <ClInclude Include="include\EntityBlockFileWriter.h" />
     <ClInclude Include="include\EntityBlockPython.h" />
@@ -205,7 +204,6 @@
     <ClCompile Include="src\EntityBlockCircuitResistor.cpp" />
     <ClCompile Include="src\EntityBlockConnection.cpp" />
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
-    <ClCompile Include="src\EntityBlockDataDimensionReducer.cpp" />
     <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockFileWriter.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />

@@ -1,14 +1,12 @@
 #include "PipelineHandler.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockPython.h"
-#include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
 #include "EntityBlockStorage.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPython.h"
-#include "BlockHandlerDataDimensionReducer.h"
 #include "BlockHandlerDisplay.h"
 #include "BlockHandlerFileWriter.h"
 #include "BlockHandlerStorage.h"
@@ -25,10 +23,11 @@ void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNo
 			std::shared_ptr<BlockHandler> handler = _blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
 		}
+		_uiComponent->displayMessage("Pipeline executed successfull.\n");
 	}
 	catch (const std::exception& ex)
 	{
-		OT_LOG_E(std::string(ex.what())+"\n");
+		OT_LOG_E("Pipeline execution failed with error:" +  std::string(ex.what())+"\n");
 	}
 }
 
@@ -57,12 +56,6 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	if (pythonEntity != nullptr)
 	{
 		return std::make_shared <BlockHandlerPython>(pythonEntity, _blockHandlerByGraphNode);
-	}
-
-	EntityBlockDataDimensionReducer* dataDimensionReducer = dynamic_cast<EntityBlockDataDimensionReducer*>(blockEntity.get());
-	if (dataDimensionReducer != nullptr)
-	{
-		return std::make_shared <BlockHandlerDataDimensionReducer>(dataDimensionReducer,_blockHandlerByGraphNode);
 	}
 
 	EntityBlockDisplay* display = dynamic_cast<EntityBlockDisplay*>(blockEntity.get());

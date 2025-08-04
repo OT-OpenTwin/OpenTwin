@@ -47,7 +47,7 @@ bool ot::GraphicsArcItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 QMarginsF ot::GraphicsArcItem::getOutlineMargins(void) const {
 	const GraphicsArcItemCfg* cfg = this->getItemConfiguration<GraphicsArcItemCfg>();
 	OTAssertNullptr(cfg);
-	double margs = cfg->getLineStyle().width() / 2.;
+	double margs = cfg->getLineStyle().getWidth() / 2.;
 	return QMarginsF(margs, margs, margs, margs);
 }
 

@@ -24,14 +24,18 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 	m_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitCurrentMeter::createProperties(const ot::UID& _circuitModelFolderID) {
-	EntityBlockCircuitElement::createProperties(_circuitModelFolderID);
+void EntityBlockCircuitCurrentMeter::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
+	EntityBlockCircuitElement::createProperties(_circuitModelFolderName ,_circuitModelFolderID);
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
 std::string EntityBlockCircuitCurrentMeter::getTypeAbbreviation() {
 	return "CM";
+}
+
+std::string EntityBlockCircuitCurrentMeter::getFolderName() {
+	return "Current Meter";
 }
 
 const double EntityBlockCircuitCurrentMeter::getRotation() {
@@ -133,13 +137,15 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg() {
 }
 
 bool EntityBlockCircuitCurrentMeter::updateFromProperties(void) {
+
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+
 	return refresh;
 }
 

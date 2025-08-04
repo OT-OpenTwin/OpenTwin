@@ -11,6 +11,10 @@
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
 #include "CoordinateFormatConverter.h"
+
+// Qwt header
+#include <qwt_symbol.h>
+
 // Qt header
 #include <QtCore/qstring.h>
 #include <QtGui/qcolor.h>
@@ -19,20 +23,31 @@
 #include <string>
 
 class QwtSymbol;
-class QwtPlotCurve;
-class QwtPolarCurve;
 
 namespace ot {
 
 	class PlotBase;
 	class PolarPlotData;
+	class PolarPlotCurve;
+	class CartesianPlotCurve;
 
 	class OT_WIDGETS_API_EXPORT PlotDataset {
 		OT_DECL_NOCOPY(PlotDataset)
 		OT_DECL_NODEFAULT(PlotDataset)
 	public:
+		static QwtSymbol::Style toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbol);
+		static Plot1DCurveCfg::Symbol toPlot1DCurveSymbol(QwtSymbol::Style _symbol);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Constructor / Destructor
+
 		PlotDataset(PlotBase* _ownerPlot, const Plot1DCurveCfg& _config, PlotDatasetData&& _data);
 		virtual ~PlotDataset();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Attach / Detach
 
 		void attach(void);
 
@@ -68,8 +83,6 @@ namespace ot {
 
 		void setCurveColor(const Color& _color, bool _repaint = true);
 
-		void setCurvePointsVisible(bool _isVisible = true, bool _repaint = true);
-
 		void setCurvePointInnerColor(const Color& _color, bool _repaint = true);
 
 		void setCurvePointOuterColor(const Color& _color, bool _repaint = true);
@@ -78,20 +91,22 @@ namespace ot {
 
 		void setCurvePointOuterColorWidth(double _size, bool _repaint = true);
 
-		void setCurveTitle(const std::string& _title);
-
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
-		void setConfig(ot::Plot1DCurveCfg& _config) 
-		{
+		void setPointInterval(int _interval, bool _repaint = true);
+
+		void setConfig(ot::Plot1DCurveCfg& _config) {
 			m_config = _config;
 		}
+
+		void setSelected(bool _isSelected);
+		bool isSelected() const { return m_isSelected; };
 
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId(void) const { return m_config.getNavigationId(); };
 
-		QwtPlotCurve* getCartesianCurve(void) ;
-		QwtPolarCurve* getPolarCurve(void);
+		CartesianPlotCurve* getCartesianCurve();
+		PolarPlotCurve* getPolarCurve();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -101,8 +116,13 @@ namespace ot {
 		const PointsContainer getDisplayedPoints();
 		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 
+		void setCurveNameBase(const std::string& _curveNameBase) { m_curveNameBase = _curveNameBase; }
+		const std::string& getCurveNameBase() { return m_curveNameBase; }
+
 	private:
 		friend class PlotBase;
+
+		std::string m_curveNameBase = "";
 
 		void buildCartesianCurve();
 		void buildPolarCurve();
@@ -110,16 +130,18 @@ namespace ot {
 		PlotBase* m_ownerPlot = nullptr;
 
 		bool m_isAttatched = false;
-
+		bool m_isSelected = false;
+		
 		PlotDatasetData m_data;
-		CoordinateFormatConverter m_CoordinateFormatConverter;
-		// Plot elements
-		QwtPlotCurve* m_cartesianCurve = nullptr;
+		CoordinateFormatConverter m_coordinateFormatConverter;
 
-		QwtPolarCurve* m_polarCurve = nullptr;
+		// Plot elements
+		CartesianPlotCurve* m_cartesianCurve = nullptr;
+
+		PolarPlotCurve* m_polarCurve = nullptr;
 		PolarPlotData* m_polarData = nullptr; //Adapter pattern, since the QwtPolarCurve requires data of a internal type. 
 
-		QwtSymbol* m_cartesianCurvePointSymbol = nullptr;
+		QwtSymbol* m_cartesianCurvePointSymbol = nullptr; //Ownership is taken by the QwtPlotCurve that get the symbol set in setSymbol
 		QwtSymbol* m_polarCurvePointSymbol = nullptr;
 
 		// Config

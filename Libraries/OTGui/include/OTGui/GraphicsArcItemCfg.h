@@ -60,7 +60,7 @@ namespace ot {
 		double getSpanAngle(void) const { return m_spanAngle; };
 
 		void setLineWidth(double _width) { m_lineStyle.setWidth(_width); };
-		double getLineWidth(void) const { return m_lineStyle.width(); };
+		double getLineWidth(void) const { return m_lineStyle.getWidth(); };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -68,7 +68,7 @@ namespace ot {
 		void setPainter(Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
 
 		//! @brief Background painter.
-		const Painter2D* getPainter(void) const { return m_lineStyle.painter(); };
+		const Painter2D* getPainter(void) const { return m_lineStyle.getPainter(); };
 
 		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
 		const PenFCfg& getLineStyle(void) const { return m_lineStyle; };

@@ -44,6 +44,9 @@ namespace ot {
 
 		// Setter / Getter
 
+		void setIsModal(bool _isModal = true) { m_isModal = _isModal; };
+		bool getIsModal() const { return m_isModal; };
+
 		TreeWidget* getTreeWidget(void) const;
 
 		void setupGridFromConfig(const PropertyGridCfg& _config);
@@ -77,7 +80,7 @@ namespace ot {
 		PropertyGridGroup* findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const;
 		void findAllChildItems(QTreeWidgetItem* _parentTreeItem, std::list<PropertyGridItem*>& _items) const;
 
-
+		bool m_isModal;
 		PropertyGridTree* m_tree;
 	};
 

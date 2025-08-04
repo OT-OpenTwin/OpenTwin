@@ -10,8 +10,8 @@
 #include "uiServiceTypes.h"				// Model and View types
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/BasicServiceInformation.h"
@@ -201,6 +201,7 @@ public:
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayLogMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayLogMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportInformation, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -268,9 +269,11 @@ public:
 	OT_HANDLER(handleUnlock, ExternalServicesComponent, OT_ACTION_CMD_UI_Unlock, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddSettingsData, ExternalServicesComponent, OT_ACTION_CMD_UI_AddSettingsData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddIconSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddIconSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetDebugInformation, ExternalServicesComponent, OT_ACTION_CMD_GetDebugInformation, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Property Grid
 	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleClearModalPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_ClearModalPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleFocusPropertyGridItem, ExternalServicesComponent, OT_ACTION_CMD_UI_FocusPropertyGridItem, ot::MessageType::ALL_MESSAGE_TYPES)
 		
 	// Version Graph
@@ -341,6 +344,7 @@ public:
 	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleModelLibraryDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_ModelDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 
 public Q_SLOTS:
 	char *performAction(const char *json, const char *senderIP);
@@ -353,8 +357,6 @@ public Q_SLOTS:
 	void setProgressValue(int percentage);
 	void lockGui(void);
 	void unlockGui(void);
-	void showError(const char* message);
-	void showInformation(const char* message);
 	void activateModelVersion(const char* version);
 	void keepAlive();
 

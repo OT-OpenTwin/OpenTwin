@@ -35,6 +35,9 @@ Actions
     * - :ref:`GetAllUserCount <reference-get-all-users-count>`
       - Counts all users in the database.
       - OT_ACTION_GET_ALL_USER_COUNT
+    * - :ref:`GetProjectData <reference-get-project-data>`
+      - Gets the project data.
+      - OT_ACTION_GET_PROJECT_DATA
 
 ----
 
@@ -394,3 +397,41 @@ Response
 A String containing the count of all users.
 
 ----
+
+.. _reference-get-project-data:
+
+GetProjectData
+^^^^^^^^^^^^^^
+
+Brief description
+"""""""""""""""""
+
+Gets the project data.
+
+Message Type
+""""""""""""
+
+One way TLS
+
+Parameters
+""""""""""
+
+.. list-table::
+    :widths: 25 25 50 50
+    :header-rows: 1
+
+    * - Name
+      - Type
+      - Description
+      - Macro
+    * - ProjectName
+      - String
+      - Project name
+      - OT_PARAM_AUTH_PROJECT_NAME
+
+Response
+""""""""
+
+A String containing an :ref:`ot::ReturnMessage <reference-ot-return-message>`.
+
+In case of success it will contain the project data.

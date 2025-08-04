@@ -72,6 +72,9 @@
     <ClCompile Include="src\DataSourceUnstructuredMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\VtkDriverUnstructuredVectorSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -126,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DataSourceUnstructuredMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VtkDriverUnstructuredVectorSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

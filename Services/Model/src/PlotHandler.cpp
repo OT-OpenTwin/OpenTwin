@@ -44,21 +44,7 @@ std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
 	}
 
 	ot::NewModelStateInformation newModelStateInformation;
-	std::list<ot::Plot1DCurveCfg> curveConfigs = createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
-
-	//Now we extract the releveant information for the plot entity
-	std::list<std::string> parameterLabels;
-	std::list<std::string> quantityLabel;
-	for (ot::Plot1DCurveCfg& curveConfig : curveConfigs)
-	{
-		for (auto& parameterDescription : curveConfig.getQueryInformation().m_parameterDescriptions)
-		{
-			parameterLabels.push_back(parameterDescription.m_label);
-		}
-		quantityLabel.push_back(curveConfig.getQueryInformation().m_quantityDescription.m_label);
-	}
-	parameterLabels.unique();
-	quantityLabel.unique();
+	createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
 
 
 	//Finally we create the plot entity
@@ -69,7 +55,6 @@ std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
 	ot::Plot1DCfg plotCfg;
 	const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);
 	plotCfg.setTitle(shortName);
-	newPlot.setFamilyOfCurveProperties(parameterLabels, quantityLabel);
 	newPlot.createProperties();
 	newPlot.setPlot(plotCfg);
 	newPlot.StoreToDataBase();
@@ -104,29 +89,7 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)
 	{
 		const std::string plotName = selectedPlot->getName();
-		std::list<ot::Plot1DCurveCfg> curveConfigs = createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);
-		std::list<std::string> parameterLabels;
-		std::list<std::string> quantityLabel;
-		for (ot::Plot1DCurveCfg& curveConfig : curveConfigs)
-		{
-			for (auto& parameterDescription : curveConfig.getQueryInformation().m_parameterDescriptions)
-			{
-				parameterLabels.push_back(parameterDescription.m_label);
-			}
-			quantityLabel.push_back(curveConfig.getQueryInformation().m_quantityDescription.m_label);
-		}
-		parameterLabels.unique();
-		quantityLabel.unique();
-		selectedPlot->updateFamilyOfCurveProperties(parameterLabels, quantityLabel);
-		storeSecond = selectedPlot->getModified();
-		if (storeSecond)
-		{
-			selectedPlot->StoreToDataBase();
-			plotsForUpdate.m_topologyEntityIDs.push_back(selectedPlot->getEntityID());
-			plotsForUpdate.m_topologyEntityVersions.push_back(selectedPlot->getEntityStorageVersion());
-			plotsForUpdate.m_forceVisible.push_back(false);
-		}
-		
+		createCurves(selectedSeriesMetadata, newModelStateInformation, plotName);		
 	}
 
 	Model* model = Application::instance()->getModel();
@@ -251,13 +214,11 @@ std::string PlotHandler::getFreePlotName()
 	}
 }
 
-std::list<ot::Plot1DCurveCfg> PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase)
+void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata, ot::NewModelStateInformation& _modelStateInformation, const std::string& _nameBase)
 {
 	ot::PainterRainbowIterator colourIt;
 	MetadataEntityInterface metadataEntityInteraface;
 	Model* model = Application::instance()->getModel();
-
-	std::list<ot::Plot1DCurveCfg> curves;
 
 	for (EntityMetadataSeries* seriesMetadata : _seriesMetadata)
 	{
@@ -265,11 +226,6 @@ std::list<ot::Plot1DCurveCfg> PlotHandler::createCurves(std::list<EntityMetadata
 		ot::Plot1DCurveCfg curveConfig;
 		const std::string fullName = seriesMetadata->getName();
 		const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
-		curveConfig.setTitle(shortName);
-		curveConfig.setXAxisTitle("X-Title");
-		curveConfig.setYAxisTitle("Y-Title");
-		curveConfig.setXAxisUnit("X-Unit");
-		curveConfig.setYAxisUnit("Y-Unit");
 		auto painter = colourIt.getNextPainter();
 		curveConfig.setLinePen(painter.release());
 
@@ -279,14 +235,12 @@ std::list<ot::Plot1DCurveCfg> PlotHandler::createCurves(std::list<EntityMetadata
 		newCurve.setName(_nameBase + "/" + shortName);
 		newCurve.createProperties();
 		newCurve.setCurve(curveConfig);
-		curves.push_back(curveConfig);
 		newCurve.StoreToDataBase();
 
 		_modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
 		_modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
 		_modelStateInformation.m_forceVisible.push_back(false);
 	}
-	return curves;
 }
 
 void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons)

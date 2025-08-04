@@ -23,12 +23,16 @@ EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, Ent
 
 }
 
-void EntityBlockCircuitGND::createProperties(const ot::UID& _circuitModelFolderID) {
+void EntityBlockCircuitGND::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
 std::string EntityBlockCircuitGND::getTypeAbbreviation() {
+	return "GND";
+}
+
+std::string EntityBlockCircuitGND::getFolderName() {
 	return "GND";
 }
 
@@ -89,12 +93,13 @@ ot::GraphicsItemCfg* EntityBlockCircuitGND::CreateBlockCfg() {
 bool EntityBlockCircuitGND::updateFromProperties(void)
 {
 	bool refresh = false;
+	refresh = EntityBlockCircuitElement::updateFromProperties();
 
 	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 
 	}
-	CreateBlockItem();
+	
 	return refresh;
 }
 
