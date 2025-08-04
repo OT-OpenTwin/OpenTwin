@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/WidgetViewTab.h"
@@ -33,7 +34,7 @@ ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
 }
 
 ot::WidgetViewTab::~WidgetViewTab() {
-
+	
 }
 
 void ot::WidgetViewTab::setIsPinned(bool _pinned) {
@@ -100,4 +101,9 @@ void ot::WidgetViewTab::slotClose(void) {
 
 void ot::WidgetViewTab::slotTogglePinned(void) {
 	this->setIsPinned(!m_isPinned);
+}
+
+void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
+	ads::CDockWidgetTab::mousePressEvent(_event);
+	Q_EMIT tabPressed();
 }

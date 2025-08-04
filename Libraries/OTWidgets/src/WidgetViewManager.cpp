@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -139,11 +140,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->getViewDockWidget()->blockSignals(true);
 	_view->blockSignals(true);
 
-	// Remove the dock widget itself
-	m_dockManager->removeDockWidget(_view->getViewDockWidget());
-
-	// Finally destroy the view
-	delete _view;
+	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
+	_view->deleteLater();
 
 	m_state = bck;
 }
@@ -217,6 +215,12 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	
 	// Disconnect signals
 	this->disconnect(view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->disconnect(view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (view->getViewDockWidget()->tabWidget()) {
+		this->disconnect(view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
 
 	// If the view is the current central, set current central to 0
 	if (view == m_focusInfo.last) m_focusInfo.last = nullptr;
@@ -566,45 +570,55 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 
 void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 	std::list<WidgetView*> views;
+	// Iterate trough all views
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
 		OTAssertNullptr(dock);
+
+		// Check if the view matches the auto close flags and is not pinned
 		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
 			bool concider = true;
+
+			// If ignore current is set, do not close the last focused view
 			if (m_autoCloseInfo.ignoreCurrent) {
 				concider = !(view.second == m_focusInfo.last ||
 					view.second == m_focusInfo.lastCentral ||
 					view.second == m_focusInfo.lastSide ||
 					view.second == m_focusInfo.lastTool);
-
-
 			}
 
-			if (concider && !m_autoCloseInfo.activeSelection.getSelectedNavigationItems().empty()) {
-				for (const UID& active : m_autoCloseInfo.activeSelection.getSelectedNavigationItems()) {
-					for (const UID& viewSelection : view.second->getSelectionInformation().getSelectedNavigationItems()) {
-						if (active == viewSelection) {
-							concider = false;
-							break;
-						}
-					}
+			// If the active selection is set, do not close views that are selected in the active selection
+			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
 
-					if (!concider) {
-						break;
-					}
+			if (concider && !activeSel.empty()) {
+				// Check if the view is selected in the active selection
+				if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
+					concider = false;
 				}
 			}
 
+			// If the view matches all criteria, add it to the list of views to close
 			if (concider) {
 				views.push_back(view.second);
 			}
-
 		}
 	}
 
+	// Request to close all matching views
 	for (WidgetView* view : views) {
 		this->handleViewCloseRequest(view);
 	}
+}
+
+void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
+	WidgetView* view = dynamic_cast<WidgetView*>(sender());
+	if (!view) {
+		OT_LOG_E("View cast failed");
+		return;
+	}
+
+	view->setAsCurrentViewTab();
+	view->getViewDockWidget()->setFocus();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -715,6 +729,14 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	newViewEntry.second = _view;
 	m_views.push_back(newViewEntry);
 
+	// Connect signals
+	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
+	this->connect(_view, &WidgetView::pinnedChanged, this, &WidgetViewManager::slotViewPinnedChanged);
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+
 	// Update focus information or reset the current focus depending on the insert mode
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
 		for (WidgetView* view : focusedViews) {
@@ -724,17 +746,11 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 	else {
 		m_state |= InsertViewState;
+		_view->setAsCurrentViewTab();
 		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
 		m_state &= (~InsertViewState);
 	}
 
-	// Connect signals
-	this->connect(_view, &WidgetView::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
-	this->connect(_view, &WidgetView::viewDataModifiedChanged, this, &WidgetViewManager::slotViewDataModifiedChanged);
-	if (_view->getViewDockWidget()->tabWidget()) {
-		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
-	}
-	
 	return true;
 }
 

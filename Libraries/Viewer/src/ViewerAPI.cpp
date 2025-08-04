@@ -539,6 +539,14 @@ void ViewerAPI::setEntityName(unsigned long long _modelEntityID, const std::stri
 	GlobalModel::instance()->setEntityName(_modelEntityID, _newName);
 }
 
+std::string ViewerAPI::getEntityName(ot::UID _modelEntityID) {
+	if (GlobalModel::instance() == nullptr) {
+		return "";
+	}
+
+	return GlobalModel::instance()->getEntityName(_modelEntityID);
+}
+
 void ViewerAPI::renameEntityPath(const std::string &oldPath, const std::string &newPath)
 {
 	if (GlobalModel::instance() == nullptr) return;

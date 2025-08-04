@@ -22,14 +22,18 @@ namespace ot {
             Simple,     //! @brief Simple format, current timezone ("yyyy-mm-dd hh:MM:ss.zzz", e.g. "2000-01-01 00:00:00.000").
             SimpleUTC,  //! @brief Simple format, UTC time ("yyyy-mm-dd hh:MM:ss.zzz", e.g. "2000-01-01 00:00:00.000").
             ISO8601UTC, //! @brief ISO 8601, UTC time ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000Z").
-            RFC3339     //! @brief ISO 8601, explicit timezone ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000+00:00").
+            RFC3339,    //! @brief ISO 8601, explicit timezone ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000+00:00").
+			Msec        //! @brief Milliseconds since epoch, UTC time.
         };
 
         //! @brief Returns the current time as a string with the given format.
         static std::string currentTimestamp(DateFormat _format);
 
         //! @brief Current milliseconds since epoch.
-        static long long getMSSinceEpoc(void);
+        static int64_t msSinceEpoch();
+
+		//! @brief Converts milliseconds since epoch to a timestamp string.
+        static std::string timestampFromMsec(int64_t _msecSinceEpoch, DateFormat _format);
 
     };
 

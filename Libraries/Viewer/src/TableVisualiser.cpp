@@ -23,6 +23,10 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 
+				ot::UIDList visualizingEntities;
+				visualizingEntities.push_back(this->getSceneNode()->getModelEntityID());
+				doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(visualizingEntities, doc.GetAllocator()), doc.GetAllocator());
+
 				FrontendAPI::instance()->messageModelService(doc.toJson());
 				return true;
 			}

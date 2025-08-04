@@ -46,11 +46,11 @@ public:
 
 	void displayMessage(const std::string &message);
 	//Not existing in uiComponent
-	void reportError(const std::string &message);
+	void reportError(const std::string& _message, const std::string& _detailedMessage = std::string());
 	//Not existing in uiComponent
-	void reportWarning(const std::string &message);
+	void reportWarning(const std::string& _message, const std::string& _detailedMessage = std::string());
 	//Not existing in uiComponent
-	void reportInformation(const std::string &message);
+	void reportInformation(const std::string& _message, const std::string& _detailedMessage = std::string());
 	//Not existing in uiComponent
 	void resetAllViews(ot::UID visualizationModelID);
 

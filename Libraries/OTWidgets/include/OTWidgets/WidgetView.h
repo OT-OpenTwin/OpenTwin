@@ -26,16 +26,16 @@ namespace ot {
 	class WidgetViewDock;
 	class QWidgetInterface;
 	class WidgetViewManager;
-	
+
 	//! @class WidgetView
 	//! @brief The WidgetView class is used to integrate the Qt-ADS functionallity into open twin.
 	class OT_WIDGETS_API_EXPORT WidgetView : public QObject {
 		Q_OBJECT
-		OT_DECL_NODEFAULT(WidgetView)
-		OT_DECL_NOCOPY(WidgetView)
+			OT_DECL_NODEFAULT(WidgetView)
+			OT_DECL_NOCOPY(WidgetView)
 	public:
 		enum InsertFlag {
-			NoInsertFlags    = 0 << 0,
+			NoInsertFlags = 0 << 0,
 			KeepCurrentFocus = 1 << 0
 		};
 		typedef ot::Flags<InsertFlag> InsertFlags;
@@ -101,12 +101,15 @@ namespace ot {
 
 		bool isCurrentViewTab() const;
 
-		void setSelectionInformation(const SelectionInformation& _info) { m_selectionInfo = _info; };
-		const SelectionInformation& getSelectionInformation() const { return m_selectionInfo; };
+		void addVisualizingItem(UID _itemId) { m_visualizingItems.addSelectedNavigationItem(_itemId); };
+		void removeVisualizingItem(UID _itemId) { m_visualizingItems.removeSelectedNavigationItem(_itemId); };
+		void clearVisualizingItems() { m_visualizingItems.setSelectedNavigationItems(UIDList()); };
+		const SelectionInformation& getVisualizingItems() const { return m_visualizingItems; };
 
 	Q_SIGNALS:
 		void closeRequested();
 		void viewDataModifiedChanged();
+		void pinnedChanged(bool _isPinned);
 
 	protected:
 
@@ -118,6 +121,7 @@ namespace ot {
 		void slotCloseRequested();
 		void slotToggleVisible();
 		void slotPinnedChanged(bool _isPinned);
+		void slotTabPressed();
 
 	private:
 		friend class WidgetViewManager;
@@ -128,8 +132,8 @@ namespace ot {
 		bool m_isDeletedByManager; //! @brief If false the widget will deregister from the manager upon deleting
 		bool m_isPermanent; //! @brief If set the widget wont be removed by the manager
 		bool m_isModified; //! @brief If set the current view content was modified
-
-		SelectionInformation m_selectionInfo;
+		
+		SelectionInformation m_visualizingItems;
 	};
 
 }

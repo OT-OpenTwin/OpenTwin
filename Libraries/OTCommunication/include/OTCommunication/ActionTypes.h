@@ -140,6 +140,7 @@
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
 #define OT_ACTION_CMD_UI_DisplayMessage "UI.DisplayMessage"
 #define OT_ACTION_CMD_UI_DisplayStyledMessage "UI.DisplayStyledMessage"
+#define OT_ACTION_CMD_UI_DisplayLogMessage "UI.DisplayLogMessage"
 #define OT_ACTION_CMD_UI_ReportError "UI.ReportError"
 #define OT_ACTION_CMD_UI_ReportWarning "UI.ReportWarning"
 #define OT_ACTION_CMD_UI_ReportInformation "UI.ReportInformation"
@@ -342,6 +343,7 @@
 #define OT_ACTION_PARAM_Content "Content"
 #define OT_ACTION_PARAM_IniList "IniList"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ModelType "ModelType"
@@ -353,8 +355,8 @@
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
+#define OT_ACTION_PARAM_VisualizingEntities "VisualizingEntities"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
-
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"
@@ -448,6 +450,7 @@
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
 #define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
+#define OT_ACTION_PARAM_GlobalLoggerUrl "Global.LoggerUrl"
 
 #define OT_ACTION_PARAM_GLOBAL_CPU_LOAD "Global.CPU.Load"
 #define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"

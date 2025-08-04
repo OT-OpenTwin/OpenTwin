@@ -33,7 +33,7 @@ public:
 							const std::vector<std::array<double, 3>> &triangle_p3,
 							const std::vector<std::array<double, 3>> &triangle_rgb);
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 private:
 	osg::Node * createOSGNodeFromTriangles(const std::vector<std::array<double, 3>> &triangle_p1,

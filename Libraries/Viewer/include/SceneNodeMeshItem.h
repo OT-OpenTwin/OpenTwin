@@ -50,7 +50,7 @@ public:
 
 	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) override;
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 	void setDisplayTetEdges(bool displayEdges);
 

@@ -185,7 +185,7 @@ void AddGroupDialog::slotConfirm()
 	OTAssertNullptr(app);
 
 	if (m_input->text().length() == 0) {
-		app->showErrorPrompt("Please specify a name for the new group", "Create New Group");
+		app->showErrorPrompt("Please specify a name for the new group", "", "Create New Group");
 		return;
 	}
 
@@ -198,7 +198,7 @@ void AddGroupDialog::slotConfirm()
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -207,7 +207,7 @@ void AddGroupDialog::slotConfirm()
 	responseDoc.fromJson(response);
 	
 	if (hasError(response)) {
-		app->showErrorPrompt("The new group can not be created (the name may already be in use)", "Create New Group");
+		app->showErrorPrompt("The new group can not be created (the name may already be in use)", "", "Create New Group");
 		return;
 	}
 
@@ -279,12 +279,12 @@ void RenameGroupDialog::slotConfirm() {
 
 	// Add new group
 	if (m_input->text().length() == 0) {
-		app->showErrorPrompt("Please specify a new name for the group", "Rename Group");
+		app->showErrorPrompt("Please specify a new name for the group", "", "Rename Group");
 		return;
 	}
 
 	if (m_groupToRename == m_input->text().toStdString()) {
-		app->showWarningPrompt("The new name of the new group must be different from the original.", "Rename Group");
+		app->showWarningPrompt("The new name of the new group must be different from the original.", "", "Rename Group");
 		return;
 	}
 
@@ -298,7 +298,7 @@ void RenameGroupDialog::slotConfirm() {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -307,7 +307,7 @@ void RenameGroupDialog::slotConfirm() {
 	responseDoc.fromJson(response);
 
 	if (!hasSuccessful(response)) {
-		app->showErrorPrompt("The new group can not be renamed (the new name may already be in use)", "Rename Group");
+		app->showErrorPrompt("The new group can not be renamed (the new name may already be in use)", "", "Rename Group");
 		return;
 	}
 
@@ -562,7 +562,7 @@ void ManageGroups::slotDeleteGroup(void)
 		std::string response;
 		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send request to authorization service");
-			AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+			AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 			exit(ot::AppExitCode::SendFailed);
 			return;
 		}
@@ -607,7 +607,7 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -651,7 +651,7 @@ void ManageGroups::slotFillGroupsList(void) {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -764,7 +764,7 @@ void ManageGroups::slotFillMembersList(void) {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -868,7 +868,7 @@ void ManageGroups::readUserList(void)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}

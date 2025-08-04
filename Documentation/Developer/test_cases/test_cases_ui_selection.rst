@@ -52,3 +52,16 @@ Frontend Selection
       - - Other table view opens with range selected
         - Old range selection is cleared and only new selection is stored at new view ✔
         - New selection is not stored at old view ❌
+
+
+
+Rework notes:
+*************
+
+Navigation tree selection -> Forward to viewer
+
+View focused -> restore selection from info
+
+Viewer selection set notification -> SceneNode notification -> Visualizer notification -> add selected node to view selection info (api call)
+Viewer selection unset notification -> SceneNode notification -> Visualizer notification -> remove selected node from view selection info (api call)
+

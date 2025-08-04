@@ -19,6 +19,6 @@ private:
 	void bufferSelectionEntities(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> extractSelectionRanges(const ot::UIDList& _selectedEntityIDs);
 	const std::list<std::shared_ptr<EntityTableSelectedRanges>> findSelectionsThatNeedVisualisation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities);
-	bool requestToOpenTable(const std::string& _tableName);
+	bool requestToOpenTable(const std::string& _tableName, const ot::UIDList& _visualizingEntities);
 	void requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);
 };

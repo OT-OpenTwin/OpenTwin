@@ -129,6 +129,7 @@ ot::MessageDialogCfg::~MessageDialogCfg() {
 void ot::MessageDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	DialogCfg::addToJsonObject(_object, _allocator);
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
+	_object.AddMember("Detailed", JsonString(m_detailedText, _allocator), _allocator);
 	_object.AddMember("Icon", JsonString(this->iconToString(m_icon), _allocator), _allocator);
 	_object.AddMember("Buttons", JsonArray(this->toStringList(m_buttons), _allocator), _allocator);
 }
@@ -136,6 +137,7 @@ void ot::MessageDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 void ot::MessageDialogCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	DialogCfg::setFromJsonObject(_object);
 	m_text = json::getString(_object, "Text");
+	m_detailedText = json::getString(_object, "Detailed");
 	m_icon = this->stringToIcon(json::getString(_object, "Icon"));
 	m_buttons = this->stringListToButtons(json::getStringList(_object, "Buttons"));
 }

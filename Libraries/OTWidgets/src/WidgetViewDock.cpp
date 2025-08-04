@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -27,7 +28,7 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view) :
 }
 
 ot::WidgetViewDock::~WidgetViewDock() {
-
+	
 }
 
 void ot::WidgetViewDock::openView(void) {

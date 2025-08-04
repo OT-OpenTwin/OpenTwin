@@ -400,11 +400,11 @@ public:
 	//! \brief Clears the graphics picker and stored service picker data.
 	void clearGraphicsPickerData(void);
 
-	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
-	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName);
+	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
 
@@ -412,11 +412,11 @@ public:
 
 	// Text Editor
 
-	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
-	ot::TextEditorView* findTextEditor(const std::string& _entityName);
+	ot::TextEditorView* findTextEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closeTextEditor(const std::string& _entityName);
 
@@ -426,11 +426,11 @@ public:
 
 	// Table
 
-	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
-	ot::TableView* findTable(const std::string& _entityName);
+	ot::TableView* findTable(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closeTable(const std::string& _name);
 
@@ -438,11 +438,11 @@ public:
 
 	// Plot
 
-	ot::PlotView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::PlotView* createNewPlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
-	ot::PlotView* findPlot(const std::string& _entityName);
+	ot::PlotView* findPlot(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
+	ot::PlotView* findOrCreatePlot(const ot::Plot1DCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
 
 	void closePlot(const std::string& _name);
 
@@ -452,14 +452,14 @@ public:
 
 	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config) override;
 
-	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
+	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
 public Q_SLOTS:
-	void showInfoPrompt(const std::string& _message, const std::string& _title);
+	void showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showWarningPrompt(const std::string& _message, const std::string& _title);
+	void showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showErrorPrompt(const std::string& _message, const std::string& _title);
+	void showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
 public:
 
@@ -573,7 +573,7 @@ private:
 
 	void cleanupWidgetViewInfo(ot::WidgetView* _view);
 
-	void setupNewCentralView(ot::WidgetView* _view);
+	void addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UIDList& _visualizingEntities);
 
 	void runSelectionHandling(ot::SelectionOrigin _eventOrigin);
 

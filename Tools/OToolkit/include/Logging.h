@@ -82,6 +82,7 @@ public Q_SLOTS:
 	void slotImport(void);
 	void slotExport(void);
 
+	void slotRefillData(void);
 	void slotClear(void);
 	void slotClearAll(void);
 	void slotFilterChanged(void);
@@ -113,6 +114,7 @@ private:
 
 	ot::WidgetView* m_root;
 
+	QCheckBox* m_convertToLocalTime;
 	QCheckBox* m_ignoreNewMessages;
 	QCheckBox* m_autoScrollToBottom;
 	QTableWidget* m_table;

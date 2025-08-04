@@ -48,7 +48,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string fileName = getStudioSuiteFileNameForCommit(projectName, studioSuiteServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
@@ -80,7 +80,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
 		ot::MessageDialogCfg::BasicButton result = ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\n"
-			"Do you really want to continue?", "Get", ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+			"Do you really want to continue?", "", "Get", ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
 		if (result != ot::MessageDialogCfg::Yes) {
 			return "";
@@ -89,7 +89,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string fileName = getStudioSuiteFileNameForGet(projectName, studioSuiteServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ot::MessageBoxManager::showWarningPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
+			ot::MessageBoxManager::showWarningPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
@@ -198,13 +198,13 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 			{
 				errorMessage += "\n\nThe local file name has not been changed.";
-				ot::MessageBoxManager::showErrorPrompt(errorMessage, "Set CST File");
+				ot::MessageBoxManager::showErrorPrompt(errorMessage, "", "Set CST File");
 				return "";
 			}
 
 			StudioSuiteConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
 
-			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "Set CST File");
+			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "", "Set CST File");
 		}
 	}
 

@@ -25,7 +25,7 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
-#include "OTServiceFoundation/ErrorWarningLogFrontendNotifier.h"
+#include "OTServiceFoundation/FrontendLogNotifier.h"
 
 #include "DataBase.h"
 #include "Document\DocumentAccess.h"
@@ -55,7 +55,7 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_sessionService.enabledCounter = 0;
 	m_sessionService.service = nullptr;
 
-	new ErrorWarningLogFrontendNotifier(this); // Log Dispatcher gets the ownership of the notifier.
+	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 }
 
 ot::ApplicationBase::~ApplicationBase()

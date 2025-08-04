@@ -266,16 +266,19 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		return true;
 	}
 	else {
+		// Store last error as error string
 		g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
 			"\", \"Error buffer\": \"" + errbuf +
 			"\", \"Receiver\": \"" + _receiverIP +
 			"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
 			" }";
 
+		// If log message should be generated, do so now
 		if (_flags & msg::CreateLogMessage) {
 			OT_LOG_E("Message sent failed: " + g_lastError );
 		}
 
+		// If exit on fail is set, assert and exit
 		if (_flags & msg::ExitOnFail) {
 			OTAssert(0, "Failed to send message. Exiting...");
 			exit(ot::AppExitCode::SendFailed);

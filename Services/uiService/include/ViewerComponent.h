@@ -37,68 +37,24 @@ public:
 	ViewerComponent();
 	virtual ~ViewerComponent();
 
-	// #####################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Extern calls
-	
-	// Tree
+	// General
 
-	virtual void clearTree(void) override;
-	virtual ot::UID addTreeItem(const std::string &treePath, bool editable, bool selectChildren) override;
-	virtual void removeTreeItems(std::list<ot::UID> treeItemIDList) override;
-	virtual void selectTreeItem(ot::UID treeItemID) override;
-	virtual void selectSingleTreeItem(ot::UID treeItemID) override;
-	virtual void expandSingleTreeItem(ot::UID treeItemID) override;
-	virtual bool isTreeItemExpanded(ot::UID treeItemID) override;
-	virtual void toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) override;
-	virtual void clearTreeSelection(void) override;
-	virtual void setTreeItemIcon(ot::UID treeItemID, int iconSize, const std::string &iconName) override;
-	virtual void setTreeItemText(ot::UID treeItemID, const std::string &text) override;
-	virtual void refreshSelection(void) override;
-	virtual void addKeyShortcut(const std::string &keySequence) override;
-	virtual void fillPropertyGrid(const ot::PropertyGridCfg& configuration) override;
-	virtual void clearModalPropertyGrid() override;
-	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) override;
-	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) override;
+	virtual void addKeyShortcut(const std::string& keySequence) override;
 	virtual void lockSelectionAndModification(bool flag) override;
+
 	virtual void removeViewer(ot::UID viewerID) override;
 
-	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) override;
+	virtual void removeUIElements(std::list<ViewerUIDtype>& itemIDList) override;
 
-	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
-	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
-
-	virtual ot::WidgetView* getCurrentView(void) override;
-
-	virtual bool getCurrentViewIsModified(void) override;
-
-	// Menu/Widgets
-
-	virtual ViewerUIDtype addMenuPage(const std::string &pageName) override;
-	virtual ViewerUIDtype addMenuGroup(ViewerUIDtype menuPageID, const std::string &groupName) override;
-	virtual ViewerUIDtype addMenuSubGroup(ViewerUIDtype _menuGroupID, const std::string& _subGroupName) override;
-	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName) override;
-	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) override;
-	virtual void setMenuPushButtonToolTip(ViewerUIDtype _buttonID, const std::string& _toolTip) override;
-
-	virtual void setCurrentMenuPage(const std::string& _pageName) override;
-	virtual std::string getCurrentMenuPage(void) override;
-
-	virtual void removeUIElements(std::list<ViewerUIDtype> &itemIDList) override;
-
-	virtual void displayText(const std::string &text) override;
-
-	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
-	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
-	virtual std::string getCurrentVisualizationTabTitle(void) override;
-
-	virtual void requestSaveForCurrentVisualizationTab(void) override;
+	virtual void displayText(const std::string& text) override;
 
 	virtual void enableDisableControls(const ot::UIDList& _enabledControls, bool _resetDisabledCounterForEnabledControls, const ot::UIDList& _disabledControls) override;
 
-	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues) override;
+	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues) override;
 
-	virtual void rubberbandFinished(ot::serviceID_t creatorId, const std::string &note, const std::string &pointJson, const std::vector<double> &transform) override;
+	virtual void rubberbandFinished(ot::serviceID_t creatorId, const std::string& note, const std::string& pointJson, const std::vector<double>& transform) override;
 
 	virtual void updateSettings(const ot::PropertyGridCfg& _config) override;
 
@@ -116,11 +72,81 @@ public:
 
 	virtual std::string getSaveFileName(const std::string& _title, const std::string& _path, const std::string& _filters) override;
 
-	// #####################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
+	
+	// Tree
+
+	virtual void clearTree(void) override;
+	virtual ot::UID addTreeItem(const std::string &treePath, bool editable, bool selectChildren) override;
+	virtual void removeTreeItems(std::list<ot::UID> treeItemIDList) override;
+	virtual void selectTreeItem(ot::UID treeItemID) override;
+	virtual void selectSingleTreeItem(ot::UID treeItemID) override;
+	virtual void expandSingleTreeItem(ot::UID treeItemID) override;
+	virtual bool isTreeItemExpanded(ot::UID treeItemID) override;
+	virtual void toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) override;
+	virtual void clearTreeSelection(void) override;
+	virtual void setTreeItemIcon(ot::UID treeItemID, int iconSize, const std::string &iconName) override;
+	virtual void setTreeItemText(ot::UID treeItemID, const std::string &text) override;
+	virtual void refreshSelection(void) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// PropertyGrid
+
+	virtual void fillPropertyGrid(const ot::PropertyGridCfg& configuration) override;
+	virtual void clearModalPropertyGrid() override;
+	virtual void setDoublePropertyValue(const std::string& _groupName, const std::string& _itemName, double value) override;
+	virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Plot
+
+	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Views
+
+	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+	virtual bool hasViewFocus(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+
+	virtual void addVisualizingEntityToView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+	virtual void removeVisualizingEntityFromView(ot::UID _treeItemId, const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+	virtual void clearVisualizingEntitesFromView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+
+	virtual ot::WidgetView* getCurrentView(void) override;
+	virtual ot::WidgetView* getLastFocusedCentralView(void) override;
+
+	virtual bool getCurrentViewIsModified(void) override;
+
+	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
+	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
+	virtual std::string getCurrentVisualizationTabTitle(void) override;
+
+	virtual void requestSaveForCurrentVisualizationTab(void) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ToolBar
+
+	virtual ViewerUIDtype addMenuPage(const std::string &pageName) override;
+	virtual ViewerUIDtype addMenuGroup(ViewerUIDtype menuPageID, const std::string &groupName) override;
+	virtual ViewerUIDtype addMenuSubGroup(ViewerUIDtype _menuGroupID, const std::string& _subGroupName) override;
+	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName) override;
+	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) override;
+	virtual void setMenuPushButtonToolTip(ViewerUIDtype _buttonID, const std::string& _toolTip) override;
+
+	virtual void setCurrentMenuPage(const std::string& _pageName) override;
+	virtual std::string getCurrentMenuPage(void) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	void setProcessingGroupOfMessages(bool _flag);
 
-	// Intern calls
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Internal calls
 
 	virtual void notify(
 		ot::UID							_senderId,

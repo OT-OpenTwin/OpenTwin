@@ -16,6 +16,10 @@ ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDia
 		_parent
 	);
 	
+	if (!_config.getDetailedText().empty()) {
+		msg.setDetailedText(QString::fromStdString(_config.getDetailedText()));
+	}
+
 	QMessageBox::StandardButton btn = (QMessageBox::StandardButton)msg.exec();
 	
 	switch (btn)

@@ -1,10 +1,7 @@
-/*
- * ControlsManager.cpp
- *
- *  Created on: February 20, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! @file ControlsManager.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "ControlsManager.h"
 #include "AppBase.h"
@@ -505,7 +502,7 @@ void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ot::UI
 void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement, bool _eraseUiElements) {
 	auto serviceE = serviceEnabledLevel(_serviceInfo);
 	auto serviceL = serviceLockLevel(_serviceInfo);
-	OT_LOG_D("clean service due to: " + _serviceInfo.serviceName(), " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
+	OT_LOG_D("clean service due to: " + _serviceInfo.serviceName() + " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
 	for (auto e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
 			LockManagerElement* element = this->uiElement(e.first);

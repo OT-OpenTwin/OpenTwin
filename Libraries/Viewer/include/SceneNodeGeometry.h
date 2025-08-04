@@ -59,7 +59,7 @@ public:
 	virtual void setWireframe(bool w) override;
 	virtual void setVisible(bool v) override;
 	virtual void setHighlighted(bool h) override;
-	virtual ot::SelectionHandlingResult setSelected(bool selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection) override;
+	virtual ot::SelectionHandlingResult setSelected(bool selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes) override;
 
 	void setShowWhenSelected(bool flag) { showWhenSelected = flag; };
 
@@ -90,7 +90,7 @@ public:
 	Model *getModel(void) { return model; };
 	void setModel(Model *m) { model = m; };
 
-	virtual bool isItem3D(void) { return true; };
+	virtual bool isItem3D(void) const override { return true; };
 
 	osg::Node* addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2);
 	void removeSelectedEdge(osg::Node* selected);

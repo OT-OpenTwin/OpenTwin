@@ -10,7 +10,7 @@ public:
 	SceneNodeContainer();
 	virtual ~SceneNodeContainer();
 
-	virtual bool isItem3D(void) { return false; };
+	virtual bool isItem3D(void) const override { return false; };
 
 };
 
