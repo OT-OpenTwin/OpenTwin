@@ -306,10 +306,7 @@ void Logging::slotExport(void) {
 void Logging::slotRefillData(void) {
 	std::list<ot::LogMessage> messages = std::move(m_messages);
 	this->slotClear();
-
-	for (const ot::LogMessage& msg : messages) {
-		this->appendLogMessage(msg);
-	}
+	this->appendLogMessages(messages);
 }
 
 void Logging::slotClear(void) {
