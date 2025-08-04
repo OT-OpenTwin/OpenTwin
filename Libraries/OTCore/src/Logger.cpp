@@ -108,7 +108,14 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	
 	std::string versionString = json::getString(_object, OT_ACTION_PARAM_LOG_DataVersion);
 	if (versionString != "1.1") {
-		throw std::exception("Invalid log version");
+		if (versionString == "1.0") {
+			// Version 1.0 is deprecated, but we can still read it
+			this->setFromVersion1_0(_object);
+			return;
+		}
+		else {
+			throw std::exception("Invalid log version");
+		}
 	}
 
 	// Get values
@@ -117,6 +124,19 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
 	m_localSystemTime = json::getUInt64(_object, OT_ACTION_PARAM_LOG_Time_Local);
 	m_globalSystemTime = json::getUInt64(_object, OT_ACTION_PARAM_LOG_Time_Global);
+	m_userName = json::getString(_object, OT_ACTION_PARAM_LOG_User);
+	m_projectName = json::getString(_object, OT_ACTION_PARAM_LOG_Project);
+
+	ConstJsonArray flagsArr = json::getArray(_object, OT_ACTION_PARAM_LOG_Flags);
+	m_flags = logFlagsFromJsonArray(flagsArr);
+}
+
+void ot::LogMessage::setFromVersion1_0(const ConstJsonObject& _object) {
+	m_serviceName = json::getString(_object, OT_ACTION_PARAM_LOG_Service);
+	m_functionName = json::getString(_object, OT_ACTION_PARAM_LOG_Function);
+	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
+	m_localSystemTime = 0; // Version 1.0 did have string date format
+	m_globalSystemTime = 0; // Version 1.0 did have string date format
 	m_userName = json::getString(_object, OT_ACTION_PARAM_LOG_User);
 	m_projectName = json::getString(_object, OT_ACTION_PARAM_LOG_Project);
 

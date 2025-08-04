@@ -411,6 +411,8 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 	private:
+		void setFromVersion1_0(const ConstJsonObject& _object);
+
 		friend OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
 
 		std::string m_serviceName;			//! @brief Name of the message creator.
