@@ -25,6 +25,7 @@
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "ClassFactory.h"
+#include "DocumentAPI.h"
 #include "EntityResultText.h"
 #include "EntityUnits.h"
 #include "EntityMaterial.h"
@@ -917,29 +918,25 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 		return;
 	}
 
-	// First, we need to decode the data back into a byte buffer
-	int decoded_compressed_data_length = Base64decode_len(data.c_str());
-	char* decodedCompressedString = new char[decoded_compressed_data_length];
+	// Now we read the data from GridFS
+	DataStorageAPI::DocumentAPI doc;
+	uint8_t* dataBuffer = nullptr;
+	size_t length = 0;
 
-	Base64decode(decodedCompressedString, data.c_str());
+	bsoncxx::oid oid_obj{ data };
+	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-	data.clear();
+	doc.GetDocumentUsingGridFs(id, dataBuffer, length, DataBase::GetDataBase()->getProjectName());
+	assert(length == uncompressedDataLength);
 
-	// Decompress the data
-	char* dataBuffer = new char[uncompressedDataLength];
-	uLongf destLen = (uLongf)uncompressedDataLength;
-	uLong  sourceLen = decoded_compressed_data_length;
-	uncompress((Bytef*)dataBuffer, &destLen, (Bytef*)decodedCompressedString, sourceLen);
-
-	delete[] decodedCompressedString;
-	decodedCompressedString = nullptr;
+	doc.DeleteGridFSData(id, DataBase::GetDataBase()->getProjectName());
 
 	try
 	{
 		{
 			// Now the data is in the dataBuffer with length uncompressedDataLength
 			// We need to process the buffer and read the data from it
-			Result1DManager resultManager(dataBuffer, uncompressedDataLength);
+			Result1DManager resultManager((char *) dataBuffer, uncompressedDataLength);
 
 			// We can now delete the buffer
 			delete[] dataBuffer;

@@ -11,6 +11,7 @@
 #include "EntityFile.h"
 #include "DataBase.h"
 #include "ClassFactory.h"
+#include "DocumentAPI.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -331,7 +332,7 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 	// the previously stored data should be kept. 
 
 	bool appendData = includeParametricResults;  
-	std::string dataContent;
+	std::string fileId;
 	size_t uncompressedDataLength = 0;
 
 	if (!changedRunIds.empty())
@@ -380,27 +381,11 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 			// In a next step, we do not need the original data anymore
 			result1DData.clear();
 
-			// Create a buffer for the compressed storage
-			uLong compressedSize = compressBound((uLong)uncompressedDataLength);
+			// Now upload the data to gridFS (even 1D data can be very large)
+			DataStorageAPI::DocumentAPI doc;
 
-			char* compressedData = new char[compressedSize];
-			compress((Bytef*)compressedData, &compressedSize, (Bytef*)buffer.data(), uncompressedDataLength);
-
-			buffer.clear();
-
-			// Convert the binary to an encoded string
-			int encoded_data_length = Base64encode_len(compressedSize);
-			char* base64_string = new char[encoded_data_length];
-
-			Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-			delete[] compressedData;
-			compressedData = nullptr;
-
-			dataContent = std::string(base64_string);
-
-			delete[] base64_string;
-			base64_string = nullptr;
+			bsoncxx::types::value result = doc.InsertBinaryDataUsingGridFs((uint8_t*)(buffer.data()), buffer.size(), DataBase::GetDataBase()->getProjectName());
+			fileId = result.get_oid().value.to_string();
 		}
 	}
 
@@ -410,7 +395,7 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_RESULT1D, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_APPEND, appendData, doc.GetAllocator());  // We need ids for the data entities and the file entities
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(dataContent, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileId, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), doc.GetAllocator());
 
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
