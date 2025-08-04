@@ -158,7 +158,7 @@ SessionService::SessionService()
 
 std::list<std::string> SessionService::getSessionIDs() {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	return ot::ContainerHelper::listFromMapKeys(m_sessions);
+	return ot::ContainerHelper::getKeys(m_sessions);
 }
 
 bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
