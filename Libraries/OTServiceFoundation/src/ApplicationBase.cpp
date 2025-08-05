@@ -39,6 +39,7 @@
 
 // Third party header
 #include "curl/curl.h"
+#include "OTServiceFoundation/MessageQueueHandler.h"
 
 #undef GetObject
 
@@ -47,14 +48,6 @@
 ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier)
 	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier), m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false)
 {
-	m_directoryService.doc = nullptr;
-	m_directoryService.enabledCounter = 0;
-	m_directoryService.service = nullptr;
-
-	m_sessionService.doc = nullptr;
-	m_sessionService.enabledCounter = 0;
-	m_sessionService.service = nullptr;
-
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 }
 
@@ -85,20 +78,28 @@ std::string ot::ApplicationBase::deploymentPath(void) const {
 
 // Setter
 
-void ot::ApplicationBase::setDirectoryServiceURL(const std::string& _url) {
-	m_directoryService.doc = nullptr;
-	m_directoryService.enabledCounter = 0;
-	if (m_directoryService.service != nullptr) { delete m_directoryService.service; }
-	m_directoryService.service = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService, _url, invalidServiceID);
+void ot::ApplicationBase::setDirectoryServiceURL(const std::string& _url) 
+{
+	if (m_directoryService != nullptr)
+	{
+		delete m_directoryService;
+		m_directoryService = nullptr;
+	}
+	
+	m_directoryService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService, _url, invalidServiceID);
+	
 	m_serviceIdMap.insert_or_assign(invalidServiceID - 1, m_directoryService);
 }
 
 void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 {
-	m_sessionService.doc = nullptr;
-	m_sessionService.enabledCounter = 0;
-	if (m_sessionService.service != nullptr) { delete m_sessionService.service; }
-	m_sessionService.service = new ServiceBase(OT_INFO_SERVICE_TYPE_SessionService, OT_INFO_SERVICE_TYPE_SessionService, _url, invalidServiceID);
+	if (m_sessionService != nullptr)
+	{
+		delete m_sessionService;
+		m_sessionService = nullptr;
+	}
+	
+	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_SessionService, OT_INFO_SERVICE_TYPE_SessionService, _url, invalidServiceID);
 	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
 }
 
@@ -126,7 +127,7 @@ ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByID(serviceID_t _id) 
 		assert(0); // Invalid ID
 		return nullptr;
 	}
-	return itm->second.service;
+	return itm->second;
 }
 
 ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByName(const std::string & _name) {
@@ -135,58 +136,43 @@ ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByName(const std::stri
 		assert(0); // Invalid ID
 		return nullptr;
 	}
-	return itm->second.service;
+	return itm->second;
 }
 
 // ##########################################################################################################################################
 
 // IO
 
-void ot::ApplicationBase::enableMessageQueuing(
-	const std::string &			_service,
-	bool						_flag
-) {
-	auto destination = m_serviceNameMap.find(_service);
-	if (destination == m_serviceNameMap.end()) {
+void ot::ApplicationBase::enableMessageQueuing(const std::string & _service, bool _enableQueing) 
+{
+	auto serviceInfoByName= m_serviceNameMap.find(_service);
+	if (serviceInfoByName == m_serviceNameMap.end()) {
 		OTAssert(0, "Destination service not found");
 		return;
 	}
-	destination->second.enabledCounter += (_flag ? 1 : -1);
-
-	if (destination->second.enabledCounter < 0) {
-		OTAssert(0, "Enabled counter reached a negative value");
-		return;
-	}
-
-	if (destination->second.enabledCounter == 0)
+	
+	ServiceBase* destinationServiceInfo = serviceInfoByName->second;
+	if (_enableQueing)
 	{
-		flushQueuedHttpRequests(_service);
+		MessageQueueHandler::instance().flushIfAppropriate(1,destinationServiceInfo);
+	}
+	else
+	{
+		MessageQueueHandler::instance().flushIfAppropriate(-1, destinationServiceInfo);
 	}
 }
 
 void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 {
-	auto destination = m_serviceNameMap.find(_service);
-	if (destination == m_serviceNameMap.end()) {
+	auto serviceInfoByName = m_serviceNameMap.find(_service);
+	if (serviceInfoByName == m_serviceNameMap.end()) {
 		OTAssert(0, "Destination service not found");
 		return;
 	}
+	
+	ServiceBase* destinationServiceInfo = serviceInfoByName->second;
 
-	if (destination->second.doc != nullptr)
-	{
-		JsonDocument* queuedDoc = destination->second.doc;
-
-		std::string response;
-		if (queuedDoc->IsObject()) {
-			ot::msg::send(this->getServiceURL(), destination->second.service->getServiceURL(), ot::QUEUE, queuedDoc->toJson(), response);
-
-			delete queuedDoc;
-			destination->second.doc = nullptr;
-		}
-		else {
-			OTAssert(0, "The queued doc is not a object");
-		}
-	}
+	MessageQueueHandler::instance().flushServiceBuffer(destinationServiceInfo);
 }
 
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
@@ -197,53 +183,22 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
-	auto destination = m_serviceNameMap.find(_serviceName);
-	if (destination == m_serviceNameMap.end()) {
+	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
+	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
 		OTAssert(0, "Destination service not found");
 		return "";
 	}
+	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
+	
+	const bool messageWasQueued = MessageQueueHandler::instance().addToQueueIfRequired(destinationServiceInfo, m_projectName, _doc, _prefetchIds);
 
-	if (destination->second.enabledCounter > 0 && _queue)
+	if (!messageWasQueued)
 	{
-		JsonDocument *queuedDoc = nullptr;
-		
-		if (destination->second.doc == nullptr)
-		{
-			queuedDoc = new JsonDocument;
-
-			JsonArray docs;
-			JsonArray prefetchedIDs;
-			JsonArray prefetchedVersions;
-
-			queuedDoc->AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Compound, queuedDoc->GetAllocator());
-			queuedDoc->AddMember(OT_ACTION_PARAM_PROJECT_NAME, JsonString(m_projectName, queuedDoc->GetAllocator()), queuedDoc->GetAllocator());
-			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_Documents, docs, queuedDoc->GetAllocator());
-			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_ID, prefetchedIDs, queuedDoc->GetAllocator());
-			queuedDoc->AddMember(OT_ACTION_PARAM_PREFETCH_Version, prefetchedVersions, queuedDoc->GetAllocator());
-
-			destination->second.doc = queuedDoc;
-		}
-		else
-		{
-			queuedDoc = destination->second.doc;
-		}
-
-		JsonAllocator& allocator = queuedDoc->GetAllocator();
-
-		ot::JsonValue v(_doc, allocator);
-		(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_Documents].PushBack(v, allocator);
-
-		for (auto id : _prefetchIds)
-		{
-			(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_ID].PushBack(id.first, allocator);
-			(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_Version].PushBack(id.second, allocator);
-		}
-
-		return true;
+		return ot::msg::send(m_serviceURL, destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
 	}
 	else
 	{
-		return ot::msg::send(m_serviceURL, destination->second.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
+		return true;
 	}
 }
 
@@ -255,7 +210,7 @@ bool ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _mess
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	return ot::msg::send(m_serviceURL, m_sessionService.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
+	return ot::msg::send(m_serviceURL, m_sessionService->getServiceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
 }
 
 bool ot::ApplicationBase::broadcastMessage(bool _queue, const JsonDocument& _doc) {
@@ -570,9 +525,7 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 
 void ot::ApplicationBase::__serviceConnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
 	// Prepare information to store data
-	structServiceInformation info;
-	info.doc = nullptr; info.enabledCounter = 0;
-
+	
 	// Check for duplicate
 	if (m_serviceIdMap.find(_id) != m_serviceIdMap.end()) {
 		OT_LOG_EAS("Service already registered { \"Name\": \"" + _name + "\", \"Type\": \"" + _type + "\", \"URL\": \"" + _url + "\", \"ID\": " + std::to_string(_id) + " }");
@@ -586,9 +539,10 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 		}
 		// Store information
 		m_uiComponent = new components::UiComponent(_name, _type, _url, _id, this);
-		info.service = m_uiComponent;
-		m_serviceIdMap.insert_or_assign(_id, info);
-		m_serviceNameMap.insert_or_assign(_name, info);
+		
+
+		m_serviceIdMap.insert_or_assign(_id, m_uiComponent);
+		m_serviceNameMap.insert_or_assign(_name, m_uiComponent);
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), true);
@@ -607,45 +561,55 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 		assert(m_modelComponent == nullptr);
 		ot::ModelAPIManager::setModelServiceURL(_url);
 		m_modelComponent = new components::ModelComponent(_name, _type, _url, _id, this);
-		info.service = m_modelComponent;
-		m_serviceIdMap.insert_or_assign(_id, info);
-		m_serviceNameMap.insert_or_assign(_name, info);
+		
+		m_serviceIdMap.insert_or_assign(_id, m_modelComponent);
+		m_serviceNameMap.insert_or_assign(_name, m_modelComponent);
 		modelConnected(m_modelComponent);
 	}
 	else {
 		// Store information
-		auto s = new ServiceBase(_name, _type, _url, _id);
-		info.service = s;
-		m_serviceIdMap.insert_or_assign(_id, info);
-		m_serviceNameMap.insert_or_assign(_name, info);
-		serviceConnected(s);
+		auto newServiceInformation = new ServiceBase(_name, _type, _url, _id);
+		
+		m_serviceIdMap.insert_or_assign(_id, newServiceInformation);
+		m_serviceNameMap.insert_or_assign(_name, newServiceInformation);
+		serviceConnected(newServiceInformation);
 	}
 }
 
 void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
-	auto itm = m_serviceIdMap.find(_id);
-	assert(itm != m_serviceIdMap.end());
+	auto serviceByID = m_serviceIdMap.find(_id);
+	assert(serviceByID != m_serviceIdMap.end());
+	auto& serviceInfo = serviceByID->second;
 
 	if (_type == OT_INFO_SERVICE_TYPE_UI) {
-		assert(itm->second.service == (ServiceBase *)m_uiComponent);
+
+		assert(serviceInfo == (ServiceBase*)m_uiComponent);
+
 		uiDisconnected(m_uiComponent);
+		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
+		
 		delete m_uiComponent;
 		m_uiComponent = nullptr;
+		
 		GuiAPIManager::instance().frontendDisconnected();
 	}
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
-		assert(itm->second.service == (ServiceBase *)m_modelComponent);
+		assert(serviceInfo == (ServiceBase*)m_modelComponent);
 		ot::ModelAPIManager::setModelServiceURL(std::string());
 		modelDisconnected(m_modelComponent);
+		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
 
 		delete m_modelComponent;
 		m_modelComponent = nullptr;
+
 	}
 	else {
-		serviceDisconnected(itm->second.service);
-		delete itm->second.service;
+		serviceDisconnected(serviceInfo);
+		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
+		delete serviceInfo;
+		serviceInfo = nullptr;
 	}
-	if (itm->second.doc != nullptr) { delete itm->second.doc; }
+	
 	m_serviceIdMap.erase(_id);
 	m_serviceNameMap.erase(_name);
 }

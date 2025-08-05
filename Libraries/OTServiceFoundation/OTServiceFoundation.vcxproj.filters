@@ -43,6 +43,9 @@
     <ClCompile Include="src\FrontendLogNotifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\MessageQueueHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTServiceFoundation\AbstractModelNotifier.h">
@@ -100,6 +103,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTServiceFoundation\MessageQueueHandler.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
