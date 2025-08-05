@@ -588,8 +588,11 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 		uiDisconnected(m_uiComponent);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
 		
-		delete m_uiComponent;
-		m_uiComponent = nullptr;
+		if (m_uiComponent != nullptr)
+		{
+			delete m_uiComponent;
+			m_uiComponent = nullptr;
+		}
 		
 		GuiAPIManager::instance().frontendDisconnected();
 	}
@@ -599,15 +602,21 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 		modelDisconnected(m_modelComponent);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
 
-		delete m_modelComponent;
-		m_modelComponent = nullptr;
+		if(m_modelComponent != nullptr)
+		{
+			delete m_modelComponent;
+			m_modelComponent = nullptr;
+		}
 
 	}
 	else {
 		serviceDisconnected(serviceInfo);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
-		delete serviceInfo;
-		serviceInfo = nullptr;
+		if (serviceInfo != nullptr)
+		{
+			delete serviceInfo;
+			serviceInfo = nullptr;
+		}
 	}
 	
 	m_serviceIdMap.erase(_id);
