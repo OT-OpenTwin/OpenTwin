@@ -126,10 +126,11 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		state.m_setFocus = false;
 		state.m_selected = true;
 		state.m_singleSelection = true;
+		state.m_selectionOrigin = ot::SelectionOrigin::User;
 		for (Visualiser* visualiser : allVisualiser)
 		{
 			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {
-				visualiser->showVisualisation(state);
+				visualiser->requestVisualization(state);
 			}
 		}
 	}

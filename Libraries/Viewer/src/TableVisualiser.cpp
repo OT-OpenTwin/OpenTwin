@@ -13,7 +13,7 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
-	if (!m_viewIsOpen && _state.m_selectionOrigin == ot::SelectionOrigin::User) {
+	if (_state.m_selectionOrigin == ot::SelectionOrigin::User) {
 		if (_state.m_singleSelection) {
 			if (_state.m_selected) {
 				ot::JsonDocument doc;
