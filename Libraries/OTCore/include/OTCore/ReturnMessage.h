@@ -14,8 +14,10 @@ namespace ot
 	{
 	public:
 		enum ReturnMessageStatus {
-			Ok, //! @brief Ok
-			Failed //! @brief Error
+			Ok,     //! @brief Ok
+			Failed, //! @brief Error
+			True,
+			False
 		};
 
 		static std::string statusToString(ReturnMessageStatus _status);
