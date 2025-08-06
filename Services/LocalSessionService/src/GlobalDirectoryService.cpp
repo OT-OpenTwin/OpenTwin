@@ -9,6 +9,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
@@ -89,15 +90,11 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	std::string response;
 	if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
-	}
-	else if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Failed to start services. Reason: Invalid response: \"" + response + "\". Expected: \"" OT_ACTION_RETURN_VALUE_OK "\"");
+		return false;
 	}
 	else {
-		return true;
+		return ot::ReturnMessage::fromJson(response) == ot::ReturnMessage::Ok;
 	}
-
-	return false;
 }
 
 bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID) {
@@ -125,15 +122,11 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	std::string response;
 	if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
-	}
-	else if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Failed to start services. Reason: Invalid response: \"" + response + "\". Expected: \"" OT_ACTION_RETURN_VALUE_OK "\"");
+		return false;
 	}
 	else {
-		return true;
+		return ot::ReturnMessage::fromJson(response) == ot::ReturnMessage::Ok;
 	}
-
-	return false;
 }
 
 bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL) {

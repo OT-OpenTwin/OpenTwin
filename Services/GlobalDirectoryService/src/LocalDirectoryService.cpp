@@ -53,8 +53,8 @@ bool LocalDirectoryService::updateSystemUsageValues(ot::JsonDocument& _jsonDocum
 
 // Service management
 
-bool LocalDirectoryService::supportsService(const std::string& _serviceName) {
-	for (std::string serviceName : m_supportedServices) {
+bool LocalDirectoryService::supportsService(const std::string& _serviceName) const {
+	for (const std::string& serviceName : m_supportedServices) {
 		if (serviceName == _serviceName) {
 			return true;
 		}

@@ -77,6 +77,8 @@ private:
 	//! @return A pointer to the least loaded directory service that supports the given service, or nullptr if no such service exists.
 	LocalDirectoryService* leastLoadedDirectoryService(const ServiceInformation& _info);
 
+	bool canStartService(const ServiceInformation& _info) const;
+
 	Application();
 	virtual ~Application();
 

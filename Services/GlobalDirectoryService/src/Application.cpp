@@ -10,6 +10,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -168,9 +169,15 @@ std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 	
 	OT_LOG_I("Service start requested: { Name: " + serviceName + "; Type: " + serviceType + "; SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
 
-	m_startupDispatcher.addRequest(ServiceInformation(serviceName, serviceType, serviceID, sessionID, sessionServiceURL));
+	ServiceInformation info(serviceName, serviceType, serviceID, sessionID, sessionServiceURL);
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	if (!this->canStartService(info)) {
+		OT_LOG_W("Service \"" + serviceName + "\" of type \"" + serviceType + "\" cannot be started.");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Service \"" + serviceName + "\" of type \"" + serviceType + "\" is not supported by any LDS");
+	}
+	
+	m_startupDispatcher.addRequest(std::move(info));
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
@@ -208,13 +215,20 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 		OT_LOG_I("Service start requested (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS.URL = \"" + sessionServiceURL + "\")");
 
-		requestedServices.push_back(ServiceInformation(serviceName, serviceType, serviceID, sessionID, sessionServiceURL));
+		ServiceInformation info(serviceName, serviceType, serviceID, sessionID, sessionServiceURL);
+
+		if (!this->canStartService(info)) {
+			OT_LOG_W("Service \"" + serviceName + "\" of type \"" + serviceType + "\" cannot be started.");
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Service \"" + serviceName + "\" of type \"" + serviceType + "\" is not supported by any LDS");
+		}
+
+		requestedServices.push_back(std::move(info));
 	}
 
 	// Add the list to the dispatcher queue
 	m_startupDispatcher.addRequest(std::move(requestedServices));
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
@@ -424,6 +438,16 @@ LocalDirectoryService* Application::leastLoadedDirectoryService(const ServiceInf
 		}
 	}
 	return leastLoaded;
+}
+
+bool Application::canStartService(const ServiceInformation& _info) const {
+	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
+		if (lds.supportsService(_info.getName())) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 Application::Application()

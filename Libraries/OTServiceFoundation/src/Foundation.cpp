@@ -132,6 +132,7 @@ int ot::foundation::init(
 			std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 			std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
 			std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
+			ot::serviceID_t actualServiceID = static_cast<ot::serviceID_t>(ot::json::getUInt(params, OT_ACTION_PARAM_SERVICE_ID));
 			// Initialize the service with the parameters from the file
 
 			int startupResult = intern::ExternalServicesComponent::instance().startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
@@ -139,7 +140,7 @@ int ot::foundation::init(
 				return startupResult;
 			}
 
-			std::string initResult = intern::ExternalServicesComponent::instance().init(actualSessionServiceURL, actualSessionID);
+			std::string initResult = intern::ExternalServicesComponent::instance().init(actualSessionServiceURL, actualSessionID, actualServiceID);
 			if (initResult != OT_ACTION_RETURN_VALUE_OK) {
 				return -22;
 			}
@@ -213,6 +214,7 @@ int ot::foundation::initDebugExplicit(
 		std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 		std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
 		std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
+		ot::serviceID_t actualServiceID = static_cast<ot::serviceID_t>(ot::json::getUInt(params, OT_ACTION_PARAM_SERVICE_ID));
 		// Initialize the service with the parameters from the file
 
 		int startupResult = intern::ExternalServicesComponent::instance().startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
@@ -220,7 +222,7 @@ int ot::foundation::initDebugExplicit(
 			return startupResult;
 		}
 
-		std::string initResult = intern::ExternalServicesComponent::instance().initDebugExplicit(actualSessionServiceURL, actualSessionID);
+		std::string initResult = intern::ExternalServicesComponent::instance().initDebugExplicit(actualSessionServiceURL, actualSessionID, actualServiceID);
 		if (initResult != OT_ACTION_RETURN_VALUE_OK) {
 			return -22;
 		}

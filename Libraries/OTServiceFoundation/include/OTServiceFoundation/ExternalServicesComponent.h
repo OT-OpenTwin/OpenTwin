@@ -49,14 +49,8 @@ namespace ot {
 			//! @param _ownIP The IP address of this service
 			//! @param _sessionServiceIP The IP address of the session service this service was started from/ should interact with
 			//! @param _sessionID The ID of the session this service is running at
-			std::string init(
-				const std::string &					_sessionServiceURL,
-				const std::string &					_sessionID
-			);			
-			std::string initDebugExplicit(
-				const std::string &					_sessionServiceURL,
-				const std::string &					_sessionID
-			);
+			std::string init(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID);
+			std::string initDebugExplicit(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter

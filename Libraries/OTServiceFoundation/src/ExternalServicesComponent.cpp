@@ -151,10 +151,7 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	return 0;
 }
 
-std::string ot::intern::ExternalServicesComponent::init(
-	const std::string &					_sessionServiceURL,
-	const std::string &					_sessionID
-) {
+std::string ot::intern::ExternalServicesComponent::init(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID) {
 	if (m_componentState != WaitForInit) {
 		OT_LOG_EA("Component already initialized");
 		return OT_ACTION_RETURN_INDICATOR_Error "Component already initialized";
@@ -165,7 +162,11 @@ std::string ot::intern::ExternalServicesComponent::init(
 	// Store information
 	m_application->setSessionServiceURL(_sessionServiceURL);
 	m_application->setSessionID(_sessionID);
-	
+	m_application->setServiceID(_serviceID);
+
+	ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
+	OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
+
 	// Get the database information
 	{
 		JsonDocument request;
@@ -233,16 +234,12 @@ std::string ot::intern::ExternalServicesComponent::init(
 		JsonDocument reply;
 		reply.fromJson(response);
 
-		m_application->setServiceID(json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
-		ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
 		ot::ThisService::instance().setServiceID(m_application->getServiceID());
 
 		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
 			m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 		}
-
-		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
 			m_application->setWebSocketURL(ot::json::getString(reply, OT_ACTION_PARAM_WebsocketURL));
@@ -262,8 +259,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::string& _sessionServiceURL, const std::string& _sessionID)
-{
+std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID) {
 	if (m_componentState != WaitForInit) {
 		OT_LOG_EA("Component already initialized");
 		return OT_ACTION_RETURN_INDICATOR_Error "Component already initialized";
@@ -274,6 +270,10 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 	// Store information
 	m_application->setSessionServiceURL(_sessionServiceURL);
 	m_application->setSessionID(_sessionID);
+	m_application->setServiceID(_serviceID);
+
+	ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
+	OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
 
 	// Get the database information
 	{
@@ -339,15 +339,12 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 		JsonDocument reply;
 		reply.fromJson(response);
-		m_application->setServiceID(ot::json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
-		ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
 
 		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
 			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
 			m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 		}
 
-		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->getServiceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
 			m_application->setWebSocketURL(ot::json::getString(reply, OT_ACTION_PARAM_WebsocketURL));
@@ -487,10 +484,11 @@ std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocumen
 std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
 	std::string serviceName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string sessionID = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_ID);
 
-	return this->init(sessionServiceURL, sessionID);
+	return this->init(sessionServiceURL, sessionID, serviceID);
 }
 
 std::string ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {

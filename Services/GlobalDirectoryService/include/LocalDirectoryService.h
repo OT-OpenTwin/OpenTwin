@@ -43,7 +43,7 @@ public:
 	// Service management
 
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
-	bool supportsService(const std::string& _serviceName);
+	bool supportsService(const std::string& _serviceName) const;
 
 	bool requestToRunService(const ServiceInformation& _serviceInfo);
 	bool requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
