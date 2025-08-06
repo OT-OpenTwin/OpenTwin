@@ -306,7 +306,15 @@ void Logging::slotExport(void) {
 void Logging::slotRefillData(void) {
 	std::list<ot::LogMessage> messages = std::move(m_messages);
 	this->slotClear();
+
+	// Temporarily disable ignoring new messages to allow appending
+	QSignalBlocker blocker(m_ignoreNewMessages);
+	bool isIgnoring = m_ignoreNewMessages->isChecked();
+	m_ignoreNewMessages->setChecked(false);
+
 	this->appendLogMessages(messages);
+
+	m_ignoreNewMessages->setChecked(isIgnoring);
 }
 
 void Logging::slotClear(void) {
