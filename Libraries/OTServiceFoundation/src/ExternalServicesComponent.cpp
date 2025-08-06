@@ -198,6 +198,7 @@ std::string ot::intern::ExternalServicesComponent::init(const std::string& _sess
 		newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_RegisterNewService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PORT, JsonString(ot::IpConverter::portFromIp(m_application->getServiceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_HOST, JsonString(ot::IpConverter::hostFromIp(m_application->getServiceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
@@ -306,6 +307,7 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 		newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_RegisterNewService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->sessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PORT, JsonString(ot::IpConverter::portFromIp(m_application->getServiceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_HOST, JsonString(ot::IpConverter::hostFromIp(m_application->getServiceURL()), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());

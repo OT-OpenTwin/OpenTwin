@@ -197,9 +197,9 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonA
 
 void GlobalSessionService::healthCheck(void) {
 	int ct;
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, doc.GetAllocator()), doc.GetAllocator());
-	std::string pingMessage = doc.toJson();
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string pingMessage = pingDoc.toJson();
 
 	std::string lssUrl = SessionService::instance().getUrl();
 
@@ -219,13 +219,13 @@ void GlobalSessionService::healthCheck(void) {
 		else if (m_connectionStatus != Connected) {
 			// Register at the session service
 			ot::JsonDocument registerDoc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, doc.GetAllocator()), doc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, registerDoc.GetAllocator()), registerDoc.GetAllocator());
 
-			doc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), doc.GetAllocator()), doc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 
 			ot::JsonArray iniListArr;
-			doc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, doc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, registerDoc.GetAllocator());
 
 			std::string registerResponse;
 

@@ -33,21 +33,22 @@ GlobalDirectoryService::~GlobalDirectoryService() {
 // Management
 
 bool GlobalDirectoryService::connect(const std::string& _url, bool _waitForConnection) {
-	std::lock_guard<std::mutex> lock(m_mutex);
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
 
-	// Clean up potentially running health check thread
-	this->stopHealthCheck();
+		// Clean up potentially running health check thread
+		this->stopHealthCheck();
 
-	// Update information
-	this->setServiceURL(_url);
+		// Update information
+		this->setServiceURL(_url);
 
-	m_connectionStatus = CheckingNewConnection;
-	
-	OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
+		m_connectionStatus = CheckingNewConnection;
 
-	// Start health check and wait for success
-	this->startHealthCheck();
+		OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
 
+		// Start health check and wait for success
+		this->startHealthCheck();
+	}
 	if (_waitForConnection) {
 		// Wait for connection success
 		int ct = 0;
