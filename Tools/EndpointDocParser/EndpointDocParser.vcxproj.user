@@ -4,4 +4,8 @@
     <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\%(OT_DLLD);%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <LocalDebuggerEnvironment>PATH=$(OT_SYSTEM_ROOT)\$(OT_DLLD);$(OT_CORE_ROOT)\%(OT_DLLD);%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

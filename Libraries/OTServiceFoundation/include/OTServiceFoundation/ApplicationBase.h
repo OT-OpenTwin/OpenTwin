@@ -174,10 +174,10 @@ namespace ot {
 		std::string webSocketURL(void) { return m_websocketURL; }
 
 		//! @brief Will return the session service URL
-		std::string sessionServiceURL(void) { return m_sessionService.service->getServiceURL(); }
+		std::string sessionServiceURL(void) { return m_sessionService->getServiceURL(); }
 
 		//! @brief Will return the local directory service URL
-		std::string directoryServiceURL(void) { return m_directoryService.service->getServiceURL(); }
+		std::string directoryServiceURL(void) { return m_directoryService->getServiceURL(); }
 
 		//! @brief Will return the session ID this service is running in
 		std::string sessionID(void) { return m_sessionID; }
@@ -278,18 +278,14 @@ namespace ot {
 
 		bool											m_uiMessageQueuingEnabled;
 
-		struct structServiceInformation {
-			ServiceBase *	service;
-			int				enabledCounter;
-			JsonDocument*	doc;
-		};
 
-		std::map<std::string, structServiceInformation>	m_serviceNameMap;
 
-		std::map<serviceID_t, structServiceInformation>	m_serviceIdMap;
+		std::map<std::string, ServiceBase*>	m_serviceNameMap;
 
-		structServiceInformation						m_sessionService;
-		structServiceInformation						m_directoryService;
+		std::map<serviceID_t, ServiceBase*>	m_serviceIdMap;
+
+		ServiceBase*						m_sessionService;
+		ServiceBase*						m_directoryService;
 		components::ModelComponent *					m_modelComponent;
 		components::UiComponent *						m_uiComponent;
 		AbstractUiNotifier *							m_uiNotifier;

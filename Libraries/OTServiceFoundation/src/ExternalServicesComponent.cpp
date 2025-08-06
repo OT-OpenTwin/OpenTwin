@@ -24,6 +24,8 @@
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/ExternalServicesComponent.h"	// Corresponding header
 
+#include "OTServiceFoundation/MessageQueueHandler.h"
+
 #include <DataBase.h>
 
 // std header
@@ -133,6 +135,7 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	}
 
 	m_application->setServiceURL(_ownURL);
+	MessageQueueHandler::instance().setOwnServiceURL(_ownURL);
 	m_application->setDirectoryServiceURL(_localDirectoryServiceURL);
 	m_application->setSiteID("1");
 

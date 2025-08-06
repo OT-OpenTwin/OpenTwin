@@ -199,6 +199,7 @@
     <ClCompile Include="src\Encryption.cpp" />
     <ClCompile Include="src\FrontendLogNotifier.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
+    <ClCompile Include="src\MessageQueueHandler.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
+    <ClInclude Include="include\OTServiceFoundation\MessageQueueHandler.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h" />
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h" />

@@ -10,7 +10,7 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
-	if (!m_viewIsOpen && !m_alreadyRequestedVisualisation) {
+	if (!m_alreadyRequestedVisualisation) {
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());

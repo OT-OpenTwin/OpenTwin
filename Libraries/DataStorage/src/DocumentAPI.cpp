@@ -43,7 +43,7 @@ namespace DataStorageAPI
 		}
 	}
 
-	value DocumentAPI::InsertDocumentUsingGridFs(std::istream* source, std::string fileName)
+	value DocumentAPI::InsertDocumentUsingGridFs(std::istream* source, const std::string &fileName)
 	{
 		try
 		{
@@ -90,7 +90,7 @@ namespace DataStorageAPI
 		}
 	}
 
-	void DocumentAPI::GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, std::string fileName)
+	void DocumentAPI::GetDocumentUsingGridFs(value id, uint8_t *&buffer, size_t &length, const std::string &fileName)
 	{
 		try
 		{
@@ -112,7 +112,7 @@ namespace DataStorageAPI
 		}
 	}
 
-	value DocumentAPI::InsertDocumentUsingGridFs(bsoncxx::document::view docView, std::string fileName, Document &metaDoc)
+	value DocumentAPI::InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName, Document &metaDoc)
 	{
 		try
 		{
@@ -146,7 +146,7 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
-	value DocumentAPI::InsertDocumentUsingGridFs(bsoncxx::document::view docView, std::string fileName)
+	value DocumentAPI::InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName)
 	{
 		try
 		{
@@ -178,7 +178,7 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
-	value DocumentAPI::InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, std::string fileName)
+	value DocumentAPI::InsertBinaryDataUsingGridFs(const uint8_t* dataBuffer, size_t dataSize, const std::string &fileName)
 	{
 		try
 		{
@@ -200,6 +200,22 @@ namespace DataStorageAPI
 		{
 			std::cout << e.what();
 			throw e;
+		}
+	}
+	void DocumentAPI::DeleteGridFSData(value id, const std::string &fileName)
+	{
+		try
+		{
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
+			bucketOptions.bucket_name(fileName);
+			auto bucket = db.gridfs_bucket(bucketOptions);
+
+			bucket.delete_file(id);
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
 		}
 	}
 	std::vector<std::string_view> DocumentAPI::insertElementsToMetadata(bsoncxx::document::view docView, Document & metaDoc)

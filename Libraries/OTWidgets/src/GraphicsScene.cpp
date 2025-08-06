@@ -304,7 +304,18 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_connectionPreview) {
 		OTAssertNullptr(m_connectionOrigin);
-		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->mapToScene(m_connectionOrigin->getQGraphicsItem()->boundingRect().center()));
+		QGraphicsItem* graphicsItem = m_connectionOrigin->getQGraphicsItem();
+		OTAssertNullptr(graphicsItem);
+		if (graphicsItem != nullptr) //There was a bug where the m_connectionOrigin existed, but the graphicsItem was deleted
+		{
+			const auto& graphicsItemCenter = graphicsItem->boundingRect().center();
+			graphicsItem->mapToScene(graphicsItemCenter);
+		}
+		else
+		{
+			assert(0);
+		}
+
 		m_connectionPreview->setDestPos(_event->scenePos());
 	}
 

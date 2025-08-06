@@ -39,7 +39,7 @@ public:
 	const std::string& getDescription() const { return m_description; };
 
 	void setMacro(const std::string& _macro) { m_macro = _macro; };
-	const std::string& getMacro() const { return m_macro; };
+	const std::string& getMacro() const;
 
 private:
 	std::string m_name;

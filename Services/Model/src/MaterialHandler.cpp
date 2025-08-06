@@ -281,10 +281,12 @@ bool MaterialHandler::handleAction(const std::string& _action, ot::JsonDocument&
 	else if (_action == m_buttonMaterialMissing.GetFullDescription())
 	{
 		showMaterialMissing(_doc);
+		actionIsHandled = true;
 	}
 	else if (_action == m_buttonCreateMaterial.GetFullDescription())
 	{
 		createNewMaterial(_doc);
+		actionIsHandled = true;
 	}
 	return actionIsHandled;
 }
