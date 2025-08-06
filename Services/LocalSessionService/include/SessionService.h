@@ -72,9 +72,9 @@ private:
 
 	Service& runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session);
 
-	Service& runRelayService(Session& _session);
+	Service& runRelayService(Session& _session, const std::string& _serviceName, const std::string& _serviceType);
 
-	bool hasMandatoryService(const std::string& _serviceName);
+	bool hasMandatoryService(const std::string& _serviceName) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

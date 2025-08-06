@@ -100,11 +100,11 @@ std::list<std::string> Session::getToolBarTabOrder(void) {
 	return tabOrder;
 }
 
-bool Session::hasRequestedServices() {
+bool Session::hasRequestedServices(ot::serviceID_t _ignoredService) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	for (const Service& service : m_services) {
-		if (service.isRequested()) {
+		if (service.getServiceID() != _ignoredService && service.isRequested()) {
 			return true;
 		}
 	}
@@ -151,9 +151,6 @@ void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _al
 	}
 
 	ot::JsonArray stateArr;
-	if (m_state.flagIsSet(Session::WaitingForServices)) {
-		stateArr.PushBack(ot::JsonString("WaitingForServices", _allocator), _allocator);
-	}
 	if (m_state.flagIsSet(Session::ShuttingDown)) {
 		stateArr.PushBack(ot::JsonString("ShuttingDown", _allocator), _allocator);
 	}
@@ -181,15 +178,6 @@ Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation
 
 	Service newService(_serviceInformation, m_id);
 	newService.setRequested(true);
-	newService.setServiceID(this->generateNextServiceID());
-	return this->addService(std::move(newService));
-}
-
-Service& Session::addAliveService(const ot::ServiceBase& _serviceInformation) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	Service newService(_serviceInformation, m_id);
-	newService.setAlive(true);
 	newService.setServiceID(this->generateNextServiceID());
 	return this->addService(std::move(newService));
 }
@@ -320,6 +308,7 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 
 	// Flag all services as shutting down
 	for (Service& service : m_services) {
+		service.setRequested(false);
 		service.setAlive(false);
 		service.setShuttingDown(true);
 	}

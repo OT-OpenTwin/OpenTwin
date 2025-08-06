@@ -273,16 +273,16 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 	auto it = m_sessionMap.find(projectName);
 	if (it == m_sessionMap.end()) {
 		// Session does not exist
-		return std::string();
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::False);
 	}
 	else {
 		try {
 			// Get user (may throw if not found...)
-			return this->getLssFromSessionId(projectName).getSessionUser(projectName);
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::True, this->getLssFromSessionId(projectName).getSessionUser(projectName));
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());
-			return std::string("<error while searching for user>");
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "<error while searching for user>");
 		}
 	}
 }

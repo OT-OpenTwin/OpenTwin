@@ -733,13 +733,19 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 	AppBase * app{ AppBase::instance() };
 
 	std::string response;
-	sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), doc.toJson(), response);
+	if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), doc.toJson(), response)) {
+		OT_LOG_EA("Failed to send HTTP request to check if project is opened");
+		return false;
+	}
 
-	// todo: add json return value containing true/false and username instead of empty string for more clarity
-	if (response.empty()) return false;
-
-	projectUser = response;
-	return true;
+	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(response);
+	if (msg == ot::ReturnMessage::True) {
+		projectUser = msg.getWhat();
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 // ###################################################################################################

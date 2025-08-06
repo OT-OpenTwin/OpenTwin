@@ -12,6 +12,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -360,11 +361,13 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	return newDebugService;
 }
 
-Service& SessionService::runRelayService(Session& _session) {
+Service& SessionService::runRelayService(Session& _session, const std::string& _serviceName, const std::string& _serviceType) {
 	ot::ServiceBase relayInfo(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService);
 
 	if (this->getIsServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
-		return this->runServiceInDebug(relayInfo, _session);
+		Service& relay = this->runServiceInDebug(relayInfo, _session);
+		relay.setServiceName(_serviceName);
+		relay.setServiceType(_serviceType);
 	}
 	else {
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
@@ -377,6 +380,8 @@ Service& SessionService::runRelayService(Session& _session) {
 			throw ot::Exception::ObjectNotFound("Failed to start relay service");
 		}
 
+		relay.setServiceName(_serviceName);
+		relay.setServiceType(_serviceType);
 		relay.setServiceURL(newServiceUrl);
 		relay.setWebsocketUrl(newWebsocketUrl);
 
@@ -384,7 +389,7 @@ Service& SessionService::runRelayService(Session& _session) {
 	}
 }
 
-bool SessionService::hasMandatoryService(const std::string& _serviceName) {
+bool SessionService::hasMandatoryService(const std::string& _serviceName) const {
 	for (const auto& it : m_mandatoryServicesMap) {
 		for (const ot::ServiceBase& serviceInfo : it.second) {
 			if (serviceInfo.getServiceName() == _serviceName) {
@@ -401,14 +406,14 @@ bool SessionService::hasMandatoryService(const std::string& _serviceName) {
 
 void SessionService::workerShutdownSession() {
 	while (m_workerRunning) {
-
+		//! @todo Implement shutdown worker
 	}
 	OT_LOG_D("Shutdown session worker finished");
 }
 
 void SessionService::workerRunServices() {
 	while (m_workerRunning) {
-
+		//! @todo Implement run services worker
 	}
 	OT_LOG_D("Run services worker finished");
 }
@@ -565,7 +570,6 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Create the session
 	Session& newSession = this->createSession(sessionID, userName, projectName, collectionName, sessionType);
-	newSession.setWaitingForServices(true);
 
 	// Set the user credentials
 	newSession.setCredentialsUsername(credentialsUserName);
@@ -587,7 +591,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	if (shouldRunRelayService) {
 		OT_LOG_D("Relay service requested by session creator");
 
-		Service& relayService = this->runRelayService(newSession);
+		Service& relayService = this->runRelayService(newSession, serviceName, serviceType);
 		relayService.setRequested(false);
 		relayService.setAlive(true);
 
@@ -598,7 +602,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	}
 	else {
 		OT_LOG_D("Session created without relay service (for session creator)");
-		Service& requestingService = newSession.addAliveService(requestingServiceInfo);
+		Service& requestingService = newSession.addRequestedService(requestingServiceInfo);
 		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, requestingService.getServiceID(), responseDoc.GetAllocator());
 	}
 
@@ -629,15 +633,15 @@ std::string SessionService::handleCheckProjectOpen(ot::JsonDocument& _commandDoc
 
 	// Required session params
 	std::string projectName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_PROJECT_NAME);
-
+	
 	// Check session
 	for (auto& session : m_sessions) {
 		if (session.second.getProjectName() == projectName) {
-			return session.second.getUserName();
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::True, session.second.getUserName());
 		}
 	}
 
-	return "";
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::False);
 }
 
 std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandDoc) {
@@ -669,8 +673,8 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 		response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
 	}
 
-	// If all services are ready, send the run command
-	if (!theSession.isWaitingForServices()) {
+	// If all services are ready, add services information
+	if (!theSession.hasRequestedServices(serviceID)) {
 		// Session is already active
 		ot::JsonArray aliveServices;
 		theSession.addAliveServicesToJsonArray(aliveServices, response.GetAllocator());
@@ -831,10 +835,11 @@ std::string SessionService::handleCheckStartupCompleted(ot::JsonDocument& _comma
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
+	ot::serviceID_t serviceID(static_cast<ot::serviceID_t>(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID)));
 
 	Session& session = this->getSession(sessionID);
 
-	if (session.isWaitingForServices()) {
+	if (session.hasRequestedServices(serviceID)) {
 		return OT_ACTION_RETURN_VALUE_FALSE;
 	}
 	else {

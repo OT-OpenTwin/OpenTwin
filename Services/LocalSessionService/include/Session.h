@@ -27,7 +27,6 @@ class Session {
 public:
 	enum SessionStateFlag {
 		NoState            = 0 << 0, //! @brief No state set.
-		WaitingForServices = 1 << 0, //! @brief Session is waiting for services to register.
 		ShuttingDown       = 1 << 0  //! @brief Session is shutting down.
 	};
 	typedef ot::Flags<SessionStateFlag> SessionState; //! @brief Flags used to describe the state of the session.
@@ -72,16 +71,14 @@ public:
 	std::list<std::string> getToolBarTabOrder(void);
 
 	//! @brief Returns true if any of the services in this session is flagged as requested.
-	bool hasRequestedServices();
+	//! @param _ignoredService If provided, this service will be ignored in the check.
+	bool hasRequestedServices(ot::serviceID_t _ignoredService);
 
 	//! @brief Returns true if any of the services in this session is alive.
 	bool hasAliveServices();
 
 	//! @brief Returns true if any of the services in this session is shutting down.
 	bool hasShuttingDownServices();
-
-	void setWaitingForServices(bool _isWaiting) { m_state.setFlag(Session::WaitingForServices, _isWaiting); };
-	bool isWaitingForServices() const { return m_state.flagIsSet(Session::WaitingForServices); };
 
 	bool isShuttingDown() const { return m_state.flagIsSet(Session::ShuttingDown); };
 
@@ -97,8 +94,6 @@ public:
 
 	Service& addRequestedService(const ot::ServiceBase& _serviceInformation);
 	
-	Service& addAliveService(const ot::ServiceBase& _serviceInformation);
-
 	Service& setServiceAlive(ot::serviceID_t _serviceID);
 
 	void setServiceShutdownCompleted(ot::serviceID_t _serviceID);
