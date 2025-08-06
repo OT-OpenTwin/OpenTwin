@@ -69,6 +69,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	else
 	{
 		assert(false);
+		throw std::exception("Not supported type for type conversion.");
 	}
 }
 
