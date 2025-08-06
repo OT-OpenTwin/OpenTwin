@@ -14,11 +14,26 @@
 #include "StringConverter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
+#include "OTCore/EntityName.h"
+
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
 {
 	m_input = blockEntity->getConnectorInput();
 	m_fileName = blockEntity->getFileName();
+	if (m_fileName.empty())
+	{
+		const std::string entityName = blockEntity->getName();
+		auto entityNameShort = ot::EntityName::getSubName(entityName);
+		if (entityNameShort.has_value())
+		{
+			m_fileName = entityNameShort.value();
+		}
+		else
+		{
+			OT_LOG_W("Failed to deduce a fitting name for the text file");
+		}
+	}
 	m_headline = blockEntity->getHeadline();
 	m_fileType =blockEntity->getFileType();
 }
