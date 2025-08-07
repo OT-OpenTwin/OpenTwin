@@ -153,7 +153,8 @@ void EntityResult1DPlot::createProperties(void)
 	m_querySettings.setQueryDefinitions(allQueryOptions);
 	m_querySettings.setProperties(this);
 
-	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
+	//EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian", "Polar", "Polar - Complex" }, "Cartesian", "", getProperties());
+	EntityPropertiesSelection::createProperty("General", "Plot type", { "Cartesian"}, "Cartesian", "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Plot quantity", { "Magnitude", "Phase", "Real", "Imaginary" }, "Real", "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesColor::createProperty("General", "Grid color", { 100, 100, 100 }, "", getProperties());
