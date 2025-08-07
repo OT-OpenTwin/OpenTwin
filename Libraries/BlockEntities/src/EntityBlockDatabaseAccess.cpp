@@ -323,9 +323,10 @@ ValueCharacteristicProperties EntityBlockDatabaseAccess::getQueryValueCharacteri
 	return getValueCharacteristics(groupName);
 }
 
-int32_t EntityBlockDatabaseAccess::getMaxNumberOfQueries()
+int32_t EntityBlockDatabaseAccess::getSelectedNumberOfQueries()
 {
-	return m_maxNbOfQueries;
+	int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(this, m_propertyNumberOfQueries);
+	return numberOfQueries;
 }
 
 
@@ -348,7 +349,7 @@ const std::list<ValueComparisionDefinition> EntityBlockDatabaseAccess::getAdditi
 {
 	
 	std::list<ValueComparisionDefinition> valueComparisionDefinitions;
-	int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(this, m_propertyNumberOfQueries);
+	const int32_t numberOfQueries = getSelectedNumberOfQueries();
 	for (int i = 1; i <= numberOfQueries; i++)
 	{
 		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);

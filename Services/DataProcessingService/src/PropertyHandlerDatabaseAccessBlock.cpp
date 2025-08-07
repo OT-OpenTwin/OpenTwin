@@ -70,7 +70,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 			parameterList = dependingParameterLables;
 		}
 
-		int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+		int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
 		for (int32_t i = 1; i <= numberOfQueries; i++)
 		{
 			auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
@@ -95,7 +95,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 
 	//Now we update all parameter overviews and the labels of the parameter
 
-	int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+	int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
 	for (int32_t i = 1; i <= numberOfQueries; i++)
 	{
 		auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
@@ -141,13 +141,17 @@ void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<st
 {
 	const std::vector<std::string>& optionsSeries = _selection->getOptions();
 	std::list<std::string> optionsSeriesList{ optionsSeries.begin(),optionsSeries.end() };
+	EntityPropertiesSelection* newSelection = dynamic_cast<EntityPropertiesSelection*>(_selection->createCopy());
 	if (optionsSeriesList != _valuesInProject)
 	{
-		EntityPropertiesSelection* newSelection = dynamic_cast<EntityPropertiesSelection*>(_selection->createCopy());
 		newSelection->resetOptions(_valuesInProject);
+	}
+	
+	if (newSelection->getValue() != m_selectedValueNone)
+	{
 		if (_valuesInProject.empty())
 		{
-			newSelection->setValue("");
+			newSelection->setValue(m_selectedValueNone);
 		}
 		else
 		{
@@ -158,8 +162,9 @@ void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<st
 				newSelection->setValue(*_valuesInProject.begin());
 			}
 		}
-		_properties.createProperty(newSelection, newSelection->getGroup());
 	}
+
+	_properties.createProperty(newSelection, newSelection->getGroup());
 }
 
 std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNecessary(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity, ResultCollectionMetadataAccess* _resultCollectionAccess, EntityProperties& _properties)
@@ -167,30 +172,23 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 	auto quantityValueCharacteristic = _dbAccessEntity->getQuantityValueCharacteristic();
 	const std::string& selectedQuantityLabel = quantityValueCharacteristic.m_label->getValue();
 	
-	//If a quantity is selected we need to check for matching labels
+	//If a quantity is selected we need to check for matching labels and if the name is still valid for project
 	if (selectedQuantityLabel != m_selectedValueNone)
 	{
 		//If a quantity is selected, we need to check if it is still a valid one for the selected campaign.
 		const MetadataQuantity* quantity = _resultCollectionAccess->findMetadataQuantity(selectedQuantityLabel);
+		
+		//Quantity of the selected name does not exist in the 
 		if (quantity == nullptr)
 		{
-			//Reset selected quantity label if necessary
-			if (quantityValueCharacteristic.m_label->getValue() != m_selectedValueNone)
-			{
-				EntityPropertiesSelection* newLabelProperty = dynamic_cast<EntityPropertiesSelection*>(quantityValueCharacteristic.m_label->createCopy());
-				assert(newLabelProperty != nullptr);
-				newLabelProperty->setValue(m_selectedValueNone);
-				_properties.createProperty(newLabelProperty, newLabelProperty->getGroup());
-			}
+			std::list<std::string> emptyList{};
 			
-			//Reset all labels, if necessary
+			updateSelectionIfNecessary(emptyList, quantityValueCharacteristic.m_label, _properties);
 			resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
+			auto valueDescriptionSelection = _dbAccessEntity->getQuantityValueDescriptionSelection();
+			updateSelectionIfNecessary(emptyList, valueDescriptionSelection, _properties);
 
-			//Reset value description selection
-			EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
-			std::list<std::string> emptyList{ };
-			updateSelectionIfNecessary(emptyList, selectionQuantityValDescr, _properties);
-			return std::list<std::string>();
+			return std::list<std::string>();			
 		}
 
 		//First we extract all parameter labels that shall be shown in relation to the selected quantity.
