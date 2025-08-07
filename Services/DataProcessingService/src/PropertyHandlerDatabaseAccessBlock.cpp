@@ -202,13 +202,15 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 
 		//Now we check if the options of value descriptions is still up-to-date and the selected labels need to be updated
 		EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
+		bool firstSelection = selectionQuantityValDescr->getOptions().size() == 0;
 		const std::string& selectedQuantityValDescr = selectionQuantityValDescr->getValue();
 		const auto& quantityValueDescriptions = quantity->valueDescriptions;
 		std::string expectedUnit(""), expectedDataType("");
 		std::list<std::string> valueDescriptionLabels;
+		
 		for (const auto& quantityValueDescription : quantityValueDescriptions)
 		{
-			if (quantityValueDescription.quantityValueLabel == selectedQuantityValDescr)
+			if (quantityValueDescription.quantityValueLabel == selectedQuantityValDescr || firstSelection)
 			{
 				expectedUnit = quantityValueDescription.unit;
 				expectedDataType = quantityValueDescription.dataTypeName;
