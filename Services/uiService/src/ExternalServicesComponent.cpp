@@ -3706,7 +3706,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	}
 	else
 	{
-		const ot::Plot1DCfg& oldConfig = plot->getPlot()->getConfiguration();
+		const ot::Plot1DCfg& oldConfig = plot->getConfig();
 		if (plotConfig.getXLabelAxisAutoDetermine())
 		{
 			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
@@ -3756,11 +3756,10 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 				std::string curveTitle = dataSet->getConfig().getTitle();
 				
 				curveTitle = ot::String::replace(curveTitle, curveNameBase, newNameShort);
-
-				ot::Plot1DCurveCfg curveCfg = dataSet->getConfig();
-				curveCfg.setTitle(curveTitle);
 				
-				dataSet->setConfig(curveCfg);
+				config.setTitle(curveTitle);
+				
+				dataSet->setConfig(config);
 				dataSet->setCurveNameBase(newNameShort);
 
 				dataSet->updateCurveVisualization();
