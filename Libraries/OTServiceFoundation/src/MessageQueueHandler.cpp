@@ -7,7 +7,9 @@ void MessageQueueHandler::flushIfAppropriate(int _queueRequestIncrement, ot::Ser
 	buffer.m_queueRequestCounter += _queueRequestIncrement;
 	
 	if (buffer.m_queueRequestCounter < 0) {
-		OTAssert(0, "Enabled counter reached a negative value");
+		//OTAssert(0, "Enabled counter reached a negative value"); 
+		// Can happen. If a manual flush is being applied then the counter is set to zero because of a flush, but any enabled locks may still try to unlock
+		buffer.m_queueRequestCounter = 0;
 		return;
 	}
 
