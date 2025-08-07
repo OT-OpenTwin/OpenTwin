@@ -2026,11 +2026,14 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 				connectedEntityID = connectionCfg.getDestinationUid();
 			}
 			auto connectedEntity = entityMap.find(connectedEntityID);
-			assert(connectedEntity != entityMap.end());
-			EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
-			assert(connectedBlockEntity != nullptr);
-			connectedBlockEntity->RemoveConnection(connectionID);
-			entitiesMarkedForStorage.insert(connectedEntity->second);
+			if (connectedEntity != entityMap.end())
+			{
+				EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
+				assert(connectedBlockEntity != nullptr);
+				connectedBlockEntity->RemoveConnection(connectionID);
+				entitiesMarkedForStorage.insert(connectedEntity->second);
+			}
+			
 
 			//Check if the connection was also selected for removal
 			if (connectionsSelectedForRemovalByEntID.find(connectionEntity->getEntityID()) != connectionsSelectedForRemovalByEntID.end())
