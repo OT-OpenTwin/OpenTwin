@@ -99,7 +99,7 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 		m_sessionService = nullptr;
 	}
 	
-	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_SessionService, OT_INFO_SERVICE_TYPE_SessionService, _url, invalidServiceID);
+	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, _url, invalidServiceID);
 	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
 }
 
