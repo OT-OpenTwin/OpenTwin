@@ -294,8 +294,8 @@ namespace ot {
 
 		std::map<serviceID_t, ServiceBase*>	m_serviceIdMap;
 
-		ServiceBase*						m_sessionService;
-		ServiceBase*						m_directoryService;
+		ServiceBase*						m_sessionService = nullptr;
+		ServiceBase*						m_directoryService = nullptr;
 		components::ModelComponent *					m_modelComponent;
 		components::UiComponent *						m_uiComponent;
 		AbstractUiNotifier *							m_uiNotifier;
