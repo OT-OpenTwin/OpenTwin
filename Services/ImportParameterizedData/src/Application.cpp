@@ -259,7 +259,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 			if (action == m_buttonImportTouchstone.GetFullDescription())
 			{
-				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
@@ -362,8 +361,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				auto value = ot::json::getInt( _doc,OT_ACTION_PARAM_Value);
 				_touchstoneToResultdata->createResultdata(value);
-				delete m_twoPartsAction;
-				m_twoPartsAction = nullptr;
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
