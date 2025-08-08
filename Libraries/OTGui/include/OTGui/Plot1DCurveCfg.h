@@ -100,6 +100,7 @@ namespace ot {
 		void setLinePenColor(const Color& _color) { m_linePen.setColor(_color); };
 		void setLinePenColor(ColorStyleValueEntry _styleReference) { m_linePen.setColor(_styleReference); };
 		void setLinePenStyle(LineStyle _style) { m_linePen.setStyle(_style); };
+		void setLinePenPainter(Painter2D* _painter) { m_linePen.setPainter(_painter); };
 		const PenFCfg& getLinePen() const { return m_linePen; };
 
 		void setPointSymbol(Symbol _symbol) { m_pointSymbol = _symbol; };
@@ -117,6 +118,7 @@ namespace ot {
 		void setPointOutlinePenColor(const Color& _color) { m_pointOulinePen.setColor(_color); };
 		void setPointOutlinePenColor(ColorStyleValueEntry _styleReference) { m_pointOulinePen.setColor(_styleReference); };
 		void setPointOutlinePenStyle(LineStyle _style) { m_pointOulinePen.setStyle(_style); };
+		void setPointOutlinePenPainter(Painter2D* _painter) { m_pointOulinePen.setPainter(_painter); };
 		const PenFCfg& getPointOutlinePen() const { return m_pointOulinePen; };
 
 		void setPointFillColor(DefaultColor _color);
