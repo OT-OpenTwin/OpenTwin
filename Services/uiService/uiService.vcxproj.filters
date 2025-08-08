@@ -149,6 +149,9 @@
     <ClCompile Include="src\ViewStateCfg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CurveColourSetter.cpp">
+      <Filter>Source Files\CurveHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -216,6 +219,9 @@
     </ClInclude>
     <ClInclude Include="include\UITestLogs.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurveColourSetter.h">
+      <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

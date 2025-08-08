@@ -11,6 +11,7 @@
 #include "AppBase.h"
 #include "OTCore/EntityName.h"
 #include "OTGui/PainterRainbowIterator.h"
+#include "CurveColourSetter.h"
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ValueComparisionDefinition>& _valueComparisions)
 {
@@ -157,7 +158,9 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 		numberOfQuantityEntries *= quantityDimension;
 	}
 
-
+	//We may need to iterate the rainbow painter
+	CurveColourSetter colourSetting(_curveCfg, numberOfQuantityEntries);
+	
 	std::vector<std::unique_ptr<ot::ComplexNumberContainerCartesian>> dataY; 
 	dataY.resize(numberOfQuantityEntries);
 	for (size_t i = 0; i < numberOfQuantityEntries; i++)
@@ -209,8 +212,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	
 	const std::string curveNameBase = ot::EntityName::getSubName(_curveCfg.getEntityName()).value();
 	std::list<ot::PlotDataset*> allCurves;
-	ot::PainterRainbowIterator rainBowIt;
-
+	
 	bool showEntireMatrix = _plotCfg.getShowEntireMatrix();
 	int32_t showMatrixRowEntry = _plotCfg.getShowMatrixRowEntry() - 1;
 	int32_t showMatrixColumnEntry = _plotCfg.getShowMatrixColumnEntry() - 1;
@@ -219,21 +221,9 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	for (uint32_t j = 0; j < numberOfQuantityEntries; j++)
 	{
 		auto newCurveCfg = _curveCfg;
-
-		if (dataX.size() == 1)
-		{
-			newCurveCfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
-			newCurveCfg.setLinePenStyle(ot::LineStyle::NoLine);
-			auto nextPainter = rainBowIt.getNextPainter();
-			newCurveCfg.setPointFillPainter(nextPainter.release());
-			newCurveCfg.setPointOutlinePen(nextPainter.release());
-
-		}
-		else
-		{
-			newCurveCfg.setLinePen(rainBowIt.getNextPainter().release());
-		}
-
+		bool datasetHasSingleDatapoint = dataX.size() == 1;
+		colourSetting.setPainter(newCurveCfg, j, datasetHasSingleDatapoint);
+		
 		if (numberOfQuantityEntries == 1)
 		{
 
@@ -260,8 +250,6 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 			{
 				ot::PlotDataset* familyOfCurves = new ot::PlotDataset(nullptr, newCurveCfg, ot::PlotDatasetData(dataX, dataY[j].release()));
 
-				
-				
 				newCurveCfg.setTitle(curveNameBase + " (" + std::to_string(row + 1) + "," + std::to_string(column + 1) + ")");
 
 				familyOfCurves->setConfig(newCurveCfg);
@@ -502,7 +490,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	}
 	
 	
-	ot::PainterRainbowIterator rainBowIt;
+	
+	//We may need to iterate the rainbow painter
+	CurveColourSetter curveColourSetter(_curveCfg);
 	for (auto& singleCurve : familyOfCurves) 
 	{
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
@@ -524,20 +514,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 			std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
 			yData->m_real = std::move(curveData.m_yData);
 
-			if (curveData.m_xData.size() == 1)
-			{
-				newCurveCfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
-				newCurveCfg.setLinePenStyle(ot::LineStyle::NoLine);
-				auto nextPainter = rainBowIt.getNextPainter();
-				newCurveCfg.setPointFillPainter(nextPainter.release());
-				newCurveCfg.setPointOutlinePen(nextPainter.release());
-
-			}
-			else
-			{
-				newCurveCfg.setLinePen(rainBowIt.getNextPainter().release());
-			}
-
+			bool datasetHasSingleDatapoint = curveData.m_xData.size() == 1;
+			curveColourSetter.setPainter(newCurveCfg, datasetHasSingleDatapoint);
+			
 			ot::PlotDatasetData datasetData(std::move(curveData.m_xData), yData.release());
 			auto dataset = new ot::PlotDataset (nullptr, newCurveCfg, std::move(datasetData));
 			dataset->setCurveNameBase(simpleNameBase);
@@ -564,21 +543,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 					const std::string curveTitleWithIndex = curveTitle + " (" + std::to_string(row + 1) + "," + std::to_string(column + 1) + ")";
 					ot::Plot1DCurveCfg newCurveCfgSub = newCurveCfg;
 					
-					if (curveData.m_xData.size() == 1)
-					{
-						newCurveCfgSub.setPointSymbol(ot::Plot1DCurveCfg::Circle);
-						newCurveCfgSub.setLinePenStyle(ot::LineStyle::NoLine);
-						auto nextPainter = rainBowIt.getNextPainter();
-						newCurveCfgSub.setPointFillPainter(nextPainter.release());
-						newCurveCfgSub.setPointOutlinePen(nextPainter.release());
-
-					}
-					else
-					{
-						newCurveCfgSub.setLinePen(rainBowIt.getNextPainter().release());
-					}
-
-
+					bool datasetHasSingleDatapoint = curveData.m_xData.size() == 1;
+					curveColourSetter.setPainter(newCurveCfgSub, datasetHasSingleDatapoint);
+				
 					newCurveCfg.setTitle(curveTitleWithIndex);
 					std::unique_ptr<ot::ComplexNumberContainerCartesian> yData(new ot::ComplexNumberContainerCartesian());
 					yData->m_real = std::move(curveData.m_yData);

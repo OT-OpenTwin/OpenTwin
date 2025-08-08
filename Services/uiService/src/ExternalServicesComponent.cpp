@@ -102,6 +102,7 @@
 #include <iostream>
 
 #include "OTCore/EntityName.h"
+#include "CurveColourSetter.h"
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
@@ -3745,7 +3746,7 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 		ot::Plot* plot = plotView->getPlot();
 		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
-
+		CurveColourSetter colourSetter(config);
 		for (ot::PlotDataset* dataSet : allDatasets) {
 			if (dataSet->getEntityName() == config.getEntityName()) {
 				const std::string curveNameBase =  dataSet->getCurveNameBase();
@@ -3759,6 +3760,11 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 				
 				config.setTitle(curveTitle);
 				
+				//if a rainbow painter is not set yet, it may have been newly set. In that case we need to iterate the colours.
+				bool datasetHasDingleDatapoint = dataSet->getPlotData().getDataX().size() == 1;
+				colourSetter.setPainter(config, datasetHasDingleDatapoint);
+				
+
 				dataSet->setConfig(config);
 				dataSet->setCurveNameBase(newNameShort);
 
