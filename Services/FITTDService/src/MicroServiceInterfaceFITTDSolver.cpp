@@ -679,7 +679,7 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 
 		dataset.setQuantityDescription(quantDesc.release());
 		ot::Plot1DCurveCfg curveConfig;
-		curveConfig.setLinePen(painter.release());
+		curveConfig.setLinePenPainter(painter.release());
 		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
 	}
 	

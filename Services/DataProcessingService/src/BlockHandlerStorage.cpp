@@ -256,7 +256,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				
 				ot::Plot1DCurveCfg curveConfig;
 				auto painter = colourIt.getNextPainter();
-				curveConfig.setLinePen(painter.release());
+				curveConfig.setLinePenPainter(painter.release());
 				CurveFactory::addToConfig(*series, curveConfig);
 
 				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());

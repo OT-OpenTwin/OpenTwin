@@ -55,38 +55,38 @@ namespace ot {
 	public:
 		//! @brief Default constructor.
 		//! Creates a black fill painter.
-		PenCfg();
+		explicit PenCfg();
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		PenCfg(DefaultColor _color);
+		explicit PenCfg(DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		PenCfg(const Color& _color);
+		explicit PenCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenCfg() "See default constructor"]).
-		PenCfg(Painter2D* _painter);
+		explicit PenCfg(Painter2D* _painter);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		PenCfg(int _width, DefaultColor _color);
+		explicit PenCfg(int _width, DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		PenCfg(int _width, const Color& _color);
+		explicit PenCfg(int _width, const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width 
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenCfg() "See default constructor"]).
-		PenCfg(int _width, Painter2D* _painter);
+		explicit PenCfg(int _width, Painter2D* _painter);
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		PenCfg(const PenCfg& _other);
+		explicit PenCfg(const PenCfg& _other);
 
 		//! @brief Destructor.
 		~PenCfg();
@@ -179,38 +179,38 @@ namespace ot {
 	public:
 		//! @brief Default constructor.
 		//! Creates a black fill painter.
-		PenFCfg();
+		explicit PenFCfg();
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		PenFCfg(DefaultColor _color);
+		explicit PenFCfg(DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _color Initial color.
-		PenFCfg(const Color& _color);
+		explicit PenFCfg(const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenFCfg() "See default constructor"]).
-		PenFCfg(Painter2D* _painter);
+		explicit PenFCfg(Painter2D* _painter);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		PenFCfg(double _width, DefaultColor _color);
+		explicit PenFCfg(double _width, DefaultColor _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width.
 		//! @param _color Initial color.
-		PenFCfg(double _width, const Color& _color);
+		explicit PenFCfg(double _width, const Color& _color);
 
 		//! @brief Assignment constructor.
 		//! @param _width Line width 
 		//! @param _painter Initial painter (if 0, default painter will be set [/ref PenFCfg() "See default constructor"]).
-		PenFCfg(double _width, Painter2D* _painter);
+		explicit PenFCfg(double _width, Painter2D* _painter);
 
 		//! @brief Copy constructor.
 		//! @param _other The other style.
-		PenFCfg(const PenFCfg& _other);
+		explicit PenFCfg(const PenFCfg& _other);
 
 		//! @brief Destructor.
 		~PenFCfg();

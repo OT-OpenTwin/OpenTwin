@@ -278,7 +278,7 @@ void Application::createFamilyOfCurves()
 	curveCfg.setEntityName(plotName + "/A_Curve");
 	auto stylePainter = rainbowPainterIt.getNextPainter();
 
-	curveCfg.setLinePen(stylePainter.release());
+	curveCfg.setLinePenPainter(stylePainter.release());
 	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve");
 
 	//Here the shared part

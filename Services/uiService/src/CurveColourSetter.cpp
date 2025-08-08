@@ -35,9 +35,8 @@ void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingl
 		{
 			painter = _curveCfg.getLinePen().getPainter()->createCopy();
 		}
-		_curveCfg.setPointFillPainter(painter);
-		_curveCfg.setPointOutlinePen(painter);
-
+		_curveCfg.setPointFillPainter(painter->createCopy());
+		_curveCfg.setPointOutlinePenPainter(painter);
 	}
 	else
 	{
@@ -50,9 +49,8 @@ void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingl
 		{
 			painter = _curveCfg.getLinePen().getPainter()->createCopy();
 		}
-		ot::PenFCfg pen = _curveCfg.getLinePen();
-		pen.setPainter(painter);
-		_curveCfg.setLinePen(pen);
+
+		_curveCfg.setLinePenPainter(painter);
 	}
 }
 
@@ -72,9 +70,8 @@ void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _buff
 		{
 			painter = _curveCfg.getLinePen().getPainter()->createCopy();
 		}
-		_curveCfg.setPointFillPainter(painter);
-		ot::Painter2D* secondPainter = painter->createCopy();
-		_curveCfg.setPointOutlinePenPainter(secondPainter);
+		_curveCfg.setPointFillPainter(painter->createCopy());
+		_curveCfg.setPointOutlinePenPainter(painter);
 
 	}
 	else
@@ -88,8 +85,7 @@ void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _buff
 		{
 			painter = _curveCfg.getLinePen().getPainter()->createCopy();
 		}
-		ot::PenFCfg pen = _curveCfg.getLinePen();
-		pen.setPainter(painter);
-		_curveCfg.setLinePen(pen);
+
+		_curveCfg.setLinePenPainter(painter);
 	}
 }

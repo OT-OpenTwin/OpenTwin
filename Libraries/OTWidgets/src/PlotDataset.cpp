@@ -266,7 +266,7 @@ ot::PolarPlotCurve* ot::PlotDataset::getPolarCurve(void) {
 // Data Setter / Getter
 
 void ot::PlotDataset::updateCurveVisualization(void) {
-	PenFCfg linePenCfg = m_config.getLinePen();
+	PenFCfg linePenCfg(m_config.getLinePen());
 	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
 
 	// The line has no pen style set use the color from the points

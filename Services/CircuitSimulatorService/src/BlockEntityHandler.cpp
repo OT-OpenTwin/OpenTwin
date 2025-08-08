@@ -641,7 +641,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		curveCfg.setTitle(curveName);
 				
 		auto stylePainter = rainbowPainterIt.getNextPainter();
-		curveCfg.setLinePen(stylePainter.release());
+		curveCfg.setLinePenPainter(stylePainter.release());
 
 		std::string yLabel = it.first;
 		if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)

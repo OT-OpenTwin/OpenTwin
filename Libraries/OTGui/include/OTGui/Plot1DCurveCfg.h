@@ -100,7 +100,12 @@ namespace ot {
 		void setLinePenColor(const Color& _color) { m_linePen.setColor(_color); };
 		void setLinePenColor(ColorStyleValueEntry _styleReference) { m_linePen.setColor(_styleReference); };
 		void setLinePenStyle(LineStyle _style) { m_linePen.setStyle(_style); };
+
+		//! @brief Sets the painter for the line pen.
+		//! The pen takes ownership of the painter.
+		//! @param _painter Painter to set.
 		void setLinePenPainter(Painter2D* _painter) { m_linePen.setPainter(_painter); };
+
 		const PenFCfg& getLinePen() const { return m_linePen; };
 
 		void setPointSymbol(Symbol _symbol) { m_pointSymbol = _symbol; };
@@ -118,13 +123,24 @@ namespace ot {
 		void setPointOutlinePenColor(const Color& _color) { m_pointOulinePen.setColor(_color); };
 		void setPointOutlinePenColor(ColorStyleValueEntry _styleReference) { m_pointOulinePen.setColor(_styleReference); };
 		void setPointOutlinePenStyle(LineStyle _style) { m_pointOulinePen.setStyle(_style); };
+
+		//! @brief Sets the painter for the point outline pen.
+		//! The pen takes ownership of the painter.
+		//! @param _painter Painter to set.
 		void setPointOutlinePenPainter(Painter2D* _painter) { m_pointOulinePen.setPainter(_painter); };
 		const PenFCfg& getPointOutlinePen() const { return m_pointOulinePen; };
 
 		void setPointFillColor(DefaultColor _color);
 		void setPointFillColor(const Color& _color);
 		void setPointFillColor(ColorStyleValueEntry _styleReference);
+
+		//! @brief Sets the painter for the point fill.
+		//! The curve takes ownership of the painter.
+		//! @param _painter Painter to set.
 		void setPointFillPainter(Painter2D* _painter);
+
+		//! @brief Returns the painter for the point fill.
+		//! The curve keeps ownership of the painter.
 		const Painter2D* getPointFillPainter() const { return m_pointFillPainter; };
 
 		void setQueryInformation(QueryInformation _queryInformation) { m_queryInformation = _queryInformation; };
