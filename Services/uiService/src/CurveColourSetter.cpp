@@ -17,10 +17,7 @@ CurveColourSetter::CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _ra
 	}
 }
 
-bool CurveColourSetter::painterIsRainbowPainter(const ot::Painter2D* _painter)
-{
-	return m_painterRainbowIterator.isRainbowPainter(_painter);
-}
+
 
 void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint)
 {

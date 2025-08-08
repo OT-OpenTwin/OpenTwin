@@ -7,7 +7,6 @@ public:
 	CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg);
 	CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize);
 	
-	bool painterIsRainbowPainter(const ot::Painter2D* _painter);
 	void setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint);
 	void setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _bufferIndex ,bool _hasSingleDatapoint);
 
