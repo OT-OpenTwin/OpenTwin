@@ -3292,7 +3292,11 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 
 	// If true is returned a new view was requested
 	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
-	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
+	ot::SelectionData selectionData;
+	selectionData.setSelectedTreeItems(selectionInfo.getSelectedNavigationItems());
+	selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
+	selectionData.setSelectionOrigin(_eventOrigin);
+	_result->setFlag(m_viewerComponent->handleSelectionChanged(selectionData));
 
 	// Notifiy views about selection change
 	ot::UIDList selectedUids;

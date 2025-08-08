@@ -38,6 +38,7 @@
 // Qt header
 #include <qwidget.h>
 #include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qapplication.h>
 
 // AK header
 #include <akAPI/uiAPI.h>
@@ -345,7 +346,11 @@ void ViewerComponent::clearTreeSelection(void) {
 }
 
 void ViewerComponent::refreshSelection(void) {
-	this->handleSelectionChanged(ot::SelectionOrigin::Custom, AppBase::instance()->getSelectedNavigationTreeItems());
+	ot::SelectionData selectionData;
+	selectionData.setSelectionOrigin(ot::SelectionOrigin::Custom);
+	selectionData.setSelectedTreeItems(AppBase::instance()->getSelectedNavigationTreeItems().getSelectedNavigationItems());
+	selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
+	this->handleSelectionChanged(selectionData);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -663,7 +668,11 @@ void ViewerComponent::setProcessingGroupOfMessages(bool flag) {
 		if (processingGroupCounter == 0) {
 			// Process all delayed actions 
 			if (treeSelectionReceived) {
-				this->handleSelectionChanged(ot::SelectionOrigin::Custom, AppBase::instance()->getSelectedNavigationTreeItems());
+				ot::SelectionData selectionData;
+				selectionData.setSelectionOrigin(ot::SelectionOrigin::Custom);
+				selectionData.setSelectedTreeItems(AppBase::instance()->getSelectedNavigationTreeItems().getSelectedNavigationItems());
+				selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
+				this->handleSelectionChanged(selectionData);
 			}
 		}
 	}
@@ -681,7 +690,7 @@ void ViewerComponent::notify(
 ) {
 	try {
 		try {
-			if (_event == ak::etClicked) {
+			if (_event & ak::etClicked) {
 				ViewerAPI::executeAction(_senderId);
 			}
 		}
@@ -692,7 +701,7 @@ void ViewerComponent::notify(
 	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to handle internal notify.", _e.what(), "Error"); }
 }
 
-ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectionInformation) {
+ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::SelectionData& _selectionData) {
 	ot::SelectionHandlingResult result;
 
 	OT_TEST_VIEWECOMPONENT_Interval("Selection Changed");
@@ -704,7 +713,7 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(ot::Selectio
 
 	// Send the selection changed notification to the viewer component and the model component
 	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;
-	result = ViewerAPI::setSelectedTreeItems(_selectionInformation.getSelectedNavigationItems(), selectedModelItems, selectedVisibleModelItems, _selectionOrigin);
+	result = ViewerAPI::setSelectedTreeItems(_selectionData, selectedModelItems, selectedVisibleModelItems);
 
 	// If the model was already notified it means that the selection handling already triggered a notification.
 	if (true || !(result & ot::SelectionHandlingEvent::ModelWasNotified)) {

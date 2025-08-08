@@ -17,8 +17,6 @@ CurveColourSetter::CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _ra
 	}
 }
 
-
-
 void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint)
 {
 	if (_hasSingleDatapoint)

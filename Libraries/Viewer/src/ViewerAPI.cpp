@@ -505,14 +505,14 @@ Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
 	return nullptr;
 }
 
-ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin)
+ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems)
 {
 	ot::SelectionHandlingResult result;
 	
 	Model* model = GlobalModel::instance();
 
 	if (model) {
-		result = model->setSelectedTreeItems(_selectedTreeItems, _selectedModelItems, _selectedVisibleModelItems, _selectionOrigin);
+		result = model->setSelectedTreeItems(_selectionData, _selectedModelItems, _selectedVisibleModelItems);
 	}
 
 	return result;

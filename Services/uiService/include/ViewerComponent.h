@@ -20,6 +20,7 @@
 
 // openTwin header
 #include "OTCore/ServiceBase.h"
+#include "OTWidgets/SelectionData.h"
 #include "OTWidgets/SelectionInformation.h"
 
 // AK header
@@ -221,7 +222,7 @@ public:
 	//! \brief Handle navigation tree selection changed event.
 	//! \param _selectionFromTree If true the selection event was emitted from the tree or tree operation.
 	//! \return Returns true if the selection has requested a new view.
-	ot::SelectionHandlingResult handleSelectionChanged(ot::SelectionOrigin _selectionOrigin, const ot::SelectionInformation& _selectedItems);
+	ot::SelectionHandlingResult handleSelectionChanged(const ot::SelectionData& _selectionData);
 
 	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
 

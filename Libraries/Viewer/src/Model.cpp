@@ -1065,7 +1065,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false, ot::SelectionOrigin::Custom, isSingleItemSelected(), {});
+	root->setSelected(false, ot::SelectionData(), isSingleItemSelected(), {});
 	root->setSelectionHandled(false);
 
 	for (auto child : root->getChildren())
@@ -1094,7 +1094,7 @@ void Model::setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root)
 	}
 }
 
-ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin) {
+ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems) {
 	ot::SelectionHandlingResult result;
 
 	_selectedModelItems.clear();
@@ -1102,14 +1102,14 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	// Set the selection and selection handled flags for all nodes to false
 	resetSelection(sceneNodesRoot);
 
-	if (_selectedTreeItems.empty()) {
+	if (_selectionData.getSelectedTreeItems().empty()) {
 		// No shape selected -> Draw all shapes opaque
 		setAllShapesOpaque(sceneNodesRoot);
 
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
 		
-		ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
+		ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems());
 		clear1DPlot();
 		refreshAllViews();
 
@@ -1122,7 +1122,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 		return result;
 	}
 
-	singleItemSelected = (_selectedTreeItems.size() == 1);
+	singleItemSelected = (_selectionData.getSelectedTreeItems().size() == 1);
 
 	// Now at least one shape is selected
 	// -> selected shapes are drawn opaque and all others are drawn transparent
@@ -1132,7 +1132,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	// First gather information about all selected nodes
 	std::list<SceneNodeBase*> selectedNodes;
 	
-	for (ot::UID item : _selectedTreeItems) {
+	for (ot::UID item : _selectionData.getSelectedTreeItems()) {
 		SceneNodeBase* node = treeItemToSceneNodesMap[item];
 		if (node != nullptr) {
 			selectedNodes.push_back(node);
@@ -1153,7 +1153,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 			FrontendAPI::instance()->addVisualizingEntityToView(node->getTreeItemID(), "3D", ot::WidgetViewBase::View3D);
 		}
 		
-		result |= node->setSelected(true, _selectionOrigin, isSingleItemSelected(), selectedNodes);
+		result |= node->setSelected(true, _selectionData, isSingleItemSelected(), selectedNodes);
 		_selectedModelItems.push_back(node->getModelEntityID());
 
 		if (node->isVisible()) {
@@ -1173,7 +1173,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const std::list<ot::UID>
 	}
 
 	// Update the UI state and the view
-	ViewerToolBar::instance().updateViewEnabledState(_selectedTreeItems);
+	ViewerToolBar::instance().updateViewEnabledState(_selectionData.getSelectedTreeItems());
 	refreshAllViews();
 
 	// Update the working plane transformation 

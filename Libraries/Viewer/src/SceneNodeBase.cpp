@@ -28,7 +28,7 @@ SceneNodeBase::~SceneNodeBase() {
 	}
 }
 
-ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
+ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
@@ -40,7 +40,7 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 		VisualiserState state;
 		state.m_selected = _selected;
 		state.m_singleSelection = _singleSelection;
-		state.m_selectionOrigin = _selectionOrigin;
+		state.m_selectionData = _selectionData;
 		state.m_anyVisualiserHasFocus = false;
 		state.m_selectedNodes = _selectedNodes;
 
@@ -126,7 +126,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		state.m_setFocus = false;
 		state.m_selected = true;
 		state.m_singleSelection = true;
-		state.m_selectionOrigin = ot::SelectionOrigin::User;
+		state.m_selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 		for (Visualiser* visualiser : allVisualiser)
 		{
 			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {

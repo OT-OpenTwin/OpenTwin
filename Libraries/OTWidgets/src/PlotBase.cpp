@@ -232,8 +232,7 @@ void ot::PlotBase::applyConfig(void) {
 
 	std::string axisTitleX;
 	std::string axisTitleY;
-	
-	
+		
 	axisTitleX = m_config.getAxisLabelX();
 	axisTitleY = m_config.getAxisLabelY();
 	
