@@ -55,6 +55,8 @@ ot::Property* ot::PropertyInputPainter2D::createPropertyConfiguration(void) cons
 	if (p) newProperty->setPainter(p->createCopy());
 	else newProperty->setPainter(new FillPainter2D);
 
+	newProperty->setFilter(m_button->getFilter());
+
 	return newProperty;
 }
 
