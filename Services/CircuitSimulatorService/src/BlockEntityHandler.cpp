@@ -667,6 +667,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		}
 		else
 		{
+			curveCfg.setEntityName(fullPlotNameCurrent + "/" + curveName);
 			yLabel = "Current";
 			yUnit = "I";
 			quantity->setName(yLabel);
