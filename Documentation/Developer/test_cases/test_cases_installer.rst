@@ -57,3 +57,7 @@ End User Installation Test Specifications
      - Start a reinstallation. In the install options, unset the "Documentation" option. 
      -  In the install options, the option for "Documentation" should have been unset by default.
 
+   * - 2
+     - Reset the VM to the checkpoint.
+     - Install OpenTwin but change the Admin password of MongoDB to: Bä@
+     - Installation succeeds. MongoDB is running and OpenTwin can be started. Projects can be created. Additionally, test a few functions within the project.
