@@ -405,6 +405,18 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
+	if (allEntitiesByBlockID.empty()) {
+		OT_LOG_E("The " + name + " is empty!");
+		finishFailedSimulation();
+		return;
+	}
+
+	if (allConnectionEntitiesByID.empty()) {
+		OT_LOG_E("No connections found in " + name);
+		finishFailedSimulation();
+		return;
+	}
+
 
 	// Here i generate my netlist
 
