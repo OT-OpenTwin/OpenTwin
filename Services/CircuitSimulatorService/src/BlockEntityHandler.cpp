@@ -578,6 +578,16 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 	std::string _curveFolderPath = solverName + "/" + "Results" + "/" + "1D/Curves";
 
+	// Here i create the plot for all the curves of voltage
+	const std::string _plotNameVoltage = "/" + simulationType + "-Voltage";
+	const std::string plotFolderVoltage = solverName + "/" + "Results";
+	const std::string fullPlotNameVoltage = plotFolderVoltage + _plotNameVoltage;
+
+	// Here i create the plit for all the curves of current
+	const std::string _plotNameCurrent = "/" + simulationType + "-Current";
+	const std::string plotFolderCurrent = solverName + "/" + "Results";
+	const std::string fullPlotNameCurrent = plotFolderCurrent + _plotNameCurrent;
+
 	ot::PainterRainbowIterator rainbowPainterIt;
 	// No i want to get the node vectors of voltage and for each of them i create a curve
 	for (auto& it : resultVectors) {
@@ -639,13 +649,16 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 		ot::Plot1DCurveCfg curveCfg;
 		curveCfg.setTitle(curveName);
-				
+
+		
+			
 		auto stylePainter = rainbowPainterIt.getNextPainter();
 		curveCfg.setLinePenPainter(stylePainter.release());
 
 		std::string yLabel = it.first;
 		if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 		{
+			curveCfg.setEntityName(fullPlotNameVoltage + "/" + curveName);
 			yLabel = "Voltage";
 			quantity->setName(yLabel);
 			quantity->addValueDescription("", ot::TypeNames::getDoubleTypeName(), yUnit);
@@ -664,15 +677,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		}
 	}
 	
-	// Here i create the plot for all the curves of voltage
-	const std::string _plotNameVoltage = "/" + simulationType+"-Voltage";
-	const std::string plotFolderVoltage = solverName + "/" + "Results";
-	const std::string fullPlotNameVoltage = plotFolderVoltage + _plotNameVoltage;
-
-	// Here i create the plit for all the curves of current
-	const std::string _plotNameCurrent = "/" + simulationType+ "-Current";
-	const std::string plotFolderCurrent = solverName + "/" + "Results";
-	const std::string fullPlotNameCurrent = plotFolderCurrent + _plotNameCurrent;
+	
 
 	// Creating the Plot Entity for Voltage
 	if (plotBuilderVoltage.getNumberOfCurves() != 0)
