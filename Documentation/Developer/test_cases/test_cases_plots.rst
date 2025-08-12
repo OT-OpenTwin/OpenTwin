@@ -45,7 +45,7 @@ Single Curve
 
    * - 1.5
      - 
-     - In plot settings:
+     - In plot properties:
          - Set "Number of queries" to 1
          - Define query 1:
              - Name: `Magnitude`
@@ -55,7 +55,7 @@ Single Curve
 
    * - 1.6
      - 
-     - In plot settings:
+     - In plot properties:
          - Set "Number of queries" to 2
          - Define query 2:
              - Name: `frequency`
