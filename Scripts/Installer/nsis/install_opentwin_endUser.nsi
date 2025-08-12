@@ -969,6 +969,7 @@ Section "-Extract Installer Tools (Required)" SEC01
 	SectionIn RO ;read only section
 	SetOutPath "$INSTDIR\Tools\ThirdParty"
 	DetailPrint "Extracting toolchain..."
+	# Batch file to read environment variables from registry and set session variables to these values.
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
 	
 	SetOutPath ${LOG_PATH}

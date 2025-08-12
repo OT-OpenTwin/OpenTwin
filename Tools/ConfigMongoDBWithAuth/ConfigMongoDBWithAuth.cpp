@@ -25,7 +25,7 @@ bool lineStartsWith(const std::string& line, const std::string& pattern)
 	return false;
 }
 
-void modifyConfigFile(const std::string& configFile, const std::string& tlsKeyPath, const std::string& newPort)
+void modifyConfigFile(const std::string& configFile, const std::string& tlsKeyPath)
 {
 	// Read the entire config file line by line
 	std::ifstream inFile(configFile);
@@ -50,10 +50,6 @@ void modifyConfigFile(const std::string& configFile, const std::string& tlsKeyPa
 		{
 			line.replace(line.find("disabled"), sizeof("disabled") - 1, "enabled");
 			outputFileContent.push_back(line);
-		}
-		else if (lineStartsWith(line, "port:"))
-		{
-			outputFileContent.push_back("  port: " + newPort);
 		}
 		else if (lineStartsWith(line, "bindIp:"))
 		{
@@ -82,16 +78,15 @@ void modifyConfigFile(const std::string& configFile, const std::string& tlsKeyPa
 
 int main(int argc, char** argv)
 {
-	if (argc < 4) {
+	if (argc < 3) {
 		std::cout << "Usage: ConfigMongoDBWithAuth.exe <config file path> <tls key path> <new port>" << std::endl;
 		return 1;
 	}
 
 	std::string configFile = argv[1];
 	std::string tlsKeyPath = argv[2];
-	std::string port = argv[3];
 
-	modifyConfigFile(configFile, tlsKeyPath, port);
+	modifyConfigFile(configFile, tlsKeyPath);
 
 	return 0;
 }
