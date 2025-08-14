@@ -340,6 +340,15 @@ GraphicsTestCases
      - Connect and delete one
      - Connection and block removed
 
+   * - 6
+     - Create a voltage source and a resistor
+     - When connecting move the mouse around while clicking
+     - Should not cause any crash
+    
+   * - 7
+     - Create a voltage source and a resistor
+     - When connecting move the mouse before clicking without stopping before clicking
+     - Should not cause any crash
 
 ErrorTestCases
 --------------
