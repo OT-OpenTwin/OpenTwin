@@ -302,3 +302,40 @@ The rectifier circuit consists of a diode, a resistor, and a capacitor.
 The diode allows current to flow in only one direction, 
 resulting in a pulsating DC output signal that is smoothed by the capacitor, 
 providing a more stable voltage level.
+
+GraphicsTestCases
+-----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 5 25 25 30
+
+   * - #
+     - Setup
+     - Execution
+     - Expectation
+
+   * - 1
+     - Create a voltage source and a resistor
+     - Connect with one connection
+     - Items connected and version increased
+
+   * - 2
+     - Create a voltage source and a resistor
+     - Rotate resistor and connect from resistor and to resistor
+     - Both connections created and version increased two times
+
+   * - 3
+     - Create a voltage source and a resistor
+     - Select both and drag 
+     - Both moved and version increased by two after finished moving
+
+   * - 4
+     - Create a voltage source and a resistor
+     - Select both and move via arrow keys
+     - Both moved and version increased by two after finished moving
+   
+   * - 5
+     - Create a voltage source and a resistor
+     - Connect and delete one
+     - Connection and block removed
