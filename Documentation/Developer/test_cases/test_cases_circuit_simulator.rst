@@ -339,3 +339,39 @@ GraphicsTestCases
      - Create a voltage source and a resistor
      - Connect and delete one
      - Connection and block removed
+
+
+ErrorTestCases
+--------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 5 25 25 30
+
+   * - #
+     - Setup
+     - Execution
+     - Expectation
+
+   * - 1
+     - Create a solver without changing properties
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No Circuit found or selected! and 
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down!
+
+   * - 2
+     - Create a solver and select a circuit in solver properties
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No Element for DC Simulation found or selected! 
+        - [ERROR] [CircuitSimulatorService] Failed at creating Simulation Line
+        - [ERROR] [CircuitSimulatorService] NGSpice Initialize function failed!
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down!
+  
+   * - 3
+     - Create a voltage source and a resistor without connections also create a solver select the circuit and select the element voltage source in DC-Settings
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No connections found in Circuit 3
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down! 
