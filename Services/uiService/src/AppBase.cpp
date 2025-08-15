@@ -2730,6 +2730,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		return;
 	}
 
+	OT_SLECTION_TEST_LOG("Closing view request");
+
 	if (_view->getViewContentModified()) {
 		ot::MessageDialogCfg msgCfg;
 		msgCfg.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
@@ -2748,6 +2750,11 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
+	OT_SLECTION_TEST_LOG("+ Deselecting navigation items");
+
+	// Store current selection and view information
+	ot::WidgetView* lastStoredView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+
 	// Deselect navigation item if exists
 	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
 	{
@@ -2757,8 +2764,23 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		}
 	}
 	
+	OT_SLECTION_TEST_LOG("+ Closing actual view");
+
 	// Now close the view
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
+
+	// Restore selection if the view did not change during close
+	if (_view != lastStoredView && ot::WidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
+		OT_SLECTION_TEST_LOG("+ Restore view selection");
+
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		for (ot::UID uid : lastStoredView->getVisualizingItems().getSelectedNavigationItems()) {
+			m_projectNavigation->getTree()->setItemSelected(uid, true);
+		}
+	}
+
+	OT_SLECTION_TEST_LOG(">> Closing view request completed");
+
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
