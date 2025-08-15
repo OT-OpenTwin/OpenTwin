@@ -9,4 +9,5 @@ Test Cases
     test_cases_pipeline
     test_cases_plots
     test_cases_installer
+    test_cases_dataimport_table
     
