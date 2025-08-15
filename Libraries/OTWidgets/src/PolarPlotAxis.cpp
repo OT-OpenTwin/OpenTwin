@@ -27,7 +27,7 @@ void ot::PolarPlotAxis::updateAxis(void) {
 
 	}
 	else if (!this->getIsLogScale() && this->getIsLogScaleSet()) {
-		this->setIsLogScaleSet(true);
+		this->setIsLogScaleSet(false);
 		m_plot->setScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
 	}
 	
