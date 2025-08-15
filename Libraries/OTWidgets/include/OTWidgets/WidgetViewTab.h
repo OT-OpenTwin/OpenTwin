@@ -35,7 +35,6 @@ namespace ot {
 	Q_SIGNALS:
 		void viewCloseRequested(void);
 		void viewPinnedChanged(bool _isPinned);
-		void tabPressed();
 
 	private Q_SLOTS:
 		void slotClose(void);

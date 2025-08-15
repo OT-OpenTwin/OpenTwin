@@ -131,8 +131,3 @@ void ot::WidgetView::slotToggleVisible(void) {
 void ot::WidgetView::slotPinnedChanged(bool _isPinned) {
 	Q_EMIT pinnedChanged(_isPinned);
 }
-
-void ot::WidgetView::slotTabPressed(void) {
-	this->setAsCurrentViewTab();
-	this->getViewDockWidget()->setFocus();
-}

@@ -105,5 +105,4 @@ void ot::WidgetViewTab::slotTogglePinned(void) {
 
 void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
 	ads::CDockWidgetTab::mousePressEvent(_event);
-	Q_EMIT tabPressed();
 }
