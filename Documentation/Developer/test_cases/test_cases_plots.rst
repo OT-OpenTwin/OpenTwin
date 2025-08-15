@@ -16,11 +16,10 @@ Single Curve
    * - 1
      - Create a developer project.
      - Select the button **"Single Curve"** in the Debug Tab.
-     - A plot is created in the Test folder. The plot looks like the reference image.
-       Check especially:
-         - Units are set
-         - Plot name matches the entity name of the plot entity
-         - Curve label matches the curve entity's name
+     - A plot is created in the Test folder. The plot looks like the reference image. Check especially:
+        - Units are set
+        - Plot name matches the entity name of the plot entity
+        - Curve label matches the curve entity's name
        
 
    * - 1.1
