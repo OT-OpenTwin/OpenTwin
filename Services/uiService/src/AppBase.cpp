@@ -1286,7 +1286,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 }
 
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-	OT_LOG_T("Set current vis tab");
+	OT_SLECTION_TEST_LOG("Set current visualization tab from name \"" + _entityName + "\" and type \"" + ot::WidgetViewBase::toString(_viewType) + "\"");
 
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
@@ -1297,7 +1297,7 @@ void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entit
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
-	OT_LOG_T("Set current vis tab from title");
+	OT_SLECTION_TEST_LOG("Set current vis tab from title \"" + _tabTitle + "\"");
 
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
@@ -1751,7 +1751,6 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
-	OT_LOG_T("Auto close");
 	OT_SLECTION_TEST_LOG("Auto close unpinned views");
 
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(

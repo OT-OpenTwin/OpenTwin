@@ -49,14 +49,6 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		bool skipViewHandling = _selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier);
 		skipViewHandling |= _selectionData.isViewHandlingFlagSet(ot::ViewHandlingFlag::SkipViewHandling);
 
-		if (skipViewHandling) {
-			OT_LOG_T("Set node selected. Skipping view handling");
-		}
-		else {
-			OT_LOG_T("Set node selected. Perform view handling");
-		}
-		
-
 		// Check if any visualiser has focus
 		for (Visualiser* visualiser : visualisers) {
 			if (FrontendAPI::instance()->hasViewFocus(getName(), visualiser->getViewType())) {
@@ -107,8 +99,6 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 				visualiser->hideVisualisation(state);
 			}
 		}
-
-		OT_LOG_T(">> Set node selected completed");
 	}
 
 	return result;

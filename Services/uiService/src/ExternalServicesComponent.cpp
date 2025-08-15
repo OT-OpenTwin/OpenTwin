@@ -3632,7 +3632,6 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
 	}
 	if (suppressViewHandling) {
-		OT_LOG_T("Suppressing view handling for plot creation");
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
