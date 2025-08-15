@@ -29,6 +29,7 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetTypes.h"
 #include "OTWidgets/MessageBoxHandler.h"
 
 // uiCore header
@@ -93,13 +94,7 @@ struct structModelViewInfo {
 //! The API manager is used to manage the global objects required for this API to work
 class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, public ot::AbstractLogNotifier, public ot::MessageBoxHandler {
 	Q_OBJECT
-public:
-	enum class ViewHandlingConfig : uint32_t {
-		NoConfig            = 0 << 0, //! \brief Default view handling.
-		SkipEntitySelection = 1 << 0  //! \brief Entity selection will not be performed on view focus changes
-	};
-	typedef ot::Flags<ViewHandlingConfig> ViewHandlingFlags;
-	
+public:	
 	//! @brief Deconstructor
 	virtual ~AppBase();
 
@@ -203,8 +198,15 @@ public:
 
 	ViewerUIDtype createView(ModelUIDtype _modelUID, const std::string& _projectName);
 
+	//! @brief Sets the current visualization tab.
+	//! @param _entityName Name of the entity to set the tab for.
+	//! @param _viewType Type of the view to set the tab for.
 	void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType);
+
+	//! @brief Sets the current visualization tab from the provided title.
+	//! @param _tabTitle Title of the tab to set as current.
 	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
+
 	std::string getCurrentVisualizationTabTitle(void);
 
 	void importProject(void);
@@ -228,9 +230,9 @@ public:
 	void SetCollectionName(const std::string _collectionName);
 	void startSessionRefreshTimer(void);
 
-	void setViewHandlingConfigFlag(ViewHandlingConfig _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
-	void setViewHandlingConfigFlags(const ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
-	const ViewHandlingFlags& getViewHandlingConfigFlags(void) const { return m_viewHandling; };
+	void setViewHandlingFlag(ot::ViewHandlingFlag _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
+	void setViewHandlingFlags(const ot::ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
+	const ot::ViewHandlingFlags& getViewHandlingFlags(void) const { return m_viewHandling; };
 
 	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
 
@@ -578,7 +580,7 @@ private:
 	void runSelectionHandling(ot::SelectionOrigin _eventOrigin);
 
 	AppStateFlags               m_state;
-	ViewHandlingFlags           m_viewHandling;
+	ot::ViewHandlingFlags       m_viewHandling;
 
 	std::string					m_uiServiceURL;
 	int							m_siteID;
@@ -654,5 +656,3 @@ private:
 
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(AppBase::AppState)
 };
-
-OT_ADD_FLAG_FUNCTIONS(AppBase::ViewHandlingConfig)

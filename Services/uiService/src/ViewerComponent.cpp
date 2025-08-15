@@ -708,8 +708,11 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::Se
 
 	if (processingGroupCounter > 0) {
 		treeSelectionReceived = true;
+		OT_LOG_T("Skipping selection changed");
 		return result;
 	}
+
+	OT_LOG_T(std::string("Handling selection changed. Control ") + (_selectionData.getKeyboardModifiers() & Qt::ControlModifier ? "true" : "false"));
 
 	// Send the selection changed notification to the viewer component and the model component
 	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;

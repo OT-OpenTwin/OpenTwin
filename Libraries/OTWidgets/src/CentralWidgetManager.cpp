@@ -8,7 +8,6 @@
 #include "OTWidgets/CentralWidgetManager.h"
 
 // Qt header
-#include <QtCore/qtimer.h>
 #include <QtWidgets/qlabel.h>
 
 ot::CentralWidgetManager::CentralWidgetManager(MainWindow* _window) :

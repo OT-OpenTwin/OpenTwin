@@ -1286,6 +1286,8 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 }
 
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	OT_LOG_T("Set current vis tab");
+
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
@@ -1295,6 +1297,8 @@ void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entit
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
+	OT_LOG_T("Set current vis tab from title");
+
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
@@ -1747,6 +1751,7 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {
+	OT_LOG_T("Auto close");
 	OT_SLECTION_TEST_LOG("Auto close unpinned views");
 
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
@@ -2151,9 +2156,9 @@ void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
-	ViewHandlingFlags viewFlags = m_viewHandling;
+	ot::ViewHandlingFlags viewFlags = m_viewHandling;
 	if (_ignoreEntitySelect) {
-		m_viewHandling |= ViewHandlingConfig::SkipEntitySelection;
+		m_viewHandling |= ot::ViewHandlingFlag::SkipEntitySelection;
 	}
 
 	_view->setAsCurrentViewTab();
@@ -2677,7 +2682,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-			{
+			if (m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)) {
+				// Skip entity selection if configured
+				OT_SLECTION_TEST_LOG("+ View focus changed: Skipping entity selection");
+				m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+			}
+			else {
 				ak::aTreeWidget* tree = m_projectNavigation->getTree();
 				QSignalBlocker sigBlock(tree);
 
@@ -2705,7 +2715,9 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 
-		AppBase::instance()->autoCloseUnpinnedViews();
+		if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling)) {
+			this->autoCloseUnpinnedViews();
+		}
 	}
 	else {
 		m_lastFocusedView = nullptr;
@@ -3296,6 +3308,7 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	selectionData.setSelectedTreeItems(selectionInfo.getSelectedNavigationItems());
 	selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
 	selectionData.setSelectionOrigin(_eventOrigin);
+	selectionData.setViewHandlingFlags(m_viewHandling);
 	_result->setFlag(m_viewerComponent->handleSelectionChanged(selectionData));
 
 	// Notifiy views about selection change

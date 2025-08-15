@@ -32,6 +32,7 @@ bool CurveVisualiser::requestVisualization(const VisualiserState& _state) {
 		plotState.m_setFocus = true;
 		plotState.m_singleSelection = true;
 		plotState.m_selectedNodes = _state.m_selectedNodes;
+		plotState.m_selectionData = _state.m_selectionData;
 		plotVisualiser->requestVisualization(plotState);
 		newVisualisation = true;
 	}

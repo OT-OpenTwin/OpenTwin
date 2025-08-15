@@ -19,6 +19,13 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 
+		if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier)) {
+			doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, true, doc.GetAllocator());
+		}
+		else {
+			doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, false, doc.GetAllocator());
+		}
+
 		// Find all selected entities for this plot
 		
 		doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(getVisualizingUIDs(_state), doc.GetAllocator()), doc.GetAllocator());

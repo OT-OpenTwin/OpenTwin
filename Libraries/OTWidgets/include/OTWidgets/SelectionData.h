@@ -9,7 +9,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -36,10 +36,16 @@ namespace ot {
 		void setSelectionOrigin(SelectionOrigin _origin) { m_selectionOrigin = _origin; };
 		SelectionOrigin getSelectionOrigin() const { return m_selectionOrigin; }
 
+		void setViewHandlingFlag(ViewHandlingFlag _flag, bool _isSet = true) { m_viewHandlingFlags.setFlag(_flag, _isSet); };
+		void setViewHandlingFlags(const ViewHandlingFlags& _flags) { m_viewHandlingFlags = _flags; };
+		const ViewHandlingFlags& getViewHandlingFlags() const { return m_viewHandlingFlags; }
+		bool isViewHandlingFlagSet(ViewHandlingFlag _flag) const { return (m_viewHandlingFlags & _flag) == _flag; };
+
 	private:
 		std::list<UID> m_selectedTreeItems;
 		Qt::KeyboardModifiers m_keyboardModifiers;
 		SelectionOrigin m_selectionOrigin;
+		ViewHandlingFlags m_viewHandlingFlags;
 	};
 
 }

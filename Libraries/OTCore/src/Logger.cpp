@@ -17,7 +17,7 @@
 #include <exception>
 #include <filesystem>
 
-#define OT_LOGGER_USE_MUTEX false
+#define OT_LOGGER_USE_MUTEX true
 
 #if OT_LOGGER_USE_MUTEX==true
 #include <mutex>

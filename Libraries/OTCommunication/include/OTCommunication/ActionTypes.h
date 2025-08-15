@@ -356,6 +356,7 @@
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_VisualizingEntities "VisualizingEntities"
+#define OT_ACTION_PARAM_SuppressViewHandling "SuppressViewHandling"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"

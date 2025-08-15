@@ -27,6 +27,13 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
 				visualizingEntities.push_back(this->getSceneNode()->getModelEntityID());
 				doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(visualizingEntities, doc.GetAllocator()), doc.GetAllocator());
 
+				if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier)) {
+					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, true, doc.GetAllocator());
+				}
+				else {
+					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, false, doc.GetAllocator());
+				}
+
 				FrontendAPI::instance()->messageModelService(doc.toJson());
 				return true;
 			}

@@ -7,6 +7,8 @@
 
 #include "FrontendAPI.h"
 
+#include "OTCore/Logger.h"
+
 SceneNodeBase::~SceneNodeBase() {
 	// Remove visualiser before deleting to avoid access to visualiser during deletion
 	std::list<Visualiser*> visualisers = std::move(m_visualiser);
@@ -44,6 +46,17 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		state.m_anyVisualiserHasFocus = false;
 		state.m_selectedNodes = _selectedNodes;
 
+		bool skipViewHandling = _selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier);
+		skipViewHandling |= _selectionData.isViewHandlingFlagSet(ot::ViewHandlingFlag::SkipViewHandling);
+
+		if (skipViewHandling) {
+			OT_LOG_T("Set node selected. Skipping view handling");
+		}
+		else {
+			OT_LOG_T("Set node selected. Perform view handling");
+		}
+		
+
 		// Check if any visualiser has focus
 		for (Visualiser* visualiser : visualisers) {
 			if (FrontendAPI::instance()->hasViewFocus(getName(), visualiser->getViewType())) {
@@ -66,9 +79,11 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 					// If the view is currently open and the entity is selected, we want to set the focus on the view
 					// We do not want to focus every visualiser, so if any visualiser has focus, we do not set the focus again
 					if (!state.m_anyVisualiserHasFocus) {
+						if (!skipViewHandling) {
+							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+						}
 						
-						FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-						FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
+						//FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
 
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 
@@ -92,6 +107,8 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 				visualiser->hideVisualisation(state);
 			}
 		}
+
+		OT_LOG_T(">> Set node selected completed");
 	}
 
 	return result;
