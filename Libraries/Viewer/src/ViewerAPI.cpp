@@ -58,6 +58,24 @@ void ViewerAPI::setFrontendAPI(FrontendAPI* _api) {
 	FrontendAPI::setInstance(_api);
 }
 
+void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+	ot::JsonArray modelArr;
+	for (const auto& it : intern::OsgModelManager::uidToModelMap()) {
+		ot::JsonObject modelObj;
+		it.second->getDebugInformation(modelObj, _allocator);
+		modelArr.PushBack(modelObj, _allocator);
+	}
+	_object.AddMember("Models", modelArr, _allocator);
+
+	ot::JsonArray viewerArr;
+	for (const auto& it : intern::ViewerManager::uidToViewerMap()) {
+		ot::JsonObject viewerObj;
+		it.second->getViewer()->getDebugInformation(viewerObj, _allocator);
+		viewerArr.PushBack(viewerObj, _allocator);
+	}
+	_object.AddMember("Viewers", viewerArr, _allocator);
+}
+
 ot::UID ViewerAPI::createModel(void)
 {
 	intern::OsgModelManager::modelCount()++;

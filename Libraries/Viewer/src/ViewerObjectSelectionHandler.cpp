@@ -104,7 +104,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 			model->processCurrentSelectionMode(intersector, viewer->getSceneData()->getBound().radius(), bCtrlKeyPressed);
 		}
 	}
-	else if (ea.getEventType() == osgGA::GUIEventAdapter::DOUBLECLICK && ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON)
+	else if (ea.getEventType() & osgGA::GUIEventAdapter::DOUBLECLICK && ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 	{
 		// Here we move the view center
 		osg::ref_ptr<osgUtil::Intersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());

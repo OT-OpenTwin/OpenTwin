@@ -194,6 +194,8 @@ public:
 
 	bool debug(void) const;
 
+	std::string getDebugInformation() const;
+
 	ModelUIDtype createModel();
 
 	ViewerUIDtype createView(ModelUIDtype _modelUID, const std::string& _projectName);

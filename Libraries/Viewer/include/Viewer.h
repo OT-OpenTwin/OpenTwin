@@ -1,5 +1,6 @@
 #pragma once
 
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/QWidgetInterface.h"
@@ -47,6 +48,8 @@ public:
 
 	virtual QWidget* getQWidget(void) override { return this; };
 	virtual const QWidget* getQWidget(void) const override { return this; };
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	void reset();
 	void refresh(bool _ignoreUpdateSettingsRequest = true);

@@ -701,6 +701,10 @@ void ViewerComponent::notify(
 	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to handle internal notify.", _e.what(), "Error"); }
 }
 
+void ViewerComponent::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	ViewerAPI::getDebugInformation(_object, _allocator);
+}
+
 ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::SelectionData& _selectionData) {
 	ot::SelectionHandlingResult result;
 

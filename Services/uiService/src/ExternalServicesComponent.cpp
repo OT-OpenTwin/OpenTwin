@@ -3347,8 +3347,7 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
-
-	return "";
+	return AppBase::instance()->getDebugInformation();
 }
 
 // Property Grid

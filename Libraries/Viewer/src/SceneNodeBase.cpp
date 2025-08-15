@@ -30,6 +30,10 @@ SceneNodeBase::~SceneNodeBase() {
 	}
 }
 
+void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+
+}
+
 ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;

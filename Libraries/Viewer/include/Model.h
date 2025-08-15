@@ -1,5 +1,6 @@
 #pragma once
 
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -33,6 +34,8 @@ class Model
 public:
 	Model();
 	virtual ~Model();
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	void setID(unsigned long long id) { viewerModelID = id; }
 	unsigned long long getID(void) { return viewerModelID; }

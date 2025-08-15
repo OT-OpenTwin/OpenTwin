@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include "OldTreeIcon.h"
 
+#include "OTCore/JSON.h"
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"
@@ -30,6 +31,8 @@ namespace ot { class WidgetView; }
 namespace ViewerAPI {
 
 	__declspec(dllexport) void setFrontendAPI(FrontendAPI* _api);
+
+	__declspec(dllexport) void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
 
 	__declspec(dllexport) ot::UID createModel(void);
 	__declspec(dllexport) void activateModel(ot::UID osgModelID);

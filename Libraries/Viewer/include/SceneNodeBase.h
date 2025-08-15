@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/SelectionData.h"
@@ -21,6 +22,8 @@ class SceneNodeBase
 {
 public:
 	virtual ~SceneNodeBase();
+
+	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	void setName(const std::string &n) { m_name = n; };
 	const std::string& getName(void) const { return m_name; };

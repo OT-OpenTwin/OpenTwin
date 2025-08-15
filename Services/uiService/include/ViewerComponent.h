@@ -156,6 +156,8 @@ public:
 		int								_info2
 	) override;
 
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
+
 	ViewerUIDtype getActiveDataModel();
 	ViewerUIDtype getActiveViewerModel();
 	void resetAllViews3D(ViewerUIDtype visualizationModelID);

@@ -12,10 +12,15 @@ namespace osgViewer
 
 class ViewerObjectSelectionHandler : public osgGA::GUIEventHandler {
 public:
-	ViewerObjectSelectionHandler(Viewer * _creator) : active(false), creator(_creator), lastHeight(0.0) {};
+	ViewerObjectSelectionHandler(Viewer * _creator) : active(false), creator(_creator), lastHeight(0.0), model(nullptr) {};
 	virtual bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa) override;
 	void setModel(Model *m) { model = m; };
 	void setActive(bool a) { active = a; };
+
+	Model* getModel() const { return model; };
+	bool getActive() const { return active; };
+	Viewer* getCreator() const { return creator; };
+	double getLastHeight() const { return lastHeight; };
 
 private:
 	enum projectionType {IN_PLANE, HEIGHT};

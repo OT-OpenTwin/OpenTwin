@@ -84,6 +84,106 @@ Model::~Model()
 	ViewerToolBar::instance().removeUIControls();
 }
 
+void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	using namespace ot;
+	JsonArray viewerArr;
+	for (const auto& it : viewerList) {
+		JsonObject viewerObj;
+		viewerObj.AddMember("ID", it->getViewerID(), _allocator);
+		viewerArr.PushBack(viewerObj, _allocator);
+	}
+	_object.AddMember("Viewers", viewerArr, _allocator);
+
+	if (sceneNodesRoot) {
+		JsonObject rootObj;
+		sceneNodesRoot->getDebugInformation(rootObj, _allocator);
+		_object.AddMember("SceneNodesRoot", rootObj, _allocator);
+	}
+	else {
+		_object.AddMember("SceneNodesRoot", JsonNullValue(), _allocator);
+	}
+
+	_object.AddMember("IsActive", isActive, _allocator);
+	_object.AddMember("WireFrameState", wireFrameState, _allocator);
+	if (currentHoverItem) {
+		JsonObject currentHoverItemObj;
+		currentHoverItemObj.AddMember("Name", JsonString(currentHoverItem->getName(), _allocator), _allocator);
+		currentHoverItemObj.AddMember("ModelID", currentHoverItem->getModelEntityID(), _allocator);
+		currentHoverItemObj.AddMember("TreeItemID", currentHoverItem->getTreeItemID(), _allocator);
+		_object.AddMember("CurrentHoverItem", currentHoverItemObj, _allocator);
+	}
+	else {
+		_object.AddMember("CurrentHoverItem", JsonNullValue(), _allocator);
+	}
+	_object.AddMember("DataModelID", dataModelID, _allocator);
+
+	switch (currentSelectionMode) {
+	case Model::ENTITY:
+		_object.AddMember("CurrentSelectionMode", JsonString("Entity", _allocator), _allocator);
+		break;
+	case Model::FACE:
+		_object.AddMember("CurrentSelectionMode", JsonString("Face", _allocator), _allocator);
+		break;
+	case Model::SHAPE:
+		_object.AddMember("CurrentSelectionMode", JsonString("Shape", _allocator), _allocator);
+		break;
+	case Model::EDGE:
+		_object.AddMember("CurrentSelectionMode", JsonString("Edge", _allocator), _allocator);
+		break;
+	default:
+		_object.AddMember("CurrentSelectionMode", JsonString("<Unknown>", _allocator), _allocator);
+		break;
+	}
+
+	_object.AddMember("CurrentSelectionReplyTo", currentSelectionReplyTo, _allocator);
+	_object.AddMember("CurrentSelectionAction", JsonString(currentSelectionAction, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionOptionNames", JsonArray(currentSelectionOptionNames, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionOptionValues", JsonArray(currentSelectionOptionValues, _allocator), _allocator);
+	_object.AddMember("CurrentSelectionMultiple", currentSelectionMultiple, _allocator);
+
+	JsonArray currentFaceSelectionArr;
+	for (const FaceSelection& faceSelection : currentFaceSelection) {
+		if (faceSelection.getSelectedItem()) {
+			JsonObject faceSelectionObj;
+			faceSelectionObj.AddMember("SelectedItem.Name", JsonString(currentHoverItem->getName(), _allocator), _allocator);
+			faceSelectionObj.AddMember("SelectedItem.ModelID", currentHoverItem->getModelEntityID(), _allocator);
+			faceSelectionObj.AddMember("SelectedItem.TreeItemID", currentHoverItem->getTreeItemID(), _allocator);
+			currentFaceSelectionArr.PushBack(faceSelectionObj, _allocator);
+		}
+		else {
+			currentFaceSelectionArr.PushBack(JsonNullValue(), _allocator);
+		}
+	}
+	_object.AddMember("CurrentFaceSelection", currentFaceSelectionArr, _allocator);
+
+	JsonArray currentEdgeSelectionArr;
+	for (const EdgeSelection& edgeSelection : currentEdgeSelection) {
+		if (edgeSelection.getSelectedItem()) {
+			JsonObject edgeSelectionObj;
+			edgeSelectionObj.AddMember("SelectedItem.Name", JsonString(edgeSelection.getSelectedItem()->getName(), _allocator), _allocator);
+			edgeSelectionObj.AddMember("SelectedItem.ModelID", edgeSelection.getSelectedItem()->getModelEntityID(), _allocator);
+			edgeSelectionObj.AddMember("SelectedItem.TreeItemID", edgeSelection.getSelectedItem()->getTreeItemID(), _allocator);
+			currentEdgeSelectionArr.PushBack(edgeSelectionObj, _allocator);
+		}
+		else {
+			currentEdgeSelectionArr.PushBack(JsonNullValue(), _allocator);
+		}
+	}
+	_object.AddMember("CurrentEdgeSelection", currentEdgeSelectionArr, _allocator);
+
+	_object.AddMember("ViewerModelID", viewerModelID, _allocator);
+	_object.AddMember("SingleItemSelected", singleItemSelected, _allocator);
+	_object.AddMember("TreeStateRecording", treeStateRecording, _allocator);
+
+	_object.AddMember("HasModalMenu", m_hasModalMenu, _allocator);
+	_object.AddMember("CurrentMenu", JsonString(m_currentMenu, _allocator), _allocator);
+	_object.AddMember("PreviousMenu", JsonString(m_previousMenu, _allocator), _allocator);
+
+	JsonObject currentCentralViewObj;
+	m_currentCentralView.addToJsonObject(currentCentralViewObj, _allocator);
+	_object.AddMember("CurrentCentralView", currentCentralViewObj, _allocator);
+}
+
 void Model::attachViewer(Viewer *viewer)
 {
 	assert(std::find(viewerList.begin(), viewerList.end(), viewer) == viewerList.end());    // Check that the item is not in the list yet

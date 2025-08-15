@@ -1185,6 +1185,90 @@ void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
 
+std::string AppBase::getDebugInformation() const {
+	using namespace ot;
+	JsonDocument doc;
+
+	// Add basic information
+
+	JsonArray stateArr;
+	if (m_state & AppState::RestoringSettingsState) {
+		stateArr.PushBack(JsonString("RestoringSettingsState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_state & AppState::LoggedInState) {
+		stateArr.PushBack(JsonString("LoggedInState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_state & AppState::ProjectOpenState) {
+		stateArr.PushBack(JsonString("ProjectOpenState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember("State", stateArr, doc.GetAllocator());
+
+	JsonArray viewHandlingArr;
+	if (m_viewHandling & ViewHandlingFlag::SkipEntitySelection) {
+		viewHandlingArr.PushBack(JsonString("SkipEntitySelection", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_viewHandling & ViewHandlingFlag::SkipViewHandling) {
+		viewHandlingArr.PushBack(JsonString("SkipViewHandling", doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember("ViewHandling", viewHandlingArr, doc.GetAllocator());
+
+	doc.AddMember("UIUrl", JsonString(m_uiServiceURL, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("SiteID", m_siteID, doc.GetAllocator());
+	doc.AddMember("RelayUrl", JsonString(m_relayURLs, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectName", JsonString(m_currentProjectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectType", JsonString(m_currentProjectType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("CollectionName", JsonString(m_collectionName, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember("UserCollection", JsonString(m_currentUserCollection, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("SessionServiceURL", JsonString(m_sessionServiceURL, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember("AppIsRunning", m_appIsRunning, doc.GetAllocator());
+	doc.AddMember("IsInitialized", m_isInitialized, doc.GetAllocator());
+	doc.AddMember("IsDebug", m_isDebug, doc.GetAllocator());
+	doc.AddMember("IsWelcomeScreenVisible", m_widgetIsWelcome, doc.GetAllocator());
+
+	doc.AddMember("ProjectStateModified", m_projectStateIsModified, doc.GetAllocator());
+
+	JsonObject loginDataObj;
+	loginDataObj.AddMember("GSSUrl", JsonString(m_loginData.getGss().getConnectionUrl().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("DatabaseUrl", JsonString(m_loginData.getDatabaseUrl(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("AuthorizationUrl", JsonString(m_loginData.getAuthorizationUrl(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("UserName", JsonString(m_loginData.getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("UserPassword", JsonString(m_loginData.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("EncryptedUserPassword", JsonString(m_loginData.getEncryptedUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("SessionUser", JsonString(m_loginData.getSessionUser(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("SessionPassword", JsonString(m_loginData.getSessionPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("LoginData", loginDataObj, doc.GetAllocator());
+
+	JsonObject windowStateObj;
+	windowStateObj.AddMember("ViewShown", m_currentStateWindow.viewShown, doc.GetAllocator());
+	windowStateObj.AddMember("WindowState", JsonString(m_currentStateWindow.window, doc.GetAllocator()), doc.GetAllocator());
+	windowStateObj.AddMember("ViewState", JsonString(m_currentStateWindow.view, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("WindowState", windowStateObj, doc.GetAllocator());
+
+	// Lock manager
+
+	JsonObject lockManagerObj;
+
+	doc.AddMember("LockManager", lockManagerObj, doc.GetAllocator());
+
+	// Widget view manager
+
+	JsonObject widgetViewManagerObj;
+
+	doc.AddMember("WidgetViewManager", widgetViewManagerObj, doc.GetAllocator());
+
+	// Viewer component
+
+	JsonObject viewerComponentObj;
+	if (m_viewerComponent) {
+		m_viewerComponent->getDebugInformation(viewerComponentObj, doc.GetAllocator());
+	}
+	doc.AddMember("ViewerComponent", viewerComponentObj, doc.GetAllocator());
+
+	return doc.toJson();
+}
+
 ModelUIDtype AppBase::createModel() {
 	ViewerUIDtype view = m_viewerComponent->createModel();
 	//NOTE, modeIDs will not be used in the future
