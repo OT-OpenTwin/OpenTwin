@@ -1,6 +1,17 @@
 Frontend Selection and View Handling
 ####################################
 
+Use the Development project type for the following tests.
+
+.. note::
+  Use any python script from the ``TestData/PythonScripts`` folder when a Python script is required for the test case.
+
+  Use any csv file from the ``TestData/Tables`` folder when a csv file is required for the test case.
+  Do not use csv files from the subdirectories since some of them are pretty large and might take a long time to visualize.
+
+View handling tests
+*******************
+
 .. list-table::
     :header-rows: 1
 
@@ -12,56 +23,109 @@ Frontend Selection and View Handling
     
     * - 1
       - New View from Selection
-      - No selection
-      - Select a visualizable entity (e.g. PythonScript)
-      - - View opens ✔
-        - Entity remains selected ✔
-
+      - No entity selection
+      - Select a Python script entity
+      - * Text view opens
+        * Entity remains selected
+    
     * - 2
-      - Remove Selection from View Close
-      - - Visualizable Entity selected (e.g. PythonScript)
-        - Corresponding view is open
-      - Close the view
-      - Entity deselected ✔
-
-    * - 3 
-      - Selection restore
-      - - Visualizable Entity selected (e.g. PythonScript)
-        - Corresponding view pinned
-      - Change to another central view and then back
-      - Selection of the view is restored without opening new views ✔
-
+      - Auto close views
+      - * Python script entity is selected
+        * Corresponding text view is open
+      - Switch to another central view (e.g. 3D view)
+      - Python script text view closes
+    
+    * - 3
+      - Auto close pinned views 1
+      - * Python script entity is selected
+        * Corresponding text view is open and pinned
+      - Switch to another central view (e.g. 3D view)
+      - Python script text view remains open
+    
     * - 4
-      - Selection information updated
-      - Visualizable Entity selected and at least one other
-      - Change selection so that the entity view remains open
-      - Selection information is stored correctly (check via test #3) ✔
-
+      - Auto close pinned views 2
+      - * CSV file entity is selected
+        * Corresponding text and table views are open
+      - * Pin one of the views (text or table)
+        * Switch to another central view (e.g. 3D view)
+      - * The pinned view remains open
+        * The unpinned view closes
+        * The unpinned view remains closed when switching back to the pinned view
+    
     * - 5
-      - Range Selection triggers new view
-      - - No selection
-        - 3D view is focused
-      - Select Series Metadata with Ctrl pressed
-      - - Table view opens ✔
-        - Range selection is not saved for 3D view (check by changing back to 3D view) ❌
+      - New view position 1
+      - * Python script entity is selected
+        * Corresponding text view is open and pinned
+      - * Dock the python script text view to any other location
+        * Select another python script entity
+      - * The corresponding text view opens for the newly selected python script entity
+        * The newly opened view is tabbed at the same container the previous python script text view
+        * The previous python script text view remains open
     
     * - 6
-      - Range Selection triggers new view 2
-      - Range entity selected (e.g. SeriesMetadata)
-      - Select other Range of other Table with Ctrl pressed
-      - - Other table view opens with range selected
-        - Old range selection is cleared and only new selection is stored at new view ✔
-        - New selection is not stored at old view ❌
+      - New view position 2
+      - * Python script entity is selected
+        * Corresponding text view is open and pinned
+      - * Dock the python script text view to any other location
+        * Select another central view (e.g. 3D view)
+        * Select another python script entity
+      - * The python script text view remains open when switching to the 3D view
+        * The corresponding text view opens for the newly selected python script entity
+        * The newly opened view is tabbed at the same container as the last selected central view (e.g. 3D view)
+        * The previous python script text view remains open
 
+Selection handling tests
+************************
 
+.. list-table::
+    :header-rows: 1
 
-Rework notes:
-*************
+    * - #
+      - Name
+      - Setup
+      - Execution
+      - Expectation
+    
+    * - 1
+      - Remove Selection from View Close
+      - * Python script entity is selected
+        * Corresponding text view is open
+      - Close the text view
+      - Entity gets deselected
 
-Navigation tree selection -> Forward to viewer
+    * - 2
+      - Selection restore single view
+      - * Python script entity is selected
+        * Corresponding text view is open and pinned
+      - Change to another central view (e.g. 3D view) and then back to the Python script text view
+      - * Entity gets deselected when switching to the 3D view
+        * Python script text view remains open when switching to the 3D view
+        * Entity gets selected when switching to the Python script view
 
-View focused -> restore selection from info
+    * - 3
+      - View change same entity
+      - * CSV file entity is selected
+        * Corresponding text and table view are open but not pinned
+      - Switch from the current view to the other view (by pressing the tab of the view) of the entity (from text to table view and vice versa)
+      - * Both views remain open while switching
+        * Entity selection remains while switching
 
-Viewer selection set notification -> SceneNode notification -> Visualizer notification -> add selected node to view selection info (api call)
-Viewer selection unset notification -> SceneNode notification -> Visualizer notification -> remove selected node from view selection info (api call)
+    * - 4
+      - Selection restore two views
+      - * Two csv files are imported
+        * One of the two views (text or table) is closed and the other is open and pinned
+      - * Select the other csv file entity
+        * Close one of the two views (text or table) of the selected entity
+        * Pin the remaining view of the selected entity
+        * Switch between the views of the first and second csv file entity
+      - * When selecting the second csv file entity the pinned view remains open
+        * When switching between the views the corresponding entity gets selected
+        * When the entity selection changes the closed views do not open
 
+    * - 5
+      - Range selection triggers view
+      - Import a csv file and make a range selection in the table (by selecting a column in the table view and pressing ``Series Metadata`` in the Import Parameterized Data ToolBar tab)
+      - * Close all the views of the entity
+        * Select the range entity (Data Categorization/Campaign Metadata/Series Metadata_1/<Name of the Column>)
+      - * When selecting the entity only the table view opens
+        * Only the range entity is stored as visualizing entity (check by pinning the view and switching back and forth to another central view (e.g. 3D view))
