@@ -17,3 +17,9 @@ Visualiser::~Visualiser()
 		FrontendAPI::instance()->closeView(m_node->getName(), m_viewType);
 	}
 }
+
+void Visualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("MayVisualize", m_mayVisualise, _allocator);
+	_object.AddMember("ViewIsOpen", m_viewIsOpen, _allocator);
+	_object.AddMember("ViewType", ot::JsonString(ot::WidgetViewBase::toString(m_viewType), _allocator), _allocator);
+}

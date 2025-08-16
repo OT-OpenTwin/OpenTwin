@@ -1,4 +1,5 @@
 #pragma once
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "VisualiserState.h"
@@ -38,6 +39,8 @@ public:
 	SceneNodeBase* getSceneNode(void) const { return m_node; };
 	
 	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
+
+	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 protected:
 	SceneNodeBase* m_node = nullptr;

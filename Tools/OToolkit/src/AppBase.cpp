@@ -257,6 +257,14 @@ void AppBase::slotProcessMessage(const QString& _json) {
 
 				if (m_logger) m_logger->appendLogMessage(msg);
 			}
+			else if (action == "DisplayData") {
+				std::string data = ot::json::getString(inboundAction, OT_ACTION_PARAM_Data);
+
+				this->log("DisplayData Request", otoolkit::APIInterface::Information, QString::fromStdString(data));
+			}
+			else {
+				OT_LOG_E("Unknown action received \"" + action + "\"");
+			}
 		}
 		else {
 			this->updateStatusStringAsError("The received message is not a JSON object");

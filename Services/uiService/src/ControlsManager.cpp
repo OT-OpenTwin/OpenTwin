@@ -570,6 +570,52 @@ std::string LockManager::printLockState()
 	return state;
 }
 
+void LockManager::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	ot::JsonArray specialsArr;
+	for (const LockManagerElement* special : m_specials) {
+		ot::JsonObject specialObj;
+		special->getDebugInformation(specialObj, _allocator);
+		specialsArr.PushBack(specialObj, _allocator);
+	}
+	_object.AddMember("Specials", specialsArr, _allocator);
+
+	ot::JsonArray serviceToUiLockLevelArr;
+	for (const auto& serviceToUiLockLevel : m_serviceToUiLockLevel) {
+		ot::JsonObject serviceObj;
+		serviceObj.AddMember("ServiceName", ot::JsonString(serviceToUiLockLevel.first.serviceName(), _allocator), _allocator);
+		ot::JsonObject lockLevelsObj;
+		for (const auto& lockLevel : *serviceToUiLockLevel.second) {
+			ot::JsonString key(ot::toString(lockLevel.first), _allocator);
+			lockLevelsObj.AddMember(key, lockLevel.second, _allocator);
+		}
+		serviceObj.AddMember("LockLevels", lockLevelsObj, _allocator);
+		serviceToUiLockLevelArr.PushBack(serviceObj, _allocator);
+	}
+	_object.AddMember("ServiceToUILockLevels", serviceToUiLockLevelArr, _allocator);
+
+	ot::JsonArray serviceToUiEnabledLevelArr;
+	for (const auto& serviceToUiEnabledLevel : m_serviceToUiEnabledLevel) {
+		ot::JsonObject serviceObj;
+		serviceObj.AddMember("ServiceName", ot::JsonString(serviceToUiEnabledLevel.first.serviceName(), _allocator), _allocator);
+		ot::JsonObject enabledLevelsObj;
+		for (const auto& enabledLevel : *serviceToUiEnabledLevel.second) {
+			ot::JsonString key(std::to_string(enabledLevel.first), _allocator);
+			enabledLevelsObj.AddMember(key, enabledLevel.second, _allocator);
+		}
+		serviceObj.AddMember("EnabledLevels", enabledLevelsObj, _allocator);
+		serviceToUiEnabledLevelArr.PushBack(serviceObj, _allocator);
+	}
+	_object.AddMember("ServiceToUIEnabledLevels", serviceToUiEnabledLevelArr, _allocator);
+
+	ot::JsonArray uiElementsArr;
+	for (const auto& uiElement : m_uiElements) {
+		ot::JsonObject uiElementObj;
+		uiElement.second->getDebugInformation(uiElementObj, _allocator);
+		uiElementsArr.PushBack(uiElementObj, _allocator);
+	}
+	_object.AddMember("UIElements", uiElementsArr, _allocator);
+}
+
 // #######################################################################################################################
 
 // Private functions
@@ -825,3 +871,15 @@ void LockManagerElement::unlock(int _value, ot::LockTypeFlag _lockType) {
 	}
 }
 
+void LockManagerElement::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("HasTree", m_tree != nullptr, _allocator);
+	_object.AddMember("HasPropertyGrid", m_prop != nullptr, _allocator);
+	_object.AddMember("HasGraphics", m_graphics != nullptr, _allocator);
+	_object.AddMember("HasText", m_text != nullptr, _allocator);
+	_object.AddMember("HasView", m_view != nullptr, _allocator);
+	_object.AddMember("HasLockable", m_lockable != nullptr, _allocator);
+	_object.AddMember("UID", m_uid, _allocator);
+	_object.AddMember("LockTypes", ot::JsonArray(ot::toStringList(m_lockTypes), _allocator), _allocator);
+	_object.AddMember("DisabledCount", m_disabledCount, _allocator);
+	_object.AddMember("LockCount", m_lockCount, _allocator);
+}

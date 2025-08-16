@@ -443,7 +443,7 @@ ot::WidgetViewManager::ViewNameTypeList ot::WidgetViewManager::getViewNamesFromO
 		return ViewNameTypeList();
 	}
 	else {
-		return std::move(ViewNameTypeList(*it->second));
+		return ViewNameTypeList(*it->second);
 	}
 }
 
@@ -454,7 +454,7 @@ std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicS
 			result.push_back(entry.first);
 		}
 	}
-	return std::move(result);
+	return result;
 }
 
 bool ot::WidgetViewManager::getAnyViewContentModified() {
@@ -468,6 +468,103 @@ bool ot::WidgetViewManager::getAnyViewContentModified() {
 
 ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView() const {
 	return this->getViewFromDockWidget(m_dockManager->focusedDockWidget());
+}
+
+void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const {
+	JsonArray stateArr;
+	if (m_state & ManagerState::InsertViewState) {
+		stateArr.PushBack(JsonString("InsertViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::CloseViewState) {
+		stateArr.PushBack(JsonString("CloseViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::MulticloseViewState) {
+		stateArr.PushBack(JsonString("MulticloseViewState", _allocator), _allocator);
+	}
+	_object.AddMember("State", stateArr, _allocator);
+
+	JsonArray configArr;
+	if (m_config & ManagerConfigFlag::InputFocusCentralViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusCentralViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusSideViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusSideViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusToolViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusToolViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::IgnoreInputFocusOnViewInsert) {
+		configArr.PushBack(JsonString("IgnoreInputFocusOnViewInsert", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::UseBestAreaFinderOnViewInsert) {
+		configArr.PushBack(JsonString("UseBestAreaFinderOnViewInsert", _allocator), _allocator);
+	}
+	_object.AddMember("Config", configArr, _allocator);
+
+	JsonObject focusInfoObj;
+	if (m_focusInfo.last) {
+		focusInfoObj.AddMember("LastFocusedView", JsonString(m_focusInfo.last->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastCentral) {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonString(m_focusInfo.lastCentral->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastSide) {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonString(m_focusInfo.lastSide->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastTool) {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonString(m_focusInfo.lastTool->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonNullValue(), _allocator);
+	}
+	_object.AddMember("FocusInfo", focusInfoObj, _allocator);
+
+	JsonObject autoCloseInfoObj;
+	autoCloseInfoObj.AddMember("Flags", JsonArray(WidgetViewBase::toStringList(m_autoCloseInfo.flags), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("ActiveSelection", JsonArray(m_autoCloseInfo.activeSelection.getSelectedNavigationItems(), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("IgnoreCurrent", m_autoCloseInfo.ignoreCurrent, _allocator);
+	_object.AddMember("AutoCloseInfo", autoCloseInfoObj, _allocator);
+
+	JsonArray viewOwnerMapArr;
+	for (const auto& it : m_viewOwnerMap) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		it.first.addToJsonObject(ownerObj, _allocator);
+
+		JsonArray viewNamesArr;
+		for (const ViewNameTypeListEntry& entry : *it.second) {
+			JsonObject nameTypeObj;
+			nameTypeObj.AddMember("Name", JsonString(entry.first, _allocator), _allocator);
+			nameTypeObj.AddMember("Type", JsonString(WidgetViewBase::toString(entry.second), _allocator), _allocator);
+			viewNamesArr.PushBack(nameTypeObj, _allocator);
+		}
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("ViewInfo", viewNamesArr, _allocator);
+		viewOwnerMapArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("ViewOwnerMap", viewOwnerMapArr, _allocator);
+
+	JsonArray viewsArr;
+	for (const ViewEntry& entry : m_views) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		entry.first.addToJsonObject(ownerObj, _allocator);
+		JsonObject viewObj;
+		entry.second->getDebugInformation(viewObj, _allocator);
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("View", viewObj, _allocator);
+		viewsArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("Views", viewsArr, _allocator);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

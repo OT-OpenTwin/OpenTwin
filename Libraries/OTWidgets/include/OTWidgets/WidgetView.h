@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
@@ -105,6 +106,8 @@ namespace ot {
 		void removeVisualizingItem(UID _itemId) { m_visualizingItems.removeSelectedNavigationItem(_itemId); };
 		void clearVisualizingItems() { m_visualizingItems.setSelectedNavigationItems(UIDList()); };
 		const SelectionInformation& getVisualizingItems() const { return m_visualizingItems; };
+
+		virtual void getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const;
 
 	Q_SIGNALS:
 		void closeRequested();

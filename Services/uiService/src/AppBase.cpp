@@ -420,7 +420,7 @@ void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2
 	try {
 		// Main window
 		if (_senderId == m_mainWindow) {
-			if (_eventType == etTabToolbarChanged) {
+			if (_eventType & etTabToolbarChanged) {
 				// The clicked event occurs before the tabs are changed
 				if (_info1 == 0 && !m_widgetIsWelcome) {
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
@@ -1248,14 +1248,20 @@ std::string AppBase::getDebugInformation() const {
 
 	// Lock manager
 
-	JsonObject lockManagerObj;
-
-	doc.AddMember("LockManager", lockManagerObj, doc.GetAllocator());
+	LockManager* lm = m_ExternalServicesComponent->lockManager();
+	if (lm) {
+		JsonObject lockManagerObj;
+		lm->getDebugInformation(lockManagerObj, doc.GetAllocator());
+		doc.AddMember("LockManager", lockManagerObj, doc.GetAllocator());
+	}
+	else {
+		doc.AddMember("LockManager", ot::JsonNullValue(), doc.GetAllocator());
+	}
 
 	// Widget view manager
 
 	JsonObject widgetViewManagerObj;
-
+	ot::WidgetViewManager::instance().getDebugInformation(widgetViewManagerObj, doc.GetAllocator());
 	doc.AddMember("WidgetViewManager", widgetViewManagerObj, doc.GetAllocator());
 
 	// Viewer component

@@ -54,6 +54,11 @@ void PlotVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
 
+void PlotVisualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("Type", ot::JsonString("PlotVisualiser", _allocator), _allocator);
+	Visualiser::getDebugInformation(_object, _allocator);
+}
+
 void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)
 {
 	m_alreadyRequestedVisualisation = false;

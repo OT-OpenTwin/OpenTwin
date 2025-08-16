@@ -3347,7 +3347,30 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
-	return AppBase::instance()->getDebugInformation();
+	std::string debugInfo = AppBase::instance()->getDebugInformation();
+
+	if (_document.HasMember(OT_ACTION_PARAM_SENDER_URL) && _document.HasMember(OT_ACTION_PARAM_CallbackAction)) {
+		std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+		std::string callbackAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+
+		ot::JsonDocument responseDoc;
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(callbackAction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_Data, ot::JsonString(debugInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		std::string response;
+		if (!ot::msg::send("", senderUrl, ot::EXECUTE_ONE_WAY_TLS, responseDoc.toJson(), response, 0, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send debug information response to \"" + senderUrl + "\"");
+		}
+		else {
+			OT_LOG_T("Debug information send to \"" + senderUrl + "\"");
+		}
+	}
+	else {
+		AppBase::instance()->appendInfoMessage("Debug Information:\n" + QString::fromStdString(debugInfo));
+		OT_LOG_I(debugInfo);
+	}
+
+	return "";
 }
 
 // Property Grid

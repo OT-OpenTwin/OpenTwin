@@ -31,7 +31,44 @@ SceneNodeBase::~SceneNodeBase() {
 }
 
 void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("TreeItemID", m_treeItemID, _allocator);
+	_object.AddMember("ModelEntityID", m_modelEntityID, _allocator);
+	_object.AddMember("Editable", m_editable, _allocator);
+	_object.AddMember("Visible", m_visible, _allocator);
+	_object.AddMember("Selected", m_selected, _allocator);
+	_object.AddMember("SelectionFromNavigationTree", m_selectionFromNavigationTree, _allocator);
+	_object.AddMember("Transparent", m_transparent, _allocator);
+	_object.AddMember("Wireframe", m_wireframe, _allocator);
+	_object.AddMember("Highlighted", m_highlighted, _allocator);
+	_object.AddMember("Offset", m_offset, _allocator);
+	_object.AddMember("SelectChildren", m_selectChildren, _allocator);
+	_object.AddMember("ManageVisibilityOfParent", m_manageVisibilityOfParent, _allocator);
+	_object.AddMember("ManageVisibilityOfChildren", m_manageVisibilityOfChildren, _allocator);
+	_object.AddMember("SelectionHandled", m_selectionHandled, _allocator);
+	_object.AddMember("Errors", ot::JsonString(m_errors, _allocator), _allocator);
+	if (m_parent) {
+		_object.AddMember("ParentName", ot::JsonString(m_parent->getName(), _allocator), _allocator);
+	}
+	else {
+		_object.AddMember("ParentName", ot::JsonNullValue(), _allocator);
+	}
 
+	ot::JsonArray childrenArr;
+	for (const SceneNodeBase* child : m_children) {
+		ot::JsonObject childObj;
+		child->getDebugInformation(childObj, _allocator);
+		childrenArr.PushBack(childObj, _allocator);
+	}
+	_object.AddMember("Children", childrenArr, _allocator);
+
+	ot::JsonArray visualizersArr;
+	for (const Visualiser* visualizer : m_visualiser) {
+		ot::JsonObject visualizerObj;
+		visualizer->getDebugInformation(visualizerObj, _allocator);
+		visualizersArr.PushBack(visualizerObj, _allocator);
+	}
+	_object.AddMember("Visualizers", visualizersArr, _allocator);
 }
 
 ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
