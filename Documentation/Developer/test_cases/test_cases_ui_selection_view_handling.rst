@@ -1,5 +1,5 @@
-Frontend Selection
-##################
+Frontend Selection and View Handling
+####################################
 
 .. list-table::
     :header-rows: 1

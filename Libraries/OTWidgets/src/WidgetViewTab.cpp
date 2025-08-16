@@ -14,7 +14,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
-	: ads::CDockWidgetTab(_dockWidget), m_isPinned(false)
+	: ads::CDockWidgetTab(_dockWidget), m_isPinned(false), m_isMiddleButtonPressed(false)
 {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
@@ -104,5 +104,18 @@ void ot::WidgetViewTab::slotTogglePinned(void) {
 }
 
 void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
+	if (_event->button() == Qt::MiddleButton) {
+		m_isMiddleButtonPressed = true;
+	}
 	ads::CDockWidgetTab::mousePressEvent(_event);
+}
+
+void ot::WidgetViewTab::mouseReleaseEvent(QMouseEvent* _event) {
+	ads::CDockWidgetTab::mouseReleaseEvent(_event);
+	if (_event->button() == Qt::MiddleButton) {
+		if (m_isMiddleButtonPressed && m_closeButton->isVisible()) {
+			Q_EMIT viewCloseRequested();
+		}
+		m_isMiddleButtonPressed = false;
+	}
 }
