@@ -1216,7 +1216,10 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 		// Clear visualizing entities for last central view
 		ot::WidgetView* view = FrontendAPI::instance()->getLastFocusedCentralView();
 		if (view) {
-			view->clearVisualizingItems();
+			ot::WidgetViewBase::ViewType viewType = view->getViewData().getViewType();
+			if (viewType == ot::WidgetViewBase::View3D || viewType == ot::WidgetViewBase::View1D) {
+				view->clearVisualizingItems();
+			}
 		}
 
 		return result;
