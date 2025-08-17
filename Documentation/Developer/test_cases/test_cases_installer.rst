@@ -12,7 +12,7 @@ End User Installation Test Specifications
 
    * - 1
      - Create a fresh VM with Windows installed. Add german keyboard settings if not available yet and copy the end user installer into the VM. Set a checkpoint (recovery point). Reboot is not necessary.
-     - Execute the installer. Keep all default settings, except the of the port settings. Use the costumised port option and select different values for all ports (take a screenshot of the chosen ports).
+     - Execute the installer. Keep all default settings except for the port settings. Select the custom port option and choose different values for each port. Take a screenshot of the selected ports.
      - Installation succeeds. MongoDB is running and OpenTwin can be started. Projects can be created. Additionally, test a few functions within the project.
        
    * - 1.1
@@ -45,7 +45,7 @@ End User Installation Test Specifications
    * - 1.6
      - Still during the installation. 
      - In the Server Settings, choose Public IP and enter 127.0.0.1. In the next page enter the custom path to C:\Users\User\Documents\OT_Certs per copy paste. Finish the installation.
-     - Try OpenTwin, it should still work. Check the if OPEN_TWIN_CERTS_PATH is now pointing to C:\Users\User\Documents\OT_Certs
+     - Try OpenTwin, it should still work. Check if the OPEN_TWIN_CERTS_PATH is now pointing to C:\Users\User\Documents\OT_Certs
 
    * - 1.7
      - OpenTwin is installed and in the install directory (default is Program Filesx86/OpenTwin) should be a folder called "Documentation".
