@@ -253,7 +253,6 @@ void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, st
 		if (series != nullptr)
 		{
 			seriesSelected = true;
-			break;
 		}
 		else
 		{
