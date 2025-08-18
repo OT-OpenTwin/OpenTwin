@@ -249,13 +249,17 @@ void AppBase::slotProcessMessage(const QString& _json) {
 			std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 
 			if (action == OT_ACTION_CMD_Log) {
-				ot::ConstJsonObject logObj = ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG);
+				if (m_logger) {
+					std::list<ot::LogMessage> messages;
+					for (const ot::ConstJsonObject& logObj : ot::json::getObjectList(inboundAction, OT_ACTION_PARAM_LOGS)) {
+						ot::LogMessage msg;
+						msg.setFromJsonObject(logObj);
+						msg.setCurrentTimeAsGlobalSystemTime();
+						messages.push_back(msg);
+					}
 
-				ot::LogMessage msg;
-				msg.setFromJsonObject(logObj);
-				msg.setCurrentTimeAsGlobalSystemTime();
-
-				if (m_logger) m_logger->appendLogMessage(msg);
+					m_logger->appendLogMessages(messages);
+				}
 			}
 			else if (action == "DisplayData") {
 				std::string data = ot::json::getString(inboundAction, OT_ACTION_PARAM_Data);

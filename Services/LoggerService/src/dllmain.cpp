@@ -52,9 +52,11 @@ namespace ot {
 						return OT_ACTION_CMD_Ping;
 					}
 					else if (action == OT_ACTION_CMD_ServiceShutdown) {
+						OT_LOG_D("Shutting down logger service");
 						exit(ot::AppExitCode::Success);
 					}
 					else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
+						OT_LOG_D("Logger service emergency shutdown");
 						exit(ot::AppExitCode::EmergencyShutdown);
 					}
 					else {
@@ -74,9 +76,11 @@ namespace ot {
 				}
 			}
 			catch (const std::exception& _e) {
+				OT_LOG_E(_e.what());
 				return OT_ACTION_RETURN_INDICATOR_Error + std::string(_e.what());
 			}
 			catch (...) {
+				OT_LOG_E("Unknown error");
 				return OT_ACTION_RETURN_UnknownError;
 			}
 		}

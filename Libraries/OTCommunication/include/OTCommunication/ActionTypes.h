@@ -452,6 +452,7 @@
 #define OT_ACTION_PARAM_HOSTNAME "Host.Name"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
+#define OT_ACTION_PARAM_LOGS "LogMessages"
 #define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
 #define OT_ACTION_PARAM_GlobalLoggerUrl "Global.LoggerUrl"
 
