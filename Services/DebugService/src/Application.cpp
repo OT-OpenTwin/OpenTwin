@@ -136,15 +136,15 @@ void Application::createPlotOneCurve()
 	DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
-	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
 	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i <= 50; i++)
+	for (float i = 0.; i <= 50.; i++)
 	{
-		quantDesc->addDatapoint(ot::Variable(i));
+		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
 		parameter.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
@@ -171,14 +171,14 @@ void Application::createPlotTwoCurves() {
 	DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
-	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
 	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i <= 50; i++) {
-		quantDesc->addDatapoint(ot::Variable(i));
+	for (float i = 0.; i <= 50.; i++) {
+		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
 		parameter.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
@@ -197,14 +197,14 @@ void Application::createPlotTwoCurves() {
 	DatasetDescription description2;
 	MetadataParameter parameter2;
 	parameter2.parameterName = "Frequency";
-	parameter2.typeName = ot::TypeNames::getInt32TypeName();
+	parameter2.typeName = ot::TypeNames::getFloatTypeName();
 	parameter2.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
 	quantDesc2->setName("Magnitude");
 	quantDesc2->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i <= 50; i++) {
-		quantDesc2->addDatapoint(ot::Variable(-i));
+	for (float i = 0.; i <= 50.; i++) {
+		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
 		parameter2.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
@@ -442,13 +442,13 @@ void Application::createPlotScatter() {
 	DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
-	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
 	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i <= 50; i++) {
+	for (float i = 0.; i <= 50.; i++) {
 		quantDesc->addDatapoint(ot::Variable(rand() % 100));
 		parameter.values.push_back(ot::Variable(i));
 	}
@@ -476,14 +476,14 @@ void Application::createPlotSinglePoint() {
 	DatasetDescription description;
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
-	parameter.typeName = ot::TypeNames::getInt32TypeName();
+	parameter.typeName = ot::TypeNames::getFloatTypeName();
 	parameter.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 	quantDesc->setName("Magnitude");
 	quantDesc->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i < 1; i++) {
-		quantDesc->addDatapoint(ot::Variable(i));
+	for (float i = 0.; i < 1; i++) {
+		quantDesc->addDatapoint(ot::Variable(static_cast<int32_t>(i)));
 		parameter.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
@@ -502,14 +502,14 @@ void Application::createPlotSinglePoint() {
 	DatasetDescription description2;
 	MetadataParameter parameter2;
 	parameter2.parameterName = "Frequency";
-	parameter2.typeName = ot::TypeNames::getInt32TypeName();
+	parameter2.typeName = ot::TypeNames::getFloatTypeName();
 	parameter2.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
 	quantDesc2->setName("Magnitude");
 	quantDesc2->addValueDescription("", ot::TypeNames::getInt32TypeName(), "dB");
 
-	for (int i = 0; i < 1; i++) {
-		quantDesc2->addDatapoint(ot::Variable(-i));
+	for (float i = 0.; i < 1; i++) {
+		quantDesc2->addDatapoint(ot::Variable(-static_cast<int32_t>(i)));
 		parameter2.values.push_back(ot::Variable(i));
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
