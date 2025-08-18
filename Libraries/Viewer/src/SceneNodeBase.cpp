@@ -116,13 +116,13 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
 						}
 						
-						//FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
-
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 
 						state.m_anyVisualiserHasFocus = true;
 					}
 					
+					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
+
 					// The visualizer may want to unhide/un-dim the visualisation
 					visualiser->showVisualisation(state);
 				}
