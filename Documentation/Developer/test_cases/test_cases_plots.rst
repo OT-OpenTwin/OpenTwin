@@ -306,7 +306,7 @@ Matrix and Manual Plot Creation
 
    * - 8.3
      - 
-     - Select the plot entity of Single Curve and the curve entity of the Scatter plot. Execute the button "Add curve to plot" in the model tab
+     - Select the plot entity of Single Curve and the Dataset entity of the Scatter plot. Execute the button "Add curve to plot" in the model tab
      - Another curve entity is added below the plot entity of the Single Curve. Both curves are now displayed in the same view.
 
 .. image:: images/Plot_Matrix.png
