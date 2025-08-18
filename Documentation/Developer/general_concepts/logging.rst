@@ -7,6 +7,8 @@ The Logger Service stores the received log messages and forwards them to any reg
 .. image:: images/logging_overview.png
     :scale: 50%
 
+.. _setup_logger:
+
 Setup Logger
 ============
 
@@ -31,7 +33,16 @@ The initialize method ot the ServiceLogNotifier will call the initialize method 
 .. note::
    If the service is using the ``OTServiceFoundation/Foundation`` the ``ot::foundation::init`` method will call ``ot::ServiceLogNotifier::initialize`` by providing the service name that is set in the provided ApplicationBase object.
 
-When creating the ``ServiceLogNotifier`` instance, it sets the logging options from the following environment variables.
+When creating the ``ServiceLogNotifier`` instance, it sets the logging options from the :ref:`environment variables<logging_environment_variables>`.
+
+.. note::
+   The environment variables are optional.
+   When launching OpenTwin via the batch files provided with OpenTwin the variables will be set if not done so in the system/user environment.
+
+.. _logging_environment_variables:
+
+Environment variables
+---------------------
 
 .. list-table::
     :header-rows: 1
@@ -47,38 +58,38 @@ When creating the ``ServiceLogNotifier`` instance, it sets the logging options f
     * - OPEN_TWIN_LOGGING_MODE
       - Sets the active log flags that determine which log messages will be generated.
         
-        A union of multiple flags can be created by splitting them with a '|' character (without any blank space)
+        A union of multiple flags can be created by splitting them with a '|' character without any blank spaces (e.g. ``WARNING_LOG|ERROR_LOG``).
 
-        * INFORMATION_LOG: *General information log*
+        * **INFORMATION_LOG**: General information log
         
-        * DETAILED_LOG: *Detailed information log*
+        * **DETAILED_LOG**: Detailed information log
         
-        * WARNING_LOG: *Warning log*
+        * **WARNING_LOG**: Warning log
 
-        * ERROR_LOG: *Error log*
+        * **ERROR_LOG**: Error log
 
-        * INBOUND_MESSAGE_LOG *Execute enpoint message received log*
+        * **INBOUND_MESSAGE_LOG**: Execute enpoint message received log
 
-        * QUEUED_INBOUND_MESSAGE_LOG *Queue endpoint message received log*
+        * **QUEUED_INBOUND_MESSAGE_LOG**: Queue endpoint message received log
 
-        * ONEWAY_TLS_INBOUND_MESSAGE_LOG *One way tls endpoint message received log*
+        * **ONEWAY_TLS_INBOUND_MESSAGE_LOG**: One way tls endpoint message received log
 
-        * OUTGOING_MESSAGE_LOG *Outgoing message log*
+        * **OUTGOING_MESSAGE_LOG**: Outgoing message log
 
-        * TEST_LOG *Test (e.g. Runtime Test) message log*
+        * **TEST_LOG**: Test (e.g. Runtime Test) message log
 
-        * ALL_GENERAL_LOG_FLAGS *All general log flags will be set (Default, Detailed, Warning, Error)*
+        * **ALL_GENERAL_LOG_FLAGS**: All general log flags will be set (Default, Detailed, Warning, Error)
 
-        * ALL_INCOMING_MESSAGE_LOG_FLAGS *All flags for incoming messages will be set*
+        * **ALL_INCOMING_MESSAGE_LOG_FLAGS**: All flags for incoming messages will be set
 
-        * ALL_OUTGOING_MESSAGE_LOG_FLAGS *All flags for outgoing message will be set*
+        * **ALL_OUTGOING_MESSAGE_LOG_FLAGS**: All flags for outgoing message will be set
 
-        * ALL_MESSAGE_LOG_FLAGS *All flags for incoming and outgoing messages will be set*
+        * **ALL_MESSAGE_LOG_FLAGS**: All flags for incoming and outgoing messages will be set
 
-        * ALL_LOG_FLAGS *All log flags will be set*
+        * **ALL_LOG_FLAGS**: All log flags will be set
 
-.. note::
-   The environment variables are optional. Also the variables will be set when running OpenTwin by using the batch files provided with OpenTwin.
+    * - OPEN_TWIN_FILE_LOGGING
+      - If set to **true** :ref:`file logging<use_file_logging>` will be enabled.
 
 Generate Log Messages
 =====================
@@ -122,6 +133,8 @@ The Information, Detailed, Warning, Error and Test log macros have the following
 
 * ``A`` Assert before log. The log message will be displayed in the assert messsage. Message must be a C-String (const char*) (e.g. LOG_EA("Test") -> Log Error & Assert).
 * ``AS`` Assert simple before log. The Assert will have no message set. Especially useful when wanting to assert but to log a std::string at the same time (e.g. LOG_EAS("Test: " + myString) -> Log Error & Assert simple).
+
+.. _use_file_logging:
 
 Use file logging
 ****************
