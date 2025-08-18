@@ -14,3 +14,4 @@ Test Cases
     test_cases_dataimport_table
     test_cases_text_table
     test_cases_logger_and_otoolkit
+    test_cases_management
