@@ -44,8 +44,8 @@ End User Installation Test Specifications
 
    * - 1.6
      - Still during the installation. 
-     - In the Server Settings, choose Public IP and enter 127.0.0.1. In the next page enter the custom path to C:\Users\User\Documents\OT_Certs per copy paste. Finish the installation.
-     - Try OpenTwin, it should still work. Check if the OPEN_TWIN_CERTS_PATH is now pointing to C:\Users\User\Documents\OT_Certs
+     - In the Server Settings, choose Public IP and enter 127.0.0.1. In the next page enter the custom path to C:\\Users\\User\\Documents\\OT_Certs per copy paste. Finish the installation.
+     - Try OpenTwin, it should still work. Check if the OPEN_TWIN_CERTS_PATH is now pointing to C:\\Users\User\\Documents\\OT_Certs
 
    * - 1.7
      - OpenTwin is installed and in the install directory (default is Program Filesx86/OpenTwin) should be a folder called "Documentation".
@@ -53,7 +53,7 @@ End User Installation Test Specifications
      - In the install options, the option for "Documentation" should have been set by default. After the reinstallation there is no "Documentation" folder in the installation directory.
 
    * - 1.8
-     - After test 1.8. 
+     - After test 1.7. 
      - Start a reinstallation. In the install options, unset the "Documentation" option. 
      -  In the install options, the option for "Documentation" should have been unset by default.
 
