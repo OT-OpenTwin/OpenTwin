@@ -33,7 +33,7 @@ ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
 	m_tree(nullptr), m_filter(nullptr), m_layout(nullptr),
 	m_filterCaseSensitive(false), m_filterRefreshOnChange(true), m_currentId(0), m_itemsAreEditable(false),
 	m_selectAndDeselectChildren(false), m_ignoreEvents(false), m_focusedItem(invalidUID), m_isReadOnly(false),
-	m_displayChildsOnFilter(false)
+	m_displayChildsOnFilter(false), m_mouseIsPressed(false), m_selectionHasChanged(false)
 {
 	// Create tree
 	m_tree = new ak::aTreeWidgetBase(this);
@@ -67,6 +67,8 @@ ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
 	connect(m_filter, &aLineEditWidget::keyPressed, this, &aTreeWidget::slotFilterKeyPressed);
 	connect(m_filter, &QLineEdit::textChanged, this, &aTreeWidget::slotFilterTextChanged);
 
+	connect(this, &aTreeWidget::selectionChanged, this, &aTreeWidget::slotHandleSelectionChanged);
+
 	connect(m_tree, &aTreeWidgetBase::keyPressed, this, &aTreeWidget::slotTreeKeyPressed);
 	connect(m_tree, &aTreeWidgetBase::keyReleased, this, &aTreeWidget::slotTreeKeyReleased);
 	connect(m_tree, &QTreeWidget::itemActivated, this, &aTreeWidget::slotTreeItemActivated);
@@ -77,6 +79,9 @@ ak::aTreeWidget::aTreeWidget() : ak::aWidget(otTree),
 	connect(m_tree, &QTreeWidget::itemExpanded, this, &aTreeWidget::slotTreeItemExpanded);
 	connect(m_tree, &QTreeWidget::itemSelectionChanged, this, &aTreeWidget::slotTreeSelectionChanged);
 	connect(m_tree, &aTreeWidgetBase::mouseMove, this, &aTreeWidget::slotTreeMouseMove);
+	connect(m_tree, &aTreeWidgetBase::mousePressed, this, &aTreeWidget::slotTreeMousePressed);
+	connect(m_tree, &aTreeWidgetBase::mouseReleased, this, &aTreeWidget::slotTreeMouseReleased);
+	connect(m_tree, &aTreeWidgetBase::enter, this, &aTreeWidget::slotTreeEnter);
 	connect(m_tree, &aTreeWidgetBase::leave, this, &aTreeWidget::slotTreeLeave);
 	connect(m_tree, &QTreeWidget::customContextMenuRequested, this, &aTreeWidget::slotCustomContextMenuRequested);
 }
@@ -638,6 +643,15 @@ ak::aTreeWidgetItem * ak::aTreeWidget::itemAt(const QPoint& _pos) {
 
 // ###########################################################################################################################
 
+void ak::aTreeWidget::slotHandleSelectionChanged() {
+	if (m_mouseIsPressed) {
+		m_selectionHasChanged = true;
+	}
+	else {
+		Q_EMIT selectionChangeCompleted();
+	}
+}
+
 void ak::aTreeWidget::slotTreeKeyPressed(QKeyEvent * _event) {
 	if (m_ignoreEvents) { return; }
 	Q_EMIT keyPressed(_event);
@@ -724,11 +738,37 @@ void ak::aTreeWidget::slotTreeMouseMove(QMouseEvent * _event) {
 	}
 }
 
+void ak::aTreeWidget::slotTreeMousePressed(QMouseEvent* _event) {
+	if (_event->button() == Qt::MouseButton::LeftButton) {
+		m_mouseIsPressed = true;
+	}
+}
+
+void ak::aTreeWidget::slotTreeMouseReleased(QMouseEvent* _event) {
+	if (_event->button() == Qt::MouseButton::LeftButton) {
+		m_mouseIsPressed = false;
+		if (m_selectionHasChanged) {
+			m_selectionHasChanged = false;
+			Q_EMIT selectionChangeCompleted();
+		}
+	}
+}
+
+void ak::aTreeWidget::slotTreeEnter(QEnterEvent* _event) {
+
+}
+
 void ak::aTreeWidget::slotTreeLeave(QEvent * _event) {
 	if (m_focusedItem != invalidUID) {
 		m_focusedItem = invalidUID;
 		if (m_ignoreEvents) { return; }
 		Q_EMIT focusLost();
+	}
+
+	if (m_mouseIsPressed || m_selectionHasChanged) {
+		m_mouseIsPressed = false;
+		m_selectionHasChanged = false;
+		Q_EMIT selectionChangeCompleted();
 	}
 }
 
@@ -825,22 +865,41 @@ ak::aTreeWidgetBase::~aTreeWidgetBase() { A_OBJECT_DESTROYING }
 
 void ak::aTreeWidgetBase::keyPressEvent(QKeyEvent *_event)
 {
-	QTreeWidget::keyPressEvent(_event); Q_EMIT keyPressed(_event);
+	QTreeWidget::keyPressEvent(_event);
+	Q_EMIT keyPressed(_event);
 }
 
 void ak::aTreeWidgetBase::keyReleaseEvent(QKeyEvent * _event)
 {
-	QTreeWidget::keyReleaseEvent(_event); Q_EMIT keyReleased(_event);
+	QTreeWidget::keyReleaseEvent(_event);
+	Q_EMIT keyReleased(_event);
 }
 
-void ak::aTreeWidgetBase::mouseMoveEvent(QMouseEvent * _event)
+void ak::aTreeWidgetBase::mousePressEvent(QMouseEvent * _event)
 {
-	QTreeWidget::mouseMoveEvent(_event); Q_EMIT mouseMove(_event);
+	QTreeWidget::mousePressEvent(_event);
+	Q_EMIT mousePressed(_event);
+}
+
+void ak::aTreeWidgetBase::mouseReleaseEvent(QMouseEvent* _event) {
+	QTreeWidget::mouseReleaseEvent(_event);
+	Q_EMIT mouseReleased(_event);
+}
+
+void ak::aTreeWidgetBase::mouseMoveEvent(QMouseEvent* _event) {
+	QTreeWidget::mouseMoveEvent(_event);
+	Q_EMIT mouseMove(_event);
 }
 
 void ak::aTreeWidgetBase::leaveEvent(QEvent *_event)
 {
-	QTreeWidget::leaveEvent(_event); Q_EMIT leave(_event);
+	QTreeWidget::leaveEvent(_event);
+	Q_EMIT leave(_event);
+}
+
+void ak::aTreeWidgetBase::enterEvent(QEnterEvent* event) {
+	QTreeWidget::enterEvent(event);
+	Q_EMIT enter(event);
 }
 
 void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {

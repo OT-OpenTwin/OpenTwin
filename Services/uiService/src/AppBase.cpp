@@ -1090,7 +1090,7 @@ void AppBase::createUi(void) {
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 			
-			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChangeCompleted, this, &AppBase::slotTreeItemSelectionChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 			this->connect(&m_navigationManager, &ot::NavigationSelectionManager::selectionHasChanged, this, &AppBase::slotHandleSelectionHasChanged);
@@ -3382,6 +3382,7 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
+	OT_LOG_T("Sel");
 	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 	OT_SLECTION_TEST_LOG(">> Tree item selection changed completed");
