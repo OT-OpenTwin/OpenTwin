@@ -18,6 +18,13 @@
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aTreeWidget.h>
 
+#define OT_CONTROLSMANAGER_LOG_ENABLED false
+#if OT_CONTROLSMANAGER_LOG_ENABLED==true
+#define OT_LOG_CONTROLSMANAGER(___msg) OT_LOG_D(___msg)
+#else
+#define OT_LOG_CONTROLSMANAGER(___msg)
+#endif
+
 ControlsManager::~ControlsManager() {
 	for (auto itm : m_creatorMap) { delete itm.second; }
 }
@@ -138,7 +145,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on UID uiElementCreated");
+				OT_LOG_CONTROLSMANAGER("Lock applied on UID uiElementCreated");
 
 				uiElement->lock(lockLevel.second, lockLevel.first);
 			}
@@ -155,7 +162,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on TeeWidget uiElementCreated");
+				OT_LOG_CONTROLSMANAGER("Lock applied on TeeWidget uiElementCreated");
 
 				newTree->lock(lockLevel.second, lockLevel.first);
 			}
@@ -172,7 +179,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on propGrid uiElementCreated");
+				OT_LOG_CONTROLSMANAGER("Lock applied on propGrid uiElementCreated");
 				newProp->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -188,7 +195,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on graphicsView uiElementCreated");
+				OT_LOG_CONTROLSMANAGER("Lock applied on graphicsView uiElementCreated");
 				newGraphics->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -204,7 +211,7 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on textEditor uiElementCreated");
+				OT_LOG_CONTROLSMANAGER("Lock applied on textEditor uiElementCreated");
 				newText->lock(lockLevel.second, lockLevel.first);
 			}
 		}
@@ -220,7 +227,7 @@ void LockManager::uiViewCreated(const ot::BasicServiceInformation& _serviceInfo,
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on View created");
+				OT_LOG_CONTROLSMANAGER("Lock applied on View created");
 
 				newView->lock(lockLevel.second, lockLevel.first);
 			}
@@ -237,7 +244,7 @@ void LockManager::registerLockable(const ot::BasicServiceInformation& _serviceIn
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				OT_LOG_D("Log applied on register lockable");
+				OT_LOG_CONTROLSMANAGER("Lock applied on register lockable");
 
 				newLockable->lock(lockLevel.second, lockLevel.first);
 			}
@@ -316,7 +323,7 @@ void LockManager::deregisterLockable(LockableWidget* _lockable) {
 }
 
 void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
-	OT_LOG_D("Lock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
+	OT_LOG_CONTROLSMANAGER("Lock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
 	auto service = serviceLockLevel(_serviceInfo);
 
 	// Get old value
@@ -374,7 +381,7 @@ void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, const ot
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 	auto service = serviceLockLevel(_serviceInfo);
-	OT_LOG_D("Unlock applied on request from: " + _serviceInfo.serviceName());
+	OT_LOG_CONTROLSMANAGER("Unlock applied on request from: " + _serviceInfo.serviceName());
 
 	for (auto lockVal : *service) {
 		for (auto itm : m_uiElements) {
@@ -390,25 +397,24 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 
 	if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 
-	const std::string state = printLockState();
-	OT_LOG_D("Log state after unlock:\n" + state);
+	OT_LOG_CONTROLSMANAGER("Lock state after unlock:\n" + this->getDebugInformationString());
 }
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
 	auto service = serviceLockLevel(_serviceInfo);
-	OT_LOG_D("Unlock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
-	std::string state = printLockState();
-	OT_LOG_D("Log state before unlock:\n" + state);
+	OT_LOG_CONTROLSMANAGER("Unlock applied on request from: " + _serviceInfo.serviceName() + " LogFlag:" + ot::toString(_type));
+	OT_LOG_CONTROLSMANAGER("Lock state before unlock:\n" + this->getDebugInformationString());
+	
 	// Get old value
 	auto oldLevel = service->find(_type);
 	int lockFlagCount = 0;
 	if (oldLevel != service->end()) {
 		lockFlagCount = oldLevel->second;
 	}
-	OT_LOG_D("Unlock old value found");
+
 	// Store data
 	if (lockFlagCount > 0) {
-		OT_LOG_D("Unlocking. Lock count larger then 0");
+		OT_LOG_CONTROLSMANAGER("Unlocking. Lock count larger then 0");
 		service->insert_or_assign(_type, lockFlagCount - 1);
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(1, _type);
@@ -419,15 +425,15 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::Lo
 		}
 	}
 	else {
-		OT_LOG_D("Unlocking. Lock count is 0");
+		OT_LOG_CONTROLSMANAGER("Unlocking. Lock count is 0");
 		service->insert_or_assign(_type, lockFlagCount);
 	}
 
 	if (_type & ot::LockAll) {
 		if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 	}
-	state = printLockState();
-	OT_LOG_D("Log state after unlock:\n" + state);
+
+	OT_LOG_CONTROLSMANAGER("Lock state after unlock:\n" + this->getDebugInformationString());
 }
 
 void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags) {
@@ -502,7 +508,9 @@ void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ot::UI
 void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement, bool _eraseUiElements) {
 	auto serviceE = serviceEnabledLevel(_serviceInfo);
 	auto serviceL = serviceLockLevel(_serviceInfo);
-	OT_LOG_D("clean service due to: " + _serviceInfo.serviceName() + " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
+	
+	OT_LOG_CONTROLSMANAGER("clean service due to: " + _serviceInfo.serviceName() + " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
+	
 	for (auto e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
 			LockManagerElement* element = this->uiElement(e.first);
@@ -518,7 +526,8 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 			}
 		}
 	}
-	OT_LOG_D("Clean service unlocks");
+	OT_LOG_CONTROLSMANAGER("Clean service unlocks");
+
 	for (auto l : *serviceL) {
 		if (l.second > 0 && _reenableElement) {
 			for (auto itm : m_uiElements) {
@@ -530,8 +539,8 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 			}
 		}
 	}
-	const std::string state =	printLockState();
-	OT_LOG_D(state);
+
+	OT_LOG_CONTROLSMANAGER(this->getDebugInformationString());
 
 	delete serviceE;
 	delete serviceL;
@@ -553,24 +562,7 @@ int LockManager::lockLevel(ot::LockTypeFlag _type) {
 	return ret;
 }
 
-std::string LockManager::printLockState()
-{
-	std::string state("");
-	for (auto flagCountByLogFlagByService : m_serviceToUiLockLevel)
-	{
-		state += "Service: " + flagCountByLogFlagByService.first.serviceName() + "\n";
-		auto flagCountsByLogFlags = flagCountByLogFlagByService.second;
-		for (auto& flagCountsByLogFlag : *flagCountsByLogFlags)
-		{
-			state += "	Flag: " + ot::toString(flagCountsByLogFlag.first) + " lock count: " + std::to_string(flagCountsByLogFlag.second) + "\n";
-		}
-		state += "\n";
-	}
-
-	return state;
-}
-
-void LockManager::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+void LockManager::getDebugInformation(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	ot::JsonArray specialsArr;
 	for (const LockManagerElement* special : m_specials) {
 		ot::JsonObject specialObj;
@@ -614,6 +606,12 @@ void LockManager::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator
 		uiElementsArr.PushBack(uiElementObj, _allocator);
 	}
 	_object.AddMember("UIElements", uiElementsArr, _allocator);
+}
+
+std::string LockManager::getDebugInformationString() const {
+	ot::JsonDocument doc;
+	this->getDebugInformation(doc, doc.GetAllocator());
+	return doc.toJson();
 }
 
 // #######################################################################################################################
@@ -763,7 +761,7 @@ void LockManagerElement::enable(int _value) {
 		}
 		else {
 			if (ak::uiAPI::object::exists(m_uid)) {
-				OT_LOG_D("Enabling: " + std::to_string(m_uid));
+				OT_LOG_CONTROLSMANAGER("Enabling: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, true);
 			}
 		}
@@ -793,7 +791,7 @@ void LockManagerElement::disable(int _value) {
 			m_lockable->setWidgetLocked(true);
 		}
 		else {
-			OT_LOG_D("Disabling: " + std::to_string(m_uid));
+			OT_LOG_CONTROLSMANAGER("Disabling: " + std::to_string(m_uid));
 			ak::uiAPI::object::setEnabled(m_uid, false);
 		}
 	}
@@ -825,7 +823,7 @@ void LockManagerElement::lock(int _value, ot::LockTypeFlag _lockType) {
 				m_lockable->setWidgetLocked(true);
 			}
 			else {
-				OT_LOG_D("Locking: " + std::to_string(m_uid));
+				OT_LOG_CONTROLSMANAGER("Locking: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, false);
 			}
 		}
@@ -864,7 +862,7 @@ void LockManagerElement::unlock(int _value, ot::LockTypeFlag _lockType) {
 				m_lockable->setWidgetLocked(false);
 			}
 			else {
-				OT_LOG_D("Unlocking: " + std::to_string(m_uid));
+				OT_LOG_CONTROLSMANAGER("Unlocking: " + std::to_string(m_uid));
 				ak::uiAPI::object::setEnabled(m_uid, true);
 			}
 		}

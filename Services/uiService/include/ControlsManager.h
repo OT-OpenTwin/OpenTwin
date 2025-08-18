@@ -101,9 +101,9 @@ public:
 
 	int lockLevel(ot::LockTypeFlag _type);
 
-	std::string printLockState();
+	void getDebugInformation(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
-	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
+	std::string getDebugInformationString() const;
 
 private:
 	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;
