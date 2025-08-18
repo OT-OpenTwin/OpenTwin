@@ -68,7 +68,9 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 			else OT_ACTION_IF_RESPONSE_WARNING(ret) { alive = false; }
 			else if (ret != OT_ACTION_CMD_Ping) { alive = false; }
 		}
-		catch (...) { alive = false; }
+		catch (...) {
+			alive = false;
+		}
 	}
 
 	OT_LOG_E("Session service \"" + _sessionServiceURL + "\" has died unexpectedly. Shutting down...");
@@ -269,10 +271,10 @@ extern "C"
 			}
 		}
 		catch (const std::exception & e) {
-			assert(0); // Error
+			OT_LOG_EAS(e.what());
 		}
 		catch (...) {
-			assert(0); // Error
+			OT_LOG_EA("[FATAL] Unknown error");
 		}
 	}
 }

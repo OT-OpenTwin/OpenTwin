@@ -94,8 +94,12 @@ bool SocketServer::sendHttpRequest(const std::string& operation, const std::stri
 
 		return success;
 	}
+	catch (const std::exception& e) {
+		OT_LOG_E(e.what());
+		return false;
+	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_EA("[FATAL] Unknown error");
 		return false;
 	}
 
@@ -151,7 +155,7 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 		return OT_ACTION_RETURN_INDICATOR_Error + QString(e.what());
 	}
 	catch (...) {
-		OT_LOG_E("Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 		return OT_ACTION_RETURN_INDICATOR_Error "[FATAL] Unknown error";
 	}
 }
@@ -182,7 +186,7 @@ void SocketServer::queueAction(const char* json, const char* senderIP)
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_E("Unknown error");
+		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -282,7 +286,7 @@ void SocketServer::processMessage(QString message) {
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_E("Unknown error");
+		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -314,8 +318,10 @@ void SocketServer::onSslErrors(const QList<QSslError>& _errors)
 
 void SocketServer::slotSocketClosed(void) {
 	OT_LOG_D("Socket closed");
-	if (m_pWebSocketServer) delete m_pWebSocketServer;
-	m_pWebSocketServer = nullptr;
+	if (m_pWebSocketServer) {
+		m_pWebSocketServer = nullptr;
+		delete m_pWebSocketServer;
+	}
 
 	QCoreApplication::quit();
 }
@@ -373,6 +379,8 @@ void SocketServer::processMessages(void) {
 }
 
 void SocketServer::shutdown(void) {
+	OT_LOG_D("Shutting down relay service");
+
 	// Exit the application
 	exit(ot::AppExitCode::Success);
 }
