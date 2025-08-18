@@ -3382,7 +3382,6 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
-	OT_LOG_T("Sel");
 	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 	OT_SLECTION_TEST_LOG(">> Tree item selection changed completed");
