@@ -260,7 +260,9 @@ void Session::serviceFailure(Service * _failedService) {
 			"\"; id = \"" + std::to_string(_failedService->getId()) + "\"");
 		SessionService::instance().serviceClosing(_failedService, false, false);
 	}
-
+	else {
+		OT_LOG_W("Handling service failure (nullptr)");
+	}
 	ot::JsonDocument shutdownDoc;
 	shutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, shutdownDoc.GetAllocator()), shutdownDoc.GetAllocator());
 	std::string msg = shutdownDoc.toJson();

@@ -86,7 +86,7 @@ namespace ot {
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
 
-			OT_LOG_D("Removing external services component and calling exit()");
+			OT_LOG_D("Removing external services component and calling exit(" + std::to_string(_exitCode) + ")");
 
 			exit(_exitCode);
 		}
