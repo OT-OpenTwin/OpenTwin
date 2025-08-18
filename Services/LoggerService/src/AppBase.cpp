@@ -264,8 +264,8 @@ void AppBase::workerNotify() {
 			}
 
 			// Add the new messages to the main message list
-			m_messages.splice(m_messages.end(), std::move(m_newMessages));
-			m_newMessages.clear();
+			m_messages.splice(m_messages.end(), std::move(messagesToSend));
+			messagesToSend.clear();
 
 			m_count += newCount;
 
