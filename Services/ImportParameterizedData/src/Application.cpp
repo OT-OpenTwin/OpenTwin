@@ -144,8 +144,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(m_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	_ui->addMenuButton(m_buttonAddBatchCreator, modelWrite, "BatchProcessing");
-	_ui->addMenuButton(m_buttonLockCharacterisation, modelWrite, "icon");
-	_ui->addMenuButton(m_buttonUnLockCharacterisation, modelWrite, "icon");
+	_ui->addMenuButton(m_buttonLockCharacterisation, modelWrite, "Lock");
+	_ui->addMenuButton(m_buttonUnLockCharacterisation, modelWrite, "Unlock");
 
 	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "RunSolver");
 	_ui->addMenuButton(m_buttonCreateDataCollection, modelWrite, "database");

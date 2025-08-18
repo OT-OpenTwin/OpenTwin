@@ -35,7 +35,7 @@ private:
 	static const std::string _dataCategorieQuant;
 
 	const std::string m_unlockedIcon = "Categorization";
-	const std::string m_lockedIcon = "Cone";
+	const std::string m_lockedIcon = "CategorizationLocked";
 	bool m_locked = false;
 
 	DataCategorie _selectedCategory = UNKNOWN;
