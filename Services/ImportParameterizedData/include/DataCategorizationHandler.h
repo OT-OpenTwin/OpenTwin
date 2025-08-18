@@ -41,6 +41,7 @@ public:
 
 	inline void ensureEssentials();
 	void clearBufferedMetadata();
+	void handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock);
 
 private:
 	const std::string m_tableFolder;
@@ -64,8 +65,8 @@ private:
 	void bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void setBackgroundColour(EntityParameterizedDataCategorization::DataCategorie _category);
 	bool checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
-	void addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
-	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
+	
+	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityParameterizedDataCategorization>>& _consideredSeries, std::list<std::string>& _folderContent, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 	
 	//! @brief Queued request that sets the colour of the selection and returns the selected table ranges. Subsequently executed function: storeSelectionRanges

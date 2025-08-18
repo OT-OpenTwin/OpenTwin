@@ -134,6 +134,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
 	m_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
 	
+	m_buttonLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Lock Data Characterisation");
+	m_buttonUnLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation");
+
 
 	_ui->addMenuButton(m_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(m_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
@@ -141,13 +144,15 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(m_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	_ui->addMenuButton(m_buttonAddBatchCreator, modelWrite, "BatchProcessing");
+	_ui->addMenuButton(m_buttonLockCharacterisation, modelWrite, "icon");
+	_ui->addMenuButton(m_buttonUnLockCharacterisation, modelWrite, "icon");
 
 	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "RunSolver");
 	_ui->addMenuButton(m_buttonCreateDataCollection, modelWrite, "database");
 
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
-		std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .GetFullDescription()};
+		std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .GetFullDescription(), m_buttonLockCharacterisation.GetFullDescription(), m_buttonUnLockCharacterisation.GetFullDescription()};
 
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
 	}
@@ -212,24 +217,24 @@ bool Application::settingChanged(const ot::Property * _item) {
 
 void Application::modelSelectionChanged(void)
 {	
-	Application::instance()->prefetchDocumentsFromStorage(m_selectedEntities);
-	ClassFactory& classFactory =  Application::instance()->getClassFactory();
 
 	EntityBatchImporter importer(0, nullptr, nullptr, nullptr, nullptr, "");
-	bool batchImporterSelected = false;
-	for (ot::UID selectedEntityID : m_selectedEntities)
+	EntityParameterizedDataCategorization categorisation(0, nullptr, nullptr, nullptr, nullptr, "");
+	bool batchImporterSelected(false),categorisationSelected(false);
+	
+	for (ot::EntityInformation& selectedEntityInfo : m_selectedEntityInfos)
 	{
-		ot::UID version = Application::instance()->getPrefetchedEntityVersion(selectedEntityID);
-		if (version != ot::getInvalidUID())
+		if (selectedEntityInfo.getEntityType() == importer.getClassName())
 		{
-			EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityID, version, classFactory);
-			if (entityBase != nullptr && entityBase->getClassName() == importer.getClassName())
-			{
-				batchImporterSelected = true;
-				break;
-			}
+			batchImporterSelected = true;
+		}
+
+		if (selectedEntityInfo.getEntityType() == categorisation.getClassName())
+		{
+			categorisationSelected = true;
 		}
 	}
+
 	std::list<std::string> enabled, disabled;
 	if (batchImporterSelected)
 	{
@@ -238,6 +243,17 @@ void Application::modelSelectionChanged(void)
 	else
 	{
 		disabled.push_back(m_buttonAutomaticCreationMSMD.GetFullDescription());
+	}
+
+	if (categorisationSelected)
+	{
+		enabled.push_back(m_buttonLockCharacterisation.GetFullDescription());
+		enabled.push_back(m_buttonUnLockCharacterisation.GetFullDescription());
+	}
+	else
+	{
+		disabled.push_back(m_buttonLockCharacterisation.GetFullDescription());
+		disabled.push_back(m_buttonUnLockCharacterisation.GetFullDescription());
 	}
 
 	uiComponent()->setControlsEnabledState(enabled, disabled);
@@ -272,36 +288,43 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()) != std::string::npos)
 			{
-
 				EntityParameterizedDataCategorization::DataCategorie category = EntityParameterizedDataCategorization::DataCategorie::UNKNOWN;
-				if (action == m_buttonCreateMSMDEntry.GetFullDescription())
+				
+				if (action == m_buttonLockCharacterisation.GetFullDescription() || action == m_buttonUnLockCharacterisation.GetFullDescription())
 				{
-					category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
-				}
-				else if (action == m_buttonCreateRMDEntry.GetFullDescription())
-				{
-					category = EntityParameterizedDataCategorization::researchMetadata;
-				}
-				else if (action == m_buttonCreateParameterEntry.GetFullDescription())
-				{
-					category = EntityParameterizedDataCategorization::parameter;
-				}
-				else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
-				{
-					category = EntityParameterizedDataCategorization::quantity;
-				}
-				//This action involves a queued message to the ui, to receive the selected table range. Until the subsequent function is performed, the ui remains locked.
-				std::list<ot::EntityInformation> selectedEntities;
-				ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities); //buffered selected entities won't do, since text files belong to the model service now.
-
-				bool success =m_parametrizedDataHandler->markSelectionForStorage(selectedEntities,category);
-				if (!success)
-				{
-					m_parametrizedDataHandler->clearBufferedMetadata();
+					m_parametrizedDataHandler->handleChategorisationLock(m_selectedEntityInfos,action == m_buttonLockCharacterisation.GetFullDescription());
 				}
 				else
 				{
-					m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+					if (action == m_buttonCreateMSMDEntry.GetFullDescription())
+					{
+						category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
+					}
+					else if (action == m_buttonCreateRMDEntry.GetFullDescription())
+					{
+						category = EntityParameterizedDataCategorization::researchMetadata;
+					}
+					else if (action == m_buttonCreateParameterEntry.GetFullDescription())
+					{
+						category = EntityParameterizedDataCategorization::parameter;
+					}
+					else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
+					{
+						category = EntityParameterizedDataCategorization::quantity;
+					}
+					//This action involves a queued message to the ui, to receive the selected table range. Until the subsequent function is performed, the ui remains locked.
+					std::list<ot::EntityInformation> selectedEntities;
+					ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntities); //buffered selected entities won't do, since text files belong to the model service now.
+
+					bool success =m_parametrizedDataHandler->markSelectionForStorage(selectedEntities,category);
+					if (!success)
+					{
+						m_parametrizedDataHandler->clearBufferedMetadata();
+					}
+					else
+					{
+						m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+					}
 				}
 			}
 			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())

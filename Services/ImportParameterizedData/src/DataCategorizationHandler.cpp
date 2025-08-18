@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <bitset>
 #include "EntityResultText.h"
-
+#include "OTCore/EntityName.h"
 DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, std::string _previewTableName)
 	:m_tableFolder(_tableFolder), m_previewTableName(_previewTableName)
 {
@@ -123,19 +123,55 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 	}
 	else
 	{
-		bool hasACategorisationEntitySelected = checkForCategorisationEntity(_selectedEntities);
-		if (hasACategorisationEntitySelected)
+		std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataCategorisationFolder, true);
+		std::list<std::string> categorisationEntities;
+		for (std::string& folderItem : folderItems)
 		{
+			size_t topoLvl =  ot::EntityName::getTopologyLevel(folderItem);
+			if (topoLvl == 2)
+			{
+				categorisationEntities.push_back(folderItem);
+			}
+		}
+		
+		std::list<std::unique_ptr<EntityParameterizedDataCategorization>> consideredSeries;
+		if (categorisationEntities.size() != 0)
+		{
+			std::list<ot::EntityInformation> entityInfos;
+			ot::ModelServiceAPI::getEntityInformation(categorisationEntities, entityInfos);
+			ot::UIDList categoristationIDs;
+			for (ot::EntityInformation& entityInfo : entityInfos)
+			{
+				categoristationIDs.push_back(entityInfo.getEntityID());
+			}
+
+			Application::instance()->prefetchDocumentsFromStorage(categoristationIDs);
+			for (ot::EntityInformation& entityInfo : entityInfos)
+			{
+				EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+				std::unique_ptr<EntityParameterizedDataCategorization>categorisationEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
+				bool consider = !categorisationEnt->getIsLocked();
+				if (consider)
+				{
+					consideredSeries.push_back(std::move(categorisationEnt));
+				}
+			}
+
 			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
-				addSMDEntries (_selectedEntities);
+				for (auto& series : consideredSeries)
+				{
+					m_bufferedCategorisationNames.insert(series->getName());
+				}
 			}
 			else
 			{
-				addParamOrQuantityEntries(_selectedEntities, _category);
+				addParamOrQuantityEntries(consideredSeries,folderItems, _category);
 			}
+
 		}
-		else
+
+		if(categorisationEntities.size() == 0 || consideredSeries.size() == 0)
 		{
 			std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
 			bool addNewEntityToActiveList;
@@ -195,6 +231,52 @@ void DataCategorizationHandler::clearBufferedMetadata()
 	m_markedForStorringEntities.clear();
 }
 
+void DataCategorizationHandler::handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
+{
+	EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
+
+	std::string stateChange = "";
+	if (_lock)
+	{
+		stateChange ="Locked categorisation entities";
+	}
+	else
+	{
+		stateChange = "Unlocked categorisation entities";
+	}
+
+	ot::UIDList selectedCategorisations;
+	
+	for (ot::EntityInformation& selectedEntityInfo : _selectedEntities)
+	{
+		if (selectedEntityInfo.getEntityType() == temp.getClassName())
+		{
+			selectedCategorisations.push_back(selectedEntityInfo.getEntityID());
+		}
+	}
+	Application::instance()->prefetchDocumentsFromStorage(selectedCategorisations);
+	ot::NewModelStateInformation updatedEntities;
+	for (ot::UID selectedChategorisation : selectedCategorisations)
+	{
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedChategorisation, Application::instance()->getPrefetchedEntityVersion(selectedChategorisation), Application::instance()->getClassFactory());
+		std::unique_ptr<EntityParameterizedDataCategorization> categorisation(dynamic_cast<EntityParameterizedDataCategorization*>(baseEntity));
+		assert(categorisation != nullptr);
+		if (categorisation->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata && categorisation->getIsLocked() != _lock)
+		{
+			
+			categorisation->setLock(_lock);
+			categorisation->StoreToDataBase();
+			updatedEntities.m_topologyEntityIDs.push_back(categorisation->getEntityID());
+			updatedEntities.m_topologyEntityVersions.push_back(categorisation->getEntityStorageVersion());
+			updatedEntities.m_forceVisible.push_back(false);
+		}
+	}
+	if (updatedEntities.m_topologyEntityIDs.size() > 0)
+	{
+		ot::ModelServiceAPI::updateTopologyEntities(updatedEntities.m_topologyEntityIDs, updatedEntities.m_topologyEntityVersions, stateChange);
+	}
+}
+
 bool DataCategorizationHandler::checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
 {
 	for (std::unique_ptr<EntityBase>& entityBase : _selectedEntities)
@@ -208,115 +290,51 @@ bool DataCategorizationHandler::checkForCategorisationEntity(std::list<std::uniq
 	return false;
 }
 
-void DataCategorizationHandler::addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities)
+void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_ptr<EntityParameterizedDataCategorization>>& _consideredSeries, std::list<std::string>& _folderContent, EntityParameterizedDataCategorization::DataCategorie _category)
 {
-	// Now we search the selected entities for the series metadata categorisations that correspond to the selection and add them to the buffer
-	for (auto& entityBase : _selectedEntities)
+	// If a smd entity is selected but that smd has no parameter/quantity entity below itself, the parameter/quantity entity needs to be created
+	std::list<std::string> allQuantityAndParameterCategorisationNames;
+	for (std::string& folderItem : _folderContent)
 	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
-		
-		if (categorizationEntity != nullptr)
+		if(ot::EntityName::getTopologyLevel(folderItem) == 3)
 		{
-			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::measurementSeriesMetadata)
+			auto entityShortNameOpt = ot::EntityName::getSubName(folderItem);
+			if (entityShortNameOpt.has_value())
 			{
-				m_bufferedCategorisationNames.insert(categorizationEntity->getName());
-			}
-			else if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::parameter|| categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::quantity)
-			{
-				size_t lastDevider = categorizationEntity->getName().find_last_of('/');
-				const std::string seriesMetadataName =	categorizationEntity->getName().substr(0, lastDevider);
-				m_bufferedCategorisationNames.insert(seriesMetadataName);
-			}
-			else
-			{
-				//ignoring the rmd entry.
-			}
-		}
-	}
-	// If none is selected, we need to create a new smd categorisation.
-	if (m_bufferedCategorisationNames.size() == 0)
-	{
-		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
-		bool addToActiveEntities = true;
-		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
-	}
-}
-
-void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
-{
-	std::list<EntityParameterizedDataCategorization*> seriesCategorisations, quantityOrParameterCategorisations; //or Parameterentity. Depeding on the parameter.
-	// First we sort the selected entities into series metadata and quantity/parameter
-	for (auto& entityBase : _selectedEntities)
-	{
-		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase.get()));
-		if (categorizationEntity != nullptr)
-		{		
-			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
-			{
-				seriesCategorisations.push_back(categorizationEntity);
-			}
-			else if (categorizationEntity->GetSelectedDataCategorie() == _category)
-			{
-				quantityOrParameterCategorisations.push_back(categorizationEntity);
+				const std::string entityShortName =entityShortNameOpt.value();
+				if (entityShortName == CategorisationFolderNames::getQuantityFolderName() || entityShortName == CategorisationFolderNames::getParameterFolderName())
+				{
+					allQuantityAndParameterCategorisationNames.push_back(folderItem);
+				}
 			}
 		}
 	}
 	
-	// If a smd entity is selected but that smd has no parameter/quantity entity below itself, the parameter/quantity entity needs to be created
-	for (auto seriesCategorisation : seriesCategorisations)
+	for (auto& seriesCategorisation : _consideredSeries)
 	{
-		bool smdHasSubCategorisationEntity = false;
-		for (auto quantityOrParameterCategorisation : quantityOrParameterCategorisations)
-		{
-			if (quantityOrParameterCategorisation->getName().find(seriesCategorisation->getName()) != std::string::npos)
-			{
-				smdHasSubCategorisationEntity = true;
-				break;
-			}
-		}
-		
-		if (!smdHasSubCategorisationEntity)
-		{
-			std::string entityName;
-			if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
-			{
-				entityName = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getQuantityFolderName();
-			}
-			else
-			{
-				entityName = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getParameterFolderName();
-			}
-			const bool addEntityToActiveList = true;
-			addNewCategorizationEntity(entityName, _category, addEntityToActiveList);
-			m_bufferedCategorisationNames.insert(entityName);
-		}
-	}
-	// Now we add the names of the selected quantity/parameter categorisations
-	for (auto quantityOrParameterCategorisation : quantityOrParameterCategorisations)
-	{
-		m_bufferedCategorisationNames.insert(quantityOrParameterCategorisation->getName());
-	}
 
-	//If nothing was selected, we nee to create a new series + quantity/parameter
-	if (m_bufferedCategorisationNames.size() == 0)
-	{
-		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
-		bool addToActiveEntities = false;
-		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
-
+		std::string subCategoryFolder("");
 		if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
 		{
-			entityName += "/" + CategorisationFolderNames::getQuantityFolderName();
+			subCategoryFolder = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getQuantityFolderName();
 		}
 		else
 		{
-			entityName += "/" + CategorisationFolderNames::getParameterFolderName();
+			subCategoryFolder = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getParameterFolderName();
 		}
-		addToActiveEntities = true;
-		addNewCategorizationEntity(entityName, _category, addToActiveEntities);
+		
+		if (std::find(_folderContent.begin(), _folderContent.end(), subCategoryFolder) == _folderContent.end())
+		{
+			//No subcategory entity set yet.
+			const bool addEntityToActiveList = true;
+			addNewCategorizationEntity(subCategoryFolder, _category, addEntityToActiveList);
+		}
+
+		// Now we add the names of the selected quantity/parameter categorisations
+		m_bufferedCategorisationNames.insert(subCategoryFolder);
+		
 	}
 }
-
 
 void DataCategorizationHandler::addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive)
 {

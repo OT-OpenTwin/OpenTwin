@@ -20,7 +20,12 @@ public:
 
 	static std::string GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie category);
 
-
+	void setLock(bool _lock) 
+	{ 
+		m_locked = _lock; 
+		setModified();
+	}
+	bool getIsLocked() const { return m_locked; }
 private:
 	static const std::string _dataCategorieGroup;
 	static const std::string _defaultCategory ;
@@ -28,6 +33,10 @@ private:
 	static const std::string _dataCategorieMSMD ;
 	static const std::string _dataCategorieParam;
 	static const std::string _dataCategorieQuant;
+
+	const std::string m_unlockedIcon = "Categorization";
+	const std::string m_lockedIcon = "Cone";
+	bool m_locked = false;
 
 	DataCategorie _selectedCategory = UNKNOWN;
 	

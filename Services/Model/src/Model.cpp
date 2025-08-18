@@ -4541,6 +4541,24 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		if (oldEntity != nullptr)
 		{
 			removeFromDisplay.push_back(oldEntity->getEntityID());
+
+			EntityContainer*  oldContainer =	dynamic_cast<EntityContainer*>(oldEntity);
+			if (oldContainer != nullptr)
+			{
+				EntityContainer*  newContainer =	dynamic_cast<EntityContainer*>(newEntity);
+				assert(newContainer != nullptr);
+				for (EntityBase* child : oldContainer->getChildrenList())
+				{
+					newContainer->addChild(child);
+					child->setParent(newContainer);
+				}
+
+				for (EntityBase* child : newContainer->getChildrenList())
+				{
+					oldContainer->removeChild(child);
+				}
+			}
+
 			// Remove the entity from the entity map and also from the model state
 			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
 			delete oldEntity;

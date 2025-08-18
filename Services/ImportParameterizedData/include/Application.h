@@ -133,6 +133,9 @@ private:
 	ot::MenuButtonDescription m_buttonCreateRMDEntry;
 	ot::MenuButtonDescription m_buttonCreateParameterEntry;
 	ot::MenuButtonDescription m_buttonCreateQuantityEntry;
+	ot::MenuButtonDescription m_buttonLockCharacterisation;
+	ot::MenuButtonDescription m_buttonUnLockCharacterisation;
+
 	ot::MenuButtonDescription m_buttonAutomaticCreationMSMD;
 	ot::MenuButtonDescription m_buttonAddBatchCreator;
 

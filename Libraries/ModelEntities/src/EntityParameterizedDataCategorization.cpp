@@ -13,8 +13,16 @@ void EntityParameterizedDataCategorization::addVisualizationNodes()
 	{
 		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
-		treeIcons.visibleIcon = "Categorization";
-		treeIcons.hiddenIcon = "Categorization";
+		if (m_locked)
+		{
+			treeIcons.visibleIcon = m_lockedIcon;
+			treeIcons.hiddenIcon = m_lockedIcon;
+		}
+		else
+		{
+			treeIcons.visibleIcon = m_unlockedIcon;
+			treeIcons.hiddenIcon = m_unlockedIcon;
+		}
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
@@ -60,6 +68,7 @@ void EntityParameterizedDataCategorization::AddStorageData(bsoncxx::builder::bas
 			bsoncxx::builder::basic::kvp("Category", returnVal)
 		);
 	}
+	storage.append(bsoncxx::builder::basic::kvp("Locked", m_locked));
 }
 
 void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -77,6 +86,7 @@ void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(bsoncxx
 	{
 		throw std::runtime_error("Data category in EntityParameterizedDataCategorization was not set.");
 	}
+	m_locked = doc_view["Locked"].get_bool();
 }
 
 const std::string EntityParameterizedDataCategorization::_dataCategorieGroup = "Data Category";
