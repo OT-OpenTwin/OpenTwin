@@ -60,6 +60,7 @@ LogModeSetter::LogModeSetter() {
 	m_msgTypeError = new QCheckBox("Error");
 	m_msgTypeMsgIn = new QCheckBox("Inbound Message");
 	m_msgTypeMsgOut = new QCheckBox("Outgoing Message");
+	m_msgTypeTest = new QCheckBox("Test");
 
 	QPushButton* applyButton = new QPushButton("Send");
 
@@ -80,6 +81,7 @@ LogModeSetter::LogModeSetter() {
 	typeLayout->addWidget(m_msgTypeError);
 	typeLayout->addWidget(m_msgTypeMsgIn);
 	typeLayout->addWidget(m_msgTypeMsgOut);
+	typeLayout->addWidget(m_msgTypeTest);
 
 	// Connect signals
 	this->connect(applyButton, &QPushButton::clicked, this, &LogModeSetter::slotApply);
@@ -98,6 +100,7 @@ void LogModeSetter::restoreSettings(QSettings& _settings) {
 	m_msgTypeError->setChecked(_settings.value("LogModeSetter.Error", true).toBool());
 	m_msgTypeMsgIn->setChecked(_settings.value("LogModeSetter.Message.In", false).toBool());
 	m_msgTypeMsgOut->setChecked(_settings.value("LogModeSetter.Message.Out", false).toBool());
+	m_msgTypeTest->setChecked(_settings.value("LogModeSetter.Test", false).toBool());
 }
 
 void LogModeSetter::saveSettings(QSettings& _settings) {
@@ -109,6 +112,7 @@ void LogModeSetter::saveSettings(QSettings& _settings) {
 	_settings.setValue("LogModeSetter.Error", m_msgTypeError->isChecked());
 	_settings.setValue("LogModeSetter.Message.In", m_msgTypeMsgIn->isChecked());
 	_settings.setValue("LogModeSetter.Message.Out", m_msgTypeMsgOut->isChecked());
+	_settings.setValue("LogModeSetter.Test", m_msgTypeTest->isChecked());
 }
 
 void LogModeSetter::slotApply(void) {
@@ -126,6 +130,7 @@ void LogModeSetter::slotApply(void) {
 	if (m_msgTypeError->isChecked()) newFlags |= ot::ERROR_LOG;
 	if (m_msgTypeMsgIn->isChecked()) newFlags |= ot::ALL_INCOMING_MESSAGE_LOG_FLAGS;
 	if (m_msgTypeMsgOut->isChecked()) newFlags |= ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS;
+	if (m_msgTypeTest->isChecked()) newFlags |= ot::TEST_LOG;
 
 	ot::LogModeManager newMode;
 
