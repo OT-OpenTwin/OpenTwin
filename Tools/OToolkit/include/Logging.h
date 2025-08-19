@@ -76,6 +76,7 @@ public:
 public Q_SLOTS:
 	void slotUpdateColumnWidth(void);
 
+	void slotImportFileLogs();
 	void runQuickExport(void);
 	void slotConnect(void);
 	void slotAutoConnect(void);

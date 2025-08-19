@@ -234,6 +234,9 @@
     <ClCompile Include="src\SVGBrowser.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileLogImporterDialog.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -396,6 +399,9 @@
     </QtMoc>
     <QtMoc Include="include\SVGBrowser.h">
       <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\FileLogImporterDialog.h">
+      <Filter>Header Files\Logger</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

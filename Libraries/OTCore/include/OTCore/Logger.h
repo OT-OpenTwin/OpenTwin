@@ -368,6 +368,7 @@ namespace ot {
 		static std::string logTypeMTLS() { return "mTLS"; };
 		static std::string logTypeTLS() { return "TLS"; };
 		static std::string logTypeQueued() { return "QUEUED"; };
+		static std::string logTypeOutgoing() { return "OUTGOING"; };
 
 		LogMessage();
 		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags = LogFlags(ot::INFORMATION_LOG));

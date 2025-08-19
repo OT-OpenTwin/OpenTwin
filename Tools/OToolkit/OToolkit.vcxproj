@@ -26,6 +26,7 @@
     <ClCompile Include="src\ExternalLibrary.cpp" />
     <ClCompile Include="src\ExternalLibraryManager.cpp" />
     <ClCompile Include="src\FAR.cpp" />
+    <ClCompile Include="src\FileLogImporterDialog.cpp" />
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerExportConfig.cpp" />
@@ -87,6 +88,7 @@
     <QtMoc Include="include\SettingsManager.h" />
     <ClInclude Include="include\ExternalLibrary.h" />
     <ClInclude Include="include\ExternalLibraryManager.h" />
+    <QtMoc Include="include\FileLogImporterDialog.h" />
     <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
     <QtMoc Include="include\NetworkTools.h" />
     <QtMoc Include="include\PortBlockerServer.h" />

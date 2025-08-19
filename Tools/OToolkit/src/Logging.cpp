@@ -9,6 +9,7 @@
 #include "LogModeSetter.h"
 #include "QuickLogExport.h"
 #include "LoggingFilterView.h"
+#include "FileLogImporterDialog.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
 
@@ -187,11 +188,13 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	_rootMenu->addSeparator();
 	m_importButton = _rootMenu->addAction(QIcon(":images/Import.png"), "Import");
+	QAction* importFromFileLog = _rootMenu->addAction(QIcon(":images/Import.png"), "Import File logs");
 	m_exportButton = _rootMenu->addAction(QIcon(":images/Export.png"), "Export");
 
 	connect(m_connectButton, &QAction::triggered, this, &Logging::slotConnect);
 	connect(m_autoConnect, &QAction::triggered, this, &Logging::slotToggleAutoConnect);
 	connect(m_importButton, &QAction::triggered, this, &Logging::slotImport);
+	connect(importFromFileLog, &QAction::triggered, this, &Logging::slotImportFileLogs);
 	connect(m_exportButton, &QAction::triggered, this, &Logging::slotExport);
 
 	LOGVIS_LOG("Initialization completed");
@@ -476,6 +479,16 @@ void Logging::slotUpdateColumnWidth(void) {
 		for (auto w : tableColumnWidthsList) {
 			m_table->setColumnWidth(column++, w.toInt());
 		}
+	}
+}
+
+void Logging::slotImportFileLogs() {
+	FileLogImporterDialog dia(m_table);
+	if (dia.showDialog() == ot::Dialog::Ok) {
+		if (dia.getLogMessages().empty()) {
+			return;
+		}
+		this->appendLogMessages(dia.getLogMessages());
 	}
 }
 

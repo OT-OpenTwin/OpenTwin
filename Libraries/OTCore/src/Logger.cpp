@@ -164,7 +164,7 @@ std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 	case ot::INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeMTLS(); break;
 	case ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeTLS(); break;
 	case ot::QUEUED_INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeQueued(); break;
-	case ot::OUTGOING_MESSAGE_LOG: _stream << LogMessage::logTypeMTLS(); break;
+	case ot::OUTGOING_MESSAGE_LOG: _stream << LogMessage::logTypeOutgoing(); break;
 	default:
 		OTAssert(0, "Unknown log type");
 		_stream << LogMessage::logTypeInformation();
