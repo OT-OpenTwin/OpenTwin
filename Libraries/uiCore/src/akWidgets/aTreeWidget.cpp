@@ -877,8 +877,8 @@ void ak::aTreeWidgetBase::keyReleaseEvent(QKeyEvent * _event)
 
 void ak::aTreeWidgetBase::mousePressEvent(QMouseEvent * _event)
 {
-	QTreeWidget::mousePressEvent(_event);
 	Q_EMIT mousePressed(_event);
+	QTreeWidget::mousePressEvent(_event);
 }
 
 void ak::aTreeWidgetBase::mouseReleaseEvent(QMouseEvent* _event) {
@@ -898,8 +898,8 @@ void ak::aTreeWidgetBase::leaveEvent(QEvent *_event)
 }
 
 void ak::aTreeWidgetBase::enterEvent(QEnterEvent* event) {
-	QTreeWidget::enterEvent(event);
 	Q_EMIT enter(event);
+	QTreeWidget::enterEvent(event);
 }
 
 void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
@@ -1106,7 +1106,7 @@ ak::aTreeWidgetItem::aTreeWidgetItem(
 	aTreeWidgetItem *						_parent,
 	int								_type
 ) : ak::aObject(otTreeItem), QTreeWidgetItem(_type), m_isVisible(true),
-m_id(_newId), m_parent(_parent), m_isEditable(false), m_isLockedForEdit(false) {}
+m_id(_newId), m_parent(_parent), m_isEditable(false), m_isLockedForEdit(false), m_selectChilds(false) {}
 
 ak::aTreeWidgetItem::aTreeWidgetItem(
 	ak::aTreeWidgetBase *			_view,
@@ -1114,7 +1114,7 @@ ak::aTreeWidgetItem::aTreeWidgetItem(
 	aTreeWidgetItem *						_parent,
 	int								_type
 ) : ak::aObject(otTreeItem), QTreeWidgetItem(_view, _type), m_isVisible(true),
-m_id(_newId), m_parent(_parent), m_isEditable(false), m_isLockedForEdit(false) {}
+m_id(_newId), m_parent(_parent), m_isEditable(false), m_isLockedForEdit(false), m_selectChilds(false) {}
 
 ak::aTreeWidgetItem::~aTreeWidgetItem() {
 	A_OBJECT_DESTROYING
