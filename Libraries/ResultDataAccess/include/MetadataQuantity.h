@@ -114,7 +114,12 @@ struct __declspec(dllexport) MetadataQuantity : ot::Serializable
 	{
 		quantityLabel = ot::json::getString(_object, "Label");
 		quantityName = ot::json::getString(_object, "Name");
-		dependingParameterIds = ot::json::getUInt64Vector(_object, "DependingParameterIDs");
+		//This one is not set in the state the serialised metadata is used in the pipeline.
+		if(ot::json::exists(_object, "DependingParameterIDs"))
+		{
+			dependingParameterIds = ot::json::getUInt64Vector(_object, "DependingParameterIDs");
+		}
+
 		dependingParameterLabels = ot::json::getStringVector(_object, "DependingParametersLabels");
 		auto allValueDesriptions =	ot::json::getArray(_object, "ValueDescriptions");
 		for (rapidjson::SizeType i = 0; i < allValueDesriptions.Size(); i++)
