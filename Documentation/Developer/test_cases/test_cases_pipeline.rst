@@ -145,10 +145,10 @@ Pipeline Testing Specification
           * - >
             - 9.5
             - 4 Results (9.6; 9.7; 9.8; 9.9)
-          * - is any
+          * - Any of
             - 9.5,9.6
             - 2 Results (9.5; 9.6)
-          * - is not any
+          * - Not any of
             - 9.5,9.6
             - 9 Results (9; 9.1; 9.2; 9.3; 9.4; 9.7; 9.8; 9.9; 1)
           * - range
