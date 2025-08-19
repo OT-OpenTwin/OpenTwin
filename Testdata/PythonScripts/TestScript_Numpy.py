@@ -1,6 +1,7 @@
 #@ Port : {"type": "out", "name": "DisplayValue", "label" : "DisplayValue"}
 import numpy as np 
 import OpenTwin
+import json
 
 def __main__(this):  
     # creating a 2X2 Numpy matrix 
@@ -15,4 +16,5 @@ def __main__(this):
       
     print("\nDeterminant of given 2X2 matrix:") 
     print(int(det))
-    OpenTwin.SetPortData("DisplayValue",int(det))
+    data = {"Determinant": int(det)}
+    OpenTwin.SetPortData("DisplayValue",json.dumps(data))
