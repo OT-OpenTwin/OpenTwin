@@ -8,6 +8,7 @@
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
+#include <regex>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -94,4 +95,106 @@ int64_t ot::DateTime::msSinceEpoch() {
 std::string ot::DateTime::timestampFromMsec(int64_t msecSinceEpoch, DateFormat format) {
     auto tp = std::chrono::system_clock::time_point(std::chrono::milliseconds(msecSinceEpoch));
 	return intern::toTimeStamp(tp, format);
+}
+
+int64_t ot::DateTime::timestampToMsec(const std::string& _timestamp, DateFormat _format) {
+    if (_format == Msec) {
+        // Direct conversion
+        return std::stoll(_timestamp);
+    }
+
+    std::tm timeStruct = {};
+    int milliseconds = 0;
+    int tzOffsetMinutes = 0; // only for RFC3339
+
+    switch (_format) {
+    case Simple:
+    case SimpleUTC:
+    {
+        // Format: "yyyy-mm-dd hh:MM:ss.zzz"
+        std::istringstream ss(_timestamp.substr(0, 19));
+        ss >> std::get_time(&timeStruct, "%Y-%m-%d %H:%M:%S");
+        if (ss.fail()) {
+            throw std::runtime_error("Failed to parse timestamp");
+        }
+
+        // parse milliseconds (after '.')
+        if (_timestamp.size() > 20 && _timestamp[19] == '.') {
+            milliseconds = std::stoi(_timestamp.substr(20, 3));
+        }
+
+        // Interpret as UTC
+#if defined(_WIN32)
+        time_t t = _mkgmtime(&timeStruct);
+#else
+        time_t t = timegm(&timeStruct);
+#endif
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::from_time_t(t).time_since_epoch()).count() + milliseconds;
+    }
+
+    case ISO8601UTC:
+    {
+        // Format: "yyyy-mm-ddThh:MM:ss.zzzZ"
+        std::istringstream ss(_timestamp.substr(0, 19));
+        ss >> std::get_time(&timeStruct, "%Y-%m-%dT%H:%M:%S");
+        if (ss.fail()) {
+            throw std::runtime_error("Failed to parse timestamp");
+        }
+
+        if (_timestamp.size() > 20 && _timestamp[19] == '.') {
+            milliseconds = std::stoi(_timestamp.substr(20, 3));
+        }
+
+        // Must end with 'Z' (UTC)
+#if defined(_WIN32)
+        time_t t = _mkgmtime(&timeStruct);
+#else
+        time_t t = timegm(&timeStruct);
+#endif
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::from_time_t(t).time_since_epoch()).count() + milliseconds;
+    }
+
+    case RFC3339:
+    {
+        // Example: "2000-01-01T00:00:00.000+02:00"
+        // Split date/time and timezone
+        std::smatch match;
+        std::regex re(R"(^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{3}))?([+-]\d{2}:\d{2}|Z)$)");
+        if (!std::regex_match(_timestamp, match, re)) {
+            throw std::runtime_error("Invalid RFC3339 timestamp: " + _timestamp);
+        }
+
+        // base time
+        std::istringstream ss(match[1].str());
+        ss >> std::get_time(&timeStruct, "%Y-%m-%dT%H:%M:%S");
+        if (ss.fail()) {
+            throw std::runtime_error("Failed to parse timestamp");
+        }
+
+        if (match[2].matched) {
+            milliseconds = std::stoi(match[2].str());
+        }
+
+        std::string tzStr = match[3].str();
+        if (tzStr != "Z") {
+            int hours = std::stoi(tzStr.substr(0, 3));   // +02 or -05
+            int minutes = std::stoi(tzStr.substr(4, 2));
+            tzOffsetMinutes = hours * 60 + (hours >= 0 ? minutes : -minutes);
+        }
+
+        // Convert to UTC
+#if defined(_WIN32)
+        time_t t = _mkgmtime(&timeStruct);
+#else
+        time_t t = timegm(&timeStruct);
+#endif
+        auto baseMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::from_time_t(t).time_since_epoch()).count() + milliseconds;
+
+        // Adjust by timezone offset (in minutes)
+        return baseMs - tzOffsetMinutes * 60 * 1000LL;
+    }
+
+    default:
+        throw std::invalid_argument("Unknown DateFormat");
+    }
 }

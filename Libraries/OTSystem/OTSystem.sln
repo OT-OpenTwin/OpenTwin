@@ -5,6 +5,11 @@ VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OTSystem", "OTSystem.vcxproj", "{5891ABB0-83B7-498C-8270-D8B689AA5CA8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OTSystemTest", "test\OTSystemTest\OTSystemTest.vcxproj", "{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5891ABB0-83B7-498C-8270-D8B689AA5CA8} = {5891ABB0-83B7-498C-8270-D8B689AA5CA8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +26,12 @@ Global
 		{5891ABB0-83B7-498C-8270-D8B689AA5CA8}.Release|x64.Build.0 = Release|x64
 		{5891ABB0-83B7-498C-8270-D8B689AA5CA8}.ReleaseTest|x64.ActiveCfg = ReleaseTest|x64
 		{5891ABB0-83B7-498C-8270-D8B689AA5CA8}.ReleaseTest|x64.Build.0 = ReleaseTest|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.Debug|x64.ActiveCfg = Debug|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.DebugTest|x64.ActiveCfg = Debug|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.DebugTest|x64.Build.0 = Debug|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.Release|x64.ActiveCfg = Release|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.ReleaseTest|x64.ActiveCfg = Release|x64
+		{7A3983E1-03F7-4B47-AE2C-19C9DB6F0D31}.ReleaseTest|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
