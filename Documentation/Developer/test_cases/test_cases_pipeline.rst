@@ -43,7 +43,7 @@ Pipeline Testing Specification
         }
 
    * - 2.2
-     - Complete test **#2.1**.
+     - Complete test **2.1**.
      - * At the **DBA block properties** change the type from Magnitude to Phase in the Quantity settings.
        * At the **File Writer block properties** set the File Name property to "Phase".
        * Run the pipeline.
@@ -63,15 +63,15 @@ Pipeline Testing Specification
           }
 
    * - 3.1
-     - Complete test **#2.1**.
+     - Complete test **2.1**.
      - * At the **DBA block properties** select the comparator **>** (bigger than) and set value 1.
        * Run the pipeline.
-     - * A text file has been added to the navigation tree: **Text Files/Phase_1**.
+     - * A text file has been added to the navigation tree: **Text Files/File Writer_1**.
        * The output window shows that the query returned **4** results.
        * The Phase_1 document contains **4** entries (4 S-parameter entries and 4 frequency entries).
 
    * - 3.2
-     - Complete test **#3.1**.
+     - Complete test **3.1**.
      - * Replace the File Writer block with a Store in Database block.
        * Rename the **Blocks/Data Processing/Store in Database** entity to **Magnitude > 1**.
        * Run the pipeline.
