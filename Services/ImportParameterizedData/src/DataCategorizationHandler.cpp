@@ -539,7 +539,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 	ot::MatrixEntryPointer matrixPointer;
 
 	ot::GenericDataStructMatrix tableContent = _table->getTable();
-	
+
 	while (rangeIt != _selectedRanges.end())
 	{
 		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
@@ -551,6 +551,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 				const ot::Variable& cellValue = tableContent.getValue(matrixPointer);
 				assert(cellValue.isConstCharPtr());
 				std::string value = cellValue.getConstCharPtr();
+				
 				if (value != "")
 				{
 					
@@ -558,6 +559,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 					{
 						_logMessagesByErrorType["Thousands delimiter was found"] = "Make sure that the decimal character is not: \"" + std::string(1, thousandsDelimiter) + "\". String to numeric value cast may lead to unwanted results.\n";
 					}
+					converter.normaliseNumericString(value, decimalDelimiter);
 					ot::Variable variable = converter(value, decimalDelimiter);
 				
 					std::bitset<5> dataTypeField;
