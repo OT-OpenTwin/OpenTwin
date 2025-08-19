@@ -38,7 +38,7 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
 	
-	//this->bufferSelectionEntities(selectionEntities);
+	this->bufferSelectionEntities(selectionEntities);
 
 	std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
 	
@@ -55,16 +55,6 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 					// Add table as visualizing entity if selected
 					if (std::find(visualizingEntities.begin(), visualizingEntities.end(), it.getEntityID()) == visualizingEntities.end()) {
 						visualizingEntities.push_back(it.getEntityID());
-					}
-				}
-				else {
-					// Check containers except root container
-					if (ot::EntityName::isChildOf(entity->getName(), it.getEntityName())) {
-						if (ot::EntityName::getTopologyLevel(it.getEntityName()) > 1) {
-							if (std::find(visualizingEntities.begin(), visualizingEntities.end(), it.getEntityID()) == visualizingEntities.end()) {
-								visualizingEntities.push_back(it.getEntityID());
-							}
-						}
 					}
 				}
 			}
