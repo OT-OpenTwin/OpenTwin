@@ -402,7 +402,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	}
 	
 	std::map<std::string, std::string> logMessagesByErrorType;
-	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges, logMessagesByErrorType);
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges, logMessagesByErrorType, tableEntPtr->getHeaderMode());
 	logWarnings(logMessagesByErrorType, entityInfos);
 
 	const ot::GenericDataStructMatrix table = tableEntPtr->getTable();
@@ -518,7 +518,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "added new table selection range");
 }
 
-std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType)
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode)
 {
 	ot::StringToVariableConverter converter;
 	std::bitset<5> dataTypeOverall;
@@ -575,12 +575,16 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 				
 					if (dataTypeField[4] == 1)
 					{
-						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."]  += "row " + std::to_string(matrixPointer.m_row) + " column " + std::to_string(matrixPointer.m_column) + "\n";
+						ot::TableRange cellAsRange(matrixPointer.m_row, matrixPointer.m_column, matrixPointer.m_row, matrixPointer.m_column);
+						const ot::TableRange userCellCoordinates = ot::TableIndexSchemata::matrixToUserRange(cellAsRange, _headerMode);
+						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."]  += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
 					}
 				}
 				else
 				{
-					_logMessagesByErrorType["Empty field detected. If a numerical value is selected, empty fields are interpreted with a default (0 or 0.0)"] += "row " + std::to_string(matrixPointer.m_row) + " column " + std::to_string(matrixPointer.m_column) + "\n";
+					ot::TableRange cellAsRange(matrixPointer.m_row, matrixPointer.m_column, matrixPointer.m_row, matrixPointer.m_column);
+					const ot::TableRange userCellCoordinates = ot::TableIndexSchemata::matrixToUserRange(cellAsRange, _headerMode);
+					_logMessagesByErrorType["Empty field detected. If a numerical value is selected, empty fields are interpreted with a default (0 or 0.0)"] += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
 				}
 				matrixPointer.m_column++;
 			}

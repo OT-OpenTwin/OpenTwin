@@ -20,6 +20,7 @@
 #include "OTCore/Variable.h"
 #include "OTGui/TableRange.h"
 #include "IVisualisationTable.h"
+#include "OTGui/TableCfg.h"
 
 #include <optional>
 #include <map>
@@ -72,7 +73,7 @@ private:
 	//! @brief Queued request that sets the colour of the selection and returns the selected table ranges. Subsequently executed function: storeSelectionRanges
 	void requestRangeSelection(const std::string& _tableName);
 
-	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType);
+	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode);
 	void logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInformation& _entityInfos);
 	std::map<std::string, ot::UID> getAllScripts();
 };
