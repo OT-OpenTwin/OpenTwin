@@ -360,6 +360,15 @@ namespace ot {
 		OT_DECL_DEFCOPY(LogMessage)
 		OT_DECL_DEFMOVE(LogMessage)
 	public:
+		static std::string logTypeInformation() { return "INFO"; };
+		static std::string logTypeDetailed() { return "DETAILED"; };
+		static std::string logTypeWarning() { return "WARNING"; };
+		static std::string logTypeError() { return "ERROR"; };
+		static std::string logTypeTest() { return "TEST"; };
+		static std::string logTypeMTLS() { return "mTLS"; };
+		static std::string logTypeTLS() { return "TLS"; };
+		static std::string logTypeQueued() { return "QUEUED"; };
+
 		LogMessage();
 		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags = LogFlags(ot::INFORMATION_LOG));
 		virtual ~LogMessage();

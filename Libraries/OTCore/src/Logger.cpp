@@ -145,7 +145,7 @@ void ot::LogMessage::setFromVersion1_0(const ConstJsonObject& _object) {
 }
 
 std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
-	// General Message Information
+	// Message Information
 	if (_msg.m_globalSystemTime == 0) {
 		_stream << "[" << ot::DateTime::timestampFromMsec(_msg.m_localSystemTime, ot::DateTime::Simple) << "] [" << _msg.m_serviceName << "] ";
 	}
@@ -153,17 +153,28 @@ std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 		_stream << "[" << ot::DateTime::timestampFromMsec(_msg.m_globalSystemTime, ot::DateTime::Simple) << "] [" << _msg.m_serviceName << "] ";
 	}
 
-	// General Log Type
-	if (_msg.m_flags & ot::DETAILED_LOG) _stream << "[DETAILED] ";
-	else if (_msg.m_flags & ot::WARNING_LOG) _stream << "[WARNING] ";
-	else if (_msg.m_flags & ot::ERROR_LOG) _stream << "[ERROR] ";
-	else if (_msg.m_flags & ot::TEST_LOG) _stream << "[TEST] ";
-	else _stream << "[INFO] ";
+	// Log Type
+	_stream << "[";
+	switch (_msg.m_flags.data()) {
+	case ot::INFORMATION_LOG: _stream << LogMessage::logTypeInformation(); break;
+	case ot::DETAILED_LOG: _stream << LogMessage::logTypeDetailed(); break;
+	case ot::WARNING_LOG: _stream << LogMessage::logTypeWarning(); break;
+	case ot::ERROR_LOG: _stream << LogMessage::logTypeError(); break;
+	case ot::TEST_LOG: _stream << LogMessage::logTypeTest(); break;
+	case ot::INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeMTLS(); break;
+	case ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeTLS(); break;
+	case ot::QUEUED_INBOUND_MESSAGE_LOG: _stream << LogMessage::logTypeQueued(); break;
+	case ot::OUTGOING_MESSAGE_LOG: _stream << LogMessage::logTypeMTLS(); break;
+	default:
+		OTAssert(0, "Unknown log type");
+		_stream << LogMessage::logTypeInformation();
+		break;
+	}
+	_stream << "] ";
 
 	// Log source
+	_stream << "[" << _msg.m_functionName << "] " << _msg.m_text;
 
-	if (!_msg.m_functionName.empty()) _stream << "[" << _msg.m_functionName << "] ";
-	_stream << _msg.m_text;
 	return _stream;
 }
 
