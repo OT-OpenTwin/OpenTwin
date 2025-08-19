@@ -274,8 +274,14 @@ void Logging::slotImport(void) {
 		return;
 	}
 
+	QSignalBlocker blocker(m_ignoreNewMessages);
+	bool isIgnoring = m_ignoreNewMessages->isChecked();
+	m_ignoreNewMessages->setChecked(false);
+
 	this->slotClear();
 	this->appendLogMessages(messages);
+
+	m_ignoreNewMessages->setChecked(isIgnoring);
 
 	settings->setValue("Logging.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
@@ -488,7 +494,12 @@ void Logging::slotImportFileLogs() {
 		if (dia.getLogMessages().empty()) {
 			return;
 		}
+
+		QSignalBlocker blocker(m_ignoreNewMessages);
+		bool isIgnoring = m_ignoreNewMessages->isChecked();
+		m_ignoreNewMessages->setChecked(false);
 		this->appendLogMessages(dia.getLogMessages());
+		m_ignoreNewMessages->setChecked(isIgnoring);
 	}
 }
 
