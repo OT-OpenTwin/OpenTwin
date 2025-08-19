@@ -117,6 +117,14 @@ Pipeline Testing Specification
        * Run the pipeline.
      - In the metadata, the unit **Hz** should be specified under **Parameter/Frequency**.
 
+   * - 4.3
+     -  Complete test **4.2**.
+     - * Replace the DisplayBlock with a **Store in Database** block. 
+       * Rename the **Store in Database** into "InHerz", set the property "Create plot" and set the "Plot name" property to "New dataset".
+       * Run the pipeline. 
+     - * In the folder Datasets, a new entry named "InHerz" appears.
+       * In the plot folder a new plot, named "New dataset" appears. The plot has the parameter Frequency[Hz] on the x-axis.
+
    * - 5
      - * Import **CMC_Stysch_simple.s4p** (**4** ports).
        * Create a DataBaseAccess block and a Display block.
