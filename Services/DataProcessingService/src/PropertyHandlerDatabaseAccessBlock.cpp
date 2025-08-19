@@ -278,7 +278,7 @@ void PropertyHandlerDatabaseAccessBlock::updateParameterIfNecessary(const Result
 			
 			//Update unit property if necessary
 			const std::string& expectedUnit = parameter->unit;
-			updateIfNecessaryValueCharacteristicLabelDataType(_selectedProperties, expectedUnit, _properties);
+			updateIfNecessaryValueCharacteristicLabelUnit(_selectedProperties, expectedUnit, _properties);
 		}
 	}
 	else
