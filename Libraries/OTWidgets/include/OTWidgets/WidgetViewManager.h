@@ -249,6 +249,7 @@ namespace ot {
 			WidgetViewBase::ViewFlags flags;
 			SelectionInformation activeSelection;
 			bool ignoreCurrent;
+			std::list<WidgetView*> viewsToClose; //! @brief Views that are currently in the process of being closed.
 		};
 
 		WidgetViewManager();

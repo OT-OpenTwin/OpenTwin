@@ -190,6 +190,8 @@ void ot::WidgetViewManager::closeViews() {
 }
 
 void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
+	m_autoCloseTimer.stop();
+
 	m_autoCloseInfo.flags = _flags;
 	m_autoCloseInfo.activeSelection = _activeSelection;
 	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
@@ -205,6 +207,16 @@ void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 
 ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
 	OTAssertNullptr(m_dockManager);
+
+	// Remove from auto close list
+	for (auto it = m_autoCloseInfo.viewsToClose.begin(); it != m_autoCloseInfo.viewsToClose.end();) {
+		if ((*it)->getViewData().getEntityName() == _entityName && (*it)->getViewData().getViewType() == _type) {
+			it = m_autoCloseInfo.viewsToClose.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
 
 	// Find view and owner
 	WidgetView* view = nullptr;
@@ -532,6 +544,14 @@ void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocat
 	autoCloseInfoObj.AddMember("Flags", JsonArray(WidgetViewBase::toStringList(m_autoCloseInfo.flags), _allocator), _allocator);
 	autoCloseInfoObj.AddMember("ActiveSelection", JsonArray(m_autoCloseInfo.activeSelection.getSelectedNavigationItems(), _allocator), _allocator);
 	autoCloseInfoObj.AddMember("IgnoreCurrent", m_autoCloseInfo.ignoreCurrent, _allocator);
+	JsonArray viewsToCloseArr;
+	for (WidgetView* view : m_autoCloseInfo.viewsToClose) {
+		JsonObject viewObj;
+		viewObj.AddMember("EntityName", JsonString(view->getViewData().getEntityName(), _allocator), _allocator);
+		viewObj.AddMember("Type", JsonString(WidgetViewBase::toString(view->getViewData().getViewType()), _allocator), _allocator);
+		viewsToCloseArr.PushBack(viewObj, _allocator);
+	}
+	autoCloseInfoObj.AddMember("ViewsToClose", viewsToCloseArr, _allocator);
 	_object.AddMember("AutoCloseInfo", autoCloseInfoObj, _allocator);
 
 	JsonArray viewOwnerMapArr;
@@ -666,7 +686,6 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 }
 
 void ot::WidgetViewManager::slotCloseUnpinnedViews() {
-	std::list<WidgetView*> views;
 	// Iterate trough all views
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
@@ -696,13 +715,15 @@ void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 
 			// If the view matches all criteria, add it to the list of views to close
 			if (concider) {
-				views.push_back(view.second);
+				m_autoCloseInfo.viewsToClose.push_back(view.second);
 			}
 		}
 	}
 
 	// Request to close all matching views
-	for (WidgetView* view : views) {
+	while (!m_autoCloseInfo.viewsToClose.empty()) {
+		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
+		m_autoCloseInfo.viewsToClose.pop_front();
 		this->handleViewCloseRequest(view);
 	}
 }
