@@ -277,3 +277,19 @@ Touchstone File Import
      - Select the Dataset/CMC_Stysch entity and select the info button in the model tab.
      - | One quantity "S-Parameter" is listed. The quantitty has a dimension 4,4. It has two value descriptions: "Magnitude" which has no unit and "Phase" which has the unit "Deg". 
        | Both value descriptions are of type double. A single parameter "Frequency" is listed with 1001 values and the unit "Hz". The associated .result collection has 2002 documents.
+
+
+Load Test
+---------
+Setup:
+   * Import all csv files from the folder LoadTest_1
+   * Open the first file and chategorise the first column as parameter and the second as quantity
+   * Import the script **UpdateScriptNextTable_HSU.py**
+   * Select both selection ranges and set the properties "Consider for batching" and "Pass on Script". As script select the **UpdateScriptNextTable_HSU.py**
+   * Create a batch importer. Set its Repetitions property to 9995. Set "Series Metadata" as name base.
+
+Execution:
+   * Select the batch importer entity and use the button "Auto Create Series Metadata"
+
+Expectation:
+   * In total 9996 Series Metadata entities exist in the "Data Chategorisation". Each of them pointing to one of the tables (not the same, it should be sequential)

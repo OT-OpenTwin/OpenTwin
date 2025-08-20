@@ -185,3 +185,15 @@ Test Cases
       - * Table has a horizontal header (1; 2; 3)
         * Table has a row header (1; 2; 3; 4)
         * Table has 4 rows and 3 columns
+
+Load Test
+---------
+Setup:
+   * Create an empty data pipeline project
+
+Execution:
+   * First, import all files from the directory LoadTest_1 (9996 files)
+   * Afterwards, import all files from the directory LoadTest_2 (9996 files)
+
+Expectation:
+   * Each import shows a progress bar. In the output window, three timingds are shown: Import of x file(s), Storing document(s) and Model update. The timings should be approximately the same for both import operations (LoadTest_1 and LoadTest_2).
