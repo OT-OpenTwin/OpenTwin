@@ -52,13 +52,16 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, new UiNotifier(), new ModelNotifier())
+	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, new UiNotifier(), new ModelNotifier()),
+	m_selectionWorkerRunning(true), m_selectionWorker(nullptr), m_twoPartsAction(nullptr)
 {
 	
 	_tableHandler = new TableHandler( _tableFolder);
 	m_parametrizedDataHandler = new DataCategorizationHandler( _tableFolder, _previewTableNAme);
 	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_datasetFolder, _tableFolder);
 	_touchstoneToResultdata = new TouchstoneToResultdata();
+
+	m_selectionWorker = new std::thread(&Application::HandleSelectionChanged, this);
 }
 
 Application::~Application()
@@ -67,6 +70,15 @@ Application::~Application()
 	{
 		delete m_twoPartsAction;
 		m_twoPartsAction = nullptr;
+	}
+
+	m_selectionWorkerRunning = false;
+	if (m_selectionWorker != nullptr) {
+		if (m_selectionWorker->joinable()) {
+			m_selectionWorker->join();
+		}
+		delete m_selectionWorker;
+		m_selectionWorker = nullptr;
 	}
 }
 
@@ -90,7 +102,7 @@ void Application::run(void)
 }
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
-	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc));
+	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc), m_selectedEntities);
 	handler.detach();
 
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -214,7 +226,6 @@ bool Application::settingChanged(const ot::Property * _item) {
 	return false;
 }
 
-
 void Application::modelSelectionChanged(void)
 {	
 
@@ -258,11 +269,11 @@ void Application::modelSelectionChanged(void)
 
 	uiComponent()->setControlsEnabledState(enabled, disabled);
 
-	std::thread handler(&Application::HandleSelectionChanged,this);
-	handler.detach();
+	std::lock_guard<std::mutex> lock(m_selectedEntitiesMutex);
+	m_selectedEntitiesQueue.push_back(m_selectedEntities);
 }
 
-void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
+void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc, ot::UIDList _selectedEntities)
 {
 	std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
 	try
@@ -329,7 +340,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
 			{				
-				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, m_batchedCategorisationHandler, std::ref(m_selectedEntities));
+				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, m_batchedCategorisationHandler, _selectedEntities);
 				worker.detach();
 			}
 			else if (action == m_buttonCreateDataCollection.GetFullDescription())
@@ -440,13 +451,26 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 void Application::HandleSelectionChanged()
 {
-	try
-	{
-		UILockWrapper wrapper(Application::instance()->uiComponent(),ot::LockModelWrite);
-		m_rangleSelectionVisualisationHandler.selectRange(m_selectedEntities);
-	}
-	catch (std::exception& e)
-	{
-		m_uiComponent->displayMessage("Changed selection caused exception: " + std::string(e.what()));
+	while (m_selectionWorkerRunning) {
+		m_selectedEntitiesMutex.lock();
+		if (m_selectedEntitiesQueue.empty())
+		{
+			m_selectedEntitiesMutex.unlock();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+		else {
+			ot::UIDList entities = std::move(m_selectedEntitiesQueue.front());
+			m_selectedEntitiesQueue.pop_front();
+			m_selectedEntitiesMutex.unlock();
+
+			std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
+			try {
+				UILockWrapper wrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+				m_rangleSelectionVisualisationHandler.selectRange(entities);
+			}
+			catch (std::exception& e) {
+				m_uiComponent->displayMessage("Changed selection caused exception: " + std::string(e.what()));
+			}
+		}
 	}
 }

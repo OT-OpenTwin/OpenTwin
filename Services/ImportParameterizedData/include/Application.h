@@ -13,6 +13,8 @@
 #include "OTServiceFoundation/MenuButtonDescription.h"
 
 // C++ header
+#include <list>
+#include <mutex>
 #include <string>
 
 #include "TableHandler.h"
@@ -33,6 +35,10 @@ namespace ot {
 		class UiComponent;
 		class ModelComponent;
 	}
+}
+
+namespace std {
+	class thread;
 }
 
 class Application : public ot::ApplicationBase {
@@ -149,7 +155,12 @@ private:
 	const std::string _datasetFolder = ot::FolderNames::DatasetFolder;
 
 	ot::UID _visualizationModel = -1;
-	   
+	
+	std::atomic_bool m_selectionWorkerRunning;
+	std::thread* m_selectionWorker;
+	std::mutex m_selectedEntitiesMutex;
+	std::list<ot::UIDList> m_selectedEntitiesQueue;
+
 	TableHandler* _tableHandler = nullptr;
 	DataCategorizationHandler* m_parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
@@ -158,5 +169,5 @@ private:
 	RangeSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
 	BatchedCategorisationHandler m_batchedCategorisationHandler;
 	void HandleSelectionChanged();
-	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
+	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc, ot::UIDList _selectedEntities);
 };

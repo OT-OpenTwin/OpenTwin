@@ -8,18 +8,17 @@
 #include "OTCore/EntityName.h"
 #include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
-void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID>& _selectedEntities)
+void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID> _selectedEntities)
 {
 	try
 	{
-		ot::UIDList selectedEntities =	_selectedEntities; //is passed on by reference through thread barrier. The passed on list is not thread safe!
 		UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 
 		ensureEssentials();
-		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
+		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
 		ClassFactory& classFactory = Application::instance()->getClassFactory();
 		std::list<std::unique_ptr<EntityBatchImporter>> selectedBatchImporter;
-		for (ot::UID entityID : selectedEntities)
+		for (ot::UID entityID : _selectedEntities)
 		{
 			ot::UID version = Application::instance()->getPrefetchedEntityVersion(entityID);
 			std::unique_ptr<EntityBase> baseEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, version, classFactory));
