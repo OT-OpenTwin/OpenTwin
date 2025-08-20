@@ -3008,7 +3008,7 @@ void AppBase::slotCreateProject(void) {
 
 		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
 
-		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
+		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) != ot::MessageDialogCfg::Yes) {
 			return;
 		}
 
