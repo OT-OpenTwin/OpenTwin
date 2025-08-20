@@ -47,10 +47,11 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UI
 			
 			for (uint32_t i = 1; i <= numberOfRuns; i++)
 			{
-				_uiComponent->displayMessage("Executing import " + std::to_string(numberOfRuns) + "\n");
+				_uiComponent->displayMessage("Executing import " + std::to_string(i) + "\n");
 				run(nameBase);
 				updater.triggerUpdate(i);
 			}
+			_uiComponent->displayMessage("Batch import finished.\n");
 		}
 	}
 	catch (std::exception& _e)
