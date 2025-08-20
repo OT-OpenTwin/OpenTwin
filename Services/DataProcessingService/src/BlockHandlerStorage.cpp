@@ -142,20 +142,20 @@ bool BlockHandlerStorage::executeSpecialized()
 										ot::GenericDataStructMatrix matrixValues(matrixDimensions);
 										ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
 										std::list<ot::Variable> values;
-										for (auto& entry : linearMatrix)
+										for (auto& matrixEntry : linearMatrix)
 										{
 											if (dataType != "")
 											{
-												if (!ot::JSONToVariableConverter::typeIsCompatible(entry, dataType))
+												if (!ot::JSONToVariableConverter::typeIsCompatible(matrixEntry, dataType))
 												{
 													throw std::exception(("The data type of: " + key + " is inconsistent with the data type mentioned in its metadata.").c_str());
 												}
-												const ot::Variable value = converter(entry, dataType);
+												const ot::Variable value = converter(matrixEntry, dataType);
 												values.push_back(value);
 											}
 											else
 											{
-												const ot::Variable value = converter(entry);
+												const ot::Variable value = converter(matrixEntry);
 												values.push_back(value);
 											}
 										}
@@ -167,7 +167,7 @@ bool BlockHandlerStorage::executeSpecialized()
 										QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
 										if (dataType != "")
 										{
-											if (!ot::JSONToVariableConverter::typeIsCompatible(entry, dataType))
+											if (!ot::JSONToVariableConverter::typeIsCompatible(fieldValue, dataType))
 											{
 												throw std::exception(("The data type of: " + key + " is inconsistent with the data type mentioned in its metadata.").c_str());
 											}

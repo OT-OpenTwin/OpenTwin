@@ -42,7 +42,6 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, const std::string _type)
 {
 	
-
 	if (_type == ot::TypeNames::getStringTypeName())
 	{
 		return ot::Variable(value.GetString());
@@ -69,7 +68,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	}
 	else
 	{
-		assert(false);
+		throw std::exception("Cast to variant not possible due to unknown type name");
 	}
 }
 
@@ -88,33 +87,36 @@ std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArr
 
 bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const std::string _type)
 {
+	auto type =	value.GetType();
+	bool compatible = false;
 	if (_type == ot::TypeNames::getStringTypeName())
 	{
-		return value.IsString();
+		compatible = value.IsString();
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
-	{
-		return value.IsInt();
+	{		
+		compatible = value.IsInt();
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
 	{
-		return value.IsInt64();
+		compatible =  value.IsInt64();
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
 	{
-		return value.IsFloat();
+		compatible = value.IsFloat();
 	}
 	else if (_type == ot::TypeNames::getDoubleTypeName())
 	{
-		return value.IsDouble();
+		compatible = value.IsDouble();
 	}
 	else if (_type == ot::TypeNames::getBoolTypeName())
 	{
-		return value.IsBool();
+		compatible = value.IsBool();
 	}
 	else
 	{
 		assert(false);
 	}
+	return compatible;
 }
 
