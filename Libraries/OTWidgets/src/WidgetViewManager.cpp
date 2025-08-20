@@ -10,6 +10,7 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetViewDockComponentsFactory.h"
@@ -130,6 +131,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	auto bck = m_state;
 	m_state |= CloseViewState;
 
+	OT_LOG_T("Closing view: " + _view->getViewData().getEntityName());
+
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
 	_view->m_isDeletedByManager = true;
 	this->forgetView(_view);
@@ -138,6 +141,10 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
 	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
 	_view->getViewDockWidget()->blockSignals(true);
+	if (_view->getViewDockWidget()->getWidgetViewTab()) {
+		_view->getViewDockWidget()->getWidgetViewTab()->blockSignals(true);
+		_view->getViewDockWidget()->getWidgetViewTab()->setEnabled(false);
+	}
 	_view->blockSignals(true);
 
 	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
@@ -598,6 +605,7 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 	WidgetView* n = this->getViewFromDockWidget(_newFocus);
 
 	if (n) {
+		OT_LOG_T("New view focus: " + n->getViewData().getEntityName());
 		m_focusInfo.last = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
 			m_focusInfo.lastCentral = n;

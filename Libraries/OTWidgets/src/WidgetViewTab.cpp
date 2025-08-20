@@ -104,6 +104,7 @@ void ot::WidgetViewTab::slotTogglePinned(void) {
 }
 
 void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
+	OT_LOG_T("Tab mouse pressed");
 	if (_event->button() == Qt::MiddleButton) {
 		m_isMiddleButtonPressed = true;
 	}
