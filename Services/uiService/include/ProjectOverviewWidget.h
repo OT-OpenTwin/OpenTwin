@@ -40,15 +40,15 @@ public:
 	ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
 
 	void setIsChecked(bool _checked);
-	bool getIsChecked(void) const;
-	QString getProjectName(void) const;
-	bool getOwnerIsCreator(void) const { return m_ownerIsCreator; };
+	bool getIsChecked() const;
+	QString getProjectName() const;
+	bool getOwnerIsCreator() const { return m_ownerIsCreator; };
 
 Q_SIGNALS:
 	void checkedChanged();
 
 private Q_SLOTS:
-	void slotCheckedChanged(void);
+	void slotCheckedChanged();
 
 private:
 	QTableWidget* m_table;
@@ -82,58 +82,60 @@ public:
 
 	virtual void setWidgetLocked(bool _isLocked) override;
 
-	virtual QWidget* getQWidget(void) override { return m_widget; };
-	virtual const QWidget* getQWidget(void) const override { return m_widget; };
+	virtual QWidget* getQWidget() override { return m_widget; };
+	virtual const QWidget* getQWidget() const override { return m_widget; };
 
-	QString getCurrentProjectFilter(void) const;
+	virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
-	std::list<QString> getSelectedProjects(void) const;
+	QString getCurrentProjectFilter() const;
 
-	void refreshProjectList(void);
-	void refreshRecentProjects(void);
+	std::list<QString> getSelectedProjects() const;
+
+	void refreshProjectList();
+	void refreshRecentProjects();
 
 Q_SIGNALS:
-	void createProjectRequest(void);
-	void openProjectRequest(void);
-	void copyProjectRequest(void);
-	void renameProjectRequest(void);
-	void deleteProjectRequest(void);
-	void exportProjectRequest(void);
-	void projectAccessRequest(void);
-	void projectOwnerRequest(void);
+	void createProjectRequest();
+	void openProjectRequest();
+	void copyProjectRequest();
+	void renameProjectRequest();
+	void deleteProjectRequest();
+	void exportProjectRequest();
+	void projectAccessRequest();
+	void projectOwnerRequest();
 
 private Q_SLOTS:
-	void slotUpdateItemSelection(void);
+	void slotUpdateItemSelection();
 
-	void slotCreateProject(void);
+	void slotCreateProject();
 	void slotProjectDoubleClicked(int _row, int _column);
 	void slotTableHeaderItemClicked(int _column);
 	void slotTableHeaderSortingChanged(int _column, Qt::SortOrder _order);
 
-	void slotRefreshProjectList(void);
-	void slotRefreshRecentProjects(void);
-	void slotRefreshAllProjects(void);
+	void slotRefreshProjectList();
+	void slotRefreshRecentProjects();
+	void slotRefreshAllProjects();
 
-	void slotToggleViewMode(void);
-	void slotOpenProject(void);
-	void slotCopyProject(void);
-	void slotRenameProject(void);
-	void slotDeleteProject(void);
-	void slotExportProject(void);
-	void slotAccessProject(void);
-	void slotOwnerProject(void);
+	void slotToggleViewMode();
+	void slotOpenProject();
+	void slotCopyProject();
+	void slotRenameProject();
+	void slotDeleteProject();
+	void slotExportProject();
+	void slotAccessProject();
+	void slotOwnerProject();
 
-	void slotFilterChanged(void);
-	void slotProjectCheckedChanged(void);
+	void slotFilterChanged();
+	void slotProjectCheckedChanged();
 
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
-	void clear(void);
+	void clear();
 	void addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator);
 	void updateCountLabel(bool _hasMore);
-	void updateToggleViewModeButton(void);
+	void updateToggleViewModeButton();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
-	bool hasDifferentSelectedOwner(void);
+	bool hasDifferentSelectedOwner();
 	ProjectOverviewEntry* findEntry(const QString& _projectName);
 	
 	ViewMode m_mode;

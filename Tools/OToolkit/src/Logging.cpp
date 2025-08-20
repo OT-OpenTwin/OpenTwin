@@ -244,7 +244,7 @@ bool Logging::prepareToolShutdown(QSettings& _settings) {
 
 bool Logging::eventFilter(QObject* _obj, QEvent* _event) {
 	if (_obj == m_table && _event->type() == QEvent::KeyPress) {
-		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(_event);
+		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
 		if (!keyEvent) {
 			LOGVIS_LOGE("Key event is null");
 			return false;
