@@ -23,7 +23,7 @@
 #define OT_TEST_VISUALIZATIONHANDLER_Interval(___testText)
 #endif
 
-void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent, const ot::UIDList& _visualizingEntities)
+void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent, const ot::UIDList& _visualizingEntities, bool _suppressViewHandling)
 {
 	Model* model = Application::instance()->getModel();
 	EntityBase* baseEntity = model->getEntityByID(_entityID);
@@ -43,6 +43,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_SuppressViewHandling, _suppressViewHandling, document.GetAllocator());
 
 			ot::TableCfg tableCfg = tableEntity->getTableConfig(_overrideContent);
 			ot::JsonObject cfgObj;
@@ -67,6 +68,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_SuppressViewHandling, _suppressViewHandling, document.GetAllocator());
 
 			ot::TextEditorCfg configuration = textEntity->createConfig(_overrideContent);
 			ot::JsonObject cfgObj;
@@ -91,6 +93,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_SuppressViewHandling, _suppressViewHandling, document.GetAllocator());
 
 			const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
 			ot::JsonObject cfgObj;

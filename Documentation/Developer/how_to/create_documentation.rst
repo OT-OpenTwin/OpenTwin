@@ -440,6 +440,8 @@ Other documents in the documentation can be referenced the following way:
 
     :doc:`Custom Text </path relative to documentation root>`
 
+.. _create_documentation_internal_references:
+
 Internal References
 -------------------
 
@@ -472,3 +474,23 @@ To add a custom text that will result in a hyperlink use:
 
 .. note::
     Note that the underscore suffix is mandatory.
+
+Hidden pages
+------------
+
+To create a hidden page, simply create a regular ***.rst** file.
+At the top of the file add ``:orphan:`` so the compiler won't generate any warnings during compilation.
+Use :ref:`internal links<create_documentation_internal_references>` to reference the page.
+
+Here is an example hidden page:
+
+.. code-block:: RST
+
+  :orphan:
+
+  .. _my_hidden_page:
+
+  My Hidden page
+  ##############
+
+  My hidden text

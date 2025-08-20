@@ -227,7 +227,7 @@ void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata
 		const std::string fullName = seriesMetadata->getName();
 		const std::string shortName = fullName.substr(fullName.find_last_of("/") + 1);
 		auto painter = colourIt.getNextPainter();
-		curveConfig.setLinePen(painter.release());
+		curveConfig.setLinePenPainter(painter.release());
 
 		CurveFactory::addToConfig(series, curveConfig);
 
@@ -253,7 +253,6 @@ void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, st
 		if (series != nullptr)
 		{
 			seriesSelected = true;
-			break;
 		}
 		else
 		{

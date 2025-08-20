@@ -103,6 +103,7 @@ bool EntityProperties::deleteProperty(const std::string &_name, const std::strin
 	if (property == nullptr) return false; // Delete failed, because item does not exist
 
 	const std::string key = createKey(_name, _groupName);
+	//If the property was created with the group name, but it is deleted without it, this could cause an issue
 	m_properties.erase(key);
 	m_propertiesList.remove(property);
 

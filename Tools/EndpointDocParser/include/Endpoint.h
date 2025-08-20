@@ -14,7 +14,7 @@ public:
 		TLS
 	};
 
-	Endpoint() = default;
+	Endpoint();
 	Endpoint(const Endpoint& _other) = default;
 	Endpoint(Endpoint&& _other) noexcept = default;
 
@@ -37,7 +37,8 @@ public:
 
 	void setMessageType(MessageType _messageType) { m_messageType = _messageType; };
 	MessageType getMessageType() const { return m_messageType; };
-	
+	std::string getMessageTypeString() const;
+
 	void setParameters(const std::list<Parameter>& _parameters) { m_parameters = _parameters; };
 	const std::list<Parameter>& getParameters() const { return m_parameters; };
 
@@ -46,6 +47,11 @@ public:
 
 	void setResponseParameters(const std::list<Parameter>& _responseParameters) { m_responseParameters = _responseParameters; };
 	const std::list<Parameter>& getResponseParameters() const { return m_responseParameters; };
+
+	void addParameter(const Parameter& _parameter) { m_parameters.push_back(_parameter); };
+	void addResponseParameter(const Parameter& _parameter) { m_responseParameters.push_back(_parameter); };
+
+	void printEndpoint() const;
 
 private:
 	std::string m_name;

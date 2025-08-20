@@ -52,5 +52,6 @@ private:
 	QCheckBox* m_msgTypeError;
 	QCheckBox* m_msgTypeMsgIn;
 	QCheckBox* m_msgTypeMsgOut;
+	QCheckBox* m_msgTypeTest;
 
 };

@@ -1,14 +1,14 @@
 #pragma once
 
+// OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTSystem/Flags.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"
 
-#include <string>
-#include <ostream>
+// std header
 #include <mutex>
-#include <list>
+#include <string>
 
 #pragma warning (disable: 4251)
 
@@ -31,6 +31,7 @@ namespace ot {
 		void log(const LogMessage& _message);
 
 	private:
+		std::mutex              m_mutex;
 		std::string				m_loggingServiceURL;
 
 		ServiceLogNotifier();

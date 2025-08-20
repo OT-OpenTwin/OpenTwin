@@ -9,6 +9,7 @@
 #include "LogModeSetter.h"
 #include "QuickLogExport.h"
 #include "LoggingFilterView.h"
+#include "FileLogImporterDialog.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
 
@@ -161,6 +162,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_table->installEventFilter(this);
 
 	splitter->setStretchFactor(1, 1);
 	
@@ -187,11 +189,13 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	_rootMenu->addSeparator();
 	m_importButton = _rootMenu->addAction(QIcon(":images/Import.png"), "Import");
+	QAction* importFromFileLog = _rootMenu->addAction(QIcon(":images/Import.png"), "Import File logs");
 	m_exportButton = _rootMenu->addAction(QIcon(":images/Export.png"), "Export");
 
 	connect(m_connectButton, &QAction::triggered, this, &Logging::slotConnect);
 	connect(m_autoConnect, &QAction::triggered, this, &Logging::slotToggleAutoConnect);
 	connect(m_importButton, &QAction::triggered, this, &Logging::slotImport);
+	connect(importFromFileLog, &QAction::triggered, this, &Logging::slotImportFileLogs);
 	connect(m_exportButton, &QAction::triggered, this, &Logging::slotExport);
 
 	LOGVIS_LOG("Initialization completed");
@@ -238,6 +242,28 @@ bool Logging::prepareToolShutdown(QSettings& _settings) {
 	}
 }
 
+bool Logging::eventFilter(QObject* _obj, QEvent* _event) {
+	if (_obj == m_table && _event->type() == QEvent::KeyPress) {
+		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
+		if (!keyEvent) {
+			LOGVIS_LOGE("Key event is null");
+			return false;
+		}
+		if (keyEvent->key() == Qt::Key_Return) {
+			auto items = m_table->selectedItems();
+			while (!items.isEmpty()) {
+				QTableWidgetItem* item = items.front();
+				items.pop_front();
+				if (item) {
+					this->slotViewCellContent(item);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void Logging::slotConnect(void) {
 	this->connectToLogger(false);
 }
@@ -271,8 +297,14 @@ void Logging::slotImport(void) {
 		return;
 	}
 
+	QSignalBlocker blocker(m_ignoreNewMessages);
+	bool isIgnoring = m_ignoreNewMessages->isChecked();
+	m_ignoreNewMessages->setChecked(false);
+
 	this->slotClear();
 	this->appendLogMessages(messages);
+
+	m_ignoreNewMessages->setChecked(isIgnoring);
 
 	settings->setValue("Logging.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
@@ -476,6 +508,21 @@ void Logging::slotUpdateColumnWidth(void) {
 		for (auto w : tableColumnWidthsList) {
 			m_table->setColumnWidth(column++, w.toInt());
 		}
+	}
+}
+
+void Logging::slotImportFileLogs() {
+	FileLogImporterDialog dia(m_table);
+	if (dia.showDialog() == ot::Dialog::Ok) {
+		if (dia.getLogMessages().empty()) {
+			return;
+		}
+
+		QSignalBlocker blocker(m_ignoreNewMessages);
+		bool isIgnoring = m_ignoreNewMessages->isChecked();
+		m_ignoreNewMessages->setChecked(false);
+		this->appendLogMessages(dia.getLogMessages());
+		m_ignoreNewMessages->setChecked(isIgnoring);
 	}
 }
 

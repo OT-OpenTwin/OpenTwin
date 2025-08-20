@@ -302,3 +302,85 @@ The rectifier circuit consists of a diode, a resistor, and a capacitor.
 The diode allows current to flow in only one direction, 
 resulting in a pulsating DC output signal that is smoothed by the capacitor, 
 providing a more stable voltage level.
+
+GraphicsTestCases
+-----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 5 25 25 30
+
+   * - #
+     - Setup
+     - Execution
+     - Expectation
+
+   * - 1
+     - Create a voltage source and a resistor
+     - Connect with one connection
+     - Items connected and version increased
+
+   * - 2
+     - Create a voltage source and a resistor
+     - Rotate resistor and connect from resistor and to resistor
+     - Both connections created and version increased two times
+
+   * - 3
+     - Create a voltage source and a resistor
+     - Select both and drag 
+     - Both moved and version increased by two after finished moving
+
+   * - 4
+     - Create a voltage source and a resistor
+     - Select both and move via arrow keys
+     - Both moved and version increased by two after finished moving
+   
+   * - 5
+     - Create a voltage source and a resistor
+     - Connect and delete one
+     - Connection and block removed
+
+   * - 6
+     - Create a voltage source and a resistor
+     - When connecting move the mouse around while clicking
+     - Should not cause any crash
+    
+   * - 7
+     - Create a voltage source and a resistor
+     - When connecting move the mouse before clicking without stopping before clicking
+     - Should not cause any crash
+
+ErrorTestCases
+--------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 5 25 25 30
+
+   * - #
+     - Setup
+     - Execution
+     - Expectation
+
+   * - 1
+     - Create a solver without changing properties
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No Circuit found or selected! and 
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down!
+
+   * - 2
+     - Create a solver and select a circuit in solver properties
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No Element for DC Simulation found or selected! 
+        - [ERROR] [CircuitSimulatorService] Failed at creating Simulation Line
+        - [ERROR] [CircuitSimulatorService] NGSpice Initialize function failed!
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down!
+  
+   * - 3
+     - Create a voltage source and a resistor without connections also create a solver select the circuit and select the element voltage source in DC-Settings
+     - Select solver and run simulation
+     - Error messages:
+        - [ERROR] [CircuitSimulatorService] No connections found in Circuit 3
+        - [ERROR] [CircuitSimulatorService] Simulation Failed! Shutting down! 

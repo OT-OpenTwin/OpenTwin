@@ -1,9 +1,11 @@
 #pragma once
 
+#include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
+#include "OTWidgets/SelectionData.h"
 #include "OldTreeIcon.h"
 #include "Geometry.h"
 #include "SceneNodeBase.h"
@@ -32,6 +34,8 @@ class Model
 public:
 	Model();
 	virtual ~Model();
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 	void setID(unsigned long long id) { viewerModelID = id; }
 	unsigned long long getID(void) { return viewerModelID; }
@@ -90,7 +94,7 @@ public:
 	void updateObjectFacetsFromDataBase(unsigned long long modelEntityID, unsigned long long entityID, unsigned long long entityVersion);
 
 	//! \return Returns true if the selection has requested a new view.
-	ot::SelectionHandlingResult setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin);
+	ot::SelectionHandlingResult setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems);
 	void executeAction(unsigned long long _buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
 	void clearHoverView(void);

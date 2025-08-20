@@ -10,6 +10,7 @@
 #include "OTCore/ContainerHelper.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetViewDockComponentsFactory.h"
@@ -138,6 +139,11 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
 	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
 	_view->getViewDockWidget()->blockSignals(true);
+	if (_view->getViewDockWidget()->getWidgetViewTab()) {
+		_view->getViewDockWidget()->getWidgetViewTab()->blockSignals(true);
+		_view->getViewDockWidget()->getWidgetViewTab()->setEnabled(false);
+		_view->getViewDockWidget()->getWidgetViewTab()->disableButtons();
+	}
 	_view->blockSignals(true);
 
 	// Since the view may be the origin of a signal that leads to the removal of the view, we delete it later
@@ -190,6 +196,8 @@ void ot::WidgetViewManager::closeViews() {
 }
 
 void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
+	m_autoCloseTimer.stop();
+
 	m_autoCloseInfo.flags = _flags;
 	m_autoCloseInfo.activeSelection = _activeSelection;
 	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
@@ -205,6 +213,16 @@ void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 
 ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
 	OTAssertNullptr(m_dockManager);
+
+	// Remove from auto close list
+	for (auto it = m_autoCloseInfo.viewsToClose.begin(); it != m_autoCloseInfo.viewsToClose.end();) {
+		if ((*it)->getViewData().getEntityName() == _entityName && (*it)->getViewData().getViewType() == _type) {
+			it = m_autoCloseInfo.viewsToClose.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
 
 	// Find view and owner
 	WidgetView* view = nullptr;
@@ -443,7 +461,7 @@ ot::WidgetViewManager::ViewNameTypeList ot::WidgetViewManager::getViewNamesFromO
 		return ViewNameTypeList();
 	}
 	else {
-		return std::move(ViewNameTypeList(*it->second));
+		return ViewNameTypeList(*it->second);
 	}
 }
 
@@ -454,7 +472,7 @@ std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicS
 			result.push_back(entry.first);
 		}
 	}
-	return std::move(result);
+	return result;
 }
 
 bool ot::WidgetViewManager::getAnyViewContentModified() {
@@ -468,6 +486,111 @@ bool ot::WidgetViewManager::getAnyViewContentModified() {
 
 ot::WidgetView* ot::WidgetViewManager::getCurrentlyFocusedView() const {
 	return this->getViewFromDockWidget(m_dockManager->focusedDockWidget());
+}
+
+void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const {
+	JsonArray stateArr;
+	if (m_state & ManagerState::InsertViewState) {
+		stateArr.PushBack(JsonString("InsertViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::CloseViewState) {
+		stateArr.PushBack(JsonString("CloseViewState", _allocator), _allocator);
+	}
+	if (m_state & ManagerState::MulticloseViewState) {
+		stateArr.PushBack(JsonString("MulticloseViewState", _allocator), _allocator);
+	}
+	_object.AddMember("State", stateArr, _allocator);
+
+	JsonArray configArr;
+	if (m_config & ManagerConfigFlag::InputFocusCentralViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusCentralViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusSideViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusSideViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::InputFocusToolViewOnFocusChange) {
+		configArr.PushBack(JsonString("InputFocusToolViewOnFocusChange", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::IgnoreInputFocusOnViewInsert) {
+		configArr.PushBack(JsonString("IgnoreInputFocusOnViewInsert", _allocator), _allocator);
+	}
+	if (m_config & ManagerConfigFlag::UseBestAreaFinderOnViewInsert) {
+		configArr.PushBack(JsonString("UseBestAreaFinderOnViewInsert", _allocator), _allocator);
+	}
+	_object.AddMember("Config", configArr, _allocator);
+
+	JsonObject focusInfoObj;
+	if (m_focusInfo.last) {
+		focusInfoObj.AddMember("LastFocusedView", JsonString(m_focusInfo.last->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastCentral) {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonString(m_focusInfo.lastCentral->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedCentralView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastSide) {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonString(m_focusInfo.lastSide->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedSideView", JsonNullValue(), _allocator);
+	}
+	if (m_focusInfo.lastTool) {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonString(m_focusInfo.lastTool->getViewData().getEntityName(), _allocator), _allocator);
+	}
+	else {
+		focusInfoObj.AddMember("LastFocusedToolView", JsonNullValue(), _allocator);
+	}
+	_object.AddMember("FocusInfo", focusInfoObj, _allocator);
+
+	JsonObject autoCloseInfoObj;
+	autoCloseInfoObj.AddMember("Flags", JsonArray(WidgetViewBase::toStringList(m_autoCloseInfo.flags), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("ActiveSelection", JsonArray(m_autoCloseInfo.activeSelection.getSelectedNavigationItems(), _allocator), _allocator);
+	autoCloseInfoObj.AddMember("IgnoreCurrent", m_autoCloseInfo.ignoreCurrent, _allocator);
+	JsonArray viewsToCloseArr;
+	for (WidgetView* view : m_autoCloseInfo.viewsToClose) {
+		JsonObject viewObj;
+		viewObj.AddMember("EntityName", JsonString(view->getViewData().getEntityName(), _allocator), _allocator);
+		viewObj.AddMember("Type", JsonString(WidgetViewBase::toString(view->getViewData().getViewType()), _allocator), _allocator);
+		viewsToCloseArr.PushBack(viewObj, _allocator);
+	}
+	autoCloseInfoObj.AddMember("ViewsToClose", viewsToCloseArr, _allocator);
+	_object.AddMember("AutoCloseInfo", autoCloseInfoObj, _allocator);
+
+	JsonArray viewOwnerMapArr;
+	for (const auto& it : m_viewOwnerMap) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		it.first.addToJsonObject(ownerObj, _allocator);
+
+		JsonArray viewNamesArr;
+		for (const ViewNameTypeListEntry& entry : *it.second) {
+			JsonObject nameTypeObj;
+			nameTypeObj.AddMember("Name", JsonString(entry.first, _allocator), _allocator);
+			nameTypeObj.AddMember("Type", JsonString(WidgetViewBase::toString(entry.second), _allocator), _allocator);
+			viewNamesArr.PushBack(nameTypeObj, _allocator);
+		}
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("ViewInfo", viewNamesArr, _allocator);
+		viewOwnerMapArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("ViewOwnerMap", viewOwnerMapArr, _allocator);
+
+	JsonArray viewsArr;
+	for (const ViewEntry& entry : m_views) {
+		JsonObject entryObj;
+		JsonObject ownerObj;
+		entry.first.addToJsonObject(ownerObj, _allocator);
+		JsonObject viewObj;
+		entry.second->getDebugInformation(viewObj, _allocator);
+		entryObj.AddMember("Owner", ownerObj, _allocator);
+		entryObj.AddMember("View", viewObj, _allocator);
+		viewsArr.PushBack(entryObj, _allocator);
+	}
+	_object.AddMember("Views", viewsArr, _allocator);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -569,7 +692,6 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 }
 
 void ot::WidgetViewManager::slotCloseUnpinnedViews() {
-	std::list<WidgetView*> views;
 	// Iterate trough all views
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
@@ -599,13 +721,15 @@ void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 
 			// If the view matches all criteria, add it to the list of views to close
 			if (concider) {
-				views.push_back(view.second);
+				m_autoCloseInfo.viewsToClose.push_back(view.second);
 			}
 		}
 	}
 
 	// Request to close all matching views
-	for (WidgetView* view : views) {
+	while (!m_autoCloseInfo.viewsToClose.empty()) {
+		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
+		m_autoCloseInfo.viewsToClose.pop_front();
 		this->handleViewCloseRequest(view);
 	}
 }

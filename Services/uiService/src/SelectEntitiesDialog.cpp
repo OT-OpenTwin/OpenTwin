@@ -65,7 +65,7 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 		}
 	}
 
-	if (m_flags && ot::NavigationTreePackage::ItemsDefaultExpanded) {
+	if (m_flags & ot::NavigationTreePackage::ItemsDefaultExpanded) {
 		m_available->getTreeWidget()->expandAll();
 		m_selected->getTreeWidget()->expandAll();
 	}

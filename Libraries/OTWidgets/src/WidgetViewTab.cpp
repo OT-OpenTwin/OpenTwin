@@ -14,7 +14,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::WidgetViewTab::WidgetViewTab(ads::CDockWidget * _dockWidget)
-	: ads::CDockWidgetTab(_dockWidget), m_isPinned(false)
+	: ads::CDockWidgetTab(_dockWidget), m_isPinned(false), m_isMiddleButtonPressed(false)
 {
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
@@ -95,6 +95,15 @@ void ot::WidgetViewTab::setPinButtonVisible(bool _vis) {
 	m_pinButton->setVisible(_vis);
 }
 
+void ot::WidgetViewTab::disableButtons() {
+	if (m_closeButton) {
+		m_closeButton->setEnabled(false);
+	}
+	if (m_pinButton) {
+		m_pinButton->setEnabled(false);
+	}
+}
+
 void ot::WidgetViewTab::slotClose(void) {
 	Q_EMIT viewCloseRequested();
 }
@@ -104,6 +113,18 @@ void ot::WidgetViewTab::slotTogglePinned(void) {
 }
 
 void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
+	if (_event->button() == Qt::MiddleButton) {
+		m_isMiddleButtonPressed = true;
+	}
 	ads::CDockWidgetTab::mousePressEvent(_event);
-	Q_EMIT tabPressed();
+}
+
+void ot::WidgetViewTab::mouseReleaseEvent(QMouseEvent* _event) {
+	ads::CDockWidgetTab::mouseReleaseEvent(_event);
+	if (_event->button() == Qt::MiddleButton) {
+		if (m_isMiddleButtonPressed && m_closeButton->isVisible()) {
+			Q_EMIT viewCloseRequested();
+		}
+		m_isMiddleButtonPressed = false;
+	}
 }

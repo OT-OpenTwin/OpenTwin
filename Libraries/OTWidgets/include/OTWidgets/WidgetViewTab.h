@@ -27,25 +27,28 @@ namespace ot {
 		virtual ~WidgetViewTab();
 
 		void setIsPinned(bool _pinned);
-		bool getIsPinned(void) const { return m_isPinned; };
+		bool getIsPinned() const { return m_isPinned; };
 
 		void setCloseButtonVisible(bool _vis);
 		void setPinButtonVisible(bool _vis);
 
+		void disableButtons();
+
 	Q_SIGNALS:
-		void viewCloseRequested(void);
+		void viewCloseRequested();
 		void viewPinnedChanged(bool _isPinned);
-		void tabPressed();
 
 	private Q_SLOTS:
-		void slotClose(void);
-		void slotTogglePinned(void);
+		void slotClose();
+		void slotTogglePinned();
 
 	protected:
 		virtual void mousePressEvent(QMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
 
 	private:
 		bool m_isPinned;
+		bool m_isMiddleButtonPressed;
 
 		ToolButton* m_closeButton;
 		ToolButton* m_pinButton;

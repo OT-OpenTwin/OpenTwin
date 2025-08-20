@@ -329,6 +329,7 @@
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Size "Size"
+#define OT_ACTION_PARAM_Data "Data"
 #define OT_ACTION_PARAM_Alive "Alive"
 #define OT_ACTION_PARAM_State "State"
 #define OT_ACTION_PARAM_Flags "Flags"
@@ -354,12 +355,14 @@
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ElementType "ElementType"
+#define OT_ACTION_PARAM_CallbackAction "CallbackAction"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_VisualizingEntities "VisualizingEntities"
+#define OT_ACTION_PARAM_SuppressViewHandling "SuppressViewHandling"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
@@ -455,6 +458,7 @@
 #define OT_ACTION_PARAM_HOSTNAME "Host.Name"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
+#define OT_ACTION_PARAM_LOGS "LogMessages"
 #define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
 #define OT_ACTION_PARAM_GlobalLoggerUrl "Global.LoggerUrl"
 

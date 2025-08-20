@@ -23,13 +23,17 @@ ot::ServiceLogNotifier& ot::ServiceLogNotifier::initialize(const std::string& _s
 	ot::ServiceLogNotifier& obj = ot::ServiceLogNotifier::instance();
 	obj.getDeleteLogNotifierLater();
 	ot::LogDispatcher::instance().addReceiver(&obj);
-	if (!_loggingServiceUrl.empty() && _loggingServiceUrl.find("//") != 0) obj.setLoggingServiceURL(_loggingServiceUrl);
+	if (!_loggingServiceUrl.empty() && _loggingServiceUrl.find("//") != 0) {
+		obj.setLoggingServiceURL(_loggingServiceUrl);
+	}
 	return obj;
 }
 
 // #################################################################################
 
 void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if (_url.empty() || _url.find("//") == 0) {
 		m_loggingServiceURL = "";
 	}
@@ -55,7 +59,10 @@ void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
 }
 
 void ot::ServiceLogNotifier::log(const LogMessage& _message) {	
-	if (m_loggingServiceURL.empty()) return;
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (m_loggingServiceURL.empty()) {
+		return;
+	}
 
 	std::string response;
 	JsonDocument doc;

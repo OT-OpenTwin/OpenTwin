@@ -28,7 +28,7 @@ public:
 	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
 	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
 	
-	int32_t getMaxNumberOfQueries();
+	int32_t getSelectedNumberOfQueries();
 
 	const ValueComparisionDefinition getSelectedQuantityDefinition();
 

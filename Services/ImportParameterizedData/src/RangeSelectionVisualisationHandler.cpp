@@ -5,6 +5,7 @@
 #include "RangeSelectionVisualisationHandler.h"
 
 // OpenTwin header
+#include "OTCore/EntityName.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -31,6 +32,9 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 {
 	OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval("Select range: Total");
 
+	std::list<ot::EntityInformation> selectedEntitiesInfo;
+	ot::ModelServiceAPI::getSelectedEntityInformation(selectedEntitiesInfo);
+
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
 	
@@ -42,7 +46,19 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 	std::map<std::string, ot::UIDList> visualizingEntitiesByTableName;
 	for (const auto& entity : selectionEntities) {
 		const std::string tableName = entity->getTableName();
-		visualizingEntitiesByTableName[tableName].push_back(entity->getEntityID());
+		ot::UIDList& visualizingEntities = visualizingEntitiesByTableName[tableName];
+		visualizingEntities.push_back(entity->getEntityID());
+
+		for (auto& it : selectedEntitiesInfo) {
+			if (it.getEntityName() != entity->getName()) {
+				if (it.getEntityName() == tableName) {
+					// Add table as visualizing entity if selected
+					if (std::find(visualizingEntities.begin(), visualizingEntities.end(), it.getEntityID()) == visualizingEntities.end()) {
+						visualizingEntities.push_back(it.getEntityID());
+					}
+				}
+			}
+		}
 	}
 
 	if (!selectionsThatNeedVisualisation.empty())

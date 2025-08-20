@@ -31,7 +31,7 @@ void ot::CartesianPlotAxis::updateAxis(void) {
 
 	}
 	else if (!this->getIsLogScale() && this->getIsLogScaleSet()) {
-		this->setIsLogScaleSet(true);
+		this->setIsLogScaleSet(false);
 		m_plot->setAxisScaleEngine(this->getCartesianAxisID(), new QwtLinearScaleEngine());
 	}
 	

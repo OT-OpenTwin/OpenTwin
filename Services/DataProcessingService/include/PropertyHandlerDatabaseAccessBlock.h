@@ -27,6 +27,8 @@ private:
 	void resetValueCharacteristicLabelsIfNecessary(const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
 	void resetValueCharacteristicLabelUnit(const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
 	void resetValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
+	void updateIfNecessaryValueCharacteristicLabelUnit(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
+	void updateIfNecessaryValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties);
 
 	void requestPropertyUpdate(ot::UIDList entityIDs, const std::string& propertiesAsJSON);
 };

@@ -20,6 +20,7 @@
 #include "OTCore/Variable.h"
 #include "OTGui/TableRange.h"
 #include "IVisualisationTable.h"
+#include "OTGui/TableCfg.h"
 
 #include <optional>
 #include <map>
@@ -41,6 +42,7 @@ public:
 
 	inline void ensureEssentials();
 	void clearBufferedMetadata();
+	void handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock);
 
 private:
 	const std::string m_tableFolder;
@@ -64,14 +66,14 @@ private:
 	void bufferCorrespondingMetadataNames(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void setBackgroundColour(EntityParameterizedDataCategorization::DataCategorie _category);
 	bool checkForCategorisationEntity(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
-	void addSMDEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities);
-	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityBase>>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
+	
+	void addParamOrQuantityEntries(std::list<std::unique_ptr<EntityParameterizedDataCategorization>>& _consideredSeries, std::list<std::string>& _folderContent, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 	
 	//! @brief Queued request that sets the colour of the selection and returns the selected table ranges. Subsequently executed function: storeSelectionRanges
 	void requestRangeSelection(const std::string& _tableName);
 
-	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType);
+	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode);
 	void logWarnings(std::map<std::string, std::string>& _logMessagesByErrorType, ot::NewModelStateInformation& _entityInfos);
 	std::map<std::string, ot::UID> getAllScripts();
 };

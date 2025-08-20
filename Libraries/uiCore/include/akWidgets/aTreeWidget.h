@@ -368,9 +368,10 @@ namespace ak {
 	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
-		void cleared(void);
-		void focusLost(void);
-		void selectionChanged(void);
+		void cleared();
+		void focusLost();
+		void selectionChanged();
+		void selectionChangeCompleted();
 		void itemActivated(QTreeWidgetItem *, int);
 		void itemChanged(QTreeWidgetItem *, int);
 		void itemClicked(QTreeWidgetItem *, int);
@@ -384,7 +385,7 @@ namespace ak {
 		void customContextMenuRequested(const QPoint& _pos);
 
 	public Q_SLOTS:
-
+		void slotHandleSelectionChanged();
 		void slotTreeKeyPressed(QKeyEvent * _event);
 		void slotTreeKeyReleased(QKeyEvent * _event);
 		void slotTreeItemActivated(QTreeWidgetItem * _item, int _column);
@@ -395,11 +396,14 @@ namespace ak {
 		void slotTreeItemExpanded(QTreeWidgetItem * _item);
 		void slotTreeSelectionChanged();
 		void slotTreeMouseMove(QMouseEvent *);
+		void slotTreeMousePressed(QMouseEvent *);
+		void slotTreeMouseReleased(QMouseEvent *);
+		void slotTreeEnter(QEnterEvent *);
 		void slotTreeLeave(QEvent *);
 		void slotCustomContextMenuRequested(const QPoint& _pos);
 
 		//! @brief Will perform actions on the filter text changed event
-		void slotFilterTextChanged(void);
+		void slotFilterTextChanged();
 
 		//! @brief Will perform actions on the filter enter pressed event
 		void slotFilterKeyPressed(QKeyEvent * _event);
@@ -442,6 +446,9 @@ namespace ak {
 		bool										m_isReadOnly;
 		bool										m_displayChildsOnFilter;
 
+		bool                                        m_selectionHasChanged;
+		bool                                        m_mouseIsPressed;
+		
 		UID											m_focusedItem;
 
 		QString										m_headerText;				//! The header text of the tree
@@ -468,27 +475,6 @@ namespace ak {
 		aTreeWidgetBase(aTreeWidget * _ownerTree);
 
 		virtual ~aTreeWidgetBase();
-
-		// #######################################################################################################
-		// Event handling
-
-		//! @brief Emits a key pressend signal a key is pressed
-		virtual void keyPressEvent(QKeyEvent * _event) override;
-
-		//! @brief Emits a key released signal a key is released
-		virtual void keyReleaseEvent(QKeyEvent * _event) override;
-
-		//! @brief Emits a mouse move event
-		virtual void mouseMoveEvent(QMouseEvent *event) override;
-
-		//! @brief Emits a FocusLeft event
-		virtual void leaveEvent(QEvent *event) override;
-
-		virtual void dropEvent(QDropEvent * _event) override;
-		
-		virtual void dragEnterEvent(QDragEnterEvent * _event) override;
-
-		virtual void dragLeaveEvent(QDragLeaveEvent * _event) override;
 
 		// #######################################################################################################
 
@@ -543,7 +529,39 @@ namespace ak {
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
 		void mouseMove(QMouseEvent *);
+		void mousePressed(QMouseEvent *);
+		void mouseReleased(QMouseEvent *);
 		void leave(QEvent *);
+		void enter(QEnterEvent*);
+
+	protected:
+		// #######################################################################################################
+
+		// Event handling
+
+		//! @brief Emits a key pressend signal a key is pressed
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+
+		//! @brief Emits a key released signal a key is released
+		virtual void keyReleaseEvent(QKeyEvent* _event) override;
+
+		//! @brief Emits a mouse move event
+		virtual void mouseMoveEvent(QMouseEvent* event) override;
+
+		virtual void mousePressEvent(QMouseEvent* event) override;
+
+		virtual void mouseReleaseEvent(QMouseEvent* event) override;
+
+		//! @brief Emits a FocusLeft event
+		virtual void leaveEvent(QEvent* event) override;
+
+		virtual void enterEvent(QEnterEvent* event) override;
+
+		virtual void dropEvent(QDropEvent* _event) override;
+
+		virtual void dragEnterEvent(QDragEnterEvent* _event) override;
+
+		virtual void dragLeaveEvent(QDragLeaveEvent* _event) override;
 
 	private:
 		aTreeWidget *						m_ownerTree;

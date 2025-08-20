@@ -359,6 +359,7 @@ public Q_SLOTS:
 	void unlockGui(void);
 	void activateModelVersion(const char* version);
 	void keepAlive();
+	void slotProcessActionBuffer();
 
 private:
 	// ###################################################################################################
@@ -395,6 +396,9 @@ private:
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
 	// #################################################################
+
+	bool                                            m_bufferActions;
+	std::list<std::string>                          m_actionBuffer;
 
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;

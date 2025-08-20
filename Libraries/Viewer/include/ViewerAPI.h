@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include "OldTreeIcon.h"
 
+#include "OTCore/JSON.h"
 #include "OTCore/Color.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"
@@ -12,6 +13,7 @@
 #include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/TableRange.h"
+#include "OTWidgets/SelectionData.h"
 #include "ViewChangedStates.h"
 
 #include <list>
@@ -29,6 +31,8 @@ namespace ot { class WidgetView; }
 namespace ViewerAPI {
 
 	__declspec(dllexport) void setFrontendAPI(FrontendAPI* _api);
+
+	__declspec(dllexport) void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
 
 	__declspec(dllexport) ot::UID createModel(void);
 	__declspec(dllexport) void activateModel(ot::UID osgModelID);
@@ -50,7 +54,7 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void setTreeStateRecording(ot::UID osgModelID, bool flag);
 
-	__declspec(dllexport) ot::SelectionHandlingResult setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin);
+	__declspec(dllexport) ot::SelectionHandlingResult setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems);
 	__declspec(dllexport) void executeAction(unsigned long long buttonID);
 
 	__declspec(dllexport) void setHoverTreeItem(ot::UID hoverItemID);

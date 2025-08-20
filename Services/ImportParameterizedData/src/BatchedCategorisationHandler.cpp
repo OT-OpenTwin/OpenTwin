@@ -8,18 +8,17 @@
 #include "OTCore/EntityName.h"
 #include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
-void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID>& _selectedEntities)
+void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID> _selectedEntities)
 {
 	try
 	{
-		ot::UIDList selectedEntities =	_selectedEntities; //is passed on by reference through thread barrier. The passed on list is not thread safe!
 		UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 
 		ensureEssentials();
-		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
+		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
 		ClassFactory& classFactory = Application::instance()->getClassFactory();
 		std::list<std::unique_ptr<EntityBatchImporter>> selectedBatchImporter;
-		for (ot::UID entityID : selectedEntities)
+		for (ot::UID entityID : _selectedEntities)
 		{
 			ot::UID version = Application::instance()->getPrefetchedEntityVersion(entityID);
 			std::unique_ptr<EntityBase> baseEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, version, classFactory));
@@ -47,10 +46,12 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UI
 			
 			for (uint32_t i = 1; i <= numberOfRuns; i++)
 			{
-				_uiComponent->displayMessage("Executing import " + std::to_string(numberOfRuns) + "\n");
-				run(nameBase);
+				_uiComponent->displayMessage("Executing import " + std::to_string(i) + "\n");
+				bool lastRun = i == numberOfRuns;
+				run(nameBase,lastRun);
 				updater.triggerUpdate(i);
 			}
+			_uiComponent->displayMessage("Batch import finished.\n");
 		}
 	}
 	catch (std::exception& _e)
@@ -79,7 +80,7 @@ void BatchedCategorisationHandler::addCreator()
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added batch importer");
 }
 
-void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
+void BatchedCategorisationHandler::run(const std::string& _seriesNameBase, bool _lastRun)
 {
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = findAllTableSelectionsWithConsiderForBatching();
 	if (!allRelevantTableSelections.empty())
@@ -104,7 +105,7 @@ void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
 		}
 		allRelevantTableSelections.clear();
 
-		auto batchingInformationsByPriority = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD, _seriesNameBase);
+		auto batchingInformationsByPriority = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD, _seriesNameBase, _lastRun);
 
 		for (auto batchingInformationByPriority = batchingInformationsByPriority.rbegin(); batchingInformationByPriority != batchingInformationsByPriority.rend(); batchingInformationByPriority++)
 		{
@@ -178,7 +179,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandl
 }
 
 
-std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD, const std::string& _newMSMDNameBase)
+std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD, const std::string& _newMSMDNameBase, bool _lastRun)
 {
 	ot::UIDList topoIDs, topoVers, dataEnt{};
 	std::list<bool> forceVis;
@@ -269,7 +270,17 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 
 			//Switch the batching strategy.
 			bool considerForBatching = selection->getConsiderForBatchprocessing();
-			newSelection->setConsiderForBatchprocessing(considerForBatching);
+			
+			//After the last run the batching process should finish. A new run should not create anything.
+			if (_lastRun)
+			{
+				newSelection->setConsiderForBatchprocessing(false);
+			}
+			else
+			{
+				newSelection->setConsiderForBatchprocessing(considerForBatching);
+			}
+
 			bool passOnScript = selection->getPassOnScript();
 			newSelection->setPassOnScript(passOnScript);
 

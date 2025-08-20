@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
@@ -106,6 +107,8 @@ namespace ot {
 		void clearVisualizingItems() { m_visualizingItems.setSelectedNavigationItems(UIDList()); };
 		const SelectionInformation& getVisualizingItems() const { return m_visualizingItems; };
 
+		virtual void getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const;
+
 	Q_SIGNALS:
 		void closeRequested();
 		void viewDataModifiedChanged();
@@ -121,8 +124,7 @@ namespace ot {
 		void slotCloseRequested();
 		void slotToggleVisible();
 		void slotPinnedChanged(bool _isPinned);
-		void slotTabPressed();
-
+		
 	private:
 		friend class WidgetViewManager;
 

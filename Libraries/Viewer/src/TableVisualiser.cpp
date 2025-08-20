@@ -13,7 +13,7 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
-	if (_state.m_selectionOrigin == ot::SelectionOrigin::User) {
+	if (_state.m_selectionData.getSelectionOrigin() == ot::SelectionOrigin::User) {
 		if (_state.m_singleSelection) {
 			if (_state.m_selected) {
 				ot::JsonDocument doc;
@@ -26,6 +26,13 @@ bool TableVisualiser::requestVisualization(const VisualiserState& _state) {
 				ot::UIDList visualizingEntities;
 				visualizingEntities.push_back(this->getSceneNode()->getModelEntityID());
 				doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(visualizingEntities, doc.GetAllocator()), doc.GetAllocator());
+
+				if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier)) {
+					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, true, doc.GetAllocator());
+				}
+				else {
+					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, false, doc.GetAllocator());
+				}
 
 				FrontendAPI::instance()->messageModelService(doc.toJson());
 				return true;
@@ -45,4 +52,9 @@ void TableVisualiser::showVisualisation(const VisualiserState& _state) {
 
 void TableVisualiser::hideVisualisation(const VisualiserState& _state) {
 
+}
+
+void TableVisualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("Type", ot::JsonString("TableVisualiser", _allocator), _allocator);
+	Visualiser::getDebugInformation(_object, _allocator);
 }

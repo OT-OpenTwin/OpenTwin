@@ -49,8 +49,8 @@ namespace intern {
 
 			_string.replace(checkIx + 1, (lastIx - checkIx) - 1, "****");
 
-lastIx = _string.find('\"', checkIx + 1) + 1; // Last index is now invalid after replacing
-passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT, lastIx);
+			lastIx = _string.find('\"', checkIx + 1) + 1; // Last index is now invalid after replacing
+			passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT, lastIx);
 		}
 	}
 }
@@ -61,7 +61,7 @@ AppBase& AppBase::instance(void) {
 }
 
 void AppBase::log(const ot::LogMessage& _message) {
-	this->appendLogMessage(_message);
+	this->appendLogMessage(ot::LogMessage(_message));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -82,24 +82,23 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 
 	msg.setCurrentTimeAsGlobalSystemTime();
 
-	this->appendLogMessage(msg);
+	this->appendLogMessage(std::move(msg));
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 std::string AppBase::handleRegister(ot::JsonDocument& _jsonDocument) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	std::string receiverUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 
-	m_receiverMutex.lock();
 	m_receiver.push_back(receiverUrl);
 #ifdef _DEBUG
 	std::cout << "New Receiver: " << receiverUrl << std::endl;
 #endif // _DEBUG
 
-	m_receiverMutex.unlock();
-
 	ot::JsonDocument doc(rapidjson::kArrayType);
-	for (auto msg : m_messages) {
+	for (ot::LogMessage& msg : m_messages) {
 		ot::JsonObject msgObj;
 		msg.addToJsonObject(msgObj, doc.GetAllocator());
 		doc.PushBack(msgObj, doc.GetAllocator());
@@ -108,9 +107,10 @@ std::string AppBase::handleRegister(ot::JsonDocument& _jsonDocument) {
 }
 
 std::string AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	std::string receiverUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
 	std::string ret = OT_ACTION_RETURN_VALUE_FAILED;
-	m_receiverMutex.lock();
 	auto it = std::find(m_receiver.begin(), m_receiver.end(), receiverUrl);
 	if (it != m_receiver.end()) {
 		m_receiver.erase(it);
@@ -119,25 +119,29 @@ std::string AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
 		std::cout << "Removed Receiver: " << receiverUrl << std::endl;
 #endif // _DEBUG
 	}
-	m_receiverMutex.unlock();
 	return ret;
 }
 
 std::string AppBase::handleClear(ot::JsonDocument& _jsonDocument) {
+	std::lock_guard<std::mutex> newMessageLock(m_newMessageMutex);
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	m_messages.clear();
 	m_count = 0;
 	m_receiver.clear();
+	m_newMessages.clear();
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 std::string AppBase::handleGetDebugInfo(ot::JsonDocument& _jsonDocument) {
+	std::lock_guard<std::mutex> newMessageLock(m_newMessageMutex);
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	ot::JsonDocument doc;
 	doc.AddMember("MessageCount", m_count, doc.GetAllocator());
-
-	m_receiverMutex.lock();
+	doc.AddMember("NewMessageCount", m_newMessages.size(), doc.GetAllocator());
 	doc.AddMember("Receivers", ot::JsonArray(m_receiver, doc.GetAllocator()), doc.GetAllocator());
-	m_receiverMutex.unlock();
 
 	return doc.toJson();
 }
@@ -218,54 +222,65 @@ void AppBase::updateBufferSizeFromLogFlags(const ot::LogFlags& _flags) {
 
 // Private: Helper
 
-void AppBase::appendLogMessage(const ot::LogMessage& _message) {
-	if (m_count >= m_bufferSize) {
-		m_messages.pop_front();
-	}
-	else {
-		m_count++;
-	}
+void AppBase::appendLogMessage(ot::LogMessage&& _message) {
+	std::lock_guard<std::mutex> lock(m_newMessageMutex);
 
-	m_messages.push_back(_message);
-	this->notifyListeners(_message);
+	m_newMessages.push_back(std::move(_message));
 }
 
-void AppBase::notifyListeners(const ot::LogMessage& _message) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Log, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonObject logObj;
-	_message.addToJsonObject(logObj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_LOG, logObj, doc.GetAllocator());
-	
-	std::string msg = doc.toJson();
-
-	m_receiverMutex.lock();
-	std::list<std::string> receiverList = m_receiver;
-	m_receiverMutex.unlock();
-
-	std::thread t(&AppBase::workerNotify, this, receiverList, msg);
-	t.detach();
-}
-
-void AppBase::workerNotify(std::list<std::string> _receiver, std::string _message) {
-	std::list<std::string> failed;
-	for (auto r : _receiver) {
-		std::string response;
-		if (!ot::msg::send("", r, ot::EXECUTE, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			failed.push_back(r);
+void AppBase::workerNotify() {
+	while (m_notifyThreadRunning) {
+		std::list<ot::LogMessage> messagesToSend;
+		{
+			std::lock_guard<std::mutex> newLock(m_newMessageMutex);
+			messagesToSend = std::move(m_newMessages);
+			m_newMessages.clear();
 		}
-		else if (response != OT_ACTION_RETURN_VALUE_OK) {
-			failed.push_back(r);
+
+		if (!messagesToSend.empty()) {
+			// Prepare the message to be sent
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Log, doc.GetAllocator()), doc.GetAllocator());
+
+			size_t newCount = 0;
+
+			ot::JsonArray messagesArray;
+			for (const ot::LogMessage& msg : messagesToSend) {
+				messagesArray.PushBack(ot::JsonObject(msg, doc.GetAllocator()), doc.GetAllocator());
+				newCount++;
+			}
+			doc.AddMember(OT_ACTION_PARAM_LOGS, messagesArray, doc.GetAllocator());
+			std::string msgStr = doc.toJson();
+
+			// Notify all receivers
+			std::list<std::string> failed;
+			std::lock_guard<std::mutex> mainLock(m_mutex);
+
+			for (auto& receiver : m_receiver) {
+				std::string response;
+				if (!ot::msg::send("", receiver, ot::EXECUTE, msgStr, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					failed.push_back(receiver);
+				}
+			}
+
+			// Add the new messages to the main message list
+			m_messages.splice(m_messages.end(), std::move(messagesToSend));
+			messagesToSend.clear();
+
+			m_count += newCount;
+
+			// Shrink buffer if necessary
+			while (m_count > m_bufferSize) {
+				m_messages.pop_front();
+				m_count--;
+			}
 		}
 	}
-	for (auto f : failed) {
-		removeReceiver(f);
-	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void AppBase::removeReceiver(const std::string& _receiver) {
-	m_receiverMutex.lock();
 	bool erased = true;
 	while (erased) {
 		erased = false;
@@ -281,8 +296,6 @@ void AppBase::removeReceiver(const std::string& _receiver) {
 #ifdef _DEBUG
 	std::cout << "Receiver removed: " << _receiver << std::endl;
 #endif // _DEBUG
-
-	m_receiverMutex.unlock();
 }
 
 void AppBase::resizeBuffer(void) {
@@ -295,10 +308,23 @@ void AppBase::resizeBuffer(void) {
 }
 
 AppBase::AppBase() 
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0), m_bufferSize(1000)
+	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0), m_bufferSize(1000), m_notifyThreadRunning(false)
 {
 	// Set this so the log dispatcher will not destroy the AppBase
 	this->setDeleteLogNotifierLater(true);
+
+	m_notifyThreadRunning = true;
+	m_notifyThread = new std::thread(&AppBase::workerNotify, this);
 }
 
-AppBase::~AppBase() {}
+AppBase::~AppBase() {
+	m_notifyThreadRunning = false;
+
+	if (m_notifyThread) {
+		if (m_notifyThread->joinable()) {
+			m_notifyThread->join();
+		}
+		delete m_notifyThread;
+		m_notifyThread = nullptr;
+	}
+}

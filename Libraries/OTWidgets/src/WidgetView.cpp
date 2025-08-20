@@ -107,6 +107,14 @@ bool ot::WidgetView::isCurrentViewTab(void) const {
 	return m_dockWidget->isCurrentTab();
 }
 
+void ot::WidgetView::getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const {
+	_object.AddMember("BaseData", JsonObject(m_data, _allocator), _allocator);
+	_object.AddMember("IsDeletedByManager", m_isDeletedByManager, _allocator);
+	_object.AddMember("IsPermanent", m_isPermanent, _allocator);
+	_object.AddMember("IsModified", m_isModified, _allocator);
+	_object.AddMember("VisualizingItems", JsonArray(m_visualizingItems.getSelectedNavigationItems(), _allocator), _allocator);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
@@ -130,9 +138,4 @@ void ot::WidgetView::slotToggleVisible(void) {
 
 void ot::WidgetView::slotPinnedChanged(bool _isPinned) {
 	Q_EMIT pinnedChanged(_isPinned);
-}
-
-void ot::WidgetView::slotTabPressed(void) {
-	this->setAsCurrentViewTab();
-	this->getViewDockWidget()->setFocus();
 }

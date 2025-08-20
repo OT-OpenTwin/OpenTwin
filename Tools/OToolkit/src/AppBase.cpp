@@ -249,13 +249,32 @@ void AppBase::slotProcessMessage(const QString& _json) {
 			std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 
 			if (action == OT_ACTION_CMD_Log) {
-				ot::ConstJsonObject logObj = ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG);
+				if (m_logger) {
+					std::list<ot::LogMessage> messages;
+					if (inboundAction.HasMember(OT_ACTION_PARAM_LOGS)) {
+						for (const ot::ConstJsonObject& logObj : ot::json::getObjectList(inboundAction, OT_ACTION_PARAM_LOGS)) {
+							ot::LogMessage msg;
+							msg.setFromJsonObject(logObj);
+							msg.setCurrentTimeAsGlobalSystemTime();
+							messages.push_back(msg);
+						}
+					}
+					else if (inboundAction.HasMember(OT_ACTION_PARAM_LOG)) {
+						ot::LogMessage msg;
+						msg.setFromJsonObject(ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG));
+						messages.push_back(msg);
+					}
+					
+					m_logger->appendLogMessages(messages);
+				}
+			}
+			else if (action == "DisplayData") {
+				std::string data = ot::json::getString(inboundAction, OT_ACTION_PARAM_Data);
 
-				ot::LogMessage msg;
-				msg.setFromJsonObject(logObj);
-				msg.setCurrentTimeAsGlobalSystemTime();
-
-				if (m_logger) m_logger->appendLogMessage(msg);
+				this->log("DisplayData Request", otoolkit::APIInterface::Information, QString::fromStdString(data));
+			}
+			else {
+				OT_LOG_E("Unknown action received \"" + action + "\"");
 			}
 		}
 		else {

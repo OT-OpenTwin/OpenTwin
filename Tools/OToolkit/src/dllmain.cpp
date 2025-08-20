@@ -58,27 +58,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	return TRUE;
 }
 
-class A {
-public:
-	virtual int foo(void) const { return 1; };
-};
-
-class B : public A {
-public:
-	int foo(void) const override { return 2; };
-};
-
-class C : public B {
-public:
-	int foo(void) const override { return 3; };
-};
-
 void mainApplicationThread()
 {
-
-	B b;
-	int x = b.foo();
-
 	try {
 		// Initialize seed
 		srand(time(0));
@@ -90,6 +71,8 @@ void mainApplicationThread()
 		// Initialize OpenTwin API
 		#ifdef OT_RELEASE_DEBUG
 			ot::LogDispatcher::initialize("Toolkit", true);
+		#else
+			ot::LogDispatcher::initialize("Toolkit", false);
 		#endif 
 		ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
 
@@ -194,8 +177,7 @@ extern "C"
 		}
 	}
 
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP)
-	{
+	_declspec(dllexport) const char *performAction(const char* _json, const char* _senderUrl) {
 		// Ensure the initialization process is done
 		while (otoolkit::intern::g_starting) {
 			using namespace std::chrono_literals;
@@ -205,7 +187,7 @@ extern "C"
 		try {
 			// Check if the received message was a ping message
 			ot::JsonDocument inboundAction;
-			inboundAction.fromJson(json);
+			inboundAction.fromJson(_json);
 			if (inboundAction.IsObject()) {
 				std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
 				if (action == OT_ACTION_CMD_Ping) {
@@ -214,7 +196,7 @@ extern "C"
 					return r;
 				}
 				else {
-					QMetaObject::invokeMethod(AppBase::instance(), "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(json)));
+					QMetaObject::invokeMethod(AppBase::instance(), "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(_json)));
 					char * r = new char[strlen(OT_ACTION_RETURN_VALUE_OK) + 1];
 					strcpy(r, OT_ACTION_RETURN_VALUE_OK);
 					return r;
@@ -239,23 +221,23 @@ extern "C"
 		return retval;
 	}
 
-	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderUrl)
-	{
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderUrl) {
 		return performAction(_json, _senderUrl);
 	}
 
-	_declspec(dllexport) const char *getServiceURL(void)
-	{
+	_declspec(dllexport) const char* performActionOneWayTLS(const char* _json, const char* _senderUrl) {
+		return performAction(_json, _senderUrl);
+	}
+
+	_declspec(dllexport) const char *getServiceURL() {
 		char *retVal = new char[otoolkit::intern::g_serviceURL.size() + 1];
 		strcpy(retVal, otoolkit::intern::g_serviceURL.c_str());
 
 		return retVal;
 	}
 
-	_declspec(dllexport) void deallocateData(const char * _data)
-	{
-		if (_data != nullptr)
-		{
+	_declspec(dllexport) void deallocateData(const char * _data) {
+		if (_data != nullptr) {
 			delete[] _data;
 		}
 	}

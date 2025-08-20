@@ -32,7 +32,16 @@ public:
 
 	static Application* instance(void);
 	
+	//api @security mTLS
+	//api @action OT_ACTION_CMD_MODEL_Delete
+	//api @brief Deletes a model.
+	//api @return An empty String.
 	OT_HANDLER(handleDeleteModel, Application, OT_ACTION_CMD_MODEL_Delete, ot::SECURE_MESSAGE_TYPES)
+		
+		//api @security mTLS
+		//api @action OT_ACTION_CMD_PROJ_Save
+		//api @brief Saves a project in the database.
+		//api @return In case of success will return an empty String. In case of error will return a String with prefix "Error: ".
 		OT_HANDLER(handleProjectSave, Application, OT_ACTION_CMD_PROJ_Save, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleItemRenamed, Application, OT_ACTION_CMD_MODEL_ItemRenamed, ot::SECURE_MESSAGE_TYPES)

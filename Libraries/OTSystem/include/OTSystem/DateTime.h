@@ -27,14 +27,21 @@ namespace ot {
         };
 
         //! @brief Returns the current time as a string with the given format.
+		//! @param _format Format of the timestamp string.
         static std::string currentTimestamp(DateFormat _format);
 
         //! @brief Current milliseconds since epoch.
         static int64_t msSinceEpoch();
 
 		//! @brief Converts milliseconds since epoch to a timestamp string.
+		//! @param _msecSinceEpoch Milliseconds since epoch to convert.
+		//! @param _format Format of the timestamp string.
         static std::string timestampFromMsec(int64_t _msecSinceEpoch, DateFormat _format);
 
+		//! @brief Converts a timestamp string to milliseconds since epoch.
+		//! @param _timestamp Timestamp string to convert.
+		//! @param _format Format of the timestamp string.
+		static int64_t timestampToMsec(const std::string& _timestamp, DateFormat _format);
     };
 
 }

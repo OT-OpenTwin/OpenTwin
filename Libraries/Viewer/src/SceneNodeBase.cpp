@@ -7,6 +7,8 @@
 
 #include "FrontendAPI.h"
 
+#include "OTCore/Logger.h"
+
 SceneNodeBase::~SceneNodeBase() {
 	// Remove visualiser before deleting to avoid access to visualiser during deletion
 	std::list<Visualiser*> visualisers = std::move(m_visualiser);
@@ -28,7 +30,48 @@ SceneNodeBase::~SceneNodeBase() {
 	}
 }
 
-ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::SelectionOrigin _selectionOrigin, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
+void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
+	_object.AddMember("TreeItemID", m_treeItemID, _allocator);
+	_object.AddMember("ModelEntityID", m_modelEntityID, _allocator);
+	_object.AddMember("Editable", m_editable, _allocator);
+	_object.AddMember("Visible", m_visible, _allocator);
+	_object.AddMember("Selected", m_selected, _allocator);
+	_object.AddMember("SelectionFromNavigationTree", m_selectionFromNavigationTree, _allocator);
+	_object.AddMember("Transparent", m_transparent, _allocator);
+	_object.AddMember("Wireframe", m_wireframe, _allocator);
+	_object.AddMember("Highlighted", m_highlighted, _allocator);
+	_object.AddMember("Offset", m_offset, _allocator);
+	_object.AddMember("SelectChildren", m_selectChildren, _allocator);
+	_object.AddMember("ManageVisibilityOfParent", m_manageVisibilityOfParent, _allocator);
+	_object.AddMember("ManageVisibilityOfChildren", m_manageVisibilityOfChildren, _allocator);
+	_object.AddMember("SelectionHandled", m_selectionHandled, _allocator);
+	_object.AddMember("Errors", ot::JsonString(m_errors, _allocator), _allocator);
+	if (m_parent) {
+		_object.AddMember("ParentName", ot::JsonString(m_parent->getName(), _allocator), _allocator);
+	}
+	else {
+		_object.AddMember("ParentName", ot::JsonNullValue(), _allocator);
+	}
+
+	ot::JsonArray childrenArr;
+	for (const SceneNodeBase* child : m_children) {
+		ot::JsonObject childObj;
+		child->getDebugInformation(childObj, _allocator);
+		childrenArr.PushBack(childObj, _allocator);
+	}
+	_object.AddMember("Children", childrenArr, _allocator);
+
+	ot::JsonArray visualizersArr;
+	for (const Visualiser* visualizer : m_visualiser) {
+		ot::JsonObject visualizerObj;
+		visualizer->getDebugInformation(visualizerObj, _allocator);
+		visualizersArr.PushBack(visualizerObj, _allocator);
+	}
+	_object.AddMember("Visualizers", visualizersArr, _allocator);
+}
+
+ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
@@ -40,9 +83,12 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 		VisualiserState state;
 		state.m_selected = _selected;
 		state.m_singleSelection = _singleSelection;
-		state.m_selectionOrigin = _selectionOrigin;
+		state.m_selectionData = _selectionData;
 		state.m_anyVisualiserHasFocus = false;
 		state.m_selectedNodes = _selectedNodes;
+
+		bool skipViewHandling = _selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier);
+		skipViewHandling |= _selectionData.isViewHandlingFlagSet(ot::ViewHandlingFlag::SkipViewHandling);
 
 		// Check if any visualiser has focus
 		for (Visualiser* visualiser : visualisers) {
@@ -66,15 +112,17 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, ot::Selec
 					// If the view is currently open and the entity is selected, we want to set the focus on the view
 					// We do not want to focus every visualiser, so if any visualiser has focus, we do not set the focus again
 					if (!state.m_anyVisualiserHasFocus) {
+						if (!skipViewHandling) {
+							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
+						}
 						
-						FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
-						FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
-
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 
 						state.m_anyVisualiserHasFocus = true;
 					}
 					
+					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, getName(), visualiser->getViewType());
+
 					// The visualizer may want to unhide/un-dim the visualisation
 					visualiser->showVisualisation(state);
 				}
@@ -126,7 +174,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		state.m_setFocus = false;
 		state.m_selected = true;
 		state.m_singleSelection = true;
-		state.m_selectionOrigin = ot::SelectionOrigin::User;
+		state.m_selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 		for (Visualiser* visualiser : allVisualiser)
 		{
 			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {

@@ -2026,11 +2026,14 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 				connectedEntityID = connectionCfg.getDestinationUid();
 			}
 			auto connectedEntity = entityMap.find(connectedEntityID);
-			assert(connectedEntity != entityMap.end());
-			EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
-			assert(connectedBlockEntity != nullptr);
-			connectedBlockEntity->RemoveConnection(connectionID);
-			entitiesMarkedForStorage.insert(connectedEntity->second);
+			if (connectedEntity != entityMap.end())
+			{
+				EntityBlock* connectedBlockEntity =	dynamic_cast<EntityBlock*>(connectedEntity->second);
+				assert(connectedBlockEntity != nullptr);
+				connectedBlockEntity->RemoveConnection(connectionID);
+				entitiesMarkedForStorage.insert(connectedEntity->second);
+			}
+			
 
 			//Check if the connection was also selected for removal
 			if (connectionsSelectedForRemovalByEntID.find(connectionEntity->getEntityID()) != connectionsSelectedForRemovalByEntID.end())
@@ -4538,6 +4541,24 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		if (oldEntity != nullptr)
 		{
 			removeFromDisplay.push_back(oldEntity->getEntityID());
+
+			EntityContainer*  oldContainer =	dynamic_cast<EntityContainer*>(oldEntity);
+			if (oldContainer != nullptr)
+			{
+				EntityContainer*  newContainer =	dynamic_cast<EntityContainer*>(newEntity);
+				assert(newContainer != nullptr);
+				for (EntityBase* child : oldContainer->getChildrenList())
+				{
+					newContainer->addChild(child);
+					child->setParent(newContainer);
+				}
+
+				for (EntityBase* child : newContainer->getChildrenList())
+				{
+					oldContainer->removeChild(child);
+				}
+			}
+
 			// Remove the entity from the entity map and also from the model state
 			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
 			delete oldEntity;

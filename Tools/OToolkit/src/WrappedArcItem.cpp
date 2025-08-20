@@ -174,7 +174,7 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::PenFCfg lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle(this->getLineStyle());
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
@@ -185,7 +185,7 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::PenFCfg lineStyle = this->getLineStyle();
+		ot::PenFCfg lineStyle(this->getLineStyle());
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}

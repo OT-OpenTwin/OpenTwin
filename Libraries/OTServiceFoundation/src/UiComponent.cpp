@@ -535,11 +535,10 @@ void ot::components::UiComponent::displayLogMessage(const LogMessage& _message) 
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayLogMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
-	JsonObject messageObject;
-	_message.addToJsonObject(messageObject, cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, messageObject, cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonObject(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	ot::msg::send("", this->getServiceURL(), ot::QUEUE, cmdDoc.toJson(), response, 0, ot::msg::NoRequestFlags);
 }
 
 void ot::components::UiComponent::displayErrorPrompt(const std::string& _message, const std::string& _detailedMessage) const {

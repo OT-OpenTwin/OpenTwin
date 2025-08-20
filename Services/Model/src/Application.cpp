@@ -983,10 +983,11 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
 	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-
+	bool suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+	
 	try
 	{
-		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities);
+		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities, suppressViewHandling);
 	}
 	catch (std::exception& e)
 	{

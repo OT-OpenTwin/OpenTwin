@@ -24,6 +24,7 @@
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerServiceGlobal.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/ReturnMessage.h"
@@ -102,6 +103,7 @@
 #include <iostream>
 
 #include "OTCore/EntityName.h"
+#include "CurveColourSetter.h"
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
@@ -184,7 +186,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_lockManager{ nullptr },
 	m_owner{ _owner },
 	m_prefetchingDataCompleted{ false },
-	m_servicesUiSetupCompleted(false)
+	m_servicesUiSetupCompleted(false),
+	m_bufferActions(false)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -447,7 +450,7 @@ bool ExternalServicesComponent::isCurrentModelModified(void) {
 void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, int _info1, int _info2) {
 	try {
 
-		if (_event == ak::etClicked || _event == ak::etEditingFinished)
+		if (_event & (ak::etClicked | ak::etEditingFinished))
 		{
 			auto receiver = this->getServiceFromNameType(m_controlsManager->objectCreator(_senderId));
 			
@@ -458,7 +461,7 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, AppBase::instance()->getViewerComponent()->getActiveDataModel(), doc.GetAllocator());
 				std::string response;
 
-				if (_event == ak::etEditingFinished)
+				if (_event & ak::etEditingFinished)
 				{
 					std::string editText = ak::uiAPI::niceLineEdit::text(_senderId).toStdString();
 					doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
@@ -1072,6 +1075,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 	AppBase * app{ AppBase::instance() };
 	try {
+		ot::BasicScopedBoolWrapper actionBuffer(m_bufferActions);
+
 		ot::LogDispatcher::instance().setProjectName(_projectName);
 
 		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
@@ -1295,6 +1300,9 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		uiLock.setNoUnlock();
 
 		OT_LOG_D("Open project completed");
+
+		// Process buffered actions
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
 		return true;
 	}
@@ -1535,19 +1543,9 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 // Slots
 
 char* ExternalServicesComponent::performAction(const char* json, const char* senderIP) {
-	using namespace std::chrono_literals;
-	static bool lock = false;
-
-	while (lock) {
-		std::this_thread::sleep_for(1ms);
-	}
-
-	lock = true;
-
-	char* retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::QUEUE);
-
-	lock = false;
-	
+	OT_LOG_E("Perform action requets are not supported by the frontend");
+	char* retval = new char[1];
+	retval[0] = '\0';
 	return retval;
 }
 
@@ -1568,7 +1566,7 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(const char* json, const char* senderIP) {
+void ExternalServicesComponent::queueAction(const char* _json, const char* _senderIP) {
 	using namespace std::chrono_literals;
 	static bool lock = false;
 
@@ -1581,16 +1579,35 @@ void ExternalServicesComponent::queueAction(const char* json, const char* sender
 
 	lock = true;
 
-	ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+	std::string json(_json);
 
-	delete[] senderIP;
-	senderIP = nullptr;
+	if (m_bufferActions) {
+		OT_LOG_D("Buffering request: " + json);
 
-	// Now notify the end of the currently processed message
-	if (m_websocket != nullptr) {
-		m_websocket->finishedProcessingQueuedMessage();
+		// If the buffer is enabled, we store the action in the buffer
+		m_actionBuffer.push_back(std::move(json));
+	}
+	else {
+		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+
+		// If there are still buffered actions, we process them now
+		while (!m_actionBuffer.empty() && !m_bufferActions) {
+			std::string action = m_actionBuffer.front();
+			m_actionBuffer.pop_front();
+			ot::ActionDispatcher::instance().dispatch(action, ot::QUEUE);
+		}
+
+		// Now notify the end of the currently processed message
+		if (m_websocket != nullptr) {
+			m_websocket->finishedProcessingQueuedMessage();
+		}
 	}
 
+	if (_senderIP) {
+		delete[] _senderIP;
+		_senderIP = nullptr;
+	}
+	
 	lock = false;
 }
 
@@ -3352,6 +3369,28 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocument& _document) {
+	std::string debugInfo = AppBase::instance()->getDebugInformation();
+
+	if (_document.HasMember(OT_ACTION_PARAM_SENDER_URL) && _document.HasMember(OT_ACTION_PARAM_CallbackAction)) {
+		std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+		std::string callbackAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+
+		ot::JsonDocument responseDoc;
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(callbackAction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_Data, ot::JsonString(debugInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		std::string response;
+		if (!ot::msg::send("", senderUrl, ot::EXECUTE_ONE_WAY_TLS, responseDoc.toJson(), response, 0, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send debug information response to \"" + senderUrl + "\"");
+		}
+		else {
+			OT_LOG_T("Debug information send to \"" + senderUrl + "\"");
+		}
+	}
+	else {
+		AppBase::instance()->appendInfoMessage("Debug Information:\n" + QString::fromStdString(debugInfo));
+		OT_LOG_I(debugInfo);
+	}
 
 	return "";
 }
@@ -3471,10 +3510,22 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
 	}
 
+	bool suppressViewHandling = false;
+	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
+		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+	}
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+	}
+
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualizingEntities);
+
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+	}
 
 	return "";
 }
@@ -3620,6 +3671,15 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
 	}
 
+	bool suppressViewHandling = false;
+	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
+		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+	}
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(plotConfig, info, insertFlags, visualizingEntities);
 	ot::Plot* plot = plotView->getPlot();
 
@@ -3712,7 +3772,7 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	}
 	else
 	{
-		const ot::Plot1DCfg& oldConfig = plot->getPlot()->getConfiguration();
+		const ot::Plot1DCfg& oldConfig = plot->getConfig();
 		if (plotConfig.getXLabelAxisAutoDetermine())
 		{
 			plotConfig.setAxisLabelX(oldConfig.getAxisLabelX());
@@ -3727,6 +3787,10 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	plot->refresh();
 	plot->resetView();
 	
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+	}
+
 	// Lastly we notify the scene nodes that they have a state change to view opened.
 	const auto& viewerType = plotView->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
@@ -3751,7 +3815,7 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 		ot::Plot* plot = plotView->getPlot();
 		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
-
+		CurveColourSetter colourSetter(config);
 		for (ot::PlotDataset* dataSet : allDatasets) {
 			if (dataSet->getEntityName() == config.getEntityName()) {
 				const std::string curveNameBase =  dataSet->getCurveNameBase();
@@ -3762,11 +3826,15 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 				std::string curveTitle = dataSet->getConfig().getTitle();
 				
 				curveTitle = ot::String::replace(curveTitle, curveNameBase, newNameShort);
-
-				ot::Plot1DCurveCfg curveCfg = dataSet->getConfig();
-				curveCfg.setTitle(curveTitle);
 				
-				dataSet->setConfig(curveCfg);
+				config.setTitle(curveTitle);
+				
+				//if a rainbow painter is not set yet, it may have been newly set. In that case we need to iterate the colours.
+				bool datasetHasDingleDatapoint = dataSet->getPlotData().getDataX().size() == 1;
+				colourSetter.setPainter(config, datasetHasDingleDatapoint);
+				
+
+				dataSet->setConfig(config);
 				dataSet->setCurveNameBase(newNameShort);
 
 				dataSet->updateCurveVisualization();
@@ -3798,10 +3866,19 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
-
+	
 	ot::UIDList visualizingEntities;
 	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
 		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
+	}
+
+	bool suppressViewHandling = false;
+	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
+		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+	}
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName(), visualizingEntities);
@@ -3814,6 +3891,10 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	}
 	else {
 		editor = AppBase::instance()->createNewTextEditor(config, info, insertFlags, visualizingEntities);
+	}
+
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
 
 	editor->getTextEditor()->setContentSaved();
@@ -3886,14 +3967,22 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	if (_document.HasMember(OT_ACTION_PARAM_KeepCurrentEntitySelection)) {
 		keepCurrentEntitySelection = ot::json::getBool(_document, OT_ACTION_PARAM_KeepCurrentEntitySelection);
 	}
+	bool suppressViewHandling = false;
+	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
+		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+	}
+	ot::ViewHandlingFlags viewHandlingFlags = AppBase::instance()->getViewHandlingFlags();
+	if (keepCurrentEntitySelection) {
+		AppBase::instance()->setViewHandlingFlags(viewHandlingFlags | ot::ViewHandlingFlag::SkipEntitySelection);
+	}
+
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
 
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	AppBase::ViewHandlingFlags viewHandlingFlags = AppBase::instance()->getViewHandlingConfigFlags();
-	if (keepCurrentEntitySelection) {
-		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags | AppBase::ViewHandlingConfig::SkipEntitySelection);
-	}
 
 	ot::UIDList visualizingEntities;
 	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
@@ -3912,7 +4001,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		table->getTable()->setContentChanged(false);
 	}
 	
-	AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags);
+	AppBase::instance()->setViewHandlingFlags(viewHandlingFlags);
+
+	if (suppressViewHandling) {
+		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
+	}
 
 	const std::string& name = table->getViewData().getEntityName();
 	const auto& viewerType = table->getViewData().getViewType();
@@ -4405,6 +4498,16 @@ void ExternalServicesComponent::keepAlive()
 		std::string response;
 		sendToModelService(ping, response);
 	}
+}
+
+void ExternalServicesComponent::slotProcessActionBuffer() {
+	if (m_bufferActions || m_actionBuffer.empty()) {
+		return;
+	}
+
+	std::string action = m_actionBuffer.front();
+	m_actionBuffer.pop_front();
+	this->queueAction(action.c_str(), nullptr);
 }
 
 // ###################################################################################################

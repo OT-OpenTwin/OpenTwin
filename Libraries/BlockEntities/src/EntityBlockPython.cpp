@@ -111,9 +111,11 @@ void EntityBlockPython::resetBlockRelatedAttributes()
 	for (auto& property : allProperties)
 	{
 		const std::string propertyName = property->getName();
+		const std::string propertyGroupName = property->getGroup();
+
 		if (propertyName != _propertyNameScripts)
 		{
-			getProperties().deleteProperty(propertyName);
+			getProperties().deleteProperty(propertyName, propertyGroupName);
 		}
 	}
 	

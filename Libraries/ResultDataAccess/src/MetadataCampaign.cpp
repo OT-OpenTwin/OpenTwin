@@ -52,6 +52,59 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 	}
 }
 
+std::map<std::string, MetadataParameter*> MetadataCampaign::extractParameter()
+{
+	std::map<std::string, MetadataParameter*> pipelineCampaignParametersByLabel;
+	for (const MetadataSeries& pipelineSeries : getSeriesMetadata())
+	{
+		for (const MetadataParameter& pipelineParameter : pipelineSeries.getParameter())
+		{
+			auto pipelineCampaignParameterByLabel = pipelineCampaignParametersByLabel.find(pipelineParameter.parameterLabel);
+			if (pipelineCampaignParameterByLabel == pipelineCampaignParametersByLabel.end())
+			{
+				pipelineCampaignParametersByLabel[pipelineParameter.parameterLabel] = const_cast<MetadataParameter*>(&pipelineParameter);
+			}
+			else
+			{
+				//Label should be unique
+				if (*pipelineCampaignParameterByLabel->second != pipelineParameter)
+				{
+					throw std::exception(("Incosistent parameter with the same label detected: " + pipelineParameter.parameterLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
+				}
+			}
+		}
+	}
+
+	return pipelineCampaignParametersByLabel;
+}
+
+std::map<std::string, MetadataQuantity*> MetadataCampaign::extractQuantity()
+{
+	std::map<std::string, MetadataQuantity*> pipelineCampaignQuantitiesByLabel;
+
+	for (const MetadataSeries& pipelineSeries : getSeriesMetadata())
+	{
+
+		for (const MetadataQuantity& pipelineQuantity : pipelineSeries.getQuantities())
+		{
+			auto pipelineCampaignQuantityByLabel = pipelineCampaignQuantitiesByLabel.find(pipelineQuantity.quantityLabel);
+			if (pipelineCampaignQuantityByLabel == pipelineCampaignQuantitiesByLabel.end())
+			{
+				pipelineCampaignQuantitiesByLabel[pipelineQuantity.quantityLabel] = const_cast<MetadataQuantity*>(&pipelineQuantity);
+			}
+			else
+			{
+				//Label should be unique
+				if (*pipelineCampaignQuantityByLabel->second != pipelineQuantity)
+				{
+					throw std::exception(("Incosistent quantity with the same label detected: " + pipelineQuantity.quantityLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
+				}
+			}
+		}
+	}
+	return pipelineCampaignQuantitiesByLabel;
+}
+
 
 void MetadataCampaign::reset()
 {
@@ -61,3 +114,32 @@ void MetadataCampaign::reset()
 	m_metaData.clear();
 }
 
+void MetadataCampaign::setFromJsonObject(const ot::ConstJsonObject& _object)
+{
+	m_campaignName = ot::json::getString(_object, "Name");
+
+	ot::ConstJsonArray allSeries = ot::json::getArray(_object, "series");
+	for (rapidjson::SizeType i = 0; i < allSeries.Size(); i++)
+	{
+		MetadataSeries series;
+		series.setFromJsonObject(ot::json::getObject(allSeries, i));
+		m_seriesMetadata.push_back(series);
+	}
+	m_quantityOverviewByLabel =	extractQuantity();
+	m_parameterOverviewByLabel = extractParameter();
+}
+
+void MetadataCampaign::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+{
+
+	_object.AddMember("Name", ot::JsonString(m_campaignName, _allocator), _allocator);
+
+	ot::JsonArray allSeries;
+	for (const MetadataSeries& series : m_seriesMetadata)
+	{
+		ot::JsonObject object;
+		series.addToJsonObject(object, _allocator);
+		allSeries.PushBack(object, _allocator);
+	}
+	_object.AddMember("series", allSeries, _allocator);
+}

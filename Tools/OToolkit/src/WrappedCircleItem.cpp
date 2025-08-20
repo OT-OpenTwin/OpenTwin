@@ -115,7 +115,7 @@ void WrappedCircleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::PenFCfg lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle(this->getOutline());
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setOutline(lineStyle);
 	}
@@ -126,7 +126,7 @@ void WrappedCircleItem::propertyChanged(const ot::Property* _property) {
 			return;
 		}
 
-		ot::PenFCfg lineStyle = this->getOutline();
+		ot::PenFCfg lineStyle(this->getOutline());
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setOutline(lineStyle);
 	}

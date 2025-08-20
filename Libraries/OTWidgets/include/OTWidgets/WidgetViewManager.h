@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
@@ -209,6 +210,8 @@ namespace ot {
 		WidgetView* getLastFocusedToolView() const { return m_focusInfo.lastTool; };
 		WidgetView* getLastFocusedCentralView() const { return m_focusInfo.lastCentral; };
 
+		void getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const;
+
 	Q_SIGNALS:
 		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
 		void viewCloseRequested(WidgetView* _view);
@@ -246,6 +249,7 @@ namespace ot {
 			WidgetViewBase::ViewFlags flags;
 			SelectionInformation activeSelection;
 			bool ignoreCurrent;
+			std::list<WidgetView*> viewsToClose; //! @brief Views that are currently in the process of being closed.
 		};
 
 		WidgetViewManager();

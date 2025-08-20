@@ -14,9 +14,10 @@
 #include "OTCommunication/ActionHandler.h"
 
 // std header
+#include <list>
 #include <mutex>
 #include <string>
-#include <list>
+#include <thread>
 
 class AppBase : public ot::ServiceBase, public ot::AbstractLogNotifier {
 	OT_DECL_NOCOPY(AppBase)
@@ -48,23 +49,26 @@ public:
 	void updateBufferSizeFromLogFlags(const ot::LogFlags& _flags);
 
 private:
-	void appendLogMessage(const ot::LogMessage& _message);
+	void appendLogMessage(ot::LogMessage&& _message);
 
-	void notifyListeners(const ot::LogMessage& _message);
-
-	void workerNotify(std::list<std::string> _receiver, std::string _message);
+	void workerNotify();
 
 	void removeReceiver(const std::string& _receiver);
 
 	void resizeBuffer(void);
 
-	size_t						m_bufferSize;
+	std::mutex                  m_newMessageMutex;
+	std::list<ot::LogMessage>   m_newMessages;
 
+	std::mutex					m_mutex;
+	std::thread*                m_notifyThread;
+	std::atomic_bool            m_notifyThreadRunning;
+
+	size_t						m_bufferSize;
 	std::list<ot::LogMessage>	m_messages;
 	size_t						m_count;
 
 	std::list<std::string>		m_receiver;
-	std::mutex					m_receiverMutex;
 
 	AppBase();
 	virtual ~AppBase();

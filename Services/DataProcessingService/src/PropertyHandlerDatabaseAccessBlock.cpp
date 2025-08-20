@@ -70,7 +70,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 			parameterList = dependingParameterLables;
 		}
 
-		int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+		int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
 		for (int32_t i = 1; i <= numberOfQueries; i++)
 		{
 			auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
@@ -95,7 +95,7 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 
 	//Now we update all parameter overviews and the labels of the parameter
 
-	int32_t numberOfQueries = _dbAccessEntity->getMaxNumberOfQueries();
+	int32_t numberOfQueries = _dbAccessEntity->getSelectedNumberOfQueries();
 	for (int32_t i = 1; i <= numberOfQueries; i++)
 	{
 		auto queryValueCharacteristics = _dbAccessEntity->getQueryValueCharacteristics(i);
@@ -141,25 +141,34 @@ void PropertyHandlerDatabaseAccessBlock::updateSelectionIfNecessary(std::list<st
 {
 	const std::vector<std::string>& optionsSeries = _selection->getOptions();
 	std::list<std::string> optionsSeriesList{ optionsSeries.begin(),optionsSeries.end() };
+	EntityPropertiesSelection* newSelection = dynamic_cast<EntityPropertiesSelection*>(_selection->createCopy());
 	if (optionsSeriesList != _valuesInProject)
 	{
-		EntityPropertiesSelection* newSelection = dynamic_cast<EntityPropertiesSelection*>(_selection->createCopy());
 		newSelection->resetOptions(_valuesInProject);
+	}
+	
+	if (_selection->getValue() != m_selectedValueNone)
+	{
 		if (_valuesInProject.empty())
 		{
-			newSelection->setValue("");
+			newSelection->setValue(m_selectedValueNone);
 		}
 		else
 		{
-			const std::string selectedValue = newSelection->getValue();
+			const std::string selectedValue = _selection->getValue();
 			auto selectedValueInSelectedProject = std::find(_valuesInProject.begin(), _valuesInProject.end(), selectedValue);
 			if (selectedValueInSelectedProject == _valuesInProject.end() || selectedValue == "")
 			{
 				newSelection->setValue(*_valuesInProject.begin());
 			}
+			else
+			{
+				newSelection->setValue(_selection->getValue());
+			}
 		}
-		_properties.createProperty(newSelection, newSelection->getGroup());
 	}
+
+	_properties.createProperty(newSelection, newSelection->getGroup());
 }
 
 std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNecessary(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity, ResultCollectionMetadataAccess* _resultCollectionAccess, EntityProperties& _properties)
@@ -167,77 +176,72 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 	auto quantityValueCharacteristic = _dbAccessEntity->getQuantityValueCharacteristic();
 	const std::string& selectedQuantityLabel = quantityValueCharacteristic.m_label->getValue();
 	
-	//If a quantity is selected we need to check for matching labels
+	//If a quantity is selected we need to check for matching labels and if the name is still valid for project
 	if (selectedQuantityLabel != m_selectedValueNone)
 	{
 		//If a quantity is selected, we need to check if it is still a valid one for the selected campaign.
 		const MetadataQuantity* quantity = _resultCollectionAccess->findMetadataQuantity(selectedQuantityLabel);
+		
+		//Quantity of the selected name does not exist in the 
 		if (quantity == nullptr)
 		{
-			//Reset selected quantity label if necessary
-			if (quantityValueCharacteristic.m_label->getValue() != m_selectedValueNone)
+			std::list<std::string> emptyList{};
+			
+			resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
+			auto valueDescriptionSelection = _dbAccessEntity->getQuantityValueDescriptionSelection();
+			updateSelectionIfNecessary(emptyList, valueDescriptionSelection, _properties);
+
+			return std::list<std::string>();			
+		}
+		else
+		{
+			//Here the selected quantity exists in the currently selected project. But maybe we need to adjust the other fields
+			//First the value  descritpions
+			EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
+			std::list<std::string> valueDescriptionLabels;
+			const auto& quantityValueDescriptions = quantity->valueDescriptions;
+			for (const auto& quantityValueDescription : quantityValueDescriptions)
 			{
-				EntityPropertiesSelection* newLabelProperty = dynamic_cast<EntityPropertiesSelection*>(quantityValueCharacteristic.m_label->createCopy());
-				assert(newLabelProperty != nullptr);
-				newLabelProperty->setValue(m_selectedValueNone);
-				_properties.createProperty(newLabelProperty, newLabelProperty->getGroup());
+				valueDescriptionLabels.push_back(quantityValueDescription.quantityValueLabel);
+			}
+
+			updateSelectionIfNecessary(valueDescriptionLabels, selectionQuantityValDescr, _properties);
+			//Update selection if necessary may keeps the value == "" if "" was selected before. However, here we want always one type selected.
+			EntityPropertiesBase* newSelectionQuantityValDescrBase = _properties.getProperty(selectionQuantityValDescr->getName(), selectionQuantityValDescr->getGroup());
+			if (newSelectionQuantityValDescrBase != nullptr)
+			{
+				EntityPropertiesSelection* newSelectionQuantityValDescr = dynamic_cast<EntityPropertiesSelection*>(newSelectionQuantityValDescrBase);
+				if (newSelectionQuantityValDescr->getValue() == m_selectedValueNone)
+				{
+					newSelectionQuantityValDescr->setValue(newSelectionQuantityValDescr->getOptions().front());
+				}
+				const std::string selectedQuantityValDescription = newSelectionQuantityValDescr->getValue();
+				
+				for (auto& valueDescription : quantity->valueDescriptions)
+				{
+					
+					if (valueDescription.quantityValueName == selectedQuantityValDescription)
+					{
+						const std::string selectedType = valueDescription.dataTypeName;
+						updateIfNecessaryValueCharacteristicLabelDataType(quantityValueCharacteristic,selectedType, _properties);
+						const std::string selectedUnit = valueDescription.unit;
+						updateIfNecessaryValueCharacteristicLabelUnit(quantityValueCharacteristic,selectedUnit,_properties);
+					}
+				}
 			}
 			
-			//Reset all labels, if necessary
-			resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
 
-			//Reset value description selection
-			EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
-			std::list<std::string> emptyList{ };
-			updateSelectionIfNecessary(emptyList, selectionQuantityValDescr, _properties);
-			return std::list<std::string>();
-		}
-
-		//First we extract all parameter labels that shall be shown in relation to the selected quantity.
-		const auto& dependingParameterIDs = quantity->dependingParameterIds;
-		std::list<std::string> dependingParameterLables;
-		for (ot::UID parameterID : dependingParameterIDs)
-		{
-			const MetadataParameter* parameter = _resultCollectionAccess->findMetadataParameter(parameterID);
-			dependingParameterLables.push_back(parameter->parameterLabel);
-		}
-
-		//Now we check if the options of value descriptions is still up-to-date and the selected labels need to be updated
-		EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
-		const std::string& selectedQuantityValDescr = selectionQuantityValDescr->getValue();
-		const auto& quantityValueDescriptions = quantity->valueDescriptions;
-		std::string expectedUnit(""), expectedDataType("");
-		std::list<std::string> valueDescriptionLabels;
-		for (const auto& quantityValueDescription : quantityValueDescriptions)
-		{
-			if (quantityValueDescription.quantityValueLabel == selectedQuantityValDescr)
+			//Lastly we extract all parameter labels that shall be shown in relation to the selected quantity.
+			const auto& dependingParameterIDs = quantity->dependingParameterIds;
+			std::list<std::string> dependingParameterLables;
+			for (ot::UID parameterID : dependingParameterIDs)
 			{
-				expectedUnit = quantityValueDescription.unit;
-				expectedDataType = quantityValueDescription.dataTypeName;
+				const MetadataParameter* parameter = _resultCollectionAccess->findMetadataParameter(parameterID);
+				dependingParameterLables.push_back(parameter->parameterLabel);
 			}
-			valueDescriptionLabels.push_back(quantityValueDescription.quantityValueLabel);
-		}
-		updateSelectionIfNecessary(valueDescriptionLabels, selectionQuantityValDescr, _properties);
-		
-		
-		const std::string selectedType = quantityValueCharacteristic.m_dataType->getValue();
-		if (expectedDataType != selectedType)
-		{
-			EntityPropertiesString* newDataTypeProperty = dynamic_cast<EntityPropertiesString*>(quantityValueCharacteristic.m_dataType->createCopy());
-			assert(newDataTypeProperty != nullptr);
-			newDataTypeProperty->setValue(expectedDataType);
-			_properties.createProperty(newDataTypeProperty, newDataTypeProperty->getGroup());
-		}
+			return dependingParameterLables;
 
-		const std::string selectedUnit = quantityValueCharacteristic.m_unit->getValue();
-		if (expectedUnit != selectedUnit)
-		{
-			EntityPropertiesString* newUnitProperty = dynamic_cast<EntityPropertiesString*>(quantityValueCharacteristic.m_unit->createCopy());
-			assert(newUnitProperty != nullptr);
-			newUnitProperty->setValue(expectedUnit);
-			_properties.createProperty(newUnitProperty, newUnitProperty->getGroup());
-		}
-		return dependingParameterLables;
+		}		
 	}
 	else
 	{
@@ -270,26 +274,11 @@ void PropertyHandlerDatabaseAccessBlock::updateParameterIfNecessary(const Result
 		else
 		{
 			const std::string& expectedType = parameter->typeName;
-			const std::string & selectedType = _selectedProperties.m_dataType->getValue();
-			//Update data type property if necessary
-			if (expectedType != selectedType)
-			{
-				EntityPropertiesString* newDataTypeProperty = dynamic_cast<EntityPropertiesString*>(_selectedProperties.m_dataType->createCopy());
-				assert(newDataTypeProperty != nullptr);
-				newDataTypeProperty->setValue(expectedType);
-				_properties.createProperty(newDataTypeProperty, newDataTypeProperty->getGroup());
-			}
-
+			updateIfNecessaryValueCharacteristicLabelDataType(_selectedProperties, expectedType, _properties);
+			
 			//Update unit property if necessary
 			const std::string& expectedUnit = parameter->unit;
-			const std::string & selectedUnit = _selectedProperties.m_unit->getValue();
-			if(expectedUnit != selectedUnit)	
-			{
-				EntityPropertiesString* newDataTypeProperty = dynamic_cast<EntityPropertiesString*>(_selectedProperties.m_unit->createCopy());
-				assert(newDataTypeProperty != nullptr);
-				newDataTypeProperty->setValue(expectedUnit);
-				_properties.createProperty(newDataTypeProperty, newDataTypeProperty->getGroup());
-			}
+			updateIfNecessaryValueCharacteristicLabelUnit(_selectedProperties, expectedUnit, _properties);
 		}
 	}
 	else
@@ -328,6 +317,30 @@ void PropertyHandlerDatabaseAccessBlock::resetValueCharacteristicLabelDataType(c
 	assert(newDataTypeProperty != nullptr);
 	newDataTypeProperty->setValue(m_selectedValueNone);
 	_properties.createProperty(newDataTypeProperty, newDataTypeProperty->getGroup());
+}
+
+void PropertyHandlerDatabaseAccessBlock::updateIfNecessaryValueCharacteristicLabelUnit(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue,  EntityProperties& _properties)
+{
+	const std::string selectedUnit = _selectedProperties.m_unit->getValue();
+	if (selectedUnit != _expectedValue)
+	{
+		EntityPropertiesString* newUnitProperty = dynamic_cast<EntityPropertiesString*>(_selectedProperties.m_unit->createCopy());
+		assert(newUnitProperty != nullptr);
+		newUnitProperty->setValue(_expectedValue);
+		_properties.createProperty(newUnitProperty, newUnitProperty->getGroup());
+	}
+}
+
+void PropertyHandlerDatabaseAccessBlock::updateIfNecessaryValueCharacteristicLabelDataType(const ValueCharacteristicProperties& _selectedProperties, const std::string& _expectedValue, EntityProperties& _properties)
+{
+	const std::string selectedDataType = _selectedProperties.m_dataType->getValue();
+	if (selectedDataType != _expectedValue)
+	{
+		EntityPropertiesString* newDTProperty = dynamic_cast<EntityPropertiesString*>(_selectedProperties.m_dataType->createCopy());
+		assert(newDTProperty != nullptr);
+		newDTProperty->setValue(_expectedValue);
+		_properties.createProperty(newDTProperty, newDTProperty->getGroup());
+	}
 }
 
 void PropertyHandlerDatabaseAccessBlock::requestPropertyUpdate(ot::UIDList entityIDs, const std::string& propertiesAsJSON)

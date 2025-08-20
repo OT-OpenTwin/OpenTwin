@@ -62,7 +62,7 @@ bool BlockHandlerStorage::executeSpecialized()
 		const auto modelComponent = Application::instance()->modelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
 		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
-		resultCollectionExtender.setSaveModel(!m_createPlot);
+		resultCollectionExtender.setSaveModel(!m_createPlot); //If a plot shall be added as well, we create more entities later on.
 
 		ot::JSONToVariableConverter converter;
 		for (const std::string portName : m_allDataInputs)
@@ -73,9 +73,9 @@ bool BlockHandlerStorage::executeSpecialized()
 			auto pipelineByName = m_dataPerPort.find(portName);
 			PipelineData* dataPipeline = pipelineByName->second;
 
-			const MetadataCampaign* campaign = dataPipeline->getMetadataCampaign();
-			const std::map <std::string, MetadataQuantity*>& campaignQuantitiesByLabel = campaign->getMetadataQuantitiesByLabel();
-			const std::map<std::string, MetadataParameter*>& campaignParametersByLabel = campaign->getMetadataParameterByLabel();
+			const MetadataCampaign* pipelineCampaign = dataPipeline->getMetadataCampaign();
+			auto pipelineCampaignQuantitiesByLabel = pipelineCampaign->getMetadataQuantitiesByLabel();
+			auto pipelineCampaignParametersByLabel = pipelineCampaign->getMetadataParameterByLabel();
 
 			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
 			std::map < std::string, MetadataParameter> occurringParametersByLabel;
@@ -95,117 +95,125 @@ bool BlockHandlerStorage::executeSpecialized()
 						{
 							const std::string key = field.name.GetString();
 							const ot::JsonValue& fieldValue = field.value;
-
-							auto quantityByLabel = campaignQuantitiesByLabel.find(key);
-							if (quantityByLabel != campaignQuantitiesByLabel.end())
-							{
-								auto datasetDescription = datasetDescriptionByQuantityLabel.find(key);
-								MetadataQuantity* quantity = quantityByLabel->second;
-								if (datasetDescription == datasetDescriptionByQuantityLabel.end())
+								auto pipelineQuantityByLabel = pipelineCampaignQuantitiesByLabel.find(key);
+								if (pipelineQuantityByLabel != pipelineCampaignQuantitiesByLabel.end())
 								{
-									DatasetDescription newDatasetDescription;
-									std::unique_ptr<QuantityDescription> quantityDescription;
-									if (quantity->dataDimensions.size() > 1) // We got a matrix
+									auto datasetDescription = datasetDescriptionByQuantityLabel.find(key);
+									MetadataQuantity* pipelineQuantity = pipelineQuantityByLabel->second;
+									if (datasetDescription == datasetDescriptionByQuantityLabel.end())
 									{
-										ot::MatrixEntryPointer matrixDimensions;
-										matrixDimensions.m_row = quantity->dataDimensions[0];
-										matrixDimensions.m_column= quantity->dataDimensions[1];
-
-										quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
-									}
-									else
-									{
-										quantityDescription.reset(new QuantityDescriptionCurve());
-
-									}
-
-									quantityDescription->setMetadataQuantity(*quantity);
-									//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
-									quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
-									quantityDescription->getMetadataQuantity().quantityIndex = 0;
-									for (auto& valueDescription : quantityDescription->getMetadataQuantity().valueDescriptions)
-									{
-										valueDescription.quantityIndex = 0;
-									}
-									newDatasetDescription.setQuantityDescription(quantityDescription.release());
-									datasetDescriptionByQuantityLabel[key] = std::move(newDatasetDescription);
-									datasetDescription = datasetDescriptionByQuantityLabel.find(key);
-								}
-								
-								const std::string& dataType = quantity->valueDescriptions.begin()->dataTypeName;
-								if (quantity->dataDimensions.size() > 1) // Here the data is a matrix
-								{
-									QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
-									ot::MatrixEntryPointer matrixDimensions;
-									matrixDimensions.m_row = quantity->dataDimensions[0];
-									matrixDimensions.m_column = quantity->dataDimensions[1];
-
-									ot::GenericDataStructMatrix matrixValues(matrixDimensions);
-									ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
-									std::list<ot::Variable> values;
-									for (auto& entry : linearMatrix)
-									{
-										if (dataType != "")
+										DatasetDescription newDatasetDescription;
+										std::unique_ptr<QuantityDescription> quantityDescription;
+										if (pipelineQuantity->dataDimensions.size() > 1) // We got a matrix
 										{
-											const ot::Variable value = converter(entry, dataType);
-											values.push_back(value);
+											ot::MatrixEntryPointer matrixDimensions;
+											matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
+											matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
+
+											quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
 										}
 										else
 										{
-											const ot::Variable value = converter(entry);
-											values.push_back(value);
+											quantityDescription.reset(new QuantityDescriptionCurve());
+
+										}
+
+										quantityDescription->setMetadataQuantity(*pipelineQuantity);
+										//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
+										quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
+										quantityDescription->getMetadataQuantity().quantityIndex = 0;
+										for (auto& valueDescription : quantityDescription->getMetadataQuantity().valueDescriptions)
+										{
+											valueDescription.quantityIndex = 0;
+										}
+										newDatasetDescription.setQuantityDescription(quantityDescription.release());
+										datasetDescriptionByQuantityLabel[key] = std::move(newDatasetDescription);
+										datasetDescription = datasetDescriptionByQuantityLabel.find(key);
+									}
+
+									const std::string& dataType = pipelineQuantity->valueDescriptions.begin()->dataTypeName;
+									if (pipelineQuantity->dataDimensions.size() > 1) // Here the data is a matrix
+									{
+										QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
+										ot::MatrixEntryPointer matrixDimensions;
+										matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
+										matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
+
+										ot::GenericDataStructMatrix matrixValues(matrixDimensions);
+										ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
+										std::list<ot::Variable> values;
+										for (auto& matrixEntry : linearMatrix)
+										{
+											if (dataType != "")
+											{
+												if (!ot::JSONToVariableConverter::typeIsCompatible(matrixEntry, dataType))
+												{
+													throw std::exception(("The data type of: " + key + " is inconsistent with the data type mentioned in its metadata.").c_str());
+												}
+												const ot::Variable value = converter(matrixEntry, dataType);
+												values.push_back(value);
+											}
+											else
+											{
+												const ot::Variable value = converter(matrixEntry);
+												values.push_back(value);
+											}
+										}
+										matrixValues.setValues(values);
+										matrix->addToValues(matrixValues);
+									}
+									else
+									{
+										QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
+										if (dataType != "")
+										{
+											if (!ot::JSONToVariableConverter::typeIsCompatible(fieldValue, dataType))
+											{
+												throw std::exception(("The data type of: " + key + " is inconsistent with the data type mentioned in its metadata.").c_str());
+											}
+											ot::Variable value = converter(fieldValue, dataType);
+											curve->addDatapoint(std::move(value));
+										}
+										else
+										{
+											ot::Variable value = converter(fieldValue);
+											curve->addDatapoint(std::move(value));
 										}
 									}
-									matrixValues.setValues(values);
-									matrix->addToValues(matrixValues);
 								}
 								else
 								{
-									QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
-									if (dataType != "")
+									auto occurringParameterByLabel = occurringParametersByLabel.find(key);
+									if (occurringParameterByLabel == occurringParametersByLabel.end())
 									{
-										ot::Variable value = converter(fieldValue, dataType);
-										curve->addDatapoint(std::move(value));
+										auto campaignParameterByLabel = pipelineCampaignParametersByLabel.find(key);
+										if (campaignParameterByLabel == pipelineCampaignParametersByLabel.end())
+										{
+											//Error case
+											assert(false);
+										}
+										else
+										{
+											MetadataParameter campaignParameter = *campaignParameterByLabel->second;
+											campaignParameter.values.clear();
+											occurringParametersByLabel[key] = std::move(campaignParameter);
+											occurringParameterByLabel = occurringParametersByLabel.find(key);
+										}
 									}
-									else
-									{
-										ot::Variable value = converter(fieldValue);
-										curve->addDatapoint(std::move(value));
-									}
-								}
-							}
-							else
-							{
-								auto occurringParameterByLabel = occurringParametersByLabel.find(key);
-								if (occurringParameterByLabel == occurringParametersByLabel.end())
-								{
-									auto campaignParameterByLabel = campaignParametersByLabel.find(key);
-									if (campaignParameterByLabel == campaignParametersByLabel.end())
-									{
-										//Error case
-										assert(false);
-									}
-									else
-									{
-										MetadataParameter campaignParameter= *campaignParameterByLabel->second;
-										campaignParameter.values.clear();
-										occurringParametersByLabel[key] = std::move(campaignParameter);
-										occurringParameterByLabel = occurringParametersByLabel.find(key);
-									}
-								}
 
-								MetadataParameter& param = occurringParameterByLabel->second;
-								const std::string typeName = param.typeName;
-								if (typeName != "")
-								{
-									param.values.push_back(converter(fieldValue, typeName));
+									MetadataParameter& param = occurringParameterByLabel->second;
+									const std::string typeName = param.typeName;
+									if (typeName != "")
+									{
+										param.values.push_back(converter(fieldValue, typeName));
+									}
+									else
+									{
+										param.values.push_back(converter(fieldValue));
+									}
 								}
-								else
-								{
-									param.values.push_back(converter(fieldValue));
-								}
-							}
-						
+							
+							
 						}
 					}
 					else
@@ -256,7 +264,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				
 				ot::Plot1DCurveCfg curveConfig;
 				auto painter = colourIt.getNextPainter();
-				curveConfig.setLinePen(painter.release());
+				curveConfig.setLinePenPainter(painter.release());
 				CurveFactory::addToConfig(*series, curveConfig);
 
 				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());

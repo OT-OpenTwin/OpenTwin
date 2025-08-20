@@ -10,6 +10,7 @@
 
 // Open twin header
 #include "OTSystem/Flags.h"
+#include "OTCore/Logger.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 
@@ -100,7 +101,9 @@ public:
 
 	int lockLevel(ot::LockTypeFlag _type);
 
-	std::string printLockState();
+	void getDebugInformation(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
+
+	std::string getDebugInformationString() const;
 
 private:
 	std::map<ot::LockTypeFlag, int> * generateDefaultLockMap(void) const;
@@ -161,6 +164,8 @@ public:
 	ot::TextEditor* getText(void) const { return m_text; };
 	ot::WidgetView* getView(void) const { return m_view; };
 	LockableWidget* getLockable(void) const { return m_lockable; };
+
+	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 private:
 

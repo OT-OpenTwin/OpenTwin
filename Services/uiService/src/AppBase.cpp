@@ -420,7 +420,7 @@ void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2
 	try {
 		// Main window
 		if (_senderId == m_mainWindow) {
-			if (_eventType == etTabToolbarChanged) {
+			if (_eventType & etTabToolbarChanged) {
 				// The clicked event occurs before the tabs are changed
 				if (_info1 == 0 && !m_widgetIsWelcome) {
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
@@ -1090,7 +1090,7 @@ void AppBase::createUi(void) {
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
 			this->connect(m_propertyGrid->getPropertyGrid(), &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
 			
-			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
+			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::selectionChangeCompleted, this, &AppBase::slotTreeItemSelectionChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation->getTree(), &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 			this->connect(&m_navigationManager, &ot::NavigationSelectionManager::selectionHasChanged, this, &AppBase::slotHandleSelectionHasChanged);
@@ -1184,6 +1184,96 @@ void AppBase::createUi(void) {
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
+
+std::string AppBase::getDebugInformation() const {
+	using namespace ot;
+	JsonDocument doc;
+
+	// Add basic information
+
+	JsonArray stateArr;
+	if (m_state & AppState::RestoringSettingsState) {
+		stateArr.PushBack(JsonString("RestoringSettingsState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_state & AppState::LoggedInState) {
+		stateArr.PushBack(JsonString("LoggedInState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_state & AppState::ProjectOpenState) {
+		stateArr.PushBack(JsonString("ProjectOpenState", doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember("State", stateArr, doc.GetAllocator());
+
+	JsonArray viewHandlingArr;
+	if (m_viewHandling & ViewHandlingFlag::SkipEntitySelection) {
+		viewHandlingArr.PushBack(JsonString("SkipEntitySelection", doc.GetAllocator()), doc.GetAllocator());
+	}
+	if (m_viewHandling & ViewHandlingFlag::SkipViewHandling) {
+		viewHandlingArr.PushBack(JsonString("SkipViewHandling", doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember("ViewHandling", viewHandlingArr, doc.GetAllocator());
+
+	doc.AddMember("UIUrl", JsonString(m_uiServiceURL, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("SiteID", m_siteID, doc.GetAllocator());
+	doc.AddMember("RelayUrl", JsonString(m_relayURLs, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectName", JsonString(m_currentProjectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ProjectType", JsonString(m_currentProjectType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("CollectionName", JsonString(m_collectionName, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember("UserCollection", JsonString(m_currentUserCollection, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("SessionServiceURL", JsonString(m_sessionServiceURL, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember("AppIsRunning", m_appIsRunning, doc.GetAllocator());
+	doc.AddMember("IsInitialized", m_isInitialized, doc.GetAllocator());
+	doc.AddMember("IsDebug", m_isDebug, doc.GetAllocator());
+	doc.AddMember("IsWelcomeScreenVisible", m_widgetIsWelcome, doc.GetAllocator());
+
+	doc.AddMember("ProjectStateModified", m_projectStateIsModified, doc.GetAllocator());
+
+	JsonObject loginDataObj;
+	loginDataObj.AddMember("GSSUrl", JsonString(m_loginData.getGss().getConnectionUrl().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("DatabaseUrl", JsonString(m_loginData.getDatabaseUrl(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("AuthorizationUrl", JsonString(m_loginData.getAuthorizationUrl(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("UserName", JsonString(m_loginData.getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("UserPassword", JsonString(m_loginData.getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("EncryptedUserPassword", JsonString(m_loginData.getEncryptedUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("SessionUser", JsonString(m_loginData.getSessionUser(), doc.GetAllocator()), doc.GetAllocator());
+	loginDataObj.AddMember("SessionPassword", JsonString(m_loginData.getSessionPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("LoginData", loginDataObj, doc.GetAllocator());
+
+	JsonObject windowStateObj;
+	windowStateObj.AddMember("ViewShown", m_currentStateWindow.viewShown, doc.GetAllocator());
+	windowStateObj.AddMember("WindowState", JsonString(m_currentStateWindow.window, doc.GetAllocator()), doc.GetAllocator());
+	windowStateObj.AddMember("ViewState", JsonString(m_currentStateWindow.view, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("WindowState", windowStateObj, doc.GetAllocator());
+
+	// Lock manager
+
+	LockManager* lm = m_ExternalServicesComponent->lockManager();
+	if (lm) {
+		JsonObject lockManagerObj;
+		lm->getDebugInformation(lockManagerObj, doc.GetAllocator());
+		doc.AddMember("LockManager", lockManagerObj, doc.GetAllocator());
+	}
+	else {
+		doc.AddMember("LockManager", ot::JsonNullValue(), doc.GetAllocator());
+	}
+
+	// Widget view manager
+
+	JsonObject widgetViewManagerObj;
+	ot::WidgetViewManager::instance().getDebugInformation(widgetViewManagerObj, doc.GetAllocator());
+	doc.AddMember("WidgetViewManager", widgetViewManagerObj, doc.GetAllocator());
+
+	// Viewer component
+
+	JsonObject viewerComponentObj;
+	if (m_viewerComponent) {
+		m_viewerComponent->getDebugInformation(viewerComponentObj, doc.GetAllocator());
+	}
+	doc.AddMember("ViewerComponent", viewerComponentObj, doc.GetAllocator());
+
+	return doc.toJson();
+}
 
 ModelUIDtype AppBase::createModel() {
 	ViewerUIDtype view = m_viewerComponent->createModel();
@@ -1286,6 +1376,8 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 }
 
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	OT_SLECTION_TEST_LOG("Set current visualization tab from name \"" + _entityName + "\" and type \"" + ot::WidgetViewBase::toString(_viewType) + "\"");
+
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
@@ -1295,6 +1387,8 @@ void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entit
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
+	OT_SLECTION_TEST_LOG("Set current vis tab from title \"" + _tabTitle + "\"");
+
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
@@ -2151,9 +2245,9 @@ void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool
 	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
 
-	ViewHandlingFlags viewFlags = m_viewHandling;
+	ot::ViewHandlingFlags viewFlags = m_viewHandling;
 	if (_ignoreEntitySelect) {
-		m_viewHandling |= ViewHandlingConfig::SkipEntitySelection;
+		m_viewHandling |= ot::ViewHandlingFlag::SkipEntitySelection;
 	}
 
 	_view->setAsCurrentViewTab();
@@ -2677,7 +2771,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-			{
+			if (m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)) {
+				// Skip entity selection if configured
+				OT_SLECTION_TEST_LOG("+ View focus changed: Skipping entity selection");
+				m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+			}
+			else {
 				ak::aTreeWidget* tree = m_projectNavigation->getTree();
 				QSignalBlocker sigBlock(tree);
 
@@ -2705,7 +2804,9 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 
-		AppBase::instance()->autoCloseUnpinnedViews();
+		if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling)) {
+			this->autoCloseUnpinnedViews();
+		}
 	}
 	else {
 		m_lastFocusedView = nullptr;
@@ -2718,6 +2819,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	if (!(_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCloseable)) {
 		return;
 	}
+
+	OT_SLECTION_TEST_LOG("Closing view request");
 
 	if (_view->getViewContentModified()) {
 		ot::MessageDialogCfg msgCfg;
@@ -2737,6 +2840,11 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
+	OT_SLECTION_TEST_LOG("+ Deselecting navigation items");
+
+	// Store current selection and view information
+	ot::WidgetView* lastStoredView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+
 	// Deselect navigation item if exists
 	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
 	{
@@ -2746,8 +2854,23 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		}
 	}
 	
+	OT_SLECTION_TEST_LOG("+ Closing actual view");
+
 	// Now close the view
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
+
+	// Restore selection if the view did not change during close
+	if (_view != lastStoredView && ot::WidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
+		OT_SLECTION_TEST_LOG("+ Restore view selection");
+
+		QSignalBlocker sigBlock(m_projectNavigation->getTree());
+		for (ot::UID uid : lastStoredView->getVisualizingItems().getSelectedNavigationItems()) {
+			m_projectNavigation->getTree()->setItemSelected(uid, true);
+		}
+	}
+
+	OT_SLECTION_TEST_LOG(">> Closing view request completed");
+
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
@@ -2885,7 +3008,7 @@ void AppBase::slotCreateProject(void) {
 
 		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
 
-		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) & ot::MessageDialogCfg::Ok) {
+		if (this->showPrompt(msg, "", "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) != ot::MessageDialogCfg::Yes) {
 			return;
 		}
 
@@ -3292,7 +3415,12 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 
 	// If true is returned a new view was requested
 	ot::SelectionInformation selectionInfo = this->getSelectedNavigationTreeItems();
-	_result->setFlag(m_viewerComponent->handleSelectionChanged(_eventOrigin, selectionInfo));
+	ot::SelectionData selectionData;
+	selectionData.setSelectedTreeItems(selectionInfo.getSelectedNavigationItems());
+	selectionData.setKeyboardModifiers(QApplication::keyboardModifiers());
+	selectionData.setSelectionOrigin(_eventOrigin);
+	selectionData.setViewHandlingFlags(m_viewHandling);
+	_result->setFlag(m_viewerComponent->handleSelectionChanged(selectionData));
 
 	// Notifiy views about selection change
 	ot::UIDList selectedUids;

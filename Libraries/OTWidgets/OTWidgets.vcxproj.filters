@@ -550,6 +550,9 @@
     <ClCompile Include="src\MessageBoxManager.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\SelectionData.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1039,6 +1042,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
       <Filter>include\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SelectionData.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

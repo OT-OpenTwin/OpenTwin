@@ -58,7 +58,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> GraphHandler::loadAllC
 		EntityBase * connectionEntBase = ot::EntityAPI::readEntityFromEntityIDandVersion(connectionID, connectionID, classFactory);
 		if (connectionEntBase == nullptr)
 		{
-			OT_LOG_E("referenced connection not part of model.");
+			OT_LOG_D("referenced connection not part of model.");
 			delete connectionEntBase;
 		}
 		else

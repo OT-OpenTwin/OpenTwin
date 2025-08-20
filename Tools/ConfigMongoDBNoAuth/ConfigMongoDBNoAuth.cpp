@@ -39,13 +39,13 @@ bool lineStartsWith(const std::string& line, const std::string &pattern)
 	return false;
 }
 
-void modifyConfigFile(const std::string& configFile, const std::string& dbPath, const std::string& logPath, const std::string& bindIp)
+void modifyConfigFile(const std::string& _configFile, const std::string& _dbPath, const std::string& _logPath, const std::string& _bindIp, const std::string& _bindPort)
 {
-	ensureFolderExist(dbPath);
-	ensureFolderExist(logPath);
+	ensureFolderExist(_dbPath);
+	ensureFolderExist(_logPath);
 
 	// Read the entire config file line by line
-	std::ifstream inFile(configFile);
+	std::ifstream inFile(_configFile);
 	std::list<std::string> inputFileContent;
 
 	while (!inFile.eof())
@@ -61,13 +61,13 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 	// Now we process and modify the content
 	std::list<std::string> outputFileContent;
 
-	std::filesystem::path logFilePath = std::filesystem::path(logPath) / std::filesystem::path("mongodb.log");
+	std::filesystem::path logFilePath = std::filesystem::path(_logPath) / std::filesystem::path("mongodb.log");
 	bool tlsUseSystemCAIsSet = false;
 	for (auto line : inputFileContent)
 	{
 		if (lineStartsWith(line, "dbPath:"))
 		{
-			outputFileContent.push_back("  dbPath: " + dbPath);
+			outputFileContent.push_back("  dbPath: " + _dbPath);
 		}
 		else if (lineStartsWith(line, "systemLog:"))
 		{
@@ -79,7 +79,11 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 		}
 		else if (lineStartsWith(line, "bindIp:"))
 		{
-			outputFileContent.push_back("  bindIp: " + bindIp);
+			outputFileContent.push_back("  bindIp: " + _bindIp);
+		}
+		else if (lineStartsWith(line, "port:"))
+		{
+			outputFileContent.push_back("  port: " + _bindPort);
 		}
 		else if (lineStartsWith(line, "#security:"))
 		{
@@ -109,7 +113,7 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 	}
 
 	// And finally we write the content back to the file
-	std::ofstream outFile(configFile);
+	std::ofstream outFile(_configFile);
 
 	for (auto line : outputFileContent)
 	{
@@ -202,10 +206,11 @@ int main(int argc, char **argv)
 	std::string dbPath     = argv[2];
 	std::string logPath    = argv[3];
 	std::string bindIP     = argv[4];
-	std::string adminPWD   = argv[5];
-	std::string serverJS   = argv[6];
+	std::string bindPort   = argv[5];
+	std::string adminPWD   = argv[6];
+	std::string serverJS   = argv[7];
 
-	modifyConfigFile(configFile, dbPath, logPath, bindIP);
+	modifyConfigFile(configFile, dbPath, logPath, bindIP, bindPort);
 
 	setAdminPassword(adminPWD, serverJS);
 

@@ -25,16 +25,18 @@ namespace ot {
 		WidgetViewDock(WidgetView* _view);
 		virtual ~WidgetViewDock();
 
-		void openView(void);
-		void closeView(void);
+		void openView();
+		void closeView();
 		
 		void setCloseButtonVisible(bool _vis);
 		void setPinButtonVisible(bool _vis);
 
-		WidgetView* getWidgetView(void) const { return m_view; };
+		WidgetView* getWidgetView() const { return m_view; };
 
 		void setIsPinned(bool _isPinned);
-		bool getIsPinned(void) const;
+		bool getIsPinned() const;
+
+		WidgetViewTab* getWidgetViewTab() const { return m_tab; };
 
 	Q_SIGNALS:
 		void dockResized(const QSize& _newSize);

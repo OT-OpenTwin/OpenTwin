@@ -58,6 +58,24 @@ void ViewerAPI::setFrontendAPI(FrontendAPI* _api) {
 	FrontendAPI::setInstance(_api);
 }
 
+void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+	ot::JsonArray modelArr;
+	for (const auto& it : intern::OsgModelManager::uidToModelMap()) {
+		ot::JsonObject modelObj;
+		it.second->getDebugInformation(modelObj, _allocator);
+		modelArr.PushBack(modelObj, _allocator);
+	}
+	_object.AddMember("Models", modelArr, _allocator);
+
+	ot::JsonArray viewerArr;
+	for (const auto& it : intern::ViewerManager::uidToViewerMap()) {
+		ot::JsonObject viewerObj;
+		it.second->getViewer()->getDebugInformation(viewerObj, _allocator);
+		viewerArr.PushBack(viewerObj, _allocator);
+	}
+	_object.AddMember("Viewers", viewerArr, _allocator);
+}
+
 ot::UID ViewerAPI::createModel(void)
 {
 	intern::OsgModelManager::modelCount()++;
@@ -505,14 +523,14 @@ Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
 	return nullptr;
 }
 
-ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, ot::SelectionOrigin _selectionOrigin)
+ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems)
 {
 	ot::SelectionHandlingResult result;
 	
 	Model* model = GlobalModel::instance();
 
 	if (model) {
-		result = model->setSelectedTreeItems(_selectedTreeItems, _selectedModelItems, _selectedVisibleModelItems, _selectionOrigin);
+		result = model->setSelectedTreeItems(_selectionData, _selectedModelItems, _selectedVisibleModelItems);
 	}
 
 	return result;

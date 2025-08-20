@@ -285,6 +285,73 @@ void Viewer::freeze3DView(bool flag)
 	}
 }
 
+void Viewer::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+	using namespace ot;
+	_object.AddMember("ViewerID", viewerUID, _allocator);
+	if (model) {
+		JsonObject modelObj;
+		modelObj.AddMember("ModelID", model->getID(), _allocator);
+		_object.AddMember("Model", modelObj, _allocator);
+	}
+	else {
+		_object.AddMember("Model", JsonNullValue(), _allocator);
+	}
+
+	_object.AddMember("ScaleWidth", scaleWidth, _allocator);
+	_object.AddMember("ScaleHeight", scaleHeight, _allocator);
+
+	_object.AddMember("LeftButtonDown", leftButtonDown, _allocator);
+	_object.AddMember("MiddleButtonDown", middleButtonDown, _allocator);
+	_object.AddMember("RightButtonDown", rightButtonDown, _allocator);
+
+	if (selectionHandler) {
+		JsonObject selectionHandlerObj;
+		
+		if (selectionHandler->getModel()) {
+			selectionHandlerObj.AddMember("ModelID", selectionHandler->getModel()->getID(), _allocator);
+		} else {
+			selectionHandlerObj.AddMember("ModelID", JsonNullValue(), _allocator);
+		}
+		selectionHandlerObj.AddMember("IsActive", selectionHandler->getActive(), _allocator);
+
+		if (selectionHandler->getCreator()) {
+			JsonObject creatorObj;
+			creatorObj.AddMember("ViewerID", selectionHandler->getCreator()->getViewerID(), _allocator);
+			selectionHandlerObj.AddMember("Creator", creatorObj, _allocator);
+		}
+		else {
+			selectionHandlerObj.AddMember("Creator", JsonNullValue(), _allocator);
+		}
+
+		selectionHandlerObj.AddMember("LastHeight", selectionHandler->getLastHeight(), _allocator);
+
+		_object.AddMember("SelectionHandler", selectionHandlerObj, _allocator);
+	} else {
+		_object.AddMember("SelectionHandler", JsonNullValue(), _allocator);
+	}
+
+	_object.AddMember("LightSourceDistance", lightSourceDistance, _allocator);
+	_object.AddMember("LightSourceDistanceInfinite", lightSourceDistanceInfinite, _allocator);
+
+	_object.AddMember("VersionGraphTabName", JsonString(m_versionGraphTabName, _allocator), _allocator);
+	
+	_object.AddMember("LastPlotEmpty", lastPlotEmpty, _allocator);
+	_object.AddMember("FreezeViewFlag", freezeViewFlag, _allocator);
+
+	_object.AddMember("ClipPlaneActive", clipPlaneActive, _allocator);
+
+	_object.AddMember("CursorText", JsonString(cursorText, _allocator), _allocator);
+
+	_object.AddMember("MouseCursorX", mouseCursorX, _allocator);
+	_object.AddMember("MouseCursorY", mouseCursorY, _allocator);
+
+	_object.AddMember("ViewColorAutoBackgroundR", viewColorAutoBackgroundR, _allocator);
+	_object.AddMember("ViewColorAutoBackgroundG", viewColorAutoBackgroundG, _allocator);
+	_object.AddMember("ViewColorAutoBackgroundB", viewColorAutoBackgroundB, _allocator);
+
+	_object.AddMember("FreezeWorkingPlane", freezeWorkingPlane, _allocator);
+}
+
 void Viewer::reset()
 {
 	if (osgViewer != nullptr)

@@ -168,7 +168,7 @@ Function After_First_MongoDB_Install
 
 	# update the mongodB config file without authentication
 	;ExecWait '"$INSTDIR\ConfigMongoDBNoAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$UPGRADER_MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
-	nsExec::Exec '"$INSTDIR\ConfigMongoDBNoAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$UPGRADER_MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
+	nsExec::Exec '"$INSTDIR\ConfigMongoDBNoAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection $MONGODB_CUSTOM_PORT "$UPGRADER_MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
 
 	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 	
@@ -177,6 +177,7 @@ Function After_First_MongoDB_Install
 	nsExec::Exec '"$INSTDIR\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 	# restarting mongoDB service
+	# Should not be necessary. First we do the configuration: Set permissions for the data and log folder, then we adjust the config with costumised port, ip and costumised data and log paths. No authorisation and TLS off
 	nsExec::ExecToLog 'net start "MongoDB"'
 	Sleep 5000
 
@@ -195,13 +196,13 @@ Function After_First_MongoDB_Install
 	# mongoDB_storage_script_wauth.py
 	${If} $PublicIpSet <> 0
 		;ExecWait '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		nsExec::Exec '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		nsExec::Exec '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$PUBLIC_CERT_PATH\certificateKeyFile.pem"'
 		ExpandEnvStrings $0 %COMSPEC%
 			;ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 			nsExec::Exec '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 	${Else}
 		;ExecWait '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		nsExec::Exec '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		nsExec::Exec '"$INSTDIR\ConfigMongoDBWithAuth.exe" "$UPGRADER_MONGODB_INSTALL_PATH\bin\mongod.cfg" "$DEFAULT_CERT_PATH\certificateKeyFile.pem"'
 		ExpandEnvStrings $0 %COMSPEC%
 			;ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
 			nsExec::Exec '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '

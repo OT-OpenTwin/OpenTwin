@@ -40,34 +40,9 @@ public:
 	
 	void reset();
 
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
-	{
-
-		_object.AddMember("Name", ot::JsonString(m_campaignName, _allocator), _allocator);
-
-		ot::JsonArray allSeries;
-		for (const MetadataSeries& series : m_seriesMetadata)
-		{
-			ot::JsonObject object;
-			series.addToJsonObject(object, _allocator);
-			allSeries.PushBack(object, _allocator);
-		}
-		_object.AddMember("series", allSeries, _allocator);
-	}
-
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object)
-	{
-		m_campaignName = ot::json::getString(_object, "Name");
-
-		ot::ConstJsonArray allSeries = ot::json::getArray(_object, "series");
-		for (rapidjson::SizeType i = 0; i < allSeries.Size(); i++)
-		{
-			MetadataSeries series;
-			series.setFromJsonObject(ot::json::getObject(allSeries, i));
-			m_seriesMetadata.push_back(series);
-		}
-		updateMetadataOverview();
-	}
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object);
+	
 
 private:
 	std::list<MetadataSeries> m_seriesMetadata;
@@ -83,5 +58,7 @@ private:
 
 	void updateMetadataOverview(MetadataSeries& _series);
 
+	std::map<std::string, MetadataParameter*> extractParameter();
+	std::map<std::string, MetadataQuantity*> extractQuantity();
 };
 
