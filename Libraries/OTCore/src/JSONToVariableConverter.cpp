@@ -41,6 +41,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, const std::string _type)
 {
+	
 
 	if (_type == ot::TypeNames::getStringTypeName())
 	{
@@ -83,5 +84,37 @@ std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArr
 		variables.push_back(variable);
 	}
 	return variables;
+}
+
+bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const std::string _type)
+{
+	if (_type == ot::TypeNames::getStringTypeName())
+	{
+		return value.IsString();
+	}
+	else if (_type == ot::TypeNames::getInt32TypeName())
+	{
+		return value.IsInt();
+	}
+	else if (_type == ot::TypeNames::getInt64TypeName())
+	{
+		return value.IsInt64();
+	}
+	else if (_type == ot::TypeNames::getFloatTypeName())
+	{
+		return value.IsFloat();
+	}
+	else if (_type == ot::TypeNames::getDoubleTypeName())
+	{
+		return value.IsDouble();
+	}
+	else if (_type == ot::TypeNames::getBoolTypeName())
+	{
+		return value.IsBool();
+	}
+	else
+	{
+		assert(false);
+	}
 }
 
