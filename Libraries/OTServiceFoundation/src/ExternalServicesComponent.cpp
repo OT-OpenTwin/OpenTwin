@@ -385,11 +385,12 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 
 		// Get the requested action (if the member is missing a exception will be thrown)
 		std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
-		
+
+		std::lock_guard<std::mutex> guard(m_actionDispatching);
+
 		bool hasHandler{ false };
 		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, _messageType);
 
-		std::lock_guard<std::mutex> guard (m_actionDispatching);
 		// Prode the 
 		if (!hasHandler && action == OT_ACTION_CMD_GetSystemInformation)
 		{
