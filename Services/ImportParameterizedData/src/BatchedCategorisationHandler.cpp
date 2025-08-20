@@ -48,7 +48,8 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UI
 			for (uint32_t i = 1; i <= numberOfRuns; i++)
 			{
 				_uiComponent->displayMessage("Executing import " + std::to_string(i) + "\n");
-				run(nameBase);
+				bool lastRun = i == numberOfRuns;
+				run(nameBase,lastRun);
 				updater.triggerUpdate(i);
 			}
 			_uiComponent->displayMessage("Batch import finished.\n");
@@ -80,7 +81,7 @@ void BatchedCategorisationHandler::addCreator()
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added batch importer");
 }
 
-void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
+void BatchedCategorisationHandler::run(const std::string& _seriesNameBase, bool _lastRun)
 {
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = findAllTableSelectionsWithConsiderForBatching();
 	if (!allRelevantTableSelections.empty())
@@ -105,7 +106,7 @@ void BatchedCategorisationHandler::run(const std::string& _seriesNameBase)
 		}
 		allRelevantTableSelections.clear();
 
-		auto batchingInformationsByPriority = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD, _seriesNameBase);
+		auto batchingInformationsByPriority = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD, _seriesNameBase, _lastRun);
 
 		for (auto batchingInformationByPriority = batchingInformationsByPriority.rbegin(); batchingInformationByPriority != batchingInformationsByPriority.rend(); batchingInformationByPriority++)
 		{
@@ -179,7 +180,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandl
 }
 
 
-std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD, const std::string& _newMSMDNameBase)
+std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD, const std::string& _newMSMDNameBase, bool _lastRun)
 {
 	ot::UIDList topoIDs, topoVers, dataEnt{};
 	std::list<bool> forceVis;
@@ -270,7 +271,17 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 
 			//Switch the batching strategy.
 			bool considerForBatching = selection->getConsiderForBatchprocessing();
-			newSelection->setConsiderForBatchprocessing(considerForBatching);
+			
+			//After the last run the batching process should finish. A new run should not create anything.
+			if (_lastRun)
+			{
+				newSelection->setConsiderForBatchprocessing(false);
+			}
+			else
+			{
+				newSelection->setConsiderForBatchprocessing(considerForBatching);
+			}
+
 			bool passOnScript = selection->getPassOnScript();
 			newSelection->setPassOnScript(passOnScript);
 
