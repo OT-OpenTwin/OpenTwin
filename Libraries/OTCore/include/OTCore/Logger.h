@@ -20,6 +20,7 @@
 
 // std header
 #include <list>
+#include <mutex>
 #include <string>
 #include <ostream>
 
@@ -508,6 +509,7 @@ namespace ot {
 		void closeStream(void);
 
 	private:
+		std::mutex m_mutex;
 		std::ofstream* m_stream;
 	};
 

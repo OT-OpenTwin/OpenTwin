@@ -275,6 +275,7 @@ ot::LogNotifierFileWriter::~LogNotifierFileWriter() {
 
 void ot::LogNotifierFileWriter::log(const LogMessage& _message) {
 	if (m_stream) {
+		std::lock_guard<std::mutex> lock(m_mutex);
 		*m_stream << _message << std::endl;
 	}
 }
