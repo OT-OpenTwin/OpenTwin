@@ -304,6 +304,16 @@ TEST(StringToVariable, ScientificNotation)
 	EXPECT_EQ(actualValue.getFloat(), expectedValue);
 }
 
+TEST(StringToVariable, ScientificNotation_ErrorCase)
+{
+	const float expectedValue = 0.f;
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("0000000E+00", '.');
+	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_EQ(actualValue.getFloat(), expectedValue);
+}
+
+
 TEST(StringToVariable, ScientificNotationWithCommaAsDecimalSeparator)
 {
 	const float expectedValue = -1.E3f;

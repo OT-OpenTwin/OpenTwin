@@ -44,6 +44,7 @@
     <ClCompile Include="src\TestReturnMessage.cpp" />
     <ClCompile Include="src\TestReturnValues.cpp" />
     <ClCompile Include="src\TestString.cpp" />
+    <ClCompile Include="src\TestStringToNumericCheck.cpp" />
     <ClCompile Include="src\TestTextEncoding.cpp" />
     <ClCompile Include="src\TestVariable.cpp" />
   </ItemGroup>
