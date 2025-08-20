@@ -131,8 +131,6 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	auto bck = m_state;
 	m_state |= CloseViewState;
 
-	OT_LOG_T("Closing view: " + _view->getViewData().getEntityName());
-
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
 	_view->m_isDeletedByManager = true;
 	this->forgetView(_view);
@@ -606,7 +604,6 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 	WidgetView* n = this->getViewFromDockWidget(_newFocus);
 
 	if (n) {
-		OT_LOG_T("New view focus: " + n->getViewData().getEntityName());
 		m_focusInfo.last = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
 			m_focusInfo.lastCentral = n;
