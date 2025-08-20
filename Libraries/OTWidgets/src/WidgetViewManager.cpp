@@ -144,6 +144,7 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	if (_view->getViewDockWidget()->getWidgetViewTab()) {
 		_view->getViewDockWidget()->getWidgetViewTab()->blockSignals(true);
 		_view->getViewDockWidget()->getWidgetViewTab()->setEnabled(false);
+		_view->getViewDockWidget()->getWidgetViewTab()->disableButtons();
 	}
 	_view->blockSignals(true);
 

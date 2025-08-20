@@ -95,6 +95,15 @@ void ot::WidgetViewTab::setPinButtonVisible(bool _vis) {
 	m_pinButton->setVisible(_vis);
 }
 
+void ot::WidgetViewTab::disableButtons() {
+	if (m_closeButton) {
+		m_closeButton->setEnabled(false);
+	}
+	if (m_pinButton) {
+		m_pinButton->setEnabled(false);
+	}
+}
+
 void ot::WidgetViewTab::slotClose(void) {
 	Q_EMIT viewCloseRequested();
 }

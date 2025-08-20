@@ -32,6 +32,8 @@ namespace ot {
 		void setCloseButtonVisible(bool _vis);
 		void setPinButtonVisible(bool _vis);
 
+		void disableButtons();
+
 	Q_SIGNALS:
 		void viewCloseRequested();
 		void viewPinnedChanged(bool _isPinned);
