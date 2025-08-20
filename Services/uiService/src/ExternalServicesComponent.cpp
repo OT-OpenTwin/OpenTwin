@@ -24,6 +24,7 @@
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerServiceGlobal.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/ReturnMessage.h"
@@ -185,7 +186,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_lockManager{ nullptr },
 	m_owner{ _owner },
 	m_prefetchingDataCompleted{ false },
-	m_servicesUiSetupCompleted(false)
+	m_servicesUiSetupCompleted(false),
+	m_bufferActions(false)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -448,7 +450,7 @@ bool ExternalServicesComponent::isCurrentModelModified(void) {
 void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, int _info1, int _info2) {
 	try {
 
-		if (_event == ak::etClicked || _event == ak::etEditingFinished)
+		if (_event & (ak::etClicked | ak::etEditingFinished))
 		{
 			auto receiver = this->getServiceFromNameType(m_controlsManager->objectCreator(_senderId));
 			
@@ -459,7 +461,7 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, AppBase::instance()->getViewerComponent()->getActiveDataModel(), doc.GetAllocator());
 				std::string response;
 
-				if (_event == ak::etEditingFinished)
+				if (_event & ak::etEditingFinished)
 				{
 					std::string editText = ak::uiAPI::niceLineEdit::text(_senderId).toStdString();
 					doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
@@ -1067,6 +1069,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 	AppBase * app{ AppBase::instance() };
 	try {
+		ot::BasicScopedBoolWrapper actionBuffer(m_bufferActions);
+
 		ot::LogDispatcher::instance().setProjectName(_projectName);
 
 		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
@@ -1290,6 +1294,9 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		uiLock.setNoUnlock();
 
 		OT_LOG_D("Open project completed");
+
+		// Process buffered actions
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
 
 		return true;
 	}
@@ -1530,19 +1537,9 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 // Slots
 
 char* ExternalServicesComponent::performAction(const char* json, const char* senderIP) {
-	using namespace std::chrono_literals;
-	static bool lock = false;
-
-	while (lock) {
-		std::this_thread::sleep_for(1ms);
-	}
-
-	lock = true;
-
-	char* retval = ot::ActionDispatcher::instance().dispatchWrapper(json, senderIP, ot::QUEUE);
-
-	lock = false;
-	
+	OT_LOG_E("Perform action requets are not supported by the frontend");
+	char* retval = new char[1];
+	retval[0] = '\0';
 	return retval;
 }
 
@@ -1563,7 +1560,7 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(const char* json, const char* senderIP) {
+void ExternalServicesComponent::queueAction(const char* _json, const char* _senderIP) {
 	using namespace std::chrono_literals;
 	static bool lock = false;
 
@@ -1576,16 +1573,35 @@ void ExternalServicesComponent::queueAction(const char* json, const char* sender
 
 	lock = true;
 
-	ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+	std::string json(_json);
 
-	delete[] senderIP;
-	senderIP = nullptr;
+	if (m_bufferActions) {
+		OT_LOG_D("Buffering request: " + json);
 
-	// Now notify the end of the currently processed message
-	if (m_websocket != nullptr) {
-		m_websocket->finishedProcessingQueuedMessage();
+		// If the buffer is enabled, we store the action in the buffer
+		m_actionBuffer.push_back(std::move(json));
+	}
+	else {
+		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+
+		// If there are still buffered actions, we process them now
+		while (!m_actionBuffer.empty() && !m_bufferActions) {
+			std::string action = m_actionBuffer.front();
+			m_actionBuffer.pop_front();
+			ot::ActionDispatcher::instance().dispatch(action, ot::QUEUE);
+		}
+
+		// Now notify the end of the currently processed message
+		if (m_websocket != nullptr) {
+			m_websocket->finishedProcessingQueuedMessage();
+		}
 	}
 
+	if (_senderIP) {
+		delete[] _senderIP;
+		_senderIP = nullptr;
+	}
+	
 	lock = false;
 }
 
@@ -4476,6 +4492,16 @@ void ExternalServicesComponent::keepAlive()
 		std::string response;
 		sendToModelService(ping, response);
 	}
+}
+
+void ExternalServicesComponent::slotProcessActionBuffer() {
+	if (m_bufferActions || m_actionBuffer.empty()) {
+		return;
+	}
+
+	std::string action = m_actionBuffer.front();
+	m_actionBuffer.pop_front();
+	this->queueAction(action.c_str(), nullptr);
 }
 
 // ###################################################################################################
