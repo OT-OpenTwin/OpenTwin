@@ -73,9 +73,9 @@ bool BlockHandlerStorage::executeSpecialized()
 			auto pipelineByName = m_dataPerPort.find(portName);
 			PipelineData* dataPipeline = pipelineByName->second;
 
-			const MetadataCampaign* campaign = dataPipeline->getMetadataCampaign();
-			const std::map <std::string, MetadataQuantity*>& campaignQuantitiesByLabel = campaign->getMetadataQuantitiesByLabel();
-			const std::map<std::string, MetadataParameter*>& campaignParametersByLabel = campaign->getMetadataParameterByLabel();
+			const MetadataCampaign* pipelineCampaign = dataPipeline->getMetadataCampaign();
+			auto pipelineCampaignQuantitiesByLabel = pipelineCampaign->getMetadataQuantitiesByLabel();
+			auto pipelineCampaignParametersByLabel = pipelineCampaign->getMetadataParameterByLabel();
 
 			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
 			std::map < std::string, MetadataParameter> occurringParametersByLabel;
@@ -95,20 +95,20 @@ bool BlockHandlerStorage::executeSpecialized()
 						{
 							const std::string key = field.name.GetString();
 							const ot::JsonValue& fieldValue = field.value;
-								auto quantityByLabel = campaignQuantitiesByLabel.find(key);
-								if (quantityByLabel != campaignQuantitiesByLabel.end())
+								auto pipelineQuantityByLabel = pipelineCampaignQuantitiesByLabel.find(key);
+								if (pipelineQuantityByLabel != pipelineCampaignQuantitiesByLabel.end())
 								{
 									auto datasetDescription = datasetDescriptionByQuantityLabel.find(key);
-									MetadataQuantity* quantity = quantityByLabel->second;
+									MetadataQuantity* pipelineQuantity = pipelineQuantityByLabel->second;
 									if (datasetDescription == datasetDescriptionByQuantityLabel.end())
 									{
 										DatasetDescription newDatasetDescription;
 										std::unique_ptr<QuantityDescription> quantityDescription;
-										if (quantity->dataDimensions.size() > 1) // We got a matrix
+										if (pipelineQuantity->dataDimensions.size() > 1) // We got a matrix
 										{
 											ot::MatrixEntryPointer matrixDimensions;
-											matrixDimensions.m_row = quantity->dataDimensions[0];
-											matrixDimensions.m_column = quantity->dataDimensions[1];
+											matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
+											matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
 
 											quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
 										}
@@ -118,7 +118,7 @@ bool BlockHandlerStorage::executeSpecialized()
 
 										}
 
-										quantityDescription->setMetadataQuantity(*quantity);
+										quantityDescription->setMetadataQuantity(*pipelineQuantity);
 										//Now we reset the ids and dependencies of the quantity. They may not be the same anymore.
 										quantityDescription->getMetadataQuantity().dependingParameterIds.clear();
 										quantityDescription->getMetadataQuantity().quantityIndex = 0;
@@ -131,13 +131,13 @@ bool BlockHandlerStorage::executeSpecialized()
 										datasetDescription = datasetDescriptionByQuantityLabel.find(key);
 									}
 
-									const std::string& dataType = quantity->valueDescriptions.begin()->dataTypeName;
-									if (quantity->dataDimensions.size() > 1) // Here the data is a matrix
+									const std::string& dataType = pipelineQuantity->valueDescriptions.begin()->dataTypeName;
+									if (pipelineQuantity->dataDimensions.size() > 1) // Here the data is a matrix
 									{
 										QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
 										ot::MatrixEntryPointer matrixDimensions;
-										matrixDimensions.m_row = quantity->dataDimensions[0];
-										matrixDimensions.m_column = quantity->dataDimensions[1];
+										matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
+										matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
 
 										ot::GenericDataStructMatrix matrixValues(matrixDimensions);
 										ot::ConstJsonArray linearMatrix = fieldValue.GetArray();
@@ -186,8 +186,8 @@ bool BlockHandlerStorage::executeSpecialized()
 									auto occurringParameterByLabel = occurringParametersByLabel.find(key);
 									if (occurringParameterByLabel == occurringParametersByLabel.end())
 									{
-										auto campaignParameterByLabel = campaignParametersByLabel.find(key);
-										if (campaignParameterByLabel == campaignParametersByLabel.end())
+										auto campaignParameterByLabel = pipelineCampaignParametersByLabel.find(key);
+										if (campaignParameterByLabel == pipelineCampaignParametersByLabel.end())
 										{
 											//Error case
 											assert(false);
