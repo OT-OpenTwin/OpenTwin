@@ -126,11 +126,42 @@ Pipeline Testing Specification
        * In the plot folder a new plot, named "New dataset" appears. The plot has the parameter Frequency[Hz] on the x-axis.
 
    * - 5
+     - The **DataSource** project exists with the dataset **Single Curve** in it. The **BlockExecution_AddOffset.py** script is imported.
+     - * Create one database access block (DBA), two store to database (STD) blocks and one python block.
+       * Connect one STD block directly with the DBA. Rename this store to database block to "Without Offset"
+       * Select the **BlockExecution_AddOffset.py** in the python block.
+       * Connect the DBA with the python block and the python block with the second STD block. Change the name of the STD block to "With offset".
+       * Set the DBA block project property to **DataSource** and the quantity to Magnitude.
+       * Execute the pipeline.
+     - * Pipeline executes successfully.
+       * In the folder Datasets, one new entry named "With offset" and one new entry named "Without offset" appear.
+   
+   * - 5.1
+     - Complete test **5**.
+     - * Select the 
+       * Change the "line data["Magnitude"] = int(data["Magnitude"]) + offset" to "line data["Magnitude"] = float(data["Magnitude"]) + offset"
+       * Safe the changes of the textfile (strg+s)
+       * Execute the pipeline
+     - * Pipeline execution fails.
+       * Output window says " The data type of: Magnitude is inconsistent with the data type mentioned in its metadata."
+
+   * - 5.2
+     - Complete test **5.1**.
+     - * Open the **BlockExecution_AddOffset.py** 
+       * Change the "line data["Magnitude"] = int(data["Magnitude"]) + offset" to "line data["Magnitude"] = float(data["Magnitude"]) + offset"
+       * Safe the changes of the textfile (strg+s)
+       * Execute the pipeline
+     - * Pipeline execution fails.
+       * Output window says " The data type of: Magnitude is inconsistent with the data type mentioned in its metadata."
+
+   * - 6
      - * Import **CMC_Stysch_simple.s4p** (**4** ports).
        * Create a DataBaseAccess block and a Display block.
        * Set up the DBA block (project name, quantity (S-parameter)).
        * Connect the DBA output to Display.Input.
-     - Test various comparators and values for parameter 1 (Results listed at Expectation).
+     - * Set the DBA property "Number of queries" to 1
+       * In the property group "Query settings" select the name "Frequency"
+       * Test various comparators and values for parameter 1 (Results listed at Expectation). 
      - .. list-table:: 
           :header-rows: 1
           :widths: 15 15 70
