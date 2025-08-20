@@ -66,6 +66,8 @@ public:
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(QSettings& _settings) override;
 
+	virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Log Visualization

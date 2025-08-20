@@ -162,6 +162,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_table->installEventFilter(this);
 
 	splitter->setStretchFactor(1, 1);
 	
@@ -239,6 +240,28 @@ bool Logging::prepareToolShutdown(QSettings& _settings) {
 		LOGVIS_LOGE("Failed to send deregistration request to LoggerService \"" + QString::fromStdString(m_loggerUrl) + "\"");
 		return false;
 	}
+}
+
+bool Logging::eventFilter(QObject* _obj, QEvent* _event) {
+	if (_obj == m_table && _event->type() == QEvent::KeyPress) {
+		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(_event);
+		if (!keyEvent) {
+			LOGVIS_LOGE("Key event is null");
+			return false;
+		}
+		if (keyEvent->key() == Qt::Key_Return) {
+			auto items = m_table->selectedItems();
+			while (!items.isEmpty()) {
+				QTableWidgetItem* item = items.front();
+				items.pop_front();
+				if (item) {
+					this->slotViewCellContent(item);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 void Logging::slotConnect(void) {
