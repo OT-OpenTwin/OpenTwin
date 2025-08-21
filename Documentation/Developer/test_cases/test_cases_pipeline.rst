@@ -135,18 +135,10 @@ Pipeline Testing Specification
        * Execute the pipeline.
      - * Pipeline executes successfully.
        * In the folder Datasets, one new entry named "With offset" and one new entry named "Without offset" appear.
-   
+  
+
    * - 5.1
      - Complete test **5**.
-     - * Select the 
-       * Change the "line data["Magnitude"] = int(data["Magnitude"]) + offset" to "line data["Magnitude"] = float(data["Magnitude"]) + offset"
-       * Safe the changes of the textfile (strg+s)
-       * Execute the pipeline
-     - * Pipeline execution fails.
-       * Output window says " The data type of: Magnitude is inconsistent with the data type mentioned in its metadata."
-
-   * - 5.2
-     - Complete test **5.1**.
      - * Open the **BlockExecution_AddOffset.py** 
        * Change the "line data["Magnitude"] = int(data["Magnitude"]) + offset" to "line data["Magnitude"] = float(data["Magnitude"]) + offset"
        * Safe the changes of the textfile (strg+s)
