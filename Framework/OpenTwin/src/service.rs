@@ -96,7 +96,7 @@ pub async fn queue(json_value: String, addr_value: String) -> Result<String, Inf
         deallocate_data(c_buf);
 
         // format data
-        let data = format!("queue action called");
+        let data = r#"{"Status":"Ok","What":"queue action called","ReturnValues":{}}"#.to_string();
         Ok(data)
     }
 }
