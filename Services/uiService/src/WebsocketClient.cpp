@@ -127,6 +127,11 @@ void WebsocketClient::finishedProcessingQueuedMessage(void) {
 	this->slotProcessMessageQueue();
 }
 
+void WebsocketClient::prepareSessionClosing(void) {
+	m_sessionIsClosing = true;
+	m_commandQueue.clear();
+}
+
 // ###############################################################################################################################################
 
 // Private Slots
@@ -201,6 +206,10 @@ void WebsocketClient::handleMessageReceived(const QString& _message, bool _isExt
 		OT_LOG_EA("No execute requests to frontend allowed");
 	}
 	else if (action == "queue") {
+		if (m_sessionIsClosing) {
+			// Avoid processing any queued messages if the session is closing
+			return;
+		}
 		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {
 			OT_LOG_D("Putting action in command queue: " + action.toStdString() + ". Message: " + _message.toStdString());
 			if (_isExternalMessage) {

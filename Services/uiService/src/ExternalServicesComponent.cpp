@@ -1319,12 +1319,24 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		OT_LOG_D("Closing project { name = \"" + app->getCurrentProjectName() + "\"; SaveChanges = " + (_saveChanges ? "True" : "False"));
 
 		std::string projectName = app->getCurrentProjectName();
-		if (projectName.length() == 0) { return; }
+		if (projectName.length() == 0) {
+			return;
+		}
 
 		// Remove all notifiers
 		m_modelViewNotifier.clear();
 
 		app->storeSessionState();
+
+		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
+
+		// This also prevents new received messages from being processed and will clear the message queue
+		if (m_websocket != nullptr) {
+			m_websocket->prepareSessionClosing();
+		}
+
+		// Enable action buffering
+		ot::BasicScopedBoolWrapper actionBufferFlag(m_bufferActions, true);
 
 		// Notify the session service that the sesion should be closed now
 		ot::JsonDocument shutdownCommand;
@@ -1365,11 +1377,11 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		ModelUIDtype modelID = app->getViewerComponent()->getActiveDataModel();
 
 		//NOTE, model ids will no longer be used in the future
-		if (modelID == 0) return;  // No project currently active
+		if (modelID == 0) {
+			OT_LOG_W("No project currently active");
+			return;  // No project currently active
+		}
 		modelID = 1;
-
-		// Notify the websocket that the project is closing (do not worry if the relay service shuts down)
-		if (m_websocket != nullptr) { m_websocket->isClosing(); }
 
 		// Now get the id of the corresponding visualization model
 		ModelUIDtype visualizationModel = app->getViewerComponent()->getActiveViewerModel();
@@ -1422,7 +1434,12 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->replaceInfoMessage(c_buildInfo);
 
-		if (m_websocket != nullptr) { delete m_websocket; m_websocket = nullptr; }
+		if (m_websocket != nullptr) {
+			delete m_websocket;
+			m_websocket = nullptr;
+		}
+
+		m_actionBuffer.clear();
 
 		OT_LOG_D("Close project done");
 
@@ -1562,7 +1579,7 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 
 void ExternalServicesComponent::queueAction(const char* _json, const char* _senderIP) {
 	using namespace std::chrono_literals;
-	static bool lock = false;
+	static std::atomic_bool lock = false;
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);

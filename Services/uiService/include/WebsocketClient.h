@@ -19,7 +19,7 @@ public:
 
 	void finishedProcessingQueuedMessage(void);
 
-	void isClosing(void) { m_sessionIsClosing = true; }
+	void prepareSessionClosing(void);
 
 Q_SIGNALS:
 	void closed();
