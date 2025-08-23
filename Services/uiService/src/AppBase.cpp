@@ -557,6 +557,8 @@ void AppBase::downloadInstaller(QString gssUrl)
 		QMessageBox msgBox(QMessageBox::Information, "Update Download Successful", 
 			"The update has been downloaded successfully and will be installed after pressing the OK button.\n\n"
 			"Please wait until the login screen will be re-opened.", QMessageBox::Ok);
+
+		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
 		msgBox.exec();
 
 		std::string applicationPath = tempFolder + "\\" + fileName;
