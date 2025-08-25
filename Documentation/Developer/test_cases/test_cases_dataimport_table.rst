@@ -52,13 +52,12 @@ Import the files Prüfmatrix_S8_Ausschnitt, S8_306_FA, S8_328_FA, S8_329_FA, S8_
      - Select the header of the first column and use the "Parameter" button
      - | Another selection entity should have appeared below Series Metadata_1/Parameterset with the name Timestamp [us]. 
        | Datatype int32 and in the property group "Update Strategy" the property "Select entire column" should be selected.
-       | A warning should be displayed in the output window, refering to the "Table cells analysation log" entity. This log entity contains a warnig about the detection of a thousands delimiter being detected.
 
    * - 1.4
      - 
      - Select the header of the Frequency column and use the Button "Parameter". Do the same for the Amplitude column
      - | Two more selections appeared in Series Metadata_1/Parameterset with names according to the table header. 
-       | Frequency has the data type float and Amplitude has the property string (change the setting to double). A warning should be shown in the output window and the logfile about finding strings in the amplitude column.
+       | Frequency and Amplitude have the data type float. A warning should be shown in the output window and the logfile about the detection of a thousands delimiter being detected.
 
    * - 1.5
      - 
@@ -104,7 +103,7 @@ Import the files Prüfmatrix_S8_Ausschnitt, S8_306_FA, S8_328_FA, S8_329_FA, S8_
      - 
      - | Look with MongoDB Compass into the associated .result database. For that go to the projects database and select the Catalog collection. In there find an entry with the correct project_name. 
        | Take the collection_name of the document and search it in the Projects database. Open the collection with the collection_name and the .result ending.
-     - The collection has 140745 documents
+     - The collection has 188562 documents (140745 added by S8_328_FA).
 
    * - 3
      - Create a new dataprocessing project.
