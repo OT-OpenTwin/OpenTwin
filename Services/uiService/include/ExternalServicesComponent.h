@@ -360,6 +360,7 @@ public Q_SLOTS:
 	void activateModelVersion(const char* version);
 	void keepAlive();
 	void slotProcessActionBuffer();
+	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
 
 private:
 	// ###################################################################################################
@@ -394,6 +395,17 @@ private:
 	void determineViews(const std::string& modelServiceURL);
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
+
+	struct ImportFileWorkerData {
+		std::string receiverUrl;
+		std::string subsequentFunctionName;
+		std::string fileMask;
+		bool loadContent;
+	};
+
+	void workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info);
+
+	void workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info);
 
 	// #################################################################
 

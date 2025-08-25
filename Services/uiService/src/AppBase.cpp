@@ -533,7 +533,6 @@ void AppBase::lockUI(bool flag)
 	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
-		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
 	}
 	else {
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
@@ -579,12 +578,12 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
 	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.exportProject(selectedProjectName, exportFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
 	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
@@ -737,12 +736,12 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
 	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.importProject(projectName, currentUser, importFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
 	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
@@ -1653,17 +1652,15 @@ bool AppBase::checkForContinue(const std::string& _title) {
 	return true;
 }
 
-void AppBase::setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous)
-{
-	uiAPI::window::setStatusLabelText(m_mainWindow, progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, continuous);
+void AppBase::setProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
+	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
 }
 
-void AppBase::setProgressBarValue(int progressPercentage)
-{
-	uiAPI::window::setStatusProgressValue(m_mainWindow, progressPercentage);
+void AppBase::setProgressBarValue(int _progressPercentage) {
+	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
 }
 
 QString AppBase::availableTabText(const QString& _initialTabText) {

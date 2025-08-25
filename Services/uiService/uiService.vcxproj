@@ -46,6 +46,7 @@
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationSelectionManager.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
+    <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\ProjectInformation.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
