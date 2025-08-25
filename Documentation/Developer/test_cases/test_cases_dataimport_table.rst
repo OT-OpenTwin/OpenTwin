@@ -48,11 +48,11 @@ Import the files Prüfmatrix_S8_Ausschnitt, S8_306_FA, S8_328_FA, S8_329_FA, S8_
        | The log file shows that an Empty fields were detected and cells are containing string values. Double check if the row/column values in the log files are accurate.
 
    * - 1.3
-     - | Select the entity Campaign Metadata/Series Metadata_1
-       | and the table entity S8_306_FA.
+     - | Select the table entity S8_306_FA.
      - Select the header of the first column and use the "Parameter" button
      - | Another selection entity should have appeared below Series Metadata_1/Parameterset with the name Timestamp [us]. 
-       | Datatype int32 and in the property group "Update Strategy" the property "Select entire column" should be selected
+       | Datatype int32 and in the property group "Update Strategy" the property "Select entire column" should be selected.
+       | A warning should be displayed in the output window, refering to the "Table cells analysation log" entity. This log entity contains a warnig about the detection of a thousands delimiter being detected.
 
    * - 1.4
      - 
