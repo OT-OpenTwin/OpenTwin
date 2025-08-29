@@ -42,6 +42,10 @@ namespace ot {
 		//! @param _timestamp Timestamp string to convert.
 		//! @param _format Format of the timestamp string.
 		static int64_t timestampToMsec(const std::string& _timestamp, DateFormat _format);
+
+		//! @brief Converts a time interval in milliseconds to a human-readable string.
+		//! @param _msecInterval Time interval in milliseconds.
+		static std::string intervalToString(int64_t _msecInterval);
     };
 
 }
