@@ -20,6 +20,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionDispatchProfiler.h"
 #include "ResultDataStorageAPI.h"
 
 // Model header
@@ -395,10 +396,13 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
+	void actionDispatchTimeout(const std::string& _json);
+
 	// #################################################################
 
 	bool                                            m_bufferActions;
 	std::list<std::string>                          m_actionBuffer;
+	ot::ActionDispatchProfiler                      m_actionProfiler;
 
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;

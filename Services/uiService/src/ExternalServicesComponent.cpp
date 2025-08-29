@@ -17,6 +17,7 @@
 #include "ExternalServicesComponent.h"	// Corresponding header
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
 
 #include "OTCore/Logger.h"
@@ -107,6 +108,9 @@
 
 const QString c_buildInfo = "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n";
 
+//! @brief Timeout for dispatching actions in seconds.
+const int64_t c_dispatchTimeoutSeconds = 30;
+
 static std::thread * g_sessionServiceHealthCheckThread{ nullptr };
 static bool g_runSessionServiceHealthCheck{ false };
 
@@ -187,7 +191,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_owner{ _owner },
 	m_prefetchingDataCompleted{ false },
 	m_servicesUiSetupCompleted(false),
-	m_bufferActions(false)
+	m_bufferActions(false),
+	m_actionProfiler(c_dispatchTimeoutSeconds * 1000)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -1599,13 +1604,22 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 		m_actionBuffer.push_back(std::move(json));
 	}
 	else {
+		m_actionProfiler.startAction();
 		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+		if (m_actionProfiler.endAction()) {
+			this->actionDispatchTimeout(json);
+		}
 
 		// If there are still buffered actions, we process them now
 		while (!m_actionBuffer.empty() && !m_bufferActions) {
 			std::string action = m_actionBuffer.front();
 			m_actionBuffer.pop_front();
+
+			m_actionProfiler.startAction();
 			ot::ActionDispatcher::instance().dispatch(action, ot::QUEUE);
+			if (m_actionProfiler.endAction()) {
+				this->actionDispatchTimeout(action);
+			}
 		}
 
 		// Now notify the end of the currently processed message
@@ -1878,6 +1892,8 @@ std::string ExternalServicesComponent::handleSetLogFlags(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
+	m_actionProfiler.setCompound();
+
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	rapidjson::Value documents = _document[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
 	rapidjson::Value prefetchID = _document[OT_ACTION_PARAM_PREFETCH_ID].GetArray();
@@ -1931,7 +1947,11 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 
 		std::string action = ot::json::getString(d, OT_ACTION_MEMBER);
 
+		m_actionProfiler.startAction();
 		ot::ActionDispatcher::instance().dispatchLocked(action, d, tmp, ot::QUEUE);
+		if (m_actionProfiler.endAction()) {
+			this->actionDispatchTimeout(action);
+		}
 	}
 
 	// Re enable tree sorting
@@ -2102,21 +2122,7 @@ std::string ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument&
 	ot::LogMessage log;
 	log.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_MESSAGE));
 
-	ot::StyledTextBuilder message;
-
-	message << "[";
-	if (log.getFlags() & ot::ERROR_LOG) {
-		message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
-	}
-	else if (log.getFlags() & ot::WARNING_LOG) {
-		message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
-	}
-	else if (log.getFlags() & ot::TEST_LOG) {
-		message << ot::StyledText::Highlight << ot::StyledText::Bold << "TEST" << ot::StyledText::ClearStyle;
-	}
-	message << "] [" << log.getServiceName() << "] " << log.getText();
-
-	AppBase::instance()->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+	AppBase::instance()->appendLogMessage(log);
 
 	return "";
 }
@@ -4493,6 +4499,37 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		OT_LOG_WAS(response);
 	}
+}
+
+void ExternalServicesComponent::actionDispatchTimeout(const std::string& _json) {
+	std::string action = "<Invalid JSON format>";
+
+	ot::JsonDocument doc;
+	if (doc.fromJson(_json)) {
+		if (!doc.HasMember(OT_ACTION_MEMBER) || !doc[OT_ACTION_MEMBER].IsString()) {
+			action = "<Missing action member>";
+		}
+		else {
+			action = doc[OT_ACTION_MEMBER].GetString();
+		}
+	}
+
+	std::string message = "Prcoessing action \"" + action + "\" took " + ot::DateTime::intervalToString(m_actionProfiler.getLastInterval()) + ".";
+	
+	if (ot::LogDispatcher::mayLog(ot::WARNING_LOG)) {
+		// Log notifier will display the message
+		OT_LOG_W(message);
+	}
+	else {
+		// Manually display the message
+		ot::LogMessage logMessage;
+		logMessage.setServiceName(OT_INFO_SERVICE_TYPE_UI);
+		logMessage.setFlags(ot::WARNING_LOG);
+		logMessage.setText(message);
+
+		AppBase::instance()->appendLogMessage(logMessage);
+	}
+
 }
 
 void ExternalServicesComponent::keepAlive()
