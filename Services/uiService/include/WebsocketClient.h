@@ -38,6 +38,7 @@ private:
 	bool ensureConnection(void);
 	void queueMessageProcessingIfNeeded(void);
 	bool anyWaitingForResponse(void) const;
+	bool isWaitingForResponse(const std::string& _senderIP) const;
 
 	QWebSocket m_webSocket;
 	QUrl m_url;

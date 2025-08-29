@@ -7,6 +7,7 @@
 #include <thread>
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
@@ -94,14 +95,16 @@ void WebsocketClient::sendMessage(const std::string& _message, std::string& _res
 	std::string senderIP = _message.substr(index1 + 1, index2 - index1 - 1);
 
 	// Make sure we are connected
-	if (!ensureConnection()) return;
+	if (!ensureConnection()) {
+		return;
+	}
 
 	// Now send our message	
 	m_waitingForResponse[senderIP] = true;
 	m_webSocket.sendTextMessage(_message.c_str());
 
 	// Wait for the reponse
-	while (m_waitingForResponse[senderIP]) {
+	while (this->isWaitingForResponse(senderIP)) {
 		processMessages();
 	}
 
@@ -153,8 +156,11 @@ void WebsocketClient::slotMessageReceived(const QString& _message) {
 }
 
 void WebsocketClient::slotSocketDisconnected() {
-	if (!m_isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
-	// safely ignore this message.
+	if (!m_isConnected) {
+		// This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready).
+		// In this case, we can safely ignore this message.
+		return;
+	}
 
 	OT_LOG_D("Relay server disconnected on websocket");
 	m_isConnected = false;
@@ -277,6 +283,8 @@ bool WebsocketClient::ensureConnection(void) {
 		return false;
 	}
 
+	int64_t startTime = ot::DateTime::msSinceEpoch();
+
 	while (!m_isConnected) {
 		if (m_webSocket.state() == QAbstractSocket::UnconnectedState) {
 			// The relay service was probably not running when the connection was tried to establish
@@ -284,14 +292,24 @@ bool WebsocketClient::ensureConnection(void) {
 			m_webSocket.open(QUrl(m_url));
 		}
 		processMessages();
-	}
-	assert(m_isConnected);
 
-	return m_isConnected;
+		if (!m_isConnected && (ot::DateTime::msSinceEpoch() - startTime) > 30000) {
+			OT_LOG_E("Connection to relay service cancelled due to timeout");
+			return false;
+		}
+	}
+
+	if (!m_isConnected) {
+		OT_LOG_E("Could not connect to relay service");
+		return false;
+	}
+	else {
+		return true;
+	}
 }
 
 void WebsocketClient::queueMessageProcessingIfNeeded(void) {
-	if (!m_commandQueue.empty()) {
+	if (!m_commandQueue.empty() && m_isConnected) {
 		QMetaObject::invokeMethod(this, &WebsocketClient::slotProcessMessageQueue, Qt::QueuedConnection);
 	}
 }
@@ -303,4 +321,14 @@ bool WebsocketClient::anyWaitingForResponse(void) const {
 		}
 	}
 	return false;
+}
+
+bool WebsocketClient::isWaitingForResponse(const std::string& _senderIP) const {
+	const auto it = m_waitingForResponse.find(_senderIP);
+	if (it == m_waitingForResponse.end()) {
+		return false;
+	}
+	else {
+		return m_isConnected && it->second;
+	}
 }
