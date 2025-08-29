@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\ActionDispatcher.cpp" />
     <ClCompile Include="src\ActionDispatcherBase.cpp" />
+    <ClCompile Include="src\ActionDispatchProfiler.cpp" />
     <ClCompile Include="src\ActionHandleConnector.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h" />
+    <ClInclude Include="include\OTCommunication\ActionDispatchProfiler.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnector.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.h" />
