@@ -1610,6 +1610,7 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 			std::string action = m_actionBuffer.front();
 			m_actionBuffer.pop_front();
 			ot::ActionDispatcher::instance().dispatch(action, ot::QUEUE);
+			this->keepAlive();
 		}
 
 		// Now notify the end of the currently processed message
