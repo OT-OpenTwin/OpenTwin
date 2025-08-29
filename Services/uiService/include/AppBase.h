@@ -302,10 +302,10 @@ public Q_SLOTS:
 	void downloadInstaller(QString gssUrl);
 
 	//! @brief Will turn on or off the progress bar visibility and set the progress message
-	void setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous);
+	void setProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
 
 	//! @brief Will set the percentage of the progress bar
-	void setProgressBarValue(int progressPercentage);
+	void setProgressBarValue(int _progressPercentage);
 
 public:
 
@@ -369,10 +369,14 @@ public:
 
 	// Info text output
 
+public Q_SLOTS:
+
 	void replaceInfoMessage(const QString& _message);
 	
 	void appendInfoMessage(const QString& _message);
 	void appendHtmlInfoMessage(const QString& _html);
+
+public:
 
 	//! @brief Append a log message to the output.
 	//! The following information will be used from the log message:

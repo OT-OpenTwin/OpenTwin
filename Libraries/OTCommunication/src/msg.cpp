@@ -115,6 +115,14 @@ const std::string ot::msg::getLastError()
 }
 
 bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP, MessageType _type, const std::string& _message, std::string& _response, int _timeout, const RequestFlags& _flags) {
+	// Ensure receiver url was provided
+	if (_receiverIP.empty()) {
+		if (_flags & msg::CreateLogMessage) {
+			OT_LOG_W("Receiver url is empty. Ignoring message...");
+		}
+		return false;
+	}
+
 	// Block explicit self message (allow by providing empty sender)
 	if (_senderIP == _receiverIP) {
 		if (_flags & msg::CreateLogMessage) {

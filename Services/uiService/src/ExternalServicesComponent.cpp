@@ -192,7 +192,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_prefetchingDataCompleted{ false },
 	m_servicesUiSetupCompleted(false),
 	m_bufferActions(false),
-	m_actionProfiler(c_dispatchTimeoutSeconds * 1000)
+	m_actionProfiler(c_dispatchTimeoutSeconds * 1000),
+	m_lastKeepAlive(0)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -775,7 +776,7 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot:
 
 void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
 {
-	sendHttpRequest(QUEUE, m_modelServiceURL, _message, _response);
+	sendHttpRequest(EXECUTE, m_modelServiceURL, _message, _response);
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response) {
@@ -1293,8 +1294,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		assert(m_keepAliveTimer == nullptr);
 		m_keepAliveTimer = new QTimer(this);
-		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
-		m_keepAliveTimer->start(60000);
+		connect(m_keepAliveTimer, &QTimer::timeout, this, &ExternalServicesComponent::keepAlive);
+		m_keepAliveTimer->start(10000);
 
 		uiLock.setNoUnlock();
 
@@ -1372,6 +1373,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			delete m_keepAliveTimer;
 
 			m_keepAliveTimer = nullptr;
+
+			m_lastKeepAlive = 0;
 		}
 
 		QEventLoop eventLoop;
@@ -1620,6 +1623,7 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 			if (m_actionProfiler.endAction()) {
 				this->actionDispatchTimeout(action);
 			}
+			this->keepAlive();
 		}
 
 		// Now notify the end of the currently processed message
@@ -1952,6 +1956,9 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 		if (m_actionProfiler.endAction()) {
 			this->actionDispatchTimeout(action);
 		}
+
+		// Ensure keep alive is triggered when processing many actions
+		this->keepAlive();
 	}
 
 	// Re enable tree sorting
@@ -2244,13 +2251,16 @@ std::string ExternalServicesComponent::handleGenerateUIDs(ot::JsonDocument& _doc
 
 std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _document) {
 	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 
-	bool loadContent = false;
+	ImportFileWorkerData data;
+	data.fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+
+	data.subsequentFunctionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	data.receiverUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+
+	data.loadContent = false;
 	if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent)) {
-		loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
+		data.loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
 	}
 
 	bool loadMultiple = false;
@@ -2258,133 +2268,33 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 		loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
 	}
 
-	try {
-		if (loadMultiple) {
-			QStringList fileNames = QFileDialog::getOpenFileNames(
-				nullptr,
-				dialogTitle.c_str(),
-				QDir::currentPath(),
-				QString(fileMask.c_str()));
+	if (loadMultiple) {
+		QStringList fileNames = QFileDialog::getOpenFileNames(
+			nullptr,
+			dialogTitle.c_str(),
+			QDir::currentPath(),
+			QString::fromStdString(data.fileMask));
 
-			if (!fileNames.isEmpty()) {
-				ot::JsonDocument inDoc;
-				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
-
-				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
-				{
-					std::string progressBarMessage = "Importing files";
-					std::unique_ptr<ProgressUpdater> updater(nullptr);
-					if (loadContent)
-					{
-						updater.reset(new ProgressUpdater(progressBarMessage, fileNames.size()));
-					}
-
-					uint32_t counter(0);
-					std::string message = ("Import of " + std::to_string(fileNames.size()) + " file(s): ");
-					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-
-					auto startTime = std::chrono::system_clock::now();
-					for (QString& fileName : fileNames)
-					{
-						counter++;
-						std::string localEncodingString = fileName.toLocal8Bit().constData();
-						const std::string utf8String = fileName.toStdString();
-
-						ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
-						fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
-						if (loadContent)
-						{
-							std::string fileContent;
-							uint64_t uncompressedDataLength{ 0 };
-							// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-							ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
-							fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
-							uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
-							fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
-							assert(updater != nullptr);
-							updater->triggerUpdate(counter);
-						}
-					}
-					auto endTime = std::chrono::system_clock::now();
-					uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-					//AppBase::instance()->("Import of files: " + std::to_string(millisec) + " ms\n");
-					message = (std::to_string(millisec) + " ms\n");
-
-					AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
-				}
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
-				if (loadContent) {
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
-				}
-
-
-				std::string response;
-				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-				// Check if response is an error or warning
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					assert(0); // ERROR
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response) {
-					assert(0); // WARNING
-				}
-			}
+		if (!fileNames.isEmpty()) {
+			AppBase::instance()->lockUI(true);
+			std::thread workerThread(&ExternalServicesComponent::workerImportMultipleFiles, this, fileNames, data);
+			workerThread.detach();
 		}
-		else
-		{
+	}
+	else {
+		QString fileName = QFileDialog::getOpenFileName(
+			nullptr,
+			dialogTitle.c_str(),
+			QDir::currentPath(),
+			QString::fromStdString(data.fileMask));
 
-			QString fileName = QFileDialog::getOpenFileName(
-				nullptr,
-				dialogTitle.c_str(),
-				QDir::currentPath(),
-				QString(fileMask.c_str()));
-
-			if (fileName != "")
-			{
-				ot::JsonDocument inDoc;
-				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
-
-				if (loadContent)
-				{
-					std::string fileContent;
-					unsigned long long uncompressedDataLength{ 0 };
-
-					std::string localEncodingFileName = fileName.toLocal8Bit().constData();
-
-					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-					ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
-					// We need to send the file content
-					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
-				}
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-
-				std::string response;
-				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-				// Check if response is an error or warning
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					assert(0); // ERROR
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response) {
-					assert(0); // WARNING
-				}
-			}
+		if (fileName != "") {
+			AppBase::instance()->lockUI(true);
+			std::thread workerThread(&ExternalServicesComponent::workerImportSingleFile, this, fileName, data);
+			workerThread.detach();
 		}
-		return ot::ReturnMessage().toJson();
 	}
-	catch (std::exception& _e)
-	{
-		 //ToDo: Display here
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, _e.what()).toJson();
-	}
+	return ot::ReturnMessage().toJson();
 }
 
 std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _document) {
@@ -3236,7 +3146,9 @@ std::string ExternalServicesComponent::handleSetProgressVisibility(ot::JsonDocum
 
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
-	if (app != nullptr) app->setProgressBarVisibility(message.c_str(), visible, continuous);
+	if (app != nullptr) {
+		app->setProgressBarVisibility(QString::fromStdString(message), visible, continuous);
+	}
 
 	return "";
 }
@@ -4532,19 +4444,131 @@ void ExternalServicesComponent::actionDispatchTimeout(const std::string& _json) 
 
 }
 
-void ExternalServicesComponent::keepAlive()
-{
-	// The keep alive signal is necessary, since a remote firewall will usually close the connection in case of 
-	// inactivity of about 10 minutes.
+void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info) {
+	try {
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-	if (m_websocket != nullptr)
-	{
+		if (_info.loadContent) {
+			std::string fileContent;
+			unsigned long long uncompressedDataLength{ 0 };
+
+			std::string localEncodingFileName = _fileToImport.toLocal8Bit().constData();
+
+			// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+			ReadFileContent(localEncodingFileName, fileContent, uncompressedDataLength);
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
+			// We need to send the file content
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+		}
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(_fileToImport.toStdString(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+		std::string json = inDoc.toJson();
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, _info.receiverUrl), Q_ARG(std::string, std::move(json)));
+	}
+	catch (const std::exception& e) {
+		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+	}
+	catch (...) {
+		OT_LOG_EAS("Unknown exception during file import.");
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+	}
+}
+
+void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info) {
+	try {
+		ot::JsonDocument inDoc;
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
+
+		ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
+		{
+			std::string progressBarMessage = "Importing files";
+			std::unique_ptr<ProgressUpdater> updater(nullptr);
+			if (_info.loadContent) {
+				updater.reset(new ProgressUpdater(progressBarMessage, _filesToImport.size()));
+			}
+
+			uint32_t counter(0);
+			std::string message = ("Import of " + std::to_string(_filesToImport.size()) + " file(s): ");
+
+			QMetaObject::invokeMethod(AppBase::instance(), "appendInfoMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromStdString(message)));
+
+			auto startTime = std::chrono::system_clock::now();
+			for (const QString& fileName : _filesToImport) {
+				counter++;
+				std::string localEncodingString = fileName.toLocal8Bit().constData();
+				const std::string utf8String = fileName.toStdString();
+
+				ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
+				fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+				if (_info.loadContent) {
+					std::string fileContent;
+					uint64_t uncompressedDataLength{ 0 };
+					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+					ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+					fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
+					uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
+					fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+					assert(updater != nullptr);
+					updater->triggerUpdate(counter);
+				}
+			}
+			auto endTime = std::chrono::system_clock::now();
+			uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+			message = (std::to_string(millisec) + " ms\n");
+
+			QMetaObject::invokeMethod(AppBase::instance(), "appendInfoMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromStdString(message)));
+		}
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
+		if (_info.loadContent) {
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
+			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
+		}
+
+		std::string json = inDoc.toJson();
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, _info.receiverUrl), Q_ARG(std::string, std::move(json)));
+	}
+	catch (const std::exception& e) {
+		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+	}
+	catch (...) {
+		OT_LOG_EAS("Unknown exception during file import.");
+		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+	}
+}
+
+void ExternalServicesComponent::keepAlive() {
+	if (m_websocket && !m_modelServiceURL.empty()) {
+
+		// The keep alive signal is necessary, since a remote firewall will usually close the connection in case of 
+		// inactivity of about 10 minutes.
+
+		// Check if keep alive is necessary
+		const int64_t current = ot::DateTime::msSinceEpoch();
+
+		// Only send keep alive every 60s
+		if ((current - m_lastKeepAlive) < 60000) {
+			return;
+		}
+
+		// Store time of last keep alive
+		m_lastKeepAlive = current;
+
+		// Send ping
 		ot::JsonDocument pingDoc;
 		pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-		std::string ping = pingDoc.toJson();
+		const std::string ping = pingDoc.toJson();
 
 		std::string response;
-		sendToModelService(ping, response);
+		this->sendHttpRequest(EXECUTE, m_modelServiceURL, ping, response);
 	}
 }
 
@@ -4556,6 +4580,17 @@ void ExternalServicesComponent::slotProcessActionBuffer() {
 	std::string action = m_actionBuffer.front();
 	m_actionBuffer.pop_front();
 	this->queueAction(action.c_str(), nullptr);
+}
+
+void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message) {
+	AppBase::instance()->lockUI(false);
+
+	if (_receiverUrl.empty() || _message.empty()) {
+		return;
+	}
+
+	std::string response;
+	this->sendHttpRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
 // ###################################################################################################

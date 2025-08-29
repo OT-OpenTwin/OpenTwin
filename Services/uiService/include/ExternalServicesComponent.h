@@ -361,6 +361,7 @@ public Q_SLOTS:
 	void activateModelVersion(const char* version);
 	void keepAlive();
 	void slotProcessActionBuffer();
+	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
 
 private:
 	// ###################################################################################################
@@ -398,11 +399,24 @@ private:
 
 	void actionDispatchTimeout(const std::string& _json);
 
+	struct ImportFileWorkerData {
+		std::string receiverUrl;
+		std::string subsequentFunctionName;
+		std::string fileMask;
+		bool loadContent;
+	};
+
+	void workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info);
+
+	void workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info);
+
 	// #################################################################
 
 	bool                                            m_bufferActions;
 	std::list<std::string>                          m_actionBuffer;
 	ot::ActionDispatchProfiler                      m_actionProfiler;
+
+	int64_t                                         m_lastKeepAlive;
 
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;

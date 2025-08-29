@@ -395,7 +395,9 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
 		service->insert_or_assign(lockVal.first, 0);
 	}
 
-	if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
+	if (lockLevel(ot::LockAll) <= 0) {
+		m_owner->setWaitingAnimationVisible(false);
+	}
 
 	OT_LOG_CONTROLSMANAGER("Lock state after unlock:\n" + this->getDebugInformationString());
 }
@@ -430,7 +432,9 @@ void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::Lo
 	}
 
 	if (_type & ot::LockAll) {
-		if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
+		if (lockLevel(ot::LockAll) <= 0) {
+			m_owner->setWaitingAnimationVisible(false);
+		}
 	}
 
 	OT_LOG_CONTROLSMANAGER("Lock state after unlock:\n" + this->getDebugInformationString());
