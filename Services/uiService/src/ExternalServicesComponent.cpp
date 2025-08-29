@@ -17,6 +17,7 @@
 #include "ExternalServicesComponent.h"	// Corresponding header
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
 
 #include "OTCore/Logger.h"
@@ -187,7 +188,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_owner{ _owner },
 	m_prefetchingDataCompleted{ false },
 	m_servicesUiSetupCompleted(false),
-	m_bufferActions(false)
+	m_bufferActions(false),
+	m_lastKeepAlive(0)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -770,7 +772,7 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot:
 
 void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
 {
-	sendHttpRequest(QUEUE, m_modelServiceURL, _message, _response);
+	sendHttpRequest(EXECUTE, m_modelServiceURL, _message, _response);
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response) {
@@ -1288,8 +1290,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		assert(m_keepAliveTimer == nullptr);
 		m_keepAliveTimer = new QTimer(this);
-		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
-		m_keepAliveTimer->start(60000);
+		connect(m_keepAliveTimer, &QTimer::timeout, this, &ExternalServicesComponent::keepAlive);
+		m_keepAliveTimer->start(10000);
 
 		uiLock.setNoUnlock();
 
@@ -1367,6 +1369,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			delete m_keepAliveTimer;
 
 			m_keepAliveTimer = nullptr;
+
+			m_lastKeepAlive = 0;
 		}
 
 		QEventLoop eventLoop;
@@ -1932,6 +1936,9 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 		std::string action = ot::json::getString(d, OT_ACTION_MEMBER);
 
 		ot::ActionDispatcher::instance().dispatchLocked(action, d, tmp, ot::QUEUE);
+
+		// Ensure keep alive is triggered when processing many actions
+		this->keepAlive();
 	}
 
 	// Re enable tree sorting
@@ -4501,19 +4508,30 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 	}
 }
 
-void ExternalServicesComponent::keepAlive()
-{
-	// The keep alive signal is necessary, since a remote firewall will usually close the connection in case of 
-	// inactivity of about 10 minutes.
+void ExternalServicesComponent::keepAlive() {
+	if (m_websocket && !m_modelServiceURL.empty()) {
 
-	if (m_websocket != nullptr)
-	{
+		// The keep alive signal is necessary, since a remote firewall will usually close the connection in case of 
+		// inactivity of about 10 minutes.
+
+		// Check if keep alive is necessary
+		const int64_t current = ot::DateTime::msSinceEpoch();
+
+		// Only send keep alive every 60s
+		if ((current - m_lastKeepAlive) < 60000) {
+			return;
+		}
+
+		// Store time of last keep alive
+		m_lastKeepAlive = current;
+
+		// Send ping
 		ot::JsonDocument pingDoc;
 		pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-		std::string ping = pingDoc.toJson();
+		const std::string ping = pingDoc.toJson();
 
 		std::string response;
-		sendToModelService(ping, response);
+		this->sendHttpRequest(EXECUTE, m_modelServiceURL, ping, response);
 	}
 }
 

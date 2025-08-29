@@ -412,6 +412,8 @@ private:
 	bool                                            m_bufferActions;
 	std::list<std::string>                          m_actionBuffer;
 
+	int64_t                                         m_lastKeepAlive;
+
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;
 	std::string										m_currentSessionID;
