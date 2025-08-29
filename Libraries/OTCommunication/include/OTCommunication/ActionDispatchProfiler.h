@@ -5,6 +5,8 @@
 
 #pragma once
 
+#pragma warning (disable : 4251) // Disable warning for DLL export/import
+
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/CommunicationAPIExport.h"
