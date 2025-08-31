@@ -1408,12 +1408,12 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Reset all service information
 		for (auto s : m_serviceIdMap) {
-			m_lockManager->cleanService(s.second->getBasicServiceInformation(), false, true);
+			m_lockManager->cleanService(s.second->getBasicServiceInformation(), true, true);
 			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
 			app->shortcutManager()->creatorDestroyed(s.second);
 			delete s.second;
 		}
-		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
+		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation(), true, true);
 		m_controlsManager->serviceDisconnected(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
 
 		app->shortcutManager()->clearViewerHandler();

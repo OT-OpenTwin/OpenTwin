@@ -515,7 +515,7 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 	
 	OT_LOG_CONTROLSMANAGER("clean service due to: " + _serviceInfo.serviceName() + " reenableElement: " + std::to_string(_reenableElement) + " eraseUIElements: " + std::to_string(_eraseUiElements));
 	
-	for (auto e : *serviceE) {
+	for (const auto& e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
 			LockManagerElement* element = this->uiElement(e.first);
 			if (element) {
@@ -532,9 +532,9 @@ void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, 
 	}
 	OT_LOG_CONTROLSMANAGER("Clean service unlocks");
 
-	for (auto l : *serviceL) {
+	for (const auto& l : *serviceL) {
 		if (l.second > 0 && _reenableElement) {
-			for (auto itm : m_uiElements) {
+			for (auto& itm : m_uiElements) {
 				itm.second->unlock(l.second, l.first);
 			}
 			
