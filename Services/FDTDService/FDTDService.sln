@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1401
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetDPService", "GetDPService.vcxproj", "{36E113AE-6F93-42FC-AB88-97721543A1DF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDTDService", "FDTDService.vcxproj", "{36E113AE-6F93-42FC-AB88-97721543A1DF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetDPServiceTest", "test\GetDPServiceTest\GetDPServiceTest.vcxproj", "{C278B83B-A335-448A-890D-58E883B1D383}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDTDServiceTest", "test\FDTDServiceTest\FDTDServiceTest.vcxproj", "{C278B83B-A335-448A-890D-58E883B1D383}"
 	ProjectSection(ProjectDependencies) = postProject
 		{36E113AE-6F93-42FC-AB88-97721543A1DF} = {36E113AE-6F93-42FC-AB88-97721543A1DF}
 	EndProjectSection

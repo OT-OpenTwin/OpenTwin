@@ -32,9 +32,11 @@
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_GETDP
+//#define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_FDTD
 
 // The type of this service
 #define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_GETDP
+//define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_FDTD
 
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
@@ -75,18 +77,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
-	_ui->addMenuPage("GetDP");
+	_ui->addMenuPage("FDTD");
 	_ui->addMenuPage("Model");
 
-	_ui->addMenuGroup("GetDP", "Solver");
-	_ui->addMenuGroup("GetDP", "Sources");
+	_ui->addMenuGroup("FDTD", "Solver");
+	_ui->addMenuGroup("FDTD", "Sources");
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	_ui->addMenuButton("GetDP", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("GetDP", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
+	_ui->addMenuButton("FDTD", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
+	_ui->addMenuButton("FDTD", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
 
-	_ui->addMenuButton("GetDP", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
+	_ui->addMenuButton("FDTD", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
 
 	modelSelectionChanged();
 
@@ -136,9 +138,9 @@ bool Application::startAsRelayService(void) const
 
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (action == "GetDP:Solver:Create Solver")	          addSolver();
-	else if (action == "GetDP:Solver:Run Solver")		  runSolver();
-	else if (action == "GetDP:Sources:Define Electrostatic Potential")  definePotential();
+	if (action == "FDTD:Solver:Create Solver")	          addSolver();
+	else if (action == "FDTD:Solver:Run Solver")		  runSolver();
+	else if (action == "FDTD:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
 	return std::string();
 }
@@ -151,11 +153,11 @@ void Application::modelSelectionChanged()
 
 		if (m_selectedEntities.size() > 0)
 		{
-			enabled.push_back("GetDP:Solver:Run Solver");
+			enabled.push_back("FDTD:Solver:Run Solver");
 		}
 		else
 		{
-			disabled.push_back("GetDP:Solver:Run Solver");
+			disabled.push_back("FDTD:Solver:Run Solver");
 		}
 
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
@@ -187,7 +189,7 @@ void Application::definePotential(void)
 
 	// Create a property object with the new properties and get it as JSON string
 	EntityProperties properties;
-	EntityPropertiesDouble::createProperty("Solver", "Electrostatic Potential", 0.0, "GetDP", properties);
+	EntityPropertiesDouble::createProperty("Solver", "Electrostatic Potential", 0.0, "FDTD", properties);
 	properties.setAllPropertiesNonProtected();
 
 	ot::PropertyGridCfg cfg;
@@ -222,7 +224,7 @@ void Application::addSolver(void)
 	std::string solverName;
 	do
 	{
-		solverName = "Solvers/GetDP" + std::to_string(count);
+		solverName = "Solvers/FDTD" + std::to_string(count);
 		count++;
 	} while (std::find(solverItems.begin(), solverItems.end(), solverName) != solverItems.end());
 
@@ -271,7 +273,7 @@ void Application::runSolver(void)
 	std::map<std::string, bool> solverRunMap;
 	for (auto& entity : m_selectedEntityInfos)
 	{
-		if (entity.getEntityType() == "EntitySolverGetDP")
+		if (entity.getEntityType() == "EntitySolverFDTD")
 		{
 			if (entity.getEntityName().substr(0, 8) == "Solvers/")
 			{
@@ -358,7 +360,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	}
 
 	if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-	m_uiComponent->displayMessage("\nGetDP solver started: " + solverName + "\n\n");
+	m_uiComponent->displayMessage("\nFDTD solver started: " + solverName + "\n\n");
 
 	if (solverEntity == nullptr)
 	{
