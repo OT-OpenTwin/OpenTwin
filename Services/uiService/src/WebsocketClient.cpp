@@ -11,6 +11,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
 // SSL
@@ -293,7 +294,7 @@ bool WebsocketClient::ensureConnection(void) {
 		}
 		processMessages();
 
-		if (!m_isConnected && (ot::DateTime::msSinceEpoch() - startTime) > 30000) {
+		if (!m_isConnected && (ot::DateTime::msSinceEpoch() - startTime) > (5 * ot::msg::defaultTimeout)) {
 			OT_LOG_E("Connection to relay service cancelled due to timeout");
 			return false;
 		}
