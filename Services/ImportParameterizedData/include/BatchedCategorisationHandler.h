@@ -10,6 +10,8 @@
 class BatchedCategorisationHandler : public BusinessLogicHandler
 {
 public:
+	BatchedCategorisationHandler() = default;
+	~BatchedCategorisationHandler();
 	void createNewScriptDescribedMSMD(std::list<ot::UID> _selectedEntities);
 	void addCreator();
 private:

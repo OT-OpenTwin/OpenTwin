@@ -8,6 +8,15 @@
 #include "OTCore/EntityName.h"
 #include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
+
+BatchedCategorisationHandler::~BatchedCategorisationHandler()
+{
+	if (m_pythonInterface != nullptr)
+	{
+		delete m_pythonInterface;
+		m_pythonInterface = nullptr;
+	}
+}
 void BatchedCategorisationHandler::createNewScriptDescribedMSMD(std::list<ot::UID> _selectedEntities)
 {
 	try
