@@ -125,12 +125,12 @@ bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, un
 
 	{
 		std::lock_guard<std::recursive_mutex> guard(m_accessPrefetchDocuments);
-		if (m_prefetchedDocuments.count(entityID) > 0)
+		auto prefetchedDocument = m_prefetchedDocuments.find(entityID);
+		if (prefetchedDocument != m_prefetchedDocuments.end())
 		{
 			// We have prefetched this document
-			bsoncxx::builder::basic::document* prefetchedDoc = m_prefetchedDocuments[entityID];
-
-			doc.append(bsoncxx::builder::basic::kvp("Found", prefetchedDoc->view()));
+			bsoncxx::document::value prefetchedDoc = std::move(prefetchedDocument->second);
+			doc.append(bsoncxx::builder::basic::kvp("Found", std::move(prefetchedDoc)));
 
 			RemovePrefetchedDocument(entityID);
 
@@ -227,7 +227,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	DataStorageAPI::QueryBuilder queryBuilder;
 	std::vector<std::string> columnNames;
 
-	auto query = bsoncxx::builder::basic::document{};
+	
 	auto queryArray = bsoncxx::builder::basic::array();
 
 	for (auto storageID : prefetchIdandVersion)
@@ -245,7 +245,7 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	}
 
 	auto queryBuilderDoc = bsoncxx::builder::basic::document{};
-	queryBuilderDoc.append(kvp("$or", queryArray));
+	queryBuilderDoc.append(bsoncxx::builder::basic::kvp("$or", queryArray.extract()));
 
 	BsonViewOrValue filterQuery = queryBuilderDoc.extract();
 	auto projectionQuery = queryBuilder.GenerateSelectQuery(columnNames, false);
@@ -268,13 +268,11 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 		{
 			auto insertType = (*resultPointer)["InsertType"].get_int32().value;
 			if (InsertType(insertType) == InsertType::Database)
-			{
-				bsoncxx::builder::basic::document* doc = new bsoncxx::builder::basic::document{};
-				doc->append(bsoncxx::builder::concatenate(*resultPointer));
-
+			{				
+				
 				unsigned long long entityID = (*resultPointer)["EntityID"].get_int64();
 
-				m_prefetchedDocuments[entityID] = doc;
+				m_prefetchedDocuments.emplace(entityID, bsoncxx::document::value{*resultPointer});
 				numberPrefetchedDocs++;
 			}
 			else
