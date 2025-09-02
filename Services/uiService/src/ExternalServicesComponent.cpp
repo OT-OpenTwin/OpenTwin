@@ -113,62 +113,6 @@ static bool g_runSessionServiceHealthCheck{ false };
 
 #undef GetObject
 
-extern "C"
-{
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP)
-	{
-		char *retval = nullptr;
-		try {
-			OT_LOG("Perform action: " + std::string(json), ot::INBOUND_MESSAGE_LOG);
-
-			QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "performAction", /*Qt::BlockingQueuedConnection*/
-				Qt::DirectConnection, Q_RETURN_ARG(char *, retval), Q_ARG(const char*, json), Q_ARG(const char*, senderIP));
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-		return retval;
-	};
-
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP)
-	{
-		char *retval = nullptr;
-		try {
-
-			char *dataCopy = new char[strlen(json) + 1];
-			strcpy(dataCopy, json);
-
-			char *senderIPCopy = new char[strlen(senderIP) + 1];
-			strcpy(senderIPCopy, senderIP);
-
-			OT_LOG("Queue action: " + std::string(json), ot::QUEUED_INBOUND_MESSAGE_LOG);
-
-			QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-		return retval;
-	};
-
-	_declspec(dllexport) void deallocateData(const char *data)
-	{
-		try {
-			// std::cout << "deallocateData: ";
-			if (data != nullptr)
-			{
-				QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, data));
-			}
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-	};
-}
-
 namespace ot {
 	namespace intern {
 		void exitAsync(int _code) {
@@ -1557,13 +1501,6 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 // Slots
 
-char* ExternalServicesComponent::performAction(const char* json, const char* senderIP) {
-	OT_LOG_E("Perform action requets are not supported by the frontend");
-	char* retval = new char[1];
-	retval[0] = '\0';
-	return retval;
-}
-
 void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
 {
 	ot::JsonDocument doc;
@@ -1581,7 +1518,7 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(const char* _json, const char* _senderIP) {
+void ExternalServicesComponent::queueAction(std::string _json, std::string _senderIP) {
 	using namespace std::chrono_literals;
 	static std::atomic_bool lock = false;
 
@@ -1594,16 +1531,14 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 
 	lock = true;
 
-	std::string json(_json);
-
 	if (m_bufferActions) {
-		OT_LOG_D("Buffering request: " + json);
+		OT_LOG_D("Buffering request: " + _json);
 
 		// If the buffer is enabled, we store the action in the buffer
-		m_actionBuffer.push_back(std::move(json));
+		m_actionBuffer.push_back(std::move(_json));
 	}
 	else {
-		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+		ot::ActionDispatcher::instance().dispatch(_json, ot::QUEUE);
 
 		// If there are still buffered actions, we process them now
 		while (!m_actionBuffer.empty() && !m_bufferActions) {
@@ -1618,18 +1553,8 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 			m_websocket->finishedProcessingQueuedMessage();
 		}
 	}
-
-	if (_senderIP) {
-		delete[] _senderIP;
-		_senderIP = nullptr;
-	}
 	
 	lock = false;
-}
-
-void ExternalServicesComponent::deallocateData(const char *data)
-{
-	delete[] data;
 }
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
@@ -4543,7 +4468,7 @@ void ExternalServicesComponent::slotProcessActionBuffer() {
 
 	std::string action = m_actionBuffer.front();
 	m_actionBuffer.pop_front();
-	this->queueAction(action.c_str(), nullptr);
+	this->queueAction(action, "");
 }
 
 void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message) {

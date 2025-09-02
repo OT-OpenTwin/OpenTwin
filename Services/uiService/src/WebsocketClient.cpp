@@ -1,4 +1,6 @@
+#include "AppBase.h"
 #include "WebsocketClient.h"
+#include "ExternalServicesComponent.h"
 
 #include <QEventLoop>
 #include <QFile>
@@ -17,13 +19,6 @@
 // SSL
 #include <QtCore/QFile>
 #include <QProcessEnvironment>
-
-extern "C"
-{
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP);
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP);
-	_declspec(dllexport) void deallocateData(const char *data);
-}
 
 WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), 
@@ -172,7 +167,14 @@ void WebsocketClient::slotSocketDisconnected() {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceConnectionLost, doc.GetAllocator()), doc.GetAllocator());
 		m_currentlyProcessingQueuedMessage = true;
-		queueAction(doc.toJson().c_str(), "");
+
+		QMetaObject::invokeMethod(
+			AppBase::instance()->getExternalServicesComponent(),
+			"queueAction",
+			Qt::QueuedConnection,
+			Q_ARG(std::string, doc.toJson()),
+			Q_ARG(std::string, "")
+		);
 	}
 }
 
@@ -250,31 +252,30 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 	QString senderIP = message.mid(index1 + 1, index2 - index1 - 1);
 	QString jsonData = message.mid(index2 + 1);
 
-	const char *response = nullptr;
-
 	if (action == "execute")
 	{
-		response = performAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
+		OT_LOG_EA("Execute actions are not supported by the frontend");
 	}
 	else if (action == "queue")
 	{
 		m_currentlyProcessingQueuedMessage = true;
-		response = queueAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
+
+		QMetaObject::invokeMethod(
+			AppBase::instance()->getExternalServicesComponent(),
+			"queueAction",
+			Qt::QueuedConnection,
+			Q_ARG(std::string, jsonData.toStdString()),
+			Q_ARG(std::string, senderIP.toStdString())
+		);
 	}
 	else
 	{
-		assert(0); // Unknown action.
+		OT_LOG_EA("Unknown action");
 		return;
 	}
 
 	// The message was processed and we need to relay the reponse
 	std::string returnMessage = "response\n";
-
-	if (response != nullptr)
-	{
-		returnMessage += response;
-		deallocateData(response);
-	}
 
 	sendResponse(returnMessage);
 }

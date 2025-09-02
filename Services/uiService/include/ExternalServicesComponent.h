@@ -347,9 +347,7 @@ public:
 	OT_HANDLER(handleModelLibraryDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_ModelDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 
 public Q_SLOTS:
-	char *performAction(const char *json, const char *senderIP);
-	void queueAction(const char *json, const char *senderIP);
-	void deallocateData(const char *data);
+	void queueAction(std::string json, std::string senderIP);
 	void shutdownAfterSessionServiceDisconnected(void);
 	void sendExecuteRequest(const char* url, const char* message);
 	char* sendExecuteRequestWithAnswer(const char* url, const char* message);
