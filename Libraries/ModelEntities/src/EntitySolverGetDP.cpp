@@ -23,7 +23,7 @@ void EntitySolverGetDP::createProperties(std::string& _meshFolderName, ot::UID& 
 
 
 	// Add a debug switch
-	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "GetDP", getProperties());
+	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "GetDPSolver", getProperties());
 
 	// Configure the visibility
 	updateFromProperties();
