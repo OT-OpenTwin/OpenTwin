@@ -7,6 +7,7 @@
 #include "NavigationSelectionManager.h"
 
 // OpenTwin header
+#include "OTCore/ContainerHelper.h"
 #include "OTCore/LocalStateStack.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/BasicNumberIncrementWrapper.h"
@@ -22,6 +23,11 @@ ot::NavigationSelectionManager::~NavigationSelectionManager() {
 }
 
 ot::SelectionHandlingResult ot::NavigationSelectionManager::runSelectionHandling(SelectionOrigin _eventOrigin, const UIDList& _newSelection) {
+	if (ContainerHelper::isEqual(_newSelection, m_selectionInfo.getSelectedNavigationItems())) {
+		// No change
+		return SelectionHandlingEvent::Default;
+	}
+
 	BasicNumberIncrementWrapper ct(m_runCounter);
 
 	m_selectionOrigin = _eventOrigin;
