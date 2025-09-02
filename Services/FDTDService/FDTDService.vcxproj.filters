@@ -21,9 +21,6 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GetDPLauncher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,12 +33,12 @@
     <ClCompile Include="src\SolverElectrostatics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FDTDLauncher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GetDPLauncher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ModelNotifier.h">
@@ -54,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SolverElectrostatics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FDTDLauncher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

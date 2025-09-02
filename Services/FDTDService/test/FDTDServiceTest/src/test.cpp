@@ -1,7 +1,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-TEST(GetDPService, TestName) {
+TEST(FDTDService, TestName) {
   EXPECT_EQ(1, 1);
   EXPECT_TRUE(true);
 }

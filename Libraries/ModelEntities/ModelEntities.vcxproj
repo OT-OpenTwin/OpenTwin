@@ -37,6 +37,7 @@
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\EntityResultUnstructuredMeshVtk.h" />
+    <ClInclude Include="include\EntitySolverFDTD.h" />
     <ClInclude Include="include\EntitySolverPyrit.h" />
     <ClInclude Include="include\EntityVisUnstructuredVectorSurface.h" />
     <ClInclude Include="include\InvalidUID.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="src\EntityResultUnstructuredMeshVtk.cpp" />
     <ClCompile Include="src\EntitySolverCircuitSimulator.cpp" />
     <ClCompile Include="src\EntitySolverElmerFEM.cpp" />
+    <ClCompile Include="src\EntitySolverFDTD.cpp" />
     <ClCompile Include="src\EntitySolverPyrit.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarSurface.cpp" />
     <ClCompile Include="src\EntityVisUnstructuredScalarVolume.cpp" />

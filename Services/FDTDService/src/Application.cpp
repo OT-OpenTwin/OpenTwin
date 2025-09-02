@@ -19,8 +19,8 @@
 #include "EntityAPI.h"
 
 // Application specific includes
-#include "GetDPLauncher.h"
-#include "EntitySolverGetDP.h"
+#include "FDTDLauncher.h"
+#include "EntitySolverFDTD.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "ClassFactory.h"
@@ -31,11 +31,9 @@
 #include <map>
 
 // The name of this service
-//#define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_GETDP
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_FDTD
 
 // The type of this service
-//#define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_GETDP
 #define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_FDTD
 
 Application::Application()
@@ -78,17 +76,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("FDTD");
-	_ui->addMenuPage("Model");
 
 	_ui->addMenuGroup("FDTD", "Solver");
-	_ui->addMenuGroup("FDTD", "Sources");
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_ui->addMenuButton("FDTD", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("FDTD", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
-
-	_ui->addMenuButton("FDTD", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
 
 	modelSelectionChanged();
 
@@ -140,7 +134,6 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "FDTD:Solver:Create Solver")	          addSolver();
 	else if (action == "FDTD:Solver:Run Solver")		  runSolver();
-	else if (action == "FDTD:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
 	return std::string();
 }
@@ -173,32 +166,6 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 	// The visualization model isnot known yet -> get it from the model
 	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
-}
-
-void Application::definePotential(void)
-{
-	// Get the list of all geometry entities from the model service
-	std::list<ot::EntityInformation> selectedGeometryEntities, selectedTetMeshEntities;
-	ot::ModelServiceAPI::getSelectedEntityInformation(selectedGeometryEntities, "EntityGeometry");
-	ot::ModelServiceAPI::getSelectedEntityInformation(selectedTetMeshEntities, "EntityMeshTetItem");
-
-	// Get an entity list
-	ot::UIDList updateEntities;
-	for (auto entity : selectedGeometryEntities) updateEntities.push_back(entity.getEntityID());
-	for (auto entity : selectedTetMeshEntities) updateEntities.push_back(entity.getEntityID());
-
-	// Create a property object with the new properties and get it as JSON string
-	EntityProperties properties;
-	EntityPropertiesDouble::createProperty("Solver", "Electrostatic Potential", 0.0, "FDTD", properties);
-	properties.setAllPropertiesNonProtected();
-
-	ot::PropertyGridCfg cfg;
-	properties.addToConfiguration(nullptr, false, cfg);
-
-	// Set the message to the model service
-	ot::ModelServiceAPI::addPropertiesToEntities(updateEntities, cfg);
-
-	ot::ModelServiceAPI::modelChangeOperationCompleted("Added electrostatic potential definitions");
 }
 
 void Application::addSolver(void)
@@ -235,7 +202,7 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverGetDP *solverEntity = new EntitySolverGetDP(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverFDTD *solverEntity = new EntitySolverFDTD(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
@@ -412,11 +379,11 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	deleteSingleSolverResults(solverEntity);
 
-	GetDPLauncher getDPSolver(this);
+	FDTDLauncher fdtdSolver(this);
 	modelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
+	std::string output = fdtdSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
 												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 

@@ -52,6 +52,7 @@
 #include "EntityParameterizedDataPreviewTable.h"
 #include "EntityMetadataCampaign.h"
 #include "EntitySolverGetDP.h"
+#include "EntitySolverFDTD.h"
 #include "EntitySolverPyrit.h"
 #include "EntitySolverElmerFEM.h"
 #include "EntityMetadataSeries.h"
@@ -297,6 +298,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntitySolverGetDP")
 	{
 		return new EntitySolverGetDP(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntitySolverFDTD")
+	{
+		return new EntitySolverFDTD(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else if (entityType == "EntitySolverPyrit")
 	{

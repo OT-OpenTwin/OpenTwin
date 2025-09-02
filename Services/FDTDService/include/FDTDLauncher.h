@@ -19,11 +19,11 @@ class Application;
 
 class EntityBase;
 
-class GetDPLauncher
+class FDTDLauncher
 {
 public:
-	GetDPLauncher(Application *app);
-	virtual ~GetDPLauncher();
+	FDTDLauncher(Application *app);
+	virtual ~FDTDLauncher();
 
 	std::string startSolver(std::string& logFileText, const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent);
 

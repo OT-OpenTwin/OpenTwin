@@ -196,16 +196,16 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FDTDLauncher.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
-    <ClCompile Include="src\GetDPLauncher.cpp" />
     <ClCompile Include="src\SolverBase.cpp" />
     <ClCompile Include="src\SolverElectrostatics.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\FDTDLauncher.h" />
     <ClInclude Include="include\ModelNotifier.h" />
-    <ClInclude Include="include\GetDPLauncher.h" />
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverElectrostatics.h" />
     <ClInclude Include="include\UiNotifier.h" />

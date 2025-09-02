@@ -107,7 +107,6 @@ public:
 
 	void addSolver(void);
 	void runSolver(void);
-	void definePotential(void);
 	void EnsureVisualizationModelIDKnown(void);
 
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap);

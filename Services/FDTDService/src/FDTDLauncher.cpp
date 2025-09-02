@@ -1,5 +1,5 @@
 
-#include "GetDPLauncher.h"
+#include "FDTDLauncher.h"
 
 #include "DataBase.h"
 #include "Application.h"
@@ -27,18 +27,18 @@
 #include <direct.h>
 
 
-GetDPLauncher::GetDPLauncher(Application *app)
+FDTDLauncher::FDTDLauncher(Application *app)
 	: application(app)
 {
 
 }
 
-GetDPLauncher::~GetDPLauncher()
+FDTDLauncher::~FDTDLauncher()
 {
 
 }
 
-std::string GetDPLauncher::startSolver(std::string &logFileText, const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent)
+std::string FDTDLauncher::startSolver(std::string &logFileText, const std::string &dataBaseURL, const std::string &uiUrl, const std::string &projectName, EntityBase* solverEntity, int serviceID, int sessionCount, ot::components::ModelComponent *modelComponent)
 {
 	std::string outputText;
 	logFileText.clear();
@@ -137,7 +137,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 	return outputText;
 }
 
-void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo)
+void FDTDLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo)
 {
 	std::list<ot::EntityInformation> info;
 	ot::ModelServiceAPI::getEntityChildInformation(meshDataID, info, true);
@@ -148,7 +148,7 @@ void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::E
 	}
 }
 
-void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
+void FDTDLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
 {
 	application->modelComponent()->loadMaterialInformation();
 
@@ -170,7 +170,7 @@ void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityPropertie
 	}
 }
 
-void GetDPLauncher::readGroupsFromMesh(const std::string& meshFileName, std::map<std::string, size_t>& groupNameToIdMap)
+void FDTDLauncher::readGroupsFromMesh(const std::string& meshFileName, std::map<std::string, size_t>& groupNameToIdMap)
 {
 	// Here we process the mesh file in between the lines $PhysicalNames and $EndPhysicalNames
 
@@ -214,7 +214,7 @@ void GetDPLauncher::readGroupsFromMesh(const std::string& meshFileName, std::map
 	}
 }
 
-std::string GetDPLauncher::getProblemType(EntityBase* solverEntity)
+std::string FDTDLauncher::getProblemType(EntityBase* solverEntity)
 {
 	EntityPropertiesSelection* solver = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Problem type"));
 	assert(solver != nullptr);
@@ -224,7 +224,7 @@ std::string GetDPLauncher::getProblemType(EntityBase* solverEntity)
 	return solver->getValue();
 }
 
-std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::string &tempDirPath, ot::UID &meshDataID, std::string &currentMeshDataName)
+std::string FDTDLauncher::extractMesh(EntityBase* solverEntity, const std::string &tempDirPath, ot::UID &meshDataID, std::string &currentMeshDataName)
 {
 	// Get the name of the currently selected mesh
 	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
@@ -283,7 +283,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	return meshFileName;
 }
 
-std::string GetDPLauncher::readOutputFile(const std::string &fileName)
+std::string FDTDLauncher::readOutputFile(const std::string &fileName)
 {
 	std::ifstream outputFile(fileName);
 
@@ -298,7 +298,7 @@ std::string GetDPLauncher::readOutputFile(const std::string &fileName)
 	return content.str();
 }
 
-std::string GetDPLauncher::getUniqueTempDir(void)
+std::string FDTDLauncher::getUniqueTempDir(void)
 {
 	std::string tempDir = getSystemTempDir();
 
@@ -307,7 +307,7 @@ std::string GetDPLauncher::getUniqueTempDir(void)
 
 	do
 	{
-		uniqueTempDir = tempDir + "\\GETDP_WORK" + std::to_string(count);
+		uniqueTempDir = tempDir + "\\FDTD_WORK" + std::to_string(count);
 		count++;
 
 	} while (checkFileOrDirExists(uniqueTempDir));
@@ -315,12 +315,12 @@ std::string GetDPLauncher::getUniqueTempDir(void)
 	return uniqueTempDir;
 }
 
-std::string GetDPLauncher::getSystemTempDir(void)
+std::string FDTDLauncher::getSystemTempDir(void)
 {
 	return readEnvironmentVariable("TMP");
 }
 
-std::string GetDPLauncher::readEnvironmentVariable(const std::string &variableName)
+std::string FDTDLauncher::readEnvironmentVariable(const std::string &variableName)
 {
 	std::string variableValue;
 
@@ -335,7 +335,7 @@ std::string GetDPLauncher::readEnvironmentVariable(const std::string &variableNa
 	return variableValue;
 }
 
-bool GetDPLauncher::checkFileOrDirExists(const std::string &path)
+bool FDTDLauncher::checkFileOrDirExists(const std::string &path)
 {
 	struct stat info;
 
@@ -347,7 +347,7 @@ bool GetDPLauncher::checkFileOrDirExists(const std::string &path)
 		return true;   // This might be a file
 }
 
-bool GetDPLauncher::deleteDirectory(const std::string &pathName)
+bool FDTDLauncher::deleteDirectory(const std::string &pathName)
 {
 	// First delete all files in the directoy
 	WIN32_FIND_DATAA FindFileData;
