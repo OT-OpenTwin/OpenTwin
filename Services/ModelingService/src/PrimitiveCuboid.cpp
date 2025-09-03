@@ -136,8 +136,6 @@ void PrimitiveCuboid::createFromRubberbandJson(const std::string& _json, std::ve
 			double zmin = std::min(w1, w5);
 			double zmax = std::max(w1, w5);
 
-			TopoDS_Shape box = BRepPrimAPI_MakeBox(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
-
 			std::list<std::pair<std::string, std::string>> shapeParameters;
 
 			shapeParameters.push_back(std::pair<std::string, std::string>("Xmin", to_string(xmin)));
@@ -147,7 +145,14 @@ void PrimitiveCuboid::createFromRubberbandJson(const std::string& _json, std::ve
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmin", to_string(zmin)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmax", to_string(zmax)));
 
-			std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
+			TopoDS_Shape box;
+			std::list<std::string> faceNames;
+
+			if (fabs(xmax-xmin) > Precision::Confusion() && fabs(ymax - ymin) > Precision::Confusion() && fabs(zmax - zmin) > Precision::Confusion())
+			{
+				box = BRepPrimAPI_MakeBox(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
+				faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
+			}
 
 			storeShapeInModel(box, _transform, "Geometry/Cuboid", "Cuboid", shapeParameters, faceNames);
 		}
@@ -192,17 +197,26 @@ void PrimitiveCuboid::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	double zmin = std::min(zminE, zmaxE);
 	double zmax = std::max(zminE, zmaxE);
 
-	try
-	{
-		shape = BRepPrimAPI_MakeBox(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
-		
-	}
-	catch (Standard_Failure)
-	{
-		assert(0); // Invalid parameters, shape creation failed.
-	}
+	std::list<std::string> faceNames;
 
-	std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
+	if (fabs(xmax - xmin) > Precision::Confusion() && fabs(ymax - ymin) > Precision::Confusion() && fabs(zmax - zmin) > Precision::Confusion())
+	{
+		try
+		{
+			shape = BRepPrimAPI_MakeBox(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
+		}
+		catch (Standard_Failure)
+		{
+			assert(0); // Invalid parameters, shape creation failed.
+		}
+
+		faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
+	}
+	else
+	{
+		TopoDS_Shape empty;
+		shape = empty;
+	}
 
 	applyFaceNames(geomEntity, shape, faceNames);
 }
