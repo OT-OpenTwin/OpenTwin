@@ -75,14 +75,22 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
-	_ui->addMenuPage("FDTD");
 
-	_ui->addMenuGroup("FDTD", "Solver");
+	const std::string pageName = "FDTD";
+
+	_ui->addMenuPage(pageName);
+
+	const std::string groupNameSolver = "Solver";
+	const std::string groupNameSignal = "Signal Type";
+
+	_ui->addMenuGroup(pageName, groupNameSolver);
+	_ui->addMenuGroup(pageName, groupNameSignal);
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	_ui->addMenuButton("FDTD", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("FDTD", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
+	_ui->addMenuButton(pageName, groupNameSolver, "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
+	_ui->addMenuButton(pageName, groupNameSolver, "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
+	_ui->addMenuButton(pageName, groupNameSignal, "Create Signal", "Create Signal", modelWrite, "Signal", "Default");
 
 	modelSelectionChanged();
 
