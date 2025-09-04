@@ -15,10 +15,13 @@ EntitySolverFDTD::~EntitySolverFDTD()
 void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID)
 {
 	getProperties().createProperty(new EntityPropertiesEntityList("Mesh", _meshFolderName, _meshFolderID, _meshName, _meshID), "General");
-	EntityPropertiesSelection::createProperty("General", "Problem type", { "Electrostatics" }, "Electrostatics", "FDTDSolver", getProperties());
+	//EntityPropertiesSelection::createProperty("General", "Problem type", { "Electrostatics" }, "Electrostatics", "FDTDSolver", getProperties());
 
 	// Create the electrostatics properties
-	EntityPropertiesDouble::createProperty("Electrostatics", "Boundary potential", 0, "FDTDSolver", getProperties());
+	//EntityPropertiesDouble::createProperty("Electrostatics", "Boundary potential", 0, "FDTDSolver", getProperties());
+
+	// Create the timesteps properties
+	EntityPropertiesDouble::createProperty("Simulation Settings", "Timesteps", 0.0, "FDTDSolver", getProperties());
 
 
 
@@ -44,13 +47,13 @@ bool EntitySolverFDTD::updateFromProperties(void)
 	// Check and update the visibility
 	EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type"));
 
-	bool boundaryPotentialVisible = problemType->getValue() == "Electrostatics";
+	//bool boundaryPotentialVisible = problemType->getValue() == "Electrostatics";
 
-	EntityPropertiesDouble* boundaryPotential = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary potential"));
+	//EntityPropertiesDouble* boundaryPotential = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary potential"));
 
-	if (boundaryPotentialVisible != boundaryPotential->getVisible()) updatePropertiesGrid = true;
+	//if (boundaryPotentialVisible != boundaryPotential->getVisible()) updatePropertiesGrid = true;
 
-	boundaryPotential->setVisible(boundaryPotentialVisible);
+	//boundaryPotential->setVisible(boundaryPotentialVisible);
 
 	getProperties().forceResetUpdateForAllProperties();
 
