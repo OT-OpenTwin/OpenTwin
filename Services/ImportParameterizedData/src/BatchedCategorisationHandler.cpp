@@ -5,6 +5,7 @@
 
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTSystem/DateTime.h"
 #include "OTCore/EntityName.h"
 #include "EntityBatchImporter.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
@@ -25,6 +26,8 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(
 	try
 	{
 		UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
+
+		int64_t startTime = ot::DateTime::msSinceEpoch();
 
 		ensureEssentials();
 		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
@@ -82,7 +85,7 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(
 
 
 		}
-		_uiComponent->displayMessage("Batch import finished.\n");
+		_uiComponent->displayMessage("Batch import finished (Took " + ot::DateTime::intervalToString(startTime - ot::DateTime::msSinceEpoch()) + ").\n");
 	}
 	
 	catch (std::exception& _e)
