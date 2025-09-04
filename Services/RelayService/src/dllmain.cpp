@@ -204,16 +204,18 @@ extern "C"
 		return 0;
 	}
 
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP)
+	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
 		QString retVal;
 		try {
-
-			//std::cout << "performAction: " << json << std::endl;
-			QMetaObject::invokeMethod(&SocketServer::instance(), "performAction", /*Qt::BlockingQueuedConnection*/
-				Qt::DirectConnection, Q_RETURN_ARG(QString, retVal), Q_ARG(const char*, json), Q_ARG(const char*, senderIP));
-
-			// std::cout << "performAction completed: " << retval << std::endl;
+			QMetaObject::invokeMethod(
+				&SocketServer::instance(),
+				"performAction",
+				Qt::DirectConnection, 
+				Q_RETURN_ARG(QString, retVal), 
+				Q_ARG(const char*, _json),
+				Q_ARG(const char*, _senderIP)
+			);
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS(e.what());
@@ -228,17 +230,17 @@ extern "C"
 		return retval;
 	}
 
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP)
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
 	{
 		char *retval = nullptr;
 
 		try {
 
-			char *dataCopy = new char[strlen(json) + 1];
-			strcpy(dataCopy, json);
+			char *dataCopy = new char[strlen(_json) + 1];
+			strcpy(dataCopy, _json);
 
-			char *senderIPCopy = new char[strlen(senderIP) + 1];
-			strcpy(senderIPCopy, senderIP);
+			char *senderIPCopy = new char[strlen(_senderIP) + 1];
+			strcpy(senderIPCopy, _senderIP);
 
 			// std::cout << "queueAction: " << dataCopy << std::endl;
 
@@ -253,7 +255,7 @@ extern "C"
 		return retval;
 	}
 
-	_declspec(dllexport) const char *getServiceURL(void)
+	_declspec(dllexport) const char *getServiceURL()
 	{
 		char *retVal = new char[SocketServer::instance().getRelayUrl().size() + 1];
 		strcpy(retVal, SocketServer::instance().getRelayUrl().c_str());
@@ -261,13 +263,13 @@ extern "C"
 		return retVal;
 	}
 
-	_declspec(dllexport) void deallocateData(const char *data)
+	_declspec(dllexport) void deallocateData(const char * _data)
 	{
 		try {
 			// std::cout << "deallocateData: ";
-			if (data != nullptr)
+			if (_data != nullptr)
 			{
-				QMetaObject::invokeMethod(&SocketServer::instance(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, data));
+				QMetaObject::invokeMethod(&SocketServer::instance(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, _data));
 			}
 		}
 		catch (const std::exception & e) {

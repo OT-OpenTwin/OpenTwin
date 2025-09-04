@@ -22,12 +22,12 @@
 // std header
 #include <iostream>
 
-SocketServer& SocketServer::instance(void) {
+SocketServer& SocketServer::instance() {
 	static SocketServer g_instance;
 	return g_instance;
 }
 
-bool SocketServer::startServer(void) {
+bool SocketServer::startServer() {
 	OT_LOG_D("Setting up websocket \"" + m_websocketIp + "\"");
 
 	QHostAddress serverAddress;
@@ -73,19 +73,19 @@ bool SocketServer::startServer(void) {
 	}
 }
 
-bool SocketServer::sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response) {
+bool SocketServer::sendHttpRequest(const std::string& _operation, const std::string& _url, const std::string& _jsonData, std::string& _response) {
 	try {
-		OT_LOG_D("Sending http request (" + operation + ") to " + url + ": " + jsonData);
+		OT_LOG_D("Sending http request (" + _operation + ") to " + _url + ": " + _jsonData);
 
 		bool success = false;
 
-		if (operation == "execute")
+		if (_operation == "execute")
 		{
-			success = ot::msg::send(m_relayUrl, url, ot::EXECUTE, jsonData, response);
+			success = ot::msg::send(m_relayUrl, _url, ot::EXECUTE, _jsonData, _response);
 		}
-		else if (operation == "queue")
+		else if (_operation == "queue")
 		{
-			success = ot::msg::send(m_relayUrl, url, ot::QUEUE, jsonData, response);
+			success = ot::msg::send(m_relayUrl, _url, ot::QUEUE, _jsonData, _response);
 		}
 		else
 		{
@@ -110,11 +110,11 @@ bool SocketServer::sendHttpRequest(const std::string& operation, const std::stri
 
 // Public: Slots
 
-QString SocketServer::performAction(const char* json, const char* senderIP)
+QString SocketServer::performAction(const char* _json, const char* _senderIP)
 {
 	try {
 		ot::JsonDocument doc;
-		doc.fromJson(json);
+		doc.fromJson(_json);
 
 		std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
 
@@ -142,7 +142,7 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 
-		std::string response = sendProcessWSMessage("execute", senderIP, json);
+		std::string response = sendProcessWSMessage("execute", _senderIP, _json);
 
 		QString retVal = response.c_str();
 
@@ -160,11 +160,11 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 	}
 }
 
-void SocketServer::queueAction(const char* json, const char* senderIP)
+void SocketServer::queueAction(const char* _json, const char* _senderIP)
 {
 	try {
 		ot::JsonDocument doc;
-		doc.fromJson(json);
+		doc.fromJson(_json);
 
 		std::string action = ot::json::getString(doc, "action");
 
@@ -174,13 +174,16 @@ void SocketServer::queueAction(const char* json, const char* senderIP)
 			shutdown();
 		}
 
-		sendQueueWSMessage("queue", senderIP, json);
+		this->sendQueueWSMessage("queue", _senderIP, _json);
 
-		delete[] json;
-		json = nullptr;
-
-		delete[] senderIP;
-		senderIP = nullptr;
+		if (_json) {
+			delete[] _json;
+			_json = nullptr;
+		}
+		if (_senderIP) {
+			delete[] _senderIP;
+			_senderIP = nullptr;
+		}
 	}
 	catch (const std::exception& e) {
 		OT_LOG_E(std::string(e.what()));
@@ -190,13 +193,11 @@ void SocketServer::queueAction(const char* json, const char* senderIP)
 	}
 }
 
-void SocketServer::deallocateData(const char* data)
-{
-	if (data != nullptr)
-	{
-		delete[] data;
+void SocketServer::deallocateData(const char* _data) {
+	if (_data != nullptr) {
+		delete[] _data;
 	}
-	data = nullptr;
+	_data = nullptr;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -243,8 +244,8 @@ void SocketServer::processMessage(QString message) {
 		{
 			OT_LOG_D("Response to previous message received on websocket");
 
-			responseText = stdMessage.substr(index1 + 1);
-			responseReceived = true;
+			m_responseText = stdMessage.substr(index1 + 1);
+			m_responseReceived = true;
 		}
 		else if (operation == "execute" || operation == "queue")
 		{
@@ -290,7 +291,7 @@ void SocketServer::processMessage(QString message) {
 	}
 }
 
-void SocketServer::socketDisconnected(void) {
+void SocketServer::socketDisconnected() {
 	OT_LOG_D("Client disconnected on websocket");
 
 	QWebSocket* pClient = qobject_cast<QWebSocket*>(sender());
@@ -311,12 +312,12 @@ void SocketServer::socketDisconnected(void) {
 void SocketServer::onSslErrors(const QList<QSslError>& _errors)
 {
 	// TODO: HANDLE SSL ERRORS?
-	for (auto e : _errors) {
+	for (const QSslError& e : _errors) {
 		OT_LOG_E("SSL error occurred: " + e.errorString().toStdString());
 	}
 }
 
-void SocketServer::slotSocketClosed(void) {
+void SocketServer::slotSocketClosed() {
 	OT_LOG_D("Socket closed");
 	if (m_pWebSocketServer) {
 		m_pWebSocketServer = nullptr;
@@ -326,7 +327,7 @@ void SocketServer::slotSocketClosed(void) {
 	QCoreApplication::quit();
 }
 
-void SocketServer::keepAlive()
+void SocketServer::keepAlive() const
 {
 	auto currentTime = std::chrono::system_clock::now();
 
@@ -349,7 +350,7 @@ void SocketServer::keepAlive()
 // Private: Helper
 
 SocketServer::SocketServer()
-	: QObject(nullptr), m_pWebSocketServer(nullptr), responseReceived(false), m_websocketPort(0), m_keepAliveTimer(nullptr)
+	: QObject(nullptr), m_pWebSocketServer(nullptr), m_responseReceived(false), m_websocketPort(0), m_keepAliveTimer(nullptr)
 {
 
 }
@@ -372,23 +373,23 @@ SocketServer::~SocketServer() {
 	qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
-void SocketServer::processMessages(void) {
+void SocketServer::processMessages() {
 	QEventLoop eventLoop;
 	// We have to process all messages to make sure we are connected
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
-void SocketServer::shutdown(void) {
+void SocketServer::shutdown() {
 	OT_LOG_D("Shutting down relay service");
 
 	// Exit the application
 	exit(ot::AppExitCode::Success);
 }
 
-void SocketServer::sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData) {
+void SocketServer::sendQueueWSMessage(const std::string& _operation, const std::string& _senderIP, const std::string& _jsonData) {
 	// Build and send the message through the websocket connection
 
-	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
+	std::string message = _operation + "\n" + _senderIP + "\n" + _jsonData;
 
 	OT_LOG_D("Relaying received message to websocket");
 
@@ -399,12 +400,12 @@ void SocketServer::sendQueueWSMessage(const std::string operation, const std::st
 	}
 }
 
-std::string SocketServer::sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData) {
-	responseReceived = false;
+std::string SocketServer::sendProcessWSMessage(const std::string& _operation, const std::string& _senderIP, const std::string& _jsonData) {
+	m_responseReceived = false;
 
 	// Build and send the message through the websocket connection
 
-	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
+	std::string message = _operation + "\n" + _senderIP + "\n" + _jsonData;
 
 	OT_LOG_D("Relaying received message to websocket");
 
@@ -417,15 +418,15 @@ std::string SocketServer::sendProcessWSMessage(const std::string operation, cons
 	// Now wait for the response
 	// NOTE: This function is problematic, since it will also process further queued actions. A message filter needs to be 
 	// set such that this type of messages is not processed here.
-	while (!responseReceived)
+	while (!m_responseReceived)
 	{
 		processMessages();
 	}
 
-	return responseText;
+	return m_responseText;
 }
 
-std::string SocketServer::getSystemInformation(void) {
+std::string SocketServer::getSystemInformation() {
 	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
 
 	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
@@ -438,8 +439,6 @@ std::string SocketServer::getSystemInformation(void) {
 	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
 
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString("RelayService", reply.GetAllocator()), reply.GetAllocator());
-	//reply.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_application->sessionID(), reply.GetAllocator()), reply.GetAllocator());
-	//reply.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_application->projectType(), reply.GetAllocator()), reply.GetAllocator());
-
+	
 	return reply.toJson();
 }
