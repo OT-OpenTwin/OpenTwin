@@ -15,18 +15,16 @@ EntitySolverFDTD::~EntitySolverFDTD()
 void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _meshFolderID, std::string& _meshName, ot::UID& _meshID)
 {
 	getProperties().createProperty(new EntityPropertiesEntityList("Mesh", _meshFolderName, _meshFolderID, _meshName, _meshID), "General");
-	//EntityPropertiesSelection::createProperty("General", "Problem type", { "Electrostatics" }, "Electrostatics", "FDTDSolver", getProperties());
 
-	// Create the electrostatics properties
-	//EntityPropertiesDouble::createProperty("Electrostatics", "Boundary potential", 0, "FDTDSolver", getProperties());
-
-	// Create the timesteps properties
-	EntityPropertiesDouble::createProperty("Simulation Settings", "Timesteps", 0.0, "FDTDSolver", getProperties());
-
-
-
-	// Add a debug switch
+	EntityPropertiesInteger::createProperty("Frequency", "Start Frequency", 0, "FDTDSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Frequency", "Center Frequency", 0, "FDTDSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Frequency", "End Frequency", 0, "FDTDSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Simulation Settings", " Excitation type", { "Gauss Excitation", "" }, "", "FDTDSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Simulation Settings", "Boundary Conditions", 0, "FDTDSolver", getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "FDTDSolver", getProperties());
+
 
 	// Configure the visibility
 	updateFromProperties();
@@ -45,15 +43,13 @@ bool EntitySolverFDTD::updateFromProperties(void)
 	setModified();
 
 	// Check and update the visibility
-	EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type"));
-
-	//bool boundaryPotentialVisible = problemType->getValue() == "Electrostatics";
-
-	//EntityPropertiesDouble* boundaryPotential = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary potential"));
-
-	//if (boundaryPotentialVisible != boundaryPotential->getVisible()) updatePropertiesGrid = true;
-
-	//boundaryPotential->setVisible(boundaryPotentialVisible);
+	//
+	//EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type"));
+	//EntityPropertiesInteger* startFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Start Frequency"));
+	//EntityPropertiesInteger* centerFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Center Frequency"));
+	//EntityPropertiesInteger* endFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("End Frequency"));
+	//EntityPropertiesInteger* timestepSetting = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Timesteps"));
+	//
 
 	getProperties().forceResetUpdateForAllProperties();
 
