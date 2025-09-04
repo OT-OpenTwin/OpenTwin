@@ -17,21 +17,21 @@ void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _
 	getProperties().createProperty(new EntityPropertiesEntityList("Mesh", _meshFolderName, _meshFolderID, _meshName, _meshID), "General");
 
 	// Boundary conditions value list
-	std::list<std::string> boundaryValues{ "PML", "PMC", "MUR", "PML_8" };
+	std::list<std::string> boundaryValues{ "PEC", "PMC", "MUR", "PML_8" };
 	// Excitation types lists
-	std::list<std::string> excitationType{ "Gauss Excitation" };
+	std::list<std::string> excitationTypes{ "Gauss Excitation" };
 
 	EntityPropertiesInteger::createProperty("Frequency", "Start Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Frequency", "Center Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Frequency", "End Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", excitationType, "Gauss Excitation", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-min", boundaryValues, "", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-max", boundaryValues, "", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-min", boundaryValues, "", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-max", boundaryValues, "", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", excitationTypes, "Gauss Excitation", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "PML_8", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-max", boundaryValues, "PML_8", "FDTDSolver", getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "FDTDSolver", getProperties());
 
 
