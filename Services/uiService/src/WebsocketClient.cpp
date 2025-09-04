@@ -255,6 +255,10 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 	if (action == "execute")
 	{
 		OT_LOG_EA("Execute actions are not supported by the frontend");
+
+		// The message was processed and we need to relay the reponse
+		std::string returnMessage = "response\n";
+		sendResponse(returnMessage);
 	}
 	else if (action == "queue")
 	{
@@ -273,11 +277,6 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 		OT_LOG_EA("Unknown action");
 		return;
 	}
-
-	// The message was processed and we need to relay the reponse
-	std::string returnMessage = "response\n";
-
-	sendResponse(returnMessage);
 }
 
 bool WebsocketClient::ensureConnection(void) {

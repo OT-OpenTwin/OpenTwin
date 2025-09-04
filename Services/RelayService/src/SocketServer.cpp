@@ -142,13 +142,13 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 
-		std::string response = sendProcessWSMessage("execute", _senderIP, _json);
+		//std::string response = sendProcessWSMessage("execute", _senderIP, _json);
 
-		QString retVal = response.c_str();
+		//QString retVal = response.c_str();
 
-		OT_LOG_D("Returning received websocket answer to HTTP sender");
+		//OT_LOG_D("Returning received websocket answer to HTTP sender");
 
-		return retVal;
+		return "";
 	}
 	catch (const std::exception& e) {
 		OT_LOG_E(std::string(e.what()));
