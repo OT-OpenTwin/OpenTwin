@@ -16,13 +16,20 @@ void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _
 {
 	getProperties().createProperty(new EntityPropertiesEntityList("Mesh", _meshFolderName, _meshFolderID, _meshName, _meshID), "General");
 
+	//Boundary conditions value list
+	std::list<std::string> boundaryValues{ "PML", "PMC", "MUR", "PML_8" };
+
 	EntityPropertiesInteger::createProperty("Frequency", "Start Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Frequency", "Center Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Frequency", "End Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
-	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", { "Gauss Excitation" }, "", "FDTDSolver", getProperties());
-	EntityPropertiesInteger::createProperty("Simulation Settings", "Boundary Conditions", 0, "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", { "Gauss Excitation" }, "Gauss Excitiation", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-min", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-max", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-min", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-max", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "", "FDTDSolver", getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "FDTDSolver", getProperties());
 
 
@@ -43,14 +50,15 @@ bool EntitySolverFDTD::updateFromProperties(void)
 	setModified();
 
 	// Check and update the visibility
-	//
-	//EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type"));
-	//EntityPropertiesInteger* startFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Start Frequency"));
-	//EntityPropertiesInteger* centerFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Center Frequency"));
-	//EntityPropertiesInteger* endFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("End Frequency"));
-	//EntityPropertiesInteger* timestepSetting = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Timesteps"));
-	//
-
+	
+	EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type"));
+	EntityPropertiesInteger* startFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Start Frequency"));
+	EntityPropertiesInteger* centerFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Center Frequency"));
+	EntityPropertiesInteger* endFrequency = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("End Frequency"));
+	EntityPropertiesInteger* timestepSetting = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Timesteps"));
+	EntityPropertiesSelection* excitationType = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Ecitation type"));
+	EntityPropertiesSelection* boundaryConditions = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Boundary Conditions"));
+	
 	getProperties().forceResetUpdateForAllProperties();
 
 	return updatePropertiesGrid;
