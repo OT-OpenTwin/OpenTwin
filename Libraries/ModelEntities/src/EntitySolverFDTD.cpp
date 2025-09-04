@@ -30,8 +30,8 @@ void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _
 	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
 	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
 	EntityPropertiesSelection::createProperty("Boundary Conditions", "y-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "PML_8", "FDTDSolver", getProperties());
-	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-max", boundaryValues, "PML_8", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-min", boundaryValues, "PEC", "FDTDSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundary Conditions", "z-max", boundaryValues, "PEC", "FDTDSolver", getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "FDTDSolver", getProperties());
 
 
