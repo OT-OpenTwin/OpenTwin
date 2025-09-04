@@ -81,16 +81,17 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 
 	const std::string groupNameSolver = "Solver";
-	const std::string groupNameSignal = "Signal Type";
+	//const std::string groupNameSignal = "Signal Type";
 
 	_ui->addMenuGroup(pageName, groupNameSolver);
-	_ui->addMenuGroup(pageName, groupNameSignal);
+	//_ui->addMenuGroup(pageName, groupNameSignal);
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
+
 	_ui->addMenuButton(pageName, groupNameSolver, "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton(pageName, groupNameSolver, "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
-	_ui->addMenuButton(pageName, groupNameSignal, "Create Signal", "Create Signal", modelWrite, "Signal", "Default");
+	//_ui->addMenuButton(pageName, groupNameSignal, "Create Signal", "Create Signal", modelWrite, "Signal", "Default");
 
 	modelSelectionChanged();
 
