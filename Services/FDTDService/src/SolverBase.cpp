@@ -54,6 +54,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 	}
 
 	std::string commandLine = "\"" + exePath + "\\getdp.exe\"" + " model -solve " + solvTarget + " -post " + postTarget;
+	//std::string commandLine = "\"" + exePath + "\\openEMS.exe\"" + " model -solve " + solvTarget + " -post " + postTarget;
 
 	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{
