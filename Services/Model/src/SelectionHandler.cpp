@@ -32,7 +32,8 @@ void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _select
 	toggleButtonEnabledState();
 	Application::instance()->getModel()->updatePropertyGrid();
 	Application::instance()->flushRequestsToFrontEnd();
-	//Order important to avoid a racing condition.
+
+	// Order important to avoid a racing condition.
 	notifyOwners(); 
 }
 
@@ -152,9 +153,12 @@ void SelectionHandler::notifyOwners()
 
 	if (!ownerEntityListMap.empty())
 	{
-		std::lock_guard<std::mutex> lock(m_ownerNotifyMutex);
+		m_ownerNotifyMutex.lock();
+
 		m_needNotifyOwner = true;
 		m_ownerNotifyMap = std::move(ownerEntityListMap);
+
+		m_ownerNotifyMutex.unlock();
 	}
 }
 
@@ -163,12 +167,13 @@ void SelectionHandler::notifyOwnerWorker()
 	while (m_notifyOwnerThreadRunning) {
 		if (m_needNotifyOwner) {
 			OwnerEntityMap data;
-			{
-				std::lock_guard<std::mutex> lock(m_ownerNotifyMutex);
-				m_needNotifyOwner = false;
-				m_modelSelectionChangedNotificationInProgress = true;
-				data = std::move(m_ownerNotifyMap);
-			}
+			
+			m_ownerNotifyMutex.lock();
+
+			m_needNotifyOwner = false;
+			data = std::move(m_ownerNotifyMap);
+			
+			m_ownerNotifyMutex.unlock();
 			
 			for (const auto& owner : data) {
 				ot::JsonDocument notify;
@@ -186,8 +191,6 @@ void SelectionHandler::notifyOwnerWorker()
 
 				Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
 			}
-
-			m_modelSelectionChangedNotificationInProgress = false;
 		}
 		else {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));

@@ -29,7 +29,6 @@ public:
 	SelectionHandler& operator=(SelectionHandler&& _other) = delete;
 
 	void processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>&  _selectedVisibleEntityIDs);
-	bool notificationInProcess() { return m_modelSelectionChangedNotificationInProgress || m_needNotifyOwner; }
 	void clearAllBufferAndNotify();
 	void clearAllBuffer();
 	void deselectEntity(ot::UID _entityID, const std::string& _owner);
@@ -42,7 +41,6 @@ private:
 	typedef std::map<std::string, std::list<ot::EntityInformation>> OwnerEntityMap;
 
 	std::list<SelectionChangedObserver*> m_observer;
-	std::atomic_bool m_modelSelectionChangedNotificationInProgress = false;
 	std::mutex m_changeSelectedEntitiesBuffer;
 
 	std::map<std::string,std::list<ot::EntityInformation>> m_ownersWithSelection;
