@@ -161,18 +161,23 @@ void PrimitivePyramid::createFromRubberbandJson(const std::string& _json, std::v
 			double dy = ymax - ymin;
 			double dz = zmax - zmin;
 
-			std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5" };
+			std::list<std::string> faceNames;
+			TopoDS_Shape pyramid;
 
-			gp_Ax2 axis;
-			if (zmin < zmax) { 
-				axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(1, 0, 0), gp_Dir(0, 1, 0));
-				std::swap(dx, dy);
+			if (dx > Precision::Confusion() && dy > Precision::Confusion() && fabs(dz) > Precision::Confusion())
+			{
+				gp_Ax2 axis;
+				if (zmin < zmax) {
+					axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(1, 0, 0), gp_Dir(0, 1, 0));
+					std::swap(dx, dy);
+				}
+				else {
+					axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(0, 1, 0), gp_Dir(1, 0, 0));
+					dz *= (-1);
+				}
+				pyramid = BRepPrimAPI_MakeWedge(axis, dx, dz, dy, dx / 2, dy / 2, dx / 2, dy / 2);
+				faceNames = { "f1", "f2", "f3", "f4", "f5" };
 			}
-			else {
-				axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(0, 1, 0), gp_Dir(1, 0, 0));
-				dz *= (-1);
-			}
-			TopoDS_Shape pyramid = BRepPrimAPI_MakeWedge(axis, dx, dz, dy, dx/2, dy/2, dx/2, dy/2);
 
 			std::list<std::pair<std::string, std::string>> shapeParameters;
 			shapeParameters.push_back(std::pair<std::string, std::string>("XMin", to_string(xmin)));
@@ -234,24 +239,33 @@ void PrimitivePyramid::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 		ymax = temp;
 	}
 
-	gp_Ax2 axis;
-	if (zmin < zmax) {
-		axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(1, 0, 0), gp_Dir(0, 1, 0));
-		std::swap(dx, dy);
-	}
-	else {			
-		axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(0, 1, 0), gp_Dir(1, 0, 0));
-		dz *= (-1);
-	}
+	std::list<std::string> faceNames;
 
-	try {
-		shape = BRepPrimAPI_MakeWedge(axis, dx, dz, dy, dx/2, dy/2, dx/2, dy/2);
-	}
-	catch (Standard_Failure) {
-		assert(0);
-	}
+	if (dx > Precision::Confusion() && dy > Precision::Confusion() && fabs(dz) > Precision::Confusion())
+	{
+		gp_Ax2 axis;
+		if (zmin < zmax) {
+			axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(1, 0, 0), gp_Dir(0, 1, 0));
+			std::swap(dx, dy);
+		}
+		else {
+			axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(0, 1, 0), gp_Dir(1, 0, 0));
+			dz *= (-1);
+		}
 
-	std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5" };
+		try {
+			shape = BRepPrimAPI_MakeWedge(axis, dx, dz, dy, dx / 2, dy / 2, dx / 2, dy / 2);
+			faceNames = { "f1", "f2", "f3", "f4", "f5" };
+		}
+		catch (Standard_Failure) {
+			assert(0);
+		}
+	}
+	else
+	{
+		TopoDS_Shape empty;
+		shape = empty;
+	}
 
 	applyFaceNames(geomEntity, shape, faceNames);
 }

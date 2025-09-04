@@ -150,15 +150,20 @@ void PrimitiveSphere::createFromRubberbandJson(const std::string& _json, std::ve
 			double z = p1.Z() - p2.Z();
 			double radius = sqrt(x*x + y*y + z*z);
 
-			TopoDS_Shape body = BRepPrimAPI_MakeSphere(gp_Pnt(xcenter, ycenter, zcenter), radius);
+			TopoDS_Shape body;
+			std::list<std::string> faceNames;
+
+			if (radius > Precision::Confusion())
+			{
+				body = BRepPrimAPI_MakeSphere(gp_Pnt(xcenter, ycenter, zcenter), radius);
+				faceNames = { "f1" };
+			}
 
 			std::list<std::pair<std::string, std::string>> shapeParameters;
 			shapeParameters.push_back(std::pair<std::string, std::string>("XCenter", to_string(xcenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("YCenter", to_string(ycenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZCenter", to_string(zcenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Radius", to_string(radius)));
-
-			std::list<std::string> faceNames = { "f1" };
 
 			storeShapeInModel(body, _transform, "Geometry/Sphere", "Sphere", shapeParameters, faceNames);
 		}
@@ -191,15 +196,24 @@ void PrimitiveSphere::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	double ycenter = yCenterProperty->getValue();
 	double zcenter = zCenterProperty->getValue();
 	double radius = radiusProperty->getValue();
+	
+	std::list<std::string> faceNames;
 
-	try {
-		shape = BRepPrimAPI_MakeSphere(gp_Pnt(xcenter, ycenter, zcenter), radius);
+	if (radius > Precision::Confusion())
+	{
+		try {
+			shape = BRepPrimAPI_MakeSphere(gp_Pnt(xcenter, ycenter, zcenter), radius);
+			faceNames = { "f1" };
+		}
+		catch (Standard_Failure) {
+			assert(0);
+		}
 	}
-	catch (Standard_Failure) {
-		assert(0);
+	else
+	{
+		TopoDS_Shape empty;
+		shape = empty;
 	}
-
-	std::list<std::string> faceNames = { "f1" };
 
 	applyFaceNames(geomEntity, shape, faceNames);
 }
