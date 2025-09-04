@@ -85,7 +85,7 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(
 
 
 		}
-		_uiComponent->displayMessage("Batch import finished (Took " + ot::DateTime::intervalToString(startTime - ot::DateTime::msSinceEpoch()) + ").\n");
+		_uiComponent->displayMessage("Batch import finished (Took " + ot::DateTime::intervalToString(ot::DateTime::msSinceEpoch() - startTime) + ").\n");
 	}
 	
 	catch (std::exception& _e)
