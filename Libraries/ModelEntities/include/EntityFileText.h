@@ -8,6 +8,7 @@ class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualis
 {
 public:
 	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	virtual ~EntityFileText() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFileText"; };
