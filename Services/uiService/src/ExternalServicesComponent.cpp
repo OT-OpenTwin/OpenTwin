@@ -141,7 +141,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 
 ExternalServicesComponent::~ExternalServicesComponent(void)
 {
-	if (m_websocket != nullptr) delete m_websocket;
+	if (m_websocket != nullptr) { delete m_websocket; }
 	m_websocket = nullptr;
 	if (m_controlsManager != nullptr) { delete m_controlsManager; }
 	m_controlsManager = nullptr;
@@ -759,36 +759,25 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
 {
-	assert(m_websocket != nullptr);
+	OTAssertNullptr(m_websocket);
 
-	// This function is sending the request through the UI relay service to the destination
-
-	// Now we convert the document to a string 
-
-	// Now we add the destination url and the operation mode to the string 
-	// In this case, we can simply strip it from the message in the relay service without decoding the message part itself.
-	std::string mode;
+	WebsocketClient::MessageType type = WebsocketClient::EXECUTE;
 	switch (operation)
 	{
 	case EXECUTE:
-		mode = "execute";
+		type = WebsocketClient::EXECUTE;
 		break;
+
 	case QUEUE:
-		mode = "queue";
+		type = WebsocketClient::QUEUE;
 		break;
+
 	default:
-		assert(0); // Unknown operation
+		OTAssert(0, "Unknown operation");
 	}
 
-	std::string request(mode);
-	request.append("\n").append(url).append("\n").append(json);
-
-	OT_LOG("Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + "). Message = \"" + json + "\"", ot::OUTGOING_MESSAGE_LOG);
-
 	// And finally send it through the websocket
-	m_websocket->sendMessage(request, response);
-
-	OT_LOG("...Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + ") completed. Response = \"" + response + "\"", ot::OUTGOING_MESSAGE_LOG);
+	m_websocket->sendMessage(url, type, json, response);
 
 	return true;
 }
@@ -1518,9 +1507,13 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(std::string _json, std::string _senderIP) {
+void ExternalServicesComponent::queueAction(const std::string& _json, const std::string& _senderIP) {
 	using namespace std::chrono_literals;
 	static std::atomic_bool lock = false;
+
+	if (lock) {
+		OT_LOG_T("Lock on: " + _json);
+	}
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);
@@ -1535,10 +1528,13 @@ void ExternalServicesComponent::queueAction(std::string _json, std::string _send
 		OT_LOG_D("Buffering request: " + _json);
 
 		// If the buffer is enabled, we store the action in the buffer
-		m_actionBuffer.push_back(std::move(_json));
+		m_actionBuffer.push_back(_json);
+
+		lock = false;
 	}
 	else {
 		ot::ActionDispatcher::instance().dispatch(_json, ot::QUEUE);
+		this->keepAlive();
 
 		// If there are still buffered actions, we process them now
 		while (!m_actionBuffer.empty() && !m_bufferActions) {
@@ -1548,13 +1544,8 @@ void ExternalServicesComponent::queueAction(std::string _json, std::string _send
 			this->keepAlive();
 		}
 
-		// Now notify the end of the currently processed message
-		if (m_websocket != nullptr) {
-			m_websocket->finishedProcessingQueuedMessage();
-		}
+		lock = false;
 	}
-	
-	lock = false;
 }
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
@@ -4457,7 +4448,7 @@ void ExternalServicesComponent::keepAlive() {
 		const std::string ping = pingDoc.toJson();
 
 		std::string response;
-		this->sendHttpRequest(EXECUTE, m_modelServiceURL, ping, response);
+		this->sendRelayedRequest(EXECUTE, m_modelServiceURL, ping, response);
 	}
 }
 
@@ -4466,7 +4457,7 @@ void ExternalServicesComponent::slotProcessActionBuffer() {
 		return;
 	}
 
-	std::string action = m_actionBuffer.front();
+	std::string action = std::move(m_actionBuffer.front());
 	m_actionBuffer.pop_front();
 	this->queueAction(action, "");
 }
