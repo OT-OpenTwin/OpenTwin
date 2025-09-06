@@ -69,7 +69,8 @@ Model::Model() :
 	treeStateRecording(false),
 	currentManipulator(nullptr),
 	m_hasModalMenu(false),
-	m_currentCentralView(ot::WidgetViewBase::CustomView)
+	m_currentCentralView(ot::WidgetViewBase::CustomView),
+	currentSelectionReplyTo(ot::invalidServiceID)
 {
 	sceneNodesRoot = new SceneNodeContainer();
 	osgRootNode = sceneNodesRoot->getShapeNode();
