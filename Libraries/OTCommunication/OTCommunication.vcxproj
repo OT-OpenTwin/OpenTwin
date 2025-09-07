@@ -27,6 +27,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
     <ClCompile Include="src\Msg.cpp" />
+    <ClCompile Include="src\RelayedMessageHandler.cpp" />
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +45,7 @@
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
+    <ClInclude Include="include\OTCommunication\RelayedMessageHandler.h" />
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
