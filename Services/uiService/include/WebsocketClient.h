@@ -1,30 +1,30 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtWebSockets/QWebSocket>
-#include <QtNetwork/QSslError>
+// OpenTwin header
+#include "OTCommunication/RelayedMessageHandler.h"
 
-#include <string>
+// Qt header
+#include <QtCore/qobject.h>
+#include <QtWebSockets/qwebsocket.h>
+#include <QtNetwork/qsslerror.h>
+
+// std header
 #include <list>
+#include <string>
 
 class WebsocketClient : public QObject
 {
 	Q_OBJECT
 public:
-	enum MessageType {
-		EXECUTE,
-		QUEUE
-	};
-
 	WebsocketClient(const std::string& _socketUrl);
 	~WebsocketClient();
 
-	void sendMessage(const std::string& _receiverUrl, MessageType _messageType, const std::string& _message, std::string& _response);
+	bool sendMessage(bool _queue, const std::string& _receiverUrl, const std::string& _message, std::string& _response);
 	
 	void prepareSessionClosing();
 
 Q_SIGNALS:
-	void closed();
+	void connectionClosed();
 	void responseReceived();
 
 private Q_SLOTS:
@@ -35,30 +35,23 @@ private Q_SLOTS:
 	void slotProcessMessageQueue();
 
 private:
-	struct CommandData {
-		std::string action;
-		std::string senderIp;
-		std::string data;
-	};
-
 	void processMessages();	
-	void dispatchQueueAction(CommandData& _data);
+	void dispatchQueueRequest(ot::RelayedMessageHandler::Request& _data);
 
 	bool ensureConnection();
 	void queueBufferProcessingIfNeeded();
-	bool anyWaitingForResponse() const;
-	bool isWaitingForResponse(const std::string& _senderIP) const;
+	bool anyWaitingForResponse();
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
 	bool m_isConnected;
+
+	ot::RelayedMessageHandler m_messageHandler;
+
 	bool m_bufferHandlingRequested;
-	std::map<std::string, bool> m_waitingForResponse;
 	bool m_currentlyProcessingQueuedMessage;
-	std::string m_responseText;
-	
-	std::list<CommandData> m_newQueueCommands; //! @brief New commands that arrived while processing a queued message.
-	std::list<CommandData> m_commandsBuffer; //! @brief Buffer of commands that need to be processed after the current message handling.
+	std::list<ot::RelayedMessageHandler::Request> m_newRequests; //! @brief New commands that arrived while processing a queued message.
+	std::list<ot::RelayedMessageHandler::Request> m_currentRequests; //! @brief Buffer of commands that need to be processed after the current message handling.
 	
 	bool m_sessionIsClosing;
 	bool m_unexpectedDisconnect;

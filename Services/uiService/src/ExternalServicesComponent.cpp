@@ -761,25 +761,24 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const 
 {
 	OTAssertNullptr(m_websocket);
 
-	WebsocketClient::MessageType type = WebsocketClient::EXECUTE;
+	bool isQueue = false;
 	switch (operation)
 	{
 	case EXECUTE:
-		type = WebsocketClient::EXECUTE;
+		isQueue = false;
 		break;
 
 	case QUEUE:
-		type = WebsocketClient::QUEUE;
+		isQueue = true;
 		break;
 
 	default:
 		OTAssert(0, "Unknown operation");
+		return false;
 	}
 
 	// And finally send it through the websocket
-	m_websocket->sendMessage(url, type, json, response);
-
-	return true;
+	return m_websocket->sendMessage(isQueue, url, json, response);
 }
 
 bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender) {

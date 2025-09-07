@@ -73,39 +73,6 @@ bool SocketServer::startServer() {
 	}
 }
 
-bool SocketServer::sendHttpRequest(const std::string& _operation, const std::string& _url, const std::string& _jsonData, std::string& _response) {
-	try {
-		OT_LOG_D("Sending http request (" + _operation + ") to " + _url + ": " + _jsonData);
-
-		bool success = false;
-
-		if (_operation == "execute")
-		{
-			success = ot::msg::send(m_relayUrl, _url, ot::EXECUTE, _jsonData, _response);
-		}
-		else if (_operation == "queue")
-		{
-			success = ot::msg::send(m_relayUrl, _url, ot::QUEUE, _jsonData, _response);
-		}
-		else
-		{
-			assert(0);
-		}
-
-		return success;
-	}
-	catch (const std::exception& e) {
-		OT_LOG_E(e.what());
-		return false;
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-		return false;
-	}
-
-	return false;
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots
@@ -174,7 +141,7 @@ void SocketServer::queueAction(const char* _json, const char* _senderIP)
 			shutdown();
 		}
 
-		this->sendQueueWSMessage("queue", _senderIP, _json);
+		this->sendQueueWSMessage(_senderIP, _json);
 
 		if (_json) {
 			delete[] _json;
@@ -206,11 +173,18 @@ void SocketServer::deallocateData(const char* _data) {
 
 void SocketServer::onNewConnection()
 {
+	QWebSocket* pSocket = m_pWebSocketServer->nextPendingConnection();
+
+	if (m_client) {
+		OT_LOG_W("New client connection request received, but a client is already connected. Rejecting new connection.");
+		pSocket->close();
+		pSocket->deleteLater();
+		return;
+	}
+
 	OT_LOG_D("New client connected on websocket");
 
-    QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
-
-    connect(pSocket, &QWebSocket::textMessageReceived, this, &SocketServer::processMessage);
+    connect(pSocket, &QWebSocket::textMessageReceived, this, &SocketServer::messageReceived);
     connect(pSocket, &QWebSocket::disconnected, this, &SocketServer::socketDisconnected);
 
 	m_lastReceiveTime = std::chrono::system_clock::now();
@@ -224,63 +198,52 @@ void SocketServer::onNewConnection()
 		OT_LOG_E("Keep alive timer already set");
 	}
 
-    m_clients << pSocket;
+	m_client = pSocket;
 }
 
-void SocketServer::processMessage(QString message) {
+void SocketServer::messageReceived(const QString& _message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
-
 	try {
-		std::string stdMessage = message.toStdString();
+		ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
+		std::string response;
 
-		//std::cout << "Processing message: " << message.toStdString() << std::endl;
+		switch (request.messageType) {
+		case ot::RelayedMessageHandler::Response:
+			Q_EMIT responseReceived();
+			break;
 
-		int index1 = stdMessage.find('\n');
-		int index2 = stdMessage.find('\n', index1 + 1);
+		case ot::RelayedMessageHandler::Queue:
+			this->relayToHttp(request, response);
+			break;
 
-		std::string operation = stdMessage.substr(0, index1);
-
-		if (operation == "response")
+		case ot::RelayedMessageHandler::Execute:
 		{
-			OT_LOG_D("Response to previous message received on websocket");
-
-			m_responseText = stdMessage.substr(index1 + 1);
-			m_responseReceived = true;
-		}
-		else if (operation == "execute" || operation == "queue")
-		{
-			OT_LOG_D("New execute or queue message received on websocket");
-
-			std::string url = stdMessage.substr(index1 + 1, index2 - index1 - 1);
-			std::string jsonData = stdMessage.substr(index2 + 1);
-
-			std::string response;
-
-			OT_LOG_D("Relaying received message to HTTP");
-			sendHttpRequest(operation, url, jsonData, response);
-
-			response = "response\n" + url + "\n" + response;
-
-			OT_LOG_D("Sending reponse of HTTP message through websocket");
-
-			for (auto pClient : m_clients)
-			{
-				pClient->sendTextMessage(response.c_str());
-				pClient->flush();
-
+			this->relayToHttp(request, response);
+			
+			if (m_client) {
+				std::string responseRequest = m_messageHandler.createResponseRequest(request.receiverUrl, response, request.messageId);
+				m_client->sendTextMessage(QString::fromStdString(responseRequest));
+			}
+			else {
+				OT_LOG_E("No client connected to websocket");
 			}
 		}
-		else if (operation == "noinactivitycheck") {
-			if (m_keepAliveTimer) {
-				OT_LOG_W("Keep alive timer stopped");
-				m_keepAliveTimer->stop();
-				delete m_keepAliveTimer;
-				m_keepAliveTimer = nullptr;
+			break;
+
+		case ot::RelayedMessageHandler::Control:
+			if (request.message == "noinactivitycheck") {
+				if (m_keepAliveTimer) {
+					OT_LOG_W("Keep alive timer stopped");
+					m_keepAliveTimer->stop();
+					delete m_keepAliveTimer;
+					m_keepAliveTimer = nullptr;
+				}
 			}
-		}
-		else
-		{
-			throw std::exception("Unknown operation received on processMessage");
+			break;
+
+		default:
+			OT_LOG_E("Unknown message type received on websocket (" + std::to_string(static_cast<int>(request.messageType)) + ")");
+			break;
 		}
 	}
 	catch (const std::exception & e) {
@@ -294,19 +257,11 @@ void SocketServer::processMessage(QString message) {
 void SocketServer::socketDisconnected() {
 	OT_LOG_D("Client disconnected on websocket");
 
-	QWebSocket* pClient = qobject_cast<QWebSocket*>(sender());
-
-	if (pClient) {
-		m_clients.removeAll(pClient);
-		pClient->deleteLater();
+	if (m_client) {
+		m_client->deleteLater();
 	}
 
-	if (m_clients.empty())
-	{
-		OT_LOG_D("No more clients, shutting down relay service");
-
-		exit(ot::AppExitCode::Success);
-	}
+	exit(ot::AppExitCode::Success);
 }
 
 void SocketServer::onSslErrors(const QList<QSslError>& _errors)
@@ -320,9 +275,11 @@ void SocketServer::onSslErrors(const QList<QSslError>& _errors)
 void SocketServer::slotSocketClosed() {
 	OT_LOG_D("Socket closed");
 	if (m_pWebSocketServer) {
-		m_pWebSocketServer = nullptr;
 		delete m_pWebSocketServer;
+		m_pWebSocketServer = nullptr;
 	}
+
+	Q_EMIT connectionClosed();
 
 	QCoreApplication::quit();
 }
@@ -350,7 +307,7 @@ void SocketServer::keepAlive() const
 // Private: Helper
 
 SocketServer::SocketServer()
-	: QObject(nullptr), m_pWebSocketServer(nullptr), m_responseReceived(false), m_websocketPort(0), m_keepAliveTimer(nullptr)
+	: QObject(nullptr), m_pWebSocketServer(nullptr), m_websocketPort(0), m_keepAliveTimer(nullptr), m_client(nullptr)
 {
 
 }
@@ -365,18 +322,18 @@ SocketServer::~SocketServer() {
 		m_keepAliveTimer = nullptr;
 	}
 
+	if (m_client) {
+		disconnect(m_client, &QWebSocket::disconnected, this, &SocketServer::socketDisconnected);
+		m_client->close();
+		delete m_client;
+		m_client = nullptr;
+	}
+
 	if (m_pWebSocketServer) {
 		m_pWebSocketServer->close();
 		delete m_pWebSocketServer;
 		m_pWebSocketServer = nullptr;
 	}
-	qDeleteAll(m_clients.begin(), m_clients.end());
-}
-
-void SocketServer::processMessages() {
-	QEventLoop eventLoop;
-	// We have to process all messages to make sure we are connected
-	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
 void SocketServer::shutdown() {
@@ -386,44 +343,80 @@ void SocketServer::shutdown() {
 	exit(ot::AppExitCode::Success);
 }
 
-void SocketServer::sendQueueWSMessage(const std::string& _operation, const std::string& _senderIP, const std::string& _jsonData) {
+bool SocketServer::sendQueueWSMessage(const std::string& _senderIP, const std::string& _jsonData) {
+	if (!m_client) {
+		OT_LOG_E("No client connected to websocket");
+		return false;
+	}
+
 	// Build and send the message through the websocket connection
 
-	std::string message = _operation + "\n" + _senderIP + "\n" + _jsonData;
+	OT_LOG_D("Relaying received queue message to websocket");
 
-	OT_LOG_D("Relaying received message to websocket");
+	const std::string request = m_messageHandler.createQueueRequest(_senderIP, _jsonData);
+	m_client->sendTextMessage(QString::fromStdString(request));
 
-	for (auto pClient : m_clients)
-	{
-		pClient->sendTextMessage(message.c_str());
-		pClient->flush();
-	}
+	return true;
 }
 
-std::string SocketServer::sendProcessWSMessage(const std::string& _operation, const std::string& _senderIP, const std::string& _jsonData) {
-	m_responseReceived = false;
+bool SocketServer::sendProcessWSMessage(const std::string& _senderIP, const std::string& _jsonData, std::string& _response) {
+	if (!m_client) {
+		OT_LOG_E("No client connected to websocket");
+		return false;
+	}
 
 	// Build and send the message through the websocket connection
 
-	std::string message = _operation + "\n" + _senderIP + "\n" + _jsonData;
-
-	OT_LOG_D("Relaying received message to websocket");
-
-	for (auto pClient : m_clients)
-	{
-		pClient->sendTextMessage(message.c_str());
-		pClient->flush();
+	std::string request;
+	uint64_t messageId = 0;
+	if (!m_messageHandler.createExecuteRequest(_senderIP, _jsonData, request, messageId)) {
+		OT_LOG_E("Failed to create request message");
+		return false;
 	}
+
+	OT_LOG_D("Relaying received execute message to websocket and wait for response");
+
+	m_client->sendTextMessage(QString::fromStdString(request));
 	
-	// Now wait for the response
-	// NOTE: This function is problematic, since it will also process further queued actions. A message filter needs to be 
-	// set such that this type of messages is not processed here.
-	while (!m_responseReceived)
-	{
-		processMessages();
+	while (m_messageHandler.isWaitingForResponse(messageId) && m_pWebSocketServer) {
+		QEventLoop loop;
+		connect(this, &SocketServer::responseReceived, &loop, &QEventLoop::quit);
+		connect(this, &SocketServer::connectionClosed, &loop, &QEventLoop::quit);
+		loop.exec(QEventLoop::ExcludeUserInputEvents);
 	}
 
-	return m_responseText;
+	_response = m_messageHandler.grabResponse(messageId);
+
+	return true;
+}
+
+bool SocketServer::relayToHttp(const ot::RelayedMessageHandler::Request& _request, std::string& _response) {
+	try {
+		bool success = false;
+
+		if (_request.messageType == ot::RelayedMessageHandler::Execute) {
+			success = ot::msg::send(m_relayUrl, _request.receiverUrl, ot::EXECUTE, _request.message, _response);
+		}
+		else if (_request.messageType == ot::RelayedMessageHandler::Queue) {
+			success = ot::msg::send(m_relayUrl, _request.receiverUrl, ot::QUEUE, _request.message, _response);
+		}
+		else {
+			OT_LOG_EAS("Unknown message type (" + std::to_string(static_cast<int>(_request.messageType)) + ")");
+			success = false;
+		}
+
+		return success;
+	}
+	catch (const std::exception& e) {
+		OT_LOG_E(e.what());
+		return false;
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+		return false;
+	}
+
+	return false;
 }
 
 std::string SocketServer::getSystemInformation() {
