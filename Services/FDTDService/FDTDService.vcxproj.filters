@@ -30,7 +30,7 @@
     <ClCompile Include="src\SolverBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SolverElectrostatics.cpp">
+    <ClCompile Include="src\SolverFDTD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\FDTDLauncher.cpp">
@@ -50,7 +50,7 @@
     <ClInclude Include="include\SolverBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SolverElectrostatics.h">
+    <ClInclude Include="include\SolverFDTD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\FDTDLauncher.h">

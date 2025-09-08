@@ -199,7 +199,7 @@
     <ClCompile Include="src\FDTDLauncher.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\SolverBase.cpp" />
-    <ClCompile Include="src\SolverElectrostatics.cpp" />
+    <ClCompile Include="src\SolverFDTD.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -207,7 +207,7 @@
     <ClInclude Include="include\FDTDLauncher.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\SolverBase.h" />
-    <ClInclude Include="include\SolverElectrostatics.h" />
+    <ClInclude Include="include\SolverFDTD.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
