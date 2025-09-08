@@ -16,7 +16,6 @@ std::string DebugServiceConfig::toString(FeatureFlag _flag) {
 	case FeatureFlag::ExitOnRun: return "ExitOnRun";
 	case FeatureFlag::ExitOnPing: return "ExitOnPing";
 	case FeatureFlag::ExitOnPreShutdown: return "ExitOnPreShutdown";
-	case FeatureFlag::ExitOnHello: return "ExitOnHello";
 	default:
 		OT_LOG_EAS("Unknown ConfigFlag (" + std::to_string(_flag) + ")");
 		return "FeaturesDisabled";
@@ -29,7 +28,6 @@ DebugServiceConfig::FeatureFlag DebugServiceConfig::stringToFeatureFlag(const st
 	else if (_flag == toString(FeatureFlag::ExitOnRun)) { return FeatureFlag::ExitOnRun; }
 	else if (_flag == toString(FeatureFlag::ExitOnPing)) { return FeatureFlag::ExitOnPing; }
 	else if (_flag == toString(FeatureFlag::ExitOnPreShutdown)) { return FeatureFlag::ExitOnPreShutdown; }
-	else if (_flag == toString(FeatureFlag::ExitOnHello)) { return FeatureFlag::ExitOnHello; }
 	else {
 		OT_LOG_EAS("Unknown ConfigFlag \"" + _flag + "\"");
 		return FeatureFlag::FeaturesDisabled;
@@ -43,7 +41,6 @@ std::list<std::string> DebugServiceConfig::toStringList(const Features& _feature
 	if (_features & FeatureFlag::ExitOnRun) { result.push_back(toString(FeatureFlag::ExitOnRun)); }
 	if (_features & FeatureFlag::ExitOnPing) { result.push_back(toString(FeatureFlag::ExitOnPing)); }
 	if (_features & FeatureFlag::ExitOnPreShutdown) { result.push_back(toString(FeatureFlag::ExitOnPreShutdown)); }
-	if (_features & FeatureFlag::ExitOnHello) { result.push_back(toString(FeatureFlag::ExitOnHello)); }
 
 	return result;
 }
