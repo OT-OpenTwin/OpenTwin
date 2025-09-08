@@ -53,12 +53,12 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 		exePath += "\\Deployment";
 	}
 
-	std::string commandLine = "\"" + exePath + "\\getdp.exe\"" + " model -solve " + solvTarget + " -post " + postTarget;
+	std::string commandLine = "\"" + exePath + "\\openEMS\\bin\\openEMS.exe\"";
 	//std::string commandLine = "\"" + exePath + "\\openEMS.exe\"" + " model -solve " + solvTarget + " -post " + postTarget;
 
 	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{
-		throw std::string("ERROR: Unable to run GETDP executable. Command line: " + commandLine);
+		throw std::string("ERROR: Unable to run openEMS executable. Command line: " + commandLine);
 	}
 }
 
