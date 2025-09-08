@@ -4,7 +4,7 @@
 #include "DataBase.h"
 #include "Application.h"
 #include "SolverBase.h"
-#include "SolverElectrostatics.h"
+#include "SolverFDTD.h"
 
 #include "EntityMeshTet.h"
 #include "EntityMeshTetData.h"
@@ -86,7 +86,8 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	//}
 	
 	//TEMPORARY
-	solver = new SolverElectrostatics();
+	solver = new SolverFDTD();
+	//solver = new SolverFDTD();
 
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);

@@ -4,10 +4,10 @@
 
 class Application;
 
-class SolverElectrostatics : public SolverBase {
+class SolverFDTD : public SolverBase {
 public:
-	SolverElectrostatics() {}
-	virtual ~SolverElectrostatics() {}
+	SolverFDTD() {}
+	virtual ~SolverFDTD() {}
 
 	virtual void writeInputFile(std::ofstream& controlFile, Application*) override;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) override;

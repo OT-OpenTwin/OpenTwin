@@ -1,4 +1,4 @@
-#include "SolverElectrostatics.h"
+#include "SolverFDTD.h"
 #include "Application.h"
 #include "EntityVis2D3D.h"
 #include "EntityVisUnstructuredScalarSurface.h"
@@ -12,7 +12,7 @@
 
 #include <cassert>
 
-void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile, Application *app)
+void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
 {
     // Get map of all materials and their corresponding objects
     std::map<std::string, std::list<std::string>> materialsToObjectsMap;
@@ -61,14 +61,14 @@ void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile, Applicati
     writePostOperation(_controlFile);
 }
 
-std::string SolverElectrostatics::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
+std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
 {
     runSolverExe("model", "EleSta_v", "Map", tempDirPath, uiComponent);
 
     return solverOutput.str();
 }
 
-void SolverElectrostatics::convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity)
+void SolverFDTD::convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity)
 {
     long long globalVisualizationMeshID = -1;
     long long globalVisualizationMeshVersion = -1;
@@ -80,7 +80,7 @@ void SolverElectrostatics::convertResults(const std::string& tempDirPath, Applic
     convertEfield(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
 }
 
-void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app)
+void SolverFDTD::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app)
 {
     // Here we need to loop through all mesh items and their properties and get their materials
     for (auto item : entityProperties)
@@ -98,7 +98,7 @@ void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::l
     }
 }
 
-void SolverElectrostatics::getPotentialDefinitions(std::map<std::string, double>& potentialDefinitions)
+void SolverFDTD::getPotentialDefinitions(std::map<std::string, double>& potentialDefinitions)
 {
     // Here we need to loop through all objects and their properties and check which one has a potential definition
     for (auto item : entityProperties)
@@ -112,7 +112,7 @@ void SolverElectrostatics::getPotentialDefinitions(std::map<std::string, double>
     }
 }
 
-void SolverElectrostatics::buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap)
+void SolverFDTD::buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap)
 {
     // Now we create an alias name "material#n" for each material
     int count = 1;
@@ -123,7 +123,7 @@ void SolverElectrostatics::buildMaterialAliases(std::map<std::string, std::list<
     }
 }
 
-void SolverElectrostatics::buildPotentialAliases(std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
+void SolverFDTD::buildPotentialAliases(std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
 {
     // Now we create an alias name "potential#n" for each potential definition
     int count = 1;
@@ -134,7 +134,7 @@ void SolverElectrostatics::buildPotentialAliases(std::map<std::string, double>& 
     }
 }
 
-void SolverElectrostatics::writeGroups(std::ofstream& controlFile, 
+void SolverFDTD::writeGroups(std::ofstream& controlFile, 
                                        std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap,
                                        std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
 {
@@ -178,7 +178,7 @@ void SolverElectrostatics::writeGroups(std::ofstream& controlFile,
         "}\n\n";
 }
 
-std::list<int> SolverElectrostatics::meshVolumeGroupIdList(const std::list<std::string>& itemNames)
+std::list<int> SolverFDTD::meshVolumeGroupIdList(const std::list<std::string>& itemNames)
 {
     std::list<int> groupList;
 
@@ -194,7 +194,7 @@ std::list<int> SolverElectrostatics::meshVolumeGroupIdList(const std::list<std::
     return groupList;
 }
 
-std::list<int> SolverElectrostatics::meshSurfaceGroupIdList(const std::list<std::string>& itemNames)
+std::list<int> SolverFDTD::meshSurfaceGroupIdList(const std::list<std::string>& itemNames)
 {
     std::list<int> groupList;
 
@@ -210,7 +210,7 @@ std::list<int> SolverElectrostatics::meshSurfaceGroupIdList(const std::list<std:
     return groupList;
 }
 
-std::string SolverElectrostatics::getGroupList(const std::list<int>& list)
+std::string SolverFDTD::getGroupList(const std::list<int>& list)
 {
     std::string groupName;
 
@@ -227,7 +227,7 @@ std::string SolverElectrostatics::getGroupList(const std::list<int>& list)
     return groupName;
 }
 
-std::string SolverElectrostatics::getGroupList(const std::list<std::string>& list)
+std::string SolverFDTD::getGroupList(const std::list<std::string>& list)
 {
     std::string groupName;
 
@@ -244,7 +244,7 @@ std::string SolverElectrostatics::getGroupList(const std::list<std::string>& lis
     return groupName;
 }
 
-void SolverElectrostatics::writeFunctions(std::ofstream& controlFile, std::map<std::string, std::string>& materialNameToAliasMap)
+void SolverFDTD::writeFunctions(std::ofstream& controlFile, std::map<std::string, std::string>& materialNameToAliasMap)
 {
     controlFile << "Function {\n";
 
@@ -264,7 +264,7 @@ void SolverElectrostatics::writeFunctions(std::ofstream& controlFile, std::map<s
     controlFile << "}\n\n";
 }
 
-void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
+void SolverFDTD::writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
 {
     controlFile <<
         "Constraint {\n"
@@ -305,7 +305,7 @@ void SolverElectrostatics::writeConstraints(std::ofstream& controlFile, std::map
         "}\n\n";
 }
 
-void SolverElectrostatics::writeFunctionSpace(std::ofstream& controlFile)
+void SolverFDTD::writeFunctionSpace(std::ofstream& controlFile)
 {
     controlFile <<
         "eps0 = 8.854187818e-12;\n\n"
@@ -333,7 +333,7 @@ void SolverElectrostatics::writeFunctionSpace(std::ofstream& controlFile)
         "}\n\n";
 }
 
-void SolverElectrostatics::writeJacobian(std::ofstream& controlFile)
+void SolverFDTD::writeJacobian(std::ofstream& controlFile)
 {
     controlFile <<
         "Group{ \n"
@@ -354,7 +354,7 @@ void SolverElectrostatics::writeJacobian(std::ofstream& controlFile)
         "}\n\n";
 }
 
-void SolverElectrostatics::writeIntegration(std::ofstream& controlFile)
+void SolverFDTD::writeIntegration(std::ofstream& controlFile)
 {
     controlFile <<
         "Integration {\n"
@@ -394,7 +394,7 @@ void SolverElectrostatics::writeIntegration(std::ofstream& controlFile)
         "}\n\n";
 }
 
-void SolverElectrostatics::writeFormulation(std::ofstream& controlFile)
+void SolverFDTD::writeFormulation(std::ofstream& controlFile)
 {
     controlFile <<
         "Formulation{\n"
@@ -410,7 +410,7 @@ void SolverElectrostatics::writeFormulation(std::ofstream& controlFile)
         "}\n\n";
 }
 
-void SolverElectrostatics::writeResolution(std::ofstream& controlFile)
+void SolverFDTD::writeResolution(std::ofstream& controlFile)
 {
     controlFile <<
         "Resolution{\n"
@@ -425,7 +425,7 @@ void SolverElectrostatics::writeResolution(std::ofstream& controlFile)
         "}\n\n";
 }
 
-void SolverElectrostatics::writePostProcessing(std::ofstream& controlFile)
+void SolverFDTD::writePostProcessing(std::ofstream& controlFile)
 {
     controlFile <<
         "PostProcessing{\n"
@@ -452,7 +452,7 @@ void SolverElectrostatics::writePostProcessing(std::ofstream& controlFile)
         " }\n\n";
 }
 
-void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
+void SolverFDTD::writePostOperation(std::ofstream& controlFile)
 {
     controlFile <<
         "PostOperation { \n"
@@ -477,7 +477,7 @@ void SolverElectrostatics::writePostOperation(std::ofstream& controlFile)
         "} \n\n";
 }
 
-void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
+void SolverFDTD::convertPotential(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
 {
     std::map<std::string, std::string> nodeToPotentialMap;
 
@@ -485,7 +485,7 @@ void SolverElectrostatics::convertPotential(const std::string& tempDirPath, Appl
     convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverEntity);
 }
 
-void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string>& nodeToPotentialMap, Application* app, EntityBase*solverEntity,
+void SolverFDTD::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string>& nodeToPotentialMap, Application* app, EntityBase*solverEntity,
                                                   long long &globalVisualizationMeshID, long long &globalVisualizationMeshVersion)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
@@ -611,7 +611,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     vtkFile.close();
 }
 
-void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity)
+void SolverFDTD::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity)
 {
     for (auto item : groupNameToIdMap)
     {
@@ -744,7 +744,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
     }
 }
 
-size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::string& potential, 
+size_t SolverFDTD::getOrAddNode(const std::string& node, const std::string& potential, 
                                           std::map<std::string, size_t> &nodeToIndexMap, std::list<std::string> &nodeList, std::list<std::string> &potentialList,
                                           size_t &nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap)
 {
@@ -773,7 +773,7 @@ size_t SolverElectrostatics::getOrAddNode(const std::string& node, const std::st
     return index;
 }
 
-void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
+void SolverFDTD::convertEfield(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
 {
     // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
     std::string potentialFileName = tempDirPath + "\\efield.pos";
@@ -932,7 +932,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
     vtkFile.close();
 }
 
-size_t SolverElectrostatics::getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex)
+size_t SolverFDTD::getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex)
 {
     size_t index = 0;
 
@@ -953,7 +953,7 @@ size_t SolverElectrostatics::getOrAddCellNode(const std::string& node, std::map<
     return index;
 }
 
-void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<std::string>& nodeList, std::list<std::vector<size_t>>& cellList, size_t& cellListSize, Application* app, EntityBase* solverEntity, long long& visualizationMeshID, long long& visualizationMeshVersion)
+void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>& nodeList, std::list<std::vector<size_t>>& cellList, size_t& cellListSize, Application* app, EntityBase* solverEntity, long long& visualizationMeshID, long long& visualizationMeshVersion)
 {
     // Create the global mesh item if needed
     EntityBinaryData* xcoord = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
@@ -1041,7 +1041,7 @@ void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<st
     visualizationMesh = nullptr;
 }
 
-void SolverElectrostatics::storeMeshScalarData(size_t numberPoints, size_t numberCells, std::list<std::string>& potentialList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
+void SolverFDTD::storeMeshScalarData(size_t numberPoints, size_t numberCells, std::list<std::string>& potentialList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
 {
     // Create the potential data item 
     EntityBinaryData* pointScalar = new EntityBinaryData(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
@@ -1083,7 +1083,7 @@ void SolverElectrostatics::storeMeshScalarData(size_t numberPoints, size_t numbe
     visualizationMeshData = nullptr;
 }
 
-void SolverElectrostatics::storeMeshVectorData(size_t numberPoints, size_t numberCells, std::list<double> &magnitudeList, std::list<std::string> &vectorList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
+void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, std::list<double> &magnitudeList, std::list<std::string> &vectorList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
 {
     // Create the potential data item 
     EntityBinaryData* pointScalar = nullptr;
