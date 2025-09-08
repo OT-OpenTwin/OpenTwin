@@ -15,6 +15,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT OnePropertyDialog : public Dialog {
 		OT_DECL_NOCOPY(OnePropertyDialog)
+		OT_DECL_NOMOVE(OnePropertyDialog)
 	public:
 		OnePropertyDialog(const OnePropertyDialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~OnePropertyDialog();

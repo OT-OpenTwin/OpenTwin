@@ -12,6 +12,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyDouble : public Property {
 		OT_DECL_NOCOPY(PropertyDouble)
+		OT_DECL_NOMOVE(PropertyDouble)
 	public:
 		using PropertyValueType = double;
 

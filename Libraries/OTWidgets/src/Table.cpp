@@ -60,19 +60,22 @@ QRect ot::Table::getSelectionBoundingRect(const QList<QTableWidgetSelectionRange
 }
 
 ot::Table::Table(QWidget* _parentWidget)
-	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false), m_stopResizing(true)
+	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false),
+	m_stopResizing(true), m_itemDelegate(nullptr)
 {
 	this->ini();
 }
 
 ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget) 
-	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false), m_resizeRequired(false), m_stopResizing(true)
+	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false), m_resizeRequired(false),
+	m_stopResizing(true), m_itemDelegate(nullptr)
 {
 	this->ini();
 }
 
 ot::Table::~Table() {
-
+	delete m_itemDelegate;
+	m_itemDelegate = nullptr;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -415,7 +418,7 @@ void ot::Table::slotResizeRowToContent(int _row) {
 // Private helper
 
 void ot::Table::ini(void) {
-	new TableItemDelegate(this); // Will be destroyed via Qt
+	m_itemDelegate = new TableItemDelegate(this);
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);

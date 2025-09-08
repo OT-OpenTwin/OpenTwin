@@ -7,7 +7,13 @@
 #include "OTGui/Property.h"
 #include "OTWidgets/PropertyInput.h"
 
-ot::PropertyInput::PropertyInput() : m_dataChanged(false) {}
+ot::PropertyInput::PropertyInput() : 
+	m_dataChanged(false)
+{}
+
+ot::PropertyInput::~PropertyInput() {
+
+}
 
 bool ot::PropertyInput::setupFromConfiguration(const Property* _configuration) {
 	m_data = *_configuration;

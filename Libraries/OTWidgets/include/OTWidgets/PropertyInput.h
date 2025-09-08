@@ -25,7 +25,7 @@ namespace ot {
 		OT_DECL_NOCOPY(PropertyInput)
 	public:
 		PropertyInput();
-		virtual ~PropertyInput() {};
+		virtual ~PropertyInput();
 
 		//! @brief Add the current value to the provided JSON object
 		//! @param _object Target JSON object

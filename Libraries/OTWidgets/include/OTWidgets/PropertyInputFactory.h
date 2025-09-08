@@ -21,6 +21,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PropertyInputFactory {
 		OT_DECL_NOCOPY(PropertyInputFactory)
+		OT_DECL_NOMOVE(PropertyInputFactory)
 	public:
 		using PropertyInputConstructor = std::function<PropertyInput* ()>;
 

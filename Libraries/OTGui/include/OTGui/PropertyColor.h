@@ -13,6 +13,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyColor : public Property {
 		OT_DECL_NOCOPY(PropertyColor)
+		OT_DECL_NOMOVE(PropertyColor)
 	public:
 		using PropertyValueType = Color;
 

@@ -115,22 +115,6 @@ ot::PropertyBase::PropertyBase(const std::string& _name, PropertyFlags _flags)
 	: m_name(_name), m_flags(_flags)
 {}
 
-ot::PropertyBase::PropertyBase(const PropertyBase& _other) {
-	*this = _other;
-}
-
-ot::PropertyBase& ot::PropertyBase::operator = (const PropertyBase& _other) {
-	m_tip = _other.m_tip;
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	m_specialType = _other.m_specialType;
-	m_data = _other.m_data;
-	m_flags = _other.m_flags;
-	m_flags = _other.m_flags;
-
-	return *this;
-}
-
 std::string ot::PropertyBase::getAdditionalPropertyData(const std::string& _key) const {
 	const auto& it = m_data.find(_key);
 	if (it == m_data.end()) {

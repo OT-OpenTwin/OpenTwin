@@ -855,10 +855,13 @@ ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
 	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
-	this->setItemDelegate(new ot::TreeItemDelegate);
+	m_itemDelegate = new ot::TreeItemDelegate(this);
 }
 
-ak::aTreeWidgetBase::~aTreeWidgetBase() { A_OBJECT_DESTROYING }
+ak::aTreeWidgetBase::~aTreeWidgetBase() {
+	A_OBJECT_DESTROYING
+	delete m_itemDelegate;
+}
 
 // #######################################################################################################
 // Event handling

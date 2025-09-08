@@ -17,7 +17,8 @@ ot::TreeWidget::TreeWidget(QWidget * _parentWidget)
 	: QTreeWidget(_parentWidget) 
 {
 	this->setObjectName("OT_Tree");
-	this->setItemDelegate(new TreeItemDelegate);
+
+	m_itemDeletegate = new TreeItemDelegate(this);
 
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleAboutToChange, this, &TreeWidget::slotColorStyleAboutToChange);
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TreeWidget::slotColorStyleChanged);
@@ -25,6 +26,10 @@ ot::TreeWidget::TreeWidget(QWidget * _parentWidget)
 
 ot::TreeWidget::~TreeWidget() {
 	this->blockSignals(true);
+	
+	delete m_itemDeletegate;
+	m_itemDeletegate = nullptr;
+
 	std::list<QTreeWidgetItem*> items;
 	for (int i = 0; i < this->topLevelItemCount(); i++) items.push_back(this->topLevelItem(i));
 	for (QTreeWidgetItem* item : items) this->destroyRecursive(item);

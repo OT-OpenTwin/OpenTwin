@@ -39,6 +39,10 @@ class QKeyEvent;
 class QWidget;
 class QMouseEvent;
 
+namespace ot {
+	class TreeItemDelegate;
+}
+
 namespace ak {
 
 	// Forward declaration
@@ -564,7 +568,8 @@ namespace ak {
 		virtual void dragLeaveEvent(QDragLeaveEvent* _event) override;
 
 	private:
-		aTreeWidget *						m_ownerTree;
+		aTreeWidget* m_ownerTree;
+		ot::TreeItemDelegate* m_itemDelegate;
 		std::map<UID, aTreeWidgetItem *>		m_topLevelItems;
 		
 		aTreeWidgetBase(aTreeWidgetBase &) = delete;
