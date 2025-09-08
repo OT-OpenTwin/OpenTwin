@@ -75,19 +75,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 
 	SolverBase * solver = nullptr;
 
-	//if (problemType == "Electrostatics")
-	//{
-	//	solver = new SolverElectrostatics();
-	//}
-	//else
-	//{
-	//	// Unknown solver type
-	//	return "ERROR: Unknown problem type: " + problemType;
-	//}
-	
-	//TEMPORARY
 	solver = new SolverFDTD();
-	//solver = new SolverFDTD();
 
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);

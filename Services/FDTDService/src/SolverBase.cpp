@@ -55,7 +55,6 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 
 	// exe + xmlFileName + options
 	std::string commandLine = "\"" + exePath + "\\openEMS\\bin\\openEMS.exe\"";
-	//std::string commandLine = "\"" + exePath + "\\openEMS\\bin\\openEMS.exe\"" + "--engine=basic";
 
 	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{
