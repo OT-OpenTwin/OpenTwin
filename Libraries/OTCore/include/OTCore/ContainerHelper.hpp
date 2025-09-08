@@ -10,6 +10,8 @@
 // std header
 #include <set>
 #include <algorithm>
+#include <type_traits>
+#include <unordered_map>
 #include <unordered_set>
 
 template <typename K, typename V>
@@ -174,4 +176,68 @@ inline bool ot::ContainerHelper::hasIntersection(const std::vector<T>& _vector1,
 		}
 	}
 	return false;
+}
+
+namespace ot {
+	namespace intern {
+		// Helper: compare contents via hashing (O(n))
+		template <typename T>
+		static bool isEqualHashing(const T& _c1, const T& _c2) {
+			if (_c1.size() != _c2.size()) {
+				return false;
+			}
+
+			std::unordered_map<typename T::value_type, size_t> counts;
+			for (const auto& item : _c1) {
+				++counts[item];
+			}
+
+			for (const auto& item : _c2) {
+				auto it = counts.find(item);
+				if (it == counts.end() || it->second == 0) {
+					return false;
+				}
+				--it->second;
+			}
+
+			return true;
+		}
+
+		// Helper: compare contents via sorting (O(n log n))
+		template <typename T>
+		static bool isEqualSorting(const T& _c1, const T& _c2) {
+			if (_c1.size() != _c2.size()) {
+				return false;
+			}
+
+			std::vector<typename T::value_type> v1(_c1.begin(), _c1.end());
+			std::vector<typename T::value_type> v2(_c2.begin(), _c2.end());
+
+			std::sort(v1.begin(), v1.end());
+			std::sort(v2.begin(), v2.end());
+
+			return v1 == v2;
+		}
+	}
+}
+
+template <typename T>
+inline bool ot::ContainerHelper::isEqual(const std::list<T>& _list1, const std::list<T>& _list2) {
+	if constexpr (std::is_default_constructible_v<std::hash<T>>) {
+		// Prefer hashing if available
+		return intern::isEqualHashing(_list1, _list2);
+	}
+	else {
+		return intern::isEqualSorting(_list1, _list2);
+	}
+}
+
+template <typename T>
+inline bool ot::ContainerHelper::isEqual(const std::vector<T>& _vector1, const std::vector<T>& _vector2) {
+	if constexpr (std::is_default_constructible_v<std::hash<T>>) {
+		return intern::isEqualHashing(_vector1, _vector2);
+	}
+	else {
+		return intern::isEqualSorting(_vector1, _vector2);
+	}
 }

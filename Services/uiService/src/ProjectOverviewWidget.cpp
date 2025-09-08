@@ -138,7 +138,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
 
 	// Crete controls
-	ot::Label* welcomeLabel = new ot::Label("Projects");
+	m_titleLabel = new ot::Label("Projects");
 	m_filter = new ot::LineEdit;
 	m_table = new ot::Table(0, TableColumn::ColumnCount);
 	m_countLabel = new ot::Label;
@@ -164,9 +164,9 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_ownerButton = this->iniToolButton("Owner", "ToolBar/ChangeProjectOwner.png", editGroup, "Manage Owner of selected projects");
 
 	// Setup controls
-	QFont welcomeFont = welcomeLabel->font();
+	QFont welcomeFont = m_titleLabel->font();
 	welcomeFont.setPixelSize(28);
-	welcomeLabel->setFont(welcomeFont);
+	m_titleLabel->setFont(welcomeFont);
 
 	m_filter->setPlaceholderText("Find...");
 	m_filter->installEventFilter(this);
@@ -188,7 +188,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	this->updateToolButtonsEnabledState();
 
 	// Setup layouts
-	centralLayout->addWidget(welcomeLabel);
+	centralLayout->addWidget(m_titleLabel);
 	centralLayout->addWidget(m_filter);
 	centralLayout->addWidget(m_table);
 	centralLayout->addWidget(m_countLabel);
@@ -362,6 +362,7 @@ void ProjectOverviewWidget::slotRefreshRecentProjects() {
 	this->clear();
 
 	m_mode = ViewMode::ViewRecent;
+	m_titleLabel->setText("Recent Projects");
 
 	AppBase* app = AppBase::instance();
 	std::string currentUser = app->getCurrentLoginData().getUserName();
@@ -398,6 +399,7 @@ void ProjectOverviewWidget::slotRefreshAllProjects() {
 	this->clear();
 
 	m_mode = ViewMode::ViewAll;
+	m_titleLabel->setText("Projects");
 
 	AppBase* app = AppBase::instance();
 	std::string currentUser = app->getCurrentLoginData().getUserName();

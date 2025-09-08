@@ -22,20 +22,20 @@ ot::Variable::Variable(bool value)
 {}
 
 ot::Variable::Variable(const char* value)
-	:_value(StringWrapper(value))
+	:_value(value)
 {
 
 }
 
 ot::Variable::Variable(const std::string& value)
-	:_value(StringWrapper(value))
+	:_value(value)
 {
 }
 
 
 ot::Variable::Variable(std::string&& value) noexcept
 {
-	_value = StringWrapper(value);
+	_value = std::move(value);
 }
 
 ot::Variable::Variable(const complex& value)
@@ -136,7 +136,7 @@ bool ot::Variable::isBool() const
 
 bool ot::Variable::isConstCharPtr() const
 {
-	return std::holds_alternative<StringWrapper>(_value);
+	return std::holds_alternative<std::string>(_value);
 }
 
 bool ot::Variable::isComplex() const
@@ -171,7 +171,7 @@ bool ot::Variable::getBool() const
 
 const char* ot::Variable::getConstCharPtr() const
 {
-	return static_cast<const char*>(std::get<StringWrapper>(_value));
+	return (std::get<std::string>(_value)).c_str();
 }
 
 const ot::complex ot::Variable::getComplex() const

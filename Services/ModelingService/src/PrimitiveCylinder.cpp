@@ -146,17 +146,22 @@ void PrimitiveCylinder::createFromRubberbandJson(const std::string& _json, std::
 			gp_Dir direction;
 			TopoDS_Shape body;
 
-			std::list<std::string> faceNames = { "f1", "f2", "f3" };
+			std::list<std::string> faceNames;
+			
+			if (fabs(zmax - zmin) > Precision::Confusion() && radius > Precision::Confusion())
+			{
+				faceNames = { "f1", "f2", "f3" };
 
-			if (zmax > zmin) {		// if the z component is in positive z-axis direction
-				direction = gp_Dir(0, 0, 1);
-				body = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zmax);
-			}
-			else {					// if the z component is in negative z-axis direction
-				direction = gp_Dir(0, 0, -1);
-				zmax = fabs(zmax);
-				body = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zmax);
-				zmax *= (-1);
+				if (zmax > zmin) {		// if the z component is in positive z-axis direction
+					direction = gp_Dir(0, 0, 1);
+					body = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zmax);
+				}
+				else {					// if the z component is in negative z-axis direction
+					direction = gp_Dir(0, 0, -1);
+					zmax = fabs(zmax);
+					body = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zmax);
+					zmax *= (-1);
+				}
 			}
 
 			std::list<std::pair<std::string, std::string>> shapeParameters;
@@ -199,21 +204,32 @@ void PrimitiveCylinder::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 
 	gp_Pnt centerPoint = gp_Pnt(xCenter, yCenter, zMin);
 	gp_Dir direction;
-	try {
-		if (zMax > zMin) {		// if the z component is in positive z-axis direction
-			direction = gp_Dir(0, 0, 1);
-			shape = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zMax-zMin);
-		}
-		else {					// if the z component is in negative z-axis direction
-			direction = gp_Dir(0, 0, -1);
-			shape = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zMin-zMax);
-		}
-	}
-	catch (Standard_Failure) {
-		assert(0);
-	}
 
-	std::list<std::string> faceNames = { "f1", "f2", "f3" };
+	std::list<std::string> faceNames;
+
+	if (fabs(zMax - zMin) > Precision::Confusion() && radius > Precision::Confusion())
+	{
+		try {
+			if (zMax > zMin) {		// if the z component is in positive z-axis direction
+				direction = gp_Dir(0, 0, 1);
+				shape = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zMax - zMin);
+			}
+			else {					// if the z component is in negative z-axis direction
+				direction = gp_Dir(0, 0, -1);
+				shape = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zMin - zMax);
+			}
+
+			faceNames = { "f1", "f2", "f3" };
+		}
+		catch (Standard_Failure) {
+			assert(0);
+		}
+	}
+	else
+	{
+		TopoDS_Shape empty;
+		shape = empty;
+	}
 
 	applyFaceNames(geomEntity, shape, faceNames);
 }

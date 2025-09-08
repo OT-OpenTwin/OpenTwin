@@ -1,4 +1,6 @@
+#include "AppBase.h"
 #include "WebsocketClient.h"
+#include "ExternalServicesComponent.h"
 
 #include <QEventLoop>
 #include <QFile>
@@ -11,23 +13,18 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
 // SSL
-#include <QtCore/QFile>
-#include <QProcessEnvironment>
-
-extern "C"
-{
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP);
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP);
-	_declspec(dllexport) void deallocateData(const char *data);
-}
+#include <QtCore/qfile.h>
+#include <QtCore/qthread.h>
+#include <QtCore/qprocess.h>
 
 WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), 
-	m_sessionIsClosing(false), m_unexpectedDisconnect(false)
+	m_sessionIsClosing(false), m_unexpectedDisconnect(false), m_bufferHandlingRequested(false)
 {
 	std::string wsUrl = "wss://" + _socketUrl;
 	wsUrl = ot::String::replace(wsUrl, "127.0.0.1", "localhost");
@@ -44,18 +41,18 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 		if (!QFile::exists(caStr))
 		{
 			// Get the development root environment variable
-			std::cout << "Using development root certificate file" << std::endl;
+			OT_LOG_D("Using development root certificate file");
 
 			caStr = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
 		}
 		else
 		{
-			std::cout << "Using local certificate file" << std::endl;
+			OT_LOG_D("Using local certificate file");
 		}
 	}
 	else
 	{
-		std::cout << "Using global certificate file (OPEN_TWIN_CA_CERT)" << std::endl;
+		OT_LOG_D("Using global certificate file (OPEN_TWIN_CA_CERT)");
 	}
 
 	// SSL/ TLS Configuration
@@ -72,68 +69,81 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	
 	m_webSocket.setSslConfiguration(sslConfiguration);
 
+	// Connect signals
 	connect(&m_webSocket, &QWebSocket::connected, this, &WebsocketClient::slotConnected);
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &WebsocketClient::slotSocketDisconnected);
+	connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors), this, &WebsocketClient::slotSslErrors);
 
-	connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
-		this, &WebsocketClient::slotSslErrors);
-
+	// Try to connect
 	m_webSocket.open(QUrl(m_url));
-
 }
 
 WebsocketClient::~WebsocketClient()
 {
 	m_webSocket.close();
 
-	processMessages();
+	// Process any remaining events
+	QEventLoop eventLoop;
+	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
-void WebsocketClient::sendMessage(const std::string& _message, std::string& _response) {
-	size_t index1 = _message.find('\n');
-	size_t index2 = _message.find('\n', index1 + 1);
-
-	std::string senderIP = _message.substr(index1 + 1, index2 - index1 - 1);
-
+bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
 	// Make sure we are connected
-	if (!ensureConnection()) {
-		return;
+	if (!this->ensureConnection()) {
+		return false;
 	}
 
-	// Now send our message	
-	m_waitingForResponse[senderIP] = true;
-	m_webSocket.sendTextMessage(_message.c_str());
+	OT_LOG("Sending message to (Receiver = \"" + _receiverUrl +
+		"\"; Endpoint = " + (_queue ? "Queue" : "Execute") +
+		"). Message = \"" + _message + "\"",
+		ot::OUTGOING_MESSAGE_LOG
+	);
 
-	// Wait for the reponse
-	while (this->isWaitingForResponse(senderIP)) {
-		processMessages();
+	// Create the request message
+	std::string request;
+	uint64_t messageId = 0;
+	if (_queue) {
+		request = m_messageHandler.createQueueRequest(_receiverUrl, _message);
+	}
+	else if (!m_messageHandler.createExecuteRequest(_receiverUrl, _message, request, messageId)) {
+		OT_LOG_EAS("Could not create relayed message");
+		return false;
 	}
 
-	// We have received a response and return the text
-	_response = m_responseText;
+	// Send the message
+	m_webSocket.sendTextMessage(QString::fromStdString(request));
 
-	this->queueMessageProcessingIfNeeded();
+	// Wait for response if needed
+	if (!_queue) {
+		// Wait for the reponse
+		while (m_messageHandler.isWaitingForResponse(messageId) && m_isConnected) {
+			QEventLoop eventLoop;
+			eventLoop.connect(this, &WebsocketClient::responseReceived, &eventLoop, &QEventLoop::quit);
+			eventLoop.connect(this, &WebsocketClient::connectionClosed, &eventLoop, &QEventLoop::quit);
+			eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		}
 
+		// We have received a response and return the text
+		_response = m_messageHandler.grabResponse(messageId);
+	}
+
+	OT_LOG("...Sending message to (Receiver = \"" + _receiverUrl + 
+		"\"; Endpoint = " + (_queue ? "Queue" : "Execute") +
+		") completed. Response = \"" + _response + "\"", 
+		ot::OUTGOING_MESSAGE_LOG
+	);
+
+	// Queue buffer processing if no message is currently processed and buffer is not empty
+	this->queueBufferProcessingIfNeeded();
+
+	return true;
 }
 
-void WebsocketClient::sendResponse(const std::string& _message) {
-	// Make sure we are connected
-	if (!ensureConnection()) return;
-
-	// Send the reponse
-	m_webSocket.sendTextMessage(_message.c_str());
-}
-
-void WebsocketClient::finishedProcessingQueuedMessage(void) {
-	assert(m_currentlyProcessingQueuedMessage);
-	m_currentlyProcessingQueuedMessage = false;
-
-	this->slotProcessMessageQueue();
-}
-
-void WebsocketClient::prepareSessionClosing(void) {
+void WebsocketClient::prepareSessionClosing() {
+	// Mark the session as closing, this will avoid processing any new queued messages
 	m_sessionIsClosing = true;
-	m_commandQueue.clear();
+	m_newRequests.clear();
+	m_currentRequests.clear();
 }
 
 // ###############################################################################################################################################
@@ -141,19 +151,49 @@ void WebsocketClient::prepareSessionClosing(void) {
 // Private Slots
 
 void WebsocketClient::slotConnected() {
-	OT_LOG_D("Client connected");
+	OT_LOG_D("Connected to server");
 
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::slotMessageReceived);
 	m_isConnected = true;
 
 #ifdef _DEBUG
-	m_webSocket.sendTextMessage("noinactivitycheck");
+	const std::string request = m_messageHandler.createControlRequest("noinactivitycheck");
+	m_webSocket.sendTextMessage(QString::fromStdString(request));
 #endif // _DEBUG
-
 }
 
 void WebsocketClient::slotMessageReceived(const QString& _message) {
-	this->handleMessageReceived(_message, true);
+	ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
+
+	switch (request.messageType) {
+	case ot::RelayedMessageHandler::Response:
+		Q_EMIT responseReceived();
+		break;
+
+	case ot::RelayedMessageHandler::Execute:
+		OT_LOG_EA("No execute requests to frontend allowed");
+		break;
+
+	case ot::RelayedMessageHandler::Queue:
+		if (m_sessionIsClosing) {
+			OT_LOG_D("Ignoring queued message due to session close");
+			// Avoid processing any queued messages if the session is closing
+			return;
+		}
+
+		// Add the command to the new queue commands buffer
+		m_newRequests.push_back(std::move(request));
+
+		// Queue buffer processing if no message is currently processed and we are not waiting for a response
+		if (!(m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse())) {
+			this->queueBufferProcessingIfNeeded();
+		}
+		break;
+
+	default:
+		OT_LOG_EAS("Invalid message type received (" + std::to_string(static_cast<int>(request.messageType)) + ")");
+		break;
+	}
 }
 
 void WebsocketClient::slotSocketDisconnected() {
@@ -165,15 +205,23 @@ void WebsocketClient::slotSocketDisconnected() {
 
 	OT_LOG_D("Relay server disconnected on websocket");
 	m_isConnected = false;
+	m_currentRequests.clear();
+	m_newRequests.clear();
 
 	if (!m_sessionIsClosing) {
 		// This is an unexpected disconnect of the relay service -> we need to close the session
 		m_unexpectedDisconnect = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceConnectionLost, doc.GetAllocator()), doc.GetAllocator());
-		m_currentlyProcessingQueuedMessage = true;
-		queueAction(doc.toJson().c_str(), "");
+		
+		
+		ot::RelayedMessageHandler::Request data;
+		data.message = doc.toJson();
+
+		this->dispatchQueueRequest(data);
 	}
+
+	Q_EMIT connectionClosed();
 }
 
 void WebsocketClient::slotSslErrors(const QList<QSslError>& _errors) {
@@ -183,12 +231,24 @@ void WebsocketClient::slotSslErrors(const QList<QSslError>& _errors) {
 	m_webSocket.ignoreSslErrors();
 }
 
-void WebsocketClient::slotProcessMessageQueue(void) {
-	if (!m_commandQueue.empty()) {
-		QString message = m_commandQueue.front();
-		m_commandQueue.pop_front();
+void WebsocketClient::slotProcessMessageQueue() {
+	m_bufferHandlingRequested = false;
 
-		this->handleMessageReceived(message, false);
+	// Don't process buffer if we are already processing a message or if we are waiting for a response
+	if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse()) {
+		return;
+	}
+
+	// Move new commands to the main buffer
+	m_currentRequests.splice(m_currentRequests.end(), std::move(m_newRequests));
+	m_newRequests.clear();
+
+	// Process the first command in the buffer (queue action will process all remaining commands in the buffer)
+	if (!m_currentRequests.empty()) {
+		ot::RelayedMessageHandler::Request request = std::move(m_currentRequests.front());
+		m_currentRequests.pop_front();
+
+		this->dispatchQueueRequest(request);
 	}
 }
 
@@ -196,90 +256,33 @@ void WebsocketClient::slotProcessMessageQueue(void) {
 
 // Private helper
 
-void WebsocketClient::handleMessageReceived(const QString& _message, bool _isExternalMessage) {
-	// Get the action from the message
-	int index1 = _message.indexOf('\n');
-	int index2 = _message.indexOf('\n', index1 + 1);
-
-	QString action = _message.left(index1);
-	QString senderIP = _message.mid(index1 + 1, index2 - index1 - 1);
-
-	// Process the action
-	if (action == "response") {
-		m_responseText = _message.mid(index2 + 1).toStdString();
-		m_waitingForResponse[senderIP.toStdString()] = false;
-	}
-	else if (action == "execute") {
-		OT_LOG_EA("No execute requests to frontend allowed");
-	}
-	else if (action == "queue") {
-		if (m_sessionIsClosing) {
-			// Avoid processing any queued messages if the session is closing
-			return;
-		}
-		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {
-			OT_LOG_D("Putting action in command queue: " + action.toStdString() + ". Message: " + _message.toStdString());
-			if (_isExternalMessage) {
-				m_commandQueue.push_back(_message);
-			}
-			else {
-				m_commandQueue.push_front(_message);
-			}
-		}
-		else {
-			sendExecuteOrQueueMessage(_message);
-		}
-	}
-}
-
-void WebsocketClient::processMessages(void)
+void WebsocketClient::processMessages()
 {
 	QEventLoop eventLoop;		
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
-void WebsocketClient::sendExecuteOrQueueMessage(QString message)
-{
-	// We have received a message through the websocket and need to forward it to the standard
-	// messaging system for dispatching received messages.
+void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _request) {
+	// Dispatch the action to the external services component
+	ExternalServicesComponent* ext = AppBase::instance()->getExternalServicesComponent();
 
-	int index1 = message.indexOf('\n');
-	int index2 = message.indexOf('\n', index1 + 1);
-
-	QString action = message.left(index1);
-	QString senderIP = message.mid(index1 + 1, index2 - index1 - 1);
-	QString jsonData = message.mid(index2 + 1);
-
-	const char *response = nullptr;
-
-	if (action == "execute")
-	{
-		response = performAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
-	}
-	else if (action == "queue")
-	{
-		m_currentlyProcessingQueuedMessage = true;
-		response = queueAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
-	}
-	else
-	{
-		assert(0); // Unknown action.
-		return;
+	ot::BasicScopedBoolWrapper procWrapper(m_currentlyProcessingQueuedMessage);
+	
+	// Dispatch the action
+	ext->queueAction(_request.message, _request.receiverUrl);
+	
+	// Now dispatch all remaining actions in the buffer
+	while (!m_currentRequests.empty() && m_isConnected) {
+		ot::RelayedMessageHandler::Request bufferedRequest = std::move(m_currentRequests.front());
+		m_currentRequests.pop_front();
+		ext->queueAction(bufferedRequest.message, bufferedRequest.receiverUrl);
 	}
 
-	// The message was processed and we need to relay the reponse
-	std::string returnMessage = "response\n";
-
-	if (response != nullptr)
-	{
-		returnMessage += response;
-		deallocateData(response);
-	}
-
-	sendResponse(returnMessage);
+	// If we have received new commands while processing the current command, we queue buffer processing again
+	this->queueBufferProcessingIfNeeded();
 }
 
-bool WebsocketClient::ensureConnection(void) {
+bool WebsocketClient::ensureConnection() {
 	if (!m_isConnected && (m_sessionIsClosing || m_unexpectedDisconnect)) {
 		return false;
 	}
@@ -292,7 +295,9 @@ bool WebsocketClient::ensureConnection(void) {
 			// Try to connect again
 			m_webSocket.open(QUrl(m_url));
 		}
-		processMessages();
+		
+		QEventLoop eventLoop;
+		eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 
 		if (!m_isConnected && (ot::DateTime::msSinceEpoch() - startTime) > (5 * ot::msg::defaultTimeout)) {
 			OT_LOG_E("Connection to relay service cancelled due to timeout");
@@ -309,27 +314,13 @@ bool WebsocketClient::ensureConnection(void) {
 	}
 }
 
-void WebsocketClient::queueMessageProcessingIfNeeded(void) {
-	if (!m_commandQueue.empty() && m_isConnected) {
+void WebsocketClient::queueBufferProcessingIfNeeded() {
+	if (!m_bufferHandlingRequested && (!m_newRequests.empty() || !m_currentRequests.empty()) && m_isConnected) {
+		m_bufferHandlingRequested = true;
 		QMetaObject::invokeMethod(this, &WebsocketClient::slotProcessMessageQueue, Qt::QueuedConnection);
 	}
 }
 
-bool WebsocketClient::anyWaitingForResponse(void) const {
-	for (const auto& it : m_waitingForResponse) {
-		if (it.second) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool WebsocketClient::isWaitingForResponse(const std::string& _senderIP) const {
-	const auto it = m_waitingForResponse.find(_senderIP);
-	if (it == m_waitingForResponse.end()) {
-		return false;
-	}
-	else {
-		return m_isConnected && it->second;
-	}
+bool WebsocketClient::anyWaitingForResponse() {
+	return m_isConnected && m_messageHandler.anyWaitingForResponse();
 }

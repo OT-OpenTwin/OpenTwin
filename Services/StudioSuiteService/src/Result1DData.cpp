@@ -74,10 +74,18 @@ void Result1DData::setData(const std::string& data)
 		{
 			yreValues.push_back(yre);
 		}
+		else if (yreValues.capacity() != 0)
+		{
+			yreValues.push_back(0.0);
+		}
 
 		if (yimRead)
 		{
 			yimValues.push_back(yim);
+		}
+		else if (yimValues.capacity() != 0)
+		{
+			yimValues.push_back(0.0);
 		}
 	}
 }

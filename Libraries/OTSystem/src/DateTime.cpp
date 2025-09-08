@@ -198,3 +198,66 @@ int64_t ot::DateTime::timestampToMsec(const std::string& _timestamp, DateFormat 
         throw std::invalid_argument("Unknown DateFormat");
     }
 }
+
+std::string ot::DateTime::intervalToString(int64_t _msecInterval) {
+    if (_msecInterval < 0) {
+        return "-" + DateTime::intervalToString(-_msecInterval);
+    }
+
+    int64_t msec = _msecInterval % 1000;
+    int64_t totalSeconds = _msecInterval / 1000;
+
+    int64_t seconds = totalSeconds % 60;
+    int64_t totalMinutes = totalSeconds / 60;
+
+    int64_t minutes = totalMinutes % 60;
+    int64_t totalHours = totalMinutes / 60;
+
+    int64_t hours = totalHours % 24;
+    int64_t days = totalHours / 24;
+
+    std::ostringstream oss;
+    
+    if (days > 0) {
+        oss << days;
+        if (days == 1) {
+            oss << " day ";
+        }
+        else {
+            oss << " days ";
+		}
+    }
+
+    if (hours > 0 || days > 0) {
+        oss << hours;
+        if (hours == 1) {
+            oss << " hour ";
+        }
+        else {
+            oss << " hours ";
+        }
+    }
+
+    if (minutes > 0 || hours > 0 || days > 0) {
+        oss << minutes;
+        if (minutes == 1) {
+            oss << " minute ";
+        }
+        else {
+            oss << " minutes ";
+		}
+    }
+    
+    oss << seconds;
+    if (msec > 0) {
+        oss << "." << msec << " seconds";
+    }
+    else if (seconds == 1) {
+        oss << " second";
+    }
+    else {
+		oss << " seconds";
+    }
+
+    return oss.str();
+}

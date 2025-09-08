@@ -459,8 +459,8 @@ void Application::HandleSelectionChanged()
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		else {
-			ot::UIDList entities = std::move(m_selectedEntitiesQueue.front());
-			m_selectedEntitiesQueue.pop_front();
+			ot::UIDList entities = std::move(m_selectedEntitiesQueue.back());
+			m_selectedEntitiesQueue.clear();
 			m_selectedEntitiesMutex.unlock();
 
 			std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);

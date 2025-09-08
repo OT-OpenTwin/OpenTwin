@@ -1,11 +1,16 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtWebSockets/QWebSocket>
-#include <QtNetwork/QSslError>
+// OpenTwin header
+#include "OTCommunication/RelayedMessageHandler.h"
 
-#include <string>
+// Qt header
+#include <QtCore/qobject.h>
+#include <QtWebSockets/qwebsocket.h>
+#include <QtNetwork/qsslerror.h>
+
+// std header
 #include <list>
+#include <string>
 
 class WebsocketClient : public QObject
 {
@@ -14,39 +19,40 @@ public:
 	WebsocketClient(const std::string& _socketUrl);
 	~WebsocketClient();
 
-	void sendMessage(const std::string& _message, std::string& _response);
-	void sendResponse(const std::string& _message);
-
-	void finishedProcessingQueuedMessage(void);
-
-	void prepareSessionClosing(void);
+	bool sendMessage(bool _queue, const std::string& _receiverUrl, const std::string& _message, std::string& _response);
+	
+	void prepareSessionClosing();
 
 Q_SIGNALS:
-	void closed();
+	void connectionClosed();
+	void responseReceived();
 
 private Q_SLOTS:
 	void slotConnected();
 	void slotMessageReceived(const QString& _message);
 	void slotSocketDisconnected();
 	void slotSslErrors(const QList<QSslError>& _errors);
-	void slotProcessMessageQueue(void);
+	void slotProcessMessageQueue();
 
 private:
-	void handleMessageReceived(const QString& _message, bool _isExternalMessage);
-	void processMessages(void);	
-	void sendExecuteOrQueueMessage(QString message);
-	bool ensureConnection(void);
-	void queueMessageProcessingIfNeeded(void);
-	bool anyWaitingForResponse(void) const;
-	bool isWaitingForResponse(const std::string& _senderIP) const;
+	void processMessages();	
+	void dispatchQueueRequest(ot::RelayedMessageHandler::Request& _data);
+
+	bool ensureConnection();
+	void queueBufferProcessingIfNeeded();
+	bool anyWaitingForResponse();
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
 	bool m_isConnected;
-	std::map<std::string, bool> m_waitingForResponse;
+
+	ot::RelayedMessageHandler m_messageHandler;
+
+	bool m_bufferHandlingRequested;
 	bool m_currentlyProcessingQueuedMessage;
-	std::string m_responseText;
-	std::list<QString> m_commandQueue;
+	std::list<ot::RelayedMessageHandler::Request> m_newRequests; //! @brief New commands that arrived while processing a queued message.
+	std::list<ot::RelayedMessageHandler::Request> m_currentRequests; //! @brief Buffer of commands that need to be processed after the current message handling.
+	
 	bool m_sessionIsClosing;
 	bool m_unexpectedDisconnect;
 };
