@@ -8,6 +8,9 @@
 #include "OTCore/String.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
+// std header
+#include <charconv>
+
 ot::RelayedMessageHandler::RelayedMessageHandler() :
 	m_lastMessageId(0)
 {
@@ -15,11 +18,36 @@ ot::RelayedMessageHandler::RelayedMessageHandler() :
 }
 
 std::string ot::RelayedMessageHandler::createResponseRequest(const std::string& _receiverUrl, const std::string& _message, uint64_t _messageId) const {
-	return "response\n" + _receiverUrl + "\n" + std::to_string(_messageId) + "\n" + _message;
+	std::string result;
+	
+	// Temporary buffer big enough to hold any uint64_t in decimal
+	char idBuf[32];
+	const std::to_chars_result convertResult = std::to_chars(std::begin(idBuf), std::end(idBuf), _messageId);
+	const size_t idLen = static_cast<size_t>(convertResult.ptr - idBuf);
+
+	// Reserve memory for the result string (11 = "response\n" + "\n" + "\n")
+	result.reserve(11 + _receiverUrl.size() + _message.size() + idLen);
+	result.append("response\n");
+	result.append(_receiverUrl);
+	result.append("\n");
+	result.append(idBuf, idLen);
+	result.append("\n");
+	result.append(_message);
+
+	return result;
 }
 
 std::string ot::RelayedMessageHandler::createQueueRequest(const std::string& _receiverUrl, const std::string& _message) const {
-	return "queue\n" + _receiverUrl + "\n0\n" + _message;
+	std::string result;
+
+	result.reserve(9 + _receiverUrl.size() + _message.size());
+
+	result.append("queue\n");
+	result.append(_receiverUrl);
+	result.append("\n0\n");
+	result.append(_message);
+
+	return result;
 }
 
 bool ot::RelayedMessageHandler::createExecuteRequest(const std::string& _receiverUrl, const std::string& _message, std::string& _request, uint64_t& _messageId) {
@@ -28,8 +56,22 @@ bool ot::RelayedMessageHandler::createExecuteRequest(const std::string& _receive
 		return false;
 	}
 
-	// Prepare the request body
-	_request = "execute\n" + _receiverUrl + "\n" + std::to_string(_messageId) + "\n" + _message;
+	// Convert ID to string without allocation
+	char idBuf[32];
+	const std::to_chars_result convertResult =
+		std::to_chars(std::begin(idBuf), std::end(idBuf), _messageId);
+	const size_t idLen = static_cast<size_t>(convertResult.ptr - idBuf);
+
+	// Reserve memory for the result string
+	_request.clear();
+	_request.reserve(10 + _receiverUrl.size() + _message.size() + idLen);
+
+	_request.append("execute\n");
+	_request.append(_receiverUrl);
+	_request.push_back('\n');
+	_request.append(idBuf, idLen);
+	_request.push_back('\n');
+	_request.append(_message);
 
 	// Set response data
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -39,7 +81,14 @@ bool ot::RelayedMessageHandler::createExecuteRequest(const std::string& _receive
 }
 
 std::string ot::RelayedMessageHandler::createControlRequest(const std::string& _controlCommand) const {
-	return "control\n\n0\n" + _controlCommand;
+	std::string result;
+
+	result.reserve(11 + _controlCommand.size());
+
+	result.append("control\n\n0\n");
+	result.append(_controlCommand);
+
+	return result;
 }
 
 ot::RelayedMessageHandler::Request ot::RelayedMessageHandler::requestReceived(const std::string& _request) {

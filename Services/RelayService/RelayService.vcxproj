@@ -110,6 +110,7 @@
       <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <PreprocessorDefinitions>_DEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(Qt_LIBPATH_);$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -126,6 +127,7 @@
       <MinimalRebuild>
       </MinimalRebuild>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -141,6 +143,7 @@
       <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(Qt_LIBPATH_);$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -157,6 +160,7 @@
       <MinimalRebuild>
       </MinimalRebuild>
       <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

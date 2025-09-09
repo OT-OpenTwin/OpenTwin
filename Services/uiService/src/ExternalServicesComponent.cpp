@@ -1510,9 +1510,9 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 	using namespace std::chrono_literals;
 	static std::atomic_bool lock = false;
 
-	if (lock) {
-		OT_LOG_T("Lock on: " + _json);
-	}
+	//if (lock) {
+	//	OT_LOG_T("Lock on: " + _json);
+	//}
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);
