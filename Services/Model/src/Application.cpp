@@ -1269,14 +1269,6 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 		return;
 	}
 
-	// Since we are performing notifications in a parallel thread, we need to make sure that all notifications are done before
-	// we send the next round of notifications
-	using namespace std::chrono_literals;
-	while (m_selectionHandler.notificationInProcess())
-	{
-		std::this_thread::sleep_for(1ms);
-	}
-
 	// It might happen that the UI still has some reference to entitires which have already been deleted.
 	// Therefore we filter the items by checing whether they still exist.
 	std::list<ot::UID> selectedEntityIDsVerified, selectedVisibleEntityIDsVerified;

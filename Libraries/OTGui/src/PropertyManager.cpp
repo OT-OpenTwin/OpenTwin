@@ -176,7 +176,7 @@ void ot::PropertyManager::mergeWith(const PropertyManager& _other, const Propert
 		}
 		else if (_mergeMode & Property::AddMissing) {
 			// Add copy of whole missing group
-			m_groups.insert_or_assign(newIt.first, new PropertyGroup(*newIt.second));
+			m_groups.insert_or_assign(newIt.first, new PropertyGroup(newIt.second));
 		}
 	}
 }

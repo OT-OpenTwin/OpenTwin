@@ -19,10 +19,12 @@ ot::PropertyGridItemDelegate::PropertyGridItemDelegate(TreeWidget* _tree)
 	: QStyledItemDelegate(_tree), m_tree(_tree)
 {
 	OTAssertNullptr(m_tree);
+	m_tree->setItemDelegate(this);
 }
 
 ot::PropertyGridItemDelegate::~PropertyGridItemDelegate() {
-
+	m_tree->setItemDelegate(nullptr);
+	m_tree = nullptr;
 }
 
 void ot::PropertyGridItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem& _option, const QModelIndex& _index) const {

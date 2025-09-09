@@ -33,6 +33,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyDialog : public Dialog {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyDialog)
+		OT_DECL_NOMOVE(PropertyDialog)
 	public:
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();

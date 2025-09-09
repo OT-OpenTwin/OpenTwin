@@ -54,7 +54,8 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation) :
 }
 
 ot::GraphicsPicker::~GraphicsPicker() {
-
+	delete m_splitter;
+	m_splitter = nullptr;
 }
 
 QWidget* ot::GraphicsPicker::getQWidget(void) {

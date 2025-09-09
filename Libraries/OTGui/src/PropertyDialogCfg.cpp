@@ -14,23 +14,8 @@ ot::PropertyDialogCfg::PropertyDialogCfg() {
 	this->setMinSize(800, 600);
 }
 
-ot::PropertyDialogCfg::PropertyDialogCfg(const PropertyDialogCfg& _other)
-{
-	*this = _other;
-}
-
 ot::PropertyDialogCfg::~PropertyDialogCfg() {
 	
-}
-
-ot::PropertyDialogCfg& ot::PropertyDialogCfg::operator = (const PropertyDialogCfg& _other) {
-	if (this == &_other) return *this;
-
-	ot::DialogCfg::operator=(_other);
-
-	m_gridConfig = _other.m_gridConfig;
-
-	return *this;
 }
 
 void ot::PropertyDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {

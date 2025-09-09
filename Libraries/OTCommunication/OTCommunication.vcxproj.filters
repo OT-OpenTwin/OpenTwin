@@ -41,6 +41,9 @@
     <ClCompile Include="src\ActionDispatchProfiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RelayedMessageHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCommunication\ActionTypes.h">
@@ -89,6 +92,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionDispatchProfiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\RelayedMessageHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -98,7 +98,7 @@ private:
 	int serviceSiteID;
 	std::string serviceSiteIDString;
 	bool queueWritingFlag;
-	std::map<unsigned long long, bsoncxx::builder::basic::document *> m_prefetchedDocuments;
+	std::map<unsigned long long, bsoncxx::document::value> m_prefetchedDocuments;
 	std::string userName;
 	std::string userPassword;
 };

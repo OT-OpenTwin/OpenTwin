@@ -14,7 +14,7 @@ class __declspec(dllexport) EntityFile: public EntityBase
 {
 public:
 	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
-
+	virtual ~EntityFile() = default;
 	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFile"; };

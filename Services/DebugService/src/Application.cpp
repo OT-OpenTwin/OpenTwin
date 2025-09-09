@@ -7,34 +7,100 @@
 #include "Application.h"
 
 // OpenTwin header
+#include "OTCore/FolderNames.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ThisComputerInfo.h"
+
 #include "OTGui/TableCfg.h"
+#include "OTGui/PropertyInt.h"
+#include "OTGui/PropertyBool.h"
+#include "OTGui/PropertyColor.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/PropertyString.h"
+#include "OTGui/PropertyDouble.h"
+#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/PropertyPainter2D.h"
+#include "OTGui/PainterRainbowIterator.h"
+
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
-#include "OTCommunication/Msg.h"
-#include "OTCommunication/ActionTypes.h"
-#include "ResultCollectionExtender.h"
+
 #include "PlotBuilder.h"
-#include "QuantityDescriptionCurve.h"
-#include "OTCore/FolderNames.h"
-#include "OTGui/PainterRainbowIterator.h"
 #include "TemplateDefaultManager.h"
+#include "ResultCollectionExtender.h"
+#include "QuantityDescriptionCurve.h"
+
 // std header
 #include <thread>
 
 #define OT_DEBUG_SERVICE_PAGE_NAME "Debug"
+
+void testPropertyGrid() {
+	using namespace ot;
+
+	std::thread t([]() {
+		auto uiComp = Application::instance()->uiComponent();
+
+		JsonDocument fillDoc;
+		fillDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_FillPropertyGrid, fillDoc.GetAllocator()), fillDoc.GetAllocator());
+		PropertyGridCfg cfg;
+		PropertyGroup* g1 = new PropertyGroup("Group 1");
+
+		for (int i = 1; i <= 100; i++) {
+			g1->addProperty(new PropertyBool("Bool " + std::to_string(i), (i % 2) == 0));
+		}
+
+		cfg.addRootGroup(g1);
+
+		fillDoc.AddMember(OT_ACTION_PARAM_Config, JsonObject(cfg, fillDoc.GetAllocator()), fillDoc.GetAllocator());
+
+		PropertyGridCfg emptyCfg;
+		JsonDocument clearDoc;
+		clearDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_FillPropertyGrid, clearDoc.GetAllocator()), clearDoc.GetAllocator());
+		clearDoc.AddMember(OT_ACTION_PARAM_Config, JsonObject(emptyCfg, clearDoc.GetAllocator()), clearDoc.GetAllocator());
+
+		for (int i = 0; i < 10000; i++) {
+			std::string resp;
+			uiComp->sendMessage(true, fillDoc, resp);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			uiComp->sendMessage(true, clearDoc, resp);
+			if (i % 100 == 0) {
+				uiComp->displayMessage("Iteration: " + std::to_string(i + 1) + "\n");
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+
+		uiComp->displayMessage("\nDONE\n");
+		}
+	);
+	t.detach();
+}
+
+void Application::testCode() {
+	testPropertyGrid();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
 	m_nameCounter(0)
 {
 	// Debug buttons
-	m_testButtons.push_back(ButtonInfo("Test", "UI Info", "BugRed", std::bind(&Application::uiDebugInfo, this)));
-	m_testButtons.push_back(ButtonInfo("Test", "Info", "Information", std::bind(&Application::testHello, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Test", "BugRed", std::bind(&Application::testCode, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Frontend Info", "Information", std::bind(&Application::uiDebugInfo, this)));
+	m_testButtons.push_back(ButtonInfo("Test", "Debug Service Info", "Information", std::bind(&Application::serviceDebugInfo, this)));
 	m_testButtons.push_back(ButtonInfo("Test", "Kill", "Kill", std::bind(&Application::testKill, this)));
 	
 	// Table tests
@@ -51,13 +117,14 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo("Plots", "Scatter Plot", "Plot1DVisible", std::bind(&Application::createPlotScatter, this)));
 	m_testButtons.push_back(ButtonInfo("Plots", "Single Value Curve", "Plot1DVisible", std::bind(&Application::createPlotSinglePoint, this)));
 
+	// --------------------------------------------------------------------------------------------------------+
+
 	// Enable features (Exit)
 	
 	//this->enableFeature(DebugServiceConfig::ExitOnInit, true);
 	//this->enableFeature(DebugServiceConfig::ExitOnRun, true);
 	//this->enableFeature(DebugServiceConfig::ExitOnPing, true);
 	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown, true);
-	//this->enableFeature(DebugServiceConfig::ExitOnHello, true);
 		
 	// Enable features (Other)
 
@@ -93,18 +160,23 @@ void Application::uiDebugInfo() {
 	ui->sendMessage(true, doc, resp);
 }
 
-void Application::testHello(void) {
-	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnHello)) {
-		OT_LOG_T("Performing exit on \"hello\"");
-		exit(0);
-	}
-
-	OT_LOG_T("Hello :-)\n\nThis Computer Info:\n" + ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode));
+void Application::serviceDebugInfo(void) {
+	Application::instance()->uiComponent()->displayMessage(
+		"Hello :-)\n\nThis Computer Info (Debug Service):\n" 
+		+ ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode) + "\n"
+	);
 }
 
 void Application::testKill(void) {
 	std::thread t([]() {
-		OT_LOG_T("Bye :-)");
+		auto ui = Application::instance()->uiComponent();
+		ui->displayMessage("Killing debug service in 3...\n");
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		ui->displayMessage("Killing debug service in 2..\n");
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		ui->displayMessage("Killing debug service in 1.\n");
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		ui->displayMessage("Killing debug service now!\n");
 		exit(0);
 		}
 	);

@@ -31,6 +31,12 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, doub
 
 	size_t pointOffset = nodes.size();
 
+	if (fabs(deflection) < Precision::Confusion())
+	{
+		// In case the shape is empty, we will have trouble using a deflection of 0.0 for the mesh generation
+		deflection = 1.0;
+	}
+
 	Standard_Real aDeflection = deflection;
 	BRepMesh_IncrementalMesh(shape, aDeflection);
 	Standard_Integer aIndex = 1, nbNodes = 0;

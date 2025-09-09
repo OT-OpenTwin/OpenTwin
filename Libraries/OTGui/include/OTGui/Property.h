@@ -20,6 +20,7 @@ namespace ot {
 	//! \brief The Property class is used as a base class for all Properties that can be displayed and modified in the frontend.
 	class OT_GUI_API_EXPORT Property : public PropertyBase {
 		OT_DECL_NOCOPY(Property)
+		OT_DECL_NOMOVE(Property)
 	public:
 		using PropertyValueType = void;
 

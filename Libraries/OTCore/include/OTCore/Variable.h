@@ -172,7 +172,7 @@ namespace ot
 		std::string getTypeName()const;
 
 	private:
-		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,StringWrapper, complex>;
+		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, complex>;
 		inline bool DoubleCompare(const double& a, const double& b) const
 		{
 			constexpr const double epsilon = 1.0e-12; //std::numeric_limits<double>::epsilon()

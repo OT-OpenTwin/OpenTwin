@@ -21,26 +21,26 @@ namespace ot {
 	class Property;
 
 	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
+		OT_DECL_NOCOPY(PropertyGroup)
+		OT_DECL_NOMOVE(PropertyGroup)
 	public:
 		//! @brief Create empty group
 		PropertyGroup();
 
-		PropertyGroup(const PropertyGroup& _other);
+		explicit PropertyGroup(const PropertyGroup* _other);
 
 		//! @brief Create empty group with name and title
 		//! @param _name Will be set as name and title
-		PropertyGroup(const std::string& _name);
+		explicit PropertyGroup(const std::string& _name);
 
 		//! @brief Create empty group with name and title
 		//! @param _name Group name
 		//! @param _title Group title
-		PropertyGroup(const std::string& _name, const std::string& _title);
+		explicit PropertyGroup(const std::string& _name, const std::string& _title);
 
 		//! \brief Destructor.
 		//! Destroys the parent group if set.
 		virtual ~PropertyGroup();
-
-		PropertyGroup& operator = (const PropertyGroup& _other);
 
 		PropertyGroup* createCopy(bool _includeChilds) const;
 

@@ -384,22 +384,25 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 	script << "        f.close()\n";
 
 	script << "    for item in results :\n";
-	script << "        if includeParametricResults:\n";
-	script << "            runIds = project.get_3d().get_run_ids(item)\n";
-	script << "        else:\n";
-	script << "            runIds = [0]\n";
-	script << "        for id in runIds : \n";
-	script << "            data = project.get_3d().get_result_item(item, id, False)\n";
-	script << "            exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
-	script << "            os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
-	script << "            f = open(exportFileName, 'w')\n";
-	script << "            f.write(data.title + '\\n')\n";
-	script << "            f.write(data.xlabel + '\\n')\n";
-	script << "            f.write(data.ylabel + '\\n')\n";
-	script << "            f.write(str(len(data.get_data())) + '\\n')\n";
-	script << "            for value in data.get_data() :\n";
-	script << "                f.write(str(value) + '\\n')\n";
-	script << "            f.close()\n";
+	script << "        try:\n";
+	script << "            if includeParametricResults:\n";
+	script << "                runIds = project.get_3d().get_run_ids(item)\n";
+	script << "            else:\n";
+	script << "                runIds = [0]\n";
+	script << "            for id in runIds : \n";
+	script << "                data = project.get_3d().get_result_item(item, id, False)\n";
+	script << "                exportFileName = exportFolder + '\\\\' + str(id) + '\\\\' + item\n";
+	script << "                os.makedirs(os.path.dirname(exportFileName), exist_ok = True)\n";
+	script << "                f = open(exportFileName, 'w')\n";
+	script << "                f.write(data.title + '\\n')\n";
+	script << "                f.write(data.xlabel + '\\n')\n";
+	script << "                f.write(data.ylabel + '\\n')\n";
+	script << "                f.write(str(len(data.get_data())) + '\\n')\n";
+	script << "                for value in data.get_data() :\n";
+	script << "                    f.write(str(value) + '\\n')\n";
+	script << "                f.close()\n";
+	script << "        except:\n";
+	script << "            pass\n";
 
 	script << "de.set_quiet_mode(False)\n";
 

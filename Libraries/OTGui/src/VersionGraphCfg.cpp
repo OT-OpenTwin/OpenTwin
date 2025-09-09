@@ -121,7 +121,16 @@ ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(VersionGraphVersi
 	VersionsList* branch = this->findBranch(_version.getBranchName());
 	if (branch) {
 		// Insert into existing branch
+
 		VersionGraphVersionCfg::VersionNumberType versionNumber = _version.getVersionNumber();
+
+		// Attempt to insert to back
+		if (branch->empty() || (versionNumber > branch->back().getVersionNumber())) {
+			branch->push_back(std::move(_version));
+			return branch->back();
+		}
+
+		// Insert in sorted order
 		for (auto it = branch->begin(); it != branch->end(); it++) {
 			if (versionNumber < it->getVersionNumber()) {
 				// Greater version found, insert before
@@ -134,12 +143,13 @@ ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(VersionGraphVersi
 			}
 		}
 
+		OTAssert(0, "Insert location not found, but version is not greater than back. This should never happen");
 		branch->push_back(std::move(_version));
 		return branch->back();
 	}
 
 	// Create new branch
-	std::list<VersionGraphVersionCfg> newBranch;
+	VersionsList newBranch;
 	newBranch.push_back(std::move(_version));
 	return this->insertBranch(std::move(newBranch)).back();
 }
@@ -515,6 +525,16 @@ void ot::VersionGraphCfg::findAllNextVersions(std::list<const VersionGraphVersio
 
 bool ot::VersionGraphCfg::findVersionIterator(const std::string& _versionName, const VersionsList*& _list, VersionsList::const_iterator& _iterator) const {
 	for (const VersionsList& branchVersions : m_branches) {
+		OTAssert(!branchVersions.empty(), "Empty branch stored");
+
+		// First check back since it it is the most common access
+		if (_versionName == branchVersions.back().getName()) {
+			_list = &branchVersions;
+			_iterator = --branchVersions.end();
+			return true;
+		}
+
+		// Check all branch versions
 		for (VersionsList::const_iterator it = branchVersions.begin(); it != branchVersions.end(); it++) {
 			if (it->getName() == _versionName) {
 				_list = &branchVersions;

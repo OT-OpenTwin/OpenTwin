@@ -116,62 +116,6 @@ static bool g_runSessionServiceHealthCheck{ false };
 
 #undef GetObject
 
-extern "C"
-{
-	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP)
-	{
-		char *retval = nullptr;
-		try {
-			OT_LOG("Perform action: " + std::string(json), ot::INBOUND_MESSAGE_LOG);
-
-			QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "performAction", /*Qt::BlockingQueuedConnection*/
-				Qt::DirectConnection, Q_RETURN_ARG(char *, retval), Q_ARG(const char*, json), Q_ARG(const char*, senderIP));
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-		return retval;
-	};
-
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP)
-	{
-		char *retval = nullptr;
-		try {
-
-			char *dataCopy = new char[strlen(json) + 1];
-			strcpy(dataCopy, json);
-
-			char *senderIPCopy = new char[strlen(senderIP) + 1];
-			strcpy(senderIPCopy, senderIP);
-
-			OT_LOG("Queue action: " + std::string(json), ot::QUEUED_INBOUND_MESSAGE_LOG);
-
-			QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-		return retval;
-	};
-
-	_declspec(dllexport) void deallocateData(const char *data)
-	{
-		try {
-			// std::cout << "deallocateData: ";
-			if (data != nullptr)
-			{
-				QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, data));
-			}
-		}
-		catch (const std::exception & e) {
-			OT_LOG_EAS("Error occured on invoke. Exiting...\nError: " + std::string(e.what()));
-			exit(ot::AppExitCode::GeneralError);
-		}
-	};
-}
-
 namespace ot {
 	namespace intern {
 		void exitAsync(int _code) {
@@ -201,7 +145,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 
 ExternalServicesComponent::~ExternalServicesComponent(void)
 {
-	if (m_websocket != nullptr) delete m_websocket;
+	if (m_websocket != nullptr) { delete m_websocket; }
 	m_websocket = nullptr;
 	if (m_controlsManager != nullptr) { delete m_controlsManager; }
 	m_controlsManager = nullptr;
@@ -819,38 +763,26 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
 {
-	assert(m_websocket != nullptr);
+	OTAssertNullptr(m_websocket);
 
-	// This function is sending the request through the UI relay service to the destination
-
-	// Now we convert the document to a string 
-
-	// Now we add the destination url and the operation mode to the string 
-	// In this case, we can simply strip it from the message in the relay service without decoding the message part itself.
-	std::string mode;
+	bool isQueue = false;
 	switch (operation)
 	{
 	case EXECUTE:
-		mode = "execute";
+		isQueue = false;
 		break;
+
 	case QUEUE:
-		mode = "queue";
+		isQueue = true;
 		break;
+
 	default:
-		assert(0); // Unknown operation
+		OTAssert(0, "Unknown operation");
+		return false;
 	}
 
-	std::string request(mode);
-	request.append("\n").append(url).append("\n").append(json);
-
-	OT_LOG("Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + "). Message = \"" + json + "\"", ot::OUTGOING_MESSAGE_LOG);
-
 	// And finally send it through the websocket
-	m_websocket->sendMessage(request, response);
-
-	OT_LOG("...Sending message to (Receiver = \"" + url + "\"; Endpoint = " + (operation == EXECUTE ? "Execute" : (operation == QUEUE ? "Queue" : "Execute one way TLS")) + ") completed. Response = \"" + response + "\"", ot::OUTGOING_MESSAGE_LOG);
-
-	return true;
+	return m_websocket->sendMessage(isQueue, url, json, response);
 }
 
 bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender) {
@@ -1412,12 +1344,12 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Reset all service information
 		for (auto s : m_serviceIdMap) {
-			m_lockManager->cleanService(s.second->getBasicServiceInformation(), false, true);
+			m_lockManager->cleanService(s.second->getBasicServiceInformation(), true, true);
 			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
 			app->shortcutManager()->creatorDestroyed(s.second);
 			delete s.second;
 		}
-		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
+		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation(), true, true);
 		m_controlsManager->serviceDisconnected(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
 
 		app->shortcutManager()->clearViewerHandler();
@@ -1561,13 +1493,6 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 // Slots
 
-char* ExternalServicesComponent::performAction(const char* json, const char* senderIP) {
-	OT_LOG_E("Perform action requets are not supported by the frontend");
-	char* retval = new char[1];
-	retval[0] = '\0';
-	return retval;
-}
-
 void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
 {
 	ot::JsonDocument doc;
@@ -1585,9 +1510,13 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	}
 }
 
-void ExternalServicesComponent::queueAction(const char* _json, const char* _senderIP) {
+void ExternalServicesComponent::queueAction(const std::string& _json, const std::string& _senderIP) {
 	using namespace std::chrono_literals;
 	static std::atomic_bool lock = false;
+
+	//if (lock) {
+	//	OT_LOG_T("Lock on: " + _json);
+	//}
 
 	while (lock) {
 		std::this_thread::sleep_for(1ms);
@@ -1598,20 +1527,21 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 
 	lock = true;
 
-	std::string json(_json);
-
 	if (m_bufferActions) {
-		OT_LOG_D("Buffering request: " + json);
+		OT_LOG_D("Buffering request: " + _json);
 
 		// If the buffer is enabled, we store the action in the buffer
-		m_actionBuffer.push_back(std::move(json));
+		m_actionBuffer.push_back(_json);
+
+		lock = false;
 	}
 	else {
 		m_actionProfiler.startAction();
-		ot::ActionDispatcher::instance().dispatch(json, ot::QUEUE);
+		ot::ActionDispatcher::instance().dispatch(_json, ot::QUEUE);
 		if (m_actionProfiler.endAction()) {
 			this->actionDispatchTimeout(json);
 		}
+		this->keepAlive();
 
 		// If there are still buffered actions, we process them now
 		while (!m_actionBuffer.empty() && !m_bufferActions) {
@@ -1626,23 +1556,8 @@ void ExternalServicesComponent::queueAction(const char* _json, const char* _send
 			this->keepAlive();
 		}
 
-		// Now notify the end of the currently processed message
-		if (m_websocket != nullptr) {
-			m_websocket->finishedProcessingQueuedMessage();
-		}
+		lock = false;
 	}
-
-	if (_senderIP) {
-		delete[] _senderIP;
-		_senderIP = nullptr;
-	}
-	
-	lock = false;
-}
-
-void ExternalServicesComponent::deallocateData(const char *data)
-{
-	delete[] data;
 }
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
@@ -4568,7 +4483,7 @@ void ExternalServicesComponent::keepAlive() {
 		const std::string ping = pingDoc.toJson();
 
 		std::string response;
-		this->sendHttpRequest(EXECUTE, m_modelServiceURL, ping, response);
+		this->sendRelayedRequest(EXECUTE, m_modelServiceURL, ping, response);
 	}
 }
 
@@ -4577,9 +4492,9 @@ void ExternalServicesComponent::slotProcessActionBuffer() {
 		return;
 	}
 
-	std::string action = m_actionBuffer.front();
+	std::string action = std::move(m_actionBuffer.front());
 	m_actionBuffer.pop_front();
-	this->queueAction(action.c_str(), nullptr);
+	this->queueAction(action, "");
 }
 
 void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message) {

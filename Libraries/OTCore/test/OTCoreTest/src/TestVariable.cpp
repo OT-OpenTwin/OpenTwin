@@ -295,6 +295,18 @@ TEST(StringToVariable, String)
 	EXPECT_TRUE(actualValue.isConstCharPtr());
 }
 
+TEST(StringToVariable, StringLoadTest)
+{
+	ot::StringToVariableConverter converter;
+	for (int i = 0; i < 10000000; i++)
+	{
+		const ot::Variable actualValue("someContent");
+	}
+	EXPECT_TRUE(true);
+}
+
+
+
 TEST(StringToVariable, ScientificNotation)
 {
 	const float expectedValue = -1.E3f;

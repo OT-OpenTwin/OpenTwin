@@ -238,7 +238,14 @@ void PrimitiveTorus::createFromRubberbandJson(const std::string& _json, std::vec
 			double distanceToOuterCircle = sqrt((distanceToOuterCircleX*distanceToOuterCircleX) + (distanceToOuterCircleY*distanceToOuterCircleY) + (distanceToOuterCircleZ*distanceToOuterCircleZ));
 
 			// creating the torus
-			TopoDS_Shape body = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(xcenter, ycenter, zcenter), gp_Dir(0, 0, 1)), distanceToPipeCenter, pipeRadius);
+			TopoDS_Shape body;
+			std::list<std::string> faceNames;
+
+			if (distanceToPipeCenter > Precision::Confusion() && pipeRadius > Precision::Confusion() && pipeRadius <= distanceToPipeCenter)
+			{
+				body = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(xcenter, ycenter, zcenter), gp_Dir(0, 0, 1)), distanceToPipeCenter, pipeRadius);
+				faceNames = { "f1" };
+			}
 
 			std::list<std::pair<std::string, std::string>> shapeParameters;
 			shapeParameters.push_back(std::pair<std::string, std::string>("XCenter",					     to_string(xcenter)));
@@ -246,8 +253,6 @@ void PrimitiveTorus::createFromRubberbandJson(const std::string& _json, std::vec
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZCenter",					     to_string(zcenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Distance center to pipe center",  to_string(distanceToPipeCenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Pipe radius",				     to_string(pipeRadius)));
-
-			std::list<std::string> faceNames = { "f1" };
 
 			storeShapeInModel(body, _transform, "Geometry/Torus", "Torus", shapeParameters, faceNames);
 		}
@@ -283,14 +288,23 @@ void PrimitiveTorus::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	double distanceToPipeCenter = distanceToPipeCenterProperty->getValue();
 	double pipeRadius			= pipeRadiusProperty->getValue();
 
-	try {
-		shape = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(xCenter, yCenter, zCenter), gp_Dir(0, 0, 1)), distanceToPipeCenter, pipeRadius);
+	std::list<std::string> faceNames;
+	
+	if (distanceToPipeCenter > Precision::Confusion() && pipeRadius > Precision::Confusion() && pipeRadius <= distanceToPipeCenter)
+	{
+		try {
+			shape = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(xCenter, yCenter, zCenter), gp_Dir(0, 0, 1)), distanceToPipeCenter, pipeRadius);
+			faceNames = { "f1" };
+		}
+		catch (Standard_Failure) {
+			assert(0);
+		}
 	}
-	catch (Standard_Failure) {
-		assert(0);
+	else
+	{
+		TopoDS_Shape empty;
+		shape = empty;
 	}
-
-	std::list<std::string> faceNames = { "f1" };
 
 	applyFaceNames(geomEntity, shape, faceNames);
 }

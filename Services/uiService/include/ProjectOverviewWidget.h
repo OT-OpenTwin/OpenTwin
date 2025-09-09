@@ -142,6 +142,8 @@ private:
 
 	QWidget* m_widget;
 
+	ot::Label* m_titleLabel;
+
 	ot::LineEdit* m_filter;
 	ot::Table* m_table;
 	ot::Label* m_countLabel;

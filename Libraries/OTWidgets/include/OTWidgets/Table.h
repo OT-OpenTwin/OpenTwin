@@ -21,6 +21,7 @@
 namespace ot {
 
 	class TableItem;
+	class TableItemDelegate;
 
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public QWidgetInterface {
 		Q_OBJECT
@@ -92,6 +93,8 @@ namespace ot {
 		void resizeColumnsToContentIfNeeded(void);
 		void resizeRowsToContentIfNeeded(void);
 		void setResizeRequired(void);
+
+		TableItemDelegate* m_itemDelegate;
 
 		bool m_multilineCells;
 		bool m_stopResizing;
