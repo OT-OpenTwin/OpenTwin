@@ -1539,7 +1539,7 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 		m_actionProfiler.startAction();
 		ot::ActionDispatcher::instance().dispatch(_json, ot::QUEUE);
 		if (m_actionProfiler.endAction()) {
-			this->actionDispatchTimeout(json);
+			this->actionDispatchTimeout(_json);
 		}
 		this->keepAlive();
 
