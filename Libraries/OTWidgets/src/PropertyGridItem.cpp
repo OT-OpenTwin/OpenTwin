@@ -18,7 +18,7 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
-ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullptr) {
+ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullptr), m_signalProperty(nullptr) {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
 	QHBoxLayout* titleLayout = new QHBoxLayout(m_titleLayoutW);
@@ -39,13 +39,32 @@ ot::PropertyGridItem::PropertyGridItem() : m_input(nullptr), m_parentGroup(nullp
 }
 
 ot::PropertyGridItem::~PropertyGridItem() {
-	if (m_input) delete m_input;
-	m_input = nullptr;
+	if (m_titleLayoutW) {
+		delete m_titleLayoutW;
+		m_titleLayoutW = nullptr;
+	}
+
+	if (m_input) {
+		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
+		delete m_input;
+		m_input = nullptr;
+	}
+
+	if (m_signalProperty) {
+		delete m_signalProperty;
+		m_signalProperty = nullptr;
+	}
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
+	if (m_input) {
+		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
+		delete m_input;
+		m_input = nullptr;
+	}
+
 	m_titleLabel->setText(QString::fromStdString(_config->getPropertyTitle()));
-	if (m_input) delete m_input;
+	
 	m_input = PropertyInputFactory::createInput(_config);
 
 	m_deleteLabel->setHidden(!(m_input->data().getPropertyFlags() & Property::IsDeletable));
@@ -55,7 +74,7 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 	return true;
 }
 
-void ot::PropertyGridItem::finishSetup(void) {
+void ot::PropertyGridItem::finishSetup() {
 	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
 	if (!tree) {
 		OT_LOG_EA("Tree cast failed");
@@ -67,7 +86,7 @@ void ot::PropertyGridItem::finishSetup(void) {
 	this->setFirstColumnSpanned(false);
 }
 
-std::string ot::PropertyGridItem::getGroupName(void) const {
+std::string ot::PropertyGridItem::getGroupName() const {
 	if (m_parentGroup) return m_parentGroup->getName();
 	else {
 		OT_LOG_EA("No parent group set");
@@ -79,7 +98,7 @@ void ot::PropertyGridItem::setTitle(const QString& _title) {
 	this->setText(0, _title);
 }
 
-QString ot::PropertyGridItem::getTitle(void) const {
+QString ot::PropertyGridItem::getTitle() const {
 	return this->text(0);
 }
 
@@ -101,39 +120,43 @@ void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
 }
 
-ot::PropertyBase ot::PropertyGridItem::getPropertyData(void) const {
+ot::PropertyBase ot::PropertyGridItem::getPropertyData() const {
 	if (m_input) return m_input->data();
 	else return PropertyBase();
 }
 
-std::string ot::PropertyGridItem::getPropertyType(void) const {
+std::string ot::PropertyGridItem::getPropertyType() const {
 	if (m_input) return m_input->getPropertyType();
 	else return std::string();
 }
 
-void ot::PropertyGridItem::slotValueChanged(void) {
-	ot::Property* signalProperty = this->createSignalProperty();
-	Q_EMIT inputValueChanged(signalProperty);
-	if (signalProperty) delete signalProperty;
+void ot::PropertyGridItem::slotValueChanged() {
+	if (m_signalProperty) {
+		delete m_signalProperty;
+		m_signalProperty = nullptr;
+	}
+
+	m_signalProperty = this->createSignalProperty();
+	Q_EMIT inputValueChanged(m_signalProperty);
 }
 
-void ot::PropertyGridItem::slotDeleteRequested(void) {
-	ot::Property* signalProperty = this->createSignalProperty();
-	Q_EMIT deleteRequested(signalProperty);
-	if (signalProperty) delete signalProperty;
+void ot::PropertyGridItem::slotDeleteRequested() {
+	if (m_signalProperty) {
+		delete m_signalProperty;
+		m_signalProperty = nullptr;
+	}
+	
+	m_signalProperty = this->createSignalProperty();
+	Q_EMIT deleteRequested(m_signalProperty);
 }
 
-void ot::PropertyGridItem::slotGlobalStyleChanged(void) {
+void ot::PropertyGridItem::slotGlobalStyleChanged() {
 	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(ColorStyleFileEntry::PropertyItemDeleteIcon);
 	QIcon ico(pth);
 	m_deleteLabel->setPixmap(ico.pixmap(16, 16));
 }
 
-void ot::PropertyGridItem::clear(void) {
-
-}
-
-ot::Property* ot::PropertyGridItem::createSignalProperty(void) {
+ot::Property* ot::PropertyGridItem::createSignalProperty() {
 	OTAssertNullptr(m_input);
 	
 	// Create property configuration

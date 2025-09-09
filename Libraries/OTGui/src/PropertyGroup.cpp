@@ -14,10 +14,21 @@ ot::PropertyGroup::PropertyGroup()
 	: m_parentGroup(nullptr)
 {}
 
-ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other) 
+ot::PropertyGroup::PropertyGroup(const PropertyGroup* _other) 
 	: m_parentGroup(nullptr)
 {
-	*this = _other;
+	OTAssertNullptr(_other);
+
+	m_name = _other->m_name;
+	m_title = _other->m_title;
+
+	for (const Property* p : _other->m_properties) {
+		this->addProperty(p->createCopy());
+	}
+	for (const PropertyGroup* g : _other->m_childGroups) {
+		PropertyGroup* ng = new PropertyGroup(g);
+		this->addChildGroup(ng);
+	}
 }
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name)
@@ -32,27 +43,8 @@ ot::PropertyGroup::~PropertyGroup() {
 	this->clear(false);
 }
 
-ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
-	if (this == &_other) return *this;
-
-	this->clear();
-
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	
-	for (Property* p : _other.m_properties) {
-		this->addProperty(p->createCopy());
-	}
-	for (PropertyGroup* g : _other.m_childGroups) {
-		PropertyGroup* ng = new PropertyGroup(*g);
-		this->addChildGroup(ng);
-	}
-
-	return *this;
-}
-
 ot::PropertyGroup* ot::PropertyGroup::createCopy(bool _includeChilds) const {
-	if (_includeChilds) return new PropertyGroup(*this);
+	if (_includeChilds) return new PropertyGroup(this);
 	
 	PropertyGroup* newGroup = new PropertyGroup;
 	newGroup->m_name = this->m_name;
@@ -129,7 +121,7 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, const PropertyBas
 			}
 		}
 		if (!found && _mergeMode & Property::AddMissing) {
-			this->addChildGroup(new PropertyGroup(*otherGroup));
+			this->addChildGroup(new PropertyGroup(otherGroup));
 		}
 	}
 
@@ -316,8 +308,6 @@ void ot::PropertyGroup::findPropertiesBySpecialType(const std::string& _specialT
 void ot::PropertyGroup::clear(bool _keepGroups) {
 	if (m_parentGroup) {
 		m_parentGroup->forgetChildGroup(this);
-		delete m_parentGroup;
-		m_parentGroup = nullptr;
 	}
 
 	if (!_keepGroups) {

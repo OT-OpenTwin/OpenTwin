@@ -439,6 +439,8 @@ std::string GlobalSessionService::handlePrepareFrontendInstaller(ot::JsonDocumen
 	
 	loadFrontendInstallerFile();
 
+	if (m_frontendInstallerFileContent.empty()) return "0";
+
 	return std::to_string(m_frontendInstallerFileContent.size()+1);
 }
 

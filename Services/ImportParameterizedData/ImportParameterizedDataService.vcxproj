@@ -228,6 +228,7 @@
     <ClCompile Include="src\TableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TouchstoneToResultdata.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
+    <ClCompile Include="src\UniqueEntityNameCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
@@ -266,6 +267,7 @@
     <ClInclude Include="include\TableStatisticAnalyser.h" />
     <ClInclude Include="include\TouchstoneToResultdata.h" />
     <ClInclude Include="include\UiNotifier.h" />
+    <ClInclude Include="include\UniqueEntityNameCreator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,25 @@
 #include "Application.h"
 #include "Model.h"
 
+SelectionHandler::SelectionHandler() :
+	m_needNotifyOwner(false), m_ownerNotifyThread(nullptr), m_notifyOwnerThreadRunning(true)
+{
+	m_ownerNotifyThread = new std::thread(&SelectionHandler::notifyOwnerWorker, this);
+}
+
+SelectionHandler::~SelectionHandler() {
+	m_needNotifyOwner = false;
+	m_notifyOwnerThreadRunning = false;
+
+	if (m_ownerNotifyThread) {
+		if (m_ownerNotifyThread->joinable()) {
+			m_ownerNotifyThread->join();
+		}
+		delete m_ownerNotifyThread;
+		m_ownerNotifyThread = nullptr;
+	}
+}
+
 void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)
 {
 	QueuingHttpRequestsRAII queueRequests;
@@ -13,7 +32,8 @@ void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _select
 	toggleButtonEnabledState();
 	Application::instance()->getModel()->updatePropertyGrid();
 	Application::instance()->flushRequestsToFrontEnd();
-	//Order important to avoid a racing condition.
+
+	// Order important to avoid a racing condition.
 	notifyOwners(); 
 }
 
@@ -40,16 +60,16 @@ void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _own
 	notifyOwners();
 }
 
-const std::list<ot::UID>& SelectionHandler::getSelectedEntityIDs()
+std::list<ot::UID> SelectionHandler::getSelectedEntityIDs()
 {
 	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
 	return m_selectedEntityIDs;
 }
 
-const std::list<ot::UID>& SelectionHandler::getSelectedVisibleEntityIDs()
+std::list<ot::UID> SelectionHandler::getSelectedVisibleEntityIDs()
 {
 	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
-	 return m_selectedVisibleEntityIDs; 
+	return m_selectedVisibleEntityIDs; 
 }
 
 void SelectionHandler::subscribe(SelectionChangedObserver* _observer)
@@ -98,7 +118,7 @@ void SelectionHandler::notifyObservers(std::list<EntityBase*>& _selectedEntities
 
 void SelectionHandler::notifyOwners()
 {
-	std::map<std::string, std::list<ot::EntityInformation>> ownerEntityListMap;
+	OwnerEntityMap ownerEntityListMap;
 	ot::EntityInformation entityInfos;
 
 	// All owners which were involved in the previous selection will receive a notification. 
@@ -133,35 +153,49 @@ void SelectionHandler::notifyOwners()
 
 	if (!ownerEntityListMap.empty())
 	{
-		m_modelSelectionChangedNotificationInProgress = true;
+		m_ownerNotifyMutex.lock();
 
-		std::thread workerThread(&SelectionHandler::notifyOwnerThread, this, ownerEntityListMap);
-		workerThread.detach();
+		m_needNotifyOwner = true;
+		m_ownerNotifyMap = std::move(ownerEntityListMap);
+
+		m_ownerNotifyMutex.unlock();
 	}
 }
 
-void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<ot::EntityInformation>>& _ownerEntityListMap)
+void SelectionHandler::notifyOwnerWorker()
 {
-	for (auto owner : _ownerEntityListMap)
-	{
-		ot::JsonDocument notify;
-		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
-		
-		ot::UIDList entityIDs;
-		ot::JsonArray entityInfos;
-		for (ot::EntityInformation& entityInfo : owner.second)
-		{
-			ot::JsonObject entry;
-			entityInfo.addToJsonObject(entry, notify.GetAllocator());
-			entityInfos.PushBack(entry,notify.GetAllocator());
-			entityIDs.push_back(entityInfo.getEntityID());
+	while (m_notifyOwnerThreadRunning) {
+		if (m_needNotifyOwner) {
+			OwnerEntityMap data;
+			
+			m_ownerNotifyMutex.lock();
+
+			m_needNotifyOwner = false;
+			data = std::move(m_ownerNotifyMap);
+			
+			m_ownerNotifyMutex.unlock();
+			
+			for (const auto& owner : data) {
+				ot::JsonDocument notify;
+				notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
+
+				ot::UIDList entityIDs;
+				ot::JsonArray entityInfos;
+				for (const ot::EntityInformation& entityInfo : owner.second) {
+					ot::JsonObject entry;
+					entityInfo.addToJsonObject(entry, notify.GetAllocator());
+					entityInfos.PushBack(entry, notify.GetAllocator());
+					entityIDs.push_back(entityInfo.getEntityID());
+				}
+				notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, entityInfos, notify.GetAllocator());
+
+				Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
+			}
 		}
-		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, entityInfos, notify.GetAllocator());
-
-		Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 	}
-
-	m_modelSelectionChangedNotificationInProgress = false;
 }
 
 void SelectionHandler::setSelectedEntityIDs(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)

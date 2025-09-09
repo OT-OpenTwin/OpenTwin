@@ -398,21 +398,7 @@ LockManager * AppBase::lockManager(void) {
 void AppBase::log(const ot::LogMessage& _message) {
 	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG | ot::TEST_LOG;
 	if (_message.getFlags() & flags) {
-		ot::StyledTextBuilder message;
-
-		message << "[";
-		if (_message.getFlags() & ot::ERROR_LOG) {
-			message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
-		}
-		else if (_message.getFlags() & ot::WARNING_LOG) {
-			message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
-		}
-		else if (_message.getFlags() & ot::TEST_LOG) {
-			message << ot::StyledText::Highlight << ot::StyledText::Bold << "TEST" << ot::StyledText::ClearStyle;
-		}
-		message << "] [Frontend] " << _message.getText();
-
-		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message, true));
+		this->appendLogMessage(_message);
 	}
 }
 
@@ -474,10 +460,10 @@ bool AppBase::closeEvent() {
 
 		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "", "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
 
-		if (result == ot::MessageDialogCfg::Cancel) {
+		if (result & ot::MessageDialogCfg::Cancel) {
 			return false;
 		}
-		else if (result == ot::MessageDialogCfg::Yes) {
+		else if (result & ot::MessageDialogCfg::Yes) {
 			m_ExternalServicesComponent->saveProject();
 		}
 	}
@@ -533,7 +519,6 @@ void AppBase::lockUI(bool flag)
 	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
-		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
 	}
 	else {
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
@@ -557,6 +542,8 @@ void AppBase::downloadInstaller(QString gssUrl)
 		QMessageBox msgBox(QMessageBox::Information, "Update Download Successful", 
 			"The update has been downloaded successfully and will be installed after pressing the OK button.\n\n"
 			"Please wait until the login screen will be re-opened.", QMessageBox::Ok);
+
+		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
 		msgBox.exec();
 
 		std::string applicationPath = tempFolder + "\\" + fileName;
@@ -579,12 +566,12 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
 	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.exportProject(selectedProjectName, exportFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
 	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
@@ -737,12 +724,12 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
 	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.importProject(projectName, currentUser, importFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(const char*, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
 	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
@@ -1653,17 +1640,15 @@ bool AppBase::checkForContinue(const std::string& _title) {
 	return true;
 }
 
-void AppBase::setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous)
-{
-	uiAPI::window::setStatusLabelText(m_mainWindow, progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, continuous);
+void AppBase::setProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
+	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
 }
 
-void AppBase::setProgressBarValue(int progressPercentage)
-{
-	uiAPI::window::setStatusProgressValue(m_mainWindow, progressPercentage);
+void AppBase::setProgressBarValue(int _progressPercentage) {
+	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
 }
 
 QString AppBase::availableTabText(const QString& _initialTabText) {
@@ -1838,6 +1823,24 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	if (m_output) {
 		m_output->getPlainTextEdit()->appendHtml(_html);
 	}
+}
+
+void AppBase::appendLogMessage(const ot::LogMessage& _message) {
+	using namespace ot;
+	StyledTextBuilder message;
+
+	if (_message.getFlags() & ERROR_LOG) {
+		message << "[" << StyledText::Error << StyledText::Bold << "ERROR" << StyledText::ClearStyle << "]";
+	}
+	else if (_message.getFlags() & ot::WARNING_LOG) {
+		message << "[" << StyledText::Warning << StyledText::Bold << "WARNING" << StyledText::ClearStyle << "]";
+	}
+	else if (_message.getFlags() & ot::TEST_LOG) {
+		message << "[" << StyledText::Highlight << StyledText::Bold << "TEST" << StyledText::ClearStyle << "]";
+	}
+	message << " [" << _message.getServiceName() << "] " << _message.getText();
+
+	this->appendHtmlInfoMessage(StyledTextConverter::toHtml(message));
 }
 
 void AppBase::autoCloseUnpinnedViews(void) {

@@ -17,6 +17,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "OTCore/EncodingGuesser.h"
 
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccessBase.h"
@@ -750,6 +751,7 @@ void Application::changeHistory(const std::string& content)
 		{
 			// A new history item needs to be created
 			history = new EntityFileText(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, &getClassFactory(), getServiceName());
+			history->setFileProperties("", "history", "txt");
 			history->setName("History");
 
 			data = std::make_shared<EntityBinaryData>(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
@@ -758,7 +760,10 @@ void Application::changeHistory(const std::string& content)
 		data->setData(content.data(), content.size());
 		data->StoreToDataBase();
 
+		ot::EncodingGuesser guesser;
+
 		history->setData(data->getEntityID(), data->getEntityStorageVersion());
+		history->setTextEncoding(guesser(content.data(), content.size()));
 		history->getProperties().setAllPropertiesReadOnly();
 		history->setEditable(false);
 		history->StoreToDataBase();

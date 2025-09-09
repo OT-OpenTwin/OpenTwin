@@ -3,6 +3,7 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
+#include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -17,52 +18,53 @@
 class QWebSocketServer;
 class QWebSocket;
 
-Q_DECLARE_METATYPE(const char*);
-Q_DECLARE_METATYPE(char*);
+Q_DECLARE_METATYPE(const char*)
 
 class SocketServer : public QObject
 {
 	Q_OBJECT
 public:
-	static SocketServer& instance(void);
+	static SocketServer& instance();
 
-	bool startServer(void);
-
-	bool sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response);
+	bool startServer();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter / Getter
 
 	void setWebsocketIp(const std::string& _ip) { m_websocketIp = _ip; };
-	const std::string& getWebsocketIp(void) const { return m_websocketIp; };
+	const std::string& getWebsocketIp() const { return m_websocketIp; };
 
 	void setWebsocketPort(unsigned int _port) { m_websocketPort = _port; };
-	unsigned int getWebsocketPort(void) const { return m_websocketPort; };
+	unsigned int getWebsocketPort() const { return m_websocketPort; };
 
 	void setRelayUrl(const std::string& _url) { m_relayUrl = _url; };
-	const std::string& getRelayUrl(void) const { return m_relayUrl; };
+	const std::string& getRelayUrl() const { return m_relayUrl; };
+
+Q_SIGNALS:
+	void responseReceived();
+	void connectionClosed();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Public: Slots
 
 public Q_SLOTS:
-	QString performAction(const char *json, const char *senderIP);
-	void queueAction(const char *json, const char *senderIP);
-	void deallocateData(const char *data);
+	QString performAction(const char * _json, const char * _senderIP);
+	void queueAction(const char * _json, const char * _senderIP);
+	void deallocateData(const char * _data);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Slots
 
 private Q_SLOTS:
-	void onNewConnection(void);
-	void processMessage(QString message);
-	void socketDisconnected(void);
+	void onNewConnection();
+	void messageReceived(const QString& _message);
+	void socketDisconnected();
 	void onSslErrors(const QList<QSslError> &errors);
-	void slotSocketClosed(void);
-	void keepAlive();
+	void slotSocketClosed();
+	void keepAlive() const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -72,20 +74,22 @@ private:
 	SocketServer();
 	~SocketServer();
 
-	void processMessages(void);
-	void shutdown(void);
-	void sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
-	std::string sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
-	std::string getSystemInformation(void);
+	void shutdown();
+	bool sendQueueWSMessage(const std::string& _senderIP, const std::string& _jsonData);
+	bool sendProcessWSMessage(const std::string& _senderIP, const std::string& _jsonData, std::string& _response);
+
+	bool relayToHttp(const ot::RelayedMessageHandler::Request& _request, std::string& _response);
+
+	std::string getSystemInformation();
 
 	std::string m_websocketIp;
 	unsigned int m_websocketPort;
 	std::string m_relayUrl;
-	
-	QWebSocketServer *m_pWebSocketServer;
-	QList<QWebSocket *> m_clients;
-	std::string responseText;
-	bool responseReceived;
+
+	ot::RelayedMessageHandler m_messageHandler;
+
+	QWebSocketServer* m_pWebSocketServer;
+	QWebSocket* m_client;
 	ot::SystemInformation m_systemLoad;
 	std::chrono::system_clock::time_point m_lastReceiveTime;
 	QTimer* m_keepAliveTimer;

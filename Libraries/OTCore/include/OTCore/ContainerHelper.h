@@ -78,6 +78,18 @@ namespace ot {
 		//! @param _vector2 Vector 2.
 		template <typename T> static bool hasIntersection(const std::vector<T>& _vector1, const std::vector<T>& _vector2);
 
+		//! @brief Returns true if the provided lists contain the same items (order does not matter).
+		//! @tparam T Vector value type.
+		//! @param _list1 List 1.
+		//! @param _list2 List 2.
+		template <typename T> static bool isEqual(const std::list<T>& _list1, const std::list<T>& _list2);
+
+		//! @brief Returns true if the provided vectors contain the same items (order does not matter).
+		//! @tparam T Vector value type.
+		//! @param _vector1 Vector 1.
+		//! @param _vector2 Vector 2.
+		template <typename T> static bool isEqual(const std::vector<T>& _vector1, const std::vector<T>& _vector2);
+
 	};	
 }
 

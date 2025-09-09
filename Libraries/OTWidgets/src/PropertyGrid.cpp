@@ -10,7 +10,6 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridTree.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/PropertyGridItemDelegate.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -20,12 +19,7 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) :
 	QObject(_parentObject), m_isModal(false)
 {
 	m_tree = new PropertyGridTree;
-	m_tree->setColumnCount(2);
-	m_tree->setHeaderLabels({ "Name", "Value" });
-	m_tree->setIndentation(0);
-	m_tree->setObjectName("ot_property_grid");
-	m_tree->setItemDelegate(new PropertyGridItemDelegate(m_tree));
-
+	
 	this->connect(m_tree, &QTreeWidget::itemCollapsed, this, &PropertyGrid::slotItemCollapsed);
 	this->connect(m_tree, &QTreeWidget::itemExpanded, this, &PropertyGrid::slotItemExpanded);
 }
@@ -35,21 +29,21 @@ ot::PropertyGrid::~PropertyGrid() {
 	delete m_tree;
 }
 
-QWidget* ot::PropertyGrid::getQWidget(void) {
+QWidget* ot::PropertyGrid::getQWidget() {
 	return m_tree;
 }
 
-const QWidget* ot::PropertyGrid::getQWidget(void) const {
+const QWidget* ot::PropertyGrid::getQWidget() const {
 	return m_tree;
 }
 
-ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
+ot::TreeWidget* ot::PropertyGrid::getTreeWidget() const {
 	return m_tree;
 }
 
 void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->clear();
-
+	
 	QSignalBlocker thisBlock(this);
 	QSignalBlocker treeBlock(m_tree);
 
@@ -64,7 +58,7 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	}
 }
 
-ot::PropertyGridCfg ot::PropertyGrid::createGridConfig(void) const {
+ot::PropertyGridCfg ot::PropertyGrid::createGridConfig() const {
 	PropertyGridCfg cfg;
 
 	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
@@ -112,19 +106,18 @@ ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::list<std::string>& _
 	else return nullptr;
 }
 
-std::list<ot::PropertyGridItem*> ot::PropertyGrid::getAllItems(void) const {
+std::list<ot::PropertyGridItem*> ot::PropertyGrid::getAllItems() const {
 	std::list<ot::PropertyGridItem*> result;
 	this->findAllChildItems(m_tree->invisibleRootItem(), result);
 	return result;
 }
 
-void ot::PropertyGrid::clear(void) {
-	this->blockSignals(true);
-	m_tree->blockSignals(true);
+void ot::PropertyGrid::clear() {
+	QSignalBlocker thisBlock(this);
+	QSignalBlocker treeBlock(m_tree);
+
 	m_tree->clear();
 	m_isModal = false;
-	m_tree->blockSignals(false);
-	this->blockSignals(false);
 }
 
 void ot::PropertyGrid::focusProperty(const std::string& _groupName, const std::string& _itemName) {

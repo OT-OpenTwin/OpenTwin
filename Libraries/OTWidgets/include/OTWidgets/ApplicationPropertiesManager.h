@@ -25,6 +25,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT ApplicationPropertiesManager : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ApplicationPropertiesManager)
+		OT_DECL_NOMOVE(ApplicationPropertiesManager)
 	public:
 		static ApplicationPropertiesManager& instance(void);
 

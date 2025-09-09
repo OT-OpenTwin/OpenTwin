@@ -16,6 +16,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyPainter2D : public Property {
 		OT_DECL_NOCOPY(PropertyPainter2D)
+		OT_DECL_NOMOVE(PropertyPainter2D)
 	public:
 		using PropertyValueType = Painter2D*;
 

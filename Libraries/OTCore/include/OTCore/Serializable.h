@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/CoreAPIExport.h"
+#include "OTCore/OTClassHelper.h"
 
 namespace ot {
 
@@ -15,14 +16,11 @@ namespace ot {
 	//! @brief The Serializable class is the default interface of serializable objects.
 	//! It provides the default virtual addToJsonObject and setFromJsonObject methods.
 	class OT_CORE_API_EXPORTONLY Serializable {
+		OT_DECL_DEFCOPY(Serializable)
+		OT_DECL_DEFMOVE(Serializable)
 	public:
 		Serializable() = default;
-		Serializable(const Serializable&) = default;
-		Serializable(Serializable&&) noexcept = default;
 		virtual ~Serializable() = default;
-
-		Serializable& operator = (const Serializable&) = default;
-		Serializable& operator = (Serializable&&) noexcept = default;
 
 		//! @brief Serialize the object data into the provided object by using the provided allocator.
 		//! @param _object Json object value reference to write the data to.

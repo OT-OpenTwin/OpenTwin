@@ -82,6 +82,9 @@
     <ClCompile Include="src\BatchedCategorisationHandler.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
+    <ClCompile Include="src\UniqueEntityNameCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -191,6 +194,9 @@
     </ClInclude>
     <ClInclude Include="include\BatchUpdateInformation.h">
       <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UniqueEntityNameCreator.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,10 @@
 #include "OTGui/QueryInformation.h"
 #include "OTCore/FolderNames.h"
 #include "CurveFactory.h"
+#include "QuantityDescriptionCurve.h"
+#include "QuantityDescriptionCurveComplex.h"
+#include "QuantityDescriptionMatrix.h"
+#include "QuantityDescriptionSParameter.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender)
 	:m_extender(_extender)
@@ -25,7 +29,12 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 {
 	const bool valid = validityCheck(_dataSetDescriptions, _config);
 	assert(valid);
-	
+	if (!valid) {
+		OT_LOG_E("Curve validity check failed!");
+		return;
+	}
+
+
 	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
@@ -48,6 +57,10 @@ void PlotBuilder::buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState)
 {
 	assert(!_plotCfg.getEntityName().empty());
 	assert(m_curves.size() > 0);
+	if (m_curves.size() <= 0) {
+		OT_LOG_E("No curves exist to build plot!");
+		return;
+	}
 
 	createPlot(_plotCfg);
 	m_extender.setSaveModel(false);
@@ -71,6 +84,20 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 		valid &= (datasetDescription.getParameters().size() != 0) && 
 			(datasetDescription.getQuantityDescription() != nullptr) && 
 			(datasetDescription.getQuantityDescription()->getMetadataQuantity().valueDescriptions.size() > 0 );
+		QuantityDescription* quantityDescription = datasetDescription.getQuantityDescription();
+
+		if (QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(quantityDescription)) {
+			valid &= !curve->getDataPoints().empty();
+		}
+		else if (QuantityDescriptionCurveComplex* curveComplex = dynamic_cast<QuantityDescriptionCurveComplex*>(quantityDescription)) {
+			valid &= (!curveComplex->getQuantityValuesImag().empty()) && (!curveComplex->getQuantityValuesReal().empty());
+		}
+		else if (QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(quantityDescription)) {
+			valid &= !matrix->getValues().empty();
+		}
+		else if (QuantityDescriptionSParameter* sparam = dynamic_cast<QuantityDescriptionSParameter*>(quantityDescription)) {
+			valid &= (!sparam->getNumberOfFirstValues() == 0) && (!sparam->getNumberOfSecondValues() == 0);
+		}
 	}
 	return valid;
 }

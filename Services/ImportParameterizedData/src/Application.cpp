@@ -340,7 +340,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
 			{				
-				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, m_batchedCategorisationHandler, _selectedEntities);
+				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, std::ref(m_batchedCategorisationHandler), _selectedEntities);
 				worker.detach();
 			}
 			else if (action == m_buttonCreateDataCollection.GetFullDescription())
@@ -459,8 +459,8 @@ void Application::HandleSelectionChanged()
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		else {
-			ot::UIDList entities = std::move(m_selectedEntitiesQueue.front());
-			m_selectedEntitiesQueue.pop_front();
+			ot::UIDList entities = std::move(m_selectedEntitiesQueue.back());
+			m_selectedEntitiesQueue.clear();
 			m_selectedEntitiesMutex.unlock();
 
 			std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);

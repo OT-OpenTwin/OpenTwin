@@ -20,6 +20,7 @@
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionDispatchProfiler.h"
 #include "ResultDataStorageAPI.h"
 
 // Model header
@@ -347,9 +348,7 @@ public:
 	OT_HANDLER(handleModelLibraryDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_ModelDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 
 public Q_SLOTS:
-	char *performAction(const char *json, const char *senderIP);
-	void queueAction(const char *json, const char *senderIP);
-	void deallocateData(const char *data);
+	void queueAction(const std::string& _json, const std::string& _senderIP);
 	void shutdownAfterSessionServiceDisconnected(void);
 	void sendExecuteRequest(const char* url, const char* message);
 	char* sendExecuteRequestWithAnswer(const char* url, const char* message);
@@ -360,6 +359,7 @@ public Q_SLOTS:
 	void activateModelVersion(const char* version);
 	void keepAlive();
 	void slotProcessActionBuffer();
+	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
 
 private:
 	// ###################################################################################################
@@ -395,10 +395,26 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
+	void actionDispatchTimeout(const std::string& _json);
+
+	struct ImportFileWorkerData {
+		std::string receiverUrl;
+		std::string subsequentFunctionName;
+		std::string fileMask;
+		bool loadContent;
+	};
+
+	void workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info);
+
+	void workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info);
+
 	// #################################################################
 
 	bool                                            m_bufferActions;
 	std::list<std::string>                          m_actionBuffer;
+	ot::ActionDispatchProfiler                      m_actionProfiler;
+
+	int64_t                                         m_lastKeepAlive;
 
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;

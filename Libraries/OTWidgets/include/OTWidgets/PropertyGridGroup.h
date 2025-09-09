@@ -25,6 +25,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public TreeWidgetItem {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridGroup)
+		OT_DECL_NOMOVE(PropertyGridGroup)
 	public:
 		PropertyGridGroup();
 		virtual ~PropertyGridGroup();
@@ -34,35 +35,35 @@ namespace ot {
 		PropertyGroup* createConfiguration(bool _includeChildAndProperties) const;
 
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
-		void finishSetup(void);
+		void finishSetup();
 
 		void setParentPropertyGroup(PropertyGridGroup* _group) { m_parentGroup = _group; };
-		PropertyGridGroup* getParentPropertyGroup(void) const { return m_parentGroup; };
+		PropertyGridGroup* getParentPropertyGroup() const { return m_parentGroup; };
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		void setTitle(const QString& _title);
-		QString getTitle(void) const;
+		QString getTitle() const;
 
 		void addProperty(PropertyGridItem* _item);
 
 		void addChildGroup(PropertyGridGroup* _group);
 
 		PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
-		std::list<PropertyGridItem*> childProperties(void) const;
+		std::list<PropertyGridItem*> childProperties() const;
 
 		PropertyGridGroup* findChildGroup(const std::string& _name, bool _searchChildGroups) const;
-		std::list<PropertyGridGroup*> childGroups(void) const;
+		std::list<PropertyGridGroup*> childGroups() const;
 
-		void updateStateIcon(void);
+		void updateStateIcon();
 
 	Q_SIGNALS:
 		void itemInputValueChanged(const ot::Property* _property);
 		void itemDeleteRequested(const ot::Property* _property);
 
 	private Q_SLOTS:
-		void slotColorStyleChanged(void);
+		void slotColorStyleChanged();
 		void slotItemInputValueChanged(const ot::Property* _property);
 		void slotItemDeleteRequested(const ot::Property* _property);
 

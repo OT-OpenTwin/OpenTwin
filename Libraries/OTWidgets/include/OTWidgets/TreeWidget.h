@@ -19,6 +19,8 @@
 
 namespace ot {
 
+	class TreeItemDelegate;
+
 	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::QWidgetInterface {
 		Q_OBJECT
 	public:
@@ -92,6 +94,8 @@ namespace ot {
 		void slotColorStyleChanged(void);
 
 	private:
+		TreeItemDelegate* m_itemDeletegate;
+
 		std::list<int> m_columnWidths;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

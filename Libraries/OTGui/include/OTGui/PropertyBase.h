@@ -24,6 +24,8 @@ namespace ot {
 	//! @class PropertyBase
 	//! @brief The PropertyBase class is used to hold general Property information.
 	class OT_GUI_API_EXPORT PropertyBase : public Serializable {
+		OT_DECL_DEFCOPY(PropertyBase)
+		OT_DECL_DEFMOVE(PropertyBase)
 	public:
 		//! @enum PropertyFlag
 		//! @brief The PropertyFlag enum contains different settings for properties.
@@ -76,17 +78,9 @@ namespace ot {
 		//! @param _name Property name.
 		//! @param _flags Intially set flags.
 		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
-		
-		//! @brief Copy constructor.
-		//! @param _other Other PropertyBase.
-		PropertyBase(const PropertyBase& _other);
 
 		//! \brief Destructor.
 		virtual ~PropertyBase() {};
-
-		//! @brief Assignment operator.
-		//! @param _other Other PropertyBase.
-		PropertyBase& operator = (const PropertyBase& _other);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

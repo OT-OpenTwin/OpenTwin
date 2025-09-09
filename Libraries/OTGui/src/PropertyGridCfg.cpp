@@ -30,7 +30,7 @@ ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _ot
 		this->clear();
 
 		for (const PropertyGroup* g : _other.getRootGroups()) {
-			PropertyGroup* ng = new PropertyGroup(*g);
+			PropertyGroup* ng = new PropertyGroup(g);
 			this->addRootGroup(ng);
 		}
 
@@ -91,7 +91,7 @@ void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, const Propert
 			}
 		}
 		if (!found) {
-			m_rootGroups.push_back(new PropertyGroup(*group));
+			m_rootGroups.push_back(new PropertyGroup(group));
 		}
 	}
 }

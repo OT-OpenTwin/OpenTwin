@@ -21,7 +21,8 @@ ot::TableItemDelegate::TableItemDelegate(Table* _table)
 }
 
 ot::TableItemDelegate::~TableItemDelegate() {
-
+    m_table->setItemDelegate(nullptr);
+	m_table = nullptr;
 }
 
 void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem& _option, const QModelIndex& _index) const {

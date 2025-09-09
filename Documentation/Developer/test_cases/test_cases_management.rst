@@ -65,14 +65,14 @@ Project, User and Group management
 
     * - 2
       - Rename Project 2
-      - * Complete test **#4**.
+      - * Complete test **#1**.
         * Create a project with the name **Test 1**.
       - Try to rename the project **Test 1** to **Test 2**.
       - A error message is displayed showing that the name is already taken and the project cannot be renamed.
 
     * - 3
       - Overwrite Project
-      - Complete test **#4**.
+      - Complete test **#1**.
       - Try to create a project with the name **Test 2**.
       - A warning message is displayed showing that the project name is already taken and the project would be overwritten.
 
@@ -84,7 +84,7 @@ Project, User and Group management
 
     * - 5
       - Create Group 1
-      - * Create a two users.
+      - * Create two users.
         * Create a project with one of the users.
       - * Create a group (Manage Groups).
         * Assign the other user to the new group.

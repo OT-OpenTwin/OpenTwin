@@ -203,18 +203,38 @@ void PrimitiveCone::createFromRubberbandJson(const std::string& _json, std::vect
 			gp_Pnt centerPoint(xcenter, ycenter, zmin);
 			gp_Dir direction;
 			TopoDS_Shape body;
+			std::list<std::string> faceNames;
 
-			std::list<std::string> faceNames = { "f1", "f2", "f3" };
+			if (fabs(zmax - zmin) > Precision::Confusion()
+				&& bottomRadius >= 0
+				&& topRadius >= 0
+				&& !(bottomRadius < Precision::Confusion() && topRadius < Precision::Confusion()))
+			{
+				if (zmax > zmin) {
+					direction = gp_Dir(0, 0, 1);
+					body = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, zmax);
+				}
+				else {
+					direction = gp_Dir(0, 0, -1);
+					zmax = fabs(zmax);
+					body = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, zmax);
+					zmax *= (-1);
+				}
 
-			if (zmax > zmin) {
-				direction = gp_Dir(0, 0, 1);
-				body = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, zmax);
-			}
-			else {
-				direction = gp_Dir(0, 0, -1);
-				zmax = fabs(zmax);
-				body = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, zmax);
-				zmax *= (-1);
+				TopExp_Explorer exp;
+				size_t faceCount = 0;
+				for (exp.Init(body, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
+
+				if (faceCount == 2)
+				{
+					// Either top or bottom radii are zero, so we have a complete cone
+					faceNames = { "f1", "f2" };
+				}
+				else
+				{
+					// Both, top and bottom radii are non-zero, so we have a truncated cone
+					faceNames = { "f1", "f2", "f3" };
+				}
 			}
 
 			std::list<std::pair<std::string, std::string>> shapeParameters;
@@ -264,35 +284,46 @@ void PrimitiveCone::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 
 	gp_Pnt centerPoint = gp_Pnt(xcenter, ycenter, zMin);
 	gp_Dir direction;
-	try {
-		if (zMax > zMin) {
-			direction = gp_Dir(0, 0, 1);
-			shape = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, fabs(zMax-zMin));
-		}
-		else {
-			direction = gp_Dir(0, 0, -1);
-			shape = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, fabs(zMax-zMin));
-		}
-	}
-	catch (Standard_Failure) {
-		assert(0);
-	}
-
-	TopExp_Explorer exp;
-	size_t faceCount = 0;
-	for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
-
 	std::list<std::string> faceNames;
 
-	if (faceCount == 2)
+	if (fabs(zMax - zMin) > Precision::Confusion()
+		&& bottomRadius >= 0
+		&& topRadius >= 0
+		&& !(bottomRadius < Precision::Confusion() && topRadius < Precision::Confusion()))
 	{
-		// Either top or bottom radii are zero, so we have a complete cone
-		faceNames = { "f1", "f2" };
+		try {
+			if (zMax > zMin) {
+				direction = gp_Dir(0, 0, 1);
+				shape = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, fabs(zMax - zMin));
+			}
+			else {
+				direction = gp_Dir(0, 0, -1);
+				shape = BRepPrimAPI_MakeCone(gp_Ax2(centerPoint, direction), bottomRadius, topRadius, fabs(zMax - zMin));
+			}
+
+			TopExp_Explorer exp;
+			size_t faceCount = 0;
+			for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
+
+			if (faceCount == 2)
+			{
+				// Either top or bottom radii are zero, so we have a complete cone
+				faceNames = { "f1", "f2" };
+			}
+			else
+			{
+				// Both, top and bottom radii are non-zero, so we have a truncated cone
+				faceNames = { "f1", "f2", "f3" };
+			}
+		}
+		catch (Standard_Failure) {
+			assert(0);
+		}
 	}
 	else
 	{
-		// Both, top and bottom radii are non-zero, so we have a truncated cone
-		faceNames = { "f1", "f2", "f3" };
+		TopoDS_Shape empty;
+		shape = empty;
 	}
 
 	applyFaceNames(geomEntity, shape, faceNames);

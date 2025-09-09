@@ -54,6 +54,9 @@
     <Filter Include="Header Files\Helper">
       <UniqueIdentifier>{ab9b1e8e-c7ab-45a9-a1de-f7570a96d358}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{73092f66-df31-4074-ae7f-32928c75b830}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -152,6 +155,9 @@
     <ClCompile Include="src\CurveColourSetter.cpp">
       <Filter>Source Files\CurveHelper</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProgressUpdater.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -214,14 +220,14 @@
     <ClInclude Include="include\ShortParameterDescription.h">
       <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
-    <ClInclude Include="include\ProgressUpdater.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
     <ClInclude Include="include\UITestLogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\CurveColourSetter.h">
       <Filter>Header Files\CurveHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProgressUpdater.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

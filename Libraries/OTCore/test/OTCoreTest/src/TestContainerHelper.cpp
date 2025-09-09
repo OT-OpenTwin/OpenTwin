@@ -122,3 +122,59 @@ TEST(ContainerTests, IntersectsVector) {
 	EXPECT_TRUE(ot::ContainerHelper::hasIntersection(l2, l3));
 	EXPECT_FALSE(ot::ContainerHelper::hasIntersection(l1, l3));
 }
+
+TEST(ContainerTests, EqualList) {
+	// Hashing
+	std::list<int> l1 = { 1, 2 };
+	std::list<int> l2 = { 1, 2, 3 };
+	std::list<int> l3 = { 2, 1, 3 };
+	std::list<int> l4 = { 1, 3, 2 };
+	std::list<int> l5 = { 1, 3, 2, 2 };
+
+	// Sorting
+	std::list<std::vector<int>> v1 = { {1,2}, {3,4} };
+	std::list<std::vector<int>> v2 = { {1,2}, {3,4}, {5,6} };
+	std::list<std::vector<int>> v3 = { {3,4}, {5,6}, {1,2} };
+	std::list<std::vector<int>> v4 = { {5,6}, {1,2}, {3,4} };
+	std::list<std::vector<int>> v5 = { {5,6}, {1,2}, {3,4}, {1,2} };
+
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(l1, l2));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l2, l3));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l2, l4));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l3, l4));
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(l2, l5));
+
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(v1, v2));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v2, v3));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v2, v4));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v3, v4));
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(v2, v5));
+}
+
+TEST(ContainerTests, EqualVector) {
+	// Hashing
+	std::vector<int> l1 = { 1, 2 };
+	std::vector<int> l2 = { 1, 2, 3 };
+	std::vector<int> l3 = { 2, 1, 3 };
+	std::vector<int> l4 = { 1, 3, 2 };
+	std::vector<int> l5 = { 1, 3, 2, 2 };
+
+	// Sorting
+	std::vector<std::vector<int>> v1 = { {1,2}, {3,4} };
+	std::vector<std::vector<int>> v2 = { {1,2}, {3,4}, {5,6} };
+	std::vector<std::vector<int>> v3 = { {3,4}, {5,6}, {1,2} };
+	std::vector<std::vector<int>> v4 = { {5,6}, {1,2}, {3,4} };
+	std::vector<std::vector<int>> v5 = { {5,6}, {1,2}, {3,4}, {1,2} };
+
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(l1, l2));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l2, l3));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l2, l4));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(l3, l4));
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(l2, l5));
+
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(v1, v2));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v2, v3));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v2, v4));
+	EXPECT_TRUE(ot::ContainerHelper::isEqual(v3, v4));
+	EXPECT_FALSE(ot::ContainerHelper::isEqual(v2, v5));
+}

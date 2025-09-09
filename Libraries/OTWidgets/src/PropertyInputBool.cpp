@@ -54,7 +54,7 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 		return false;
 	}
 
-	m_checkBox->blockSignals(true);
+	QSignalBlocker blocker(m_checkBox);
 
 	m_checkBox->setChecked(actualProperty->getValue());
 	m_checkBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
@@ -62,8 +62,6 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 		m_checkBox->setCheckState(Qt::PartiallyChecked);
 	}
 	m_checkBox->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
-
-	m_checkBox->blockSignals(false);
 
 	return true;
 }

@@ -50,7 +50,7 @@ bool downloadFrontendInstaller(
 
 	if (!ot::msg::send("", _gssUrl, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, _timeout, ot::msg::DefaultFlagsNoExit))
 	{
-		_error = "Unable to get frontend installer size";
+		_error = "Unable to get frontend installer size.";
 		OT_LOG_E(_error);
 		return false;
 	}
@@ -64,6 +64,14 @@ bool downloadFrontendInstaller(
 	else
 	{
 		installerSize = atoll(response.c_str());
+	}
+
+	if (installerSize == 0)
+	{
+		// The frontend installer could not be found at the server side
+		_error = "The frontend installer package could not be found on the server.";
+		OT_LOG_E(_error);
+		return false;
 	}
 
 	response.clear();
@@ -93,7 +101,7 @@ bool downloadFrontendInstaller(
 
 	if (success == 0)
 	{
-		_error = "Unable to download frontend installer";
+		_error = "Unable to download frontend installer.";
 		OT_LOG_E(_error);
 		return false;
 	}
@@ -103,14 +111,14 @@ bool downloadFrontendInstaller(
 
 	// First create a temporary file name
 	if (GetTempPathA(MAX_PATH, tempPath) == 0) {
-		_error = "Unable to obtain temporary directory name";
+		_error = "Unable to obtain temporary directory name.";
 		OT_LOG_E(_error);
 		return false;
 	}
 
 	char tempDirName[MAX_PATH];
 	if (GetTempFileNameA(tempPath, "TMP", 0, tempDirName) == 0) {
-		_error = "Unable to obtain temporary file name";
+		_error = "Unable to obtain temporary file name.";
 		OT_LOG_E(_error);
 		return false;
 	}
