@@ -5158,8 +5158,9 @@ void Model::setStateMangager(ModelState* state)
 	
 	std::list<ot::UID> prefetchIds;
 	getStateManager()->getListOfTopologyEntites(prefetchIds);
+	OT_LOG_D("Loading entities of model state.");
 	prefetchDocumentsFromStorage(prefetchIds);
-
+	OT_LOG_D("Building model state.");
 	// Now read the root entity (this will implicitly also recursively load all other subentities as well
 	if (entityRootId != -1)
 	{
