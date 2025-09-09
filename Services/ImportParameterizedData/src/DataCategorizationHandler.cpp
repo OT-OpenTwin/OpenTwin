@@ -124,7 +124,8 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 	else
 	{
 		std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataCategorisationFolder, true);
-		std::list<std::string> categorisationEntities;
+		
+		std::list<std::string> categorisationEntities; //Actually, sorted by this criteria it could also be a RMD selection range
 		for (std::string& folderItem : folderItems)
 		{
 			size_t topoLvl =  ot::EntityName::getTopologyLevel(folderItem);
@@ -135,20 +136,33 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 		}
 		
 		std::list<std::unique_ptr<EntityParameterizedDataCategorization>> consideredSeries;
+		EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
+		ot::UIDList categoristationIDs;
 		if (categorisationEntities.size() != 0)
 		{
 			std::list<ot::EntityInformation> entityInfos;
 			ot::ModelServiceAPI::getEntityInformation(categorisationEntities, entityInfos);
-			ot::UIDList categoristationIDs;
 			for (ot::EntityInformation& entityInfo : entityInfos)
 			{
-				categoristationIDs.push_back(entityInfo.getEntityID());
+				//Here we double check if it realy is a chategorisation or a RMD selection range
+				if (entityInfo.getEntityType() == temp.getClassName())
+				{
+					categoristationIDs.push_back(entityInfo.getEntityID());
+				}
+				else
+				{
+					categorisationEntities.remove(entityInfo.getEntityName());
+				}
 			}
+		}
 
+		if(categorisationEntities.size() != 0)
+		{
 			Application::instance()->prefetchDocumentsFromStorage(categoristationIDs);
-			for (ot::EntityInformation& entityInfo : entityInfos)
+			for (ot::UID categoristationID : categoristationIDs)
 			{
-				EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+				ot::UID version = Application::instance()->getPrefetchedEntityVersion(categoristationID);
+				EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(categoristationID, version, Application::instance()->getClassFactory());
 				std::unique_ptr<EntityParameterizedDataCategorization>categorisationEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
 				bool consider = !categorisationEnt->getIsLocked();
 				if (consider)
