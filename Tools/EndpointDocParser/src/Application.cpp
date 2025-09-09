@@ -16,8 +16,8 @@ namespace fs = std::filesystem;
 
 void Application::run(void) {
 	std::cout << "Application is running.\n";
-	searchForServices();
 	searchInLibrary();
+	searchForServices();
 }
 
 void Application::searchForServices(void) {
@@ -31,14 +31,14 @@ void Application::searchForServices(void) {
 	try {
 		std::list<std::string> allServices = ot::FileSystem::getFiles(path, { ".vcxproj" }, ot::FileSystem::FileSystemOption::Recursive);
 
-		std::cout << "\nC++-Files:\n";
+//		std::cout << "\nC++-Files:\n";
 		for (const std::string& file : allServices) {
-			std::cout << "  " << file << "\n";
+//			std::cout << "  " << file << "\n";
 
 			// get the name of the service
 			fs::path p = file;
 			std::string serviceName = p.stem().string();
-			std::cout << "Name of the service: " << serviceName << "\n";
+//			std::cout << "Name of the service: " << serviceName << "\n";
 
 			// create the service
 			Service service;
@@ -69,53 +69,23 @@ void Application::searchForServices(void) {
 			endpoint.printEndpoint();
 		}
 	}
-/*
-		// search in one Service
-		const std::string pathToAuthorisationService = "C:\\OT\\OpenTwin\\Services\\AuthorisationService";
-
-		try {
-			std::list<std::string> allServiceFiles = ot::FileSystem::getFiles(pathToAuthorisationService, { ".vcxproj" });
-
-			std::cout << "\nC++-Files:\n";
-			for (const std::string& file : allServiceFiles) {
-				std::cout << "  " << file << "\n";
-
-				// get the name of the service
-				fs::path p = file;
-				std::string serviceName = p.stem().string();
-				std::cout << "Name of the service: " << serviceName << "\n";
-
-				// create the service
-				Service service;
-				service.setName(serviceName);
-				std::cout << "Created Service " << service.getName() << ".\n";
-
-				searchIncludeAndSrcDirectoryFiles(file, service);
-				
-				service.printService();
-			}
-			// output: C:\OT\OpenTwin\Services\AuthorisationService\AuthorisationService.vcxproj
-		}
-		catch (const std::filesystem::filesystem_error& e) {
-			std::cerr << "Error by getFiles: " << e.what() << "\n";
-		}*/
 }
 
 void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service) {
 	std::cout << "Searching for include und src directories of the given file: " << _file << "\n";
-	std::cout << "The service is " << _service.getName() << ". \n";
+//	std::cout << "The service is " << _service.getName() << ". \n";
 
 	// get the path to the .vcxproj file
 	fs::path p = _file;
 	fs::path parentDirectory = p.parent_path();
 
-	std::cout << "The path to " << p << " is " << parentDirectory << '\n';
+//	std::cout << "The path to " << p << " is " << parentDirectory << '\n';
 	// output: The parent path ... is "C:\\OT\\OpenTwin\\Services\\AuthorisationService"
 
 	// get the path to the include-directory
 	fs::path includeDir = parentDirectory / "include";
 
-	std::cout << "Path to include directory is: " << includeDir << "\n";
+//	std::cout << "Path to include directory is: " << includeDir << "\n";
 
 	if (fs::exists(includeDir) && fs::is_directory(includeDir)) {
 		searchIncludeDirectoryFiles(includeDir.string(), _service);
@@ -124,7 +94,7 @@ void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Se
 	// get the path to the src-directory
 	fs::path srcDir = parentDirectory / "src";
 
-	std::cout << "Path to src directory is: " << srcDir << "\n";
+//	std::cout << "Path to src directory is: " << srcDir << "\n";
 
 	if (fs::exists(srcDir) && fs::is_directory(srcDir)) {
 		searchSrcDirectoryFiles(srcDir.string(), _service);
@@ -132,16 +102,15 @@ void Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Se
 }
 
 void Application::searchIncludeDirectoryFiles(const std::string& _includeDirectory, Service& _service) {
-	std::cout << "The service is " << _service.getName() << ". \n";
+//	std::cout << "The service is " << _service.getName() << ". \n";
 	try {
 		std::list<std::string>  includeFiles = ot::FileSystem::getFiles(_includeDirectory, {});
-		std::cout << "Collected Files in include-directory\n";
+//		std::cout << "Collected Files in include-directory\n";
 
 		for (const std::string& file : includeFiles) {
-			std::cout << "  " << file << "\n";
+//			std::cout << "  " << file << "\n";
 			parseFile(file, _service);
 		}
-		// output: Collected Files in include-directory 
 	}
 	catch (const std::filesystem::filesystem_error& e) {
 		std::cerr << "Error by getFiles: " << e.what() << "\n";
@@ -149,16 +118,15 @@ void Application::searchIncludeDirectoryFiles(const std::string& _includeDirecto
 }
 
 void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service) {
-	std::cout << "The service is " << _service.getName() << ". \n";
+//	std::cout << "The service is " << _service.getName() << ". \n";
 	try {
 		std::list<std::string> srcFiles = ot::FileSystem::getFiles(_srcDirectory, {});
 		std::cout << "Collected Files in src-directory\n";
 
 		for (const std::string& file : srcFiles) {
-			std::cout << "  " << file << "\n";
+//			std::cout << "  " << file << "\n";
 			parseFile(file, _service);
 		}
-		// output: Collected Files in src-directory C:\OT\OpenTwin\Services\AuthorisationService\src\dllmain.cpp
 	}
 	catch (const std::filesystem::filesystem_error& e) {
 		std::cerr << "Error by getFiles: " << e.what() << "\n";
@@ -166,7 +134,7 @@ void Application::searchSrcDirectoryFiles(const std::string& _srcDirectory, Serv
 }
 
 void Application::parseFile(const std::string& _file, Service& _service) {
-	std::cout << "The service is " << _service.getName() << ". \n";
+//	std::cout << "The service is " << _service.getName() << ". \n";
 	
 	std::cout << "Parsing file: " << _file << "\n";
 	std::string blackList = " \t\n";
@@ -178,14 +146,17 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	// read lines from given file and parse them
 	try {
 		std::list<std::string> lines = ot::FileSystem::readLines(_file);
-		std::cout << "Read lines: " << "\n";
+//		std::cout << "Read lines: " << "\n";
 
 		for (const std::string& line : lines) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
-			//std::cout << trimmedLine << "\n";
+//			std::cout << trimmedLine << "\n";
+
+			std::string lowerCaseTrimmedLine = ot::String::toLower(trimmedLine);
+//			std::cout << "Lower case: " << trimmedLine << "\n";
 
 			// check if the parser is in an api documentation block
-			if (startsWith(trimmedLine, "//api")) {
+			if (startsWith(lowerCaseTrimmedLine, "//api")) {
 				if (!inApiBlock) {
 					inApiBlock = true;
 					endpoint = Endpoint();  // new endpoint
@@ -200,7 +171,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 				// check which "@commando" is given
 				if (startsWith(apiContent, "@security")) {
 					std::string security = apiContent.substr(10);
-					std::cout << "[SECURITY] -> " << security << "\n";
+//					std::cout << "[SECURITY] -> " << security << "\n";
 
 					if (security == "TLS" || security == "tls") {
 						endpoint.setMessageType(Endpoint::TLS);
@@ -213,13 +184,20 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 				}
 				else if (startsWith(apiContent, "@action")) {
 					std::string action = apiContent.substr(8);
-					std::cout << "[ACTION] -> " << action << "\n";
+					action = ot::String::removePrefixSuffix(action, " ");
+
+//  				std::cout << "[ACTION] -> >>" << action << "<<" << "\n";
 					endpoint.setAction(action);
 					std::cout << "Action set in endpoint: " << endpoint.getAction() << "\n";
+
+					std::string actionName = m_actionMacros.at(action);
+//					std::cout << "[ACTIONNAME] -> " << actionName << "\n";
+					endpoint.setName(actionName);
+					std::cout << "Name set in endpoint: " << endpoint.getName() << "\n";
 				}
 				else if (startsWith(apiContent, "@brief")) {
 					std::string brief = apiContent.substr(7);
-					std::cout << "[BRIEF] -> " << brief << "\n";
+//					std::cout << "[BRIEF] -> " << brief << "\n";
 					endpoint.setBriefDescription(brief);
 					std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
 				}
@@ -228,13 +206,13 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					std::string parameterType = "Function parameter";
 
 					std::string param = apiContent.substr(7);
-					std::cout << "[PARAM] -> " << param << "\n";
+//					std::cout << "[PARAM] -> " << param << "\n";
 
 					parseParameter(parameter, param, endpoint, parameterType);
 				}
 				else if (startsWith(apiContent, "@return")) {
 					std::string response = apiContent.substr(8);
-					std::cout << "[RETURN] -> " << response << "\n";
+//					std::cout << "[RETURN] -> " << response << "\n";
 					endpoint.setResponseDescription(response);
 					std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
 				}
@@ -243,7 +221,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					std::string parameterType = "Return parameter";
 
 					std::string rparam = apiContent.substr(8);
-					std::cout << "[RETURNPARAM] -> " << rparam << "\n";
+//					std::cout << "[RETURNPARAM] -> " << rparam << "\n";
 
 					parseParameter(parameter, rparam, endpoint, parameterType);
 				}
@@ -288,93 +266,93 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 	std::vector<std::string> splittedParamVector(splittedParamList.begin(), splittedParamList.end());
 
 	std::string macro = splittedParamVector[0];
-	std::cout << "The first string is: " << macro << "\n";
+//	std::cout << "The first string is: " << macro << "\n";
 	std::size_t sizeOfMacroString = macro.size() + 1;
-	std::cout << sizeOfMacroString << "\n";
+//	std::cout << sizeOfMacroString << "\n";
 
 	_parameter.setMacro(macro);
-	std::cout << "Macro set in parameter: " << _parameter.getMacro() << "\n";
+//	std::cout << "Macro set in parameter: " << _parameter.getMacro() << "\n";
+
+	std::string name = m_actionMacros.at(macro);
+	_parameter.setName(name);
+//	std::cout << "Macroname set in parameter: " << _parameter.getName() << "\n";
 
 	std::string dataType = splittedParamVector[1];
 
-	// TODO: replace with toLower method from String.h
-	// Convert all characters to lowercase
-	std::transform(dataType.begin(), dataType.end(), dataType.begin(), [](unsigned char c) {
-		return std::tolower(c); 
-		});
-	std::cout << "Lowercase string: " << dataType << std::endl;
+	dataType = ot::String::toLower(dataType);
+//	std::cout << "Lowercase string: " << dataType << "\n";
 
 	// data type is Unsigned Integer 64
 	if (dataType == "unsigned") {
 		std::string dataType2 = splittedParamVector[2];
 		std::string dataType3 = splittedParamVector[3];
 		std::string unsignedInt64 = dataType + " " + dataType2 + " " + dataType3;
-		std::cout << "The second string is: " << unsignedInt64 << "\n";
+//		std::cout << "The second string is: " << unsignedInt64 << "\n";
 
 		std::size_t sizeOfUnsignedInt64String = unsignedInt64.size() + 1;
-		std::cout << sizeOfUnsignedInt64String << "\n";
+//		std::cout << sizeOfUnsignedInt64String << "\n";
 
 		_parameter.setDataType(Parameter::UnsignedInteger64);
-		std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
+//		std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
 
 		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfUnsignedInt64String);
-		std::cout << "The third string is: " << paramDescription << "\n";
+//		std::cout << "The third string is: " << paramDescription << "\n";
 
 		_parameter.setDescription(paramDescription);
-		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+//		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
 	}
 	else {
-		std::cout << "The second string is: " << dataType << "\n";
+//		std::cout << "The second string is: " << dataType << "\n";
 
 		std::size_t sizeOfDataTypeString = dataType.size() + 1;
-		std::cout << sizeOfDataTypeString << "\n";
+//		std::cout << sizeOfDataTypeString << "\n";
 
 		if (dataType == "uid") {
 			_parameter.setDataType(Parameter::UnsignedInteger64);
-			std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Unsigned Integer 64 set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 
 		else if (dataType == "boolean" || dataType == "bool") {
 			_parameter.setDataType(Parameter::Boolean);
-			std::cout << "Data type Boolean set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Boolean set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "char" || dataType == "character") {
 			_parameter.setDataType(Parameter::Char);
-			std::cout << "Data type Char set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Char set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "integer" || dataType == "int") {
 			_parameter.setDataType(Parameter::Integer);
-			std::cout << "Data type Integer set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Integer set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "float") {
 			_parameter.setDataType(Parameter::Float);
-			std::cout << "Data type Float set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Float set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "double") {
 			_parameter.setDataType(Parameter::Double);
-			std::cout << "Data type Double set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Double set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "string" || dataType == "str") {
 			_parameter.setDataType(Parameter::String);
-			std::cout << "Data type String set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type String set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "array") {
 			_parameter.setDataType(Parameter::Array);
-			std::cout << "Data type Array set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Array set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "object" || dataType == "obj") {
 			_parameter.setDataType(Parameter::Object);
-			std::cout << "Data type Object set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Object set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 		else if (dataType == "enum") {
 			_parameter.setDataType(Parameter::Enum);
-			std::cout << "Data type Enum set in parameter: " << _parameter.getDataTypeString() << "\n";
+//			std::cout << "Data type Enum set in parameter: " << _parameter.getDataTypeString() << "\n";
 		}
 
 		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfDataTypeString);
-		std::cout << "The third string is: " << paramDescription << "\n";
+//		std::cout << "The third string is: " << paramDescription << "\n";
 		_parameter.setDescription(paramDescription);
-		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+//		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
 	}
 	_parameter.printParameter();
 	if (_parameterType == "Function parameter") {
@@ -400,7 +378,7 @@ void Application::searchInLibrary(void) {
 	// read lines from given file and parse them
 	try {
 		std::list<std::string> lines = ot::FileSystem::readLines(pathToActionTypesHeaderFile);
-		std::cout << "Read lines: " << "\n";
+//		std::cout << "Read lines: " << "\n";
 
 		for (const std::string& line : lines) {
 			std::string trimmedLine = ot::String::removePrefix(line, blackList);
@@ -417,7 +395,7 @@ void Application::searchInLibrary(void) {
 
 		std::cout << "The parsed map of macro-name and -definition is :\n";
 		for (const auto macro : m_actionMacros) {
-			std::cout << macro.first << " : " << macro.second << "\n";
+			std::cout << macro.first << " : >>" << macro.second << "<<" << "\n";
 		}
 	}
 	catch (const ot::FileOpenException& e) {
@@ -461,14 +439,14 @@ void Application::searchInLibrary(void) {
 
 	std::cout << "The parsed map of macro-name and -definition is :\n";
 	for (const auto macro : m_actionMacros) {
-		std::cout << macro.first << " : " << macro.second << "\n";
+		std::cout << macro.first << " : >>" << macro.second << "<<" << "\n";
 	}
 
 }
 */
 
 void Application::parseMacroDefinition(const std::string& _content) {
-	std::cout << "Parsing content: " << _content << "\n";
+///	std::cout << "Parsing content: " << _content << "\n";
 	std::string blackList = " ";
 
 	// macro definition contains macro definition in quotes
@@ -478,7 +456,7 @@ void Application::parseMacroDefinition(const std::string& _content) {
 		
 		std::string macroName = ot::String::removeSuffix(splittedContentVector[0], blackList);
 		std::string macroDefinition = splittedContentVector[1];
-		std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+//		std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
 
 		// macro definition contains two macro names at the beginning
 		if (macroName.find(" ") != std::string::npos) {
@@ -487,35 +465,35 @@ void Application::parseMacroDefinition(const std::string& _content) {
 			
 			macroName = splittedMacroNameVector[0];
 
-			std::cout << ">>" << macroName << "<<:>>" << splittedMacroNameVector[1] << "<<:>>" << macroDefinition << "<<" << "\n";
+//			std::cout << ">>" << macroName << "<<:>>" << splittedMacroNameVector[1] << "<<:>>" << macroDefinition << "<<" << "\n";
 			
 			// second macro name is OT_ACTION_RETURN_INDICATOR_Error, replace with "Error: "
 			if (splittedMacroNameVector[1] == "OT_ACTION_RETURN_INDICATOR_Error") {
 				macroDefinition = "Error: " + macroDefinition;
 
-				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+//				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
 				
 				m_actionMacros[macroName] = macroDefinition;
-				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+///				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
 			}
 		}
 		// macro definition contains OT_ACTION_PASSWORD_SUBTEXT at the end, replace with "Password"
 		else if (splittedContentVector.size() > 2 && splittedContentVector[2] != "") {
 			splittedContentVector[2] = ot::String::removePrefix(splittedContentVector[2], blackList);
-			std::cout << splittedContentVector[2] << "\n";
+//			std::cout << splittedContentVector[2] << "\n";
 			
 			if (splittedContentVector[2] == "OT_ACTION_PASSWORD_SUBTEXT") {
 				macroDefinition = splittedContentVector[1] + "Password";
 
-				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+//				std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
 
 				m_actionMacros[macroName] = macroDefinition;
-				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+///				std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
 			}	
 		}
 		else {
 			m_actionMacros[macroName] = macroDefinition;
-			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+///			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
 		}
 	}
 	// macro definition contains no macro definition in quotes
@@ -524,16 +502,16 @@ void Application::parseMacroDefinition(const std::string& _content) {
 		std::vector<std::string> splittedContentVector(splittedContentList.begin(), splittedContentList.end());
 		
 		std::string macroName = splittedContentVector[0];
-		std::cout << ">>" << macroName << "<<:>>" << splittedContentVector[1] << "<<" "\n";
+//		std::cout << ">>" << macroName << "<<:>>" << splittedContentVector[1] << "<<" "\n";
 
 		// macro definition contains OT_ACTION_PASSWORD_SUBTEXT at the end, replace with "Password"
 		if (splittedContentVector[1] == "OT_ACTION_PASSWORD_SUBTEXT") {
 			std::string macroDefinition = "Password";
 
-			std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
+//			std::cout << ">>" << macroName << "<<:>>" << macroDefinition << "<<" << "\n";
 
 			m_actionMacros[macroName] = macroDefinition;
-			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
+///			std::cout << "Added " << macroName << " and " << macroDefinition << " to Map.\n";
 		}
 	}
 }
