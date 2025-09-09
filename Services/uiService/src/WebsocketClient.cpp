@@ -120,7 +120,7 @@ bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, 
 			QEventLoop eventLoop;
 			eventLoop.connect(this, &WebsocketClient::responseReceived, &eventLoop, &QEventLoop::quit);
 			eventLoop.connect(this, &WebsocketClient::connectionClosed, &eventLoop, &QEventLoop::quit);
-			eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+			eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 		}
 
 		// We have received a response and return the text
@@ -239,10 +239,6 @@ void WebsocketClient::slotProcessMessageQueue() {
 		return;
 	}
 
-	// Move new commands to the main buffer
-	m_currentRequests.splice(m_currentRequests.end(), std::move(m_newRequests));
-	m_newRequests.clear();
-
 	// Process the first command in the buffer (queue action will process all remaining commands in the buffer)
 	if (!m_currentRequests.empty()) {
 		ot::RelayedMessageHandler::Request request = std::move(m_currentRequests.front());
@@ -250,32 +246,42 @@ void WebsocketClient::slotProcessMessageQueue() {
 
 		this->dispatchQueueRequest(request);
 	}
+	else {
+		// Move up to 100 of the new commands to the current buffer
+		for (int i = 0; i < 100 && !m_newRequests.empty(); i++) {
+			m_currentRequests.push_back(std::move(m_newRequests.front()));
+			m_newRequests.pop_front();
+		}
+
+		// Process the first command in the buffer (queue action will process all remaining commands in the buffer)
+		if (!m_currentRequests.empty()) {
+			ot::RelayedMessageHandler::Request request = std::move(m_currentRequests.front());
+			m_currentRequests.pop_front();
+			this->dispatchQueueRequest(request);
+		}
+	}
 }
 
 // ###############################################################################################################################################
 
 // Private helper
 
-void WebsocketClient::processMessages()
-{
-	QEventLoop eventLoop;		
-	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-}
-
 void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _request) {
 	// Dispatch the action to the external services component
 	ExternalServicesComponent* ext = AppBase::instance()->getExternalServicesComponent();
 
-	ot::BasicScopedBoolWrapper procWrapper(m_currentlyProcessingQueuedMessage);
-	
-	// Dispatch the action
-	ext->queueAction(_request.message, _request.receiverUrl);
-	
-	// Now dispatch all remaining actions in the buffer
-	while (!m_currentRequests.empty() && m_isConnected) {
-		ot::RelayedMessageHandler::Request bufferedRequest = std::move(m_currentRequests.front());
-		m_currentRequests.pop_front();
-		ext->queueAction(bufferedRequest.message, bufferedRequest.receiverUrl);
+	{
+		ot::BasicScopedBoolWrapper procWrapper(m_currentlyProcessingQueuedMessage);
+
+		// Dispatch the action
+		ext->queueAction(_request.message, _request.receiverUrl);
+
+		// Now dispatch all remaining actions in the buffer
+		while (!m_currentRequests.empty() && m_isConnected) {
+			ot::RelayedMessageHandler::Request bufferedRequest = std::move(m_currentRequests.front());
+			m_currentRequests.pop_front();
+			ext->queueAction(bufferedRequest.message, bufferedRequest.receiverUrl);
+		}
 	}
 
 	// If we have received new commands while processing the current command, we queue buffer processing again
