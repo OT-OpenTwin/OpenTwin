@@ -3235,7 +3235,7 @@ std::string ExternalServicesComponent::handleGetDebugInformation(ot::JsonDocumen
 		AppBase::instance()->appendInfoMessage("Debug Information:\n" + QString::fromStdString(debugInfo));
 		OT_LOG_I(debugInfo);
 	}
-
+	
 	return "";
 }
 
