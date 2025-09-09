@@ -1574,8 +1574,10 @@ void Viewer::enableClipPlane(osg::Vec3d normal, osg::Vec3d point)
 	clipNode->addClipPlane(clipPlane);
 	clipNode->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
 
+	double radius = model->getOSGRootNode()->computeBound().radius();
+
 	createClipPlane(normal, point);
-	updateCapGeometry(normal, point);
+	updateCapGeometry(normal, point, radius);
 }
 
 void Viewer::createClipPlane(osg::Vec3d normal, osg::Vec3d point)
@@ -1681,14 +1683,16 @@ void Viewer::updateClipPlane(osg::Vec3d normal, osg::Vec3d point)
 		clipPlaneTransform->setMatrix(rotateM * rotateT);
 	}
 
-	updateCapGeometry(normal, point);
+	double radius = model->getOSGRootNode()->computeBound().radius();
+
+	updateCapGeometry(normal, point, radius);
 }
 
-void Viewer::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point)
+void Viewer::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius)
 {
 	assert(getModel() != nullptr);
 
-	getModel()->updateCapGeometry(normal, point);
+	getModel()->updateCapGeometry(normal, point, radius);
 }
 
 void Viewer::disableClipPlane(void)
@@ -1698,6 +1702,9 @@ void Viewer::disableClipPlane(void)
 	clipNode->removeClipPlane((unsigned int) 0);
 	clipNode->getOrCreateStateSet()->removeMode(GL_CULL_FACE);
 	clipNode->removeChild(clipPlaneTransform);
+
+	assert(getModel() != nullptr);
+	getModel()->deleteCapGeometry();
 }
 
 void Viewer::showClipPlaneHandles(void)

@@ -55,7 +55,8 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	textureAttribute(nullptr),
 	textureAttributeGen(nullptr),
 	textureAttributeEnv(nullptr),
-	edgeTranspacency(0.35)
+	edgeTranspacency(0.35),
+	cutCapGeometry(nullptr)
 {
 }
 
@@ -1002,6 +1003,43 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 	}
 
 	return edgeNode;
+}
+
+void SceneNodeGeometry::setCutCapGeometry(osg::Geometry* geometry)
+{
+	deleteCutCapGeometry();
+
+	// First, update the color of the triangles
+	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
+	assert(triangleTransform != nullptr);
+
+	assert(triangleTransform->getNumChildren() == 1);
+	osg::Geode* triangleNode = dynamic_cast<osg::Geode*>(triangleTransform->getChild(0));
+	assert(triangleNode != nullptr);
+
+	if (triangleNode != nullptr)
+	{
+		triangleNode->addDrawable(geometry);
+		cutCapGeometry = geometry;
+	}
+}
+
+void SceneNodeGeometry::deleteCutCapGeometry()
+{
+	if (cutCapGeometry == nullptr) return;
+
+	// First, update the color of the triangles
+	osg::Transform* triangleTransform = dynamic_cast<osg::Transform*>(getTriangles());
+	assert(triangleTransform != nullptr);
+
+	assert(triangleTransform->getNumChildren() == 1);
+	osg::Geode* triangleNode = dynamic_cast<osg::Geode*>(triangleTransform->getChild(0));
+	assert(triangleNode != nullptr);
+
+	if (triangleNode != nullptr)
+	{
+		triangleNode->removeDrawable(cutCapGeometry);
+	}
 }
 
 void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)

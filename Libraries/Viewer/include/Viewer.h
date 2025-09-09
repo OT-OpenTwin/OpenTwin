@@ -155,7 +155,7 @@ private:
 	ot::PropertyGridCfg createSettings(void);
 	void updateProjection(void);
 	void createClipPlane(osg::Vec3d normal, osg::Vec3d point);
-	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
+	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius);
 	void setClearColor(int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	void setClearColorAutomatic(void);
 	void settingsSynchronized(const ot::PropertyGridCfg& _dataset);
