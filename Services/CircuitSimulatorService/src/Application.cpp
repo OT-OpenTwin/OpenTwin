@@ -14,6 +14,7 @@
 #include "SimulationResults.h"
 
 // Open twin header
+#include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -641,15 +642,18 @@ std::string Application::handleConnectionToConnection(ot::JsonDocument& _documen
 // Required functions
 
 void Application::run(void) {
-	if (!EnsureDataBaseConnection())
-	{
+	if (!EnsureDataBaseConnection()) {
 		assert(0);
 	}
+
 #ifdef _DEBUG
 	m_serverName = "TestServerCircuit";
 #else
-	m_serverName = sessionID() + OT_INFO_SERVICE_TYPE_CircuitSimulatorService;
+	// Encode project name to base64 to avoid issues with special characters
+	const std::string hexString = ot::String::toBase64Url(sessionID());
+	m_serverName = OT_INFO_SERVICE_TYPE_CircuitSimulatorService + hexString;
 #endif // _DEBUG
+
 	m_qtWrapper = new QtWrapper();
 	m_qtWrapper->run(m_serverName);
 

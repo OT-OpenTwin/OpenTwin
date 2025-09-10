@@ -5,6 +5,9 @@
 #include "SubprocessHandler.h"
 #include "CommunicationHandler.h"
 
+// OpenTwin header
+#include "OTCore/String.h"
+
 // Qt header
 #include <QtCore/qcoreapplication.h>
 
@@ -171,7 +174,10 @@ void SubprocessManager::worker(std::string _projectName) {
 #ifdef _DEBUG
 			m_communicationHandler = new CommunicationHandler(this, "TestServerPython");
 #else
-			m_communicationHandler = new CommunicationHandler(this, _projectName);
+			// Encode project name to base64 to avoid issues with special characters
+			const std::string hexString = ot::String::toBase64Url(_projectName);
+
+			m_communicationHandler = new CommunicationHandler(this, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE + hexString);
 #endif
 		}
 
