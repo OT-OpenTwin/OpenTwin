@@ -21,7 +21,7 @@ SubprocessManager::SubprocessManager(Application* _app)
 	m_subprocessHandler = new SubprocessHandler(this);
 
 	// Start worker thread for Qt event loop
-	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->sessionID() + "_" OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
+	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->sessionID());
 }
 
 SubprocessManager::~SubprocessManager() {
@@ -177,7 +177,7 @@ void SubprocessManager::worker(std::string _projectName) {
 			// Encode project name to base64 to avoid issues with special characters
 			const std::string hexString = ot::String::toBase64Url(_projectName);
 
-			m_communicationHandler = new CommunicationHandler(this, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE + hexString);
+			m_communicationHandler = new CommunicationHandler(this, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE "_" + hexString);
 #endif
 		}
 

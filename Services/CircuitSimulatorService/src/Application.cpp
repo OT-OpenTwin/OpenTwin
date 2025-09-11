@@ -651,7 +651,7 @@ void Application::run(void) {
 #else
 	// Encode project name to base64 to avoid issues with special characters
 	const std::string hexString = ot::String::toBase64Url(sessionID());
-	m_serverName = OT_INFO_SERVICE_TYPE_CircuitSimulatorService + hexString;
+	m_serverName = OT_INFO_SERVICE_TYPE_CircuitSimulatorService "_" + hexString;
 #endif // _DEBUG
 
 	m_qtWrapper = new QtWrapper();
