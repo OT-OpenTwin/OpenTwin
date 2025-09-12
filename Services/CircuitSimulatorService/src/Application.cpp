@@ -674,10 +674,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 
 	m_buttonAddSolver.SetDescription("Circuit Simulator", "Edit", "Add Solver");
-	_ui->addMenuButton(m_buttonAddSolver,ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
+	_ui->addMenuButton(m_buttonAddSolver, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
 
 	m_buttonRunSimulation.SetDescription("Circuit Simulator", "Simulate", "Run Simulation");
-	_ui->addMenuButton(m_buttonRunSimulation, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Kriging", "Default");
+	_ui->addMenuButton(m_buttonRunSimulation, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "RunSolver", "Default");
 
 	m_buttonAddCircuit.SetDescription("Circuit Simulator", "Edit", "Add Circuit");
 	_ui->addMenuButton(m_buttonAddCircuit, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
