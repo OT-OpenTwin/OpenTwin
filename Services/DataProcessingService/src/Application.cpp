@@ -191,7 +191,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
 	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
-	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "Kriging");
+	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "RunSolver");
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.OrderUIToCreateBlockPicker();
 	

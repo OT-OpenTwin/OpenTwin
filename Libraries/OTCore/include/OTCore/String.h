@@ -68,10 +68,14 @@ namespace ot {
 
 		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::string& _str, const std::string& _what, const std::string& _with);
+
+		//! @ref String::replaced
 		static std::string replace(const std::string& _str, const std::string& _what, const std::string& _with);
 
 		//! @brief Replaces all what occurances in the provided string and returns the result.
 		static void replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
+
+		//! @ref String::replaced
 		static std::wstring replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 
 		//! @brief Adds a prefix to the provided string.
@@ -133,18 +137,18 @@ namespace ot {
 		//! @brief Convert the provided string to a number
 		//! @param _string String representing a number
 		//! @param _failed Will be set to true if the operation failed
-		template <class T> static inline T toNumber(const std::string& _string, bool& _failed);
+		template <class T> static T toNumber(const std::string& _string, bool& _failed);
 
 		//! @brief Returns true if the provided string is a number.
 		//! @tparam T Number type.
 		//! @param _string Number string.
-		template <class T> static inline bool isNumber(const std::string& _string);
+		template <class T> static bool isNumber(const std::string& _string);
 
 		//! @brief Returns a hex string representing the provided number.
 		//! @param _number Number to convert.
 		//! @param _fill Fill character.
 		//! @param _length Output string length.
-		template <class T> static inline std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
+		template <class T> static std::string numberToHexString(T _number, char _fill = '0', int _length = 16);
 
 		//! @brief Evaluates any escape characters in this string.
 		static std::string evaluateEscapeCharacters(const std::string& _string);
@@ -154,6 +158,32 @@ namespace ot {
 		//! @brief Replaces all valid escape character sequence with the corresponding sequence.
 		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
 		static std::string addEscapeCharacters(const std::string& _str);
+
+		//! @brief Encodes a UTF-8 string into a hex representation (2 ASCII chars per byte).
+		//! Each byte is converted into two lowercase hex digits.
+		//! @param _string Input string (UTF-8).
+		//! @return Lowercase hexadecimal representation of the input string.
+		static std::string toHex(const std::string& _string);
+
+		//! @brief Decodes a hex string back into the original byte string.
+		//! @param _hexString Hex string (must have even length, lowercase or uppercase).
+		//! @return Byte string.
+		//! @throws ot::InvalidArgumentException if input length is odd or contains invalid hex characters.
+		static std::string fromHex(const std::string& _hexString);
+
+		//! @brief Encodes a UTF-8 string into Base64Url (URL-safe, no padding).
+		//! The output uses A–Z, a–z, 0–9, '-' and '_'.
+		//! Unlike standard Base64, '+' is replaced by '-' and '/' by '_', and padding '=' is omitted.
+		//! This guarantees a safe identifier for interprocess communication names.
+		//! @param _string Input string (UTF-8).
+		//! @return Base64Url encoded representation (ASCII only).
+		static std::string toBase64Url(const std::string& _string);
+
+		//! @brief Decodes a Base64Url string back into the original byte string.
+		//! @param input Base64Url encoded string (ASCII only, no padding).
+		//! @return Original byte string.
+		//! @throws ot::InvalidArgumentException if input contains invalid Base64Url characters.
+		static std::string fromBase64Url(const std::string& _base64UrlString);
 
 	};
 }
