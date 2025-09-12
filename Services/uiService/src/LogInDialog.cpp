@@ -511,7 +511,8 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		msg.append("Incompatible versions of frontend and backend services.\n\n"
 				   "Do you want to update the frontend to match the backend?");
 
-		QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Yes | QMessageBox::Cancel);
+		QMessageBox msgBox(QMessageBox::Warning, "Login Error", msg, QMessageBox::Yes | QMessageBox::Cancel);
+		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
 
 		if (msgBox.exec() == QMessageBox::Yes)
 		{
