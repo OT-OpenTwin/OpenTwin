@@ -32,7 +32,7 @@ public:
 
 	virtual void writeInputFile(std::ofstream& controlFile, Application *app) = 0;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) = 0;
-	virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase *solverEntity) = 0;
+	//virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase *solverEntity) = 0;
 
 	void runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent);
 
@@ -40,6 +40,9 @@ protected:
 	bool runExecutableAndWaitForCompletion(std::string commandLine, std::string workingDirectory, ot::components::UiComponent* uiComponent);
 	std::string readEnvironmentVariable(const std::string& variableName);
 	bool isPECMaterial(const std::string& materialName);
+	bool isPMCMaterial(const std::string& materialName);
+	bool isMURMaterial(const std::string& materialName);
+	bool isPMLMaterial(const std::string& materialName);
 	void ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiComponent* uiComponent);
 
 	EntityBase* solverEntity;
