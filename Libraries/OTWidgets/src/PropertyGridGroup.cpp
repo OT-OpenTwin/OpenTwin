@@ -46,12 +46,16 @@ ot::PropertyGridGroup::PropertyGridGroup() : m_parentGroup(nullptr) {
 }
 
 ot::PropertyGridGroup::~PropertyGridGroup() {
+	if (m_titleLayoutW) {
+		delete m_titleLayoutW;
+		m_titleLayoutW = nullptr;
+	}
+
 	this->disconnect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PropertyGridGroup::slotColorStyleChanged);
 }
 
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->getName();
-	
 	m_titleLabel->setText(QString::fromStdString(_group->getTitle()));
 
 	for (Property* p : _group->getProperties()) {
@@ -63,7 +67,10 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	}
 
 	for (PropertyGroup* g : _group->getChildGroups()) {
-		if (g->isEmpty()) continue;
+		if (g->isEmpty()) {
+			continue;
+		}
+
 		PropertyGridGroup* newGroup = new PropertyGridGroup;
 		this->addChildGroup(newGroup);
 
@@ -96,7 +103,7 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(bool _includeChild
 	return newGroup;
 }
 
-void ot::PropertyGridGroup::finishSetup(void) {
+void ot::PropertyGridGroup::finishSetup() {
 	this->setFirstColumnSpanned(false);
 
 	if (this->childCount() > 0) this->setExpanded(true);
@@ -129,7 +136,7 @@ void ot::PropertyGridGroup::setTitle(const QString& _title) {
 	m_titleLabel->setText(_title);
 }
 
-QString ot::PropertyGridGroup::getTitle(void) const {
+QString ot::PropertyGridGroup::getTitle() const {
 	return m_titleLabel->text();
 }
 
@@ -167,7 +174,7 @@ ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string
 	return nullptr;
 }
 
-std::list<ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties(void) const {
+std::list<ot::PropertyGridItem*> ot::PropertyGridGroup::childProperties() const {
 	std::list<ot::PropertyGridItem*> ret;
 
 	for (int i = 0; i < this->childCount(); i++) {
@@ -191,7 +198,7 @@ ot::PropertyGridGroup* ot::PropertyGridGroup::findChildGroup(const std::string& 
 	return nullptr;
 }
 
-std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const {
+std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups() const {
 	std::list<ot::PropertyGridGroup*> ret;
 
 	for (int i = 0; i < this->childCount(); i++) {
@@ -204,11 +211,11 @@ std::list<ot::PropertyGridGroup*> ot::PropertyGridGroup::childGroups(void) const
 	return ret;
 }
 
-void ot::PropertyGridGroup::updateStateIcon(void) {
+void ot::PropertyGridGroup::updateStateIcon() {
 	this->updateStateIcon(GlobalColorStyle::instance().getCurrentStyle());
 }
 
-void ot::PropertyGridGroup::slotColorStyleChanged(void) {
+void ot::PropertyGridGroup::slotColorStyleChanged() {
 	const ColorStyle& gStyle = GlobalColorStyle::instance().getCurrentStyle();
 	this->setBackground(1, gStyle.getValue(ColorStyleValueEntry::TitleBackground).toBrush());
 	this->setForeground(1, gStyle.getValue(ColorStyleValueEntry::TitleForeground).toBrush());

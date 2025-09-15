@@ -29,6 +29,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT PropertyGrid : public QObject, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGrid)
+		OT_DECL_NOMOVE(PropertyGrid)
 	public:
 		PropertyGrid(QObject* _parentObject = (QObject*)nullptr);
 		virtual ~PropertyGrid();
@@ -37,8 +38,8 @@ namespace ot {
 
 		// Base class functions
 
-		virtual QWidget* getQWidget(void) override;
-		virtual const QWidget* getQWidget(void) const override;
+		virtual QWidget* getQWidget() override;
+		virtual const QWidget* getQWidget() const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -47,11 +48,11 @@ namespace ot {
 		void setIsModal(bool _isModal = true) { m_isModal = _isModal; };
 		bool getIsModal() const { return m_isModal; };
 
-		TreeWidget* getTreeWidget(void) const;
+		TreeWidget* getTreeWidget() const;
 
 		void setupGridFromConfig(const PropertyGridCfg& _config);
 		
-		PropertyGridCfg createGridConfig(void) const;
+		PropertyGridCfg createGridConfig() const;
 
 		void addGroup(PropertyGridGroup* _group);
 
@@ -59,9 +60,9 @@ namespace ot {
 		PropertyGridGroup* findGroup(const std::list<std::string>& _groupPath) const;
 		PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
 		PropertyGridItem* findItem(const std::list<std::string>& _groupPath, const std::string& _itemName) const;
-		std::list<PropertyGridItem*> getAllItems(void) const;
+		std::list<PropertyGridItem*> getAllItems() const;
 
-		void clear(void);
+		void clear();
 
 		void focusProperty(const std::string& _groupName, const std::string& _itemName);
 		void focusProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);

@@ -18,6 +18,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PropertyGridItemDelegate : public QStyledItemDelegate {
 		OT_DECL_NOCOPY(PropertyGridItemDelegate)
+		OT_DECL_NOMOVE(PropertyGridItemDelegate)
 	public:
 		PropertyGridItemDelegate(TreeWidget* _tree);
 		virtual ~PropertyGridItemDelegate();

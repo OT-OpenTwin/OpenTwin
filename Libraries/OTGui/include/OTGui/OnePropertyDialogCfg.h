@@ -14,6 +14,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT OnePropertyDialogCfg : public DialogCfg {
 		OT_DECL_NOCOPY(OnePropertyDialogCfg)
+		OT_DECL_NOMOVE(OnePropertyDialogCfg)
 	public:
 		OnePropertyDialogCfg(Property* _property = (Property*)nullptr);
 		OnePropertyDialogCfg(const std::string& _title, Property* _property = (Property*)nullptr);

@@ -10,6 +10,8 @@
 
 namespace ot {
 
+	class PropertyGridItemDelegate;
+
 	class OT_WIDGETS_API_EXPORT PropertyGridTree : public TreeWidget {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridTree)
@@ -28,5 +30,6 @@ namespace ot {
 
 	private:
 		bool m_wasShown;
+		PropertyGridItemDelegate* m_delegate;
 	};
 }

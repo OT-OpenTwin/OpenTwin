@@ -12,6 +12,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyBool : public Property {
 		OT_DECL_NOCOPY(PropertyBool)
+		OT_DECL_NOMOVE(PropertyBool)
 	public:
 		using PropertyValueType = bool;
 

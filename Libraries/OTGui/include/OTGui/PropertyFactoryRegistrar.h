@@ -17,6 +17,7 @@ namespace ot {
 	class PropertyFactoryRegistrar {
 		OT_DECL_NODEFAULT(PropertyFactoryRegistrar)
 		OT_DECL_NOCOPY(PropertyFactoryRegistrar)
+		OT_DECL_NOMOVE(PropertyFactoryRegistrar)
 	public:
 		PropertyFactoryRegistrar(const std::string& _key);
 		~PropertyFactoryRegistrar() {};

@@ -5,16 +5,23 @@
 
 // OpenTwin header
 #include "OTWidgets/PropertyGridTree.h"
+#include "OTWidgets/PropertyGridItemDelegate.h"
 
 // Qt header
 #include <QtGui/qevent.h>
 
-ot::PropertyGridTree::PropertyGridTree() : m_wasShown(false) {
+ot::PropertyGridTree::PropertyGridTree() : m_wasShown(false), m_delegate(nullptr) {
+	this->setColumnCount(2);
+	this->setHeaderLabels({ "Name", "Value" });
+	this->setIndentation(0);
+	this->setObjectName("ot_property_grid");
 
+	m_delegate = new PropertyGridItemDelegate(this);
 }
 
 ot::PropertyGridTree::~PropertyGridTree() {
-
+	delete m_delegate;
+	m_delegate = nullptr;
 }
 
 void ot::PropertyGridTree::mousePressEvent(QMouseEvent* _event) {

@@ -15,6 +15,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyPath : public Property {
 		OT_DECL_NOCOPY(PropertyPath)
+		OT_DECL_NOMOVE(PropertyPath)
 	public:
 		typedef std::string FilePathValueType;
 		using PropertyValueType = FilePathValueType;

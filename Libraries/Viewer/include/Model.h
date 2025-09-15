@@ -162,8 +162,9 @@ public:
 
 	void lockSelectionAndModification(bool flag);
 
-	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
-	
+	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius);
+	void deleteCapGeometry();
+
 	void setCursorText(const std::string& text);
 
 private:
@@ -230,8 +231,9 @@ private:
 	void	   updateWorkingPlaneTransform(void);
 	bool       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix);
 	bool       compareTransformations(osg::Matrix &matrix1, osg::Matrix &matrix2);
-	void       updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point);
-	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point);
+	void       updateCapGeometryForSceneNodes(SceneNodeBase* root, const osg::Vec3d& normal, const osg::Vec3d& point, double radius);
+	void       deleteCapGeometryForSceneNodes(SceneNodeBase* root);
+	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point, double radius);
 	bool	   isLineDrawable(osg::Drawable *drawable);
 	void	   clearEdgeSelection(void);
 

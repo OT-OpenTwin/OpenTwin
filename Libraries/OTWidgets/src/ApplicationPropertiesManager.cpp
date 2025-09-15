@@ -142,9 +142,9 @@ ot::PropertyGridCfg ot::ApplicationPropertiesManager::buildDialogConfiguration(v
 
 	for (const auto& it : m_data) {
 		PropertyGroup* newGroup = new PropertyGroup(it.first);
-		for (PropertyGroup* newChild : it.second.getRootGroups()) {
+		for (const PropertyGroup* newChild : it.second.getRootGroups()) {
 			if (!newChild->isEmpty()) {
-				newGroup->addChildGroup(new PropertyGroup(*newChild));
+				newGroup->addChildGroup(new PropertyGroup(newChild));
 			}
 		}
 

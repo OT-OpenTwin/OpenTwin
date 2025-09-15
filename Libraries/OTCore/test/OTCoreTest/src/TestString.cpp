@@ -325,3 +325,124 @@ TEST(StringTests, StringSmartSplit_NoEscapeSkipEmpty) {
 	EXPECT_EQ(result[0], "Test");
 	EXPECT_EQ(result[1], "String \"containing\nsubstring\\\" with\\nsome escape\\\"\"");
 }
+
+TEST(StringTests, Hex_Basic) {
+	const std::string input = "ABC";
+	std::string result = ot::String::toHex(input);
+
+	// Each byte 2 hex chars: 'A' = 0x41, 'B' = 0x42, 'C' = 0x43
+	EXPECT_EQ(result, "414243");
+}
+
+TEST(StringTests, Hex_WithUmlauts1) {
+	// "Ä" in UTF-8 = 0xC3 0x84
+	const std::string input = u8"Ä";
+	std::string result = ot::String::toHex(input);
+
+	EXPECT_EQ(result, "c384");
+}
+
+TEST(StringTests, Hex_WithUmlauts2) {
+	// "Überprüfung" in UTF-8 = 0xC3 0x9C 0x62 0x65 0x72 0x70 0x72 0xFC 0x66 0x75 0x6E 0x67
+	const std::string input = u8"Überprüfung";
+	std::string result = ot::String::toHex(input);
+
+	EXPECT_EQ(result, "c39c6265727072c3bc66756e67");
+}
+
+TEST(StringTests, Hex_Empty) {
+	const std::string input = u8"Überprüfung";
+	const std::string result = ot::String::toHex(input);
+	const std::string inverse = ot::String::fromHex(result);
+	EXPECT_EQ(input, inverse);
+}
+
+TEST(StringTests, Hex_AllBytes) {
+	std::string input;
+	input.resize(256);
+	for (size_t i = 0; i < 256; ++i) {
+		input[i] = static_cast<char>(i);
+	}
+	const std::string result = ot::String::toHex(input);
+	const std::string expected = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
+	EXPECT_EQ(expected, result);
+}
+
+TEST(StringTests, Hex_Inverse1) {
+	const std::string input;
+	std::string result = ot::String::toHex(input);
+
+	EXPECT_TRUE(result.empty());
+}
+
+TEST(StringTests, Hex_Inverse2) {
+	std::string input;
+	input.resize(256);
+	for (size_t i = 0; i < 256; ++i) {
+		input[i] = static_cast<char>(i);
+	}
+	const std::string encoded = ot::String::toHex(input);
+	const std::string decoded = ot::String::fromHex(encoded);
+
+	EXPECT_EQ(input, decoded);
+}
+
+TEST(StringTests, Base64Url_Basic) {
+	const std::string input = "ABC";
+	std::string result = ot::String::toBase64Url(input);
+
+	EXPECT_EQ(result, "QUJD");
+}
+
+TEST(StringTests, Base64Url_WithUmlauts1) {
+	// "Ä" in UTF-8 = 0xC3 0x84
+	const std::string input = u8"Ä";
+	std::string result = ot::String::toBase64Url(input);
+
+	EXPECT_EQ(result, "w4Q");
+}
+
+TEST(StringTests, Base64Url_WithUmlauts2) {
+	// "Ä" in UTF-8 = 0xC3 0x84
+	const std::string input = u8"Überprüfung";
+	std::string result = ot::String::toBase64Url(input);
+	const std::string expected = "w5xiZXJwcsO8ZnVuZw";
+	EXPECT_EQ(result, expected);
+}
+
+TEST(StringTests, Base64Url_Empty) {
+	const std::string input;
+	std::string result = ot::String::toBase64Url(input);
+
+	EXPECT_TRUE(result.empty());
+}
+
+TEST(StringTests, Base64Url_AllBytes) {
+	std::string input;
+	input.resize(256);
+	for (size_t i = 0; i < 256; ++i) {
+		input[i] = static_cast<char>(i);
+	}
+	const std::string result = ot::String::toBase64Url(input);
+	const std::string expected = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w";
+
+	EXPECT_EQ(expected, result);
+}
+
+TEST(StringTests, Base64Url_Inverse1) {
+	std::string input = u8"Überprüfung";
+	const std::string encoded = ot::String::toBase64Url(input);
+	const std::string decoded = ot::String::fromBase64Url(encoded);
+	EXPECT_EQ(input, decoded);
+}
+
+TEST(StringTests, Base64Url_Inverse2) {
+	std::string input;
+	input.resize(256);
+	for (size_t i = 0; i < 256; ++i) {
+		input[i] = static_cast<char>(i);
+	}
+	const std::string encoded = ot::String::toBase64Url(input);
+	const std::string decoded = ot::String::fromBase64Url(encoded);
+	EXPECT_EQ(input, decoded);
+}

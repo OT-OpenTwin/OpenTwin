@@ -12,6 +12,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyInt : public Property {
 		OT_DECL_NOCOPY(PropertyInt)
+		OT_DECL_NOMOVE(PropertyInt)
 	public:
 		using PropertyValueType = int;
 

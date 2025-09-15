@@ -378,6 +378,14 @@ public Q_SLOTS:
 
 public:
 
+	//! @brief Append a log message to the output.
+	//! The following information will be used from the log message:
+	//! - Message Type
+	//! - Service Name
+	//! - Text
+	//! @param _message The log message to append.
+	void appendLogMessage(const ot::LogMessage& _message);
+
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 
 	void autoCloseUnpinnedViews(void);

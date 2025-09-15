@@ -21,6 +21,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyFactory {
 		OT_DECL_NOCOPY(PropertyFactory)
+		OT_DECL_NOMOVE(PropertyFactory)
 	public:
 		using PropertyConstructor = std::function<Property* ()>;
 

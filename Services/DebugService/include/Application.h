@@ -31,9 +31,11 @@ public:
 
 	// Button callbacks
 
-	void uiDebugInfo();
+	void testCode();
 
-	void testHello();
+	void uiDebugInfo();
+	void serviceDebugInfo();
+
 	void testKill();
 
 	void testTableSmall();
