@@ -96,7 +96,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
 
 		// Convert the results
-		solver->convertResults(tempDirPath, application, solverEntity);
+		//solver->convertResults(tempDirPath, application, solverEntity);
 	}
 	catch (std::string& error)
 	{
