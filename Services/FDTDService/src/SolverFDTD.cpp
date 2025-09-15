@@ -19,25 +19,25 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
     getMaterialsToObjectsMap(materialsToObjectsMap, app);
 
     // Get map of all shapes with potential definition
-    std::map<std::string, double> potentialDefinitions;
-    getPotentialDefinitions(potentialDefinitions);
+    std::map<std::string, double> boundaryCondition;
+    getBoundaryConditions(boundaryCondition);
 
     // Now we build (alias) names for each material
     std::map<std::string, std::string> materialNameToAliasMap;
     buildMaterialAliases(materialsToObjectsMap, materialNameToAliasMap);
 
     // Now we build (alias) names for each potential definition
-    std::map<std::string, std::string> potentialNameToAliasMap;
-    buildPotentialAliases(potentialDefinitions, potentialNameToAliasMap);
+    std::map<std::string, std::string> boundaryConditionsNameToAliases;
+    buildBoundaryConditionAliases(boundaryCondition, boundaryConditionsNameToAliases);
 
     // Write the groups defining the regions
-    writeGroups(_controlFile, materialsToObjectsMap, materialNameToAliasMap, potentialDefinitions, potentialNameToAliasMap);
+    //writeGroups(_controlFile, materialsToObjectsMap, materialNameToAliasMap, potentialDefinitions, potentialNameToAliasMap);
 
     // Write the functions defining the materials
     writeFunctions(_controlFile, materialNameToAliasMap);
 
     // Write the constraints defining the boundary conditions and potentials
-    writeConstraints(_controlFile, potentialDefinitions, potentialNameToAliasMap);
+    writeConstraints(_controlFile, boundaryCondition, boundaryConditionsNameToAliases);
 
     // Write the Jacobian
     writeJacobian(_controlFile);
@@ -63,21 +63,20 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
 
 std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
 {
-    runSolverExe("model", "EleSta_v", "Map", tempDirPath, uiComponent);
+    runSolverExe("model", "FDTD_XML", "Map", tempDirPath, uiComponent);
 
     return solverOutput.str();
 }
 
-void SolverFDTD::convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity)
-{
-    long long globalVisualizationMeshID = -1;
-    long long globalVisualizationMeshVersion = -1;
+void SolverFDTD::getBoundaryConditions(std::map<std::string, double>& boundaryConditionDefinitions) {
 
-    // We first need to convert the potential result file to a vtk file
-    convertPotential(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
+    for (auto item : entityProperties) {
+        EntityPropertiesDouble* boundaryCondition = dynamic_cast<EntityPropertiesDouble*>(item.second.getProperty("Boundary Condition"));
 
-    // Now we convert the electric field results to a vtk file
-    convertEfield(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
+        if (boundaryCondition != nullptr) {
+            boundaryConditionDefinitions[meshItemInfo[item.first].getEntityName()] = boundaryCondition->getValue();
+        }
+    }
 }
 
 void SolverFDTD::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app)
@@ -98,20 +97,6 @@ void SolverFDTD::getMaterialsToObjectsMap(std::map<std::string, std::list<std::s
     }
 }
 
-void SolverFDTD::getPotentialDefinitions(std::map<std::string, double>& potentialDefinitions)
-{
-    // Here we need to loop through all objects and their properties and check which one has a potential definition
-    for (auto item : entityProperties)
-    {
-        EntityPropertiesDouble *potential = dynamic_cast<EntityPropertiesDouble*>(item.second.getProperty("Electrostatic Potential"));
-
-        if (potential != nullptr)
-        {
-            potentialDefinitions[meshItemInfo[item.first].getEntityName()] = potential->getValue();
-        }
-    }
-}
-
 void SolverFDTD::buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap)
 {
     // Now we create an alias name "material#n" for each material
@@ -123,13 +108,12 @@ void SolverFDTD::buildMaterialAliases(std::map<std::string, std::list<std::strin
     }
 }
 
-void SolverFDTD::buildPotentialAliases(std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
-{
-    // Now we create an alias name "potential#n" for each potential definition
+void SolverFDTD::buildBoundaryConditionAliases(std::map<std::string, double>& boundaryConditionDefinitions, std::map<std::string, std::string>& boundaryConditionsNameToAliasMap) {
+    
     int count = 1;
-    for (auto material : potentialDefinitions)
-    {
-        potentialNameToAliasMap[material.first] = "potential" + std::to_string(count);
+
+    for (auto material : boundaryConditionDefinitions) {
+        boundaryConditionsNameToAliasMap[material.first] = "boundary" + std::to_string(count);
         count++;
     }
 }
@@ -264,20 +248,20 @@ void SolverFDTD::writeFunctions(std::ofstream& controlFile, std::map<std::string
     controlFile << "}\n\n";
 }
 
-void SolverFDTD::writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap)
+void SolverFDTD::writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& boundaryConditionDefinition, std::map<std::string, std::string>& boundaryConditionNameToAliasMap)
 {
     controlFile <<
         "Constraint {\n"
-        "  { Name ElectricScalarPotential; Type Assign;\n"
+        "  { Name Boundary Conditions; Type Assign;\n"
         "    Case {\n";
 
-    for (auto potential : potentialDefinitions)
+    for (auto boundaryCondition : boundaryConditionDefinition)
     {
-        std::string potentialName = potentialNameToAliasMap[potential.first];
-        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{potential.first});
+        std::string boundaryConditionName = boundaryConditionNameToAliasMap[boundaryCondition.first];
+        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{boundaryCondition.first});
         std::string groupList = getGroupList(groupItemList);
 
-        controlFile << "      { Region " << potentialName << "; Value " << potential.second << "; }\n";
+        controlFile << "      { Region " << boundaryConditionName << "; Value " << boundaryCondition.second << "; }\n";
     }
 
     controlFile <<
@@ -286,16 +270,16 @@ void SolverFDTD::writeConstraints(std::ofstream& controlFile, std::map<std::stri
         "  }\n";
 
     controlFile <<
-        "  { Name ElectricScalarPotential_d2; Type Assign;\n"
+        "  { Name Boundary Conditions_d2; Type Assign;\n"
         "    Case {\n";
 
-    for (auto potential : potentialDefinitions)
+    for (auto boundaryCondition : boundaryConditionDefinition)
     {
-        std::string potentialName = potentialNameToAliasMap[potential.first];
-        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{potential.first});
+        std::string boundaryConditionName = boundaryConditionNameToAliasMap[boundaryCondition.first];
+        std::list<int> groupItemList = meshSurfaceGroupIdList(std::list<std::string>{boundaryCondition.first});
         std::string groupList = getGroupList(groupItemList);
 
-        controlFile << "      { Region " << potentialName << "; Value 0.0; }\n";
+        controlFile << "      { Region " << boundaryConditionName << "; Value 0.0; }\n";
     }
 
     controlFile <<
@@ -477,273 +461,6 @@ void SolverFDTD::writePostOperation(std::ofstream& controlFile)
         "} \n\n";
 }
 
-void SolverFDTD::convertPotential(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
-{
-    std::map<std::string, std::string> nodeToPotentialMap;
-
-    convertGlobalPotential(tempDirPath, nodeToPotentialMap, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
-    convertSurfacePotentials(tempDirPath, nodeToPotentialMap, app, solverEntity);
-}
-
-void SolverFDTD::convertGlobalPotential(const std::string& tempDirPath, std::map<std::string, std::string>& nodeToPotentialMap, Application* app, EntityBase*solverEntity,
-                                                  long long &globalVisualizationMeshID, long long &globalVisualizationMeshVersion)
-{
-    // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
-    std::string potentialFileName = tempDirPath + "\\potential.pos";
-    std::ifstream potentialFile(potentialFileName);
-
-    std::map<std::string, size_t> nodeToIndexMap;
-    std::list<std::string> nodeList;
-    std::list<std::string> potentialList;
-    std::list<std::vector<size_t>> cellList;
-    size_t cellListSize = 0;
-
-    size_t nodeIndex = 0;
-
-    // Now read the file line by line
-    const int elementsPerRow = 21;
-
-    std::vector<std::string> elements;
-    elements.resize(elementsPerRow);
-
-    bool fileEndReached = false;
-    while (!fileEndReached)
-    {
-        for (int index = 0; index < elementsPerRow; index++)
-        {
-            if (!(potentialFile >> elements[index]))
-            {
-                // We have reached the end of the file
-                fileEndReached = true;
-                break;
-            }
-        }
-
-        if (!fileEndReached)
-        {
-            // Now we process the line
-            std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
-            std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
-            std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
-            std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
-
-            size_t indexN1 = getOrAddNode(n1, elements[17], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-            size_t indexN2 = getOrAddNode(n2, elements[18], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-            size_t indexN3 = getOrAddNode(n3, elements[19], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-            size_t indexN4 = getOrAddNode(n4, elements[20], nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-
-            std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
-            cellList.push_back(cell);
-
-            cellListSize += 6;
-        }
-    }
-
-    potentialFile.close();
-
-    // Create the global mesh item if needed
-    if (globalVisualizationMeshID == -1 || globalVisualizationMeshVersion == -1)
-    {
-        storeMesh(4, 10, nodeList, cellList, cellListSize, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
-    }
-
-    // Create the potential data item 
-    long long scalarDataID = -1;
-    long long scalarDataVersion = -1;
-    storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
-
-    // Create the potential volume item
-    EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredScalarVolume(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
-
-    visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-    visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Volume");
-    visualizationEntity->setEditable(true);
-    visualizationEntity->setInitiallyHidden(true);
-
-    visualizationEntity->createProperties();
-
-    visualizationEntity->setSource(scalarDataID, scalarDataVersion);
-    visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
-
-    visualizationEntity->StoreToDataBase();
-
-    app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
-
-    delete visualizationEntity;
-    visualizationEntity = nullptr;
-
-    // Now write the vtk file information based on the intermediate data structures
-    std::string vtkFileName = tempDirPath + "\\potential.vtu";
-    std::ofstream vtkFile(vtkFileName);
-
-    vtkFile << "# vtk DataFile Version 2.0" << std::endl;
-    vtkFile << "Electrostatic potential" << std::endl;
-    vtkFile << "ASCII" << std::endl;
-    vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
-
-    vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
-    for (auto node : nodeList)
-    {
-        vtkFile << node << std::endl;
-    }
-
-    vtkFile << std::endl << "CELLS " << cellList.size() << " " << 5 * cellList.size() << std::endl;
-    for (auto cell : cellList)
-    {
-        vtkFile << "4 " << cell[0] << " " << cell[1] << " " << cell[2] << " " << cell[3] << std::endl;
-    }
-
-    vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
-    for (auto cell : cellList)
-    {
-        vtkFile << "10" << std::endl;
-    }
-
-    vtkFile << std::endl << "POINT_DATA " << nodeList.size() << std::endl;
-    vtkFile << "SCALARS scalars float 1" << std::endl;
-    vtkFile << "LOOKUP_TABLE default" << std::endl;
-
-    for (auto potential : potentialList)
-    {
-        vtkFile << potential << std::endl;
-    }
-
-    vtkFile.close();
-}
-
-void SolverFDTD::convertSurfacePotentials(const std::string& tempDirPath, std::map<std::string, std::string> &nodeToPotentialMap, Application* app, EntityBase* solverEntity)
-{
-    for (auto item : groupNameToIdMap)
-    {
-        // Now we create a file with the potential on the surface of this object
-        if (item.first[0] == '#')
-        {
-            std::string potentialFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".pos";
-            std::ifstream potentialFile(potentialFileName);
-
-            std::map<std::string, size_t> nodeToIndexMap;
-            std::list<std::string> nodeList;
-            std::list<std::string> potentialList;
-            std::list<std::vector<size_t>> cellList;
-            size_t cellListSize = 0;
-
-            const int elementsPerRow = 17;
-
-            std::vector<std::string> elements;
-            elements.resize(elementsPerRow);
-
-            size_t nodeIndex = 0;
-
-            bool fileEndReached = false;
-            while (!fileEndReached)
-            {
-                for (int index = 0; index < elementsPerRow; index++)
-                {
-                    if (!(potentialFile >> elements[index]))
-                    {
-                        // We have reached the end of the file
-                        fileEndReached = true;
-                        break;
-                    }
-                }
-
-                if (!fileEndReached)
-                {
-                    // Now we process the line
-                    std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
-                    std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
-                    std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
-
-                    size_t indexN1 = getOrAddNode(n1, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-                    size_t indexN2 = getOrAddNode(n2, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-                    size_t indexN3 = getOrAddNode(n3, "", nodeToIndexMap, nodeList, potentialList, nodeIndex, nodeToPotentialMap);
-
-                    std::vector<size_t> cell{ indexN1, indexN2, indexN3 };
-                    cellList.push_back(cell);
-
-                    cellListSize += 5;
-                }
-            }
-
-            potentialFile.close();
-
-            // Now we extract the potential data for the surface
-            potentialList.clear();
-
-            for (auto node : nodeList)
-            {
-                potentialList.push_back(nodeToPotentialMap[node]);
-            }
-
-            // Create the surface mesh item if needed
-            long long visualizationMeshID = -1;
-            long long visualizationMeshVersion = -1;
-            storeMesh(3, 5, nodeList, cellList, cellListSize, app, solverEntity, visualizationMeshID, visualizationMeshVersion);
-
-            // Create the surface potential data item 
-            long long scalarDataID = -1;
-            long long scalarDataVersion = -1;
-            storeMeshScalarData(nodeList.size(), cellList.size(), potentialList, app, solverEntity, scalarDataID, scalarDataVersion);
-
-            // Create the potential volume item
-            EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredScalarSurface(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
-
-            visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-            visualizationEntity->setName(solverEntity->getName() + "/Results/Potential/Surface/" + item.first.substr(1));
-            visualizationEntity->setEditable(true);
-            visualizationEntity->setInitiallyHidden(true);
-
-            visualizationEntity->createProperties();
-
-            visualizationEntity->setSource(scalarDataID, scalarDataVersion);
-            visualizationEntity->setMesh(visualizationMeshID, visualizationMeshVersion);
-
-            visualizationEntity->StoreToDataBase();
-
-            app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
-
-            delete visualizationEntity;
-            visualizationEntity = nullptr;
-
-            // Write the vtk file
-            std::string vtkFileName = tempDirPath + "\\potential#" + std::to_string(item.second) + ".vtu";
-            std::ofstream vtkFile(vtkFileName);
-
-            vtkFile << "# vtk DataFile Version 2.0" << std::endl;
-            vtkFile << "Electrostatic potential" << std::endl;
-            vtkFile << "ASCII" << std::endl;
-            vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
-
-            vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
-            for (auto node : nodeList)
-            {
-                vtkFile << node << std::endl;
-            }
-
-            vtkFile << std::endl << "CELLS " << cellList.size() << " " << 4 * cellList.size() << std::endl;
-            for (auto cell : cellList)
-            {
-                vtkFile << "3 " << cell[0] << " " << cell[1] << " " << cell[2] << std::endl;
-            }
-
-            vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
-            for (auto cell : cellList)
-            {
-                vtkFile << "5" << std::endl;
-            }
-
-            vtkFile << std::endl << "POINT_DATA " << nodeList.size() << std::endl;
-            vtkFile << "SCALARS scalars float 1" << std::endl;
-            vtkFile << "LOOKUP_TABLE default" << std::endl;
-
-            for (auto node : nodeList)
-            {
-                vtkFile << nodeToPotentialMap[node] << std::endl;
-            }
-        }
-    }
-}
-
 size_t SolverFDTD::getOrAddNode(const std::string& node, const std::string& potential, 
                                           std::map<std::string, size_t> &nodeToIndexMap, std::list<std::string> &nodeList, std::list<std::string> &potentialList,
                                           size_t &nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap)
@@ -771,165 +488,6 @@ size_t SolverFDTD::getOrAddNode(const std::string& node, const std::string& pote
     }
 
     return index;
-}
-
-void SolverFDTD::convertEfield(const std::string& tempDirPath, Application* app, EntityBase* solverEntity, long long& globalVisualizationMeshID, long long& globalVisualizationMeshVersion)
-{
-    // Open the potential file and read nodes (with potentials) and cells into intermediate data structures
-    std::string potentialFileName = tempDirPath + "\\efield.pos";
-    std::ifstream potentialFile(potentialFileName);
-
-    std::map<std::string, size_t> nodeToIndexMap;
-    std::list<std::string> nodeList;
-    std::list<std::vector<size_t>> cellList;
-    std::list<std::string> vectorList;
-    std::list<double> magnitudeList;
-    size_t cellListSize = 0;
-
-    size_t nodeIndex = 0;
-
-    // Now read the file line by line
-    const int elementsPerRow = 29;
-
-    std::vector<std::string> elements;
-    elements.resize(elementsPerRow);
-
-    bool fileEndReached = false;
-    while (!fileEndReached)
-    {
-        for (int index = 0; index < elementsPerRow; index++)
-        {
-            if (!(potentialFile >> elements[index]))
-            {
-                // We have reached the end of the file
-                fileEndReached = true;
-                break;
-            }
-        }
-
-        if (!fileEndReached)
-        {
-            // Now we process the line
-            std::string n1 = elements[2] + " " + elements[3] + " " + elements[4];
-            std::string n2 = elements[5] + " " + elements[6] + " " + elements[7];
-            std::string n3 = elements[8] + " " + elements[9] + " " + elements[10];
-            std::string n4 = elements[11] + " " + elements[12] + " " + elements[13];
-
-            size_t indexN1 = getOrAddCellNode(n1, nodeToIndexMap, nodeList, nodeIndex);
-            size_t indexN2 = getOrAddCellNode(n2, nodeToIndexMap, nodeList, nodeIndex);
-            size_t indexN3 = getOrAddCellNode(n3, nodeToIndexMap, nodeList, nodeIndex);
-            size_t indexN4 = getOrAddCellNode(n4, nodeToIndexMap, nodeList, nodeIndex);
-
-            double x1 = atof(elements[17].c_str());
-            double y1 = atof(elements[18].c_str());
-            double z1 = atof(elements[19].c_str());
-
-            double x2 = atof(elements[20].c_str());
-            double y2 = atof(elements[21].c_str());
-            double z2 = atof(elements[22].c_str());
-
-            double x3 = atof(elements[23].c_str());
-            double y3 = atof(elements[24].c_str());
-            double z3 = atof(elements[25].c_str());
-
-            double x4 = atof(elements[26].c_str());
-            double y4 = atof(elements[27].c_str());
-            double z4 = atof(elements[28].c_str());
-
-            double xAverage = 0.25 * (x1 + x2 + x3 + x4);
-            double yAverage = 0.25 * (y1 + y2 + y3 + y4);
-            double zAverage = 0.25 * (z1 + z2 + z3 + z4);
-
-            double magnitude = sqrt(xAverage * xAverage + yAverage * yAverage + zAverage * zAverage);
-
-            std::string averageVector = std::to_string(xAverage) + " " + std::to_string(yAverage) + " " + std::to_string(zAverage);
-
-            std::vector<size_t> cell{ indexN1, indexN2, indexN3, indexN4 };
-            cellList.push_back(cell);
-            vectorList.push_back(averageVector);
-            magnitudeList.push_back(magnitude);
-
-            cellListSize += 6;
-        }
-    }
-
-    potentialFile.close();
-
-    // Create the global mesh item if needed
-    if (globalVisualizationMeshID == -1 || globalVisualizationMeshVersion == -1)
-    {
-        storeMesh(4, 10, nodeList, cellList, cellListSize, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
-    }
-
-    // Create the efield data item 
-    long long vectorDataID = -1;
-    long long vectorDataVersion = -1;
-    storeMeshVectorData(nodeList.size(), cellList.size(), magnitudeList, vectorList, app, solverEntity, vectorDataID, vectorDataVersion);
-
-    // Create the efield item
-    EntityVis2D3D* visualizationEntity = new EntityVisUnstructuredVectorVolume(app->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
-
-    visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
-    visualizationEntity->setName(solverEntity->getName() + "/Results/E-Field");
-    visualizationEntity->setEditable(true);
-    visualizationEntity->setInitiallyHidden(true);
-
-    visualizationEntity->createProperties();
-
-    visualizationEntity->setSource(vectorDataID, vectorDataVersion);
-    visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
-
-    visualizationEntity->StoreToDataBase();
-
-    app->modelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
-
-    delete visualizationEntity;
-    visualizationEntity = nullptr;
-
-    // Now write the vtk file information based on the intermediate data structures
-    std::string vtkFileName = tempDirPath + "\\efield.vtu";
-    std::ofstream vtkFile(vtkFileName);
-
-    vtkFile << "# vtk DataFile Version 2.0" << std::endl;
-    vtkFile << "Electrostatic field strength" << std::endl;
-    vtkFile << "ASCII" << std::endl;
-    vtkFile << "DATASET UNSTRUCTURED_GRID" << std::endl << std::endl;
-
-    vtkFile << "POINTS " << nodeList.size() << " float" << std::endl;
-    for (auto node : nodeList)
-    {
-        vtkFile << node << std::endl;
-    }
-
-    vtkFile << std::endl << "CELLS " << cellList.size() << " " << 5 * cellList.size() << std::endl;
-    for (auto cell : cellList)
-    {
-        vtkFile << "4 " << cell[0] << " " << cell[1] << " " << cell[2] << " " << cell[3] << std::endl;
-    }
-
-    vtkFile << std::endl << "CELL_TYPES " << cellList.size() << std::endl;
-    for (auto cell : cellList)
-    {
-        vtkFile << "10" << std::endl;
-    }
-
-    vtkFile << std::endl << "CELL_DATA " << vectorList.size() << std::endl;
-    vtkFile << "SCALARS scalars float 1" << std::endl;
-    vtkFile << "LOOKUP_TABLE default" << std::endl;
-
-    for (auto magnitude : magnitudeList)
-    {
-        vtkFile << magnitude << std::endl;
-    }
-
-    vtkFile << "VECTORS vectors float" << std::endl;
-
-    for (auto vector : vectorList)
-    {
-        vtkFile << vector << std::endl;
-    }
-
-    vtkFile.close();
 }
 
 size_t SolverFDTD::getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex)
