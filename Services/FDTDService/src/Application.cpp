@@ -391,11 +391,11 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	deleteSingleSolverResults(solverEntity);
 
-	FDTDLauncher fdtdSolver(this);
+	FDTDLauncher FDTDSolver(this);
 	modelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = fdtdSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
+	std::string output = FDTDSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
 												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 
