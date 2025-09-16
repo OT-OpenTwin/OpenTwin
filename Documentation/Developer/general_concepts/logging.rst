@@ -88,6 +88,9 @@ Environment variables
 
         * **ALL_LOG_FLAGS**: All log flags will be set
 
+    * - OPEN_TWIN_LOG_BUFFER_ROOT
+      - If set, logs will be written to files at this directory.
+
     * - OPEN_TWIN_FILE_LOGGING
       - If set to **true** :ref:`file logging<use_file_logging>` will be enabled.
 

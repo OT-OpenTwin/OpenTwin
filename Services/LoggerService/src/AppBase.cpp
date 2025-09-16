@@ -255,6 +255,7 @@ void AppBase::workerNotify() {
 			ot::JsonArray messagesArray;
 			for (const ot::LogMessage& msg : messagesToSend) {
 				messagesArray.PushBack(ot::JsonObject(msg, doc.GetAllocator()), doc.GetAllocator());
+				m_fileManager.appendLog(msg);
 				newCount++;
 			}
 			doc.AddMember(OT_ACTION_PARAM_LOGS, messagesArray, doc.GetAllocator());
@@ -321,6 +322,8 @@ AppBase::AppBase()
 {
 	// Set this so the log dispatcher will not destroy the AppBase
 	this->setDeleteLogNotifierLater(true);
+
+	m_fileManager.initialize();
 
 	m_notifyThreadRunning = true;
 	m_notifyThread = new std::thread(&AppBase::workerNotify, this);

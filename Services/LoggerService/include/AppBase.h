@@ -5,6 +5,9 @@
 
 #pragma once
 
+// Service header
+#include "FileManager.h"
+
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
@@ -71,6 +74,8 @@ private:
 	size_t						m_count;
 
 	std::list<std::string>		m_receiver;
+
+	FileManager m_fileManager;
 
 	AppBase();
 	virtual ~AppBase();
