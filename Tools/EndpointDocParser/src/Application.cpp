@@ -257,9 +257,48 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 				else if (inBriefDescriptionBlock) {
 					if (startsWith(apiContent, "@note")) {
 						std::cout << "Detected @note." << "\n";
+						inNoteBlock = true;
+						
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+						std::cout << "---\n";
 					}
 					else if (startsWith(apiContent, "@warning")) {
 						std::cout << "Detected @warning." << "\n";
+						inWarningBlock = true;
+
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+						std::cout << "---\n";
+					}
+					else if (startsWith(apiContent, "@detail")) {
+						apiContent = apiContent.substr(8);
+
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+						std::cout << "---\n";
+
+						inNoteBlock = false;
+						inWarningBlock = false;
+					}
+					else if (inNoteBlock) {
+						apiContent = "@note " + apiContent;
+
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+						std::cout << "---\n";
+					}
+					else if (inWarningBlock) {
+						apiContent = "@warning " + apiContent;
+
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+						std::cout << "---\n";
 					}
 					else {
 						std::string detailed = apiContent;
@@ -268,6 +307,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 						endpoint.addDetailedDescription(apiContent);
 						std::cout << "Detailed Description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
+						std::cout << "---\n";
 					}
 				}
 				else {

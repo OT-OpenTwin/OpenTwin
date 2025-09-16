@@ -54,8 +54,14 @@ private:
 	//api This is the detailed description.
 	//api This is the second line of the detailed description.
 	//api
-	//api @note
-	//api This is the third line of the detailed description.
+	//api @note This is an important note.
+	//api This line belongs to the note block.
+	//api @detail This is the third line of the detailed description.
+	//api @warning This is a warning.
+	//api
+	//api This line belongs to the warning block.
+	//api @detail This is the fourth line of the detailed description.
+	//api This is the fifth line of the detailed description.
 	//api @param OT_PARAM_AUTH_USERNAME String User name
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
