@@ -53,8 +53,10 @@ private:
 
 	void workerNotify();
 
+	//! @warning It is assumed that m_mutex is already locked.
 	void removeReceiver(const std::string& _receiver);
 
+	//! @warning It is assumed that m_mutex is already locked.
 	void resizeBuffer(void);
 
 	std::mutex                  m_newMessageMutex;

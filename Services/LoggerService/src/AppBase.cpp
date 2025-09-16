@@ -154,6 +154,8 @@ std::string AppBase::handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument) {
 }
 
 std::string AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	size_t size = ot::json::getUInt64(_jsonDocument, OT_ACTION_PARAM_Size);
 	m_bufferSize = size;
 	this->resizeBuffer();
@@ -163,6 +165,8 @@ std::string AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
 
 std::string AppBase::handleGetAllLogs(ot::JsonDocument& _jsonDocument) {
 	ot::ReturnMessage response;
+
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	response = ot::ReturnMessage::Ok;
 
@@ -180,8 +184,9 @@ std::string AppBase::handleGetAllLogs(ot::JsonDocument& _jsonDocument) {
 }
 
 std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
-	std::string userName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_USER_NAME);
 	ot::ReturnMessage response;
+
+	std::string userName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_USER_NAME);
 
 	if (userName.empty()) {
 		response = ot::ReturnMessage::Failed;
@@ -192,6 +197,7 @@ std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
 		
 		ot::JsonDocument doc(rapidjson::kArrayType);
 
+		std::lock_guard<std::mutex> lock(m_mutex);
 		for (const ot::LogMessage& msg : m_messages) {
 			if (msg.getUserName() == userName) {
 				ot::JsonObject msgObj;
@@ -207,6 +213,8 @@ std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
 }
 
 void AppBase::updateBufferSizeFromLogFlags(const ot::LogFlags& _flags) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if ((_flags | ot::WARNING_LOG | ot::ERROR_LOG) == (ot::WARNING_LOG | ot::ERROR_LOG)) {
 		m_bufferSize = OT_LOG_BUFFER_LIMIT_LOW;
 	}
@@ -299,7 +307,7 @@ void AppBase::removeReceiver(const std::string& _receiver) {
 #endif // _DEBUG
 }
 
-void AppBase::resizeBuffer(void) {
+void AppBase::resizeBuffer() {
 	if (m_count > m_bufferSize) {
 		auto it = m_messages.begin();
 		std::advance(it, m_count - m_bufferSize);
