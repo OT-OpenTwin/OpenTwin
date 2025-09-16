@@ -142,6 +142,10 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	Endpoint endpoint;
 	Parameter parameter;
 	bool inApiBlock = false;
+	
+	bool inBriefDescriptionBlock = false;
+	bool inNoteBlock = false;
+	bool inWarningBlock = false;
 
 	// read lines from given file and parse them
 	try {
@@ -165,7 +169,10 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 				}
 
 				// remove "//api " prefix
-				std::string apiContent = trimmedLine.substr(6);
+				std::string apiContent = trimmedLine.substr(5);
+				if (!apiContent.empty()) {
+					apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+				}
 				std::cout << apiContent << "\n";
 
 				// check which "@commando" is given
@@ -181,6 +188,10 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 						endpoint.setMessageType(Endpoint::mTLS);
 						std::cout << "Message Type mTLS set in endpoint: " << endpoint.getMessageTypeString() << "\n";
 					}
+
+					if (inBriefDescriptionBlock) {
+						inBriefDescriptionBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@action")) {
 					std::string action = apiContent.substr(8);
@@ -194,12 +205,18 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 //					std::cout << "[ACTIONNAME] -> " << actionName << "\n";
 					endpoint.setName(actionName);
 					std::cout << "Name set in endpoint: " << endpoint.getName() << "\n";
+				
+					if (inBriefDescriptionBlock) {
+						inBriefDescriptionBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@brief")) {
 					std::string brief = apiContent.substr(7);
 //					std::cout << "[BRIEF] -> " << brief << "\n";
 					endpoint.setBriefDescription(brief);
 					std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
+					
+					inBriefDescriptionBlock = true;
 				}
 				else if (startsWith(apiContent, "@param")) {
 					parameter = Parameter();
@@ -209,12 +226,20 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 //					std::cout << "[PARAM] -> " << param << "\n";
 
 					parseParameter(parameter, param, endpoint, parameterType);
+
+					if (inBriefDescriptionBlock) {
+						inBriefDescriptionBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@return")) {
 					std::string response = apiContent.substr(8);
 //					std::cout << "[RETURN] -> " << response << "\n";
 					endpoint.setResponseDescription(response);
 					std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
+
+					if (inBriefDescriptionBlock) {
+						inBriefDescriptionBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@rparam")) {
 					parameter = Parameter();
@@ -224,6 +249,26 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 //					std::cout << "[RETURNPARAM] -> " << rparam << "\n";
 
 					parseParameter(parameter, rparam, endpoint, parameterType);
+
+					if (inBriefDescriptionBlock) {
+						inBriefDescriptionBlock = false;
+					}
+				}
+				else if (inBriefDescriptionBlock) {
+					if (startsWith(apiContent, "@note")) {
+						std::cout << "Detected @note." << "\n";
+					}
+					else if (startsWith(apiContent, "@warning")) {
+						std::cout << "Detected @warning." << "\n";
+					}
+					else {
+						std::string detailed = apiContent;
+//						std::cout << "Detailed Description: >>" << apiContent << "<<" << "\n";
+
+						endpoint.addDetailedDescription(apiContent);
+						std::cout << "Detailed Description set in endpoint: " << "\n";
+						endpoint.printDetailedDescription();
+					}
 				}
 				else {
 					std::cout << "[UNKNOWN] -> " << apiContent << "\n";

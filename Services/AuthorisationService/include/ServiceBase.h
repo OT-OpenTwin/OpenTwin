@@ -50,7 +50,12 @@ private:
 
 	//api @security TLS
 	//api @action OT_ACTION_LOGIN_ADMIN 
-	//api @brief Processes the login of an administrator. 
+	//api @brief Processes the login of an administrator.
+	//api This is the detailed description.
+	//api This is the second line of the detailed description.
+	//api
+	//api @note
+	//api This is the third line of the detailed description.
 	//api @param OT_PARAM_AUTH_USERNAME String User name
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 

@@ -32,8 +32,9 @@ public:
 	void setBriefDescription(const std::string& _briefDescription) { m_briefDescription = _briefDescription; };
 	const std::string& getBriefDescription() const { return m_briefDescription; };
 
-	void setDetailedDescription(const std::string& _detailedDescription) { m_detailedDescription = _detailedDescription; };
-	const std::string& getDetailedDescription() const { return m_detailedDescription; };
+	void addDetailedDescription(const std::string& _detailedDescription) { m_detailedDescription.push_back(_detailedDescription); };
+	const std::list <std::string>& getDetailedDescription() const { return m_detailedDescription; };
+	void printDetailedDescription() const;
 
 	void setMessageType(MessageType _messageType) { m_messageType = _messageType; };
 	MessageType getMessageType() const { return m_messageType; };
@@ -57,7 +58,7 @@ private:
 	std::string m_name;
 	std::string m_action;
 	std::string m_briefDescription;
-	std::string m_detailedDescription;
+	std::list<std::string> m_detailedDescription;
 	MessageType m_messageType;
 	std::list<Parameter> m_parameters;
 	std::string m_responseDescription;
