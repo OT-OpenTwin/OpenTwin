@@ -52,7 +52,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) = 0;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root);
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) = 0;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root);
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root);
 
 	void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
@@ -76,7 +76,6 @@ public:
 
 protected:
 	void setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property);
-	void addBaseDataToJsonDocument(ot::JsonValue& _container, ot::JsonAllocator& _allocator) const;
 
 private:
 	void setMultipleValues(void) { m_multipleValues = true; }
@@ -131,7 +130,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -184,7 +183,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -228,7 +227,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -268,7 +267,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -313,7 +312,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -364,7 +363,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -401,7 +400,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
@@ -459,7 +458,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	void setValue(std::string& value) { m_value = value; }
@@ -505,7 +504,7 @@ public:
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
 
-	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
+	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
