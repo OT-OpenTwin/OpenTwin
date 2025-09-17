@@ -89,8 +89,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 		exePath += "\\Deployment";
 	}
 
-	// exe + xmlFileName + options
-	std::string commandLine = "\"" + exePath + "\\openEMS\\openEMS.exe\"" + solvTarget + " --engine=fastest";
+	std::string commandLine = "\"" + exePath + "\\openEMS\\openEMS.exe\"";
 
 	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{

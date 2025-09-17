@@ -18,7 +18,7 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
     std::map<std::string, std::list<std::string>> materialsToObjectsMap;
     getMaterialsToObjectsMap(materialsToObjectsMap, app);
 
-    // Get map of all shapes with potential definition
+    // Get map of all shapes with boundary condition
     std::map<std::string, double> boundaryCondition;
     getBoundaryConditions(boundaryCondition);
 
@@ -26,7 +26,7 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
     std::map<std::string, std::string> materialNameToAliasMap;
     buildMaterialAliases(materialsToObjectsMap, materialNameToAliasMap);
 
-    // Now we build (alias) names for each potential definition
+    // Now we build (alias) names for each boundary condition
     std::map<std::string, std::string> boundaryConditionsNameToAliases;
     buildBoundaryConditionAliases(boundaryCondition, boundaryConditionsNameToAliases);
 
