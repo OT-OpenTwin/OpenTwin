@@ -9,6 +9,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
+#include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
@@ -110,7 +111,7 @@ void FileLogImporterDialog::slotImport() {
 
 	// Select file to import
 
-	QStringList filePaths = QFileDialog::getOpenFileNames(this, "Import Log File", settings->value("Logging.FileImporter.LastDirectory", QString()).toString(), "Plain Log Files(*.otlog);;Log Files(*.otlog.json)");
+	QStringList filePaths = QFileDialog::getOpenFileNames(this, "Import Log File", settings->value("Logging.FileImporter.LastDirectory", QString()).toString(), "Plain Log Files(*.otlog);;Log Files(*.otlog.json);;Log Buffer File(*.otlogbuf)");
 
 	if (filePaths.isEmpty()) {
 		return;
@@ -220,6 +221,9 @@ void FileLogImporterDialog::importWorker() {
 		}
 		else if (info.first.endsWith(".otlog.json")) {
 			this->importJsonFile(info.first, info.second, newLogMessages);
+		}
+		else if (info.first.endsWith(".otlogbuf")) {
+			this->importLogBufferFile(info.first, info.second, newLogMessages);
 		}
 		else {
 			this->appendOutputMessage("Unsupported file format: " + info.first);
@@ -416,4 +420,42 @@ void FileLogImporterDialog::importJsonFile(const QString& _filePath, const std::
 	else {
 		this->appendOutputMessage("No valid messages found in file: \"" + _filePath + "\"");
 	}
+}
+
+void FileLogImporterDialog::importLogBufferFile(const QString& _filePath, const std::list<std::string>& _lines, std::list<ot::LogMessage>& _logMessages) {
+	this->appendOutputMessage("Parsing exported log buffer file: \"" + _filePath + "\"");
+
+	size_t validLines = 0;
+	size_t invalidLines = 0;
+	size_t ct = 0;
+	for (const std::string& line : _lines) {
+		std::string trimmed = ot::String::removePrefixSuffix(line, "\n\t ");
+		if (trimmed.empty()) {
+			continue;
+		}
+		ct++;
+		if (trimmed.find('{') != 0 || trimmed.rfind('}') != trimmed.size() - 1) {
+			this->appendOutputMessage("Invalid log buffer line syntax in line " + QString::number(ct) + ": Missing brackets");
+			invalidLines++;
+			continue;
+		}
+
+		ot::JsonDocument lineDoc;
+		if (!lineDoc.fromJson(trimmed)) {
+			this->appendOutputMessage("Invalid log buffer line syntax in line " + QString::number(ct) + ": Failed to parse JSON document");
+			invalidLines++;
+			continue;
+		}
+
+		ot::LogMessage msg;
+		msg.setFromJsonObject(lineDoc.getConstObject());
+		validLines++;
+		_logMessages.push_back(std::move(msg));
+	}
+
+	QString resultInfo("Parsed " + QString::number(validLines) + " messages from file: \"" + _filePath + "\".");
+	if (invalidLines > 0) {
+		resultInfo.append(QString::number(invalidLines) + " invalid lines detected.");
+	}
+	this->appendOutputMessage(resultInfo);
 }
