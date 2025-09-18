@@ -9,12 +9,13 @@
 // OpenTwin header
 #include "OTSystem/FileSystem.h"
 #include "OTSystem/OperatingSystem.h"
+#include "OTCore/String.h"
 
 // std header
 #include <fstream>
 #include <filesystem>
 
-FileManager::FileManager() : m_active(false), m_stream(nullptr), m_messageCount(0), m_messageLimit(10000), m_currentFile(0), m_fileCountLimit(10)
+FileManager::FileManager() : m_active(false), m_stream(nullptr), m_currentSize(0), m_maxFileSize(200000000), m_currentFile(0), m_fileCountLimit(3)
 {
 	
 }
@@ -39,6 +40,26 @@ void FileManager::initialize() {
 		return;
 	}
 
+	// Optional: Get log buffer size from env
+	std::string logBufferSizeEnv = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOG_BUFFER_SIZE");
+	if (!logBufferSizeEnv.empty()) {
+		bool convFail = false;
+		size_t size = ot::String::toNumber<size_t>(logBufferSizeEnv, convFail);
+		if (!convFail) {
+			m_maxFileSize = size;
+		}
+	}
+
+	// Optional: Get file count from env
+	std::string fileCountEnv = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOG_BUFFER_FILECOUNT");
+	if (!fileCountEnv.empty()) {
+		bool convFail = false;
+		size_t size = ot::String::toNumber<size_t>(fileCountEnv, convFail);
+		if (!convFail && m_fileCountLimit > 1) {
+			m_fileCountLimit = size;
+		}
+	}
+
 	// Ensure directory exists
 	try {
 		if (!std::filesystem::is_directory(m_fileRootDir) &&
@@ -46,16 +67,16 @@ void FileManager::initialize() {
 			m_active = false;
 			return;
 		}
+
+		// Find initial file to start writing to
+		if (!this->initializeFirstFile()) {
+			return;
+		}
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());
 		return;
 	}
-
-	m_active = true;
-
-	// Open first file
-	this->openNewFile();
 }
 
 void FileManager::appendLog(const ot::LogMessage& _message) {
@@ -67,16 +88,25 @@ void FileManager::appendLog(const ot::LogMessage& _message) {
 	}
 
 	// Write message to file
-	(*m_stream) << _message.toJson() << std::endl;
+	const std::string msg = _message.toJson();
+	(*m_stream) << msg << '\n';
 	
+	m_currentSize += (msg.size() + 1);
+
 	// Check if limit reached
-	if (++m_messageCount >= m_messageLimit) {
+	if (m_currentSize >= m_maxFileSize) {
 		m_currentFile = (m_currentFile + 1) % m_fileCountLimit;
-		openNewFile();
+		openNewFile(false);
 	}
 }
 
-void FileManager::openNewFile() {
+void FileManager::flush() {
+	if (m_stream) {
+		m_stream->flush();
+	}
+}
+
+void FileManager::openNewFile(bool _append) {
 	// Clean up old stream
 	if (m_stream) {
 		m_stream->close();
@@ -90,7 +120,8 @@ void FileManager::openNewFile() {
 		<< std::setfill('0') << m_currentFile << ".otlogbuf";
 
 	// Open new file (overwrite mode)
-	m_stream = new std::ofstream(filename.str(), std::ios::trunc);
+	const std::string fileNameStr = filename.str();
+	m_stream = new std::ofstream(fileNameStr, (_append ? std::ios::app : std::ios::trunc));
 	if (!m_stream->is_open()) {
 		delete m_stream;
 		m_stream = nullptr;
@@ -99,5 +130,64 @@ void FileManager::openNewFile() {
 		return;
 	}
 
-	m_messageCount = 0;
+	if (_append) {
+		m_currentSize = std::filesystem::file_size(fileNameStr);
+	}
+	else {
+		m_currentSize = 0;
+	}
+}
+
+bool FileManager::initializeFirstFile() {
+	// Find last modified .otlogbuf file
+	size_t lastFileIndex = 0;
+	std::string lastFilePath;
+	std::filesystem::file_time_type lastWriteTime{};
+	bool found = false;
+
+	for (auto& entry : std::filesystem::directory_iterator(m_fileRootDir)) {
+		if (!entry.is_regular_file()) continue;
+		if (entry.path().extension() != ".otlogbuf") continue;
+
+		// Filename is like OpenTwinLog_001.otlogbuf
+		std::string stem = entry.path().stem().string();
+		if (stem.rfind("OpenTwinLog_", 0) == 0) {
+			bool convFail = false;
+			size_t index = ot::String::toNumber<size_t>(stem.substr(12), convFail);
+			if (convFail) {
+				return false;
+			}
+
+			auto ftime = std::filesystem::last_write_time(entry);
+
+			if (!found || ftime > lastWriteTime) {
+				lastWriteTime = ftime;
+				lastFileIndex = index;
+				lastFilePath = entry.path().string();
+				found = true;
+			}
+		}
+	}
+
+	m_active = true;
+
+	if (found && lastFileIndex < m_fileCountLimit) {
+		// Check if file matches buffer size
+
+		size_t fileSize = std::filesystem::file_size(lastFilePath);
+		if (fileSize >= m_maxFileSize) {
+			m_currentFile = (lastFileIndex + 1) % m_fileCountLimit;
+			this->openNewFile(false);
+		}
+		else {
+			m_currentFile = lastFileIndex;
+			this->openNewFile(true);
+		}
+	}
+	else {
+		m_currentFile = 0;
+		this->openNewFile(false);
+	}
+
+	return true;
 }

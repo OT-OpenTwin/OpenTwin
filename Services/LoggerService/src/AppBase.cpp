@@ -258,6 +258,8 @@ void AppBase::workerNotify() {
 				m_fileManager.appendLog(msg);
 				newCount++;
 			}
+			m_fileManager.flush();
+
 			doc.AddMember(OT_ACTION_PARAM_LOGS, messagesArray, doc.GetAllocator());
 			std::string msgStr = doc.toJson();
 

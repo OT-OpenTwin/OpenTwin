@@ -89,7 +89,17 @@ Environment variables
         * **ALL_LOG_FLAGS**: All log flags will be set
 
     * - OPEN_TWIN_LOG_BUFFER_ROOT
-      - If set, logs will be written to files at this directory.
+      - If set, logs will be written to files at this directory by the logger service.
+
+    * - OPEN_TWIN_LOG_BUFFER_SIZE
+      - The buffer size in bytes used for the log buffer files (default is 200MB)
+        
+        Requires OPEN_TWIN_LOG_BUFFER_ROOT to be set.
+
+    * - OPEN_TWIN_LOG_BUFFER_FILECOUNT
+      - Number of files used by the logger service file buffer (default is 3).
+        
+        Requires OPEN_TWIN_LOG_BUFFER_ROOT to be set.
 
     * - OPEN_TWIN_FILE_LOGGING
       - If set to **true** :ref:`file logging<use_file_logging>` will be enabled.
