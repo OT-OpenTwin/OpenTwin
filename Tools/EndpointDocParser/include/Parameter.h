@@ -4,6 +4,7 @@
 
 // std header
 #include <string>
+#include <list>
 
 class Parameter {
 public:
@@ -38,8 +39,9 @@ public:
 	DataType getDataType() const { return m_dataType; };
 	std::string getDataTypeString() const;
 
-	void setDescription(const std::string& _description) { m_description = _description; };
-	const std::string& getDescription() const { return m_description; };
+	void addDescription(const std::string& _description) { m_description.push_back(_description); };
+	const std::list<std::string>& getDescription() const { return m_description; };
+	void printDescription() const;
 
 	void setMacro(const std::string& _macro) { m_macro = _macro; };
 	const std::string& getMacro() const { return m_macro; }
@@ -49,6 +51,6 @@ public:
 private:
 	std::string m_name;
 	DataType m_dataType;
-	std::string m_description;
+	std::list<std::string> m_description;
 	std::string m_macro;
 };

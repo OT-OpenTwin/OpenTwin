@@ -144,6 +144,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	bool inApiBlock = false;
 	
 	bool inBriefDescriptionBlock = false;
+	bool inParameterBlock = false;
 	bool inNoteBlock = false;
 	bool inWarningBlock = false;
 
@@ -192,6 +193,9 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					if (inBriefDescriptionBlock) {
 						inBriefDescriptionBlock = false;
 					}
+					if (inParameterBlock) {
+						inParameterBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@action")) {
 					std::string action = apiContent.substr(8);
@@ -209,6 +213,9 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					if (inBriefDescriptionBlock) {
 						inBriefDescriptionBlock = false;
 					}
+					if (inParameterBlock) {
+						inParameterBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@brief")) {
 					std::string brief = apiContent.substr(7);
@@ -217,6 +224,10 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
 					
 					inBriefDescriptionBlock = true;
+
+					if (inParameterBlock) {
+						inParameterBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@param")) {
 					parameter = Parameter();
@@ -226,6 +237,8 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 //					std::cout << "[PARAM] -> " << param << "\n";
 
 					parseParameter(parameter, param, endpoint, parameterType);
+
+					inParameterBlock = true;
 
 					if (inBriefDescriptionBlock) {
 						inBriefDescriptionBlock = false;
@@ -240,6 +253,9 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					if (inBriefDescriptionBlock) {
 						inBriefDescriptionBlock = false;
 					}
+					if (inParameterBlock) {
+						inParameterBlock = false;
+					}
 				}
 				else if (startsWith(apiContent, "@rparam")) {
 					parameter = Parameter();
@@ -253,23 +269,28 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					if (inBriefDescriptionBlock) {
 						inBriefDescriptionBlock = false;
 					}
+					if (inParameterBlock) {
+						inParameterBlock = false;
+					}
 				}
 				else if (inBriefDescriptionBlock) {
 					if (startsWith(apiContent, "@note")) {
 						std::cout << "Detected @note." << "\n";
 						inNoteBlock = true;
+						inWarningBlock = false;
 						
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
 					}
 					else if (startsWith(apiContent, "@warning")) {
 						std::cout << "Detected @warning." << "\n";
 						inWarningBlock = true;
+						inNoteBlock = false;
 
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
 					}
@@ -277,7 +298,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(8);
 
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
 
@@ -288,7 +309,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = "@note " + apiContent;
 
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
 					}
@@ -296,18 +317,104 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = "@warning " + apiContent;
 
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
 					}
 					else {
-						std::string detailed = apiContent;
 //						std::cout << "Detailed Description: >>" << apiContent << "<<" << "\n";
 
 						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed Description set in endpoint: " << "\n";
+						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
 						std::cout << "---\n";
+					}
+				}
+				else if (inParameterBlock) {
+					if (startsWith(apiContent, "@note")) {
+						std::cout << "Detected @note." << "\n";
+						inNoteBlock = true;
+						inWarningBlock = false;
+						
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
+					}
+					else if (startsWith(apiContent, "@warning")) {
+						std::cout << "Detected @warning." << "\n";
+						inWarningBlock = true;
+						inNoteBlock = false;
+
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
+					}
+					else if (startsWith(apiContent, "@detail")) {
+						apiContent = apiContent.substr(8);
+
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
+
+						inNoteBlock = false;
+						inWarningBlock = false;
+					}
+					else if (inNoteBlock) {
+						apiContent = "@note " + apiContent;
+
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
+					}
+					else if (inWarningBlock) {
+						apiContent = "@warning " + apiContent;
+
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
+					}
+					else {
+//						std::cout << "Detailed parameter description: >>" << apiContent << "<<" << "\n";
+
+						if (!endpoint.getParameters().empty()) {
+							Parameter& lastParam = endpoint.getParameters().back();
+//							std::cout << "Last parameter: " << lastParam.getMacro() << "\n";
+
+							lastParam.addDescription(apiContent);
+							std::cout << "Added description to " << lastParam.getMacro() << ":" << "\n";
+							lastParam.printDescription();
+							std::cout << "---\n";
+						}
 					}
 				}
 				else {
@@ -383,8 +490,8 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfUnsignedInt64String);
 //		std::cout << "The third string is: " << paramDescription << "\n";
 
-		_parameter.setDescription(paramDescription);
-//		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+		_parameter.addDescription(paramDescription);
+//		std::cout << "Description set in parameter: " << _parameter.printDescription() << "\n";
 	}
 	else {
 //		std::cout << "The second string is: " << dataType << "\n";
@@ -436,8 +543,8 @@ void Application::parseParameter(Parameter& _parameter, const std::string& _para
 
 		std::string paramDescription = _param.substr(sizeOfMacroString + sizeOfDataTypeString);
 //		std::cout << "The third string is: " << paramDescription << "\n";
-		_parameter.setDescription(paramDescription);
-//		std::cout << "Description set in parameter: " << _parameter.getDescription() << "\n";
+		_parameter.addDescription(paramDescription);
+//		std::cout << "Description set in parameter: " << _parameter.printDescription() << "\n";
 	}
 	_parameter.printParameter();
 	if (_parameterType == "Function parameter") {
