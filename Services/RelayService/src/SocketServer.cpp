@@ -239,6 +239,24 @@ void SocketServer::messageReceived(const QString& _message) {
 					m_keepAliveTimer = nullptr;
 				}
 			}
+			else {
+				ot::JsonDocument controlDoc;
+				if (!controlDoc.fromJson(request.message)) {
+					OT_LOG_W("Invalid control message: " + request.message);
+					return;
+				}
+
+				if (!controlDoc.HasMember(OT_ACTION_MEMBER)) {
+					OT_LOG_W("Invalid control message syntax (action missing): " + request.message);
+					return;
+				}
+
+				std::string action = ot::json::getString(controlDoc, OT_ACTION_MEMBER);
+				if (action == OT_ACTION_CMD_SetGlobalLogFlags) {
+					ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(controlDoc, OT_ACTION_PARAM_Flags));
+					ot::LogDispatcher::instance().setLogFlags(flags);
+				}
+			}
 			break;
 
 		default:

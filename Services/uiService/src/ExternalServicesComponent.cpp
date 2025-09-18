@@ -765,15 +765,15 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const 
 {
 	OTAssertNullptr(m_websocket);
 
-	bool isQueue = false;
+	ot::RelayedMessageHandler::MessageType type = ot::RelayedMessageHandler::Execute;
 	switch (operation)
 	{
 	case EXECUTE:
-		isQueue = false;
+		type = ot::RelayedMessageHandler::Execute;
 		break;
 
 	case QUEUE:
-		isQueue = true;
+		type = ot::RelayedMessageHandler::Queue;
 		break;
 
 	default:
@@ -782,7 +782,7 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const 
 	}
 
 	// And finally send it through the websocket
-	return m_websocket->sendMessage(isQueue, url, json, response);
+	return m_websocket->sendMessage(type, url, json, response);
 }
 
 bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender) {
@@ -1127,6 +1127,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 			if (m_websocket) delete m_websocket;
 			m_websocket = new WebsocketClient(websocketIP);
+
+			m_websocket->updateLogFlags(ot::LogDispatcher::instance().getLogFlags());
 
 			OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
 		}
@@ -1804,8 +1806,12 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::stri
 // Action handler
 
 std::string ExternalServicesComponent::handleSetLogFlags(ot::JsonDocument& _document) {
-	ot::ConstJsonArray flags = ot::json::getArray(_document, OT_ACTION_PARAM_Flags);
-	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+	ot::ConstJsonArray flagsArr = ot::json::getArray(_document, OT_ACTION_PARAM_Flags);
+	ot::LogFlags flags = ot::logFlagsFromJsonArray(flagsArr);
+	ot::LogDispatcher::instance().setLogFlags(flags);
+	if (m_websocket) {
+		m_websocket->updateLogFlags(flags);
+	}
 	AppBase::instance()->updateLogIntensityInfo();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
