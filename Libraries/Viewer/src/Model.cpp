@@ -51,6 +51,8 @@
 #include "CurveVisualiser.h"
 #include "RangeVisualiser.h"
 
+#include "IntersectionCapCalculator.h"
+
 #include <QtWidgets/qheaderview.h>
 
 
@@ -3426,29 +3428,51 @@ void Model::updateVTKNode(unsigned long long modelEntityID, const std::string &p
 	vtkNode->updateVTKNode(projectName, visualizationDataID, visualizationDataVersion);
 }
 
-void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point)
+void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point, double radius)
 {
 	// This function gets called whenever the orientation or position of the cutplane is changed and the cap geometry therefore needs to be updated
 
 	// First, we traverse the tree and find all geometry nodes
-	updateCapGeometryForSceneNodes(sceneNodesRoot, normal, point);
+	updateCapGeometryForSceneNodes(sceneNodesRoot, normal, point, radius);
 }
 
-void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point)
+void Model::deleteCapGeometry()
+{
+	// This function gets called whenever the orientation or position of the cutplane is changed and the cap geometry therefore needs to be updated
+
+	// First, we traverse the tree and find all geometry nodes
+	deleteCapGeometryForSceneNodes(sceneNodesRoot);
+}
+
+void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point, double radius)
 {
 	if (root->isVisible() && dynamic_cast<SceneNodeGeometry*>(root) != nullptr)
 	{
 		// We have a SceneNodeGeometry item -> process it
-		updateCapGeometryForGeometryItem(dynamic_cast<SceneNodeGeometry*>(root), normal, point);
+		updateCapGeometryForGeometryItem(dynamic_cast<SceneNodeGeometry*>(root), normal, point, radius);
 	}
 
 	for (auto child : root->getChildren())
 	{
-		updateCapGeometryForSceneNodes(child, normal, point);
+		updateCapGeometryForSceneNodes(child, normal, point, radius);
 	}
 }
 
-void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point)
+void Model::deleteCapGeometryForSceneNodes(SceneNodeBase* root)
+{
+	if (dynamic_cast<SceneNodeGeometry*>(root) != nullptr)
+	{
+		// We have a SceneNodeGeometry item -> process it
+		dynamic_cast<SceneNodeGeometry*>(root)->deleteCutCapGeometry();
+	}
+
+	for (auto child : root->getChildren())
+	{
+		deleteCapGeometryForSceneNodes(child);
+	}
+}
+
+void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point, double radius)
 {
 	// Here we need to check whether the geometry item intersecs with the plane and update the geometry of the cap accordingly
 
@@ -3465,11 +3489,15 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 
 	if (dist > boundingSphereRadius) {
 		OutputDebugString(L"No intersection\n\n");
+
+		item->deleteCutCapGeometry();
 	}
 	else {
 		OutputDebugString(L"Intersection\n\n");
-	}
 
+		IntersectionCapCalculator capping;
+		capping.generateCapGeometryAndVisualization(item, normalizedNormal, point, radius);
+	}
 }
 
 // Plot 1D

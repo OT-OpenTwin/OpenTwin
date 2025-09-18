@@ -820,7 +820,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	std::string response;
-	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, response);
+	m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		OT_LOG_E(response);
 		this->appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
@@ -1409,7 +1409,7 @@ void AppBase::sessionRefreshTimer(const std::string _sessionUserName, const std:
 		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionUserName, doc.GetAllocator()), doc.GetAllocator());
 
 		std::string response;
-		m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _authorizationUrl, doc, response);
+		m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _authorizationUrl, doc, response);
 
 		OT_LOG_I("Session refresh sent: " + _sessionUserName);
 
@@ -1579,7 +1579,7 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 	if (!restoredSettings.empty()) {
 		ot::JsonDocument doc;
 		doc.fromJson(restoredSettings);
-		config.setFromJsonObject(doc.GetConstObject());
+		config.setFromJsonObject(doc.getConstObject());
 	}
 
 	return config;
@@ -2294,7 +2294,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2338,7 +2338,7 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2386,7 +2386,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2437,7 +2437,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 	try {
 		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
@@ -2527,7 +2527,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
 	std::string response;
-	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 		OT_LOG_EA("Failed to send http request");
 		return;
 	}
@@ -2552,7 +2552,7 @@ void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
 
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 		OT_LOG_EA("Failed to send http request");
 		return;
 	}
@@ -2608,7 +2608,7 @@ void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 	// Send request
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 		OT_LOG_EA("Failed to send http request");
 		return;
 	}
@@ -2648,7 +2648,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(view->getTextEditor()->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 			std::string response;
-			if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 				OT_LOG_EA("Failed to send http request");
 				return;
 			}
@@ -2703,7 +2703,7 @@ void AppBase::slotTableSaveRequested(void) {
 		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
 		std::string response;
-		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_EA("Failed to send http request");
 			return;
 		}

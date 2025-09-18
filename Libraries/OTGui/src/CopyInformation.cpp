@@ -18,7 +18,7 @@ ot::CopyInformation ot::CopyInformation::fromRawString(const std::string& _rawSt
 	ot::JsonDocument importDoc;
 	if (importDoc.fromJson(_rawString)) {
 		if (importDoc.IsObject()) {
-			if (!info.tryToSetFromJson(importDoc.GetConstObject())) {
+			if (!info.tryToSetFromJson(importDoc.getConstObject())) {
 				info.setRawData(_rawString);
 			}
 		}

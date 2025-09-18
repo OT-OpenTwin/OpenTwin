@@ -40,7 +40,7 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 
 	if (doc.IsObject()) {
 		try {
-			msg.setFromJsonObject(doc.GetConstObject());
+			msg.setFromJsonObject(doc.getConstObject());
 		}
 		catch (const std::exception& _e) {
 			msg = "Failed to deserialize return message \"" + _json + "\" with error: "  + std::string(_e.what());

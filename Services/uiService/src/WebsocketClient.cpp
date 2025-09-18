@@ -87,14 +87,14 @@ WebsocketClient::~WebsocketClient()
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 }
 
-bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
+bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
 	// Make sure we are connected
 	if (!this->ensureConnection()) {
 		return false;
 	}
 
 	OT_LOG("Sending message to (Receiver = \"" + _receiverUrl +
-		"\"; Endpoint = " + (_queue ? "Queue" : "Execute") +
+		"\"; Endpoint = " + (_type == ot::RelayedMessageHandler::Queue ? "Queue" : (_type == ot::RelayedMessageHandler::Execute ? "Execute" : "Control")) +
 		"). Message = \"" + _message + "\"",
 		ot::OUTGOING_MESSAGE_LOG
 	);
@@ -102,11 +102,28 @@ bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, 
 	// Create the request message
 	std::string request;
 	uint64_t messageId = 0;
-	if (_queue) {
+	switch (_type) {
+	case ot::RelayedMessageHandler::Response:
+		OT_LOG_EA("Manual trigger of response message is forbidden");
+		break;
+
+	case ot::RelayedMessageHandler::Execute:
+		if (!m_messageHandler.createExecuteRequest(_receiverUrl, _message, request, messageId)) {
+			OT_LOG_EAS("Could not create relayed message");
+			return false;
+		}
+		break;
+
+	case ot::RelayedMessageHandler::Queue:
 		request = m_messageHandler.createQueueRequest(_receiverUrl, _message);
-	}
-	else if (!m_messageHandler.createExecuteRequest(_receiverUrl, _message, request, messageId)) {
-		OT_LOG_EAS("Could not create relayed message");
+		break;
+
+	case ot::RelayedMessageHandler::Control:
+		request = m_messageHandler.createControlRequest(_message);
+		break;
+
+	default:
+		OT_LOG_E("Unknown request type (" + std::to_string(static_cast<int>(_type)) + ")");
 		return false;
 	}
 
@@ -114,7 +131,7 @@ bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, 
 	m_webSocket.sendTextMessage(QString::fromStdString(request));
 
 	// Wait for response if needed
-	if (!_queue) {
+	if (_type == ot::RelayedMessageHandler::Execute) {
 		// Wait for the reponse
 		while (m_messageHandler.isWaitingForResponse(messageId) && m_isConnected) {
 			QEventLoop eventLoop;
@@ -128,7 +145,7 @@ bool WebsocketClient::sendMessage(bool _queue, const std::string& _receiverUrl, 
 	}
 
 	OT_LOG("...Sending message to (Receiver = \"" + _receiverUrl + 
-		"\"; Endpoint = " + (_queue ? "Queue" : "Execute") +
+		"\"; Endpoint = " + (_type == ot::RelayedMessageHandler::Queue ? "Queue" : (_type == ot::RelayedMessageHandler::Execute ? "Execute" : "Control")) +
 		") completed. Response = \"" + _response + "\"", 
 		ot::OUTGOING_MESSAGE_LOG
 	);
@@ -144,6 +161,17 @@ void WebsocketClient::prepareSessionClosing() {
 	m_sessionIsClosing = true;
 	m_newRequests.clear();
 	m_currentRequests.clear();
+}
+
+void WebsocketClient::updateLogFlags(const ot::LogFlags& _flags) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonArray arr;
+	ot::addLogFlagsToJsonArray(_flags, arr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Flags, arr, doc.GetAllocator());
+
+	std::string tmp;
+	this->sendMessage(ot::RelayedMessageHandler::Control, "", doc.toJson(), tmp);
 }
 
 // ###############################################################################################################################################

@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <string>
@@ -17,7 +16,7 @@ namespace ot {
 
 	//! @class JsonDocument
 	//! @brief JSON document.
-	class OT_CORE_API_EXPORT JsonDocument : public rapidjson::Document {
+	class JsonDocument : public rapidjson::Document {
 		OT_DECL_NOCOPY(JsonDocument)
 		OT_DECL_DEFMOVE(JsonDocument)
 	public:
@@ -27,17 +26,17 @@ namespace ot {
 
 		//! @brief Constructor
 		//! @param _type The type for the json document
-		JsonDocument(rapidjson::Type _type);
+		explicit JsonDocument(rapidjson::Type _type);
 
-		virtual ~JsonDocument() {};
+		~JsonDocument() {};
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter
 
-		const JsonDocument& constRef(void) const { return *this; };
+		const JsonDocument& constRef() const { return *this; };
 
-		ConstJsonObject GetConstObject() const { return this->GetObject(); };
+		ConstJsonObject getConstObject() const { return this->GetObject(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -46,7 +45,9 @@ namespace ot {
 		bool fromJson(const std::string& _json) { return this->fromJson(_json.c_str()); };
 		bool fromJson(const char* _fromJson);
 
-		std::string toJson(void) const;
+		std::string toJson() const;
 	};
 
 }
+
+#include "OTCore/JSONDocument.hpp"

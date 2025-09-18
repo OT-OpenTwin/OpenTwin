@@ -1,6 +1,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header
@@ -19,9 +20,10 @@ public:
 	WebsocketClient(const std::string& _socketUrl);
 	~WebsocketClient();
 
-	bool sendMessage(bool _queue, const std::string& _receiverUrl, const std::string& _message, std::string& _response);
+	bool sendMessage(ot::RelayedMessageHandler::MessageType _type, const std::string& _receiverUrl, const std::string& _message, std::string& _response);
 	
 	void prepareSessionClosing();
+	void updateLogFlags(const ot::LogFlags& _flags);
 
 Q_SIGNALS:
 	void connectionClosed();

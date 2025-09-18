@@ -60,6 +60,7 @@ private:
 	void importWorker();
 	void importFileLoggerFile(const QString& _filePath, const std::list<std::string>& _lines, std::list<ot::LogMessage>& _logMessages);
 	void importJsonFile(const QString& _filePath, const std::list<std::string>& _lines, std::list<ot::LogMessage>& _logMessages);
+	void importLogBufferFile(const QString& _filePath, const std::list<std::string>& _lines, std::list<ot::LogMessage>& _logMessages);
 
 	std::list<ot::LogMessage> m_logMessages;
 

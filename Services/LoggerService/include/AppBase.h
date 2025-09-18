@@ -5,6 +5,9 @@
 
 #pragma once
 
+// Service header
+#include "FileManager.h"
+
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
@@ -53,8 +56,10 @@ private:
 
 	void workerNotify();
 
+	//! @warning It is assumed that m_mutex is already locked.
 	void removeReceiver(const std::string& _receiver);
 
+	//! @warning It is assumed that m_mutex is already locked.
 	void resizeBuffer(void);
 
 	std::mutex                  m_newMessageMutex;
@@ -69,6 +74,8 @@ private:
 	size_t						m_count;
 
 	std::list<std::string>		m_receiver;
+
+	FileManager m_fileManager;
 
 	AppBase();
 	virtual ~AppBase();

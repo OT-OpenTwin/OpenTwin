@@ -1,21 +1,23 @@
-//! @file JSONDocument.cpp
+//! @file JSONDocument.hpp
 //! @author Alexander Kuester (alexk95)
 //! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
+#pragma once
+
 // OpenTwin header
 #include "OTCore/JSONDocument.h"
 
-ot::JsonDocument::JsonDocument() : rapidjson::Document(rapidjson::kObjectType) {};
+inline ot::JsonDocument::JsonDocument() : rapidjson::Document(rapidjson::kObjectType) {};
 
-ot::JsonDocument::JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
+inline ot::JsonDocument::JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
 
-bool ot::JsonDocument::fromJson(const char* _fromJson) {
+inline bool ot::JsonDocument::fromJson(const char* _fromJson) {
 	this->Parse(_fromJson);
 	return (this->GetType() == rapidjson::kObjectType) || (this->GetType() == rapidjson::kArrayType);
 }
 
-std::string ot::JsonDocument::toJson(void) const {
+inline std::string ot::JsonDocument::toJson() const {
 	// Create String buffer
 	rapidjson::StringBuffer buffer;
 	buffer.Clear();

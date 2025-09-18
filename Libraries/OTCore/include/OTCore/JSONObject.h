@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/CoreAPIExport.h"
+#include "OTCore/OTClassHelper.h"
 
 namespace ot {
 
@@ -23,7 +23,7 @@ namespace ot {
 		JsonObject();
 		JsonObject(const Serializable& _serializable, JsonAllocator& _allocator);
 		JsonObject(const Serializable* _serializable, JsonAllocator& _allocator);
-		virtual ~JsonObject() {};
+		~JsonObject() {};
 	};
 
 }

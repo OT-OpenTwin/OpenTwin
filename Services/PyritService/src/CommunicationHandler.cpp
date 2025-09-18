@@ -249,7 +249,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 			return;
 		}
 		ot::ReturnMessage msg;
-		msg.setFromJsonObject(responseDoc.GetConstObject());
+		msg.setFromJsonObject(responseDoc.getConstObject());
 		//if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
 		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
 			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");

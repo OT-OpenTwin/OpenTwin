@@ -543,24 +543,28 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
 
 	// TEMPORARY: Read the result data file and create a new result entity
-	std::ifstream file("resultme.vtu", std::ios::binary | std::ios::ate);
+	std::ifstream file("result.vtu", std::ios::binary | std::ios::ate);
 	int data_length = (int)file.tellg();
-	file.seekg(0, std::ios::beg);
 
-	char* fileData = new char[data_length + 1];
-	file.read(fileData, data_length);
-	fileData[data_length] = 0;
+	if (data_length != -1)
+	{
+		file.seekg(0, std::ios::beg);
 
-	addScalarResult("energy_density", fileData, data_length, solverEntity);
-	addScalarResult("region IDs", fileData, data_length, solverEntity);
-	addScalarResult("reluctivity", fileData, data_length, solverEntity);
-	addScalarResult("vector_potential", fileData, data_length, solverEntity);
+		char* fileData = new char[data_length + 1];
+		file.read(fileData, data_length);
+		fileData[data_length] = 0;
 
-	addVectorResult("flux_density", fileData, data_length, solverEntity);
-	addVectorResult("magnetic_field", fileData, data_length, solverEntity);
+		addScalarResult("energy_density", fileData, data_length, solverEntity);
+		addScalarResult("region IDs", fileData, data_length, solverEntity);
+		addScalarResult("reluctivity", fileData, data_length, solverEntity);
+		addScalarResult("vector_potential", fileData, data_length, solverEntity);
 
-	delete[] fileData;
-	fileData = nullptr;
+		addVectorResult("flux_density", fileData, data_length, solverEntity);
+		addVectorResult("magnetic_field", fileData, data_length, solverEntity);
+
+		delete[] fileData;
+		fileData = nullptr;
+	}
 
 	// Store the newly created items in the data base
 	m_modelComponent->storeNewEntities("added solver results");

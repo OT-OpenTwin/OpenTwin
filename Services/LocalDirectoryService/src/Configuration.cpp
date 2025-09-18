@@ -166,7 +166,7 @@ void Configuration::importFromEnvironment(void) {
 		exit(ot::AppExitCode::ConfigurationBroken);
 	}
 
-	this->setFromJsonObject(configurationDoc.GetConstObject());
+	this->setFromJsonObject(configurationDoc.getConstObject());
 
 	m_configurationImported = true;
 }

@@ -1,11 +1,17 @@
-//! @file JsonNullValue.cpp
+//! @file JSONString.hpp
 //! @author Alexander Kuester (alexk95)
 //! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin header
-#include "OTCore/JSONNullValue.h"
+#pragma once
 
-ot::JsonNullValue::JsonNullValue() :
-	JsonValue(rapidjson::kNullType)
-{}
+// OpenTwin header
+#include "OTCore/JSONString.h"
+
+inline ot::JsonString::JsonString(const char* _cstr, JsonAllocator& _allocator) :
+	JsonValue(_cstr, _allocator) {
+}
+
+inline ot::JsonString::JsonString(const std::string& _str, JsonAllocator& _allocator) :
+	JsonValue(_str.c_str(), _allocator) {
+}

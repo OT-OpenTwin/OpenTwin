@@ -626,7 +626,7 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 		return;
 	}
 	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.GetConstObject());
+	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
 	if (ownerInfo != m_owner) {
@@ -668,7 +668,7 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 		return;
 	}
 	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.GetConstObject());
+	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
 	if (ownerInfo != m_owner) {
@@ -712,7 +712,7 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 		return;
 	}
 	BasicServiceInformation ownerInfo;
-	ownerInfo.setFromJsonObject(doc.GetConstObject());
+	ownerInfo.setFromJsonObject(doc.getConstObject());
 
 	// Check owner equals
 	if (ownerInfo != m_owner) {

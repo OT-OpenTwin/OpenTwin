@@ -288,7 +288,9 @@ std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly)
 	{
 		if (!visibleOnly || prop->getVisible())
 		{
-			prop->addToJsonDocument(jsonDoc, root);
+			ot::JsonObject propObj;
+			prop->addToJsonObject(propObj, jsonDoc.GetAllocator(), root);
+			jsonDoc.AddMember(ot::JsonString(prop->getName(), jsonDoc.GetAllocator()), propObj, jsonDoc.GetAllocator());
 		}
 	}
 

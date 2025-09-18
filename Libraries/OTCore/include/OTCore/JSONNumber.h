@@ -1,4 +1,4 @@
-//! @file JsonNumber.h
+//! @file JSONNumber.h
 //! @author Alexander Kuester (alexk95)
 //! @date June 2025
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -8,24 +8,27 @@
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT JsonNumber : public JsonValue {
+	class JsonNumber : public JsonValue {
 		OT_DECL_NOCOPY(JsonNumber)
 		OT_DECL_DEFMOVE(JsonNumber)
 		OT_DECL_NODEFAULT(JsonNumber)
 	public:
-		JsonNumber(int _value);
-		JsonNumber(long _value);
-		JsonNumber(long long _value);
-		JsonNumber(unsigned long _value);
-		JsonNumber(unsigned long long _value);
-		JsonNumber(float _value);
-		JsonNumber(double _value);
+		explicit JsonNumber(int32_t _value) noexcept : JsonValue(_value) {};
 
-		virtual ~JsonNumber() {};
+		explicit JsonNumber(uint32_t _value) noexcept : JsonValue(_value) {};
+
+		explicit JsonNumber(int64_t _value) noexcept : JsonValue(_value) {};
+
+		explicit JsonNumber(uint64_t _value) noexcept : JsonValue(_value) {};
+
+		explicit JsonNumber(float _value) noexcept : JsonValue(_value) {};
+
+		explicit JsonNumber(double _value) noexcept : JsonValue(_value) {};
+
+		~JsonNumber() {};
 	};
 
 }

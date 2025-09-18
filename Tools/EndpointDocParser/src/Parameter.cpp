@@ -24,11 +24,18 @@ std::string Parameter::getDataTypeString() const {
     }
 }
 
+void Parameter::printDescription() const {
+    for (const std::string& line : m_description) {
+        std::cout << line << "\n";
+    }
+}
+
 void Parameter::printParameter() const {
     std::cout << "Printing Parameter: \n";
     std::cout << "Parameter name: " << m_name << "\n";
     std::cout << "Parameter macro: " << m_macro << "\n";
     std::cout << "Parameter data type: " << getDataTypeString() << "\n";
-    std::cout << "Parameter description: " << m_description << "\n";
+    std::cout << "Parameter description: \n";
+    printDescription();
 }
 

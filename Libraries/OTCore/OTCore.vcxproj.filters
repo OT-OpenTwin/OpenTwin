@@ -133,25 +133,10 @@
     <ClCompile Include="src\EntityName.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\JsonDocument.cpp">
-      <Filter>src\JSON</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JsonArray.cpp">
-      <Filter>src\JSON</Filter>
-    </ClCompile>
     <ClCompile Include="src\JSONHelper.cpp">
       <Filter>src\JSON</Filter>
     </ClCompile>
-    <ClCompile Include="src\JSONObject.cpp">
-      <Filter>src\JSON</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JsonString.cpp">
-      <Filter>src\JSON</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JsonNumber.cpp">
-      <Filter>src\JSON</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JsonNullValue.cpp">
+    <ClCompile Include="src\JsonObject.cpp">
       <Filter>src\JSON</Filter>
     </ClCompile>
   </ItemGroup>
@@ -415,6 +400,15 @@
       <Filter>include\JSON</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\JSONHelper.h">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONArray.hpp">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONDocument.hpp">
+      <Filter>include\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\JSONString.hpp">
       <Filter>include\JSON</Filter>
     </ClInclude>
   </ItemGroup>
