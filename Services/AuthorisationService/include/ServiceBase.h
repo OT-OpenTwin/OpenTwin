@@ -78,18 +78,42 @@ private:
 	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+	//api This is the detailed description of OT_ACTION_AUTH_SUCCESS.
+	//api This is the second line of the detailed description of OT_ACTION_AUTH_SUCCESS. 
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
+	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @note This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the second line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @warning This warning follows the note block.
+	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	
 	//api @security TLS
 	//api @action OT_ACTION_LOGIN
 	//api @brief Processes the login of a user.
+	//api This is the detailed description.
+	//api This is the second line of the detailed description.
 	//api @param OT_PARAM_AUTH_USERNAME String User name
+	//api This is the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api This is the second line of the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api @note This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api This is the second line in the note block of OT_PARAM_AUTH_USERNAME.
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
 	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
 	//api @rparam OT_PARAM_AUTH_PASSWORD String Unencrypted password (if successful)
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
+	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @note This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the second line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @warning This warning follows the note block.
+	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);
