@@ -258,7 +258,7 @@ TEST(VersionGraphVersionCfgTest, SerializationDeserialization) {
 	EXPECT_TRUE(importDoc.IsObject());
 
 	ot::VersionGraphVersionCfg importVersion;
-	ot::ConstJsonObject obj = importDoc.GetConstObject();
+	ot::ConstJsonObject obj = importDoc.getConstObject();
 	EXPECT_NO_THROW(importVersion.setFromJsonObject(obj));
 
 	EXPECT_TRUE(exportVersion.getName() == importVersion.getName());

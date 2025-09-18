@@ -1579,7 +1579,7 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 	if (!restoredSettings.empty()) {
 		ot::JsonDocument doc;
 		doc.fromJson(restoredSettings);
-		config.setFromJsonObject(doc.GetConstObject());
+		config.setFromJsonObject(doc.getConstObject());
 	}
 
 	return config;

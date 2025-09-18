@@ -2747,7 +2747,7 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 	ot::VisualisationTypes visualisationTypes;
-	visualisationTypes.setFromJsonObject(_document.GetConstObject());
+	visualisationTypes.setFromJsonObject(_document.getConstObject());
 	AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable, visualisationTypes);
 	
 	return "";
@@ -2761,7 +2761,7 @@ std::string ExternalServicesComponent::handleAddSceneNode(ot::JsonDocument& _doc
 	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 	ot::VisualisationTypes visualisationTypes;
-	visualisationTypes.setFromJsonObject(_document.GetConstObject());
+	visualisationTypes.setFromJsonObject(_document.getConstObject());
 	ViewerAPI::addVisualizationNode(visModelID, treeName, modelEntityID, treeIcons, editable,visualisationTypes);
 
 	return "";
@@ -3332,7 +3332,7 @@ std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(o
 
 std::string ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::GraphicsPickerCollectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -3344,7 +3344,7 @@ std::string ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument
 
 std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -3376,7 +3376,7 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 
 std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -3406,7 +3406,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 
 std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::UIDList itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
 
@@ -3440,7 +3440,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 
 std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -3464,7 +3464,7 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 
 std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -3497,7 +3497,7 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _document) {
 	// Get infos from message document
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
@@ -3699,7 +3699,7 @@ std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _docu
 
 std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
@@ -3782,7 +3782,7 @@ std::string ExternalServicesComponent::handleCloseTextEditor(ot::JsonDocument& _
 
 std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	AppBase::instance()->closeAllTextEditors(info);
 
@@ -3793,7 +3793,7 @@ std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocumen
 
 std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	if (_document.HasMember(OT_ACTION_PARAM_VIEW_SetActiveView)) {
@@ -4175,7 +4175,7 @@ std::string ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _d
 
 std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
@@ -4200,7 +4200,7 @@ std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument&
 
 std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
+	info.setFromJsonObject(_document.getConstObject());
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 

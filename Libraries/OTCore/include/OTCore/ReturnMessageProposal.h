@@ -174,7 +174,7 @@ namespace ot {
 
 		static const ConstJsonObject& getEmptyObject(void) {
 			static JsonDocument g_doc;
-			return g_doc.GetConstObject();
+			return g_doc.getConstObject();
 		}
 	};
 

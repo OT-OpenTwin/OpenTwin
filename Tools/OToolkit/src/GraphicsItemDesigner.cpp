@@ -192,7 +192,7 @@ void GraphicsItemDesigner::slotImportRequested(void) {
 	}
 
 	// Create config
-	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.GetConstObject());
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.getConstObject());
 	if (!newConfig) {
 		return;
 	}
@@ -281,7 +281,7 @@ void GraphicsItemDesigner::slotUpdateConfigRequested(void) {
 	}
 
 	// Create config
-	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.GetConstObject());
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.getConstObject());
 	if (!newConfig) {
 		return;
 	}

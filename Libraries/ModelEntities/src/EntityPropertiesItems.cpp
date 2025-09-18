@@ -947,9 +947,9 @@ void EntityPropertiesEntityList::addToJsonObject(ot::JsonObject& _jsonObject, ot
 	}
 
 	_jsonObject.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), _allocator), _allocator);
-	_jsonObject.AddMember("ContainerID", this->getEntityContainerID(), _allocator);
+	_jsonObject.AddMember("ContainerID", static_cast<int64_t>(this->getEntityContainerID()), _allocator);
 	_jsonObject.AddMember("ValueName", ot::JsonString(this->getValueName(), _allocator), _allocator);
-	_jsonObject.AddMember("ValueID", this->getValueID(), _allocator);
+	_jsonObject.AddMember("ValueID", static_cast<int64_t>(this->getValueID()), _allocator);
 
 	if (_root) {
 		_jsonObject.AddMember("Options", ot::JsonArray(opt, _allocator), _allocator);

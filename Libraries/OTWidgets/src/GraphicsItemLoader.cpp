@@ -78,7 +78,7 @@ ot::GraphicsItemCfg* ot::GraphicsItemLoader::createConfiguration(const QString& 
 		return newConfig;
 	}
 
-	newConfig = GraphicsItemCfgFactory::create(configDoc.GetConstObject());
+	newConfig = GraphicsItemCfgFactory::create(configDoc.getConstObject());
 
 	if (newConfig) {
 		m_configurations.insert_or_assign(_subPath, newConfig);

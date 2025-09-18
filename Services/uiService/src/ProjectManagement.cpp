@@ -349,7 +349,7 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		ProjectInformation newInfo(projectDoc.GetConstObject());
+		ProjectInformation newInfo(projectDoc.getConstObject());
 		_projectsFound.push_back(newInfo);
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
@@ -457,7 +457,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		ProjectInformation newInfo(projectDoc.GetConstObject());
+		ProjectInformation newInfo(projectDoc.getConstObject());
 		validProjects.push_back(newInfo.getProjectName());
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}

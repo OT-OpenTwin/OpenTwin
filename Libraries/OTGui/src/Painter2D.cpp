@@ -20,5 +20,5 @@ ot::Painter2D* ot::Painter2D::createCopy(void) const {
 	ot::JsonDocument doc;
 	this->addToJsonObject(doc, doc.GetAllocator());
 
-	return Painter2DFactory::create(doc.GetConstObject());
+	return Painter2DFactory::create(doc.getConstObject());
 }

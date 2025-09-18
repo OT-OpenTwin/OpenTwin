@@ -5,11 +5,6 @@
 
 #pragma once
 
-// OpenTwin header
-#include "OTCore/JSONTypes.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
-
 // rapidjson header
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>

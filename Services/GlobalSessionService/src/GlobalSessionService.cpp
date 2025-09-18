@@ -498,7 +498,7 @@ std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _
 std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument& _doc) {
 	LocalSessionService nService;
 	// Gather information from document
-	nService.setFromJsonObject(_doc.GetConstObject());
+	nService.setFromJsonObject(_doc.getConstObject());
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -811,7 +811,7 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 				ot::JsonDocument descriptionDoc;
 				if (descriptionDoc.fromJson(description)) {
 					if (descriptionDoc.IsObject()) {
-						descriptionBuilder.setFromJsonObject(descriptionDoc.GetConstObject());
+						descriptionBuilder.setFromJsonObject(descriptionDoc.getConstObject());
 						descriptionOk = true;
 					}
 				}

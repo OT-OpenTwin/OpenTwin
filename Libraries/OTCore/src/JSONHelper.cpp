@@ -68,7 +68,7 @@ namespace ot {
 			}
 
 			static ConstJsonObject getObject(void) {
-				return JSONManager::instance().m_obj.GetConstObject();
+				return JSONManager::instance().m_obj.getConstObject();
 			}
 
 			static ConstJsonArray getArray(void) {

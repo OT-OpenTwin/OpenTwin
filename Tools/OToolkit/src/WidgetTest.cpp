@@ -271,7 +271,7 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 
 		ot::JsonDocument newDoc;
 		newDoc.fromJson(jsonString);
-		newCfg.setFromJsonObject(newDoc.GetConstObject());
+		newCfg.setFromJsonObject(newDoc.getConstObject());
 	}
 
 	{

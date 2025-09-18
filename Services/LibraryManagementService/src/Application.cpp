@@ -141,7 +141,7 @@ std::string Application::getModelMetaData(const std::string& _collectionName, co
 	ot::ModelLibraryDialogCfg dialogCfg;
 
 	if (modelInfosDoc.IsObject()) {
-		ot::ConstJsonObject obj = modelInfosDoc.GetConstObject();
+		ot::ConstJsonObject obj = modelInfosDoc.getConstObject();
 		ot::ConstJsonArray docs = obj["Documents"].GetArray();
 
 		for (const ot::JsonValue& val : docs) {

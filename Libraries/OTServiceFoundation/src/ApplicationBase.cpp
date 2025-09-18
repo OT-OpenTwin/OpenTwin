@@ -467,7 +467,7 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 		importedSettings.fromJson(settingsJSON);
 
 		PropertyGridCfg newConfig;
-		newConfig.setFromJsonObject(importedSettings.GetConstObject());
+		newConfig.setFromJsonObject(importedSettings.getConstObject());
 
 		return newConfig;
 	}

@@ -73,7 +73,7 @@ std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 	models.fromJson(rMsg.getWhat());
 
 	if (models.IsObject()) {
-		ot::ConstJsonObject obj = models.GetConstObject();
+		ot::ConstJsonObject obj = models.getConstObject();
 		ot::ConstJsonArray docs = obj["Documents"].GetArray();
 
 		for (const ot::JsonValue& val : docs) {

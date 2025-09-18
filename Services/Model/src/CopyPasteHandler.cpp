@@ -118,7 +118,7 @@ std::string CopyPasteHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 					
 			if (entity != nullptr)
 			{
-				bool serialisedSuccessfully = entity->deserialiseFromJSON(document.GetConstObject(),info, entityMap);
+				bool serialisedSuccessfully = entity->deserialiseFromJSON(document.getConstObject(),info, entityMap);
 				if (serialisedSuccessfully)
 				{
 					//If successfull, a pointer of the entity is stored in the entitymap during deserialisation.

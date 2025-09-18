@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <list>
@@ -19,7 +18,7 @@ namespace ot {
 
 	//! @class JsonArray
 	//! @brief JSON Array value
-	class OT_CORE_API_EXPORT JsonArray : public JsonValue {
+	class JsonArray : public JsonValue {
 		OT_DECL_NOCOPY(JsonArray)
 		OT_DECL_DEFMOVE(JsonArray)
 	public:
@@ -73,7 +72,9 @@ namespace ot {
 		//! @brief Create string array
 		explicit JsonArray(const std::vector<std::string>& _vec, JsonAllocator& _allocator);
 
-		virtual ~JsonArray() {};
+		~JsonArray() {};
 	};
 
 }
+
+#include "OTCore/JSONArray.hpp"
