@@ -160,7 +160,10 @@ void ExternalServicesComponent::shutdown(void) {
 	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), commandDoc.GetAllocator());
 	commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, commandDoc.GetAllocator()), commandDoc.GetAllocator());
 	std::string response;
-	sendHttpRequest(EXECUTE, m_sessionServiceURL, commandDoc, response);
+	
+	if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, commandDoc.toJson(), response)) {
+
+	}
 
 	//NOTE, at this point we have to decide how to handle the shutdown of the uiService
 }
@@ -276,7 +279,7 @@ bool ExternalServicesComponent::deleteModel(ModelUIDtype modelID)
 		std::string response;
 		try {
 			for (auto reciever : m_modelViewNotifier) {
-				sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+				sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 				// Check if response is an error or warning
 				OT_ACTION_IF_RESPONSE_ERROR(response) {
 					assert(0); // ERROR
@@ -309,7 +312,7 @@ void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, Mode
 
 		std::string response;
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 			// Check if response is an error or warning
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -336,7 +339,7 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_EAS("Error response: " + response);
@@ -365,7 +368,7 @@ bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID) {
 	std::string response;
 
 	for (auto reciever : m_modelViewNotifier) {
-		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response: " + response);
@@ -417,7 +420,7 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 					doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
 				}
 
-				if (!sendHttpRequest(EXECUTE, receiver->getServiceURL(), doc, response)) {
+				if (!sendRelayedRequest(EXECUTE, receiver->getServiceURL(), doc.toJson(), response)) {
 					assert(0); // Failed to send HTTP request
 				}
 				// Check if response is an error or warning
@@ -451,7 +454,7 @@ void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype m
 
 	std::string response;
 	for (auto reciever : m_modelViewNotifier) {
-		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response: " + response);
@@ -470,7 +473,7 @@ void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::str
 
 	std::string response;
 	for (auto reciever : m_modelViewNotifier) {
-		sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response: " + response);
@@ -553,7 +556,7 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_E(response);
@@ -596,7 +599,7 @@ void ExternalServicesComponent::propertyGridValueDeleteRequested(const ot::Prope
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_E(response);
@@ -629,7 +632,7 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 		if (receiver != nullptr)
 		{
 			std::string response;
-			sendHttpRequest(EXECUTE, receiver->getServiceURL(), inDoc, response);
+			sendRelayedRequest(EXECUTE, receiver->getServiceURL(), inDoc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_EAS("Error response: " + response);
@@ -654,7 +657,7 @@ void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_EAS("Error response: " + response);
@@ -686,10 +689,14 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 	AppBase * app{ AppBase::instance() };
 
 	std::string response;
-	sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), doc.toJson(), response);
+	if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
+		return false;
+	}
 
 	// todo: add json return value containing true/false and username instead of empty string for more clarity
-	if (response.empty()) return false;
+	if (response.empty()) {
+		return false;
+	}
 
 	projectUser = response;
 	return true;
@@ -699,71 +706,40 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 
 // Messaging
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response) {
+bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, ot::OwnerService _service, const ot::JsonDocument& _doc, std::string& _response) {
 	auto it = m_serviceIdMap.find(_service.getId());
 	if (it == m_serviceIdMap.end()) {
 		OT_LOG_E("Failed to find service with id \"" + std::to_string(_service.getId()) + "\"");
 		return false;
 	}
-	return sendHttpRequest(operation, it->second->getServiceURL(), doc, response);
+	return sendRelayedRequest(_operation, it->second->getServiceURL(), _doc, _response);
 }
 
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response) {
+bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response) {
 	auto service = this->getService(_serviceInformation);
 	if (service) {
-		return this->sendHttpRequest(operation, service->getServiceURL(), _doc, _response);
+		return this->sendRelayedRequest(_operation, service->getServiceURL(), _doc, _response);
 	}
 	else {
 		return false;
 	}
 }
 
+bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const std::string& _url, const ot::JsonDocument& _doc, std::string& _response) {
+	return this->sendRelayedRequest(_operation, _url, _doc.toJson(), _response);
+}
+
 void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
 {
-	sendHttpRequest(EXECUTE, m_modelServiceURL, _message, _response);
-}
-
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response) {
-	return sendHttpRequest(operation, url, doc.toJson(), response); 
-}
-
-bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, const std::string &message, std::string &response) {
-	bool success = false;
-	
-	try {
-		std::string globalServiceURL = AppBase::instance()->getServiceURL();
-
-		if (m_websocket != nullptr) {
-			// If a websocket is set send the request as a relayed request trough the relay service
-			success = this->sendRelayedRequest(operation, url, message, response);
-		}
-		else {
-			// If no websocket is set send the request directly via a curl request
-			switch (operation) {
-			case EXECUTE:
-				success = ot::msg::send(globalServiceURL, url, ot::EXECUTE_ONE_WAY_TLS, message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
-				break;
-
-			case QUEUE:
-				success = ot::msg::send(globalServiceURL, url, ot::QUEUE, message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
-				break;
-
-			default:
-				OT_LOG_EA("Unknown request type");
-				break;
-			}
-		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-	}
-
-	return success;
+	sendRelayedRequest(EXECUTE, m_modelServiceURL, _message, _response);
 }
 
 bool ExternalServicesComponent::sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response)
 {
-	OTAssertNullptr(m_websocket);
+	if (!m_websocket) {
+		OT_LOG_E("No websocket connection");
+		return false;
+	}
 
 	ot::RelayedMessageHandler::MessageType type = ot::RelayedMessageHandler::Execute;
 	switch (operation)
@@ -791,7 +767,7 @@ bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandH
 	doc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(_sender->keySequence().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	std::string response;
 
-	if (!sendHttpRequest(EXECUTE, _sender->creator()->getServiceURL(), doc, response)) {
+	if (!sendRelayedRequest(EXECUTE, _sender->creator()->getServiceURL(), doc, response)) {
 		assert(0); // Failed to send HTTP request
 	}
 	// Check if response is an error or warning
@@ -823,7 +799,7 @@ void ExternalServicesComponent::sendRubberbandResultsToService(ot::serviceID_t _
 		doc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_Transform, ot::JsonArray(transform, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
-		sendHttpRequest(EXECUTE, receiver->second->getServiceURL(), doc, response);
+		sendRelayedRequest(EXECUTE, receiver->second->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response: " + response);
@@ -849,7 +825,7 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 
 		for (auto reciever : m_modelViewNotifier)
 		{
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), doc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				OT_LOG_EAS("Error response: " + response);
@@ -878,7 +854,7 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
-		this->sendHttpRequest(EXECUTE, model->getServiceURL(), doc, response);
+		this->sendRelayedRequest(EXECUTE, model->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response: " + response);
@@ -904,7 +880,7 @@ void ExternalServicesComponent::versionDeselected(void) {
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_VersionDeselected, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
-		this->sendHttpRequest(EXECUTE, model->getServiceURL(), doc, response);
+		this->sendRelayedRequest(EXECUTE, model->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			assert(0); // ERROR
@@ -933,7 +909,7 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
-		this->sendHttpRequest(EXECUTE, model->getServiceURL(), doc, response);
+		this->sendRelayedRequest(EXECUTE, model->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			assert(0); // ERROR
@@ -966,7 +942,7 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	gssDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getCurrentLoginData().getSessionUser(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 	gssDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 	
-	if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
+	if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), response)) {
 		assert(0); // Failed to send
 		OT_LOG_E("Failed to send \"" OT_ACTION_CMD_GetListOfProjectTemplates "\" request to the global session service");
 		app->showErrorPrompt("Failed to send request to the global session service", "", "Error");
@@ -1029,7 +1005,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-		if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
+		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), response)) {
 			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
 			app->showErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
@@ -1080,7 +1056,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		response.clear();
-		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {
+		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), response)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
@@ -1157,7 +1133,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		do
 		{
-			if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
+			if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
 				throw std::exception("Failed to send http request to Session Service");
 			}
 			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
@@ -1180,7 +1156,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
-		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), response)) {
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), response)) {
 			throw std::exception("Failed to send http request");
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -1285,7 +1261,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
 
 		std::string response;
-		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
 			OT_LOG_EA("Failed to send shutdown session request to LSS");
 		}
 		// Check if response is an error or warning
@@ -1405,7 +1381,7 @@ void ExternalServicesComponent::saveProject() {
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
-			sendHttpRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
+			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				assert(0); // ERROR
@@ -1502,7 +1478,7 @@ void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL,
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	sendHttpRequest(EXECUTE, URL, doc, response);
+	sendRelayedRequest(EXECUTE, URL, doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
 	}
@@ -1567,29 +1543,6 @@ void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	AppBase::instance()->showErrorPrompt("The Local Session Service has died unexpectedly. The application will be closed now.", "", "Error");
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
-}
-
-void ExternalServicesComponent::sendExecuteRequest(const char* url, const char* message)
-{
-	std::string responseString;
-	sendHttpRequest(EXECUTE, url, message, responseString);
-
-	delete[] url; url = nullptr;
-	delete[] message; message = nullptr;
-}
-
-char* ExternalServicesComponent::sendExecuteRequestWithAnswer(const char* url, const char* message)
-{
-	std::string responseString;
-	sendHttpRequest(EXECUTE, url, message, responseString);
-
-	delete[] url; url = nullptr;
-	delete[] message; message = nullptr;
-
-	char* response = new char[responseString.length() + 1];
-	strcpy(response, responseString.c_str());
-
-	return response;
 }
 
 void ExternalServicesComponent::setProgressState(bool visible, const char* message, bool continuous)
@@ -2102,7 +2055,7 @@ std::string ExternalServicesComponent::handlePromptInformation(ot::JsonDocument&
 		std::string senderUrl = this->getServiceFromNameType(sender, sender)->getServiceURL();
 
 		std::string response;
-		if (!sendHttpRequest(QUEUE, senderUrl, docOut, response)) {
+		if (!sendRelayedRequest(QUEUE, senderUrl, docOut, response)) {
 			throw std::exception("Failed to send http request");
 		}
 	}
@@ -2276,7 +2229,7 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 
 		std::string response;
 
-		sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+		sendRelayedRequest(EXECUTE, senderURL, inDoc, response);
 
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -3111,7 +3064,7 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
 
 	std::string response;
-	if (!sendHttpRequest(QUEUE, service->second->getServiceURL(), docOut, response)) {
+	if (!sendRelayedRequest(QUEUE, service->second->getServiceURL(), docOut, response)) {
 		throw std::exception("Failed to send http request");
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -4198,7 +4151,7 @@ std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument&
 		dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
 
 		std::string response;
-		sendHttpRequest(EXECUTE, info, responseDoc, response);
+		sendRelayedRequest(EXECUTE, info, responseDoc, response);
 	}
 
 	return "";
@@ -4221,7 +4174,7 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::toString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	std::string response;
-	sendHttpRequest(EXECUTE, info, responseDoc, response);
+	sendRelayedRequest(EXECUTE, info, responseDoc, response);
 
 	return "";
 }
@@ -4265,7 +4218,7 @@ std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument
 
 	// Send response
 	std::string response;
-	if (!ot::msg::send("", lmsUrl, ot::EXECUTE, responseDoc.toJson(), response)) {
+	if (!ot::msg::send("", lmsUrl, ot::EXECUTE_ONE_WAY_TLS, responseDoc.toJson(), response)) {
 		OT_LOG_E("Failed to send message to LMS at \"" + lmsUrl + "\"");
 	}
 
@@ -4282,7 +4235,7 @@ void ExternalServicesComponent::determineViews(const std::string& modelServiceUR
 	sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PARAM_MODEL_ViewsForProjectType, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
 
 	std::string response;
-	sendHttpRequest(EXECUTE, modelServiceURL, sendingDoc, response);
+	sendRelayedRequest(EXECUTE, modelServiceURL, sendingDoc, response);
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
@@ -4325,7 +4278,7 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 		doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
 	}
 	std::string response;
-	sendHttpRequest(EXECUTE, _serviceUrl, doc, response);
+	sendRelayedRequest(EXECUTE, _serviceUrl, doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		OT_LOG_EAS(response);
 	}
@@ -4511,7 +4464,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 	}
 
 	std::string response;
-	this->sendHttpRequest(EXECUTE, _receiverUrl, _message, response);
+	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
 // ###################################################################################################

@@ -145,11 +145,10 @@ public:
 	// Messaging
 	void sendToModelService(const std::string& _message, std::string _response);
 
-	bool sendHttpRequest(RequestType operation, const std::string& url, ot::JsonDocument& doc, std::string& response);
-	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response);
-	bool sendHttpRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response);
-	bool sendHttpRequest(RequestType operation, const std::string& url, const std::string& message, std::string& response);
-	bool sendRelayedRequest(RequestType operation, const std::string& url, const std::string& json, std::string& response);
+	bool sendRelayedRequest(RequestType _operation, ot::OwnerService _service, const ot::JsonDocument& _doc, std::string& _response);
+	bool sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response);
+	bool sendRelayedRequest(RequestType _operation, const std::string& _url, const ot::JsonDocument& _doc, std::string& _response);
+	bool sendRelayedRequest(RequestType _operation, const std::string& _url, const std::string& _json, std::string& _response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler* _sender);
 	void sendRubberbandResultsToService(ot::serviceID_t _serviceId, const std::string& _note, const std::string& _pointJson, const std::vector<double>& transform);
 	void requestUpdateVTKEntity(unsigned long long modelEntityID);
@@ -350,8 +349,6 @@ public:
 public Q_SLOTS:
 	void queueAction(const std::string& _json, const std::string& _senderIP);
 	void shutdownAfterSessionServiceDisconnected(void);
-	void sendExecuteRequest(const char* url, const char* message);
-	char* sendExecuteRequestWithAnswer(const char* url, const char* message);
 	void setProgressState(bool visible, const char* message, bool continuous);
 	void setProgressValue(int percentage);
 	void lockGui(void);
