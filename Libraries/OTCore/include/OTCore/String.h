@@ -172,7 +172,7 @@ namespace ot {
 		static std::string fromHex(const std::string& _hexString);
 
 		//! @brief Encodes a UTF-8 string into Base64Url (URL-safe, no padding).
-		//! The output uses A–Z, a–z, 0–9, '-' and '_'.
+		//! The output uses A-Z, a-z, 0-9, '-' and '_'.
 		//! Unlike standard Base64, '+' is replaced by '-' and '/' by '_', and padding '=' is omitted.
 		//! This guarantees a safe identifier for interprocess communication names.
 		//! @param _string Input string (UTF-8).
