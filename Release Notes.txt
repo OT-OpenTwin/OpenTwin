@@ -1,0 +1,5 @@
+Collection of changes for the next release
+
+Features/Changes
+
+Bugs
