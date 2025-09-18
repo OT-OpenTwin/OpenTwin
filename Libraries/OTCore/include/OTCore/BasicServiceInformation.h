@@ -21,8 +21,8 @@ namespace ot {
 	class OT_CORE_API_EXPORT BasicServiceInformation : public ot::Serializable {
 	public:
 		BasicServiceInformation();
-		BasicServiceInformation(const std::string& _serviceNameAndType);
-		BasicServiceInformation(const std::string& _serviceName, const std::string& _serviceType);
+		explicit BasicServiceInformation(const std::string& _serviceNameAndType);
+		explicit BasicServiceInformation(const std::string& _serviceName, const std::string& _serviceType);
 		BasicServiceInformation(const BasicServiceInformation& _other);
 		virtual ~BasicServiceInformation();
 
