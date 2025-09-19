@@ -144,6 +144,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 	bool inApiBlock = false;
 	
 	bool inBriefDescriptionBlock = false;
+	bool inResponseDescriptionBlock = false;
 	bool inParameterBlock = false;
 	bool inReturnParameterBlock = true;
 	bool inNoteBlock = false;
@@ -192,6 +193,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					}
 
 					inBriefDescriptionBlock = false;
+					inResponseDescriptionBlock = false;
 					inParameterBlock = false;
 					inReturnParameterBlock = false;
 					inNoteBlock = false;
@@ -211,6 +213,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					std::cout << "Name set in endpoint: " << endpoint.getName() << "\n";
 				
 					inBriefDescriptionBlock = false;
+					inResponseDescriptionBlock = false;
 					inParameterBlock = false;
 					inReturnParameterBlock = false;
 					inNoteBlock = false;
@@ -223,6 +226,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					std::cout << "Brief description set in endpoint: " << endpoint.getBriefDescription() << "\n";
 					
 					inBriefDescriptionBlock = true;
+					inResponseDescriptionBlock = false;
 					inParameterBlock = false;
 					inReturnParameterBlock = false;
 					inNoteBlock = false;
@@ -238,6 +242,7 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					parseParameter(parameter, param, endpoint, parameterType);
 
 					inBriefDescriptionBlock = false;
+					inResponseDescriptionBlock = false;
 					inParameterBlock = true;
 					inReturnParameterBlock = false;
 					inNoteBlock = false;
@@ -246,10 +251,12 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 				else if (startsWith(apiContent, "@return")) {
 					std::string response = apiContent.substr(8);
 //					std::cout << "[RETURN] -> " << response << "\n";
-					endpoint.setResponseDescription(response);
-					std::cout << "Response set in endpoint: " << endpoint.getResponseDescription() << "\n";
+					endpoint.addResponseDescription(response);
+					std::cout << "Response set in endpoint:\n";
+					endpoint.printResponseDescription();
 
 					inBriefDescriptionBlock = false;
+					inResponseDescriptionBlock = true;
 					inParameterBlock = false;
 					inReturnParameterBlock = false;
 					inNoteBlock = false;
@@ -265,39 +272,46 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					parseParameter(parameter, rparam, endpoint, parameterType);
 
 					inBriefDescriptionBlock = false;
+					inResponseDescriptionBlock = false;
 					inParameterBlock = false;
 					inReturnParameterBlock = true;
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (inBriefDescriptionBlock) {
+				else if (inBriefDescriptionBlock || inResponseDescriptionBlock) {
 					if (startsWith(apiContent, "@note")) {
 						std::cout << "Detected @note." << "\n";
 						inNoteBlock = true;
 						inWarningBlock = false;
 						
-						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed description set in endpoint: " << "\n";
-						endpoint.printDetailedDescription();
-						std::cout << "---\n";
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
 					}
 					else if (startsWith(apiContent, "@warning")) {
-						std::cout << "Detected @warning." << "\n";
-						inWarningBlock = true;
+						std::cout << "Detected @warning." << "\n";						
 						inNoteBlock = false;
+						inWarningBlock = true;
 
-						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed description set in endpoint: " << "\n";
-						endpoint.printDetailedDescription();
-						std::cout << "---\n";
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
 					}
 					else if (startsWith(apiContent, "@detail")) {
 						apiContent = apiContent.substr(8);
 
-						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed description set in endpoint: " << "\n";
-						endpoint.printDetailedDescription();
-						std::cout << "---\n";
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
 
 						inNoteBlock = false;
 						inWarningBlock = false;
@@ -305,27 +319,42 @@ void Application::parseFile(const std::string& _file, Service& _service) {
 					else if (inNoteBlock) {
 						apiContent = "@note " + apiContent;
 
-						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed description set in endpoint: " << "\n";
-						endpoint.printDetailedDescription();
-						std::cout << "---\n";
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
 					}
 					else if (inWarningBlock) {
 						apiContent = "@warning " + apiContent;
 
-						endpoint.addDetailedDescription(apiContent);
-						std::cout << "Detailed description set in endpoint: " << "\n";
-						endpoint.printDetailedDescription();
-						std::cout << "---\n";
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
 					}
 					else {
 //						std::cout << "Detailed Description: >>" << apiContent << "<<" << "\n";
 
-						endpoint.addDetailedDescription(apiContent);
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
+					}
+					if (inBriefDescriptionBlock) {
 						std::cout << "Detailed description set in endpoint: " << "\n";
 						endpoint.printDetailedDescription();
-						std::cout << "---\n";
 					}
+					else {
+						std::cout << "Response description set in endpoint: " << "\n";
+						endpoint.printResponseDescription();
+					}
+					std::cout << "---\n";
 				}
 				else if (inParameterBlock || inReturnParameterBlock) {
 					if (startsWith(apiContent, "@note")) {

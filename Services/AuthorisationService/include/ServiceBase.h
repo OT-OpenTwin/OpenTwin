@@ -89,6 +89,17 @@ private:
 	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @return This is the response desciption of OT_ACTION_LOGIN_ADMIN.
+	//api This is the second line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api
+	//api @note This is an important note of OT_ACTION_LOGIN_ADMIN.
+	//api This line belongs to the note block.
+	//api @detail This is the third line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api @warning This is a warning of OT_ACTION_LOGIN_ADMIN.
+	//api
+	//api This line belongs to the warning block.
+	//api @detail This is the fourth line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api This is the fifth line of the response description of OT_ACTION_LOGIN_ADMIN.
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	
 	//api @security TLS
@@ -114,6 +125,17 @@ private:
 	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @return This is the response desciption of OT_ACTION_LOGIN.
+	//api This is the second line of the response description of OT_ACTION_LOGIN.
+	//api
+	//api @note This is an important note of OT_ACTION_LOGIN.
+	//api This line belongs to the note block.
+	//api @detail This is the third line of the response description of OT_ACTION_LOGIN.
+	//api @warning This is a warning of OT_ACTION_LOGIN.
+	//api
+	//api This line belongs to the warning block.
+	//api @detail This is the fourth line of the response description of OT_ACTION_LOGIN.
+	//api This is the fifth line of the response description of OT_ACTION_LOGIN.
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);

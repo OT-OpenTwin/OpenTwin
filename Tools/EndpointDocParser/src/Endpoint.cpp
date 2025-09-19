@@ -22,13 +22,18 @@ std::string Endpoint::getMessageTypeString() const {
     }
 }
 
+void Endpoint::printResponseDescription() const {
+    for (const std::string& line : m_responseDescription) {
+        std::cout << line << "\n";
+    }
+}
+
 void Endpoint::printEndpoint() const {
     std::cout << "\nPrinting Endpoint: \n";
     std::cout << "================== \n";
     std::cout << "Endpoint name: " << m_name << "\n";
     std::cout << "Endpoint action: " << m_action << "\n";
     std::cout << "Brief description: " << m_briefDescription << "\n";
-//    std::cout << "Detailed description: " << m_detailedDescription << "\n";
     std::cout << "Detailed description: " << "\n";
     printDetailedDescription();
     std::cout << "Message type: " << getMessageTypeString() << "\n";
@@ -44,5 +49,8 @@ void Endpoint::printEndpoint() const {
     for (const Parameter& rparam : m_responseParameters) {
         rparam.printParameter();
     }
-    std::cout << "Response description: " << m_responseDescription << "\n\n";
+
+    std::cout << "Response description:\n";
+    printResponseDescription();
+    std::cout << "\n\n";
 }
