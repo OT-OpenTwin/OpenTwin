@@ -48,23 +48,26 @@ public:
 	//! The service start will be performed asynchronously.
 	//! @param _serviceInformation Information about the service to start.
 	//! @param _sessionID The ID of the session that requested the service start.
+	//! @param _lssUrl The URL of the LSS that requested the service to start.
 	//! @return Returns true if the service was successfully requested to start, false otherwise.
-	bool requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID);
+	bool requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl);
 
 	//! @brief Requests the GDS to start multiple services.
 	//! The service start will be performed asynchronously.
 	//! @param _serviceInformation List of services to start.
 	//! @param _sessionID The ID of the session that requested the service start.
+	//! @param _lssUrl The URL of the LSS that requested the services to start.
 	//! @return Returns true if the services were successfully requested to start, false otherwise.
-	bool requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID);
+	bool requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl);
 
 	//! @brief Requests the GDS to start a relay service.
 	//! The relay service start will be performed synchronously.
 	//! @param _sessionID The ID of the session that requested the relay service.
+	//! @param _lssUrl The URL of the LSS that requested the relay service to start.
 	//! @param _websocketURL Will be set to the websocket URL of the relay service on success.
 	//! @param _relayServiceURL Will be set to the URL of the relay service on success.
 	//! @return Returns true if the relay service was successfully started, false otherwise.
-	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL);
+	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, const std::string& _lssUrl, std::string& _relayServiceURL, std::string& _websocketURL);
 	
 	void notifySessionShuttingDown(const std::string& _sessionID);
 

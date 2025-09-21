@@ -73,10 +73,11 @@ bool GlobalDirectoryService::isConnected(void) {
 	return m_connectionStatus == Connected;
 }
 
-bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	std::string lssUrl = SessionService::instance().getUrl();
+bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl) {
+	if (!this->isConnected()) {
+		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Not connected to GDS");
+		return false;
+	}
 
 	// Create request
 	ot::JsonDocument requestDoc;
@@ -85,11 +86,11 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInformation.getServiceID(), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -98,16 +99,17 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	}
 }
 
-bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	std::string lssUrl = SessionService::instance().getUrl();
+bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl) {
+	if (!this->isConnected()) {
+		OT_LOG_E("Failed to start services in session \"" + _sessionID + "\". Reason: Not connected to GDS");
+		return false;
+	}
 
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewServices, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
 	for (const ServiceBase& service : _serviceInformation) {
@@ -121,7 +123,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
@@ -130,40 +132,31 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	}
 }
 
-bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, std::string& _relayServiceURL, std::string& _websocketURL) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	std::string lssUrl = SessionService::instance().getUrl();
-
+bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, const std::string& _lssUrl, std::string& _relayServiceURL, std::string& _websocketURL) {
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceID, requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	// Send request
-	std::string response;
-	if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	std::string responseStr;
+	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to start relay service. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
 		return false;
 	}
-	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos) {
-		OT_LOG_E("Failed to start relay service. Reason: Error response from GDS (URL = \"" + m_serviceURL + "\"): " + response);
-		return false;
-	}
-	if (response.find(OT_ACTION_RETURN_INDICATOR_Warning) != std::string::npos) {
-		OT_LOG_E("Failed to start relay service. Reason: Warning response from GDS (URL = \"" + m_serviceURL + "\"): " + response);
-		return false;
-	}
-	if (response == OT_ACTION_RETURN_VALUE_FAILED) {
-		OT_LOG_E("Failed to start relay service. Reason: GDS reported start failed (URL = \"" + m_serviceURL + "\")");
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+	if (response.getStatus() != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Failed to start relay service. Reason: " + response.getWhat());
 		return false;
 	}
 
 	// Check reponse
 	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
+	responseDoc.fromJson(response.getWhat());
 
 	_relayServiceURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_URL);
 	_websocketURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);

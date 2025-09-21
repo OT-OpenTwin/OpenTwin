@@ -57,7 +57,7 @@ ot::ApplicationBase::~ApplicationBase()
 	if (m_modelNotifier) { delete m_modelNotifier; }
 }
 
-std::string ot::ApplicationBase::deploymentPath(void) const {
+std::string ot::ApplicationBase::deploymentPath() const {
 	char * buffer = new char[100];
 	if (buffer == nullptr) {
 		return "";
@@ -300,7 +300,7 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 
 // Protected functions
 
-bool ot::ApplicationBase::EnsureDataBaseConnection(void)
+bool ot::ApplicationBase::EnsureDataBaseConnection()
 {
 	DataBase::GetDataBase()->setProjectName(m_collectionName);
 

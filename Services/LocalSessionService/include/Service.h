@@ -17,6 +17,8 @@
 #include <string>
 
 class Service : public ot::ServiceBase {
+	OT_DECL_DEFCOPY(Service)
+	OT_DECL_DEFMOVE(Service)
 public:
 	enum ServiceStateFlag {
 		NoState      = 0 << 0,
@@ -40,16 +42,16 @@ public:
 	void setWebsocketUrl(const std::string& _websocketUrl) { m_websocketUrl = _websocketUrl; };
 	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
 
-	void setIsDebug(bool _isDebug) { m_state.setFlag(Service::IsDebug, _isDebug); };
+	void setIsDebug(bool _isDebug = true) { m_state.setFlag(Service::IsDebug, _isDebug); };
 	bool isDebug() const { return m_state & Service::IsDebug; };
 
-	void setRequested(bool _requested) { m_state.setFlag(Service::Requested, _requested); };
+	void setRequested(bool _requested = true) { m_state.setFlag(Service::Requested, _requested); };
 	bool isRequested() const { return m_state & Service::Requested; };
 
-	void setAlive(bool _alive) { m_state.setFlag(Service::Alive, _alive); };
+	void setAlive(bool _alive = true) { m_state.setFlag(Service::Alive, _alive); };
 	bool isAlive() const { return m_state & Service::Alive; };
 
-	void setShuttingDown(bool _shuttingDown) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
+	void setShuttingDown(bool _shuttingDown = true) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
 	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };
 
 	//! @brief Will return the port numbers used by this service.
@@ -62,6 +64,7 @@ public:
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
 private:
+	std::string      m_connectedType;
 	std::string      m_websocketUrl; //! @brief Service websocket url (if available, otherwise empty).
 	ServiceState     m_state;        //! @brief Service state.
 };

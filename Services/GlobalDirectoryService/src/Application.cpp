@@ -200,7 +200,7 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 	for (rapidjson::SizeType i = 0; i < services.Size(); i++) {
 		if (!services[i].IsObject()) {
 			OT_LOG_W("JSON array entry is not an object");
-			return OT_ACTION_RETURN_INDICATOR_Error "JSON array entry is not an object";
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "JSON array entry is not an object");
 		}
 
 		auto service = services[i].GetObject();
@@ -247,13 +247,14 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	
 	LocalDirectoryService * lds = leastLoadedDirectoryService(info);
 	if (lds == nullptr) {
-		return OT_ACTION_RETURN_VALUE_FAILED;
+		OT_LOG_E("No LDS available to start relay service");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No LDS available to start relay service");
 	}
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	if (!lds->requestToRunRelayService(info, websocketUrl, relayServiceURL)) {
 		OT_LOG_E("Failed to start relay service");
-		return OT_ACTION_RETURN_VALUE_FAILED;
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to start relay service");
 	}
 	
 	OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
@@ -262,7 +263,7 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-	return responseDoc.toJson();
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
 std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {

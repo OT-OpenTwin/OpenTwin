@@ -18,6 +18,8 @@
 namespace std { class thread; }
 
 class GlobalSessionService : public ot::ServiceBase {
+	OT_DECL_NOCOPY(GlobalSessionService)
+	OT_DECL_NOMOVE(GlobalSessionService)
 public:
 	enum ConnectionStatus {
 		Connected,

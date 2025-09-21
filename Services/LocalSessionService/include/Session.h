@@ -34,7 +34,7 @@ public:
 	//! @brief Constructor.
 	//! @param _id The ID of the session.
 	//! @param _name The name of the session.
-	Session(const std::string& _id, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _type);
+	explicit Session(const std::string& _id, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _type);
 
 	Session(Session&& _other) noexcept;
 

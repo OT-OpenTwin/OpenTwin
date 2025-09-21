@@ -53,7 +53,7 @@ namespace ot {
 		// Pure virtual functions
 
 		//! @brief Will be called when the service was successfully started, the hppt and/or websocket connection is established and the service may start its work
-		virtual void run(void) = 0;
+		virtual void run() = 0;
 
 		//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
 		//! @param _action The action that should be processed
@@ -88,21 +88,21 @@ namespace ot {
 
 		//! @brief Will be called before the whole session starts to shut down (shut down can not be stopped)
 		//! At this point all services, that are listed as connected, are still reachable.
-		virtual void preShutdown(void) = 0;
+		virtual void preShutdown() = 0;
 
 		//! @brief Will be called when the application is shutting down (shut down can not be stopped)
 		//! At this point all services, that are listed as connected, might not be reachable anymore.
 		//! This function will be called after the preShutDown call
-		virtual void shuttingDown(void) = 0;
+		virtual void shuttingDown() = 0;
 
 		//! @brief Will return true if this application requires a relay service for a websocket connection
-		virtual bool startAsRelayService(void) const = 0;
+		virtual bool startAsRelayService() const = 0;
 
 		//! @brief Create settings that your application uses that are editable in the uiService.
 		//! The created class will be deleted after used for sending or synchronizing with the database.
 		//! The created settings will be requested upon Service startup to synchronize with the database,
 		//! aswell as when the uiService is connected
-		virtual PropertyGridCfg createSettings(void) const = 0;
+		virtual PropertyGridCfg createSettings() const = 0;
 
 		//! @brief This function will be called when the settings were synchronized with the database.
 		//! At this point the values from the dataset should be stored since the dataset will be deleted after this function call
@@ -118,7 +118,7 @@ namespace ot {
 
 		//! @brief Will return the path of the deployment folder
 		//! Returns an empty string in case of an error
-		virtual std::string deploymentPath(void) const;
+		virtual std::string deploymentPath() const;
 
 		virtual void modelSelectionChanged() {};
 		virtual void propertyChanged(ot::JsonDocument& _doc) {};
@@ -162,44 +162,44 @@ namespace ot {
 
 		// Getter
 
-		//void refreshSessionServiceList(void);
+		//void refreshSessionServiceList();
 
 		//! @brief Will return the URL of the database
-		std::string dataBaseURL(void) { return m_databaseURL; }
+		std::string dataBaseURL() { return m_databaseURL; }
 
 		//! @brief Will return the site ID this application is running on
-		std::string siteID(void) { return m_siteID; }
+		std::string siteID() { return m_siteID; }
 
 		//! @brief Will return the websocket URL, it is only set if a websocket was required on startup: startAsRelayService() == true
-		std::string webSocketURL(void) { return m_websocketURL; }
+		std::string webSocketURL() { return m_websocketURL; }
 
 		//! @brief Will return the session service URL
-		std::string sessionServiceURL(void) { return m_sessionService->getServiceURL(); }
+		std::string sessionServiceURL() { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
 
 		//! @brief Will return the local directory service URL
-		std::string directoryServiceURL(void) { return m_directoryService->getServiceURL(); }
+		std::string directoryServiceURL() { return (m_directoryService ? m_directoryService->getServiceURL() : ""); };
 
 		//! @brief Will return the session ID this service is running in
-		std::string sessionID(void) { return m_sessionID; }
+		std::string sessionID() { return m_sessionID; }
 		
 		//! @brief The current project type
-		const std::string& projectType(void) const { return m_projectType; };
+		const std::string& projectType() const { return m_projectType; };
 
 		const std::string& getCollectionName() const { return m_collectionName; }
 
 		//! @brief Will return true if a UI is running in the session
-		bool isUiConnected(void) const { return m_uiComponent != nullptr; }
+		bool isUiConnected() const { return m_uiComponent != nullptr; }
 
 		//! @brief Will return true if a model service is running in the session
-		bool isModelConnected(void) const { return m_modelComponent != nullptr; }
+		bool isModelConnected() const { return m_modelComponent != nullptr; }
 
 		//! @brief Will return the model component used in this application
 		//! The model component only exists when a model service is running in the session
-		components::ModelComponent * modelComponent(void) const { return m_modelComponent; }
+		components::ModelComponent * modelComponent() const { return m_modelComponent; }
 
 		//! @brief Will return the ui component used in this application
 		//! The UI component only exists when a ui service is running in the session
-		components::UiComponent * uiComponent(void) const { return m_uiComponent; }
+		components::UiComponent * uiComponent() const { return m_uiComponent; }
 
 		//! @brief Will return the service with the specified ID
 		//! @param _id The ID of the requested service
@@ -210,13 +210,13 @@ namespace ot {
 		ServiceBase * getConnectedServiceByName(const std::string & _name);
 
 		//! @brief Will return the uiNotifier attached to this application
-		AbstractUiNotifier * uiNotifier(void) { return m_uiNotifier; }
+		AbstractUiNotifier * uiNotifier() { return m_uiNotifier; }
 
 		//! @brief Will return the modelNotifier attached to this application
-		AbstractModelNotifier * modelNotifier(void) { return m_modelNotifier; }
+		AbstractModelNotifier * modelNotifier() { return m_modelNotifier; }
 
 		//! @brief Returns a handle to the global class factory for the service
-		ClassFactory& getClassFactory(void) { return classFactory; }
+		ClassFactory& getClassFactory() { return classFactory; }
 
 
 		// ##########################################################################################################################################
@@ -266,7 +266,7 @@ namespace ot {
 		// ##########################################################################################################################################
 	protected:
 
-		bool EnsureDataBaseConnection(void);
+		bool EnsureDataBaseConnection();
 
 		bool storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
 

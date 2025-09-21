@@ -170,7 +170,7 @@ bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
 
 // Management
 
-Session& SessionService::createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType) {
+Session SessionService::createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType) {
 	if (_sessionID.length() == 0) {
 		throw ot::Exception::InvalidArgument("Session ID must not be empty");
 	}
@@ -179,8 +179,7 @@ Session& SessionService::createSession(const std::string& _sessionID, const std:
 		throw ot::Exception::ObjectAlreadyExists("Session \"" + _sessionID + "\" already exists");
 	}
 
-	Session newSession(_sessionID, _userName, _projectName, _collectionName, _sessionType);
-	return m_sessions.insert_or_assign(_sessionID, std::move(newSession)).first->second;
+	return Session(_sessionID, _userName, _projectName, _collectionName, _sessionType);
 }
 
 Session& SessionService::getSession(const std::string& _sessionID) {
@@ -192,10 +191,6 @@ Session& SessionService::getSession(const std::string& _sessionID) {
 	else {
 		return it->second;
 	}
-}
-
-bool SessionService::runMandatoryServices(const std::string& _sessionID) {
-	return this->runMandatoryServices(this->getSession(_sessionID));
 }
 
 bool SessionService::runMandatoryServices(Session& _session) {
@@ -365,9 +360,43 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 	ot::ServiceBase relayInfo(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService);
 
 	if (this->getIsServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
+		// Start relay in debug mode
 		Service& relay = this->runServiceInDebug(relayInfo, _session);
 		relay.setServiceName(_serviceName);
 		relay.setServiceType(_serviceType);
+
+		// Create check command
+		OT_LOG_D("Relay start requested in debug mode. Now waiting to come alive.");
+		ot::JsonDocument checkCommandDoc;
+		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, relay.getServiceID(), checkCommandDoc.GetAllocator());
+		std::string checkCommandString = checkCommandDoc.toJson();
+
+		// Wait until the service is alive
+		while (true) {
+			std::string response;
+			if (ot::msg::send("", relay.getServiceURL(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+					OT_LOG_D("Relay service startup completed successfully");
+					break;
+				}
+				else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+					using namespace std::chrono_literals;
+					std::this_thread::sleep_for(500ms);
+				}
+				else {
+					OT_LOG_E("Invalid response \"" + response + "\"");
+					using namespace std::chrono_literals;
+					std::this_thread::sleep_for(500ms);
+				}
+			}
+			else {
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
+			}
+		}
+
+		return relay;
 	}
 	else {
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
@@ -384,6 +413,9 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 		relay.setServiceType(_serviceType);
 		relay.setServiceURL(newServiceUrl);
 		relay.setWebsocketUrl(newWebsocketUrl);
+
+		relay.setRequested(false);
+		relay.setAlive();
 
 		return relay;
 	}
@@ -569,7 +601,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	}
 
 	// Create the session
-	Session& newSession = this->createSession(sessionID, userName, projectName, collectionName, sessionType);
+	Session newSession = this->createSession(sessionID, userName, projectName, collectionName, sessionType);
 
 	// Set the user credentials
 	newSession.setCredentialsUsername(credentialsUserName);
@@ -592,9 +624,9 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		OT_LOG_D("Relay service requested by session creator");
 
 		Service& relayService = this->runRelayService(newSession, serviceName, serviceType);
-		relayService.setRequested(false);
-		relayService.setAlive(true);
-
+		relayService.setRequested(true);
+		relayService.setAlive(false);
+		
 		OT_LOG_D("Relay service started { \"Service.URL\": \"" + relayService.getServiceURL() + "\", \"Websocket.URL\": \"" + relayService.getWebsocketUrl() + "\" }");
 
 		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, relayService.getServiceID(), responseDoc.GetAllocator());
@@ -603,6 +635,11 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	else {
 		OT_LOG_D("Session created without relay service (for session creator)");
 		Service& requestingService = newSession.addRequestedService(requestingServiceInfo);
+		
+		// Since the service that requested the session is already alive we don't have to wait for it to "come alive"
+		requestingService.setRequested(true);
+		requestingService.setAlive(false);
+
 		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, requestingService.getServiceID(), responseDoc.GetAllocator());
 	}
 
@@ -624,6 +661,9 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), logData, responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_LogFlags, logData, responseDoc.GetAllocator());
 	}
+
+	// Finally store the session
+	m_sessions.insert_or_assign(newSession.getID(), std::move(newSession));
 
 	return responseDoc.toJson();
 }

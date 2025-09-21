@@ -56,11 +56,9 @@ private:
 
 	// Management
 
-	Session& createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType);
+	Session createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType);
 
 	Session& getSession(const std::string& _sessionID);
-
-	bool runMandatoryServices(const std::string& _sessionID);
 
 	bool runMandatoryServices(Session& _session);
 

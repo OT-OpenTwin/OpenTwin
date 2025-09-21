@@ -95,7 +95,7 @@ namespace ot {
 }
 
 //! @brief This function ensures that the service will shutdown if no initialization call is received during startup
-void initChecker(void) {
+void initChecker() {
 	using namespace std::chrono_literals;
 	std::this_thread::sleep_for(30s);
 	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready) {
@@ -155,6 +155,8 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 }
 
 std::string ot::intern::ExternalServicesComponent::init(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID) {
+	OTAssertNullptr(m_application);
+
 	if (m_componentState != WaitForInit) {
 		OT_LOG_EA("Component already initialized");
 		return OT_ACTION_RETURN_INDICATOR_Error "Component already initialized";
@@ -249,6 +251,16 @@ std::string ot::intern::ExternalServicesComponent::init(const std::string& _sess
 			m_application->setWebSocketURL(ot::json::getString(reply, OT_ACTION_PARAM_WebsocketURL));
 
 			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
+		}
+
+		if (reply.HasMember(OT_ACTION_PARAM_SESSION_SERVICES)) {
+			for (auto& serviceObj : json::getObjectList(reply, OT_ACTION_PARAM_SESSION_SERVICES)) {
+				ot::serviceID_t id = static_cast<ot::serviceID_t>(ot::json::getUInt(serviceObj, OT_ACTION_PARAM_SERVICE_ID));
+				std::string url = json::getString(serviceObj, OT_ACTION_PARAM_SERVICE_URL);
+				std::string name = json::getString(serviceObj, OT_ACTION_PARAM_SERVICE_NAME);
+				std::string type = json::getString(serviceObj, OT_ACTION_PARAM_SERVICE_TYPE);
+				m_application->__serviceConnected(name, type, url, id);
+			}
 		}
 	}
 

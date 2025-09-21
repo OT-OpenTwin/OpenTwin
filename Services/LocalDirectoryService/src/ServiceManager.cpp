@@ -137,9 +137,10 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(ot::servi
 	}
 
 	// The relay could be started, now ensure its alive
-	OT_LOG_D("Relay started successfully. Now checking if allive.");
+	OT_LOG_D("Relay started successfully. Now checking if alive");
 	ot::JsonDocument checkCommandDoc;
 	checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+	checkCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceID, checkCommandDoc.GetAllocator());
 	std::string checkCommandString = checkCommandDoc.toJson();
 
 	int attempt = 0;

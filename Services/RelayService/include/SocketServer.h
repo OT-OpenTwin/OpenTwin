@@ -41,6 +41,9 @@ public:
 	void setRelayUrl(const std::string& _url) { m_relayUrl = _url; };
 	const std::string& getRelayUrl() const { return m_relayUrl; };
 
+	void setServiceId(ot::serviceID_t _id) { m_serviceId = _id; };
+	ot::serviceID_t getServiceId() const { return m_serviceId; };
+
 Q_SIGNALS:
 	void responseReceived();
 	void connectionClosed();
@@ -82,6 +85,7 @@ private:
 
 	std::string getSystemInformation();
 
+	ot::serviceID_t m_serviceId;
 	std::string m_websocketIp;
 	unsigned int m_websocketPort;
 	std::string m_relayUrl;

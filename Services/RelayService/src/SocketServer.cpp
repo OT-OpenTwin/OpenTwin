@@ -96,6 +96,7 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 				return OT_ACTION_RETURN_VALUE_FALSE;
 			}
 			else if (m_pWebSocketServer->isListening()) {
+				m_serviceId = static_cast<ot::serviceID_t>(ot::json::getUInt(doc, OT_ACTION_PARAM_SERVICE_ID));
 				return OT_ACTION_RETURN_VALUE_TRUE;
 			}
 			else {
@@ -325,7 +326,8 @@ void SocketServer::keepAlive() const
 // Private: Helper
 
 SocketServer::SocketServer()
-	: QObject(nullptr), m_pWebSocketServer(nullptr), m_websocketPort(0), m_keepAliveTimer(nullptr), m_client(nullptr)
+	: QObject(nullptr), m_pWebSocketServer(nullptr), m_websocketPort(0), m_keepAliveTimer(nullptr), 
+	m_client(nullptr), m_serviceId(ot::invalidServiceID)
 {
 
 }
