@@ -1,3 +1,6 @@
+# Logfiles
+*.otlog
+
 # Prerequisites
 *.d
 

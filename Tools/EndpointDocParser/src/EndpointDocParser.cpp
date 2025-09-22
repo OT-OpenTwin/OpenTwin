@@ -1,5 +1,8 @@
 // EndpointDocParser.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+
+// Open Twin header
+#include "OTCore/Logger.h"
+
 // project header
 #include "Application.h"
 
@@ -7,11 +10,17 @@
 #include <iostream>
 
 int main() {
+	ot::LogDispatcher::initialize("EndpointDocParser", true);
+	ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
+
+#ifdef _DEBUG
+	ot::LogDispatcher::addFileWriter();
+#endif // _DEBUG
+
 	Application application;
 
-	application.run();
+	return application.run();
 
-	std::cout << "Hello World!\n";
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

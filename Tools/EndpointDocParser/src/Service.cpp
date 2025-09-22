@@ -1,3 +1,6 @@
+// Open Twin header
+#include "OTCore/Logger.h"
+
 // project header
 #include "Service.h"
 
@@ -5,11 +8,11 @@
 #include <iostream>
 
 void Service::printService() const {
-    std::cout << "\nPrinting Service: " << m_name << "\n";
-    std::cout << "================== \n";
-    std::cout << "Number of endpoints in service: " << getEndpoints().size() << std::endl;
-    std::cout << "Endpoint actions:\n";
+    OT_LOG_D("Printing Service: " + m_name);
+    OT_LOG_D("==================");
+    OT_LOG_D("Number of endpoints in service: " + std::to_string(getEndpoints().size()));
+    OT_LOG_D("Endpoint actions:");
     for (const Endpoint& endpoint : m_endpoints) {
-        std::cout << endpoint.getAction() << "\n";
+        OT_LOG_D(endpoint.getAction());
     }
 }
