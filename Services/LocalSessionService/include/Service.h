@@ -19,13 +19,15 @@
 class Service : public ot::ServiceBase {
 	OT_DECL_DEFCOPY(Service)
 	OT_DECL_DEFMOVE(Service)
+	OT_DECL_NODEFAULT(Service)
 public:
 	enum ServiceStateFlag {
 		NoState      = 0 << 0,
 		IsDebug      = 1 << 0, //! @brief Service is in debug mode.
 		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
 		Alive        = 1 << 2, //! @brief Service is registered in the session.
-		ShuttingDown = 1 << 3  //! @brief Service is shutting down, waiting for confirmation.
+		IsRunning    = 1 << 3, //! @brief Service is running (received run command).
+		ShuttingDown = 1 << 4  //! @brief Service is shutting down, waiting for confirmation.
 	};
 	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.
 
@@ -50,6 +52,9 @@ public:
 
 	void setAlive(bool _alive = true) { m_state.setFlag(Service::Alive, _alive); };
 	bool isAlive() const { return m_state & Service::Alive; };
+
+	void setRunning(bool _running = true) { m_state.setFlag(Service::IsRunning, _running); };
+	bool isRunning() const { return m_state & Service::IsRunning; };
 
 	void setShuttingDown(bool _shuttingDown = true) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
 	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };

@@ -129,7 +129,6 @@ namespace ot {
 ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_websocket{ nullptr },
 	m_keepAliveTimer { nullptr },
-	m_isRelayServiceRequired{ false },
 	m_controlsManager{ nullptr },
 	m_lockManager{ nullptr },
 	m_owner{ _owner },
@@ -171,11 +170,6 @@ void ExternalServicesComponent::shutdown(void) {
 // ###################################################################################################
 
 // Configuration
-
-void ExternalServicesComponent::setRelayServiceIsRequired(void) {
-	m_isRelayServiceRequired = true;
-	std::cout << "The relay service parameter was set: True" << std::endl;
-}
 
 void ExternalServicesComponent::setMessagingRelay(const std::string &relayAddress)
 {
@@ -939,9 +933,6 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	AppBase* app{ AppBase::instance() };
 	std::string response;
 
-#ifndef OT_USE_GSS
-	return result;
-#endif
 	// Request a session service from the global session service
 	ot::JsonDocument gssDoc;
 	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetListOfProjectTemplates, gssDoc.GetAllocator()), gssDoc.GetAllocator());
@@ -1003,21 +994,20 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		m_currentSessionID.append(":").append(_collectionName);
 		AppBase::instance()->SetCollectionName(_collectionName);
 
-		std::string response;
-#ifdef OT_USE_GSS
 		// Request a session service from the global session service
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), response)) {
+		std::string gssResponse;
+		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), gssResponse)) {
 			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
 			app->showErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(gssResponse);
 		if (responseMessage != ot::ReturnMessage::Ok) {
 			app->showErrorPrompt(responseMessage.getWhat(), "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
@@ -1027,7 +1017,6 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		m_sessionServiceURL = responseMessage.getWhat();
 
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
-#endif
 
 		app->setCurrentProjectName(_projectName);
 		app->setCurrentProjectType(_projectType);
@@ -1051,9 +1040,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Add service information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(m_uiServiceURL), sessionDoc.GetAllocator()), sessionDoc.GetAllocator()); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
-		sessionDoc.AddMember(OT_ACTION_PARAM_HOST, ot::JsonString(ot::IpConverter::hostFromIp(m_uiServiceURL), sessionDoc.GetAllocator()), sessionDoc.GetAllocator()); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
-		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired, sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_uiServiceURL, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, true, sessionDoc.GetAllocator());
 
 		// Add user credentials
 		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
@@ -1061,29 +1049,29 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		sessionDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getCurrentLoginData().getSessionUser(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
-		response.clear();
-		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), response)) {
+		std::string lssResponse;
+		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), lssResponse)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create session. ", response, "Error");
+		OT_ACTION_IF_RESPONSE_ERROR(lssResponse) {
+			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResponse);
+			app->showErrorPrompt("Failed to create session. ", lssResponse, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create session.", response, "Error");
+		else OT_ACTION_IF_RESPONSE_WARNING(lssResponse) {
+			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResponse);
+			app->showErrorPrompt("Failed to create session.", lssResponse, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		
+
 		// Check response
 		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(response);
+		responseDoc.fromJson(lssResponse);
 
 		// ##################################################################
 
@@ -1104,18 +1092,19 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Ensure to update the window title containing the project name
 		app->setCurrentProjectIsModified(false);
 
-		if (m_isRelayServiceRequired) {
-			std::string websocketIP = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
+		std::string websocketIP = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
 
-			if (m_websocket) delete m_websocket;
-			m_websocket = new WebsocketClient(websocketIP);
-
-			m_websocket->updateLogFlags(ot::LogDispatcher::instance().getLogFlags());
-
-			OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
+		// Create the websocket connection
+		if (m_websocket) {
+			delete m_websocket;
+			m_websocket = nullptr;
 		}
-		response = "";
 
+		m_websocket = new WebsocketClient(websocketIP);
+		m_websocket->updateLogFlags(ot::LogDispatcher::instance().getLogFlags());
+
+		OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
+	
 		// TabToolBar tab order
 		QStringList ttbOrder;
 		std::list<std::string> ttbOrderL = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_UI_ToolBarTabOrder);
@@ -1133,52 +1122,65 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::JsonDocument checkCommandDoc;
 		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 		checkCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), checkCommandDoc.GetAllocator());
 		std::string checkCommandString = checkCommandDoc.toJson();
 
 		OT_LOG_D("Waiting for Startup Completed");
 
-		do
-		{
-			if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
+		do {
+			std::string checkStartupResponse;
+			if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, checkCommandString, checkStartupResponse)) {
 				throw std::exception("Failed to send http request to Session Service");
 			}
-			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+
+			ot::ReturnMessage startupResult = ot::ReturnMessage::fromJson(checkStartupResponse);
+			switch (startupResult.getStatus()) {
+			case ot::ReturnMessage::True:
 				startupReady = true;
-			}
-			else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+				break;
+
+			case ot::ReturnMessage::False:
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1s);
-			}
-			else {
-				OT_LOG_E("Invalid Session Service response: " + response);
-				throw std::exception(("Invalid Session Service response: " + response).c_str());
+				break;
+
+			case ot::ReturnMessage::Failed:
+				OT_LOG_E("Failed check for session startup completed: " + startupResult.getWhat());
+				throw std::exception(("Failed check for session startup completed: " + startupResult.getWhat()).c_str());
+
+			default:
+				OT_LOG_E("Invalid Session Service response: " + checkStartupResponse);
+				throw std::exception(("Invalid Session Service response: " + checkStartupResponse).c_str());
+				break;
 			}
 		} while (!startupReady);
 
 		OT_LOG_D("Startup is completed");
 
-		// Set service visible (will notify others that the UI is available)
+		// Register service since startup is completed
 		ot::JsonDocument visibilityCommand;
-		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ConfirmService, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), response)) {
+		
+		std::string confirmResponse;
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), confirmResponse)) {
 			throw std::exception("Failed to send http request");
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
+		OT_ACTION_IF_RESPONSE_ERROR(confirmResponse) {
 			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(response);
+			ex.append(m_sessionServiceURL).append(": ").append(confirmResponse);
 			throw std::exception(ex.c_str());
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		else OT_ACTION_IF_RESPONSE_WARNING(confirmResponse) {
 			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(response);
+			ex.append(m_sessionServiceURL).append(": ").append(confirmResponse);
 			throw std::exception(ex.c_str());
 		}	
 
 		// Add services that are running in this session to the services list
 		ot::JsonDocument serviceListDoc;
-		serviceListDoc.fromJson(response);
+		serviceListDoc.fromJson(confirmResponse);
 		auto serviceList = ot::json::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
 		for (auto serviceJSON : serviceList) {
 			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
@@ -1203,10 +1205,8 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 			}
 		}
 
-#ifdef OT_USE_GSS
 		// Start the session service health check
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
-#endif // OT_USE_GSS
 
 		assert(m_keepAliveTimer == nullptr);
 		m_keepAliveTimer = new QTimer(this);
@@ -1278,13 +1278,10 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			OT_LOG_WAS("Invalid response: " + response);
 		}
 
-#ifdef OT_USE_GSS
 		// Stop the session service health check
 		ot::stopSessionServiceHealthCheck();
-#endif // OT_USE_GSS
 
-		if (m_keepAliveTimer != nullptr)
-		{
+		if (m_keepAliveTimer != nullptr) {
 			m_keepAliveTimer->stop();
 			delete m_keepAliveTimer;
 

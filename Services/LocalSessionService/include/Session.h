@@ -26,8 +26,8 @@ class Session {
 	OT_DECL_NODEFAULT(Session)
 public:
 	enum SessionStateFlag {
-		NoState            = 0 << 0, //! @brief No state set.
-		ShuttingDown       = 1 << 0  //! @brief Session is shutting down.
+		NoState      = 0 << 0, //! @brief No state set.
+		ShuttingDown = 1 << 0  //! @brief Session is shutting down.
 	};
 	typedef ot::Flags<SessionStateFlag> SessionState; //! @brief Flags used to describe the state of the session.
 
@@ -94,7 +94,11 @@ public:
 
 	Service& addRequestedService(const ot::ServiceBase& _serviceInformation);
 	
-	Service& setServiceAlive(ot::serviceID_t _serviceID);
+	void setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers);
+
+	void setServiceAlive(ot::serviceID_t _serviceID, const std::string& _serviceUrl, bool _notifyOthers);
+
+	ot::ServiceBase getServiceInfo(ot::serviceID_t _serviceID);
 
 	void setServiceShutdownCompleted(ot::serviceID_t _serviceID);
 
@@ -104,6 +108,8 @@ public:
 
 	void startHealthCheck();
 	void stopHealthCheck();
+
+	void sendRunCommand();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -198,6 +204,8 @@ private:
 	void broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, bool _forceSend);
 
 	void healthCheckWorker();
+
+	void runWorker();
 
 	static void healthCheckFailedNotifier(std::string _sessionID, ot::serviceID_t _failedServiceID);
 

@@ -42,15 +42,22 @@ namespace ot {
 
 			// Mandatory functions
 
-			int startup(ApplicationBase * _application, const std::string& _localDirectoryServiceURL, const std::string& _ownURL);
+			//! @brief Will initialize the component.
+			//! @param _application The application object that is using this component.
+			//! @param _localDirectoryServiceURL The URL of the local directory service.
+			//! @param _ownURL The URL of this service.
+			//! @return 0 if successful, otherwise an error code.
+			int startup(ApplicationBase* _application, const std::string& _localDirectoryServiceURL, const std::string& _ownURL);
 
-			//! @brief Will initialize the service
-			//! @param _siteID The site ID this service is running on
-			//! @param _ownIP The IP address of this service
-			//! @param _sessionServiceIP The IP address of the session service this service was started from/ should interact with
-			//! @param _sessionID The ID of the session this service is running at
-			std::string init(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID);
-			std::string initDebugExplicit(const std::string& _sessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID);
+			//! @brief Will initialize the service.
+			//! First the database data will be requested from the LSS.
+			//! Afterwards the registration request will be send to the LSS.
+			//! @param _localSessionServiceURL The URL of the local session service.
+			//! @param _sessionID The session ID this service is running in.
+			//! @param _serviceID The service ID assigned to this service.
+			//! @param _explicitDebug If true, the debug initialization will be performed.
+			//! The process ID will be added to the registration request.
+			std::string init(const std::string& _localSessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID, bool _explicitDebug);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter
@@ -79,8 +86,8 @@ namespace ot {
 			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
 			std::string handleGetSystemInformation();
 
-			std::string getLoggedInUserName(void) { return credentialsUsername; }
-			std::string getLoggedInUserPassword(void) { return credentialsPassword; }
+			std::string getLoggedInUserName(void) { return m_credentialsUsername; }
+			std::string getLoggedInUserPassword(void) { return m_credentialsPassword; }
 
 		private:
 			// #####################################################################################################################################
@@ -95,6 +102,7 @@ namespace ot {
 			OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleServiceShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleStartupCompleted, ExternalServicesComponent, OT_ACTION_CMD_StartupCompleted, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
 
@@ -107,8 +115,8 @@ namespace ot {
 			ComponentState    m_componentState;
 			SystemInformation m_systemLoad;
 
-			std::string credentialsUsername;
-			std::string credentialsPassword;
+			std::string m_credentialsUsername;
+			std::string m_credentialsPassword;
 			
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();

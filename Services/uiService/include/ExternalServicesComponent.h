@@ -93,8 +93,6 @@ public:
 
 	void setUiServiceURL(const std::string& _url) { m_uiServiceURL = _url; }
 
-	void setRelayServiceIsRequired(void);
-
 	void setMessagingRelay(const std::string& _relayAddress);
 
 	// ###################################################################################################
@@ -416,7 +414,6 @@ private:
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;
 	std::string										m_currentSessionID;
-	bool											m_isRelayServiceRequired;
 	ControlsManager *								m_controlsManager;
 	LockManager *									m_lockManager;
 	AppBase *										m_owner;

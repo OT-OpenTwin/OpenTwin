@@ -28,8 +28,9 @@
 
 #define OT_ACTION_CMD_Message "Message"
 #define OT_ACTION_CMD_Compound "Compound"
+#define OT_ACTION_CMD_ConfirmService "Service.Confirm"
 #define OT_ACTION_CMD_ServiceClosing "Service.Closing"
-#define OT_ACTION_CMD_RegisterNewService "Service.New"
+#define OT_ACTION_CMD_RegisterNewService "Service.Register"
 #define OT_ACTION_CMD_RemoveService "Service.Remove"
 #define OT_ACTION_CMD_StartNewService "Service.Start.Single"
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
@@ -55,6 +56,7 @@
 #define OT_ACTION_CMD_Ping "Ping"
 #define OT_ACTION_CMD_Init "Initialize"
 #define OT_ACTION_CMD_Run "Run"
+#define OT_ACTION_CMD_StartupCompleted "StartupCompleted"
 #define OT_ACTION_CMD_Reset "Reset"
 #define OT_ACTION_CMD_GetDebugInformation "Debug.Info.Get"
 #define OT_ACTION_CMD_SetVisualizationModel "VisualizationModel.Set"
@@ -70,8 +72,6 @@
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
-#define OT_ACTION_CMD_ServiceHide "Service.Hide"
-#define OT_ACTION_CMD_ServiceShow "Service.Show"
 #define OT_ACTION_CMD_CheckStartupCompleted "Service.CheckStartupCompleted"
 #define OT_ACTION_CMD_CheckRelayStartupCompleted "Relay.CheckStartupCompleted"
 #define OT_ACTION_CMD_ServiceShutdown "Shutdown"
@@ -372,8 +372,6 @@
 #define OT_ACTION_PARAM_SENDER "Sender"
 #define OT_ACTION_PARAM_ANSWER "Answer"
 #define OT_ACTION_PARAM_PARAMETER1 "Parameter1"
-#define OT_ACTION_PARAM_PORT "Port"
-#define OT_ACTION_PARAM_HOST "Host"
 #define OT_ACTION_PARAM_POSITION "Position"
 
 #define OT_ACTION_PARAM_COUNT "Count"

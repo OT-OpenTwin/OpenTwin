@@ -365,8 +365,6 @@ void ServiceManager::serviceStartFailed(const ServiceInformation& _info) {
 void ServiceManager::sendInitializeMessage(Service&& _info) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_info.getInfo().getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_info.getInfo().getType(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _info.getInfo().getID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_info.getInfo().getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_info.getInfo().getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());

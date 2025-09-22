@@ -118,7 +118,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	// Ensure receiver url was provided
 	if (_receiverIP.empty()) {
 		if (_flags & msg::CreateLogMessage) {
-			OT_LOG_W("Receiver url is empty. Ignoring message...");
+			OT_LOG_WA("Receiver url is empty. Ignoring message...");
 		}
 		return false;
 	}
