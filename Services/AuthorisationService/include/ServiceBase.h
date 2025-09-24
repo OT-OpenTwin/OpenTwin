@@ -48,57 +48,57 @@ private:
 
 	// No authentication needed
 
-	//api @security TLS
-	//api @action OT_ACTION_LOGIN_ADMIN 
-	//api @brief Processes the login of an administrator.
+	//api @SECURITY TLS
+	//api @Action OT_ACTION_LOGIN_ADMIN 
+	//api @Brief Processes the login of an administrator.
 	//api This is the detailed description.
 	//api This is the second line of the detailed description.
 	//api
-	//api @note This is an important note.
+	//api @NOTE This is an important note.
 	//api This line belongs to the note block.
-	//api @detail This is the third line of the detailed description.
-	//api @warning This is a warning.
+	//api @Detail This is the third line of the detailed description.
+	//api @warNing This is a warning.
 	//api
 	//api This line belongs to the warning block.
-	//api @detail This is the fourth line of the detailed description.
+	//api @deTail This is the fourth line of the detailed description.
 	//api This is the fifth line of the detailed description.
-	//api @param OT_PARAM_AUTH_USERNAME String User name
+	//api @PARAM OT_PARAM_AUTH_USERNAME String User name
 	//api This is the detailed description of OT_PARAM_AUTH_USERNAME.
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_USERNAME.
-	//api @note This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api @NOte This is a note in the detailed description of OT_PARAM_AUTH_USERNAME.
 	//api This is the second line in the note block of OT_PARAM_AUTH_USERNAME.
-	//api @warning This warning follows the note block.
+	//api @WARNING This warning follows the note block.
 	//api This is the second line in the warning block of OT_PARAM_AUTH_USERNAME.
-	//api @detail This is the third line in the note block of OT_PARAM_AUTH_USERNAME.
-	//api This is the fourth line in the note block of OT_PARAM_AUTH_USERNAME.
+	//api @detail This is the third line in the detailed description of OT_PARAM_AUTH_USERNAME.
+	//api This is the fourth line in the detailed description of OT_PARAM_AUTH_USERNAME.
 	//api @param OT_PARAM_AUTH_PASSWORD String User password
 	//api This is the detailed description of OT_PARAM_AUTH_PASSWORD.
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_PASSWORD.
 	//api @param OT_PARAM_AUTH_ENCRYPTED_PASSWORD Boolean Is the password encrypted 
 	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
+	//api @Rparam OT_ACTION_AUTH_SUCCESS Boolean Are the credentials correct
 	//api This is the detailed description of OT_ACTION_AUTH_SUCCESS.
 	//api This is the second line of the detailed description of OT_ACTION_AUTH_SUCCESS. 
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 	//api This is the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the second line of the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @note This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @NOTE This is a note in the detailed description of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the second line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @warning This warning follows the note block.
+	//api @Warning This warning follows the note block.
 	//api This is the second line in the warning block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
-	//api @detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
+	//api @Detail This is the third line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api This is the fourth line in the note block of OT_PARAM_AUTH_ENCRYPTED_PASSWORD.
 	//api @return This is the response desciption of OT_ACTION_LOGIN_ADMIN.
 	//api This is the second line of the response description of OT_ACTION_LOGIN_ADMIN.
 	//api
 	//api @note This is an important note of OT_ACTION_LOGIN_ADMIN.
 	//api This line belongs to the note block.
-	//api @detail This is the third line of the response description of OT_ACTION_LOGIN_ADMIN.
-	//api @warning This is a warning of OT_ACTION_LOGIN_ADMIN.
+	//api @Detail This is the third line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api @Warning This is a warning of OT_ACTION_LOGIN_ADMIN.
 	//api
 	//api This line belongs to the warning block.
-	//api @detail This is the fourth line of the response description of OT_ACTION_LOGIN_ADMIN.
+	//api @DETAIL This is the fourth line of the response description of OT_ACTION_LOGIN_ADMIN.
 	//api This is the fifth line of the response description of OT_ACTION_LOGIN_ADMIN.
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	

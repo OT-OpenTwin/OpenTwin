@@ -51,6 +51,8 @@ public:
 
 	void parseMacroDefinition(const std::string& _content);
 
+	void addDescriptionToLastParameter(std::list<Parameter>& _paramList, const std::string& _description);
+	
 private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;

@@ -204,9 +204,12 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 				}
 				OT_LOG_D(apiContent);
+				
+				std::string lowerCaseApiContent = ot::String::toLower(apiContent);
+				OT_LOG_D("Lower case api content: " + lowerCaseApiContent);
 
 				// check which "@commando" is given
-				if (startsWith(apiContent, "@security")) {
+				if (startsWith(lowerCaseApiContent, "@security")) {
 					std::string security = apiContent.substr(10);
 //					OT_LOG_D("[SECURITY] -> " + security);
 
@@ -214,7 +217,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						endpoint.setMessageType(Endpoint::TLS);
 						OT_LOG_D("Message Type TLS set in endpoint: " + endpoint.getMessageTypeString());
 					}
-					else if (security == "mTLS" || security == "mtls") {
+					else if (ot::String::toLower(security) == "mtls") {
 						endpoint.setMessageType(Endpoint::mTLS);
 						OT_LOG_D("Message Type mTLS set in endpoint: " + endpoint.getMessageTypeString());
 					}
@@ -230,7 +233,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (startsWith(apiContent, "@action")) {
+				else if (startsWith(lowerCaseApiContent, "@action")) {
 					std::string action = apiContent.substr(8);
 					action = ot::String::removePrefixSuffix(action, " ");
 
@@ -250,7 +253,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (startsWith(apiContent, "@brief")) {
+				else if (startsWith(lowerCaseApiContent, "@brief")) {
 					std::string brief = apiContent.substr(7);
 //					OT_LOG_D("[BRIEF] -> " + brief);
 					endpoint.setBriefDescription(brief);
@@ -263,7 +266,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (startsWith(apiContent, "@param")) {
+				else if (startsWith(lowerCaseApiContent, "@param")) {
 					parameter = Parameter();
 
 					std::string param = apiContent.substr(7);
@@ -278,7 +281,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (startsWith(apiContent, "@return")) {
+				else if (startsWith(lowerCaseApiContent, "@return")) {
 					std::string response = apiContent.substr(8);
 //					OT_LOG_D("[RETURN] -> " + response);
 					endpoint.addResponseDescription(response);
@@ -292,7 +295,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inNoteBlock = false;
 					inWarningBlock = false;
 				}
-				else if (startsWith(apiContent, "@rparam")) {
+				else if (startsWith(lowerCaseApiContent, "@rparam")) {
 					parameter = Parameter();
 
 					std::string rparam = apiContent.substr(8);
@@ -310,22 +313,12 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					inWarningBlock = false;
 				}
 				else if (inBriefDescriptionBlock || inResponseDescriptionBlock) {
-					if (startsWith(apiContent, "@note")) {
+					if (startsWith(lowerCaseApiContent, "@note")) {
 						OT_LOG_D("Detected @note.");
 						inNoteBlock = true;
 						inWarningBlock = false;
 						
-						if (inBriefDescriptionBlock) {
-							endpoint.addDetailedDescription(apiContent);
-						}
-						else {
-							endpoint.addResponseDescription(apiContent);
-						}
-					}
-					else if (startsWith(apiContent, "@warning")) {
-						OT_LOG_D("Detected @warning.");						
-						inNoteBlock = false;
-						inWarningBlock = true;
+						apiContent = "@note " + apiContent.substr(6);
 
 						if (inBriefDescriptionBlock) {
 							endpoint.addDetailedDescription(apiContent);
@@ -334,7 +327,21 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							endpoint.addResponseDescription(apiContent);
 						}
 					}
-					else if (startsWith(apiContent, "@detail")) {
+					else if (startsWith(lowerCaseApiContent, "@warning")) {
+						OT_LOG_D("Detected @warning.");						
+						inNoteBlock = false;
+						inWarningBlock = true;
+
+						apiContent = "@warning " + apiContent.substr(9);
+
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
+					}
+					else if (startsWith(lowerCaseApiContent, "@detail")) {
 						apiContent = apiContent.substr(8);
 
 						if (inBriefDescriptionBlock) {
@@ -388,114 +395,35 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					OT_LOG_D("---");
 				}
 				else if (inParameterBlock || inReturnParameterBlock) {
-					if (startsWith(apiContent, "@note")) {
+					std::list<Parameter>& paramList = inParameterBlock ?
+						endpoint.getParameters() :
+						endpoint.getResponseParameters();
+
+					if (startsWith(lowerCaseApiContent, "@note")) {
 						OT_LOG_D("Detected @note.");
 						inNoteBlock = true;
 						inWarningBlock = false;
-						
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
+						addDescriptionToLastParameter(paramList, "@note " + apiContent.substr(6));
 					}
-					else if (startsWith(apiContent, "@warning")) {
-						OT_LOG_D("Detected @warning.");
-						inWarningBlock = true;
+					else if (startsWith(lowerCaseApiContent, "@warning")) {
+						OT_LOG_D("Detected @warning.");						
 						inNoteBlock = false;
-
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
+						inWarningBlock = true;
+						addDescriptionToLastParameter(paramList, "@warning " + apiContent.substr(9));
 					}
-					else if (startsWith(apiContent, "@detail")) {
-						apiContent = apiContent.substr(8);
-
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
-
+					else if (startsWith(lowerCaseApiContent, "@detail")) {
 						inNoteBlock = false;
 						inWarningBlock = false;
+						addDescriptionToLastParameter(paramList, apiContent.substr(8));						
 					}
 					else if (inNoteBlock) {
-						apiContent = "@note " + apiContent;
-
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
+						addDescriptionToLastParameter(paramList, "@note " + apiContent);
 					}
 					else if (inWarningBlock) {
-						apiContent = "@warning " + apiContent;
-
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
+						addDescriptionToLastParameter(paramList, "@warning " + apiContent);
 					}
 					else {
-//						OT_LOG_D("Detailed parameter description: >>" + apiContent + "<<");
-
-						std::list<Parameter>& paramList = inParameterBlock ?
-							endpoint.getParameters() :
-							endpoint.getResponseParameters();
-
-						if (!paramList.empty()) {
-							Parameter& lastParam = paramList.back();
-//							OT_LOG_D("Last parameter: " + lastParam.getMacro());
-
-							lastParam.addDescription(apiContent);
-							OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
-							lastParam.printDescription();
-							OT_LOG_D("---");
-						}
+						addDescriptionToLastParameter(paramList, apiContent);
 					}
 				}
 				else {
@@ -757,5 +685,15 @@ void Application::parseMacroDefinition(const std::string& _content) {
 			m_actionMacros[macroName] = macroDefinition;
 ///			OT_LOG_D("Added " + macroName + " and " + macroDefinition + " to Map.");
 		}
+	}
+}
+
+void Application::addDescriptionToLastParameter(std::list<Parameter>& _paramList, const std::string& _description) {
+	if (!_paramList.empty()) {
+		Parameter& lastParam = _paramList.back();
+		lastParam.addDescription(_description);
+		OT_LOG_D("Added description to " + lastParam.getMacro() + ":");
+		lastParam.printDescription();
+		OT_LOG_D("---");
 	}
 }
