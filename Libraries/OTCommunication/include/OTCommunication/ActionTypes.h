@@ -17,6 +17,7 @@
 #define OT_ACTION_CMD_ServiceConnected "Service.Connected"
 #define OT_ACTION_CMD_ServiceDisconnected "Service.Disconnected"
 #define OT_ACTION_CMD_ShutdownRequestedByService "Service.ShutdownRequested"
+#define OT_ACTION_CMD_ShowService "Service.Show"
 
 #define OT_ACTION_CMD_GetDatabaseUrl "Get.DatabaseURL"
 #define OT_ACTION_CMD_GetAuthorisationServerUrl "Get.AuthURL"
@@ -338,6 +339,7 @@
 #define OT_ACTION_PARAM_Debug "Debug"
 #define OT_ACTION_PARAM_Range "Range"
 #define OT_ACTION_PARAM_Color "Color"
+#define OT_ACTION_PARAM_Hidden "Hidden"
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Parent "Parent"

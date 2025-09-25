@@ -418,9 +418,7 @@ bool ServiceManager::restartServiceAfterCrash(const Service& _service) {
 void ServiceManager::notifyServiceShutdownCompleted(const Service& _service) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdownCompleted, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_service.getInfo().getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_service.getInfo().getType(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_service.getUrl(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _service.getInfo().getID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_service.getInfo().getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
@@ -468,8 +466,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 	// Notify session service about the crash
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceFailure, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(serviceInfo.getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(serviceInfo.getType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceInfo.getID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Fire message

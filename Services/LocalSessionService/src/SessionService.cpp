@@ -492,7 +492,7 @@ std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _comman
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(info.getDataBaseURL(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(info.getAuthURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_gds.getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_gds.getServiceUrl(), doc.GetAllocator()), doc.GetAllocator());
 
 		return doc.toJson();
 	}
@@ -589,9 +589,13 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string serviceUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_URL);
+	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
 
 	// Optional params
-	bool shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY);
+	bool serviceInitiallyHidden = false;
+	if (_commandDoc.HasMember(OT_ACTION_PARAM_Hidden)) {
+		serviceInitiallyHidden = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_Hidden);
+	}
 
 	// Notify GSS that the session request was received (confirm session)
 	if (!m_gss.confirmSession(sessionID, userName)) {
@@ -620,7 +624,8 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		Service& relayService = this->runRelayService(newSession, serviceName, serviceType);
 		relayService.setRequested(true);
 		relayService.setAlive(false);
-		
+		relayService.setHidden(serviceInitiallyHidden);
+
 		OT_LOG_D("Relay service started { \"Service.URL\": \"" + relayService.getServiceURL() + "\", \"Websocket.URL\": \"" + relayService.getWebsocketUrl() + "\" }");
 
 		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, relayService.getServiceID(), responseDoc.GetAllocator());
@@ -638,6 +643,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		// Since the service that requested the session is already alive we don't have to wait for it to "come alive"
 		requestingService.setRequested(true);
 		requestingService.setAlive(false);
+		requestingService.setHidden(serviceInitiallyHidden);
 
 		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, requestingService.getServiceID(), responseDoc.GetAllocator());
 	}
@@ -731,6 +737,19 @@ std::string SessionService::handleConfirmService(ot::JsonDocument& _commandDoc) 
 	}
 
 	return response.toJson();
+}
+
+std::string SessionService::handleShowService(ot::JsonDocument& _commandDoc) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	// Required params
+	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
+
+	Session& theSession = this->getSession(sessionID);
+	theSession.showService(serviceID);
+
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string SessionService::handleGetSessionExists(ot::JsonDocument& _commandDoc) {

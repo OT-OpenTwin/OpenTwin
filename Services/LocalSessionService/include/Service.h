@@ -27,7 +27,8 @@ public:
 		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
 		Alive        = 1 << 2, //! @brief Service is registered in the session.
 		IsRunning    = 1 << 3, //! @brief Service is running (received run command).
-		ShuttingDown = 1 << 4  //! @brief Service is shutting down, waiting for confirmation.
+		ShuttingDown = 1 << 4, //! @brief Service is shutting down, waiting for confirmation.
+		IsHidden     = 1 << 5  //! @brief Service is invisible to other services in the session.s
 	};
 	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.
 
@@ -58,6 +59,9 @@ public:
 
 	void setShuttingDown(bool _shuttingDown = true) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
 	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };
+
+	void setHidden(bool _hidden) { m_state.setFlag(Service::IsHidden, _hidden); };
+	bool isHidden() const { return m_state & Service::IsHidden; };
 
 	//! @brief Will return the port numbers used by this service.
 	std::list<ot::port_t> getPortNumbers(void) const;

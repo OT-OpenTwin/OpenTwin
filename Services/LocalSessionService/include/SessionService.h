@@ -94,8 +94,9 @@ private:
 
 	OT_HANDLER(handleCreateNewSession, SessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCheckProjectOpen, SessionService, OT_ACTION_CMD_IsProjectOpen, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleConfirmService, SessionService, OT_ACTION_CMD_ConfirmService, ot::ALL_MESSAGE_TYPES)
-	
+	OT_HANDLER(handleConfirmService, SessionService, OT_ACTION_CMD_ConfirmService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleShowService, SessionService, OT_ACTION_CMD_ShowService, ot::SECURE_MESSAGE_TYPES)
+
 	OT_HANDLER(handleGetSessionExists, SessionService, OT_ACTION_CMD_GetSessionExists, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceClosing, SessionService, OT_ACTION_CMD_ServiceClosing, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownSession, SessionService, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)

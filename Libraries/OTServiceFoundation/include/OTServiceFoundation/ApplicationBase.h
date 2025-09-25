@@ -52,7 +52,10 @@ namespace ot {
 
 		// Pure virtual functions
 
-		//! @brief Will be called when the service was successfully started, the hppt and/or websocket connection is established and the service may start its work
+		//! @brief Run the service.
+		//! Will be called when the service was successfully started, 
+		//! the hppt and/or websocket connection is established,
+		//! all services in the session have connected and the service may start its work.
 		virtual void run() = 0;
 
 		//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)

@@ -505,7 +505,7 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	// Add to GSS
 	ot::serviceID_t newId = ot::invalidServiceID;
 	if (!this->addSessionService(std::move(nService), newId)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to attach service information");
 	}
 
 	// Create reply
@@ -523,7 +523,7 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 		reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
 	}
 
-	return reply.toJson();
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, reply.toJson());
 }
 
 std::string GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {

@@ -37,6 +37,7 @@ private Q_SLOTS:
 	void slotProcessMessageQueue();
 
 private:
+	void dispatchExecuteRequest(ot::RelayedMessageHandler::Request& _data);
 	void dispatchQueueRequest(ot::RelayedMessageHandler::Request& _data);
 
 	bool ensureConnection();

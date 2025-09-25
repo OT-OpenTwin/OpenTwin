@@ -18,7 +18,7 @@
 #include <chrono>
 
 GlobalDirectoryService::GlobalDirectoryService() :
-	ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService),
+	m_serviceInfo(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService),
 	m_connectionStatus(Disconnected), m_healthCheckRunning(false), m_healthCheckThread(nullptr)
 {
 
@@ -33,34 +33,32 @@ GlobalDirectoryService::~GlobalDirectoryService() {
 // Management
 
 bool GlobalDirectoryService::connect(const std::string& _url, bool _waitForConnection) {
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-
 		// Clean up potentially running health check thread
 		this->stopHealthCheck();
 
 		// Update information
-		this->setServiceURL(_url);
-
+		m_mutex.lock();
+		m_serviceInfo.setServiceURL(_url);
 		m_connectionStatus = CheckingNewConnection;
+		m_mutex.unlock();
 
 		OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
 
 		// Start health check and wait for success
 		this->startHealthCheck();
-	}
+
 	if (_waitForConnection) {
 		// Wait for connection success
 		int ct = 0;
-		const int maxCt = 60;
+		const int maxCt = 6000;
 		while (!this->isConnected()) {
 			if (ct++ >= maxCt) {
-				OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\" after " + std::to_string(maxCt) + " attempts");
+				OT_LOG_E("Failed to connect to Global Session Service at \"" + _url + "\": Timeout reached");
 				this->stopHealthCheck();
 				return false;
 			}
 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
 	}
@@ -74,11 +72,6 @@ bool GlobalDirectoryService::isConnected(void) {
 }
 
 bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl) {
-	if (!this->isConnected()) {
-		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Not connected to GDS");
-		return false;
-	}
-
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -90,8 +83,12 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
+	if (!this->ensureConnection()) {
+		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to establish connection to GDS.");
+		return false;
+	}
+	else if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to send http request to GDS.");
 		return false;
 	}
 	else {
@@ -112,7 +109,7 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
-	for (const ServiceBase& service : _serviceInformation) {
+	for (const ot::ServiceBase& service : _serviceInformation) {
 		ot::JsonObject serviceObj;
 		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(service.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -123,8 +120,12 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 
 	// Send request
 	std::string response;
-	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
+	if (!this->ensureConnection()) {
+		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
+		return false;
+	}
+	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
 		return false;
 	}
 	else {
@@ -142,72 +143,72 @@ bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const
 	
 	// Send request
 	std::string responseStr;
-	if (!ot::msg::send(_lssUrl, m_serviceURL, ot::EXECUTE, requestDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to start relay service. Reason: Failed to send http request to GDS (URL = \"" + m_serviceURL + "\")");
+	if (!this->ensureConnection()) {
+		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
 		return false;
 	}
-
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-
-	if (response.getStatus() != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Failed to start relay service. Reason: " + response.getWhat());
+	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr)) {
+		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
 		return false;
 	}
+	else {
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 
-	// Check reponse
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response.getWhat());
+		if (response.getStatus() != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Failed to start relay service. Reason: " + response.getWhat());
+			return false;
+		}
 
-	_relayServiceURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_URL);
-	_websocketURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
+		// Check reponse
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response.getWhat());
 
-	return true;
+		_relayServiceURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_URL);
+		_websocketURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
+
+		return true;
+	}
 }
 
 void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessionID) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send(SessionService::instance().getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send session shutdown notification to GDS at \"" + m_serviceURL + "\"");
+	if (!this->ensureConnection()) {
+		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
 	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Unexpected GDS response \"" + m_serviceURL + "\": \"" + response + "\"");
+	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
+	}
+	else if (response != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Unexpected GDS response: \"" + response + "\"");
 	}
 }
 
 void GlobalDirectoryService::notifySessionShutdownCompleted(const std::string& _sessionID) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send(SessionService::instance().getUrl(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send session shutdown completed notification to GDS at \"" + m_serviceURL + "\"");
+	std::string responseStr;
+	if (!this->ensureConnection()) {
+		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
 	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Unexpected GDS response \"" + m_serviceURL + "\": \"" + response + "\"");
+	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr)) {
+		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
+	}
+	else if (responseStr != OT_ACTION_RETURN_VALUE_OK) {
+		OT_LOG_E("Unexpected GDS response: \"" + responseStr + "\"");
 	}
 }
 
-void GlobalDirectoryService::stopHealthCheck() {
-	if (m_healthCheckThread) {
-		m_healthCheckRunning = false;
-		if (m_healthCheckThread->joinable()) {
-			m_healthCheckThread->join();
-		}
-
-		delete m_healthCheckThread;
-		m_healthCheckThread = nullptr;
-	}
+std::string GlobalDirectoryService::getServiceUrl() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_serviceInfo.getServiceURL();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -248,6 +249,8 @@ void GlobalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::Jso
 // Private
 
 void GlobalDirectoryService::startHealthCheck(void) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	if (m_healthCheckRunning) {
 		OT_LOG_EA("Health check already running");
 		return;
@@ -257,6 +260,30 @@ void GlobalDirectoryService::startHealthCheck(void) {
 
 	OT_LOG_D("Starting health check");
 	m_healthCheckThread = new std::thread(&GlobalDirectoryService::healthCheck, this);
+}
+
+void GlobalDirectoryService::stopHealthCheck() {
+	m_mutex.lock();
+
+	if (m_healthCheckThread) {
+		m_healthCheckRunning = false;
+
+		m_mutex.unlock();
+
+		if (m_healthCheckThread->joinable()) {
+			m_healthCheckThread->join();
+		}
+
+		m_mutex.lock();
+
+		delete m_healthCheckThread;
+		m_healthCheckThread = nullptr;
+
+		m_mutex.unlock();
+	}
+	else {
+		m_mutex.unlock();
+	}
 }
 
 void GlobalDirectoryService::healthCheck(void) {
@@ -270,49 +297,69 @@ void GlobalDirectoryService::healthCheck(void) {
 	OT_LOG_D("Starting health check worker...");
 
 	while (m_healthCheckRunning) {
-		
 		// Check connection
-		std::string response;
+		std::string pingResponse;
 
-		if (ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, pingMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			if (response == OT_ACTION_CMD_Ping) {
-				m_mutex.lock();
+		if (!this->sendMessage(ot::EXECUTE, pingMessage, pingResponse)) {
+			// Handle disconnected
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_connectionStatus = Disconnected;
+		}
+		else if (pingResponse == OT_ACTION_CMD_Ping) {
+			std::lock_guard<std::mutex> lock(m_mutex);
 
-				if (m_connectionStatus == CheckingNewConnection) {
-					OT_LOG_D("Successfully checked new connection to GDS at \"" + m_serviceURL + "\"");
-					m_connectionStatus = Connected;
-				}
-				else {
-					m_connectionStatus = Connected;
-				}
-				
-				m_mutex.unlock();
-
-				for (int ct = 0; ct < 60 && m_healthCheckRunning; ct++) {
-					using namespace std::chrono_literals;
-					std::this_thread::sleep_for(1s);
-				}
-			}
-			else {
-				OT_LOG_E("Invalid ping response received from GDS at \"" + m_serviceURL + "\"");
-				
-				// Handle disconnected
-				m_mutex.lock();
-				m_connectionStatus = Disconnected;
-				m_mutex.unlock();
-				break;
+			if (m_connectionStatus != Connected) {
+				OT_LOG_D("Successfully checked connection to GDS");
+				m_connectionStatus = Connected;
 			}
 		}
 		else {
-			OT_LOG_E("Failed to send ping to GDS at \"" + m_serviceURL + "\"");
+			OT_LOG_E("Invalid ping response received from GDS: \"" + pingResponse + "\".");
 
 			// Handle disconnected
-			m_mutex.lock();
+			std::lock_guard<std::mutex> lock(m_mutex);
 			m_connectionStatus = Disconnected;
-			m_mutex.unlock();
-			break;
+		}
+
+		for (int ct = 0; ct < 60 && m_healthCheckRunning; ct++) {
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+
+			if (!this->isConnected()) {
+				break;
+			}
 		}
 	}
 
 	OT_LOG_D("Health check worker stopped...");
+}
+
+bool GlobalDirectoryService::ensureConnection() {
+	int ct = 0;
+	const int checkTimeout = 10;
+	const int checkAttempts = 60 * (1000 / checkTimeout);
+
+	while (!this->isConnected()) {
+		if (++ct >= checkAttempts) {
+			return false;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(checkTimeout));
+	}
+
+	return true;
+}
+
+bool GlobalDirectoryService::sendMessage(ot::MessageType _messageType, const std::string& _message, std::string& _response) {
+	m_mutex.lock();
+	std::string receiverUrl = m_serviceInfo.getServiceURL();
+	m_mutex.unlock();
+
+	if (!ot::msg::send("", receiverUrl, _messageType, _message, _response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		m_mutex.lock();
+		m_connectionStatus = Disconnected;
+		m_mutex.unlock();
+		return false;
+	}
+	else {
+		return true;
+	}
 }

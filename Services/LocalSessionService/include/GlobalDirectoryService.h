@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 // std header
 #include <list>
@@ -18,7 +19,7 @@ namespace std { class thread; }
 
 //! @brief The GlobalDirectoryService handles all communication with the GDS.
 //! It is responsible for connecting to the GDS, starting services, and managing the connection status.
-class GlobalDirectoryService : public ot::ServiceBase {
+class GlobalDirectoryService {
 	OT_DECL_NOCOPY(GlobalDirectoryService)
 	OT_DECL_NOMOVE(GlobalDirectoryService)
 public:
@@ -75,7 +76,7 @@ public:
 	//! @param _sessionID The ID of the session that was closed.
 	void notifySessionShutdownCompleted(const std::string& _sessionID);
 
-	void stopHealthCheck();
+	std::string getServiceUrl();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,11 +86,16 @@ public:
 
 private:
 	void startHealthCheck();
+	void stopHealthCheck();
 
 	//! @brief Health check thread function.
-	void healthCheck(void);
+	void healthCheck();
+
+	bool ensureConnection();
+	bool sendMessage(ot::MessageType _messageType, const std::string& _message, std::string& _response);
 
 	ConnectionStatus m_connectionStatus;  //! @brief GDS connection status.
+	ot::ServiceBase m_serviceInfo;
 
 	std::mutex       m_mutex;             //! @brief Mutex to protect the connection status and service URL.
 	std::thread*     m_healthCheckThread; //! @brief Thread for the health check.

@@ -98,6 +98,8 @@ public:
 
 	void setServiceAlive(ot::serviceID_t _serviceID, const std::string& _serviceUrl, bool _notifyOthers);
 
+	void showService(ot::serviceID_t _serviceID);
+
 	ot::ServiceBase getServiceInfo(ot::serviceID_t _serviceID);
 
 	void setServiceShutdownCompleted(ot::serviceID_t _serviceID);
@@ -206,6 +208,8 @@ private:
 	void healthCheckWorker();
 
 	void runWorker();
+
+	void showWorker(ot::serviceID_t _visibleService);
 
 	static void healthCheckFailedNotifier(std::string _sessionID, ot::serviceID_t _failedServiceID);
 

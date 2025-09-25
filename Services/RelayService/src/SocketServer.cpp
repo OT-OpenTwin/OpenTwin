@@ -5,6 +5,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"						// rapidjson wrapper
 #include "OTCore/Logger.h"						// Logger
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
 
@@ -107,6 +108,23 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 			shutdown();
 			return OT_ACTION_RETURN_VALUE_OK;
 		}
+		else if (action == OT_ACTION_CMD_Run) {
+			this->sendQueueWSMessage(_senderIP, _json);
+			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
+		}
+		else if (action == OT_ACTION_CMD_StartupCompleted) {
+			this->sendQueueWSMessage(_senderIP, _json);
+			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
+		}
+		else if (action == OT_ACTION_CMD_Ping) {
+			std::string response;
+			if (!this->sendProcessWSMessage(_senderIP, _json, response)) {
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send ping action document trough websocket"));
+			}
+			else {
+				return QString::fromStdString(response);
+			}
+		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 
@@ -204,6 +222,7 @@ void SocketServer::onNewConnection()
 
 void SocketServer::messageReceived(const QString& _message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
+	OT_LOG("Message received trough websocket: " + _message.toStdString(), ot::OUTGOING_MESSAGE_LOG);
 	try {
 		ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
 		std::string response;
@@ -397,7 +416,7 @@ bool SocketServer::sendProcessWSMessage(const std::string& _senderIP, const std:
 	OT_LOG_D("Relaying received execute message to websocket and wait for response");
 
 	m_client->sendTextMessage(QString::fromStdString(request));
-	
+
 	while (m_messageHandler.isWaitingForResponse(messageId) && m_pWebSocketServer) {
 		QEventLoop loop;
 		connect(this, &SocketServer::responseReceived, &loop, &QEventLoop::quit);

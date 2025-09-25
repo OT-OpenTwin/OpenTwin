@@ -20,7 +20,7 @@
 #include <chrono>
 
 GlobalSessionService::GlobalSessionService()
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
+	: m_serviceInfo(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
 	m_connectionStatus(Disconnected), m_healthCheckRunning(false), m_workerThread(nullptr)
 {
 
@@ -32,20 +32,24 @@ GlobalSessionService::~GlobalSessionService() {
 
 bool GlobalSessionService::connect(const std::string& _url) {
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
+		m_mutex.lock();
 
 		// Ensure connection status is disconnected
 		if (m_connectionStatus != Disconnected) {
+			m_mutex.unlock();
+
 			OT_LOG_E("GSS state is not Disconnected. Ignoring request for \"" + _url + "\"");
 			return false;
+		}
+		else {
+			m_mutex.unlock();
 		}
 
 		// Clean up potentially running health check thread
 		this->stopHealthCheck();
 		
 		// Update information
-		this->setServiceURL(_url);
-
+		m_serviceInfo.setServiceURL(_url);
 		m_connectionStatus = CheckingNewConnection;
 
 		OT_LOG_D("Checking for connection to new GDS at \"" + _url + "\"");
@@ -82,14 +86,14 @@ bool GlobalSessionService::confirmSession(const std::string& _sessionID, const s
 	confirmDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(_userName, confirmDoc.GetAllocator()), confirmDoc.GetAllocator());
 	confirmDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_registrationResult.getServiceID(), confirmDoc.GetAllocator());
-
+	
 	// Send ping
 	std::string responseStr;
-	if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, confirmDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Global session service can not be reached");
+	if (!this->sendMessage(ot::EXECUTE, confirmDoc.toJson(), responseStr)) {
 		return false;
 	}
-
+	
+	// Read result
 	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(responseStr);
 	if (msg == ot::ReturnMessage::Ok) {
 		return true;
@@ -110,11 +114,11 @@ bool GlobalSessionService::notifySessionShutdownCompleted(const std::string& _se
 
 	// Send ping
 	std::string responseStr;
-	if (!ot::msg::send(lss.getUrl(), m_serviceURL, ot::EXECUTE, confirmDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Global session service can not be reached");
+	if (!this->sendMessage(ot::EXECUTE, confirmDoc.toJson(), responseStr)) {
 		return false;
 	}
 
+	// Read result
 	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(responseStr);
 	if (msg == ot::ReturnMessage::Ok) {
 		return true;
@@ -122,30 +126,6 @@ bool GlobalSessionService::notifySessionShutdownCompleted(const std::string& _se
 	else {
 		OT_LOG_E("Failed to notify session closed \"" + _sessionID + "\". Message: \"" + msg.getWhat() + "\"");
 		return false;
-	}
-}
-
-void GlobalSessionService::startHealthCheck(void) {
-	if (m_healthCheckRunning) {
-		OT_LOG_EA("Health check already running");
-		return;
-	}
-
-	m_healthCheckRunning = true;
-
-	OT_LOG_D("Starting health check");
-	m_workerThread = new std::thread(&GlobalSessionService::healthCheck, this);
-}
-
-void GlobalSessionService::stopHealthCheck() {
-	if (m_workerThread) {
-		m_healthCheckRunning = false;
-		if (m_workerThread->joinable()) {
-			m_workerThread->join();
-		}
-
-		delete m_workerThread;
-		m_workerThread = nullptr;
 	}
 }
 
@@ -195,7 +175,80 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonA
 
 // Private functions
 
-void GlobalSessionService::healthCheck(void) {
+bool GlobalSessionService::ensureConnection() {
+	int attemt = 0;
+	const int attemptSleepTime = 10;
+	const int attemtLimit = 60 * (1000 / attemptSleepTime);
+	while (!this->isConnected()) {
+		if (++attemt >= attemtLimit) {
+			OT_LOG_E("Failed to send message to LSS: Failed to establish connection");
+			m_mutex.lock();
+			m_connectionStatus = Disconnected;
+			m_mutex.unlock();
+			return false;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(attemptSleepTime));
+	}
+
+	return true;
+}
+
+bool GlobalSessionService::sendMessage(ot::MessageType _messageType, const std::string& _message, std::string& _response) {
+	m_mutex.lock();
+	std::string receiverUrl = m_serviceInfo.getServiceURL();
+	m_mutex.unlock();
+
+	if (!ot::msg::send("", receiverUrl, _messageType, _message, _response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		m_mutex.lock();
+		m_connectionStatus = Disconnected;
+		m_mutex.unlock();
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+void GlobalSessionService::startHealthCheck() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_healthCheckRunning) {
+		OT_LOG_EA("Health check already running");
+		return;
+	}
+
+	m_healthCheckRunning = true;
+
+	OT_LOG_D("Starting health check");
+	m_workerThread = new std::thread(&GlobalSessionService::healthCheck, this);
+}
+
+void GlobalSessionService::stopHealthCheck() {
+	m_mutex.lock();
+
+	if (m_workerThread) {
+		m_healthCheckRunning = false;
+
+		m_mutex.unlock();
+
+		if (m_workerThread->joinable()) {
+			m_workerThread->join();
+		}
+
+		m_mutex.lock();
+
+		delete m_workerThread;
+		m_workerThread = nullptr;
+
+		m_mutex.unlock();
+	}
+	else {
+		m_mutex.unlock();
+	}
+}
+
+void GlobalSessionService::healthCheck() {
 	int ct;
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PING, pingDoc.GetAllocator()), pingDoc.GetAllocator());
@@ -207,72 +260,78 @@ void GlobalSessionService::healthCheck(void) {
 		std::string pingResponse;
 
 		// Send ping
-		if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, pingMessage, pingResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_W("Global session service can not be reached at \"" + m_serviceURL + "\"");
-			m_connectionStatus = Disconnected;
-		}
-		// Check response
-		else if (pingResponse != OT_ACTION_PING) {
-			OT_LOG_W("Received invalid ping response from global session service");
-			m_connectionStatus = Disconnected;
-		}
-		else if (m_connectionStatus != Connected) {
-			// Register at the session service
-			ot::JsonDocument registerDoc;
-			registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-			registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-
-			registerDoc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
-
-			ot::JsonArray iniListArr;
-			registerDoc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, registerDoc.GetAllocator());
-
-			std::string registerResponse;
-
-			// Send registration
-			if (!ot::msg::send(lssUrl, m_serviceURL, ot::EXECUTE, registerDoc.toJson(), registerResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send register message to global session service");
+		if (this->sendMessage(ot::EXECUTE, pingMessage, pingResponse)) {
+			// Check response
+			if (pingResponse != OT_ACTION_PING) {
+				OT_LOG_W("Received invalid ping response from global session service");
+				m_mutex.lock();
+				m_connectionStatus = Disconnected;
+				m_mutex.unlock();
 			}
-			else OT_ACTION_IF_RESPONSE_ERROR(registerResponse) {
-				OT_LOG_E(registerResponse);
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(registerResponse) {
-				OT_LOG_W(registerResponse);
-			}
-			else {
-				// Get new id and database url
-				ot::JsonDocument registrationResponseDoc;
-				registrationResponseDoc.fromJson(registerResponse);
+			else if (!this->isConnected()) {
+				// Register at the session service
+				ot::JsonDocument registerDoc;
+				registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+				registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+				registerDoc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 
-				GSSRegistrationInfo info;
-				info.setServiceID(ot::json::getUInt(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_ID));
-				info.setDataBaseURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_DATABASE_URL));
-				info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
-				
-				if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
-					info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
+				ot::JsonArray iniListArr;
+				registerDoc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, registerDoc.GetAllocator());
+
+				std::string registerResponse;
+
+				// Send registration
+				if (!this->sendMessage(ot::EXECUTE, registerDoc.toJson(), registerResponse)) {
+					OT_LOG_E("Failed to send register message to global session service");
 				}
+				else {
+					ot::ReturnMessage response = ot::ReturnMessage::fromJson(registerResponse);
 
-				// Get global log flags if provided
-				
-				if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
-					ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
-					ot::LogModeManager logManager;
-					logManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(logFlags));
-					info.setLogInfo(logManager);
+					if (response != ot::ReturnMessage::Ok) {
+						OT_LOG_E("Failed to register at GSS: " + response.getWhat());
+					}
+					else {
+						// Get new id and database url
+						ot::JsonDocument registrationResponseDoc;
+						registrationResponseDoc.fromJson(response.getWhat());
+
+						GSSRegistrationInfo info;
+						info.setServiceID(ot::json::getUInt(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_ID));
+						info.setDataBaseURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_DATABASE_URL));
+						info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
+
+						if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
+							info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
+						}
+
+						// Get global log flags if provided
+
+						if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
+							ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+							ot::LogModeManager logManager;
+							logManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(logFlags));
+							info.setLogInfo(logManager);
+						}
+
+						m_mutex.lock();
+
+						m_registrationResult = std::move(info);
+
+						// Set connection status to connected
+						m_connectionStatus = Connected;
+
+						m_mutex.unlock();
+					}
 				}
-
-				m_registrationResult = std::move(info);
-
-				// Set connection status to connected
-				m_connectionStatus = Connected;
 			}
 		}
 
 		ct = 0;
-		while (ct++ < 60 && m_healthCheckRunning) { // Wait for 1 min
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1s);
+		while (ct++ < 6000 && m_healthCheckRunning) { // Wait for 1 min
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			if (!this->isConnected()) {
+				break;
+			}
 		}
 	}
 }

@@ -11,13 +11,14 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/CommunicationTypes.h"
 
 // std header
 #include <mutex>
 
 namespace std { class thread; }
 
-class GlobalSessionService : public ot::ServiceBase {
+class GlobalSessionService {
 	OT_DECL_NOCOPY(GlobalSessionService)
 	OT_DECL_NOMOVE(GlobalSessionService)
 public:
@@ -43,10 +44,6 @@ public:
 
 	bool notifySessionShutdownCompleted(const std::string& _sessionID);
 
-	void startHealthCheck();
-
-	void stopHealthCheck();
-
 	GSSRegistrationInfo getRegistrationResult();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -56,11 +53,18 @@ public:
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
 private:
-	void healthCheck(void);
+	bool ensureConnection();
+	bool sendMessage(ot::MessageType _messageType, const std::string& _message, std::string& _response);
+
+	void startHealthCheck();
+	void stopHealthCheck();
+
+	void healthCheck();
 
 	std::mutex          m_mutex;
 	std::atomic_bool    m_healthCheckRunning;
 
+	ot::ServiceBase     m_serviceInfo;
 	ConnectionStatus    m_connectionStatus;
 	std::thread*        m_workerThread;
 	GSSRegistrationInfo m_registrationResult;

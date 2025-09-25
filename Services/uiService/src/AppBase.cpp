@@ -1402,14 +1402,18 @@ void AppBase::startSessionRefreshTimer(void)
 
 void AppBase::sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl)
 {
-	while (1)
+	std::string refreshAction;
 	{
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REFRESH_SESSION, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionUserName, doc.GetAllocator()), doc.GetAllocator());
+		refreshAction = doc.toJson();
+	}
 
+	while (1)
+	{
 		std::string response;
-		m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _authorizationUrl, doc, response);
+		ot::msg::send("", _authorizationUrl, ot::EXECUTE_ONE_WAY_TLS, refreshAction, response);
 
 		OT_LOG_I("Session refresh sent: " + _sessionUserName);
 
