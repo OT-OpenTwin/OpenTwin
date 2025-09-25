@@ -3930,7 +3930,7 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	/*Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);*/
+	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
 void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
