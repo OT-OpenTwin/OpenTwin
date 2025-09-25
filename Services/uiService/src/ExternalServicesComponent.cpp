@@ -4218,7 +4218,7 @@ std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument
 
 	// Send response
 	std::string response;
-	if (!ot::msg::send("", lmsUrl, ot::EXECUTE_ONE_WAY_TLS, responseDoc.toJson(), response)) {
+	if (!sendRelayedRequest(EXECUTE,lmsUrl,responseDoc.toJson(),response)) {
 		OT_LOG_E("Failed to send message to LMS at \"" + lmsUrl + "\"");
 	}
 
