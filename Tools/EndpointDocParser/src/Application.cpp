@@ -217,7 +217,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						OT_LOG_D("Message Type mTLS set in endpoint: " + endpoint.getMessageTypeString());
 					}
 					else {
-						OT_LOG_E("Invalid @security input: Message Type must be TLS or mTLS.");
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid @security input: Message Type must be TLS or mTLS.");
 						return true;
 					}
 
@@ -233,23 +233,17 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					action = ot::String::removePrefixSuffix(action, " ");
 //					OT_LOG_D([ACTION] -> >>" + action + "<<");
 
-					if (!action.empty()) {
-						endpoint.setAction(action);
-						OT_LOG_D("Action set in endpoint: " + endpoint.getAction());
+					endpoint.setAction(action);
+					OT_LOG_D("Action set in endpoint: " + endpoint.getAction());
 
-						if (m_actionMacros.find(action) != m_actionMacros.end()) {
-							std::string actionName = m_actionMacros.at(action);
-//							OT_LOG_D("[ACTIONNAME] -> " + actionName);
-							endpoint.setName(actionName);
-							OT_LOG_D("Name set in endpoint: " + endpoint.getName());
-						}
-						else {
-							OT_LOG_E("Key not found in m_actionMacros: " + action);
-							return true;
-						}
+					if (m_actionMacros.find(action) != m_actionMacros.end()) {
+						std::string actionName = m_actionMacros.at(action);
+//						OT_LOG_D("[ACTIONNAME] -> " + actionName);
+						endpoint.setName(actionName);
+						OT_LOG_D("Name set in endpoint: " + endpoint.getName());
 					}
 					else {
-						OT_LOG_E("Invalid @action input: @action is empty.");
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Key not found in m_actionMacros: " + action);
 						return true;
 					}
 				
@@ -265,14 +259,8 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					brief = ot::String::removePrefixSuffix(brief, " ");
 //					OT_LOG_D("[BRIEF] -> " + brief);
 
-					if (!brief.empty()) {
-						endpoint.setBriefDescription(brief);
-						OT_LOG_D("Brief description set in endpoint: " + endpoint.getBriefDescription());
-					}
-					else {
-						OT_LOG_E("Invalid @brief input: @brief is empty.");
-						return true;
-					}
+					endpoint.setBriefDescription(brief);
+					OT_LOG_D("Brief description set in endpoint: " + endpoint.getBriefDescription());
 					
 					inBriefDescriptionBlock = true;
 					inResponseDescriptionBlock = false;
@@ -288,13 +276,8 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					param = ot::String::removePrefixSuffix(param, " ");
 //					OT_LOG_D("[PARAM] -> " + param);
 
-					if (!param.empty()) {
-						if (parseParameter(parameter, param, endpoint, ParameterType::FunctionParam)) {
-							return true;
-						}
-					}
-					else {
-						OT_LOG_E("Invalid @param input: @param is empty.");
+					if (parseParameter(parameter, param, endpoint, ParameterType::FunctionParam)) {
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction());
 						return true;
 					}
 
@@ -310,15 +293,9 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					response = ot::String::removePrefixSuffix(response, " ");
 //					OT_LOG_D("[RETURN] -> " + response);
 
-					if (!response.empty()) {
-						endpoint.addResponseDescription(response);
-						OT_LOG_D("Response set in endpoint:");
-						endpoint.printResponseDescription();
-					}
-					else {
-						OT_LOG_E("Invalid @return input: @return is empty.");
-						return true;
-					}
+					endpoint.addResponseDescription(response);
+					OT_LOG_D("Response set in endpoint:");
+					endpoint.printResponseDescription();
 
 					inBriefDescriptionBlock = false;
 					inResponseDescriptionBlock = true;
@@ -334,13 +311,8 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					rparam = ot::String::removePrefixSuffix(rparam, " ");
 //					OT_LOG_D("[PARAM] -> " + param);
 
-					if (!rparam.empty()) {
-						if (parseParameter(parameter, rparam, endpoint, ParameterType::ReturnParam)) {
-							return true;
-						}
-					}
-					else {
-						OT_LOG_E("Invalid @rparam input: @rparam is empty.");
+					if (parseParameter(parameter, rparam, endpoint, ParameterType::ReturnParam)) {
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction());
 						return true;
 					}
 
@@ -360,19 +332,13 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(6);
 						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 
-						if (!apiContent.empty()) {
-							apiContent = "@note " + apiContent;
+						apiContent = "@note " + apiContent;
 
-							if (inBriefDescriptionBlock) {
-								endpoint.addDetailedDescription(apiContent);
-							}
-							else {
-								endpoint.addResponseDescription(apiContent);
-							}
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
 						}
 						else {
-							OT_LOG_E("Invalid @note input: @note is empty.");
-							return true;
+							endpoint.addResponseDescription(apiContent);
 						}
 					}
 					else if (startsWith(lowerCaseApiContent, "@warning ")) {
@@ -383,23 +349,32 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(9);
 						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 
-						if (!apiContent.empty()) {
-							apiContent = "@warning " + apiContent;
+						apiContent = "@warning " + apiContent;
 
-							if (inBriefDescriptionBlock) {
-								endpoint.addDetailedDescription(apiContent);
-							}
-							else {
-								endpoint.addResponseDescription(apiContent);
-							}
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
 						}
 						else {
-							OT_LOG_E("Invalid @warning input: @warning is empty.");
-							return true;
+							endpoint.addResponseDescription(apiContent);
 						}
 					}
-					else if (startsWith(lowerCaseApiContent, "@detail")) {
-						apiContent = apiContent.substr(8);
+					else if (startsWith(lowerCaseApiContent, "@endnote ")) {
+						apiContent = apiContent.substr(9);
+						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+
+						if (inBriefDescriptionBlock) {
+							endpoint.addDetailedDescription(apiContent);
+						}
+						else {
+							endpoint.addResponseDescription(apiContent);
+						}
+
+						inNoteBlock = false;
+						inWarningBlock = false;
+					}
+					else if (startsWith(lowerCaseApiContent, "@endwarning ")) {
+						apiContent = apiContent.substr(12);
+						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 
 						if (inBriefDescriptionBlock) {
 							endpoint.addDetailedDescription(apiContent);
@@ -463,13 +438,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(6);
 						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 
-						if (!apiContent.empty()) {
-							addDescriptionToLastParameter(paramList, "@note " + apiContent);
-						}
-						else {
-							OT_LOG_E("Invalid @note input: @note is empty.");
-							return true;
-						}
+						addDescriptionToLastParameter(paramList, "@note " + apiContent);
 					}
 					else if (startsWith(lowerCaseApiContent, "@warning ")) {
 						OT_LOG_D("Detected @warning.");						
@@ -479,18 +448,25 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						apiContent = apiContent.substr(9);
 						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
 
-						if (!apiContent.empty()) {
-							addDescriptionToLastParameter(paramList, "@warning " + apiContent);
-						}
-						else {
-							OT_LOG_E("Invalid @warning input: @warning is empty.");
-							return true;
-						}
+						addDescriptionToLastParameter(paramList, "@warning " + apiContent);
 					}
-					else if (startsWith(lowerCaseApiContent, "@detail")) {
+					else if (startsWith(lowerCaseApiContent, "@endnote ")) {
 						inNoteBlock = false;
 						inWarningBlock = false;
-						addDescriptionToLastParameter(paramList, apiContent.substr(8));						
+
+						apiContent = apiContent.substr(9);
+						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+
+						addDescriptionToLastParameter(paramList, apiContent);						
+					}
+					else if (startsWith(lowerCaseApiContent, "@endwarning ")) {
+						inNoteBlock = false;
+						inWarningBlock = false;
+
+						apiContent = apiContent.substr(12);
+						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+
+						addDescriptionToLastParameter(paramList, apiContent);						
 					}
 					else if (inNoteBlock) {
 						addDescriptionToLastParameter(paramList, "@note " + apiContent);
@@ -503,24 +479,39 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					}
 				}
 				else {
-					OT_LOG_E("[UNKNOWN] -> " + apiContent);
+					OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "[UNKNOWN] -> " + apiContent);
 					return true;
 				}
 			}
 			else {
 				if (inApiBlock) {
 					// end of api block, add endpoint to service
-					OT_LOG_D("The parsed endpoint is:");
-					endpoint.printEndpoint();				
 					
-					OT_LOG_D("The service is " + _service.getName() + ".");
-					_service.addEndpoint(endpoint);
-					OT_LOG_D("Added endpoint to service.");
-					_service.printService();
+					if (!endpoint.getName().empty()) {
+						OT_LOG_D("The parsed endpoint is:");
+						endpoint.printEndpoint();
 
-					inApiBlock = false;
-					OT_LOG_D("Detected end of api documentation block.");
-					OT_LOG_D("-----------------------------------------------------------------------------------");
+						OT_LOG_D("The service is " + _service.getName() + ".");
+
+						_service.addEndpoint(endpoint);
+						OT_LOG_D("Added endpoint to service.");
+						_service.printService();
+
+						inApiBlock = false;
+						OT_LOG_D("Detected end of api documentation block.");
+						OT_LOG_D("-----------------------------------------------------------------------------------");
+
+						inBriefDescriptionBlock = false;
+						inResponseDescriptionBlock = false;
+						inParameterBlock = false;
+						inReturnParameterBlock = false;
+						inNoteBlock = false;
+						inWarningBlock = false;
+					}
+					else {
+						OT_LOG_E(_service.getName() + " " + endpoint.getAction() + ": " + "Invalid Endpoint can't be added to service: Endpoint has no name.");
+						return true;
+					}
 				}
 			}
 		}
@@ -554,9 +545,15 @@ bool Application::parseParameter(Parameter& _parameter, const std::string& _para
 	_parameter.setMacro(macro);
 //	OT_LOG_D("Macro set in parameter: " + _parameter.getMacro());
 
-	std::string name = m_actionMacros.at(macro);
-	_parameter.setName(name);
-//	OT_LOG_D("Macroname set in parameter: " + _parameter.getName());
+	if (m_actionMacros.find(macro) != m_actionMacros.end()) {
+		std::string name = m_actionMacros.at(macro);
+		_parameter.setName(name);
+//		OT_LOG_D("Macroname set in parameter: " + _parameter.getName());
+	}
+	else {
+		OT_LOG_E("Key not found in m_actionMacros: " + macro);
+		return true;
+	}
 
 	std::string dataType = splittedParamVector[1];
 
