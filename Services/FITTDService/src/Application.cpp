@@ -493,7 +493,7 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 		try
 		{
 			m_uiComponent->displayMessage("Start solver: "+ solverName +"\n");
-			MicroServiceInterfaceFITTDSolver newSolver(solverName, getServiceIDAsInt(), getSessionCount(), getClassFactory());
+			MicroServiceInterfaceFITTDSolver newSolver(solverName, static_cast<int>(getServiceID()), getSessionCount(), getClassFactory());
 			SetupSolverService(newSolver);
 			newSolver.RemoveOldResults();
 			newSolver.CreateSolver();

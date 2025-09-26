@@ -35,15 +35,15 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	// Read supported services from environment
 	Configuration::instance().importFromEnvironment();
 
-	m_serviceURL = _ownURL;
+	this->setServiceURL(_ownURL);
 
 	// Filter ip and port from own url
-	size_t ix = m_serviceURL.find(':');
+	size_t ix = this->getServiceURL().find(':');
 	if (ix == std::string::npos) {
 		exit(ot::AppExitCode::ServiceUrlInvalid);
 	}
-	std::string ip = m_serviceURL.substr(0, ix);
-	std::string port = m_serviceURL.substr(ix + 1);
+	std::string ip = this->getServiceURL().substr(0, ix);
+	std::string port = this->getServiceURL().substr(ix + 1);
 	if (port.find(':') != std::string::npos) {
 		exit(ot::AppExitCode::ServiceUrlInvalid);
 	}

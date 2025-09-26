@@ -59,7 +59,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	// Register at global session service
 	ot::JsonDocument gssDoc;
 	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-	gssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_serviceURL, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(this->getServiceURL(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
 	OT_LOG_I("Sending registration document to the Global Session Service");
 
@@ -79,7 +79,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	do {
 		gssResponse.clear();
 
-		if (!(ok = ot::msg::send(m_serviceURL, gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		if (!(ok = ot::msg::send(this->getServiceURL(), gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);

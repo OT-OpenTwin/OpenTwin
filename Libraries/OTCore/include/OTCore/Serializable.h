@@ -22,16 +22,16 @@ namespace ot {
 		Serializable() = default;
 		virtual ~Serializable() = default;
 
-		//! @brief Serialize the object data into the provided object by using the provided allocator.
-		//! @param _object Json object value reference to write the data to.
+		//! @brief Serialize the object data into the provided JSON object by using the provided allocator.
+		//! @param _jsonObject JSON object value reference to write the data to.
 		//! @param _allocator Allocator to use when writing data.
 		//! @ref Serializable::addToJsonObject
-		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const = 0;
+		virtual void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const = 0;
 
 		//! @brief Set the data by deserializing the object.
 		//! Set the object contents from the provided JSON object.
-		//! @param _object The JSON object containing the information.
+		//! @param _jsonObject JSON object containing the information.
 		//! @ref Serializable::setFromJsonObject
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) = 0;
+		virtual void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) = 0;
 	};
 }

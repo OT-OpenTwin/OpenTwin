@@ -27,7 +27,7 @@
 // std header
 #include <thread>
 
-Application* Application::instance(void) {
+Application* Application::instance() {
 	static Application* g_instance{ nullptr };
 	if (g_instance == nullptr) { g_instance = new Application; }
 	return g_instance;
@@ -847,7 +847,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	std::string actualOpenedProject = DataBase::GetDataBase()->getProjectName();
 	CrossCollectionDatabaseWrapper wrapper(collectionName);
 		
-	ModelState secondary(m_model->getSessionCount(), m_model->getServiceIDAsInt());
+	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	secondary.openProject();
 
 	std::list<ot::UID> prefetchIds;
@@ -1075,7 +1075,7 @@ void Application::flushRequestsToFrontEnd()
 
 // Required functions
 
-void Application::run(void) {
+void Application::run() {
 	if (m_model) {
 		OT_LOG_E("Model already created!");
 		return;
@@ -1154,7 +1154,7 @@ void Application::serviceDisconnected(const ot::ServiceBase* _service) {
 
 }
 
-void Application::preShutdown(void) {
+void Application::preShutdown() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
 		return;
@@ -1172,17 +1172,17 @@ void Application::preShutdown(void) {
 	m_model = nullptr;
 }
 
-void Application::shuttingDown(void) {
+void Application::shuttingDown() {
 	m_asyncActionMutex.lock();
 	m_continueAsyncActionWorker = false;
 	m_asyncActionMutex.unlock();
 }
 
-bool Application::startAsRelayService(void) const {
+bool Application::startAsRelayService() const {
 	return false;
 }
 
-ot::PropertyGridCfg Application::createSettings(void) const {
+ot::PropertyGridCfg Application::createSettings() const {
 	return ot::PropertyGridCfg();
 }
 
@@ -1220,7 +1220,7 @@ void Application::queueAction(ActionType _type, const ot::JsonDocument& _documen
 	m_asyncActionMutex.unlock();
 }
 
-void Application::asyncActionWorker(void) {
+void Application::asyncActionWorker() {
 	while (this->getContinueAsyncActionWorker()) {
 		// Check if a action is present
 		m_asyncActionMutex.lock();
@@ -1299,7 +1299,7 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 	m_selectionHandler.processSelectionChanged(selectedEntityIDsVerified, selectedVisibleEntityIDsVerified);
 }
 
-bool Application::getContinueAsyncActionWorker(void) {
+bool Application::getContinueAsyncActionWorker() {
 	bool ret = false;
 	m_asyncActionMutex.lock();
 	ret = m_continueAsyncActionWorker;

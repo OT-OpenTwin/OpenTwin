@@ -194,7 +194,7 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 
 	if (!messageWasQueued)
 	{
-		return ot::msg::send(m_serviceURL, destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
+		return ot::msg::send(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
 	}
 	else
 	{

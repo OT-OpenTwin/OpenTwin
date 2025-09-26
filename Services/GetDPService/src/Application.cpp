@@ -415,7 +415,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	std::string logFileText;
 	std::string output = getDPSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
-												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
+												 DataBase::GetDataBase()->getProjectName(), solverEntity, static_cast<int>(getServiceID()), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 
 	// Store the output in a result item

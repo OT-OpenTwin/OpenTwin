@@ -29,7 +29,7 @@ class LocalSessionService;
 //! @class GlobalSessionService
 //! @brief The GlobalSessionService is the central class of this service.
 //! It is responsible for managing all LocalSessionServices and the sessions in them.
-class GlobalSessionService : public ot::ServiceBase, public ot::Serializable {
+class GlobalSessionService : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(GlobalSessionService)
 	OT_DECL_NOCOPY(GlobalSessionService)
 	OT_DECL_NOMOVE(GlobalSessionService)

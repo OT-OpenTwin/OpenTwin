@@ -30,7 +30,7 @@ public:
 		SelectionChanged
 	};
 
-	static Application* instance(void);
+	static Application* instance();
 	
 	//api @security mTLS
 	//api @action OT_ACTION_CMD_MODEL_Delete
@@ -101,8 +101,8 @@ public:
 
 	// Setter / Getter
 
-	Model* getModel(void) const { return m_model; };
-	MicroserviceNotifier* getNotifier(void) const { return m_notifier; };
+	Model* getModel() const { return m_model; };
+	MicroserviceNotifier* getNotifier() const { return m_notifier; };
 
 	std::string getEntityInformation(std::list<ot::UID>& _entityIDList) const;
 
@@ -119,7 +119,7 @@ public:
 	// Required functions
 
 	//! @brief Will be called when the service was successfully started, the hppt and/or websocket connection is established and the service may start its work.
-	virtual void run(void) override;
+	virtual void run() override;
 
 	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation).
 	//! @param _action The action that should be processed
@@ -154,19 +154,19 @@ public:
 
 	//! @brief Will be called before the whole session starts to shut down (shut down can not be stopped).
 	//! At this point all services, that are listed as connected, are still reachable.
-	virtual void preShutdown(void) override;
+	virtual void preShutdown() override;
 
 	//! @brief Will be called when the application is shutting down (shut down can not be stopped).
-	virtual void shuttingDown(void) override;
+	virtual void shuttingDown() override;
 
 	//! @brief Will return true if this application requires a relay service for a websocket connection.
-	virtual bool startAsRelayService(void) const override;
+	virtual bool startAsRelayService() const override;
 
 	//! @brief Create settings that your application uses that are editable in the uiService.
 	//! The created class will be deleted after used for sending or synchronizing with the database.
 	//! The created settings will be requested upon Service startup to synchronize with the database,
 	//! aswell as when the uiService is connected.
-	virtual ot::PropertyGridCfg createSettings(void) const override;
+	virtual ot::PropertyGridCfg createSettings() const override;
 
 	//! @brief This function will be called when the settings were synchronized with the database.
 	//! At this point the values from the dataset should be stored since the dataset will be deleted after this function call.
@@ -191,11 +191,11 @@ public:
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 
-	void asyncActionWorker(void);
+	void asyncActionWorker();
 
 	void handleAsyncSelectionChanged(const ot::JsonDocument& _document);
 
-	bool getContinueAsyncActionWorker(void);
+	bool getContinueAsyncActionWorker();
 
 	struct ActionData {
 		ActionType type;

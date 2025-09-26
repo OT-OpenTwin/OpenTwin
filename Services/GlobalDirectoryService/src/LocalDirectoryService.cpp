@@ -73,8 +73,8 @@ bool LocalDirectoryService::requestToRunService(const ServiceInformation& _servi
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to LDS at \"" + m_serviceURL + "\"");
+	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
 		return false;
 	}
 	bool success = (response == OT_ACTION_RETURN_VALUE_OK);
@@ -92,8 +92,8 @@ bool LocalDirectoryService::requestToRunRelayService(const ServiceInformation& _
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to LDS at \"" + m_serviceURL + "\"");
+	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
 		return false;
 	}
 	else OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -151,11 +151,11 @@ void LocalDirectoryService::sessionClosing(const SessionInformation& _session) {
 
 			// Send message and check response
 			std::string response;
-			if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send session closing notification to LDS at \"" + m_serviceURL + "\"");
+			if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				OT_LOG_E("Failed to send session closing notification to LDS at \"" + this->getServiceURL() + "\"");
 			}
 			else if (response != OT_ACTION_RETURN_VALUE_OK) {
-				OT_LOG_E("Invalid response when sending session closing notification to LDS at \"" + m_serviceURL + "\"");
+				OT_LOG_E("Invalid response when sending session closing notification to LDS at \"" + this->getServiceURL() + "\"");
 			}
 			else {
 				// Successfully notified the LDS about the session shutdown
@@ -185,11 +185,11 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send session closed notification to LDS at \"" + m_serviceURL + "\"");
+					if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+						OT_LOG_E("Failed to send session closed notification to LDS at \"" + this->getServiceURL() + "\"");
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
-						OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + m_serviceURL + "\"");
+						OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + this->getServiceURL() + "\"");
 					}
 				}
 
@@ -226,11 +226,11 @@ void LocalDirectoryService::serviceClosed(const ServiceInformation& _service, co
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send service closed notification to LDS at " + m_serviceURL);
+					if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+						OT_LOG_E("Failed to send service closed notification to LDS at " + this->getServiceURL());
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
-						OT_LOG_E("Invalid response when sending service closed notification to LDS at " + m_serviceURL);
+						OT_LOG_E("Invalid response when sending service closed notification to LDS at " + this->getServiceURL());
 					}
 					else {
 						notified = true;

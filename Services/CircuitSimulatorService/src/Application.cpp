@@ -437,7 +437,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 	// Initialization of subprocess
 	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
+	const int serviceID = static_cast<int>(Application::instance()->getServiceID());
 	if (m_subprocessHandler == nullptr) {
 		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
 	}

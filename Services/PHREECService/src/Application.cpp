@@ -414,7 +414,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 	PHREECLauncher phreecSolver(this);
 
 	std::string output = phreecSolver.startSolver(DataBase::GetDataBase()->getDataBaseServerURL(), frequencyHz, m_uiComponent->getServiceURL(),
-		DataBase::GetDataBase()->getProjectName(), modelVersion, meshEntityID, debugFlag, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
+		DataBase::GetDataBase()->getProjectName(), modelVersion, meshEntityID, debugFlag, static_cast<int>(getServiceID()), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 
 	// Store the output in a result item
