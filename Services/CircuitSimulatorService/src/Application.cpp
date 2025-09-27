@@ -650,7 +650,7 @@ void Application::run(void) {
 	m_serverName = "TestServerCircuit";
 #else
 	// Encode project name to base64 to avoid issues with special characters
-	const std::string hexString = ot::String::toBase64Url(sessionID());
+	const std::string hexString = ot::String::toBase64Url(getSessionID());
 	m_serverName = OT_INFO_SERVICE_TYPE_CircuitSimulatorService "_" + hexString;
 #endif // _DEBUG
 
