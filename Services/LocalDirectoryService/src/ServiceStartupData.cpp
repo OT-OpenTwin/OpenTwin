@@ -6,10 +6,6 @@
 // LDS header
 #include "ServiceStartupData.h"
 
-ServiceStartupData::ServiceStartupData() :
-	m_maxCrashRestarts(0), m_maxStartupRestarts(0), m_initializeAttempt(0), m_startCounter(0)
-{}
-
 ServiceStartupData::ServiceStartupData(const SupportedService & _supportedServiceInfo) 
 	: m_maxCrashRestarts(_supportedServiceInfo.getMaxCrashRestarts()), m_maxStartupRestarts(_supportedServiceInfo.getMaxStartupRestarts()),
 	m_initializeAttempt(0), m_startCounter(0)
