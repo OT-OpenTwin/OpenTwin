@@ -9,7 +9,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -143,11 +143,9 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds.getServiceID(), responseDoc.GetAllocator());
 
-	if (m_logModeManager.getGlobalLogFlagsSet()) {
-		ot::JsonArray flagsArr;
-		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, responseDoc.GetAllocator());
-		responseDoc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, responseDoc.GetAllocator());
-	}
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, responseDoc.GetAllocator());
 
 	// Add LDS entry
 	m_localDirectoryServices.push_back(std::move(newLds));
@@ -364,16 +362,14 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 }
 
 std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
-	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
-	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+	ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(_doc, OT_ACTION_PARAM_Flags));
+	ot::LogDispatcher::instance().setLogFlags(flags);
 
 	// Update existing session services
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());
 	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	ot::addLogFlagsToJsonArray(flags, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -408,9 +404,9 @@ std::string Application::handleGetDebugInformation(ot::JsonDocument& _doc) {
 	m_startupDispatcher.addToJsonObject(startupObj, doc.GetAllocator());
 	doc.AddMember("StartupDispatcher", startupObj, doc.GetAllocator());
 
-	ot::JsonObject logManagerObj;
-	m_logModeManager.addToJsonObject(logManagerObj, doc.GetAllocator());
-	doc.AddMember("LogModeManager", logManagerObj, doc.GetAllocator());
+	ot::JsonArray logFlagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlagsArr, doc.GetAllocator());
+	doc.AddMember("LogFlags", logFlagsArr, doc.GetAllocator());
 
 	return doc.toJson();
 }

@@ -1,7 +1,7 @@
 
 #include "EntityProperties.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyInt.h"

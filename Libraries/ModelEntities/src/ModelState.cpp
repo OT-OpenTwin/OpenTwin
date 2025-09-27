@@ -4,7 +4,7 @@
 #undef min
 
 #include "ModelState.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 #include "DataBase.h"
 #include "EntityBase.h"

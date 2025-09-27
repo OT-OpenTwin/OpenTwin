@@ -9,7 +9,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OT header
-#include "OTCore/Logger.h"		// LogMessage
+#include "OTCore/LogDispatcher.h"		// LogMessage
 
 // Qt header
 #include <QtCore/qobject.h>

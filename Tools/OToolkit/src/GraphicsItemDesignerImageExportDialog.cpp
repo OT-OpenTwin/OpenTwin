@@ -10,7 +10,7 @@
 #include "GraphicsItemDesignerImageExportDialog.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"

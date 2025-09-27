@@ -11,7 +11,6 @@
 // Open twin header
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/IDManager.h"
@@ -88,5 +87,4 @@ private:
 	std::mutex                         m_mutex;
 	StartupDispatcher                  m_startupDispatcher;
 	ot::SystemInformation              m_systemLoadInformation;
-	ot::LogModeManager                 m_logModeManager;
 };

@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/Dialog.h"
 

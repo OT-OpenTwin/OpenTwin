@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/FileExtension.h"
 
 std::string ot::FileExtension::toFilterString(const std::list<DefaultFileExtension>& _extensions) {

@@ -11,7 +11,7 @@
 // OpenTwin header
 #include "OTSystem/DateTime.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/BasicScopedBoolWrapper.h"

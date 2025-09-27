@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/PolarPlotData.h"
 
 ot::PolarPlotData::PolarPlotData(const double* _phase, const double* _magnitude, size_t _numberOfEntries) :

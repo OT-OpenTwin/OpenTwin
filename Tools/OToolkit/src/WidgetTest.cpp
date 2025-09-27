@@ -6,7 +6,7 @@
 #include "WidgetTest.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
 
 #include "OTGui/PropertyGroup.h"

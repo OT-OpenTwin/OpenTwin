@@ -10,7 +10,7 @@
 #include "OTSystem/AppExitCodes.h"
 
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"

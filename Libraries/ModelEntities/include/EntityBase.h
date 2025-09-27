@@ -12,7 +12,7 @@
 #include "ModelState.h"
 #include "OldTreeIcon.h"
 #include "OTGui/CopyInformation.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 class EntityBase;
 class ClassFactoryHandler;

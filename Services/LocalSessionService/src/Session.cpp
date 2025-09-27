@@ -11,7 +11,7 @@
 // OpenTwin header
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 

@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTModelAPI/OTModelAPIExport.h"
 #include "EntityBase.h"

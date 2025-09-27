@@ -323,7 +323,7 @@ AppBase::AppBase()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0), m_bufferSize(1000), m_notifyThreadRunning(false)
 {
 	// Set this so the log dispatcher will not destroy the AppBase
-	this->setDeleteLogNotifierLater(true);
+	this->setCustomDeleteLogNotifier(true);
 
 	m_fileManager.initialize();
 

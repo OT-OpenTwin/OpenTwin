@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Queue.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 #ifndef OT_CFG_QueueUseGarbageLimit
 //! @brief If set to true the garbage collection will clear when reaching the QueueGarbageLimit

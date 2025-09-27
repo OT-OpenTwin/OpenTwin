@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/AbstractLogNotifier.h"
 #include "OTSystem/Flags.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 #include "OTCommunication/CommunicationTypes.h"

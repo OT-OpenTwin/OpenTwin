@@ -10,9 +10,9 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/AbstractLogNotifier.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 

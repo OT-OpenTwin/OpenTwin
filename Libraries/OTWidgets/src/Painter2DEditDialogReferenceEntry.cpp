@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Painter2DEditDialogReferenceEntry.h"

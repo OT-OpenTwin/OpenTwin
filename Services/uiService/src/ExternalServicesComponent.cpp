@@ -20,7 +20,7 @@
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/Color.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"

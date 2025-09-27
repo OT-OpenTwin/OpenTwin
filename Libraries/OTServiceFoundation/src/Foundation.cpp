@@ -6,7 +6,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "OTServiceFoundation/Foundation.h"

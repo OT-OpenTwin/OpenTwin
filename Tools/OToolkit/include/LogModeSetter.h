@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/LogModeManager.h"
+#include "OTCore/LogTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -36,7 +36,7 @@ private Q_SLOTS:
 private:
 	void stopWorker(bool _success);
 
-	void sendWorker(std::string _gss, ot::LogModeManager _newMode);
+	void sendWorker(std::string _gss, ot::LogFlags _newMode);
 
 	bool sendGlobalMode(const std::string& _gss, const ot::LogFlags& _flags);
 

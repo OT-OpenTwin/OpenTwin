@@ -14,7 +14,7 @@
 #include "ViewerToolBar.h"
 #include "GlobalFontPath.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/VariableToStringConverter.h"
 
 namespace ViewerAPI {

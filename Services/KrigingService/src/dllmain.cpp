@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/Foundation.h"
 
 // Service header

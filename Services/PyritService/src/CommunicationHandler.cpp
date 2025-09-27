@@ -5,7 +5,7 @@
 #include "SubprocessManager.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"

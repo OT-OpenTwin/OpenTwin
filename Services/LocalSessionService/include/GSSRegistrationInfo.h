@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/LogTypes.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogModeManager.h"
 
 class GSSRegistrationInfo {
 	OT_DECL_DEFCOPY(GSSRegistrationInfo)
@@ -31,8 +31,8 @@ public:
 	void setGdsURL(const std::string& _url) { m_gdsURL = _url; };
 	const std::string& getGdsURL(void) const { return m_gdsURL; };
 
-	void setLogInfo(const ot::LogModeManager& _logManager) { m_logManager = _logManager; };
-	const ot::LogModeManager& getLogInfo(void) const { return m_logManager; };
+	void setLogFlags(const ot::LogFlags& _flags) { m_logFlags = _flags; };
+	const ot::LogFlags& getLogFlags(void) const { return m_logFlags; };
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -45,5 +45,5 @@ private:
 	std::string        m_databaseURL;
 	std::string        m_authURL;
 	std::string        m_gdsURL;
-	ot::LogModeManager m_logManager;
+	ot::LogFlags       m_logFlags;
 };

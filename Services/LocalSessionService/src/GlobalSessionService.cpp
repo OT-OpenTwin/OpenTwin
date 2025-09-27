@@ -9,7 +9,7 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -306,12 +306,8 @@ void GlobalSessionService::healthCheck() {
 
 						// Get global log flags if provided
 
-						if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
-							ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
-							ot::LogModeManager logManager;
-							logManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(logFlags));
-							info.setLogInfo(logManager);
-						}
+						ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+						info.setLogFlags(ot::logFlagsFromJsonArray(logFlags));
 
 						m_mutex.lock();
 

@@ -7,10 +7,10 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTCore/LogTypes.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/LogModeManager.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
@@ -158,6 +158,5 @@ private:
 	ot::IDManager<ot::serviceID_t>				m_lssIdManager;          //! @brief ID generator used to assign IDs to the LSS.
 	ot::SystemInformation						m_systemLoadInformation; //! @brief Current system load information.
 
-	ot::LogModeManager m_logModeManager;                                 //! @brief Log mode manager.
 	std::string m_frontendInstallerFileContent;                          //! @brief Contents of the installer that will be provided to the frontend.
 };

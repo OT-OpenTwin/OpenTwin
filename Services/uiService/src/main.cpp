@@ -11,7 +11,7 @@
 
 // OT header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"

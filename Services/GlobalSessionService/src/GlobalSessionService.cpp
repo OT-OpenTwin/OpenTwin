@@ -13,7 +13,7 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
@@ -80,9 +80,9 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 	}
 	_object.AddMember("LSSMap", lssArr, _allocator);
 
-	ot::JsonObject logManagerObj;
-	m_logModeManager.addToJsonObject(logManagerObj, _allocator);
-	_object.AddMember("LogModeManager", logManagerObj, _allocator);
+	ot::JsonArray logFlagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlagsArr, _allocator);
+	_object.AddMember("LogFlags", logFlagsArr, _allocator);
 	
 	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
 }
@@ -517,11 +517,9 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
 
-	if (m_logModeManager.getGlobalLogFlagsSet()) {
-		ot::JsonArray flagsArr;
-		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, reply.GetAllocator());
-		reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
-	}
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, reply.toJson());
 }
@@ -627,15 +625,14 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 
 std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
-	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
 
 	// Update existing session services
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());
+
 	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 	
 	std::string json = doc.toJson();

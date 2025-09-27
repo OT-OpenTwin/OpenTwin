@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsConnectionCalculationData.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/QtFactory.h"

@@ -10,7 +10,7 @@
 #include "OTSystem/Exception.h"
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
@@ -56,9 +56,12 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	if (!lss.m_gss.connect(_gssUrl)) {
 		return ot::AppExitCode::GSSRegistrationFailed;
 	}
+	GSSRegistrationInfo regInfo = lss.m_gss.getRegistrationResult();
+
+	// Initialize log flags
+	ot::LogDispatcher::instance().setLogFlags(regInfo.getLogFlags());
 
 	// Initialize connection to GDS
-	GSSRegistrationInfo regInfo = lss.m_gss.getRegistrationResult();
 	if (!lss.m_gds.connect(regInfo.getGdsURL(), true)) {
 		return ot::AppExitCode::GDSRegistrationFailed;
 	}
@@ -236,13 +239,13 @@ bool SessionService::runMandatoryServices(Session& _session) {
 	return true;
 }
 
-void SessionService::updateLogMode(const ot::LogModeManager& _newData) {
-	m_logModeManager = _newData;
+void SessionService::updateLogMode(const ot::LogFlags& _newData) {
+	ot::LogDispatcher::instance().setLogFlags(_newData);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetLogFlags, doc.GetAllocator());
 	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	ot::addLogFlagsToJsonArray(_newData, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 
 	std::string notificationMessage = doc.toJson();
@@ -661,11 +664,9 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	responseDoc.AddMember(OT_ACTION_PARAM_GlobalLoggerUrl, ot::JsonString(ot::ServiceLogNotifier::instance().loggingServiceURL(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-	if (m_logModeManager.getGlobalLogFlagsSet()) {
-		ot::JsonArray logData;
-		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), logData, responseDoc.GetAllocator());
-		responseDoc.AddMember(OT_ACTION_PARAM_LogFlags, logData, responseDoc.GetAllocator());
-	}
+	ot::JsonArray logData;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logData, responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_LogFlags, logData, responseDoc.GetAllocator());
 
 	// Finally store the session and start its health check
 	Session& addedSession = m_sessions.insert_or_assign(newSession.getID(), std::move(newSession)).first->second;
@@ -717,12 +718,11 @@ std::string SessionService::handleConfirmService(ot::JsonDocument& _commandDoc) 
 	if (serviceInfo.getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 		response.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession.getToolBarTabOrder(), response.GetAllocator()), response.GetAllocator());
 	}
-	if (m_logModeManager.getGlobalLogFlagsSet()) {
-		ot::JsonArray logArr;
-		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), logArr, response.GetAllocator());
-		response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
-	}
-
+	
+	ot::JsonArray logArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logArr, response.GetAllocator());
+	response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
+	
 	// If all services are ready, add services information
 	if (!theSession.hasRequestedServices(serviceID)) {
 		// Session is already active
@@ -980,13 +980,10 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	ot::ConstJsonArray flags = ot::json::getArray(_commandDoc, OT_ACTION_PARAM_Flags);
-	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+	ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(_commandDoc, OT_ACTION_PARAM_Flags));
 
 	// Update existing session services
-	this->updateLogMode(m_logModeManager);
+	this->updateLogMode(flags);
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }

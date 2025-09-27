@@ -12,7 +12,7 @@
 #include "UiNotifier.h"
 
 // Open twin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"

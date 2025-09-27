@@ -4,7 +4,7 @@
 #include "CommunicationHandler.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "DataBuffer.h"
 // Qt header
 #include <QtCore/qeventloop.h>

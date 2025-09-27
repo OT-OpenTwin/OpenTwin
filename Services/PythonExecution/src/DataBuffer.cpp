@@ -1,5 +1,5 @@
 #include "DataBuffer.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "PythonObjectBuilder.h"
 
 DataBuffer& DataBuffer::instance(void) {

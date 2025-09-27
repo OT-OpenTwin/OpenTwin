@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/SystemServiceConfigInfo.h"
 
 #ifdef OT_OS_WINDOWS

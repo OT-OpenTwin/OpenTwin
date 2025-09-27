@@ -8,7 +8,7 @@
 #include "Session.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
 

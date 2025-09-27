@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OverlayWidgetBase.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/Positioning.h"
 
 // Qt header

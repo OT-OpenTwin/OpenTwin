@@ -11,7 +11,7 @@
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"

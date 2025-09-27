@@ -1,5 +1,5 @@
 #include "EntityBlock.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
 

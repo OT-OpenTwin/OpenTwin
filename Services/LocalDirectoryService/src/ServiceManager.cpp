@@ -9,7 +9,7 @@
 #include "ServiceManager.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTSystem/PortManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"

@@ -10,7 +10,7 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"

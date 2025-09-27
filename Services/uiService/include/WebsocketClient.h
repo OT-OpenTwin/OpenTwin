@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header

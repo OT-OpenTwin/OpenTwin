@@ -13,8 +13,8 @@
 // OpenTwin header
 #include "OTSystem/PortManager.h"
 #include "OTSystem/SystemInformation.h"
+#include "OTCore/LogTypes.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
@@ -62,7 +62,7 @@ private:
 
 	bool runMandatoryServices(Session& _session);
 
-	void updateLogMode(const ot::LogModeManager& _newData);
+	void updateLogMode(const ot::LogFlags& _newData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -130,6 +130,4 @@ private:
 	std::map<std::string, std::list<ot::ServiceBase>> m_mandatoryServicesMap; //! @brief Map containing all names of mandatory services for each session type
 
 	ot::PortManager                                   m_debugPortManager;
-	ot::LogModeManager                                m_logModeManager;
-
 };

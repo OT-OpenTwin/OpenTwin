@@ -18,7 +18,7 @@
 #include "OTCore/ReturnMessage.h"
 // OpenTwin header
 #include "DataBase.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTServiceFoundation/UiComponent.h"

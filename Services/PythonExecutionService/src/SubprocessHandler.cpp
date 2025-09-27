@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // std header
 #include <thread>

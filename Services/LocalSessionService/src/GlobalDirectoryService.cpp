@@ -8,7 +8,7 @@
 #include "GlobalDirectoryService.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"

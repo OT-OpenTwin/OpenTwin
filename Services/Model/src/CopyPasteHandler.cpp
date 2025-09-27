@@ -1,7 +1,7 @@
 #include <stdafx.h>
 #include "CopyPasteHandler.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/CopyInformation.h"
 #include "Application.h"
 #include "Model.h"

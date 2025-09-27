@@ -1,7 +1,7 @@
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"

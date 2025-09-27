@@ -6,7 +6,7 @@
 
 // OpenTwin header
 #include "SelectEntitiesDialog.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/TreeWidgetItem.h"

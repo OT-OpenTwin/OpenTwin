@@ -14,10 +14,10 @@
 #include "NavigationSelectionManager.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/AbstractLogNotifier.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"

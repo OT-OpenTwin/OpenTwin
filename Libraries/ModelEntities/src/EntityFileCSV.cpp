@@ -2,7 +2,7 @@
 
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCommunication/ActionTypes.h"
 #include "CSVProperties.h"

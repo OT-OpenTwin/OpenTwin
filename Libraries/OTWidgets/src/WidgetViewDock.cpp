@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/WidgetViewTab.h"
 #include "OTWidgets/WidgetViewDock.h"
 

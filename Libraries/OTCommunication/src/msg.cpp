@@ -7,7 +7,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/ThisComputerInfo.h"

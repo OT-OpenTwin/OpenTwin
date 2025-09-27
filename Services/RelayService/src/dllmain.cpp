@@ -9,7 +9,7 @@
 // Open Twin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"					// rapidjson wrapper
-#include "OTCore/Logger.h"				// Logger
+#include "OTCore/LogDispatcher.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition

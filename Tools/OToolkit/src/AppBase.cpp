@@ -494,7 +494,7 @@ void AppBase::slotColorStyleChanged(void) {
 AppBase::AppBase(QApplication* _app) 
 	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
 {
-	this->setDeleteLogNotifierLater(true);
+	this->setCustomDeleteLogNotifier(true);
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	// Initialize dock manager
