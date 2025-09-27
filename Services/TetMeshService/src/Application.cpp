@@ -406,7 +406,7 @@ void Application::exportMesh(void)
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::importMesh(void)
@@ -424,7 +424,7 @@ void Application::importMesh(void)
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::exportMeshFile(const std::string &fileName)
@@ -477,7 +477,7 @@ void Application::exportMeshFile(const std::string &fileName)
 	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLength, doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 std::string Application::getCurrentlySelectedMeshName(void)

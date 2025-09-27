@@ -281,12 +281,12 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 void Application::importProject(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has already been initialized.");
+		getUiComponent()->displayErrorPrompt("This project has already been initialized.");
 		return;
 	}
 	 
@@ -296,7 +296,7 @@ void Application::importProject(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::setCSTFile(void)
@@ -304,7 +304,7 @@ void Application::setCSTFile(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
 		return;
 	}
 
@@ -314,17 +314,17 @@ void Application::setCSTFile(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::commitChanges(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
 		return;
 	}
 
@@ -334,7 +334,7 @@ void Application::commitChanges(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::showInformation(void)
@@ -342,7 +342,7 @@ void Application::showInformation(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
 		return;
 	}
 
@@ -355,17 +355,17 @@ void Application::showInformation(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::getChanges(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
 		return;
 	}
 
@@ -379,7 +379,7 @@ void Application::getChanges(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::uploadNeeded(ot::JsonDocument& _doc)
@@ -426,7 +426,7 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, infoFileManager.getInfoEntityVersion(), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::downloadNeeded(ot::JsonDocument& _doc)
@@ -458,7 +458,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::filesUploaded(ot::JsonDocument& _doc)
@@ -485,13 +485,13 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 		ot::UID dataEntityID = dataEntityIDList.front(); dataEntityIDList.pop_front();
 		ot::UID dataVersion  = dataVersionList.front();  dataVersionList.pop_front();
 
-		modelComponent()->addNewTopologyEntity(fileEntityID, fileVersion, false);
-		modelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
+		getModelComponent()->addNewTopologyEntity(fileEntityID, fileVersion, false);
+		getModelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
 	}
 
 	ot::ModelServiceAPI::deleteEntitiesFromModel(deletedNameList, false);
 
-	modelComponent()->storeNewEntities("Studio Suite project uploaded", false);
+	getModelComponent()->storeNewEntities("Studio Suite project uploaded", false);
 
 	// Determine the new version
 	std::string newVersion = ot::ModelServiceAPI::getCurrentModelVersion();
@@ -503,14 +503,14 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	doc1.AddMember(OT_ACTION_PARAM_MODEL_VersionLabel, ot::JsonString(changeMessage, doc1.GetAllocator()), doc1.GetAllocator());
 
 	std::string tmp;
-	modelComponent()->sendMessage(true, doc1, tmp);
+	getModelComponent()->sendMessage(true, doc1, tmp);
 
 	// Finally we send the new version to the frontend 
 	ot::JsonDocument doc2;
 	doc2.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc2.GetAllocator()), doc2.GetAllocator());
 	doc2.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc2.GetAllocator()), doc2.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc2, tmp);
+	getUiComponent()->sendMessage(true, doc2, tmp);
 }
 
 void Application::changeUnits(const std::string &content)
@@ -542,7 +542,7 @@ void Application::changeUnits(const std::string &content)
 	{
 		units->getProperties().setAllPropertiesReadOnly();
 		units->StoreToDataBase();
-		modelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
+		getModelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
 	}
 
 	delete units; units = nullptr;
@@ -648,7 +648,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (material == nullptr)
 	{
 		// We have a new material to create
-		material = new EntityMaterial(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
 		material->setName("Materials/" + materialName);
 		material->createProperties();
 
@@ -694,7 +694,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 		material->updateFromProperties();
 		material->getProperties().setAllPropertiesReadOnly();
 		material->StoreToDataBase();
-		modelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
+		getModelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
 	}
 
 	delete material; material = nullptr;
@@ -750,11 +750,11 @@ void Application::changeHistory(const std::string& content)
 		else
 		{
 			// A new history item needs to be created
-			history = new EntityFileText(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, &getClassFactory(), getServiceName());
+			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, &getClassFactory(), getServiceName());
 			history->setFileProperties("", "history", "txt");
 			history->setName("History");
 
-			data = std::make_shared<EntityBinaryData>(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+			data = std::make_shared<EntityBinaryData>(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 		}
 
 		data->setData(content.data(), content.size());
@@ -768,8 +768,8 @@ void Application::changeHistory(const std::string& content)
 		history->setEditable(false);
 		history->StoreToDataBase();
 
-		modelComponent()->addNewDataEntity(data->getEntityID(), data->getEntityStorageVersion(), history->getEntityID());
-		modelComponent()->addNewTopologyEntity(history->getEntityID(), history->getEntityStorageVersion(), false);
+		getModelComponent()->addNewDataEntity(data->getEntityID(), data->getEntityStorageVersion(), history->getEntityID());
+		getModelComponent()->addNewTopologyEntity(history->getEntityID(), history->getEntityStorageVersion(), false);
 	}
 
 	delete history; history = nullptr;
@@ -807,7 +807,7 @@ void Application::processParameterBuffer(std::stringstream& buffer, std::map<std
 		if (parameter == nullptr)
 		{
 			// We have a new parameter to create
-			parameter = new EntityParameter(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+			parameter = new EntityParameter(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
 			parameter->setName("Parameters/" + parameterName);
 			parameter->createProperties();
 
@@ -851,7 +851,7 @@ void Application::processParameterBuffer(std::stringstream& buffer, std::map<std
 		{
 			parameter->getProperties().setAllPropertiesReadOnly();
 			parameter->StoreToDataBase();
-			modelComponent()->addNewTopologyEntity(parameter->getEntityID(), parameter->getEntityStorageVersion(), false);
+			getModelComponent()->addNewTopologyEntity(parameter->getEntityID(), parameter->getEntityStorageVersion(), false);
 		}
 
 		delete parameter; parameter = nullptr;
@@ -1010,8 +1010,8 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	int colorG = (int) (255 * std::get<1>(rgb));
 	int colorB = (int) (255 * std::get<2>(rgb));
 
-	ot::UID entityID = modelComponent()->createEntityUID();
-	ot::UID facetsID = modelComponent()->createEntityUID();
+	ot::UID entityID = getModelComponent()->createEntityUID();
+	ot::UID facetsID = getModelComponent()->createEntityUID();
 
 	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	entityGeom->setName(otName);
@@ -1034,9 +1034,9 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	entityGeom->getFacets()->StoreToDataBase();
 	entityGeom->StoreToDataBase();
 
-	modelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
-	modelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
-	modelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
+	getModelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
+	getModelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
+	getModelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
 
 	delete entityGeom;
 	entityGeom = nullptr;

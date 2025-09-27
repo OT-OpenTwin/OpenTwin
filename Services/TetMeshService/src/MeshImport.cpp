@@ -50,8 +50,8 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockProperties);
 
-	application->uiComponent()->lockUI(lockFlags);
-	application->uiComponent()->setProgressInformation("Reading mesh file", true);
+	application->getUiComponent()->lockUI(lockFlags);
+	application->getUiComponent()->setProgressInformation("Reading mesh file", true);
 
 	// Get information about the materials folder
 	std::string materialsFolder = "Materials";
@@ -83,15 +83,15 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	}
 	catch (std::string) 
 	{
-		application->uiComponent()->displayErrorPrompt("ERROR: Importing mesh failed (unsupported format or corrupted file).");
-		application->uiComponent()->unlockUI(lockFlags);
-		application->uiComponent()->closeProgressInformation();
+		application->getUiComponent()->displayErrorPrompt("ERROR: Importing mesh failed (unsupported format or corrupted file).");
+		application->getUiComponent()->unlockUI(lockFlags);
+		application->getUiComponent()->closeProgressInformation();
 
 		return;
 	}
 
-	application->uiComponent()->setProgressInformation("Converting mesh data", false);
-	application->uiComponent()->setProgress(0);
+	application->getUiComponent()->setProgressInformation("Converting mesh data", false);
+	application->getUiComponent()->setProgress(0);
 
 	// Delete the temporary file
 	TmpFileManager::deleteDirectory(tmpDir);
@@ -101,7 +101,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	gmsh::model::mesh::renumberElements();
 
 	// Create a new tet mesh entity
-	EntityMeshTet* meshEntity = new EntityMeshTet(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityMeshTet* meshEntity = new EntityMeshTet(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 
 	EntityPropertiesString::createProperty("General", "File name", originalName, "", meshEntity->getProperties());
 
@@ -110,7 +110,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 
 	// Create a new empty data entity
 	meshEntity->getMeshData()->setName(meshEntity->getName() + "/Mesh");
-	meshEntity->getMeshData()->setEntityID(application->modelComponent()->createEntityUID());
+	meshEntity->getMeshData()->setEntityID(application->getModelComponent()->createEntityUID());
 
 	// Now we call the mesh writer to store the mesh
 
@@ -118,22 +118,22 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 
 	// Store the nodes
 	meshWriter.convertAndStoreNodes();
-	application->uiComponent()->setProgress(10);
+	application->getUiComponent()->setProgress(10);
 
 	// In a next step, we convert all mesh faces and store them as triangle lists in the mesh entity
 	meshWriter.convertFaces();
-	application->uiComponent()->setProgress(20);
+	application->getUiComponent()->setProgress(20);
 
 	// In a next step, process each mesh entity and create a corresponding mesh item to store the surface mesh and volume mesh
 	writeMeshEntities(&meshWriter, meshEntity, materialsFolder, materialsFolderID);
 
 	// Now store all mesh face entities
 	meshWriter.storeFaces();
-	application->uiComponent()->setProgress(80);
+	application->getUiComponent()->setProgress(80);
 
 	// Next we write the gmsh mesh file into the database
 	meshWriter.storeMeshFile();
-	application->uiComponent()->setProgress(90);
+	application->getUiComponent()->setProgress(90);
 
 	// Write the properties of the mesh data entity
 	EntityPropertiesBoolean::createProperty("Mesh Visualization", "Show volume mesh", false, "", meshEntity->getMeshData()->getProperties());
@@ -150,18 +150,18 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 
 	// Store the mesh data entity
 	meshEntity->storeMeshData();
-	application->modelComponent()->addNewTopologyEntity(meshEntity->getMeshData()->getEntityID(), meshEntity->getMeshData()->getEntityStorageVersion(), false);
+	application->getModelComponent()->addNewTopologyEntity(meshEntity->getMeshData()->getEntityID(), meshEntity->getMeshData()->getEntityStorageVersion(), false);
 	
 	// Store the mesh entity itself
 	meshEntity->StoreToDataBase();
-	application->modelComponent()->addNewTopologyEntity(meshEntity->getEntityID(), meshEntity->getEntityStorageVersion(), false);
+	application->getModelComponent()->addNewTopologyEntity(meshEntity->getEntityID(), meshEntity->getEntityStorageVersion(), false);
 
 	// Finalize the operation and send all newly created entities to the modeler
-	application->modelComponent()->storeNewEntities("import mesh: " + originalName);
+	application->getModelComponent()->storeNewEntities("import mesh: " + originalName);
 
-	application->uiComponent()->setProgress(100);
-	application->uiComponent()->unlockUI(lockFlags);
-	application->uiComponent()->closeProgressInformation();
+	application->getUiComponent()->setProgress(100);
+	application->getUiComponent()->unlockUI(lockFlags);
+	application->getUiComponent()->closeProgressInformation();
 }
 
 void MeshImport::writeMeshEntities(MeshWriter* meshWriter, EntityMeshTet* mesh, const std::string& materialsFolder, ot::UID materialsFolderID)
@@ -239,10 +239,10 @@ void MeshImport::writeMeshEntities(MeshWriter* meshWriter, EntityMeshTet* mesh, 
 		meshWriter->storeMeshEntityFromPhysicalGroup(meshEntityName, entityTag, colorR, colorG, colorB, materialsFolder, materialsFolderID);
 
 		progressNow += progressInc;
-		application->uiComponent()->setProgress((int) progressNow);
+		application->getUiComponent()->setProgress((int) progressNow);
 	}
 
-	application->uiComponent()->setProgress(progressEnd);
+	application->getUiComponent()->setProgress(progressEnd);
 }
 
 void MeshImport::CreateTmpFileFromCompressedData(std::string fileName, const std::string& data, ot::UID uncompressedDataLength)

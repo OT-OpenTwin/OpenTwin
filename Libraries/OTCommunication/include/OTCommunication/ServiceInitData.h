@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/LogTypes.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
@@ -16,8 +17,8 @@ namespace ot {
 	//! @class ServiceInitData
 	//! @brief The ServiceInitData class is used to provide initialization data to a service when sending the initialize command.
 	class OT_COMMUNICATION_API_EXPORT ServiceInitData : public Serializable {
-		OT_DECL_NOCOPY(ServiceInitData)
-		OT_DECL_NOMOVE(ServiceInitData)
+		OT_DECL_DEFCOPY(ServiceInitData)
+		OT_DECL_DEFMOVE(ServiceInitData)
 	public:
 		ServiceInitData();
 		virtual ~ServiceInitData() {};
@@ -33,6 +34,15 @@ namespace ot {
 
 		// Setter / Getter
 
+		void setLogFlags(const ot::LogFlags& _logFlags) { m_logFlags = _logFlags; };
+		const ot::LogFlags& getLogFlags() const { return m_logFlags; };
+		
+		void setServiceName(const std::string& _name) { m_name = _name; };
+		const std::string& getServiceName() const { return m_name; };
+
+		void setServiceType(const std::string& _type) { m_type = _type; };
+		const std::string& getServiceType() const { return m_type; };
+
 		void setServiceID(const serviceID_t _serviceID) { m_serviceID = _serviceID; };
 		serviceID_t getServiceID() const { return m_serviceID; };
 
@@ -44,6 +54,9 @@ namespace ot {
 
 		void setSessionType(const std::string& _sessionType) { m_sessionType = _sessionType; };
 		const std::string& getSessionType() const { return m_sessionType; };
+
+		void setDatabaseUrl(const std::string& _databaseUrl) { m_databaseUrl = _databaseUrl; };
+		const std::string& getDatabaseUrl() const { return m_databaseUrl; };
 
 		void setUsername(const std::string& _username) { m_username = _username; };
 		const std::string& getUsername() const { return m_username; };
@@ -61,17 +74,22 @@ namespace ot {
 		const std::string& getUserCollection() const { return m_userCollection; };
 
 	private:
+		ot::LogFlags    m_logFlags;
+
+		std::string     m_name;
+		std::string     m_type;
 		ot::serviceID_t m_serviceID;
 
-		std::string m_sessionServiceURL;
-		std::string m_sessionID;
-		std::string m_sessionType;
+		std::string     m_sessionServiceURL;
+		std::string     m_sessionID;
+		std::string     m_sessionType;
 
-		std::string m_username;
-		std::string m_password;
-		std::string m_databaseUsername;
-		std::string m_databasePassword;
-		std::string m_userCollection;
+		std::string     m_databaseUrl;
+		std::string     m_username;
+		std::string     m_password;
+		std::string     m_databaseUsername;
+		std::string     m_databasePassword;
+		std::string     m_userCollection;
 
 	};
 }

@@ -229,7 +229,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 		//std::string text = _message.substr(msgStart+1, msgLength);
 		//_message = _message.substr(msgStart+1 + msgLength + 1); // There is always an additional \n at the end of the message which needs to be removed here
 
-		Application::instance()->uiComponent()->displayMessage(text);
+		Application::instance()->getUiComponent()->displayMessage(text);
 		m_manager->addLogText(text);
 
 		return;

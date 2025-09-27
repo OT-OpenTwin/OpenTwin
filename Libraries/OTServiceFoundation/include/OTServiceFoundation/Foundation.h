@@ -51,13 +51,7 @@ namespace ot {
 		//! Afterwards ot::ExternalServicesComponent::init will be called.
 		//! 
 		//! In Release mode only ot::ExternalServicesComponent::startup will be called.
-		//! @param _localDirectoryServiceURL The URL of the local directory service.
-		//! @param _ownURL The URL of this service.
-		//! @param _localSessionServiceURL The URL of the local session service.
-		//! @param _sessionID The session ID this service is running in.
-		//! @param _application The application object that is using this component.
-		//! @param _explicitDebug If true, the debug initialization will be performed even if running in release mode.
-		OT_SERVICEFOUNDATION_API_EXPORTONLY int init(const std::string& _localDirectoryServiceURL, const std::string& _ownURL, const std::string& _localSessionServiceURL, const std::string& _sessionID, ApplicationBase* _application, bool _explicitDebug);
+		OT_SERVICEFOUNDATION_API_EXPORTONLY int init(const std::string& _ownURL, ApplicationBase* _application, bool _explicitDebug);
 
 	} // namespace foundation
 

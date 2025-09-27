@@ -77,7 +77,7 @@ void Circuit::addConnection(std::string connactable,const ot::UID& key, const Co
 
 	}
 	else if (connactable != "GNDPole") {
-		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
+		Application::instance()->getUiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
 	}
 
 }

@@ -1183,7 +1183,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::JsonDocument serviceListDoc;
 		serviceListDoc.fromJson(confirmResponse);
 		auto serviceList = ot::json::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
-		for (auto serviceJSON : serviceList) {
+		for (auto& serviceJSON : serviceList) {
 			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
 			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
 			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
@@ -1971,14 +1971,13 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 
 std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocument& _document) {
 	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
-	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
 	auto itm = m_serviceIdMap.find(senderID);
 	if (itm != m_serviceIdMap.end()) {
 		ServiceDataUi* actualService = itm->second;
 		assert(actualService != nullptr);
+
+		std::string senderName = actualService->getServiceName();
 
 		// Clean up elements
 		m_lockManager->cleanService(actualService->getBasicServiceInformation(), false, true);

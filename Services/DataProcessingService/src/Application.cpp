@@ -59,7 +59,7 @@ Application::~Application()
 
 void Application::runPipeline()
 {
- 	//UILockWrapper lockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+ 	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 	try
 	{
 

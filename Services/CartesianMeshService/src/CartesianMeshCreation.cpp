@@ -246,7 +246,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		for (auto entity : currentEntityList)
 		{
-			entity->setEntityID(getApplication()->modelComponent()->createEntityUID());
+			entity->setEntityID(getApplication()->getModelComponent()->createEntityUID());
 
 			if (entity->getEntityType() == EntityBase::TOPOLOGY)
 			{
@@ -402,11 +402,11 @@ void CartesianMeshCreation::addMatrixPlot(EntityResultBase::tResultType resultTy
 	{
 	case EntityResultBase::tResultType::CARTESIAN_EDGES_3D:
 	case EntityResultBase::tResultType::CARTESIAN_DUAL_EDGES_3D:
-		visualizationEntity = new EntityVis2D3D(getApplication()->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+		visualizationEntity = new EntityVis2D3D(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 		break;
 	case EntityResultBase::tResultType::CARTESIAN_FACES_3D:
 	case EntityResultBase::tResultType::CARTESIAN_DUAL_FACES_3D:
-		visualizationEntity = new EntityVisCartesianFaceScalar(getApplication()->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+		visualizationEntity = new EntityVisCartesianFaceScalar(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 		break;
 	default:
 		assert(0); // Unknown type
@@ -449,7 +449,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	std::string error;
 
 	// First, we determine the materials which are assigned to the objects
-	application->modelComponent()->loadMaterialInformation();
+	application->getModelComponent()->loadMaterialInformation();
 
 	std::map<EntityGeometry *, std::string> objectMaterialNames;
 	std::map<std::string, CartesianMeshMaterial *> materialMap;
@@ -471,7 +471,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 			return error;
 		}
 
-		std::string materialName = application->modelComponent()->getCurrentMaterialName(materialProperty);
+		std::string materialName = application->getModelComponent()->getCurrentMaterialName(materialProperty);
 
 		if (materialName.empty())
 		{
@@ -588,7 +588,7 @@ std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
 	std::string response;
-	application->modelComponent()->sendMessage(false, reqDoc, response);
+	application->getModelComponent()->sendMessage(false, reqDoc, response);
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -812,7 +812,7 @@ void CartesianMeshCreation::determineVolumeFill(std::list<EntityGeometry *> &geo
 {
 	assert(meshData != nullptr);
 
-	getApplication()->uiComponent()->setProgress(0);
+	getApplication()->getUiComponent()->setProgress(0);
 
 	std::time_t timer = time(nullptr);
 	reportTime("Volume filling started", timer);
@@ -2135,9 +2135,9 @@ void CartesianMeshCreation::setProgress(int percentage)
 {
 	assert(getApplication() != nullptr);
 
-	if (getApplication()->uiComponent())
+	if (getApplication()->getUiComponent())
 	{
-		getApplication()->uiComponent()->setProgress(percentage);
+		getApplication()->getUiComponent()->setProgress(percentage);
 	}
 }
 
@@ -2145,9 +2145,9 @@ void CartesianMeshCreation::displayMessage(std::string message)
 {
 	assert(getApplication() != nullptr);
 
-	if (getApplication()->uiComponent())
+	if (getApplication()->getUiComponent())
 	{
-		getApplication()->uiComponent()->displayMessage(message);
+		getApplication()->getUiComponent()->displayMessage(message);
 	}
 }
 
@@ -2155,9 +2155,9 @@ void CartesianMeshCreation::setProgressInformation(std::string message, bool con
 {
 	assert(getApplication() != nullptr);
 
-	if (getApplication()->uiComponent())
+	if (getApplication()->getUiComponent())
 	{
-		getApplication()->uiComponent()->setProgressInformation(message, continuous);
+		getApplication()->getUiComponent()->setProgressInformation(message, continuous);
 	}
 }
 
@@ -2165,9 +2165,9 @@ void CartesianMeshCreation::closeProgressInformation(void)
 {
 	assert(getApplication() != nullptr);
 
-	if (getApplication()->uiComponent())
+	if (getApplication()->getUiComponent())
 	{
-		getApplication()->uiComponent()->closeProgressInformation();
+		getApplication()->getUiComponent()->closeProgressInformation();
 	}
 }
 
@@ -2175,7 +2175,7 @@ void CartesianMeshCreation::setUILock(bool flag, lockType type)
 {
 	assert(getApplication() != nullptr);
 
-	if (getApplication()->uiComponent())
+	if (getApplication()->getUiComponent())
 	{
 		static int count = 0;
 
@@ -2201,7 +2201,7 @@ void CartesianMeshCreation::setUILock(bool flag, lockType type)
 					f.setFlag(ot::LockAll);
 				}
 
-				getApplication()->uiComponent()->lockUI(f);
+				getApplication()->getUiComponent()->lockUI(f);
 			}
 
 			count++;
@@ -2233,7 +2233,7 @@ void CartesianMeshCreation::setUILock(bool flag, lockType type)
 						f.setFlag(ot::LockAll);
 					}
 
-					getApplication()->uiComponent()->unlockUI(f);
+					getApplication()->getUiComponent()->unlockUI(f);
 				}
 			}
 		}

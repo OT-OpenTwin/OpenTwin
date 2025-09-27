@@ -13,6 +13,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTServiceFoundation/IDManager.h"
 
@@ -68,7 +69,7 @@ public:
 	void setDatabasePassword(const std::string& password) { m_dbCredentials.setEncryptedPassword(password); };
 	std::string getDatabasePassword() const { return m_dbCredentials.getEncryptedPassword(); };
 
-	std::list<std::string> getToolBarTabOrder(void);
+	std::list<std::string> getToolBarTabOrder();
 
 	//! @brief Returns true if any of the services in this session is flagged as requested.
 	//! @param _ignoredService If provided, this service will be ignored in the check.
@@ -81,6 +82,8 @@ public:
 	bool hasShuttingDownServices();
 
 	bool isShuttingDown() const { return m_state.flagIsSet(Session::ShuttingDown); };
+
+	ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

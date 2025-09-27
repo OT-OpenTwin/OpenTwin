@@ -151,11 +151,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::modelSelectionChanged(void)
 {
-	uiComponent()->setControlState(_buttonRunSolver.GetFullDescription(), (m_selectedEntities.size() > 0));
+	getUiComponent()->setControlState(_buttonRunSolver.GetFullDescription(), (m_selectedEntities.size() > 0));
 
-	uiComponent()->setControlState(_buttonCreateSignal.GetFullDescription(), (m_selectedEntities.size() == 1));
-	uiComponent()->setControlState(_buttonAddMonitor.GetFullDescription(), (m_selectedEntities.size() == 1));
-	uiComponent()->setControlState(_buttonAddPort.GetFullDescription(), (m_selectedEntities.size() == 1));
+	getUiComponent()->setControlState(_buttonCreateSignal.GetFullDescription(), (m_selectedEntities.size() == 1));
+	getUiComponent()->setControlState(_buttonAddMonitor.GetFullDescription(), (m_selectedEntities.size() == 1));
+	getUiComponent()->setControlState(_buttonAddPort.GetFullDescription(), (m_selectedEntities.size() == 1));
 }
 	
 void Application::EnsureVisualizationModelIDKnown(void)

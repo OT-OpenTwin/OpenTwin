@@ -78,7 +78,7 @@ const char* ot::foundation::getServiceURL(void)
 	return retVal;
 }
 
-int ot::foundation::init(const std::string& _localDirectoryServiceURL, const std::string& _ownURL, const std::string& _localSessionServiceURL, const std::string& _sessionID, ApplicationBase* _application, bool _explicitDebug) {
+int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _application, bool _explicitDebug) {
 	try {
 		// Setup logger
 #if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
@@ -128,19 +128,19 @@ int ot::foundation::init(const std::string& _localDirectoryServiceURL, const std
 
 				OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
 
-				std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
-				std::string actualSessionServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-				std::string actualLocalDirectoryServiceURL = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-				std::string actualSessionID = ot::json::getString(params, OT_ACTION_PARAM_SESSION_ID);
-				ot::serviceID_t actualServiceID = static_cast<ot::serviceID_t>(ot::json::getUInt(params, OT_ACTION_PARAM_SERVICE_ID));
+				const std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+				
+				ot::ServiceInitData iniData;
+				iniData.setFromJsonObject(ot::json::getObject(params, OT_ACTION_PARAM_Config));
+
 				// Initialize the service with the parameters from the file
 
-				int startupResult = intern::ExternalServicesComponent::instance().startup(_application, actualLocalDirectoryServiceURL, actualServiceURL);
+				int startupResult = intern::ExternalServicesComponent::instance().startup(_application, actualServiceURL);
 				if (startupResult != 0) {
 					return startupResult;
 				}
 
-				std::string initResult = intern::ExternalServicesComponent::instance().init(actualSessionServiceURL, actualSessionID, actualServiceID, _explicitDebug);
+				std::string initResult = intern::ExternalServicesComponent::instance().init(iniData, _explicitDebug);
 				if (initResult != OT_ACTION_RETURN_VALUE_OK) {
 					return -22;
 				}
@@ -153,7 +153,7 @@ int ot::foundation::init(const std::string& _localDirectoryServiceURL, const std
 			}
 		}
 		else {
-			return intern::ExternalServicesComponent::instance().startup(_application, _localDirectoryServiceURL, _ownURL);
+			return intern::ExternalServicesComponent::instance().startup(_application, _ownURL);
 		}
 	}
 	catch (const std::exception& _e) {

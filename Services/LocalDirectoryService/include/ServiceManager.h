@@ -7,11 +7,15 @@
 
 // LDS header
 #include "Service.h"
+#include "RequestedService.h"
+#include "SessionInformation.h"
+#include "ServiceStartupData.h"
 
 // OpenTwin header
 #include "OTSystem/Network.h"
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
+#include "OTCommunication/ServiceInitData.h"
 
 // std header
 #include <map>
@@ -48,9 +52,9 @@ public:
 	//! @param _sessionInformation Information about the session where the service should be connected to
 	//! @param _serviceInformation Information about the service that should be started
 	//! @param _serviceURL The URL where the service will be running will be written here
-	RequestResult requestStartService(const ServiceInformation& _serviceInformation);
+	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation);
 
-	RequestResult requestStartRelayService(ot::serviceID_t _serviceID, const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
+	RequestResult requestStartRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketUrl);
 
 	//! @brief Will mark all services in the session as expected to shut down.
 	//! Services that are currently requested will be removed from the requested list.
@@ -62,7 +66,7 @@ public:
 	//! @param _sessionID 
 	void sessionClosed(const std::string& _sessionID);
 
-	void serviceDisconnected(const ServiceInformation& _info, const std::string& _serviceURL);
+	void serviceDisconnected(const std::string& _sessionID, ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,9 +91,9 @@ private:
 
 	void runThreads(void);
 	
-	void serviceStartFailed(const ServiceInformation& _info);
+	void serviceStartFailed(const ot::ServiceInitData& _serviceInformation);
 	void sendInitializeMessage(Service&& _info);
-	void serviceInitializeFailed(const Service& _info);
+	void serviceInitializeFailed(Service&& _info);
 
 	std::vector<Service> * sessionServices(const SessionInformation& _sessionInformation);
 
@@ -144,7 +148,7 @@ private:
 	std::map<SessionInformation, std::vector<Service>*>  m_services;
 	std::mutex                                           m_mutexServices;
 
-	std::list<ServiceInformation>                        m_requestedServices;
+	std::list<RequestedService>                          m_requestedServices;
 	std::mutex                                           m_mutexRequestedServices;
 
 	std::list<Service>                                   m_initializingServices;

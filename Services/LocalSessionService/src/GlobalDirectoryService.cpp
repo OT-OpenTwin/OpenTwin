@@ -71,15 +71,11 @@ bool GlobalDirectoryService::isConnected(void) {
 	return m_connectionStatus == Connected;
 }
 
-bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl) {
+bool GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _serviceInformation) {
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInformation.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInformation.getServiceID(), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send request
 	std::string response;
@@ -96,17 +92,16 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	}
 }
 
-bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl) {
+bool GlobalDirectoryService::requestToStartServices(const ot::ServiceInitData& _generalData, const std::list<ot::ServiceBase>& _serviceInformation) {
 	if (!this->isConnected()) {
-		OT_LOG_E("Failed to start services in session \"" + _sessionID + "\". Reason: Not connected to GDS");
+		OT_LOG_E("Failed to start services in session \"" + _generalData.getSessionID() + "\". Reason: Not connected to GDS");
 		return false;
 	}
 
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewServices, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_generalData, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
 	for (const ot::ServiceBase& service : _serviceInformation) {
@@ -133,14 +128,12 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	}
 }
 
-bool GlobalDirectoryService::startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, const std::string& _lssUrl, std::string& _relayServiceURL, std::string& _websocketURL) {
+bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketURL) {
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceID, requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_lssUrl, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	
+	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
 	// Send request
 	std::string responseStr;
 	if (!this->ensureConnection()) {

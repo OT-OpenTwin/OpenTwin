@@ -1081,18 +1081,18 @@ void Application::run() {
 		return;
 	}
 
-	size_t index = this->sessionID().find(':');
+	size_t index = this->getSessionID().find(':');
 	if (index == std::string::npos) {
 		OT_LOG_E("Invalid session id format");
 		return;
 	}
 
-	std::string projectName(this->sessionID().substr(0, index));
-	std::string collectionName(this->sessionID().substr(index + 1));
+	std::string projectName(this->getSessionID().substr(0, index));
+	std::string collectionName(this->getSessionID().substr(index + 1));
 
 	this->EnsureDataBaseConnection();
 
-	m_model = new Model(projectName, this->projectType(), collectionName);
+	m_model = new Model(projectName, this->getProjectType(), collectionName);
 }
 
 std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc) {
@@ -1201,12 +1201,12 @@ bool Application::settingChanged(const ot::Property* _item) {
 void Application::addButtons()
 {
 	const std::string pageName = "Model";
-	m_fileHandler.addButtons(uiComponent(), pageName);
+	m_fileHandler.addButtons(getUiComponent(), pageName);
 	
-	m_plotHandler.addButtons(uiComponent(), pageName);
+	m_plotHandler.addButtons(getUiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_plotHandler);
 
-	m_materialHandler.addButtons(uiComponent(), pageName);
+	m_materialHandler.addButtons(getUiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_materialHandler);
 }
 

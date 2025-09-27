@@ -16,7 +16,7 @@ ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectio
 {}
 
 ResultCollectionExtender::ResultCollectionExtender(ot::ApplicationBase* _applicationBase)
-	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->modelComponent(), &_applicationBase->getClassFactory(),_applicationBase->getServiceName())
+	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent(), &_applicationBase->getClassFactory(),_applicationBase->getServiceName())
 {}
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)

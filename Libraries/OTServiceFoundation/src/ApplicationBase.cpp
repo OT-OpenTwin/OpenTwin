@@ -78,19 +78,6 @@ std::string ot::ApplicationBase::deploymentPath() const {
 
 // Setter
 
-void ot::ApplicationBase::setDirectoryServiceURL(const std::string& _url) 
-{
-	if (m_directoryService != nullptr)
-	{
-		delete m_directoryService;
-		m_directoryService = nullptr;
-	}
-	
-	m_directoryService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService, _url, invalidServiceID);
-	
-	m_serviceIdMap.insert_or_assign(invalidServiceID - 1, m_directoryService);
-}
-
 void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 {
 	if (m_sessionService != nullptr)
@@ -254,7 +241,7 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 
 		modelSelectionChanged();
 
-		uiComponent()->sendUpdatedControlState();
+		getUiComponent()->sendUpdatedControlState();
 
 		return "";  // No further processing necessary
 	}
@@ -561,12 +548,12 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 	}
 }
 
-void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
+void ot::ApplicationBase::__serviceDisconnected(serviceID_t _id) {
 	auto serviceByID = m_serviceIdMap.find(_id);
 	assert(serviceByID != m_serviceIdMap.end());
 	auto& serviceInfo = serviceByID->second;
 
-	if (_type == OT_INFO_SERVICE_TYPE_UI) {
+	if (serviceInfo->getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 
 		assert(serviceInfo == (ServiceBase*)m_uiComponent);
 
@@ -581,7 +568,7 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 		
 		GuiAPIManager::instance().frontendDisconnected();
 	}
-	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
+	else if (serviceInfo->getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		assert(serviceInfo == (ServiceBase*)m_modelComponent);
 		ot::ModelAPIManager::setModelServiceURL(std::string());
 		modelDisconnected(m_modelComponent);
@@ -605,7 +592,7 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 	}
 	
 	m_serviceIdMap.erase(_id);
-	m_serviceNameMap.erase(_name);
+	m_serviceNameMap.erase(serviceInfo->getServiceName());
 }
 
 void ot::ApplicationBase::__shuttingDown(bool _requestedAsCommand) {

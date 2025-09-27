@@ -42,7 +42,7 @@ std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, con
 {
 //	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 	// Load the material information
-	application->modelComponent()->loadMaterialInformation();
+	application->getModelComponent()->loadMaterialInformation();
 
 	std::string error;
 
@@ -385,7 +385,7 @@ std::string PHREECMeshExport::prefetchTetList(const std::string &dataBaseURL, co
 
 	if (materialProperty != nullptr)
 	{
-		std::string materialName = application->modelComponent()->getCurrentMaterialName(materialProperty);
+		std::string materialName = application->getModelComponent()->getCurrentMaterialName(materialProperty);
 
 		objectMaterialList.push_back(std::pair<std::string, std::string>(meshItemName, materialName));
 	}

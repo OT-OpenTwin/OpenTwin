@@ -58,6 +58,7 @@ extern "C"{
 	};
 
 	// This function is called once upon startup of this service
-	_declspec(dllexport) int init(const char * _localDirectoryServiceURL, const char * _ownIP, const char * _sessionServiceIP, const char * _sessionID)
-	{ return ot::foundation::init(_localDirectoryServiceURL, _ownIP, _sessionServiceIP, _sessionID, new Application(), false); };
+	_declspec(dllexport) int init(const char* _ownUrl, const char* _unused1, const char* _unused2, const char* _unused3) {
+		return ot::foundation::init(_ownUrl, new Application(), false);
+	}
 }

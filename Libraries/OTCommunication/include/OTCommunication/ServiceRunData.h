@@ -19,8 +19,8 @@ namespace ot {
 	//! @class ServiceRunData
 	//! @brief The ServiceRunData class is used to provide data to a service when sending the run command.
 	class OT_COMMUNICATION_API_EXPORT ServiceRunData : public Serializable {
-		OT_DECL_NOCOPY(ServiceRunData)
-		OT_DECL_NOMOVE(ServiceRunData)
+		OT_DECL_DEFCOPY(ServiceRunData)
+		OT_DECL_DEFMOVE(ServiceRunData)
 	public:
 		ServiceRunData();
 		virtual ~ServiceRunData() {};

@@ -41,6 +41,9 @@ public:
 
 	const std::string& getUrl() const { return m_url; };
 
+	void setDatabaseUrl(const std::string& _url) { m_dataBaseUrl = _url; };
+	const std::string& getDatabaseUrl() const { return m_dataBaseUrl; };
+
 	void setSiteID(std::string _id) { m_siteID = _id; };
 	const std::string& getSiteID() const { return m_siteID; };
 
@@ -118,6 +121,7 @@ private:
 	GlobalSessionService                              m_gss;
 	GlobalDirectoryService                            m_gds;
 
+	std::string                                       m_dataBaseUrl;
 	std::string                                       m_siteID; //! @brief Site ID
 
 	std::string                                       m_url;

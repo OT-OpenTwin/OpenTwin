@@ -241,7 +241,7 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 		}
 		catch (std::exception)
 		{
-			uiComponent()->displayMessage("ERROR: Unable to create the data item.");
+			getUiComponent()->displayMessage("ERROR: Unable to create the data item.");
 			return;
 		}
 	}

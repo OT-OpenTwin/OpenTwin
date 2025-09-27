@@ -267,7 +267,7 @@ void Application::modelSelectionChanged(void)
 		disabled.push_back(m_buttonUnLockCharacterisation.GetFullDescription());
 	}
 
-	uiComponent()->setControlsEnabledState(enabled, disabled);
+	getUiComponent()->setControlsEnabledState(enabled, disabled);
 
 	std::lock_guard<std::mutex> lock(m_selectedEntitiesMutex);
 	m_selectedEntitiesQueue.push_back(m_selectedEntities);
@@ -295,7 +295,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());
 
 				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
+				getUiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()) != std::string::npos)
 			{
@@ -334,7 +334,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					}
 					else
 					{
-						m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+						m_twoPartsAction = new UILockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 					}
 				}
 			}
@@ -345,10 +345,10 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == m_buttonCreateDataCollection.GetFullDescription())
 			{
-				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockModelWrite);
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
-				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
+				_tabledataToResultdataHandler->createDataCollection(getDataBaseURL(), m_collectionName);
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
 			}
@@ -465,7 +465,7 @@ void Application::HandleSelectionChanged()
 
 			std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
 			try {
-				UILockWrapper wrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+				UILockWrapper wrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 				m_rangleSelectionVisualisationHandler.selectRange(entities);
 			}
 			catch (std::exception& e) {

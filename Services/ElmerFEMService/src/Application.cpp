@@ -412,7 +412,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	deleteSingleSolverResults(solverEntity);
 
 	ElmerFEMLauncher elmerFEMSolver(this);
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	std::string logFileText;
 	std::string output = elmerFEMSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
@@ -423,8 +423,8 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText + output);
 
-	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
-	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
+	getModelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
+	getModelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
 
 	// Store the newly created items in the data base
 	m_modelComponent->storeNewEntities("added solver results");

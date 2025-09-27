@@ -10,6 +10,8 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ServiceRunData.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTSystem/SystemInformation.h"
 
 // std header
@@ -44,20 +46,14 @@ namespace ot {
 
 			//! @brief Will initialize the component.
 			//! @param _application The application object that is using this component.
-			//! @param _localDirectoryServiceURL The URL of the local directory service.
 			//! @param _ownURL The URL of this service.
 			//! @return 0 if successful, otherwise an error code.
-			int startup(ApplicationBase* _application, const std::string& _localDirectoryServiceURL, const std::string& _ownURL);
+			int startup(ApplicationBase* _application, const std::string& _ownURL);
 
 			//! @brief Will initialize the service.
-			//! First the database data will be requested from the LSS.
-			//! Afterwards the registration request will be send to the LSS.
-			//! @param _localSessionServiceURL The URL of the local session service.
-			//! @param _sessionID The session ID this service is running in.
-			//! @param _serviceID The service ID assigned to this service.
 			//! @param _explicitDebug If true, the debug initialization will be performed.
 			//! The process ID will be added to the registration request.
-			std::string init(const std::string& _localSessionServiceURL, const std::string& _sessionID, ot::serviceID_t _serviceID, bool _explicitDebug);
+			std::string init(const ot::ServiceInitData& _initData, bool _explicitDebug);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter

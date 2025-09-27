@@ -14,6 +14,8 @@
 
 // std header
 #include <string>
+#include <thread>
+#include <atomic>
 
 class QWebSocketServer;
 class QWebSocket;
@@ -27,6 +29,8 @@ public:
 	static SocketServer& instance();
 
 	bool startServer();
+
+	void startSessionServiceHealthCheck(const std::string& _lssUrl);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -83,6 +87,8 @@ private:
 
 	bool relayToHttp(const ot::RelayedMessageHandler::Request& _request, std::string& _response);
 
+	void lssHealthCheckWorker();
+
 	std::string getSystemInformation();
 
 	ot::serviceID_t m_serviceId;
@@ -97,6 +103,10 @@ private:
 	ot::SystemInformation m_systemLoad;
 	std::chrono::system_clock::time_point m_lastReceiveTime;
 	QTimer* m_keepAliveTimer;
+
+	std::string m_lssUrl;
+	std::atomic_bool m_lssHealthCheckRunning;
+	std::thread* m_lssHealthCheckThread;
 };
 
 #endif //SOCKETSERVER_H

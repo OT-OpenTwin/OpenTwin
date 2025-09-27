@@ -8,9 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
-
-// GDS header
-#include "ServiceInformation.h"
+#include "OTCommunication/ServiceInitData.h"
 
 // std header
 #include <list>
@@ -34,12 +32,12 @@ public:
 	//! @brief Add a service start request to the queue.
 	//! The request will be processed by the worker thread.
 	//! @param _info Information about the service to start.
-	void addRequest(ServiceInformation&& _info);
+	void addRequest(ot::ServiceInitData&& _info);
 
 	//! @brief Add multiple service start requests to the queue.
 	//! The requests will be processed by the worker thread.
 	//! @param _info List of service information objects to start.
-	void addRequest(std::list<ServiceInformation>&& _info);
+	void addRequest(std::list<ot::ServiceInitData>&& _info);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -64,10 +62,10 @@ private:
 	//! @brief Will notify the session service about a failed service start request.
 	//! @warning It is assumed that the mutex is locked when calling this method.
 	//! @param _serviceInfo Information about the service that failed to start.
-	void serviceStartRequestFailed(const ServiceInformation& _serviceInfo);
+	void serviceStartRequestFailed(const ot::ServiceInitData& _serviceInfo);
 
-	std::list<ServiceInformation> m_requestedServices; //! @brief List of service start requests that are waiting to be processed.
-	std::mutex                    m_mutex;             //! @brief Mutex to protect access to the request list.
-	std::thread*                  m_workerThread;      //! @brief The worker thread that processes service start requests.
-	std::atomic_bool              m_isStopping;        //! @brief Flag indicating whether the worker thread is stopping.
+	std::list<ot::ServiceInitData> m_requestedServices; //! @brief List of service start requests that are waiting to be processed.
+	std::mutex                     m_mutex;             //! @brief Mutex to protect access to the request list.
+	std::thread*                   m_workerThread;      //! @brief The worker thread that processes service start requests.
+	std::atomic_bool               m_isStopping;        //! @brief Flag indicating whether the worker thread is stopping.
 };

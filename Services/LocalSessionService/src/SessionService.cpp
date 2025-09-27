@@ -66,6 +66,8 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 		return ot::AppExitCode::GDSRegistrationFailed;
 	}
 
+	lss.m_dataBaseUrl = regInfo.getDataBaseURL();
+
 	// Initialize system load information
 	lss.m_systemLoadInformation.initialize();
 
@@ -208,6 +210,8 @@ bool SessionService::runMandatoryServices(Session& _session) {
 	std::list<ot::ServiceBase> debugServices;
 	std::list<ot::ServiceBase> releaseServices;
 
+	ot::serviceID_t validServiceID = ot::invalidServiceID;
+
 	for (const ot::ServiceBase& serviceInfo : it->second) {
 		if (this->getIsServiceInDebugMode(serviceInfo.getServiceName())) {
 			debugServices.push_back(serviceInfo);
@@ -230,7 +234,10 @@ bool SessionService::runMandatoryServices(Session& _session) {
 		}
 
 		OT_LOG_D("Starting services via DirectoryService (Service.Count = \"" + std::to_string(releaseServices.size()) + "\")");
-		if (!m_gds.requestToStartServices(releaseServices, _session.getID(), m_url)) {
+
+		ot::ServiceInitData generalData = _session.createServiceInitData(1);
+
+		if (!m_gds.requestToStartServices(generalData, releaseServices)) {
 			OT_LOG_E("Failed to request service start");
 			return false;
 		}
@@ -321,13 +328,11 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 
 	// Create start params
 	ot::JsonDocument statupParams;
-	statupParams.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString("1", statupParams.GetAllocator()), statupParams.GetAllocator());
 	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_ID, newDebugService.getServiceID(), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(this->getUrl(), statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL, ot::JsonString("", statupParams.GetAllocator()), statupParams.GetAllocator());
-	statupParams.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.getID(), statupParams.GetAllocator()), statupParams.GetAllocator());
 
+	ot::ServiceInitData iniData = _session.createServiceInitData(newDebugService.getServiceID());
+	statupParams.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(iniData, statupParams.GetAllocator()), statupParams.GetAllocator());
+	
 	// If the service is a relay service add websocket information
 	if (newDebugService.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
 		websocketPort = m_debugPortManager.determineAndBlockAvailablePort();
@@ -375,7 +380,8 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 		OT_LOG_D("Relay start requested in debug mode. Now waiting to come alive.");
 		ot::JsonDocument checkCommandDoc;
 		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
-		checkCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, relay.getServiceID(), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_session.createServiceInitData(relay.getServiceID()), checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+
 		std::string checkCommandString = checkCommandDoc.toJson();
 
 		// Wait until the service is alive
@@ -411,7 +417,10 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 
 		std::string newServiceUrl;
 		std::string newWebsocketUrl;
-		if (!m_gds.startRelayService(relay.getServiceID(), _session.getID(), m_url, newServiceUrl, newWebsocketUrl)) {
+
+		ot::ServiceInitData iniData = _session.createServiceInitData(relay.getServiceID());
+
+		if (!m_gds.startRelayService(iniData, newServiceUrl, newWebsocketUrl)) {
 			throw ot::Exception::ObjectNotFound("Failed to start relay service");
 		}
 
@@ -974,7 +983,7 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	
 	this->serviceFailure(sessionID, serviceID);
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc) {

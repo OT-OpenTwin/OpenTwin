@@ -379,7 +379,7 @@ void DataCategorizationHandler::requestRangeSelection(const std::string& _tableN
 	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
 
 	std::string tmp;
-	Application::instance()->uiComponent()->sendMessage(true, doc, tmp);
+	Application::instance()->getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 

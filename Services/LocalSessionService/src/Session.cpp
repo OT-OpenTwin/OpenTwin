@@ -83,7 +83,7 @@ Session& Session::operator=(Session&& _other) noexcept {
 
 // Setter / Getter
 
-std::list<std::string> Session::getToolBarTabOrder(void) {
+std::list<std::string> Session::getToolBarTabOrder() {
 	std::list<std::string> tabOrder;
 
 	tabOrder.push_back("File");
@@ -136,6 +136,33 @@ bool Session::hasShuttingDownServices() {
 	return false;
 }
 
+ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
+	ot::ServiceInitData initData;
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	const Service& service = this->getServiceFromID(_serviceID);
+	OTAssert(service.getServiceID() == _serviceID, "Service ID mismatch");
+
+	initData.setLogFlags(ot::LogDispatcher::instance().getLogFlags());
+
+	initData.setServiceName(service.getServiceName());
+	initData.setServiceType(service.getServiceType());
+	initData.setServiceID(_serviceID);
+
+	initData.setSessionServiceURL(SessionService::instance().getUrl());
+	initData.setSessionID(m_id);
+	initData.setSessionType(m_type);
+
+	initData.setDatabaseUrl(SessionService::instance().getDatabaseUrl());
+	initData.setUsername(m_userCredentials.getUserName());
+	initData.setPassword(m_userCredentials.getEncryptedPassword());
+	initData.setDatabaseUsername(m_dbCredentials.getUserName());
+	initData.setDatabasePassword(m_dbCredentials.getEncryptedPassword());
+	initData.setUserCollection(m_userCollection);
+
+	return initData;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Service management
@@ -183,6 +210,8 @@ Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation
 }
 
 void Session::setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers) {
+	_notifyOthers |= !this->hasRequestedServices(_serviceID);
+
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	Service& service = this->getServiceFromID(_serviceID);
@@ -196,6 +225,8 @@ void Session::setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers) {
 }
 
 void Session::setServiceAlive(ot::serviceID_t _serviceID, const std::string& _serviceUrl, bool _notifyOthers) {
+	_notifyOthers |= !this->hasRequestedServices(_serviceID);
+
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	Service& service = this->getServiceFromID(_serviceID);
@@ -469,6 +500,8 @@ void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _senderService, _doc.GetAllocator());
 		}
 	}
+
+	_doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, _doc.GetAllocator()), _doc.GetAllocator());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

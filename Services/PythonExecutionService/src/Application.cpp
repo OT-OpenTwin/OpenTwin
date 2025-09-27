@@ -68,7 +68,7 @@ void Application::run(void) {
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
 	DataBaseInfo info;
-	info.setSiteID(this->siteID());
+	info.setSiteID(this->getSiteID());
 	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
 	info.setCollectionName(this->m_collectionName);
 	info.setUserName(DataBase::GetDataBase()->getUserName());
@@ -76,11 +76,11 @@ void Application::run(void) {
 
 	m_subprocessManager->setDataBaseInfo(info);
 
-	if (this->uiComponent()) {
-		m_subprocessManager->setFrontendUrl(this->uiComponent()->getServiceURL());
+	if (this->getUiComponent()) {
+		m_subprocessManager->setFrontendUrl(this->getUiComponent()->getServiceURL());
 	}
-	if (this->modelComponent()) {
-		m_subprocessManager->setModelUrl(this->modelComponent()->getServiceURL());
+	if (this->getModelComponent()) {
+		m_subprocessManager->setModelUrl(this->getModelComponent()->getServiceURL());
 	}
 }
 

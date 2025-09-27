@@ -146,10 +146,6 @@ namespace ot {
 		//! @param _url The websocket URL to set
 		void setWebSocketURL(const std::string & _url) { m_websocketURL = _url; }
 
-		//! @brief Will set the local directory service URL
-		//! @param _url The directory service URL
-		void setDirectoryServiceURL(const std::string& _url);
-
 		//! @brief Will set the session service URL
 		//! @param _url The session service URL
 		void setSessionServiceURL(const std::string & _url);
@@ -168,25 +164,22 @@ namespace ot {
 		//void refreshSessionServiceList();
 
 		//! @brief Will return the URL of the database
-		std::string dataBaseURL() { return m_databaseURL; }
+		std::string getDataBaseURL() { return m_databaseURL; }
 
 		//! @brief Will return the site ID this application is running on
-		std::string siteID() { return m_siteID; }
+		std::string getSiteID() { return m_siteID; }
 
 		//! @brief Will return the websocket URL, it is only set if a websocket was required on startup: startAsRelayService() == true
-		std::string webSocketURL() { return m_websocketURL; }
+		std::string getWebSocketURL() { return m_websocketURL; }
 
 		//! @brief Will return the session service URL
-		std::string sessionServiceURL() { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
-
-		//! @brief Will return the local directory service URL
-		std::string directoryServiceURL() { return (m_directoryService ? m_directoryService->getServiceURL() : ""); };
+		std::string getSessionServiceURL() { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
 
 		//! @brief Will return the session ID this service is running in
-		std::string sessionID() { return m_sessionID; }
+		std::string getSessionID() { return m_sessionID; }
 		
 		//! @brief The current project type
-		const std::string& projectType() const { return m_projectType; };
+		const std::string& getProjectType() const { return m_projectType; };
 
 		const std::string& getCollectionName() const { return m_collectionName; }
 
@@ -198,11 +191,11 @@ namespace ot {
 
 		//! @brief Will return the model component used in this application
 		//! The model component only exists when a model service is running in the session
-		components::ModelComponent * modelComponent() const { return m_modelComponent; }
+		components::ModelComponent * getModelComponent() const { return m_modelComponent; }
 
 		//! @brief Will return the ui component used in this application
 		//! The UI component only exists when a ui service is running in the session
-		components::UiComponent * uiComponent() const { return m_uiComponent; }
+		components::UiComponent * getUiComponent() const { return m_uiComponent; }
 
 		//! @brief Will return the service with the specified ID
 		//! @param _id The ID of the requested service
@@ -213,10 +206,10 @@ namespace ot {
 		ServiceBase * getConnectedServiceByName(const std::string & _name);
 
 		//! @brief Will return the uiNotifier attached to this application
-		AbstractUiNotifier * uiNotifier() { return m_uiNotifier; }
+		AbstractUiNotifier * getUiNotifier() { return m_uiNotifier; }
 
 		//! @brief Will return the modelNotifier attached to this application
-		AbstractModelNotifier * modelNotifier() { return m_modelNotifier; }
+		AbstractModelNotifier * getModelNotifier() { return m_modelNotifier; }
 
 		//! @brief Returns a handle to the global class factory for the service
 		ClassFactory& getClassFactory() { return classFactory; }
@@ -317,7 +310,7 @@ namespace ot {
 		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
 		
-		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
+		void __serviceDisconnected(serviceID_t _id);
 		std::string __processMessage(const std::string & _message, JsonDocument&doc, serviceID_t _senderID);
 		void __shuttingDown(bool _requestedAsCommand);
 

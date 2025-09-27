@@ -19,15 +19,15 @@
 #include <chrono>
 #include <thread>
 
-Service::Service(ServiceManager * _owner, const ServiceInformation& _info) :
-	m_owner(_owner), m_info(_info), m_processHandle(OT_INVALID_PROCESS_HANDLE), 
-	m_port(0), m_websocketPort(0), m_isShuttingDown(false)
+Service::Service(ServiceManager * _owner, RequestedService&& _requestedService) :
+	m_owner(_owner), m_initData(std::move(_requestedService.getInitData())), m_processHandle(OT_INVALID_PROCESS_HANDLE), 
+	m_port(0), m_websocketPort(0), m_isShuttingDown(false), m_counters(std::move(_requestedService.getStartupData()))
 {}
 
 Service::Service(Service&& _other) noexcept :
-	m_owner(_other.m_owner), m_isShuttingDown(_other.m_isShuttingDown), m_info(std::move(_other.m_info)),
+	m_owner(_other.m_owner), m_isShuttingDown(_other.m_isShuttingDown), m_initData(std::move(_other.m_initData)),
 	m_processHandle(_other.m_processHandle), m_port(_other.m_port), m_websocketPort(_other.m_websocketPort),
-	m_url(std::move(_other.m_url)), m_websocketUrl(std::move(_other.m_websocketUrl))
+	m_url(std::move(_other.m_url)), m_websocketUrl(std::move(_other.m_websocketUrl)), m_counters(std::move(_other.m_counters))
 {
 	_other.m_owner = nullptr;
 	_other.m_processHandle = OT_INVALID_PROCESS_HANDLE;
@@ -49,7 +49,8 @@ Service& Service::operator=(Service&& _other) noexcept {
 	if (this != &_other) {
 		m_owner = _other.m_owner;
 		m_isShuttingDown = _other.m_isShuttingDown;
-		m_info = std::move(_other.m_info);
+		m_initData = std::move(_other.m_initData);
+		m_counters = std::move(_other.m_counters);
 		m_processHandle = _other.m_processHandle;
 		m_port = _other.m_port;
 		m_websocketPort = _other.m_websocketPort;
@@ -69,10 +70,14 @@ Service& Service::operator=(Service&& _other) noexcept {
 // Serialization
 
 void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	ot::JsonObject infoObj;
-	m_info.addToJsonObject(infoObj, _allocator);
+	ot::JsonObject countersObj;
+	m_counters.addToJsonObject(countersObj, _allocator);
+	_object.AddMember("Information", countersObj, _allocator);
 
-	_object.AddMember("Information", infoObj, _allocator);
+	ot::JsonObject initObj;
+	m_initData.addToJsonObject(initObj, _allocator);
+	_object.AddMember("InitData", initObj, _allocator);
+
 	_object.AddMember("IsShuttingDown", m_isShuttingDown, _allocator);
 	_object.AddMember("URL", ot::JsonString(m_url, _allocator), _allocator);
 	_object.AddMember("Port", m_port, _allocator);
@@ -85,13 +90,12 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 // Service control
 
 ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t _websocketPort) {
-	OT_LOG_D("Starting service { \"Name\": \"" + m_info.getName() + "\", \"Type\": \"" + m_info.getType() + 
-		"\", \"Session.ID\": \"" + m_info.getSessionId() + "\", \"LSS.Url\": \"" + m_info.getSessionServiceURL() + "\" }");
+	OT_LOG_D("Starting service { \"ServiceID\": " + std::to_string(m_initData.getServiceID()) + ", \"" + m_initData.getServiceName() + "\"; \"Type\": \"" + m_initData.getServiceType() + "\"; \"URL\": \"" + m_url + "\", \"SessionID\": \"" + m_initData.getSessionID() + "\" }");
 
 	m_port = _port;
 	m_url = _url + ":" + std::to_string(m_port);
 
-	if (m_info.getType() == OT_INFO_SERVICE_TYPE_RelayService) {
+	if (m_initData.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
 		m_websocketPort = _websocketPort;
 		m_websocketUrl = _url + ":" + std::to_string(m_websocketPort);
 	}
@@ -108,19 +112,14 @@ ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t
 	if (!path.empty()) {
 		path.append("\\");
 	}
-	path.append(m_info.getName()).append(".dll");
+	path.append(m_initData.getServiceName()).append(".dll");
 
-	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" +
-		Application::instance().getServiceURL() + "\" \"" + m_url + "\" \"";
+	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" + m_url + "\" \"";
 
-	if (m_info.getType() == OT_INFO_SERVICE_TYPE_RelayService) {
-		// Relay: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "websocketURL" "sessionServiceURL"
-		commandLine.append(m_websocketUrl).append("\" \"").append(m_info.getSessionServiceURL()).append("\"");
+	if (m_initData.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
+		commandLine.append(m_websocketUrl);
 	}
-	else {
-		// Others: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "sessionServiceURL" "session ID"
-		commandLine.append(m_info.getSessionServiceURL()).append("\" \"").append(m_info.getSessionId()).append("\"");
-	}
+	commandLine.append("\" \"\" \"\"");
 	
 	OT_LOG_D("Starting \"" + launcherName + "\" with command line \"" + commandLine + "\"");
 	
@@ -131,7 +130,7 @@ ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t
 #endif
 }
 
-ot::RunResult Service::shutdown(void) {
+ot::RunResult Service::shutdown() {
 	ot::RunResult result;
 
 #if defined(OT_OS_WINDOWS)
@@ -151,7 +150,7 @@ ot::RunResult Service::shutdown(void) {
 	return result;
 }
 
-ot::RunResult Service::checkAlive(void) {
+ot::RunResult Service::checkAlive() {
 	ot::RunResult result;
 #if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
@@ -165,7 +164,7 @@ ot::RunResult Service::checkAlive(void) {
 	else {		
 		OT_LOG_E("Failed to get exit code");
 		result.setAsError(exitCode);
-		result.setErrorMessage("Failed to get service exit code { \"Name\": \"" + m_info.getName() + "\"; \"Type\": \"" + m_info.getType() + "\"; \"URL\": \"" + m_url + "\" }.");
+		result.setErrorMessage("Failed to get service exit code { \"ServiceID\": " + std::to_string(m_initData.getServiceID()) + ", \"" + m_initData.getServiceName() + "\"; \"Type\": \"" + m_initData.getServiceType() + "\"; \"URL\": \"" + m_url + "\", \"SessionID\": \"" + m_initData.getSessionID() + "\" }.");
 	}
 
 #else

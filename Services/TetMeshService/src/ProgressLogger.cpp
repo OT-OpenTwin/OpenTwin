@@ -100,7 +100,7 @@ void ProgressLogger::stopLogger2D(void)
 
 	if (!message.empty() && showLogMessagesFlag)
 	{
-		application->uiComponent()->displayMessage(message);
+		application->getUiComponent()->displayMessage(message);
 	}
 }
 
@@ -134,7 +134,7 @@ void ProgressLogger::stopLogger3D(void)
 
 	if (!message.empty() && showLogMessagesFlag)
 	{
-		application->uiComponent()->displayMessage(message);
+		application->getUiComponent()->displayMessage(message);
 	}
 }
 
@@ -193,7 +193,7 @@ void ProgressLogger::readLogInformation2D(bool verbose, size_t edges, size_t fac
 
 			if (verbose)
 			{
-				application->uiComponent()->displayMessage(messageText + "\n");
+				application->getUiComponent()->displayMessage(messageText + "\n");
 			}
 
 			messageCount = messages.size();
@@ -203,7 +203,7 @@ void ProgressLogger::readLogInformation2D(bool verbose, size_t edges, size_t fac
 			if (nowPercent > lastPercent)
 			{
 				lastPercent = nowPercent;
-				application->uiComponent()->setProgress(nowPercent);
+				application->getUiComponent()->setProgress(nowPercent);
 			}
 		}
 	}
@@ -260,8 +260,8 @@ void ProgressLogger::readLogInformation3D(bool verbose)
 					{
 						if (messages[i] == "Info: Optimizing mesh..." || messages[i].find("Info: Improving") != std::string::npos)
 						{
-							application->uiComponent()->setProgress(100);
-							application->uiComponent()->setProgressInformation("Optimizing mesh", true);
+							application->getUiComponent()->setProgress(100);
+							application->getUiComponent()->setProgressInformation("Optimizing mesh", true);
 							meshOptimization = true;
 						}
 					}
@@ -270,7 +270,7 @@ void ProgressLogger::readLogInformation3D(bool verbose)
 
 			if (verbose)
 			{
-				application->uiComponent()->displayMessage(messageText + "\n");
+				application->getUiComponent()->displayMessage(messageText + "\n");
 			}
 
 			messageCount = messages.size();
@@ -284,7 +284,7 @@ void ProgressLogger::readLogInformation3D(bool verbose)
 				if (nowPercent > lastPercent)
 				{
 					lastPercent = nowPercent;
-					application->uiComponent()->setProgress(nowPercent);
+					application->getUiComponent()->setProgress(nowPercent);
 				}
 			}
 		}

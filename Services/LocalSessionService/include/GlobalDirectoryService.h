@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 // std header
@@ -51,7 +52,7 @@ public:
 	//! @param _sessionID The ID of the session that requested the service start.
 	//! @param _lssUrl The URL of the LSS that requested the service to start.
 	//! @return Returns true if the service was successfully requested to start, false otherwise.
-	bool requestToStartService(const ot::ServiceBase& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl);
+	bool requestToStartService(const ot::ServiceInitData& _serviceInformation);
 
 	//! @brief Requests the GDS to start multiple services.
 	//! The service start will be performed asynchronously.
@@ -59,7 +60,7 @@ public:
 	//! @param _sessionID The ID of the session that requested the service start.
 	//! @param _lssUrl The URL of the LSS that requested the services to start.
 	//! @return Returns true if the services were successfully requested to start, false otherwise.
-	bool requestToStartServices(const std::list<ot::ServiceBase>& _serviceInformation, const std::string& _sessionID, const std::string& _lssUrl);
+	bool requestToStartServices(const ot::ServiceInitData& _generalData, const std::list<ot::ServiceBase>& _serviceInformation);
 
 	//! @brief Requests the GDS to start a relay service.
 	//! The relay service start will be performed synchronously.
@@ -68,7 +69,7 @@ public:
 	//! @param _websocketURL Will be set to the websocket URL of the relay service on success.
 	//! @param _relayServiceURL Will be set to the URL of the relay service on success.
 	//! @return Returns true if the relay service was successfully started, false otherwise.
-	bool startRelayService(ot::serviceID_t _serviceID, const std::string& _sessionID, const std::string& _lssUrl, std::string& _relayServiceURL, std::string& _websocketURL);
+	bool startRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketURL);
 	
 	void notifySessionShuttingDown(const std::string& _sessionID);
 

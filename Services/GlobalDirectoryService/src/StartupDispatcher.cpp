@@ -28,7 +28,7 @@ StartupDispatcher::~StartupDispatcher() {
 
 // Request management
 
-void StartupDispatcher::addRequest(ServiceInformation&& _info) {
+void StartupDispatcher::addRequest(ot::ServiceInitData&& _info) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	m_requestedServices.push_back(std::move(_info));
@@ -36,7 +36,7 @@ void StartupDispatcher::addRequest(ServiceInformation&& _info) {
 	this->run();
 }
 
-void StartupDispatcher::addRequest(std::list<ServiceInformation>&& _info) {
+void StartupDispatcher::addRequest(std::list<ot::ServiceInitData>&& _info) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	m_requestedServices.splice(m_requestedServices.end(), std::move(_info));
@@ -59,7 +59,7 @@ void StartupDispatcher::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllo
 	}
 
 	ot::JsonArray requestedArr;
-	for (const ServiceInformation& info : m_requestedServices) {
+	for (const ot::ServiceInitData& info : m_requestedServices) {
 		ot::JsonObject obj;
 		info.addToJsonObject(obj, _allocator);
 		requestedArr.PushBack(obj, _allocator);
@@ -119,7 +119,7 @@ void StartupDispatcher::workerFunction(void) {
 			}
 			
 			// Grab first item
-			ServiceInformation info(std::move(m_requestedServices.front()));
+			ot::ServiceInitData info(std::move(m_requestedServices.front()));
 			m_requestedServices.pop_front();
 
 			if (!Application::instance().requestToRunService(info)) {
@@ -129,15 +129,22 @@ void StartupDispatcher::workerFunction(void) {
 	}
 }
 
-void StartupDispatcher::serviceStartRequestFailed(const ServiceInformation& _serviceInfo) {
-	OT_LOG_E("Service startup failed { \"Name\": \"" + _serviceInfo.getName() + "\", \"Type\": \"" + _serviceInfo.getType() + "\" }");
+void StartupDispatcher::serviceStartRequestFailed(const ot::ServiceInitData& _serviceInfo) {
+	OT_LOG_E(
+		"Service startup failed { \"ID\": " + std::to_string(_serviceInfo.getServiceID()) + ", "
+		"\"Name\": \"" + _serviceInfo.getServiceName() + "\", "
+		"\"Type\": \"" + _serviceInfo.getServiceType() + "\", "
+		"\"SessionID\": \"" + _serviceInfo.getSessionID() + "\", "
+		"\"LssUrl\": \"" + _serviceInfo.getSessionServiceURL() + "\""
+		" }"
+	);
 
 	// Clean up other requests for the same session
 	bool erased = false;
 	while (erased) {
 		erased = false;
 		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
-			if (it->getSessionInformation() == _serviceInfo.getSessionInformation()) {
+			if (it->getSessionID() == _serviceInfo.getSessionID() && it->getServiceID() == _serviceInfo.getServiceID()) {
 				m_requestedServices.erase(it);
 				erased = true;
 				break;
@@ -148,9 +155,8 @@ void StartupDispatcher::serviceStartRequestFailed(const ServiceInformation& _ser
 	// Notify session service about the failed startup
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceStartupFailed, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.getType(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInfo.getServiceID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionID(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Send message asynchronously
 	ot::msg::sendAsync(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);

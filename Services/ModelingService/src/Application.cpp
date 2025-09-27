@@ -303,10 +303,10 @@ bool Application::startAsRelayService(void) const
 
 void Application::modelSelectionChanged(void)
 {
-	uiComponent()->setControlState("Modeling:Modify:Boolean Add", !m_selectedEntities.empty());
-	uiComponent()->setControlState("Modeling:Modify:Boolean Subtract", !m_selectedEntities.empty());
-	uiComponent()->setControlState("Modeling:Modify:Boolean Intersect", !m_selectedEntities.empty());
-	uiComponent()->setControlState("Modeling:Modify:Transform", !m_selectedEntities.empty());
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Add", !m_selectedEntities.empty());
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Subtract", !m_selectedEntities.empty());
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Intersect", !m_selectedEntities.empty());
+	getUiComponent()->setControlState("Modeling:Modify:Transform", !m_selectedEntities.empty());
 
 	// We need to call the handler in the base class
 	ApplicationBase::modelSelectionChanged();
@@ -516,7 +516,7 @@ void Application::importSTEP(void)
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::executeFunction(const std::string &function, const std::string &fileName, bool removeFile, const std::string &originalName)

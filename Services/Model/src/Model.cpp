@@ -2413,7 +2413,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	lockFlag.setFlag(ot::LockNavigationWrite);
 	lockFlag.setFlag(ot::LockViewWrite);
 	lockFlag.setFlag(ot::LockProperties);
-	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	for (auto serviceUpdate : otherServicesUpdate)
 	{
@@ -3924,7 +3924,7 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(_targetFolder, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(_elementType, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->uiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
@@ -4618,7 +4618,7 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	lockFlag.setFlag(ot::LockNavigationWrite);
 	lockFlag.setFlag(ot::LockViewWrite);
 	lockFlag.setFlag(ot::LockProperties);
-	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	ot::JsonDocument notify;
 	ot::JsonArray changedEntitiesInfos;
