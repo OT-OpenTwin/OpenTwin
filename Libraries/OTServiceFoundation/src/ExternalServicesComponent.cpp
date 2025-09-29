@@ -180,12 +180,12 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	m_application->m_dataBaseUserName = _initData.getDatabaseUsername();
 	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
 
+	// Initialize database api (project name will be set by the setSessionIDPrivate call above)
 	DataBase* db = DataBase::GetDataBase();
 	db->setDataBaseServerURL(_initData.getDatabaseUrl());
 	db->setSiteIDString("1");
 	db->setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
-	db->setProjectName(_initData.getUserCollection());
-
+	
 	// Register this service as a service in the session service
 	JsonDocument newServiceCommandDoc;
 	newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
