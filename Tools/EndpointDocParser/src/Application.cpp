@@ -195,7 +195,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				// remove "//api " prefix
 				std::string apiContent = trimmedLine.substr(5);
 				if (!apiContent.empty()) {
-					apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+					apiContent = ot::String::removePrefixSuffix(apiContent, " \t");
 				}
 				OT_LOG_D(apiContent);
 				
@@ -205,7 +205,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				// check which "@commando" is given
 				if (startsWith(lowerCaseApiContent, "@security ")) {
 					std::string security = lowerCaseApiContent.substr(10);
-					security = ot::String::removePrefixSuffix(security, " ");
+					security = ot::String::removePrefixSuffix(security, " \t");
 //					OT_LOG_D("[SECURITY] -> " + security);
 
 					if (security == "tls") {
@@ -230,7 +230,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				}
 				else if (startsWith(lowerCaseApiContent, "@action ")) {
 					std::string action = apiContent.substr(8);
-					action = ot::String::removePrefixSuffix(action, " ");
+					action = ot::String::removePrefixSuffix(action, " \t");
 //					OT_LOG_D([ACTION] -> >>" + action + "<<");
 
 					endpoint.setAction(action);
@@ -256,7 +256,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				}
 				else if (startsWith(lowerCaseApiContent, "@brief ")) {
 					std::string brief = apiContent.substr(7);
-					brief = ot::String::removePrefixSuffix(brief, " ");
+					brief = ot::String::removePrefixSuffix(brief, " \t");
 //					OT_LOG_D("[BRIEF] -> " + brief);
 
 					endpoint.setBriefDescription(brief);
@@ -273,7 +273,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					parameter = Parameter();
 
 					std::string param = apiContent.substr(7);
-					param = ot::String::removePrefixSuffix(param, " ");
+					param = ot::String::removePrefixSuffix(param, " \t");
 //					OT_LOG_D("[PARAM] -> " + param);
 
 					if (parseParameter(parameter, param, endpoint, ParameterType::FunctionParam)) {
@@ -290,7 +290,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 				}
 				else if (startsWith(lowerCaseApiContent, "@return ")) {
 					std::string response = apiContent.substr(8);
-					response = ot::String::removePrefixSuffix(response, " ");
+					response = ot::String::removePrefixSuffix(response, " \t");
 //					OT_LOG_D("[RETURN] -> " + response);
 
 					endpoint.addResponseDescription(response);
@@ -308,7 +308,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 					parameter = Parameter();
 
 					std::string rparam = apiContent.substr(8);
-					rparam = ot::String::removePrefixSuffix(rparam, " ");
+					rparam = ot::String::removePrefixSuffix(rparam, " \t");
 //					OT_LOG_D("[PARAM] -> " + param);
 
 					if (parseParameter(parameter, rparam, endpoint, ParameterType::ReturnParam)) {
@@ -330,7 +330,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						inWarningBlock = false;
 						
 						apiContent = apiContent.substr(6);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+						apiContent = ot::String::removePrefixSuffix(apiContent, " \t");
 
 						apiContent = "@note " + apiContent;
 
@@ -347,7 +347,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						inWarningBlock = true;
 
 						apiContent = apiContent.substr(9);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+						apiContent = ot::String::removePrefixSuffix(apiContent, " \t");
 
 						apiContent = "@warning " + apiContent;
 
@@ -358,29 +358,23 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 							endpoint.addResponseDescription(apiContent);
 						}
 					}
-					else if (startsWith(lowerCaseApiContent, "@endnote ")) {
-						apiContent = apiContent.substr(9);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+					else if (startsWith(lowerCaseApiContent, "@endnote")) {
+						apiContent = apiContent.substr(8);
 
-						if (inBriefDescriptionBlock) {
-							endpoint.addDetailedDescription(apiContent);
-						}
-						else {
-							endpoint.addResponseDescription(apiContent);
+						if (!apiContent.empty()) {
+							OT_LOG_E("Invalid input: @endnote must be empty.");
+							return true;
 						}
 
 						inNoteBlock = false;
 						inWarningBlock = false;
 					}
-					else if (startsWith(lowerCaseApiContent, "@endwarning ")) {
-						apiContent = apiContent.substr(12);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+					else if (startsWith(lowerCaseApiContent, "@endwarning")) {
+						apiContent = apiContent.substr(11);
 
-						if (inBriefDescriptionBlock) {
-							endpoint.addDetailedDescription(apiContent);
-						}
-						else {
-							endpoint.addResponseDescription(apiContent);
+						if (!apiContent.empty()) {
+							OT_LOG_E("Invalid input: @endwarning must be empty.");
+							return true;
 						}
 
 						inNoteBlock = false;
@@ -436,7 +430,7 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						inWarningBlock = false;
 
 						apiContent = apiContent.substr(6);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+						apiContent = ot::String::removePrefixSuffix(apiContent, " \t");
 
 						addDescriptionToLastParameter(paramList, "@note " + apiContent);
 					}
@@ -446,27 +440,31 @@ bool Application::parseFile(const std::string& _file, Service& _service) {
 						inWarningBlock = true;
 
 						apiContent = apiContent.substr(9);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+						apiContent = ot::String::removePrefixSuffix(apiContent, " \t");
 
 						addDescriptionToLastParameter(paramList, "@warning " + apiContent);
 					}
-					else if (startsWith(lowerCaseApiContent, "@endnote ")) {
+					else if (startsWith(lowerCaseApiContent, "@endnote")) {
+						apiContent = apiContent.substr(8);
+
+						if (!apiContent.empty()) {
+							OT_LOG_E("Invalid input: @endnote must be empty.");
+							return true;
+						}
+
 						inNoteBlock = false;
 						inWarningBlock = false;
+					}					
+					else if (startsWith(lowerCaseApiContent, "@endwarning")) {
+						apiContent = apiContent.substr(11);
 
-						apiContent = apiContent.substr(9);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
+						if (!apiContent.empty()) {
+							OT_LOG_E("Invalid input: @endwarning must be empty.");
+							return true;
+						}
 
-						addDescriptionToLastParameter(paramList, apiContent);						
-					}
-					else if (startsWith(lowerCaseApiContent, "@endwarning ")) {
 						inNoteBlock = false;
 						inWarningBlock = false;
-
-						apiContent = apiContent.substr(12);
-						apiContent = ot::String::removePrefixSuffix(apiContent, " ");
-
-						addDescriptionToLastParameter(paramList, apiContent);						
 					}
 					else if (inNoteBlock) {
 						addDescriptionToLastParameter(paramList, "@note " + apiContent);
