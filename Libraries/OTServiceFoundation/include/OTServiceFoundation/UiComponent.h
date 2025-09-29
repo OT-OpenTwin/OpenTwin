@@ -50,13 +50,7 @@ namespace ot {
 				BLEND_EDGE
 			};
 
-			UiComponent(
-				const std::string &			_name,
-				const std::string &			_type,
-				const std::string &			_url,
-				serviceID_t					_id,
-				ApplicationBase *			_application
-			);
+			UiComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application);
 
 			virtual ~UiComponent();
 

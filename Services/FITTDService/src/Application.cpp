@@ -54,24 +54,13 @@ Application::~Application()
 
 Application& Application::instance(void)
 {
-	static Application INSTANCE;
-	return INSTANCE;
+	static Application g_instance;
+	return g_instance;
 }
 
 // ##################################################################################################################################
 
 // Required functions
-
-void Application::run(void)
-{
-	// This method is called once the service can start its operation
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-	// Add code that should be executed when the service is started and may start its work
-
-}
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
@@ -104,11 +93,6 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		return OT_ACTION_RETURN_UnknownAction;
 	}
 	return "";
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -151,17 +135,17 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::modelSelectionChanged(void)
 {
-	getUiComponent()->setControlState(_buttonRunSolver.GetFullDescription(), (m_selectedEntities.size() > 0));
+	getUiComponent()->setControlState(_buttonRunSolver.GetFullDescription(), (this->getSelectedEntities().size() > 0));
 
-	getUiComponent()->setControlState(_buttonCreateSignal.GetFullDescription(), (m_selectedEntities.size() == 1));
-	getUiComponent()->setControlState(_buttonAddMonitor.GetFullDescription(), (m_selectedEntities.size() == 1));
-	getUiComponent()->setControlState(_buttonAddPort.GetFullDescription(), (m_selectedEntities.size() == 1));
+	getUiComponent()->setControlState(_buttonCreateSignal.GetFullDescription(), (this->getSelectedEntities().size() == 1));
+	getUiComponent()->setControlState(_buttonAddMonitor.GetFullDescription(), (this->getSelectedEntities().size() == 1));
+	getUiComponent()->setControlState(_buttonAddPort.GetFullDescription(), (this->getSelectedEntities().size() == 1));
 }
 	
 void Application::EnsureVisualizationModelIDKnown(void)
 {
 	if (visualizationModelID > 0) return;
-	if (m_modelComponent == nullptr) {
+	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -171,21 +155,15 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 void Application::addMonitor(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
-	assert(m_selectedEntities.size() == 1);
+	assert(this->getSelectedEntities().size() == 1);
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	assert(m_modelComponent != nullptr);
-	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	assert(this->getModelComponent() != nullptr);
+	ot::ModelServiceAPI::getEntityInformation(this->getSelectedEntities(), selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 	
@@ -193,7 +171,7 @@ void Application::addMonitor(void)
 	assert(solverEntity != nullptr);
 	
 	//Create new monitor
-	ot::UID newMonitorID = m_modelComponent->createEntityUID();
+	ot::UID newMonitorID = this->getModelComponent()->createEntityUID();
 	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr, nullptr, "Model");
 
 	// Get a list of all items of this specific solver
@@ -226,23 +204,16 @@ void Application::addMonitor(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
 }
 
-void Application::addPort(void)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+void Application::addPort(void) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
-	assert(m_selectedEntities.size() == 1);
+	assert(this->getSelectedEntities().size() == 1);
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	assert(m_modelComponent != nullptr);
-	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	assert(this->getModelComponent() != nullptr);
+	ot::ModelServiceAPI::getEntityInformation(this->getSelectedEntities(), selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
@@ -250,7 +221,7 @@ void Application::addPort(void)
 	assert(solverEntity != nullptr);
 
 	//Create new monitor
-	ot::UID newPortID = m_modelComponent->createEntityUID();
+	ot::UID newPortID = this->getModelComponent()->createEntityUID();
 	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr, nullptr, "Model");
 
 	// Find the next free numbered entity name
@@ -295,23 +266,16 @@ void Application::addPort(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new monitor");
 }
 
-void Application::addSignalType(void)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+void Application::addSignalType(void) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
-	assert(m_selectedEntities.size() == 1);
+	assert(this->getSelectedEntities().size() == 1);
 	//Get the selected solver
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	assert(m_modelComponent != nullptr);
-	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	assert(this->getModelComponent() != nullptr);
+	ot::ModelServiceAPI::getEntityInformation(this->getSelectedEntities(), selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
@@ -333,7 +297,7 @@ void Application::addSignalType(void)
 
 
 	//Create new Signal Type
-	ot::UID newSignalID = m_modelComponent->createEntityUID();
+	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
 	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, nullptr, "Model");
 	
 	//Set properties
@@ -354,15 +318,8 @@ void Application::addSignalType(void)
 
 }
 
-void Application::addSolver(void)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+void Application::addSolver(void) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -371,7 +328,7 @@ void Application::addSolver(void)
 	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems(solverFolder);
 
 	// Now get a new entity ID for creating the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create a unique name for the new solver item
 	int count = 1;
@@ -397,7 +354,7 @@ void Application::addSolver(void)
 	solverEntity->StoreToDataBase();
 
 	//Create default signal
-	ot::UID newSignalID = m_modelComponent->createEntityUID();
+	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
 	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, nullptr, "Model");
 	newSignal->setName(solverName + "/" + FolderNames::GetFolderNameSignalType() + "/DefaultSignal");
 	newSignal->setInitiallyHidden(false);
@@ -417,26 +374,18 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
-void Application::runSolver(void)
-{
-	if (!EnsureDataBaseConnection())
+void Application::runSolver(void) {
+	if (this->getSelectedEntities().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
-	if (m_selectedEntities.empty())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	if (this->getModelComponent() == nullptr) { assert(0); throw std::exception("Model is not connected"); }
+	ot::ModelServiceAPI::getEntityInformation(this->getSelectedEntities(), selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
@@ -467,8 +416,8 @@ void Application::runSolver(void)
 
 	if (solverRunList.empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
@@ -486,29 +435,29 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockProperties);
 
-	m_uiComponent->lockUI(lockFlags);
+	this->getUiComponent()->lockUI(lockFlags);
 	
 	for (std::string solverName : solverRunList)
 	{
 		try
 		{
-			m_uiComponent->displayMessage("Start solver: "+ solverName +"\n");
+			this->getUiComponent()->displayMessage("Start solver: "+ solverName +"\n");
 			MicroServiceInterfaceFITTDSolver newSolver(solverName, static_cast<int>(getServiceID()), getSessionCount(), getClassFactory());
 			SetupSolverService(newSolver);
 			newSolver.RemoveOldResults();
 			newSolver.CreateSolver();
 			newSolver.Run();
-			m_uiComponent->displayMessage(solverName + ": run finished.\n\n");
+			this->getUiComponent()->displayMessage(solverName + ": run finished.\n\n");
 		}
 		catch (std::exception& e)
 		{
 			std::string errorMessage = "Exception in " + solverName + ": " + std::string(e.what());
-			m_uiComponent->displayMessage(errorMessage);
+			this->getUiComponent()->displayMessage(errorMessage);
 		}
 	}
 
 	// Release the UI
-	m_uiComponent->unlockUI(lockFlags);
+	this->getUiComponent()->unlockUI(lockFlags);
 }
 
 void Application::SetupSolverService(MicroServiceInterfaceFITTDSolver & newSolver)
@@ -516,8 +465,8 @@ void Application::SetupSolverService(MicroServiceInterfaceFITTDSolver & newSolve
 	// Set some general properties
 	newSolver.setDataBaseURL(DataBase::GetDataBase()->getDataBaseServerURL());
 	newSolver.setProjectName(DataBase::GetDataBase()->getProjectName());
-	newSolver.setUIComponent(m_uiComponent);
-	newSolver.setModelComponent(m_modelComponent);
+	newSolver.setUIComponent(this->getUiComponent());
+	newSolver.setModelComponent(this->getModelComponent());
 }
 
 

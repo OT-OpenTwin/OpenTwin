@@ -18,6 +18,7 @@ void ot::ServiceInitData::addToJsonObject(JsonValue& _jsonObject, JsonAllocator&
 	JsonArray flagsArr;
 	addLogFlagsToJsonArray(m_logFlags, flagsArr, _allocator);
 	_jsonObject.AddMember("LogFlags", flagsArr, _allocator);
+	_jsonObject.AddMember("LoggerUrl", JsonString(m_loggerUrl, _allocator), _allocator);
 
 	_jsonObject.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_jsonObject.AddMember("Type", JsonString(m_type, _allocator), _allocator);
@@ -36,6 +37,7 @@ void ot::ServiceInitData::addToJsonObject(JsonValue& _jsonObject, JsonAllocator&
 }
 
 void ot::ServiceInitData::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_loggerUrl = json::getString(_jsonObject, "LoggerUrl");
 	m_logFlags = logFlagsFromJsonArray(json::getArray(_jsonObject, "LogFlags"));
 
 	m_name = json::getString(_jsonObject, "Name");

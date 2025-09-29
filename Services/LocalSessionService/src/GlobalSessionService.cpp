@@ -304,10 +304,10 @@ void GlobalSessionService::healthCheck() {
 							info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
 						}
 
-						// Get global log flags if provided
-
+						// Get global logger info
+						info.setLoggingURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
 						ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
-						info.setLogFlags(ot::logFlagsFromJsonArray(logFlags));
+						info.setLogFlags(ot::logFlagsFromJsonArray(logFlags));	
 
 						m_mutex.lock();
 

@@ -48,18 +48,6 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	// This method is called once the service can start its operation
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-	// Add code that should be executed when the service is started and may start its work
-	//krig = new Kriging("run");
-	//krig.initializePython();
-}
-
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
@@ -83,11 +71,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 		return OT_ACTION_RETURN_UnknownAction;
 	}
 	return "";
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -118,45 +101,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-}
-
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
 }
 
 // ##################################################################################################################################
@@ -324,12 +268,6 @@ void Application::saveKrigingModel(void)
 void Application::addParameters(void)
 {
 	OT_LOG_D("Called..."); // todo: remove debug code
-
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
 
 	if (m_modelComponent == nullptr) {
 		assert(0); throw std::exception("Model not connected");

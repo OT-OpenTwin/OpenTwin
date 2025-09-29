@@ -58,6 +58,12 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	}
 	GSSRegistrationInfo regInfo = lss.m_gss.getRegistrationResult();
 
+#if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
+	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, regInfo.getLoggingURL(), true);
+#else
+	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, regInfo.getLoggingURL(), false);
+#endif
+
 	// Initialize log flags
 	ot::LogDispatcher::instance().setLogFlags(regInfo.getLogFlags());
 
@@ -331,7 +337,7 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	statupParams.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL, statupParams.GetAllocator()), statupParams.GetAllocator());
 
 	ot::ServiceInitData iniData = _session.createServiceInitData(newDebugService.getServiceID());
-	statupParams.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(iniData, statupParams.GetAllocator()), statupParams.GetAllocator());
+	statupParams.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(iniData, statupParams.GetAllocator()), statupParams.GetAllocator());
 	
 	// If the service is a relay service add websocket information
 	if (newDebugService.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
@@ -380,7 +386,7 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 		OT_LOG_D("Relay start requested in debug mode. Now waiting to come alive.");
 		ot::JsonDocument checkCommandDoc;
 		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
-		checkCommandDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_session.createServiceInitData(relay.getServiceID()), checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_session.createServiceInitData(relay.getServiceID()), checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 
 		std::string checkCommandString = checkCommandDoc.toJson();
 
@@ -580,7 +586,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	if (!m_gds.isConnected()) {
-		return OT_ACTION_RETURN_INDICATOR_Error "No global directory service connected";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No global directory service connected");
 	}
 
 	// Required session params
@@ -611,7 +617,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Notify GSS that the session request was received (confirm session)
 	if (!m_gss.confirmSession(sessionID, userName)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to confirm session at GSS";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to confirm session at GSS");
 	}
 
 	// Create the session
@@ -626,6 +632,8 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	newSession.setDatabaseUsername(databaseUserName);
 	newSession.setDatabasePassword(databaseUserPassword);
 
+	ot::serviceID_t creatingServiceID = ot::invalidServiceID;
+
 	// Create response document
 	ot::JsonDocument responseDoc;
 
@@ -638,9 +646,10 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		relayService.setAlive(false);
 		relayService.setHidden(serviceInitiallyHidden);
 
+		creatingServiceID = relayService.getServiceID();
+
 		OT_LOG_D("Relay service started { \"Service.URL\": \"" + relayService.getServiceURL() + "\", \"Websocket.URL\": \"" + relayService.getWebsocketUrl() + "\" }");
 
-		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, relayService.getServiceID(), responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(relayService.getWebsocketUrl(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
 	else {
@@ -657,12 +666,17 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		requestingService.setAlive(false);
 		requestingService.setHidden(serviceInitiallyHidden);
 
-		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, requestingService.getServiceID(), responseDoc.GetAllocator());
+		creatingServiceID = requestingService.getServiceID();
+	}
+
+	if (creatingServiceID == ot::invalidServiceID) {
+		OT_LOG_E("Failed to create the initial service for the session");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to create the initial service for the session");
 	}
 
 	OT_LOG_D("Running mandatory services");
 	if (!this->runMandatoryServices(newSession)) {
-		throw ot::Exception::RequestFailed("Failed to start mandatory services");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to start mandatory services");
 	}
 	
 	// Add response information
@@ -679,9 +693,12 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	// Finally store the session and start its health check
 	Session& addedSession = m_sessions.insert_or_assign(newSession.getID(), std::move(newSession)).first->second;
+
+	responseDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(addedSession.createServiceInitData(creatingServiceID), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
 	addedSession.startHealthCheck();
 
-	return responseDoc.toJson();
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
 std::string SessionService::handleCheckProjectOpen(ot::JsonDocument& _commandDoc) {
@@ -734,18 +751,13 @@ std::string SessionService::handleConfirmService(ot::JsonDocument& _commandDoc) 
 	
 	// If all services are ready, add services information
 	if (!theSession.hasRequestedServices(serviceID)) {
-		// Session is already active
-		ot::JsonArray aliveServices;
-		theSession.addAliveServicesToJsonArray(aliveServices, response.GetAllocator());
-		response.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, aliveServices, response.GetAllocator());
-
-		response.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(theSession.getUserName(), response.GetAllocator()), response.GetAllocator());
-		response.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(theSession.getProjectName(), response.GetAllocator()), response.GetAllocator());
+		ot::ServiceRunData runData = theSession.createServiceRunData(serviceID);
+		response.AddMember(OT_ACTION_PARAM_RunData, ot::JsonObject(runData, response.GetAllocator()), response.GetAllocator());
 
 		theSession.sendRunCommand();
 	}
 
-	return response.toJson();
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, response.toJson());
 }
 
 std::string SessionService::handleShowService(ot::JsonDocument& _commandDoc) {

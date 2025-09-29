@@ -110,7 +110,7 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 			}
 			else if (m_pWebSocketServer->isListening()) {
 				ot::ServiceInitData initData;
-				initData.setFromJsonObject(ot::json::getObject(doc, OT_ACTION_PARAM_Config));
+				initData.setFromJsonObject(ot::json::getObject(doc, OT_ACTION_PARAM_IniData));
 
 				m_serviceId = initData.getServiceID();
 				this->startSessionServiceHealthCheck(initData.getSessionServiceURL());
@@ -125,21 +125,17 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 			shutdown();
 			return OT_ACTION_RETURN_VALUE_OK;
 		}
-		else if (action == OT_ACTION_CMD_Run) {
-			this->sendQueueWSMessage(_senderIP, _json);
-			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
-		}
-		else if (action == OT_ACTION_CMD_StartupCompleted) {
+		else if (action == OT_ACTION_CMD_Init || action == OT_ACTION_CMD_Run) {
 			this->sendQueueWSMessage(_senderIP, _json);
 			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
 		}
 		else if (action == OT_ACTION_CMD_Ping) {
 			std::string response;
-			if (!this->sendProcessWSMessage(_senderIP, _json, response)) {
-				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send ping action document trough websocket"));
+			if (this->sendProcessWSMessage(_senderIP, _json, response)) {
+				return QString::fromStdString(response);
 			}
 			else {
-				return QString::fromStdString(response);
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send ping action document trough websocket"));
 			}
 		}
 

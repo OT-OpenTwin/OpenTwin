@@ -29,8 +29,7 @@ namespace ot {
 			catch (const std::exception& _e) {
 				OT_LOG_EAS(_e.what());
 
-				response = OT_ACTION_RETURN_INDICATOR_Error;
-				response.append(_e.what());
+				response = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, _e.what());
 			}
 			catch (...) {
 				OT_LOG_EAS("[FATAL] Unknown error occured. Shutting down...");
@@ -131,7 +130,7 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 				const std::string actualServiceURL = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
 				
 				ot::ServiceInitData iniData;
-				iniData.setFromJsonObject(ot::json::getObject(params, OT_ACTION_PARAM_Config));
+				iniData.setFromJsonObject(ot::json::getObject(params, OT_ACTION_PARAM_IniData));
 
 				// Initialize the service with the parameters from the file
 

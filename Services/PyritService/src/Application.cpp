@@ -78,13 +78,10 @@ void Application::run(void) {
 	// Create new subprocess manager
 	m_subprocessManager = new SubprocessManager(this);
 
-	if (EnsureDataBaseConnection()) {
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
 	DataBaseInfo info;
 	info.setSiteID(this->getSiteID());
 	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
-	info.setCollectionName(this->m_collectionName);
+	info.setCollectionName(this->getCollectionName());
 	info.setUserName(DataBase::GetDataBase()->getUserName());
 	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
 
@@ -96,15 +93,6 @@ void Application::run(void) {
 	if (this->getModelComponent()) {
 		m_subprocessManager->setModelUrl(this->getModelComponent()->getServiceURL());
 	}
-}
-
-
-std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc) {
-	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) {
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
@@ -149,38 +137,6 @@ void Application::modelDisconnected(const ot::components::ModelComponent * _mode
 	}
 }
 
-void Application::serviceConnected(ot::ServiceBase * _service) {
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service) {
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void) {
-
-}
-
-bool Application::startAsRelayService(void) const {
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
 void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	if (!m_subprocessManager) {
 		return;
@@ -222,7 +178,7 @@ void Application::modelSelectionChanged()
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (m_selectedEntities.size() > 0)
+		if (this->getSelectedEntities().size() > 0)
 		{
 			enabled.push_back("Pyrit:Solver:Run Solver");
 		}
@@ -231,19 +187,13 @@ void Application::modelSelectionChanged()
 			disabled.push_back("Pyrit:Solver:Run Solver");
 		}
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 }
 
 void Application::addSolver(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -251,7 +201,7 @@ void Application::addSolver(void)
 	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
 	// Now get a new entity ID for creating the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create a unique name for the new solver item
 	int count = 1;
@@ -296,28 +246,21 @@ void Application::runSolver(void)
 {
 	if (!m_subprocessManager)
 	{
-		m_uiComponent->displayMessage("\nERROR: Python subsystem is not initialized.\n");
+		this->getUiComponent()->displayMessage("\nERROR: Python subsystem is not initialized.\n");
 		return;
 	}
 
-	if (!EnsureDataBaseConnection())
+	if (this->getSelectedEntities().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
-	if (m_selectedEntities.empty())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
-	for (auto& entity : m_selectedEntityInfos)
+	for (auto& entity : this->getSelectedEntityInfos())
 	{
 		if (entity.getEntityType() == "EntitySolverPyrit")
 		{
@@ -344,8 +287,8 @@ void Application::runSolver(void)
 
 	if (solverRunList.empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
@@ -389,14 +332,14 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 	lock.setFlag(ot::LockViewWrite);
 	lock.setFlag(ot::LockProperties);
 
-	m_uiComponent->lockUI(lock);
+	this->getUiComponent()->lockUI(lock);
 
 	for (auto solver : solverInfo)
 	{
 		runSingleSolver(solver, meshInfo, solverMap[solver.getEntityName()]);
 	}
 
-	m_uiComponent->unlockUI(lock);
+	this->getUiComponent()->unlockUI(lock);
 }
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity)
@@ -407,12 +350,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		solverName = solverName.substr(8);
 	}
 
-	if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-	m_uiComponent->displayMessage("\nPyrit solver started: " + solverName + "\n\n");
+	if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+	this->getUiComponent()->displayMessage("\nPyrit solver started: " + solverName + "\n\n");
 
 	if (solverEntity == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+		this->getUiComponent()->displayMessage("ERROR: Unable to read solver information.\n");
 		return;
 	}
 
@@ -421,7 +364,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	if (problemType == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read problem type for solver.\n");
+		this->getUiComponent()->displayMessage("ERROR: Unable to read problem type for solver.\n");
 		return;
 	}
 
@@ -438,7 +381,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	}
 	else
 	{
-		m_uiComponent->displayMessage("ERROR: Unknown problem type.\n");
+		this->getUiComponent()->displayMessage("ERROR: Unknown problem type.\n");
 		return;
 	}
 
@@ -453,7 +396,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	//if (mesh == nullptr)
 	//{
-	//	m_uiComponent->displayMessage("ERROR: Unable to read mesh information for solver.\n");
+	//	this->getUiComponent()->displayMessage("ERROR: Unable to read mesh information for solver.\n");
 	//	return;
 	//}
 
@@ -486,7 +429,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	//if (meshEntityID == 0)
 	//{
-	//	m_uiComponent->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
+	//	this->getUiComponent()->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
 	//	return;
 	//}
 
@@ -514,7 +457,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	if (returnValue.getStatus() == ot::ReturnMessage::Ok)
 	{
 		std::string message = "\nPyrit solver successfully completed.\n";
-		m_uiComponent->displayMessage(message);
+		this->getUiComponent()->displayMessage(message);
 		m_subprocessManager->addLogText(message);
 	}
 	else if (returnValue.getStatus() == ot::ReturnMessage::Failed)
@@ -522,13 +465,13 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		ot::StyledTextBuilder message;
 		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "Pyrit solver failed : (" << returnValue.getWhat() << ")\n";
 
-		m_uiComponent->displayStyledMessage(message);
+		this->getUiComponent()->displayStyledMessage(message);
 		m_subprocessManager->addLogText("ERROR: Pyrit solver failed : (" + returnValue.getWhat() + ")\n");
 	}
 	else
 	{
 		std::string message = "ERROR: Unknown return status: " + returnValue.getStatusString() + "\n";
-		m_uiComponent->displayMessage(message);
+		this->getUiComponent()->displayMessage(message);
 		m_subprocessManager->addLogText(message);
 	}
 	 
@@ -537,7 +480,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	// Store the output in a result item
 
-	EntityResultText* text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
+	EntityResultText* text = this->getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
 
 	getModelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	getModelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
@@ -567,7 +510,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	}
 
 	// Store the newly created items in the data base
-	m_modelComponent->storeNewEntities("added solver results");
+	this->getModelComponent()->storeNewEntities("added solver results");
 }
 
 void Application::addScalarResult(const std::string &resultName, char* fileData, int data_length, EntityBase* solverEntity)
@@ -658,7 +601,7 @@ std::string Application::problemTypeScript(EntityBase* solverEntity)
 
 	if (script == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read script information for solver.\n");
+		this->getUiComponent()->displayMessage("ERROR: Unable to read script information for solver.\n");
 		return "";
 	}
 
@@ -667,7 +610,7 @@ std::string Application::problemTypeScript(EntityBase* solverEntity)
 	{
 		if (script == nullptr)
 		{
-			m_uiComponent->displayMessage("ERROR: Unable to read script.\n");
+			this->getUiComponent()->displayMessage("ERROR: Unable to read script.\n");
 			return "";
 		}
 	}
@@ -676,7 +619,7 @@ std::string Application::problemTypeScript(EntityBase* solverEntity)
 
 	if (entity == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read script.\n");
+		this->getUiComponent()->displayMessage("ERROR: Unable to read script.\n");
 		return "";
 	}
 
@@ -685,7 +628,7 @@ std::string Application::problemTypeScript(EntityBase* solverEntity)
 	if (scriptEntity == nullptr)
 	{
 		delete entity;
-		m_uiComponent->displayMessage("ERROR: Unable to read script (wrong data type).\n");
+		this->getUiComponent()->displayMessage("ERROR: Unable to read script (wrong data type).\n");
 		return "";
 	}
 

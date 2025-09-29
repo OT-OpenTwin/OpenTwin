@@ -245,7 +245,7 @@ void DataCategorizationHandler::clearBufferedMetadata()
 	m_markedForStorringEntities.clear();
 }
 
-void DataCategorizationHandler::handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
+void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
 {
 	EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
 
@@ -261,7 +261,7 @@ void DataCategorizationHandler::handleChategorisationLock(std::list<ot::EntityIn
 
 	ot::UIDList selectedCategorisations;
 	
-	for (ot::EntityInformation& selectedEntityInfo : _selectedEntities)
+	for (const ot::EntityInformation& selectedEntityInfo : _selectedEntities)
 	{
 		if (selectedEntityInfo.getEntityType() == temp.getClassName())
 		{

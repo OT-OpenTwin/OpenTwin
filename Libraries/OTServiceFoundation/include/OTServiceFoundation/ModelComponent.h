@@ -38,13 +38,7 @@ namespace ot {
 
 		class OT_SERVICEFOUNDATION_API_EXPORT ModelComponent : public ServiceBase {
 		public:
-			ModelComponent(
-				const std::string &			_name,
-				const std::string &			_type,
-				const std::string &			_url,
-				serviceID_t					_id,
-				ApplicationBase *			_application
-			);
+			ModelComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application);
 			virtual ~ModelComponent();
 
 			UID createEntityUID(void);

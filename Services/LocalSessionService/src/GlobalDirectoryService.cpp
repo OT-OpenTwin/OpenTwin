@@ -75,7 +75,7 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _s
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send request
 	std::string response;
@@ -101,7 +101,7 @@ bool GlobalDirectoryService::requestToStartServices(const ot::ServiceInitData& _
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewServices, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_generalData, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_generalData, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
 	ot::JsonArray serviceArr;
 	for (const ot::ServiceBase& service : _serviceInformation) {
@@ -132,7 +132,7 @@ bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _servi
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send request
 	std::string responseStr;

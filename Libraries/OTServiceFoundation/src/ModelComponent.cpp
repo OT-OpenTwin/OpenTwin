@@ -23,15 +23,9 @@
 #include <iostream>
 #include <cassert>
 
-ot::components::ModelComponent::ModelComponent(
-	const std::string &			_name,
-	const std::string &			_type,
-	const std::string &			_url,
-	serviceID_t					_id,
-	ApplicationBase *			_application
-)
+ot::components::ModelComponent::ModelComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application)
 	:uniqueUIDGenerator(nullptr),
-	ServiceBase{ _name, _type, _url, _id },  m_application{ _application }
+	ServiceBase(_serviceInfo), m_application(_application)
 { 
 	assert(m_application); 
 

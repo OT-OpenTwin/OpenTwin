@@ -18,14 +18,8 @@
 
 #include <iostream>
 
-ot::components::UiComponent::UiComponent(
-	const std::string &			_name,
-	const std::string &			_type,
-	const std::string &			_url,
-	serviceID_t					_id,
-	ApplicationBase *			_application
-)
-	: ServiceBase(_name, _type, _url, _id), m_application(_application)
+ot::components::UiComponent::UiComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application)
+	: ServiceBase(_serviceInfo), m_application(_application)
 {
 	assert(m_application != nullptr);	// No application provided
 }

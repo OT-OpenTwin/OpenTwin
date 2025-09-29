@@ -34,6 +34,9 @@ namespace ot {
 
 		// Setter / Getter
 
+		void setLoggerUrl(const std::string& _url) { m_loggerUrl = _url; };
+		const std::string& getLoggerUrl() const { return m_loggerUrl; };
+
 		void setLogFlags(const ot::LogFlags& _logFlags) { m_logFlags = _logFlags; };
 		const ot::LogFlags& getLogFlags() const { return m_logFlags; };
 		
@@ -74,6 +77,7 @@ namespace ot {
 		const std::string& getUserCollection() const { return m_userCollection; };
 
 	private:
+		std::string     m_loggerUrl;
 		ot::LogFlags    m_logFlags;
 
 		std::string     m_name;

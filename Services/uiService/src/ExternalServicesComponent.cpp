@@ -71,6 +71,8 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ServiceRunData.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
@@ -1057,24 +1059,24 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(lssResponse) {
-			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResponse);
-			app->showErrorPrompt("Failed to create session. ", lssResponse, "Error");
-			ot::LogDispatcher::instance().setProjectName("");
-			return false;
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(lssResponse) {
-			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResponse);
-			app->showErrorPrompt("Failed to create session.", lssResponse, "Error");
+
+		ot::ReturnMessage lssResult = ot::ReturnMessage::fromJson(lssResponse);
+
+		if (lssResult != ot::ReturnMessage::Ok) {
+			OT_LOG_EAS("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
+			app->showErrorPrompt("Failed to create session. ", lssResult.getWhat(), "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
 
 		// Check response
 		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(lssResponse);
+		responseDoc.fromJson(lssResult.getWhat());
 
 		// ##################################################################
+
+		ot::ServiceInitData initData;
+		initData.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_IniData));
 
 		if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
 			std::string globalLoggerURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl);
@@ -1088,7 +1090,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 			AppBase::instance()->updateLogIntensityInfo();
 		}
 
-		app->setServiceID(ot::json::getUInt(responseDoc, OT_ACTION_PARAM_SERVICE_ID));
+		app->setServiceID(initData.getServiceID());
 
 		// Ensure to update the window title containing the project name
 		app->setCurrentProjectIsModified(false);
@@ -1168,38 +1170,33 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), confirmResponse)) {
 			throw std::exception("Failed to send http request");
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(confirmResponse) {
-			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(confirmResponse);
-			throw std::exception(ex.c_str());
+
+		ot::ReturnMessage confirmResult = ot::ReturnMessage::fromJson(confirmResponse);
+
+		if (confirmResult != ot::ReturnMessage::Ok) {
+			throw std::exception(("Failed to confirm service at Local Session Service: " + confirmResult.getWhat()).c_str());
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(confirmResponse) {
-			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(confirmResponse);
-			throw std::exception(ex.c_str());
-		}	
 
 		// Add services that are running in this session to the services list
 		ot::JsonDocument serviceListDoc;
-		serviceListDoc.fromJson(confirmResponse);
-		auto serviceList = ot::json::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
-		for (auto& serviceJSON : serviceList) {
-			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
-			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
-			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
-			ot::serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
+		serviceListDoc.fromJson(confirmResult.getWhat());
+
+		ot::ServiceRunData runData;
+		runData.setFromJsonObject(ot::json::getObject(serviceListDoc, OT_ACTION_PARAM_RunData));
+
+		for (const ot::ServiceBase& service : runData.getServices()) {
 			// Dont store this services information
-			if (senderID == AppBase::instance()->getServiceID()) {
+			if (service.getServiceID() == AppBase::instance()->getServiceID()) {
 				continue;
 			}
 
-			auto oldService = m_serviceIdMap.find(senderID);
+			auto oldService = m_serviceIdMap.find(service.getServiceID());
 			if (oldService == m_serviceIdMap.end()) {
-				OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
-				m_serviceIdMap.insert_or_assign(senderID, new ServiceDataUi{ senderName, senderType, senderURL, senderID });
+				OT_LOG_D("Service registered { \"ServiceName\": \"" + service.getServiceName() + "\", \"SenderID\": " + std::to_string(service.getServiceID()) + " }");
+				m_serviceIdMap.insert_or_assign(service.getServiceID(), new ServiceDataUi{ service.getServiceName(), service.getServiceType(), service.getServiceURL(), service.getServiceID() });
 			}
 			else {
-				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + senderName + "\", \"Type\": \"" + senderType + "\" }");
+				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + service.getServiceName() + "\", \"Type\": \"" + service.getServiceType() + "\", \"ID\": " + std::to_string(service.getServiceID()) + " }");
 			}
 		}
 
@@ -1846,59 +1843,8 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	return "";
 }
 
-std::string ExternalServicesComponent::handleMessage(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	
-	std::string msg("Message from ");
-	msg.append(std::to_string(senderID)).append(": ").append(message);
-
-	OT_LOG_I(msg);
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleRun(ot::JsonDocument& _document) {
 
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleStartupCompleted(ot::JsonDocument& _document) {
-	// Get services in the session
-	for (const auto& serviceJSON : ot::json::getObjectList(_document, OT_ACTION_PARAM_SESSION_SERVICES)) {
-		std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
-		std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
-		std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
-		ot::serviceID_t senderID = static_cast<ot::serviceID_t>(ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID));
-
-		// Dont store this services information or existing service information
-		const auto oldService = m_serviceIdMap.find(senderID);
-		if (senderID == AppBase::instance()->getServiceID() || oldService != m_serviceIdMap.end()) {
-			continue;
-		}
-
-		OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
-		m_serviceIdMap.insert_or_assign(senderID, new ServiceDataUi{ senderName, senderType, senderURL, senderID });
-
-		if (senderType == OT_INFO_SERVICE_TYPE_MODEL) {
-			this->determineViews(senderURL);
-		}
-	}
-
-	// Finally show the UI service to other services in the session so they can start to send messages to the frontendF
-	ot::JsonDocument showDoc;
-	showDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShowService, showDoc.GetAllocator()), showDoc.GetAllocator());
-	showDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, showDoc.GetAllocator()), showDoc.GetAllocator());
-	showDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), showDoc.GetAllocator());
-
-	std::string responseStr;
-	this->sendRelayedRequest(EXECUTE, m_sessionServiceURL, showDoc.toJson(), responseStr);
-
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-	if (response != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Failed to show service: " + response.getWhat());
-	}
 
 	return "";
 }

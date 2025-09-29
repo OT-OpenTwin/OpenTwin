@@ -13,6 +13,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTServiceFoundation/IDManager.h"
@@ -85,6 +86,8 @@ public:
 
 	ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);
 
+	ot::ServiceRunData createServiceRunData(ot::serviceID_t _serviceID);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
@@ -149,12 +152,6 @@ private:
 
 	// Private: Messaging
 
-	//! @brief Broadcast a message action with the given message as a parameter to all alive services of this session that may receive broadcast messages.
-	//! @warning The mutex must be locked before calling this function.
-	//! @param _senderService The sender of this message.
-	//! @param _message The message text.
-	void broadcastMessage(ot::serviceID_t _senderServiceID, const std::string& _message);
-
 	//! @brief Broadcast a action to all alive services of this session that may receive broadcast messages.
 	//! @warning The mutex must be locked before calling this function.
 	//! @param _senderService The sender of this message.
@@ -201,6 +198,8 @@ private:
 	//! @param _action The action that will be broadcasted.
 	//! @param _senderService The ID of the service that is sending the broadcast message.
 	void prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string& _action, ot::serviceID_t _senderService);
+
+	ot::ServiceRunData createServiceRunDataImpl(ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

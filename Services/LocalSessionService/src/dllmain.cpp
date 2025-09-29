@@ -49,19 +49,11 @@ extern "C"
 {
 	// todo: switch from auth port to auth url
 	_declspec(dllexport) int init(const char* _loggerServiceURL, const char* _ownUrl, const char* _globalSessionServiceURL, const char* _unused) {
-		std::string loggerServiceURL(_loggerServiceURL);
-
-		// Initialize logging
-#if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
+#ifdef _DEBUG
 		std::cout << "Local Session Service" << std::endl;
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, loggerServiceURL, true);
-#else
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, loggerServiceURL, false);
-#endif
+#endif // _DEBUG
 
 		try {
-			OT_LOG_I("Local Session Service initialization");
-
 			// Now store the command line arguments and perform the initialization
 			if (_ownUrl == nullptr) {
 				exit(ot::AppExitCode::ServiceUrlInvalid);

@@ -14,6 +14,7 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 Session::Session(const std::string& _id, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _type) :
 	m_id(_id), m_userName(_userName), m_projectName(_projectName), m_collectionName(_collectionName), m_type(_type), m_state(Session::NoState), m_healthCheckRunning(false)
@@ -139,21 +140,28 @@ bool Session::hasShuttingDownServices() {
 ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	ot::ServiceInitData initData;
 
+	const SessionService& sessionService = SessionService::instance();
+
 	std::lock_guard<std::mutex> lock(m_mutex);
 	const Service& service = this->getServiceFromID(_serviceID);
 	OTAssert(service.getServiceID() == _serviceID, "Service ID mismatch");
 
+	// Logging
+	initData.setLoggerUrl(ot::ServiceLogNotifier::instance().loggingServiceURL());
 	initData.setLogFlags(ot::LogDispatcher::instance().getLogFlags());
 
+	// Service
 	initData.setServiceName(service.getServiceName());
 	initData.setServiceType(service.getServiceType());
 	initData.setServiceID(_serviceID);
 
-	initData.setSessionServiceURL(SessionService::instance().getUrl());
+	// Session
+	initData.setSessionServiceURL(sessionService.getUrl());
 	initData.setSessionID(m_id);
 	initData.setSessionType(m_type);
 
-	initData.setDatabaseUrl(SessionService::instance().getDatabaseUrl());
+	// DataBase
+	initData.setDatabaseUrl(sessionService.getDatabaseUrl());
 	initData.setUsername(m_userCredentials.getUserName());
 	initData.setPassword(m_userCredentials.getEncryptedPassword());
 	initData.setDatabaseUsername(m_dbCredentials.getUserName());
@@ -161,6 +169,11 @@ ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	initData.setUserCollection(m_userCollection);
 
 	return initData;
+}
+
+ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return this->createServiceRunDataImpl(_serviceID);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -402,13 +415,6 @@ void Session::removeFailedService(ot::serviceID_t _failedServiceID) {
 
 // Private: Messaging
 
-void Session::broadcastMessage(ot::serviceID_t _senderServiceID, const std::string& _message) {
-	ot::JsonDocument doc;
-	this->prepareBroadcastDocument(doc, OT_ACTION_CMD_Message, _senderServiceID);
-	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
-	this->broadcast(_senderServiceID, doc.toJson(), false, false);
-}
-
 void Session::broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, bool _forceSend) {
 	ot::JsonDocument doc;
 	this->prepareBroadcastDocument(doc, _action, _senderServiceID);
@@ -504,6 +510,19 @@ void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string
 	_doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, _doc.GetAllocator()), _doc.GetAllocator());
 }
 
+ot::ServiceRunData Session::createServiceRunDataImpl(ot::serviceID_t _serviceID) {
+	ot::ServiceRunData runData;
+
+	// Services
+	for (const Service& service : m_services) {
+		if (service.getServiceID() != _serviceID && service.isAlive() && !service.isHidden()) {
+			runData.addService(service);
+		}
+	}
+
+	return runData;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Worker
@@ -558,53 +577,26 @@ void Session::healthCheckWorker() {
 void Session::runWorker() {
 	std::string lssUrl = SessionService::instance().getUrl();
 
-	ot::JsonDocument startupDoc;
-	startupDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartupCompleted, startupDoc.GetAllocator()), startupDoc.GetAllocator());
-
-	ot::JsonArray servicesArray;
-	this->addAliveServicesToJsonArray(servicesArray, startupDoc.GetAllocator());
-	startupDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, servicesArray, startupDoc.GetAllocator());
-	std::string startupCommand = startupDoc.toJson();
-
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	ot::JsonDocument runDoc;
 	if (m_state & Session::ShuttingDown) {
 		OT_LOG_W("Session is shutting down. Run command will not be sent { \"SessionID\": \"" + m_id + "\" }");
 		return;
 	}
 
-	runDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, runDoc.GetAllocator()), runDoc.GetAllocator());
-	runDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_type, runDoc.GetAllocator()), runDoc.GetAllocator());
-
-	runDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(m_userCredentials.getUserName(), runDoc.GetAllocator()), runDoc.GetAllocator());
-	runDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(m_userCredentials.getEncryptedPassword(), runDoc.GetAllocator()), runDoc.GetAllocator());
-	runDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(m_dbCredentials.getUserName(), runDoc.GetAllocator()), runDoc.GetAllocator());
-	runDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(m_dbCredentials.getEncryptedPassword(), runDoc.GetAllocator()), runDoc.GetAllocator());
-
-	runDoc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(m_userCollection, runDoc.GetAllocator()), runDoc.GetAllocator());
-
-	std::string runCommand = runDoc.toJson();
-
 	// Send run command to all services that are alive but not yet running
 	for (Service& service : m_services) {
 		if (service.isAlive() && !service.isRunning() && !service.isShuttingDown()) {
+			ot::JsonDocument runDoc;
+			runDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, runDoc.GetAllocator()), runDoc.GetAllocator());
+			runDoc.AddMember(OT_ACTION_PARAM_RunData, ot::JsonObject(this->createServiceRunDataImpl(service.getServiceID()), runDoc.GetAllocator()), runDoc.GetAllocator());
+
 			std::string response;
-			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, runCommand, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, runDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 				OT_LOG_E("Failed to send run command to service { \"id\": \"" + std::to_string(service.getServiceID()) + "\", \"url\": \"" + service.getServiceURL() + "\" }");
 			}
 			else {
 				service.setRunning();
-			}
-		}
-	}
-
-	// Now we send the startup completed command to all services that are alive and running
-	for (Service& service : m_services) {
-		if (service.isRunning() && !service.isShuttingDown()) {
-			std::string response;
-			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, startupCommand, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send startup completed command to service { \"id\": \"" + std::to_string(service.getServiceID()) + "\", \"url\": \"" + service.getServiceURL() + "\" }");
 			}
 		}
 	}

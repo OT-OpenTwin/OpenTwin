@@ -156,7 +156,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 
 std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
-	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
 	OT_LOG_D("Service start requested: { \"ID\": " + std::to_string(initData.getServiceID()) + ", \"Name\": " + initData.getServiceName() + 
 		"\", \"Type\": \"" + initData.getServiceType() + "\", \"SessionID\": \"" + initData.getSessionID() + "\", \"LssUrl\": \"" + initData.getSessionServiceURL() + "\" }");
@@ -172,7 +172,7 @@ std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 
 std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
-	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
 	std::list<ot::ServiceInitData> requestedServices;
 
@@ -211,7 +211,7 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
-	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);

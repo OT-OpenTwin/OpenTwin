@@ -57,7 +57,6 @@
 #define OT_ACTION_CMD_Ping "Ping"
 #define OT_ACTION_CMD_Init "Initialize"
 #define OT_ACTION_CMD_Run "Run"
-#define OT_ACTION_CMD_StartupCompleted "StartupCompleted"
 #define OT_ACTION_CMD_Reset "Reset"
 #define OT_ACTION_CMD_GetDebugInformation "Debug.Info.Get"
 #define OT_ACTION_CMD_SetVisualizationModel "VisualizationModel.Set"

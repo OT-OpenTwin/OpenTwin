@@ -107,20 +107,9 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	// Add code that should be executed when the service is started and may start its work
-
-	// We want to be connected to the database all the time
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-	}
-}
-
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
-	entityCache.setModelComponent(m_modelComponent);
+	entityCache.setModelComponent(this->getModelComponent());
 
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
@@ -221,11 +210,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	ot::LockTypeFlags lockTypes;
@@ -262,51 +246,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelSelectionChanged();
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
 void Application::modelSelectionChanged(void)
 {
-	getUiComponent()->setControlState("Modeling:Modify:Boolean Add", !m_selectedEntities.empty());
-	getUiComponent()->setControlState("Modeling:Modify:Boolean Subtract", !m_selectedEntities.empty());
-	getUiComponent()->setControlState("Modeling:Modify:Boolean Intersect", !m_selectedEntities.empty());
-	getUiComponent()->setControlState("Modeling:Modify:Transform", !m_selectedEntities.empty());
+	const bool buttonsEnabled = !this->getSelectedEntities().empty();
+
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Add", buttonsEnabled);
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Subtract", buttonsEnabled);
+	getUiComponent()->setControlState("Modeling:Modify:Boolean Intersect", buttonsEnabled);
+	getUiComponent()->setControlState("Modeling:Modify:Transform", buttonsEnabled);
 
 	// We need to call the handler in the base class
 	ApplicationBase::modelSelectionChanged();
@@ -422,7 +369,7 @@ PrimitiveManager *Application::getPrimitiveManager(void)
 { 
 	if (primitiveManager == nullptr)
 	{
-		primitiveManager = new PrimitiveManager(m_uiComponent, m_modelComponent, getServiceName(), getServiceID(), &entityCache, &getClassFactory());
+		primitiveManager = new PrimitiveManager(this->getUiComponent(), this->getModelComponent(), getServiceName(), getServiceID(), &entityCache, &getClassFactory());
 	}
 
 	return primitiveManager; 
@@ -432,7 +379,7 @@ BooleanOperations *Application::getBooleanOperations(void)
 { 
 	if (booleanOperations == nullptr)
 	{
-		booleanOperations = new BooleanOperations(m_uiComponent, m_modelComponent, getServiceName(), &entityCache, getServiceID(), &getClassFactory());
+		booleanOperations = new BooleanOperations(this->getUiComponent(), this->getModelComponent(), getServiceName(), &entityCache, getServiceID(), &getClassFactory());
 	}
 
 	return booleanOperations; 
@@ -442,7 +389,7 @@ UpdateManager *Application::getUpdateManager(void)
 { 
 	if (updateManager == nullptr)
 	{
-		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), getBlendEdgesManager(), &getClassFactory());
+		updateManager = new UpdateManager(this->getUiComponent(), this->getModelComponent(), &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), getBlendEdgesManager(), &getClassFactory());
 	}
 
 	return updateManager; 
@@ -452,7 +399,7 @@ Transformations *Application::getTransformationManager(void)
 { 
 	if (transformationManager == nullptr)
 	{
-		transformationManager = new Transformations(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		transformationManager = new Transformations(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		transformationManager->setUpdateManager(getUpdateManager());	
 	}
 
@@ -463,7 +410,7 @@ ChamferEdges* Application::getChamferEdgesManager(void)
 {
 	if (chamferEdges == nullptr)
 	{
-		chamferEdges = new ChamferEdges(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		chamferEdges = new ChamferEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		chamferEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -474,7 +421,7 @@ BlendEdges* Application::getBlendEdgesManager(void)
 {
 	if (blendEdges == nullptr)
 	{
-		blendEdges = new BlendEdges(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		blendEdges = new BlendEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		blendEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -486,7 +433,7 @@ SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)
 {
 	if (removeFaces == nullptr)
 	{
-		removeFaces = new SimplifyRemoveFaces(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		removeFaces = new SimplifyRemoveFaces(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		removeFaces->setUpdateManager(getUpdateManager());	
 	}
 

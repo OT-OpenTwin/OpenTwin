@@ -66,31 +66,13 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-}
-
-std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
-{
-	return OT_ACTION_RETURN_UnknownAction;
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
 void Application::modelSelectionChanged()
 {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (m_selectedEntities.size() > 0)
+		if (this->getSelectedEntities().size() > 0)
 		{
 			enabled.push_back("Mesh:Tet Mesh:Update Tet Mesh");
 			enabled.push_back("Mesh:Import / Export:Export Tet Mesh");
@@ -101,7 +83,7 @@ void Application::modelSelectionChanged()
 			disabled.push_back("Mesh:Import / Export:Export Tet Mesh");
 		}
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 }
 
@@ -125,56 +107,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-}
-
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
 }
 
 // ##################################################################################################################################
@@ -220,13 +152,7 @@ std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 
 void Application::createMesh(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -243,7 +169,7 @@ void Application::createMesh(void)
 	} while (std::find(meshItems.begin(), meshItems.end(), meshName) != meshItems.end());
 
 	// Now get a new entity ID for creating the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
 	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
@@ -282,26 +208,18 @@ void Application::createMesh(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create tet mesh");
 }
 
-void Application::updateMesh(void)
-{
-	if (!EnsureDataBaseConnection())
+void Application::updateMesh(void) {
+	if (this->getSelectedEntities().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
-	if (m_selectedEntities.empty())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 	// We first get a list of all selected entities
 	std::list<ot::EntityInformation> selectedEntityInfo;
-	if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-	ot::ModelServiceAPI::getEntityInformation(m_selectedEntities, selectedEntityInfo);
+	if (this->getModelComponent() == nullptr) { assert(0); throw std::exception("Model is not connected"); }
+	ot::ModelServiceAPI::getEntityInformation(this->getSelectedEntities(), selectedEntityInfo);
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> mesherRunMap;
@@ -332,8 +250,8 @@ void Application::updateMesh(void)
 
 	if (mesherRunList.empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No tet mesh item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No tet mesh item has been selected.\n");
 		return;
 	}
 
@@ -379,8 +297,6 @@ void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std:
 
 void Application::runSingleMesher(ot::EntityInformation &mesher, EntityMeshTet *meshEntity)
 {
-	if (!EnsureDataBaseConnection()) return;
-
 	GmshMeshCreation tetMesher(this);
 	tetMesher.updateMesh(meshEntity);
 }
@@ -389,8 +305,8 @@ void Application::exportMesh(void)
 {
 	if (getCurrentlySelectedMeshName().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: You need to select a single mesh to export.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: You need to select a single mesh to export.\n");
 		return;
 	}
 
@@ -427,21 +343,13 @@ void Application::importMesh(void)
 	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::exportMeshFile(const std::string &fileName)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
+void Application::exportMeshFile(const std::string &fileName) {
 	// Determine the file extension (defines the type of the mesh export)
 	size_t index = fileName.rfind('.');
 	if (index == std::string::npos)
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: The export file type has not been specified. Please make sure to specify a valid file extension.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: The export file type has not been specified. Please make sure to specify a valid file extension.\n");
 		return;
 	}
 
@@ -450,16 +358,16 @@ void Application::exportMeshFile(const std::string &fileName)
 	ot::UID currentMeshDataID = getCurrentlySelectedMeshDataID();
 	if (currentMeshDataID == 0)
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to load the data of the selected mesh.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to load the data of the selected mesh.\n");
 		return;
 	}
 
 	MeshExport meshExporter(this);
 	if (!meshExporter.loadMesh(currentMeshDataID))
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to load the data of the selected mesh.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Unable to load the data of the selected mesh.\n");
 		return;
 	}
 
@@ -482,14 +390,14 @@ void Application::exportMeshFile(const std::string &fileName)
 
 std::string Application::getCurrentlySelectedMeshName(void)
 {
-	if (m_selectedEntities.empty()) return "";
+	if (this->getSelectedEntities().empty()) return "";
 
 	// We first get a list of all selected entities
 
 	std::string selectedMeshItem;
 
 	std::map<std::string, bool> mesherRunMap;
-	for (auto& entity : m_selectedEntityInfos)
+	for (auto& entity : this->getSelectedEntityInfos())
 	{
 		if (entity.getEntityType() == "EntityMeshTet")
 		{
@@ -544,15 +452,8 @@ ot::UID Application::getCurrentlySelectedMeshDataID(void)
 	return entityInfo.front().getEntityID();
 }
 
-void Application::importMeshFile(const std::string& originalName, const std::string& content, ot::UID uncompressedDataLength)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+void Application::importMeshFile(const std::string& originalName, const std::string& content, ot::UID uncompressedDataLength) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 

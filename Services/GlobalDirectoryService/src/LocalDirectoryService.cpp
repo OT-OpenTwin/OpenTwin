@@ -67,7 +67,7 @@ bool LocalDirectoryService::supportsService(const std::string& _serviceName) con
 bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string responseStr;
 	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -87,7 +87,7 @@ bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serv
 bool LocalDirectoryService::requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string responseStr;
 	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {

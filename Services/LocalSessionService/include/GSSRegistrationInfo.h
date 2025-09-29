@@ -17,22 +17,25 @@ public:
 	GSSRegistrationInfo();
 	~GSSRegistrationInfo() {};
 
-	void reset(void);
+	void reset();
 
 	void setServiceID(ot::serviceID_t _id) { m_serviceID = _id; };
-	ot::serviceID_t getServiceID(void) const { return m_serviceID; };
+	ot::serviceID_t getServiceID() const { return m_serviceID; };
 
 	void setDataBaseURL(const std::string& _url) { m_databaseURL = _url; };
-	const std::string& getDataBaseURL(void) const { return m_databaseURL; };
+	const std::string& getDataBaseURL() const { return m_databaseURL; };
 
 	void setAuthURL(const std::string& _url) { m_authURL = _url; };
-	const std::string& getAuthURL(void) const { return m_authURL; };
+	const std::string& getAuthURL() const { return m_authURL; };
 
 	void setGdsURL(const std::string& _url) { m_gdsURL = _url; };
-	const std::string& getGdsURL(void) const { return m_gdsURL; };
+	const std::string& getGdsURL() const { return m_gdsURL; };
+
+	void setLoggingURL(const std::string& _url) { m_loggingURL = _url; };
+	const std::string& getLoggingURL() const { return m_loggingURL; };
 
 	void setLogFlags(const ot::LogFlags& _flags) { m_logFlags = _flags; };
-	const ot::LogFlags& getLogFlags(void) const { return m_logFlags; };
+	const ot::LogFlags& getLogFlags() const { return m_logFlags; };
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -45,5 +48,6 @@ private:
 	std::string        m_databaseURL;
 	std::string        m_authURL;
 	std::string        m_gdsURL;
+	std::string        m_loggingURL;
 	ot::LogFlags       m_logFlags;
 };

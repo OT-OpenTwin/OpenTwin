@@ -82,35 +82,16 @@ Application::~Application()
 	}
 }
 
-void Application::propertyChanged(ot::JsonDocument& _doc)
-{
-	//The message is expected to come, but nothing needs to be done
-}
-
-
-
 // ##################################################################################################################################
 
 // Required functions
 
-void Application::run(void)
-{
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-}
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
-	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc), m_selectedEntities);
+	std::thread handler(&Application::ProcessActionDetached, this, _action, std::move(_doc), this->getSelectedEntities());
 	handler.detach();
 
 	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -149,7 +130,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Lock Data Characterisation");
 	m_buttonUnLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation");
 
-
 	_ui->addMenuButton(m_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(m_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(m_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
@@ -166,14 +146,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 		std::list<std::string> enabled;
 		std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .GetFullDescription(), m_buttonLockCharacterisation.GetFullDescription(), m_buttonUnLockCharacterisation.GetFullDescription()};
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-}
-
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
@@ -185,47 +160,6 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	m_batchedCategorisationHandler.setModelComponent(_model);
 }
 
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
 void Application::modelSelectionChanged(void)
 {	
 
@@ -233,7 +167,7 @@ void Application::modelSelectionChanged(void)
 	EntityParameterizedDataCategorization categorisation(0, nullptr, nullptr, nullptr, nullptr, "");
 	bool batchImporterSelected(false),categorisationSelected(false);
 	
-	for (ot::EntityInformation& selectedEntityInfo : m_selectedEntityInfos)
+	for (const ot::EntityInformation& selectedEntityInfo : this->getSelectedEntityInfos())
 	{
 		if (selectedEntityInfo.getEntityType() == importer.getClassName())
 		{
@@ -270,7 +204,7 @@ void Application::modelSelectionChanged(void)
 	getUiComponent()->setControlsEnabledState(enabled, disabled);
 
 	std::lock_guard<std::mutex> lock(m_selectedEntitiesMutex);
-	m_selectedEntitiesQueue.push_back(m_selectedEntities);
+	m_selectedEntitiesQueue.push_back(this->getSelectedEntities());
 }
 
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc, ot::UIDList _selectedEntities)
@@ -303,7 +237,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				
 				if (action == m_buttonLockCharacterisation.GetFullDescription() || action == m_buttonUnLockCharacterisation.GetFullDescription())
 				{
-					m_parametrizedDataHandler->handleChategorisationLock(m_selectedEntityInfos,action == m_buttonLockCharacterisation.GetFullDescription());
+					m_parametrizedDataHandler->handleChategorisationLock(this->getSelectedEntityInfos(), action == m_buttonLockCharacterisation.GetFullDescription());
 				}
 				else
 				{
@@ -346,11 +280,11 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (action == m_buttonCreateDataCollection.GetFullDescription())
 			{
 				UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockModelWrite);
-				m_uiComponent->displayMessage("===========================================================================\n");
-				m_uiComponent->displayMessage("Start creation of dataset\n");
-				_tabledataToResultdataHandler->createDataCollection(getDataBaseURL(), m_collectionName);
-				m_uiComponent->displayMessage("Creation of dataset finished\n");
-				m_uiComponent->displayMessage("===========================================================================\n\n");
+				this->getUiComponent()->displayMessage("===========================================================================\n");
+				this->getUiComponent()->displayMessage("Start creation of dataset\n");
+				_tabledataToResultdataHandler->createDataCollection(getDataBaseURL(), this->getCollectionName());
+				this->getUiComponent()->displayMessage("Creation of dataset finished\n");
+				this->getUiComponent()->displayMessage("===========================================================================\n\n");
 			}
 			else if (action == m_buttonAddBatchCreator.GetFullDescription())
 			{
@@ -389,7 +323,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_Config, jConfig, requestNumberOfPortsDoc.GetAllocator());
 
 				std::string tmp;
-				m_uiComponent->sendMessage(true, requestNumberOfPortsDoc, tmp);
+				this->getUiComponent()->sendMessage(true, requestNumberOfPortsDoc, tmp);
 			}
 			else if (subsequentFunction == "SetNumberOfPorts")
 			{
@@ -398,7 +332,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
-				m_uiComponent->displayMessage("Storing table range categorisations.");
+				this->getUiComponent()->displayMessage("Storing table range categorisations.");
 				try
 				{
 					auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
@@ -434,13 +368,13 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 		if (returnMessage != "")
 		{
-			m_uiComponent->displayMessage(returnMessage);
+			this->getUiComponent()->displayMessage(returnMessage);
 		}
 	}
 	catch (std::runtime_error& e)
 	{
 		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
-		m_uiComponent->displayMessage(errorMessage);
+		this->getUiComponent()->displayMessage(errorMessage);
 		if (m_twoPartsAction != nullptr)
 		{
 			delete m_twoPartsAction;
@@ -469,7 +403,7 @@ void Application::HandleSelectionChanged()
 				m_rangleSelectionVisualisationHandler.selectRange(entities);
 			}
 			catch (std::exception& e) {
-				m_uiComponent->displayMessage("Changed selection caused exception: " + std::string(e.what()));
+				this->getUiComponent()->displayMessage("Changed selection caused exception: " + std::string(e.what()));
 			}
 		}
 	}

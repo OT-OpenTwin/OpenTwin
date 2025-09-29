@@ -81,7 +81,7 @@ std::list<std::string> Application::getSupportedServices(void) const {
 
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
-	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
 	if (m_serviceManager.requestStartService(initData) != ServiceManager::RequestResult::Success) {
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, m_serviceManager.lastError());
@@ -93,7 +93,7 @@ std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) 
 
 std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
-	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
 	std::string relayServiceURL;
 	std::string websocketUrl;

@@ -165,7 +165,7 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	OT_LOG_D("Relay started successfully. Now checking if alive");
 	ot::JsonDocument checkCommandDoc;
 	checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
-	checkCommandDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_serviceInformation, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+	checkCommandDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 	std::string checkCommandString = checkCommandDoc.toJson();
 
 	int attempt = 0;
@@ -381,7 +381,7 @@ void ServiceManager::serviceStartFailed(const ot::ServiceInitData& _serviceInfor
 void ServiceManager::sendInitializeMessage(Service&& _info) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_info.getInfo(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_info.getInfo(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Send message
 	std::string responseStr;

@@ -894,8 +894,6 @@ std::string Application::handleViewsFromProjectType(ot::JsonDocument& _document)
 	return typeManager.getViews();
 }
 
-
-
 // Versions
 
 std::string Application::handleGetCurrentVersion(ot::JsonDocument& _document) {
@@ -1075,34 +1073,13 @@ void Application::flushRequestsToFrontEnd()
 
 // Required functions
 
-void Application::run() {
+void Application::initialize() {
 	if (m_model) {
 		OT_LOG_E("Model already created!");
 		return;
 	}
 
-	size_t index = this->getSessionID().find(':');
-	if (index == std::string::npos) {
-		OT_LOG_E("Invalid session id format");
-		return;
-	}
-
-	std::string projectName(this->getSessionID().substr(0, index));
-	std::string collectionName(this->getSessionID().substr(index + 1));
-
-	this->EnsureDataBaseConnection();
-
-	m_model = new Model(projectName, this->getProjectType(), collectionName);
-}
-
-std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc) {
-	
-	return "";
-}
-
-std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc) {
-
-	return "";
+	m_model = new Model(this->getProjectName(), this->getProjectType(), this->getCollectionName());
 }
 
 void Application::uiConnected(ot::components::UiComponent* _ui) {
@@ -1134,26 +1111,6 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	m_model->uiIsAvailable();
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent* _ui) {
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent* _model) {
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent* _model) {
-
-}
-
-void Application::serviceConnected(ot::ServiceBase* _service) {
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase* _service) {
-
-}
-
 void Application::preShutdown() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -1176,22 +1133,6 @@ void Application::shuttingDown() {
 	m_asyncActionMutex.lock();
 	m_continueAsyncActionWorker = false;
 	m_asyncActionMutex.unlock();
-}
-
-bool Application::startAsRelayService() const {
-	return false;
-}
-
-ot::PropertyGridCfg Application::createSettings() const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property* _item) {
-	return false;
 }
 
 // ##################################################################################################################################################################################################################
