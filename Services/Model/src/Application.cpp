@@ -1098,6 +1098,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), commandDoc.GetAllocator());
 
 	response.clear();
+
 	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, commandDoc, response)) {
 		OT_LOG_E("Failed to send request");
 		return;

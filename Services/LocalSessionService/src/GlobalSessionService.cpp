@@ -218,6 +218,8 @@ void GlobalSessionService::startHealthCheck() {
 		return;
 	}
 
+	OTAssert(m_workerThread == nullptr, "Health check thread already exists");
+
 	m_healthCheckRunning = true;
 
 	OT_LOG_D("Starting health check");
@@ -260,66 +262,72 @@ void GlobalSessionService::healthCheck() {
 		std::string pingResponse;
 
 		// Send ping
-		if (this->sendMessage(ot::EXECUTE, pingMessage, pingResponse)) {
-			// Check response
-			if (pingResponse != OT_ACTION_PING) {
-				OT_LOG_W("Received invalid ping response from global session service");
-				m_mutex.lock();
-				m_connectionStatus = Disconnected;
-				m_mutex.unlock();
+		if (!this->sendMessage(ot::EXECUTE, pingMessage, pingResponse)) {
+			m_mutex.lock();
+			m_connectionStatus = Disconnected;
+			m_mutex.unlock();
+
+			continue;
+		}
+
+		// Check response
+		if (pingResponse != OT_ACTION_PING) {
+			OT_LOG_W("Received invalid ping response from global session service");
+			m_mutex.lock();
+			m_connectionStatus = Disconnected;
+			m_mutex.unlock();
+		}
+		else if (!this->isConnected()) {
+			// Register at the session service
+			ot::JsonDocument registerDoc;
+			registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+			registerDoc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+
+			ot::JsonArray iniListArr;
+			registerDoc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, registerDoc.GetAllocator());
+
+			std::string registerResponse;
+
+			// Send registration
+			if (!this->sendMessage(ot::EXECUTE, registerDoc.toJson(), registerResponse)) {
+				OT_LOG_E("Failed to send register message to global session service");
+				continue;
 			}
-			else if (!this->isConnected()) {
-				// Register at the session service
-				ot::JsonDocument registerDoc;
-				registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewSessionService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-				registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(lssUrl, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-				registerDoc.AddMember(OT_ACTION_PARAM_Sessions, ot::JsonArray(SessionService::instance().getSessionIDs(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 
-				ot::JsonArray iniListArr;
-				registerDoc.AddMember(OT_ACTION_PARAM_IniList, iniListArr, registerDoc.GetAllocator());
+			ot::ReturnMessage response = ot::ReturnMessage::fromJson(registerResponse);
 
-				std::string registerResponse;
-
-				// Send registration
-				if (!this->sendMessage(ot::EXECUTE, registerDoc.toJson(), registerResponse)) {
-					OT_LOG_E("Failed to send register message to global session service");
-				}
-				else {
-					ot::ReturnMessage response = ot::ReturnMessage::fromJson(registerResponse);
-
-					if (response != ot::ReturnMessage::Ok) {
-						OT_LOG_E("Failed to register at GSS: " + response.getWhat());
-					}
-					else {
-						// Get new id and database url
-						ot::JsonDocument registrationResponseDoc;
-						registrationResponseDoc.fromJson(response.getWhat());
-
-						GSSRegistrationInfo info;
-						info.setServiceID(ot::json::getUInt(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_ID));
-						info.setDataBaseURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_DATABASE_URL));
-						info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
-
-						if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
-							info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
-						}
-
-						// Get global logger info
-						info.setLoggingURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
-						ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
-						info.setLogFlags(ot::logFlagsFromJsonArray(logFlags));	
-
-						m_mutex.lock();
-
-						m_registrationResult = std::move(info);
-
-						// Set connection status to connected
-						m_connectionStatus = Connected;
-
-						m_mutex.unlock();
-					}
-				}
+			if (response != ot::ReturnMessage::Ok) {
+				OT_LOG_E("Failed to register at GSS: " + response.getWhat());
+				continue;
 			}
+
+			// Get new id and database url
+			ot::JsonDocument registrationResponseDoc;
+			registrationResponseDoc.fromJson(response.getWhat());
+
+			GSSRegistrationInfo info;
+			info.setServiceID(ot::json::getUInt(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_ID));
+			info.setDataBaseURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_DATABASE_URL));
+			info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
+
+			if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
+				info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
+			}
+
+			// Get global logger info
+			info.setLoggingURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
+			ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+			info.setLogFlags(ot::logFlagsFromJsonArray(logFlags));
+
+			m_mutex.lock();
+
+			m_registrationResult = std::move(info);
+
+			// Set connection status to connected
+			m_connectionStatus = Connected;
+
+			m_mutex.unlock();
 		}
 
 		ct = 0;

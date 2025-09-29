@@ -53,7 +53,7 @@ namespace ot {
 			//! @brief Will initialize the service.
 			//! @param _explicitDebug If true, the debug initialization will be performed.
 			//! The process ID will be added to the registration request.
-			std::string init(const ot::ServiceInitData& _initData, bool _explicitDebug);
+			ot::ReturnMessage init(const ot::ServiceInitData& _initData, bool _explicitDebug);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter
@@ -82,9 +82,6 @@ namespace ot {
 			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
 			std::string handleGetSystemInformation();
 
-			std::string getLoggedInUserName(void) { return m_credentialsUsername; }
-			std::string getLoggedInUserPassword(void) { return m_credentialsPassword; }
-
 		private:
 			// #####################################################################################################################################
 
@@ -108,9 +105,6 @@ namespace ot {
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
 			SystemInformation m_systemLoad;
-
-			std::string m_credentialsUsername;
-			std::string m_credentialsPassword;
 			
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();

@@ -28,6 +28,8 @@ void ot::ServiceInitData::addToJsonObject(JsonValue& _jsonObject, JsonAllocator&
 	_jsonObject.AddMember("SessionID", JsonString(m_sessionID, _allocator), _allocator);
 	_jsonObject.AddMember("SessionType", JsonString(m_sessionType, _allocator), _allocator);
 
+	_jsonObject.AddMember("AuthUrl", JsonString(m_authUrl, _allocator), _allocator);
+
 	_jsonObject.AddMember("DatabaseUrl", JsonString(m_databaseUrl, _allocator), _allocator);
 	_jsonObject.AddMember("Username", JsonString(m_username, _allocator), _allocator);
 	_jsonObject.AddMember("Password", JsonString(m_password, _allocator), _allocator);
@@ -47,6 +49,8 @@ void ot::ServiceInitData::setFromJsonObject(const ConstJsonObject& _jsonObject) 
 	m_sessionServiceURL = json::getString(_jsonObject, "SessionServiceURL");
 	m_sessionID = json::getString(_jsonObject, "SessionID");
 	m_sessionType = json::getString(_jsonObject, "SessionType");
+
+	m_authUrl = json::getString(_jsonObject, "AuthUrl");
 
 	m_databaseUrl = json::getString(_jsonObject, "DatabaseUrl");
 	m_username = json::getString(_jsonObject, "Username");

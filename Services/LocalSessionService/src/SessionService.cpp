@@ -50,7 +50,7 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 		OT_LOG_EA("Invalid port number format");
 		return ot::AppExitCode::FailedToConvertPort;
 	}
-	lss.m_debugPortManager.addPortRange(portFrom, portFrom + 79);
+	lss.m_debugPortManager.addPortRange(portFrom + 1, portFrom + 79);
 
 	// Initialize connection to GSS
 	if (!lss.m_gss.connect(_gssUrl)) {
@@ -64,11 +64,13 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, regInfo.getLoggingURL(), false);
 #endif
 
+	lss.m_authUrl = regInfo.getAuthURL();
+
 	// Initialize log flags
 	ot::LogDispatcher::instance().setLogFlags(regInfo.getLogFlags());
 
 	// Initialize connection to GDS
-	if (!lss.m_gds.connect(regInfo.getGdsURL(), true)) {
+	if (!regInfo.getGdsURL().empty() && !lss.m_gds.connect(regInfo.getGdsURL(), true)) {
 		return ot::AppExitCode::GDSRegistrationFailed;
 	}
 

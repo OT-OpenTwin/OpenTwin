@@ -156,6 +156,7 @@ ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	initData.setServiceID(_serviceID);
 
 	// Session
+	initData.setAuthorizationUrl(sessionService.getAuthorisationServiceUrl());
 	initData.setSessionServiceURL(sessionService.getUrl());
 	initData.setSessionID(m_id);
 	initData.setSessionType(m_type);

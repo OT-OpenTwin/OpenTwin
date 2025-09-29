@@ -46,7 +46,8 @@
 #define OT_INFO_SERVICE_ID_SessionService ""
 
 ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier)
-	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier), m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false)
+	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier),
+	m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false), m_sessionService(nullptr), m_directoryService(nullptr)
 {
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 }
@@ -70,7 +71,6 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 	}
 	
 	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, _url, invalidServiceID);
-	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
 }
 
 // ##########################################################################################################################################
@@ -144,14 +144,6 @@ ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID _entityID) {
 	}
 }
 
-std::string ot::ApplicationBase::getLogInUserName() const {
-	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserName();
-}
-
-std::string ot::ApplicationBase::getLogInUserPsw() const {
-	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserPassword();
-}
-
 // ##########################################################################################################################################
 
 // IO
@@ -198,8 +190,8 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 {
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
-		OTAssert(0, "Destination service not found");
-		return "";
+		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
+		return false;
 	}
 	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
 	
@@ -506,7 +498,7 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	PropertyGridCfg newSettings = this->createSettings();
 	if (newSettings.isEmpty()) return "";
 
-	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_DBuserCollection)) {
+	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_dbUserCollection)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to store settings";
 	}
 
@@ -556,9 +548,11 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		// Store information
 		m_uiComponent = new components::UiComponent(_service, this);
 
+		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
 
 		m_serviceIdMap.insert_or_assign(_service.getServiceID(), m_uiComponent);
 		m_serviceNameMap.insert_or_assign(_service.getServiceName(), m_uiComponent);
+
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), true);
@@ -569,8 +563,6 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		m_uiComponent->sendUpdatedControlState();
 		m_uiComponent->notifyUiSetupCompleted();
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), false);
-
-		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
 	}
 	else if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
@@ -580,6 +572,7 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 
 		m_serviceIdMap.insert_or_assign(_service.getServiceID(), m_modelComponent);
 		m_serviceNameMap.insert_or_assign(_service.getServiceName(), m_modelComponent);
+
 		modelConnected(m_modelComponent);
 	}
 	else {
@@ -587,6 +580,7 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 		ot::ServiceBase* newService = new ServiceBase(_service);
 		m_serviceIdMap.insert_or_assign(_service.getServiceID(), newService);
 		m_serviceNameMap.insert_or_assign(_service.getServiceName(), newService);
+
 		serviceConnected(*newService);
 	}
 }

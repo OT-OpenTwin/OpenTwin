@@ -112,18 +112,20 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 
 				// Read file
 				std::ifstream stream(deplyomentPath);
-				char inBuffer[512];
-				stream.getline(inBuffer, 512);
+				char inBuffer[1024];
+				stream.getline(inBuffer, 1024);
 				std::string info(inBuffer);
 
 				if (info.empty()) {
 					OT_LOG_EA("Configuration not found");
-					assert(0);
 					return -21;
 				}
 				// Parse doc
 				JsonDocument params;
-				params.fromJson(info);
+				if (!params.fromJson(info)) {
+					OT_LOG_EA("Configuration not valid JSON");
+					return -22;
+				}
 
 				OT_LOG_I("Application parameters were overwritten by configuration file: " + deplyomentPath);
 
@@ -139,16 +141,16 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 					return startupResult;
 				}
 
-				std::string initResult = intern::ExternalServicesComponent::instance().init(iniData, _explicitDebug);
-				if (initResult != OT_ACTION_RETURN_VALUE_OK) {
-					return -22;
+				ot::ReturnMessage initResult = intern::ExternalServicesComponent::instance().init(iniData, _explicitDebug);
+				if (initResult != ot::ReturnMessage::Ok) {
+					return -23;
 				}
 				else {
 					return 0;
 				}
 			}
 			else {
-				return -23;
+				return -24;
 			}
 		}
 		else {

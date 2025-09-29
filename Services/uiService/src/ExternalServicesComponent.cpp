@@ -1044,8 +1044,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_uiServiceURL, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, true, sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_Hidden, true, sessionDoc.GetAllocator());
-
+		
 		// Add user credentials
 		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
@@ -1198,6 +1197,10 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 			else {
 				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + service.getServiceName() + "\", \"Type\": \"" + service.getServiceType() + "\", \"ID\": " + std::to_string(service.getServiceID()) + " }");
 			}
+
+			if (service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
+				this->determineViews(service.getServiceURL());
+			}
 		}
 
 		// Start the session service health check
@@ -1319,7 +1322,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		}
 
 		// Reset all service information
-		for (auto s : m_serviceIdMap) {
+		for (auto& s : m_serviceIdMap) {
 			m_lockManager->cleanService(s.second->getBasicServiceInformation(), true, true);
 			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
 			app->shortcutManager()->creatorDestroyed(s.second);
@@ -3046,7 +3049,9 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 	app->getViewerComponent()->activateModel(modelID);
 
 	auto service = m_serviceIdMap.find(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
-	if (service == m_serviceIdMap.end()) { throw std::exception("Sender service was not registered"); }
+	if (service == m_serviceIdMap.end()) {
+		throw std::exception("Sender service was not registered");
+	}
 
 	// Write data to JSON string
 	ot::JsonDocument docOut;
@@ -3055,7 +3060,7 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
 
 	std::string response;
-	if (!sendRelayedRequest(QUEUE, service->second->getServiceURL(), docOut, response)) {
+	if (!sendRelayedRequest(EXECUTE, service->second->getServiceURL(), docOut, response)) {
 		throw std::exception("Failed to send http request");
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {

@@ -121,7 +121,7 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::False));
 			}
 		}
-		else if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
+		else if (action == OT_ACTION_CMD_ShutdownRequestedByService || action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
 			shutdown();
 			return OT_ACTION_RETURN_VALUE_OK;
 		}

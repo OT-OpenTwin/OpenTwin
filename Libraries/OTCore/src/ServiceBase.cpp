@@ -44,7 +44,7 @@ bool ot::ServiceBase::operator != (const ServiceBase& _other) const {
 
 void ot::ServiceBase::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
 	_jsonObject.AddMember("ID", m_serviceID, _allocator);
-	_jsonObject.AddMember("Name", JsonString(m_serviceURL, _allocator), _allocator);
+	_jsonObject.AddMember("Name", JsonString(m_serviceName, _allocator), _allocator);
 	_jsonObject.AddMember("Type", JsonString(m_serviceType, _allocator), _allocator);
 	_jsonObject.AddMember("URL", JsonString(m_serviceURL, _allocator), _allocator);
 	_jsonObject.AddMember("SiteID", JsonString(m_siteId, _allocator), _allocator);

@@ -29,7 +29,6 @@
 // OpenTwin ModelEntities header
 #include "ClassFactory.h"                             // Entity class factory
 #include "EntityInformation.h"                        // Entity information
-
 // std header
 #include <map>
 #include <list>
@@ -82,10 +81,6 @@ namespace ot {
 		//! @param _id The site ID to set.
 		void setSiteID(const std::string & _id) { m_siteID = _id; }
 
-		//! @brief Will set the websocket URL that this application is connected to (only required if socket connection is established).
-		//! @param _url The websocket URL to set.
-		void setWebSocketURL(const std::string & _url) { m_websocketURL = _url; }
-
 		//! @brief Will set the session service URL.
 		//! @param _url The session service URL.
 		void setSessionServiceURL(const std::string & _url);
@@ -101,26 +96,31 @@ namespace ot {
 		//! Returns an empty string in case of an error.
 		std::string deploymentPath() const;
 
+		//! @brief Will return the URL of the authorization service.
+		const std::string& getAuthorizationUrl() const { return m_authUrl; };
+
 		//! @brief Will return the URL of the database.
-		std::string getDataBaseURL() { return m_databaseURL; }
+		const std::string& getDataBaseURL() const { return m_databaseURL; }
+
+		//! @brief Will return the name of the user collection in the database.
+		const std::string& getDbUserCollection() const { return m_dbUserCollection; };
 
 		//! @brief Will return the site ID this application is running on.
-		std::string getSiteID() { return m_siteID; }
-
-		//! @brief Will return the websocket URL, it is only set if a websocket was required on startup: startAsRelayService() == true.
-		std::string getWebSocketURL() { return m_websocketURL; }
+		const std::string& getSiteID() const { return m_siteID; }
 
 		//! @brief Will return the session service URL.
-		std::string getSessionServiceURL() { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
+		std::string getSessionServiceURL() const { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
 
 		//! @brief Will return the session ID this service is running in.
-		std::string getSessionID() { return m_sessionID; }
+		const std::string& getSessionID() const { return m_sessionID; }
 		
 		//! @brief The current project type.
 		const std::string& getProjectType() const { return m_projectType; };
 
+		//! @brief The current project name.
 		const std::string& getProjectName() const { return m_projectName; };
 
+		//! @brief The current collection name.
 		const std::string& getCollectionName() const { return m_collectionName; };
 
 		//! @brief Will return true if a UI is running in the session
@@ -152,7 +152,7 @@ namespace ot {
 		AbstractModelNotifier * getModelNotifier() { return m_modelNotifier; }
 
 		//! @brief Returns a handle to the global class factory for the service
-		ClassFactory& getClassFactory() { return classFactory; }
+		ClassFactory& getClassFactory() { return m_classFactory; }
 
 		const std::list<UID>& getSelectedEntities() const { return m_selectedEntities; };
 		const std::list<ot::EntityInformation>& getSelectedEntityInfos() const { return m_selectedEntityInfos; };
@@ -162,8 +162,11 @@ namespace ot {
 		UID getPrefetchedEntityVersion(UID _entityID);
 		const std::map<UID, UID>& getPrefetchedEntityVersions() const { return m_prefetchedEntityVersions; };
 
-		std::string getLogInUserName() const;
-		std::string getLogInUserPsw() const;
+		const std::string& getLogInUserName() const { return m_loggedInUserName; };
+		const std::string& getLogInUserPassword() const { return m_loggedInUserPassword; };
+
+		const std::string& getDataBaseUserName() const { return m_dataBaseUserName; };
+		const std::string& getDataBaseUserPassword() const { return m_dataBaseUserPassword; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -321,22 +324,27 @@ namespace ot {
 
 		std::map<std::string, ServiceBase*>	m_serviceNameMap;
 		std::map<serviceID_t, ServiceBase*>	m_serviceIdMap;
+		
+		ServiceBase*                        m_sessionService;
+		ServiceBase*                        m_directoryService;
+		components::ModelComponent*         m_modelComponent;
+		components::UiComponent*            m_uiComponent;
+		AbstractUiNotifier*                 m_uiNotifier;
+		AbstractModelNotifier*              m_modelNotifier;
 
-		ServiceBase* m_sessionService = nullptr;
-		ServiceBase* m_directoryService = nullptr;
-		components::ModelComponent* m_modelComponent;
-		components::UiComponent* m_uiComponent;
-		AbstractUiNotifier* m_uiNotifier;
-		AbstractModelNotifier* m_modelNotifier;
-
+		std::string                         m_authUrl;
 		std::string                         m_databaseURL;
 		std::string                         m_siteID;
-		std::string                         m_websocketURL;
 
 		std::string                         m_sessionID;
 		std::string                         m_projectName;
 		std::string                         m_collectionName;
 		std::string                         m_projectType;
+
+		std::string                         m_loggedInUserName;
+		std::string                         m_loggedInUserPassword;
+		std::string                         m_dataBaseUserName;
+		std::string                         m_dataBaseUserPassword;
 
 		std::list<ot::ModalCommandBase*>    m_modalCommands;
 
@@ -344,8 +352,8 @@ namespace ot {
 		std::list<ot::EntityInformation>    m_selectedEntityInfos;
 		std::map<UID, UID>                  m_prefetchedEntityVersions;
 
-		std::string  m_DBuserCollection;
-		ClassFactory classFactory;
+		std::string                         m_dbUserCollection;
+		ClassFactory                        m_classFactory;
 	};
 
 }

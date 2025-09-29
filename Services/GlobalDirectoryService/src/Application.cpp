@@ -67,7 +67,6 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	// Send message
 	std::string gssURL(_globalSessionServiceURL);
 
-
 	// Send request to GSS
 	std::string gssResponse;
 

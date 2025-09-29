@@ -148,12 +148,12 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	return 0;
 }
 
-std::string ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData, bool _explicitDebug) {
+ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData, bool _explicitDebug) {
 	OTAssertNullptr(m_application);
 
 	if (m_componentState != WaitForInit) {
 		OT_LOG_EA("Component already initialized");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Component already initialized");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Component already initialized");
 	}
 
 	// First set the log flags
@@ -174,7 +174,11 @@ std::string ot::intern::ExternalServicesComponent::init(const ot::ServiceInitDat
 
 	// Setup database parameters
 	m_application->setDataBaseURL(_initData.getDatabaseUrl());
-	m_application->m_DBuserCollection = _initData.getUserCollection();
+	m_application->m_dbUserCollection = _initData.getUserCollection();
+	m_application->m_loggedInUserName = _initData.getUsername();
+	m_application->m_loggedInUserPassword = _initData.getPassword();
+	m_application->m_dataBaseUserName = _initData.getDatabaseUsername();
+	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
 
 	DataBase* db = DataBase::GetDataBase();
 	db->setDataBaseServerURL(_initData.getDatabaseUrl());
@@ -216,19 +220,19 @@ std::string ot::intern::ExternalServicesComponent::init(const ot::ServiceInitDat
 	std::string responseStr;
 	if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), responseStr)) {
 		OT_LOG_E("Failed to send http request to LSS at \"" + m_application->getSessionServiceURL() + "\"");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 	if (response != ot::ReturnMessage::Ok) {
 		OT_LOG_E("Failed to register service at LSS: " + response.getWhat());
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to register service at LSS");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to register service at LSS");
 	}
 
 	// Ensure database connection
 	if (!m_application->initializeDataBaseConnectionPrivate()) {
 		OT_LOG_E("Failed to ensure database connection");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to ensure database connection");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to ensure database connection");
 	}
 
 	// Initialize default template
@@ -274,7 +278,7 @@ std::string ot::intern::ExternalServicesComponent::init(const ot::ServiceInitDat
 	// Initialize the performance counters
 	m_systemLoad.initialize();
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage(ot::ReturnMessage::Ok);
 }
 
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
@@ -374,7 +378,7 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 
 	OTAssertNullptr(m_application);
 
-	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString(), DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_application->m_DBuserCollection);
+	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString(), DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_application->m_dbUserCollection);
 
 	if (!oldConfig.isEmpty()) {
 		_config.mergeWith(oldConfig, ot::PropertyBase::FullMerge);
@@ -398,7 +402,7 @@ std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocumen
 std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_IniData));
-	return this->init(initData, false);
+	return this->init(initData, false).toJson();
 }
 
 std::string ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {

@@ -47,16 +47,6 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Service handling
-
-	//! @brief Add the session service to the list of session services.
-	//! @param _service The session service to add.
-	//! @param _newId The new id assigned to the session service.
-	//! @return True if the service was added successfully, false otherwise.
-	bool addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
 	// Setter / Getter
 
 	void setDatabaseUrl(const std::string& _url);
@@ -99,6 +89,17 @@ private:
 	
 	GlobalSessionService();
 	~GlobalSessionService();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Service handling
+
+	//! @brief Add the session service to the list of session services.
+	//! @note The mutex must be locked before calling this function.
+	//! @param _service The session service to add.
+	//! @param _newId The new id assigned to the session service.
+	//! @return True if the service was added successfully, false otherwise.
+	bool addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId);
 
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
 	void removeSessionService(const LocalSessionService& _service);
