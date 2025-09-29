@@ -118,7 +118,8 @@ private:
 	Application();
 	virtual ~Application();
 
-	ot::MenuButtonDescription _buttonRunPipeline;
+	ot::MenuButtonDescription m_buttonRunPipeline;
+	ot::MenuButtonDescription m_buttonCreatePipeline;
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
