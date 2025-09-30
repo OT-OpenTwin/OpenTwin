@@ -130,17 +130,13 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 
 std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	
 	m_serviceManager.sessionClosing(sessionID);
-
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	
 	m_serviceManager.sessionClosed(sessionID);
-	
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 

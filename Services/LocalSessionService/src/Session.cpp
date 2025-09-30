@@ -496,7 +496,7 @@ void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string&
 		if (!service.getServiceURL().empty() && (_forceSend || (service.isRunning() && !service.isShuttingDown())) && service.getServiceID() != _senderServiceID) {
 			std::string response;
 			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send broadcast message to service { \"id\": \"" + std::to_string(service.getServiceID()) + "\", \"url\": \"" + service.getServiceURL() + "\" }");
+				OT_LOG_E("Failed to send broadcast message to service { \"ID\": \"" + std::to_string(service.getServiceID()) + "\", \"Url\": \"" + service.getServiceURL() + "\" }");
 			}
 		}
 	}
