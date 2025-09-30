@@ -29,7 +29,9 @@
     <ClCompile Include="src\IpConverter.cpp" />
     <ClCompile Include="src\Msg.cpp" />
     <ClCompile Include="src\RelayedMessageHandler.cpp" />
+    <ClCompile Include="src\ServiceInitData.cpp" />
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
+    <ClCompile Include="src\ServiceRunData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
@@ -48,7 +50,9 @@
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
     <ClInclude Include="include\OTCommunication\RelayedMessageHandler.h" />
+    <ClInclude Include="include\OTCommunication\ServiceInitData.h" />
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h" />
+    <ClInclude Include="include\OTCommunication\ServiceRunData.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

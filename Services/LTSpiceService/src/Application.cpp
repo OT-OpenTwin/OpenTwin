@@ -71,16 +71,6 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	// This method is called once the service can start its operation
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-	// Add code that should be executed when the service is started and may start its work
-}
-
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED)
@@ -119,11 +109,6 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	return OT_ACTION_RETURN_UnknownAction;
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -144,45 +129,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
-}
-
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
 }
 
 // ##################################################################################################################################
@@ -220,7 +166,7 @@ void Application::modelSelectionChanged()
 void Application::EnsureVisualizationModelIDKnown(void)
 {
 	if (visualizationModelID > 0) return;
-	if (m_modelComponent == nullptr) {
+	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -231,12 +177,12 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 void Application::importProject(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has already been initialized.");
+		getUiComponent()->displayErrorPrompt("This project has already been initialized.");
 		return;
 	}
 	 
@@ -246,7 +192,7 @@ void Application::importProject(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::setLTSpiceFile(void)
@@ -254,7 +200,7 @@ void Application::setLTSpiceFile(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -264,17 +210,17 @@ void Application::setLTSpiceFile(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::commitChanges(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -284,7 +230,7 @@ void Application::commitChanges(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::showInformation(void)
@@ -292,7 +238,7 @@ void Application::showInformation(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -305,17 +251,17 @@ void Application::showInformation(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::getChanges(void)
 {
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -329,7 +275,7 @@ void Application::getChanges(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::uploadNeeded(ot::JsonDocument& _doc)
@@ -360,8 +306,8 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 
 	for (size_t i = 0; i < count; i++)
 	{
-		entityID.push_back(m_modelComponent->createEntityUID());
-		versionID.push_back(m_modelComponent->createEntityUID());
+		entityID.push_back(this->getModelComponent()->createEntityUID());
+		versionID.push_back(this->getModelComponent()->createEntityUID());
 	}
 
 	// Read the information
@@ -376,7 +322,7 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, infoFileManager.getInfoEntityVersion(), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::downloadNeeded(ot::JsonDocument& _doc)
@@ -408,7 +354,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::filesUploaded(ot::JsonDocument& _doc)
@@ -435,17 +381,17 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 		ot::UID dataEntityID = dataEntityIDList.front(); dataEntityIDList.pop_front();
 		ot::UID dataVersion  = dataVersionList.front();  dataVersionList.pop_front();
 
-		modelComponent()->addNewTopologyEntity(fileEntityID, fileVersion, false);
-		modelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
+		getModelComponent()->addNewTopologyEntity(fileEntityID, fileVersion, false);
+		getModelComponent()->addNewDataEntity(dataEntityID, dataVersion, fileEntityID);
 	}
 
 	ot::ModelServiceAPI::deleteEntitiesFromModel(deletedNameList, false);
 
-	modelComponent()->storeNewEntities("", false, false);
+	getModelComponent()->storeNewEntities("", false, false);
 
 	extractResults();
 
-	modelComponent()->storeNewEntities("LTSpice project uploaded", false);
+	getModelComponent()->storeNewEntities("LTSpice project uploaded", false);
 
 	// Determine the new version
 	std::string newVersion = ot::ModelServiceAPI::getCurrentModelVersion();
@@ -457,14 +403,14 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	doc1.AddMember(OT_ACTION_PARAM_MODEL_VersionLabel, ot::JsonString(changeMessage, doc1.GetAllocator()), doc1.GetAllocator());
 
 	std::string tmp;
-	modelComponent()->sendMessage(true, doc1, tmp);
+	getModelComponent()->sendMessage(true, doc1, tmp);
 
 	// Finally we send the new version to the frontend 
 	ot::JsonDocument doc2;
 	doc2.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_COPY, doc2.GetAllocator()), doc2.GetAllocator());
 	doc2.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc2.GetAllocator()), doc2.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc2, tmp);
+	getUiComponent()->sendMessage(true, doc2, tmp);
 }
 
 void Application::changeUnits(const std::string &content)
@@ -496,7 +442,7 @@ void Application::changeUnits(const std::string &content)
 	{
 		units->getProperties().setAllPropertiesReadOnly();
 		units->StoreToDataBase();
-		modelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
+		getModelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
 	}
 
 	delete units; units = nullptr;
@@ -602,7 +548,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (material == nullptr)
 	{
 		// We have a new material to create
-		material = new EntityMaterial(modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
 		material->setName("Materials/" + materialName);
 		material->createProperties();
 
@@ -648,7 +594,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 		material->updateFromProperties();
 		material->getProperties().setAllPropertiesReadOnly();
 		material->StoreToDataBase();
-		modelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
+		getModelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
 	}
 
 	delete material; material = nullptr;
@@ -812,8 +758,8 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	int colorG = (int) (255 * std::get<1>(rgb));
 	int colorB = (int) (255 * std::get<2>(rgb));
 
-	ot::UID entityID = modelComponent()->createEntityUID();
-	ot::UID facetsID = modelComponent()->createEntityUID();
+	ot::UID entityID = getModelComponent()->createEntityUID();
+	ot::UID facetsID = getModelComponent()->createEntityUID();
 
 	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	entityGeom->setName(otName);
@@ -836,9 +782,9 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	entityGeom->getFacets()->StoreToDataBase();
 	entityGeom->StoreToDataBase();
 
-	modelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
-	modelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
-	modelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
+	getModelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
+	getModelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
+	getModelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
 
 	delete entityGeom;
 	entityGeom = nullptr;

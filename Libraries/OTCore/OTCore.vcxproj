@@ -35,11 +35,14 @@
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSONHelper.cpp" />
     <ClCompile Include="src\JsonObject.cpp" />
+    <ClCompile Include="src\LogMessage.cpp" />
+    <ClCompile Include="src\LogNotifierFileWriter.cpp" />
+    <ClCompile Include="src\LogNotifierStdCout.cpp" />
+    <ClCompile Include="src\LogTypes.cpp" />
     <ClCompile Include="src\ThisComputerInfo.cpp" />
     <ClCompile Include="src\OTObject.cpp" />
     <ClCompile Include="src\RuntimeTests.cpp" />
     <ClCompile Include="src\StringToNumericCheck.cpp" />
-    <ClCompile Include="src\LogModeManager.cpp" />
     <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
@@ -50,7 +53,7 @@
     <ClCompile Include="src\ReturnMessage.cpp" />
     <ClCompile Include="src\ReturnValues.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
-    <ClCompile Include="src\Logger.cpp" />
+    <ClCompile Include="src\LogDispatcher.cpp" />
     <ClCompile Include="src\OwnerService.cpp" />
     <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\String.cpp" />
@@ -67,6 +70,7 @@
     <ClCompile Include="src\VariableToStringConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTCore\AbstractLogNotifier.h" />
     <ClInclude Include="include\OTCore\BasicNumberIncrementWrapper.h" />
     <ClInclude Include="include\OTCore\BasicScopedBoolWrapper.h" />
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
@@ -91,10 +95,14 @@
     <ClInclude Include="include\OTCore\JSONString.h" />
     <ClInclude Include="include\OTCore\JSONString.hpp" />
     <ClInclude Include="include\OTCore\JSONTypes.h" />
+    <ClInclude Include="include\OTCore\LogDispatcher.h" />
+    <ClInclude Include="include\OTCore\LogMessage.h" />
+    <ClInclude Include="include\OTCore\LogNotifierFileWriter.h" />
+    <ClInclude Include="include\OTCore\LogNotifierStdCout.h" />
+    <ClInclude Include="include\OTCore\LogTypes.h" />
     <ClInclude Include="include\OTCore\MatrixVectorizedXAlign.h" />
     <ClInclude Include="include\OTCore\LocalStateStack.h" />
     <ClInclude Include="include\OTCore\LocalStateStack.hpp" />
-    <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
     <ClInclude Include="include\OTCore\Matrix.h" />
     <ClInclude Include="include\OTCore\Matrix2.h" />
@@ -123,7 +131,6 @@
     <ClInclude Include="include\OTCore\GenericDataStructVector.h" />
     <ClInclude Include="include\OTCore\JSON.h" />
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
-    <ClInclude Include="include\OTCore\Logger.h" />
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\Owner.h" />

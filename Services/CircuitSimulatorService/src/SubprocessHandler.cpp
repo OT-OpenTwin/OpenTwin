@@ -3,7 +3,7 @@
 #include "SimulationResults.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 #include "QtCore/qcoreapplication.h"
 #include "QtCore/qtimer.h"

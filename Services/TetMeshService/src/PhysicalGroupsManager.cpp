@@ -114,12 +114,12 @@ bool PhysicalGroupsManager::isPECMaterial(EntityBase *entity, MaterialManager *m
 
 	if (materialProperty == nullptr) return false;
 
-	if (application->modelComponent()->getCurrentMaterialName(materialProperty).empty())
+	if (application->getModelComponent()->getCurrentMaterialName(materialProperty).empty())
 	{
 		throw std::string("ERROR: No material defined for shape: " + entity->getName() + "\n\n");
 	}
 
-	EntityMaterial *material = materialManager->getMaterial(application->modelComponent()->getCurrentMaterialName(materialProperty));
+	EntityMaterial *material = materialManager->getMaterial(application->getModelComponent()->getCurrentMaterialName(materialProperty));
 
 	if (material == nullptr)
 	{

@@ -7,7 +7,7 @@
 #include "LogInGSSEditDialog.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"

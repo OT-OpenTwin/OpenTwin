@@ -83,8 +83,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 			throw std::exception("Query returned nothing.\n");
 		}
 		
-		if (Application::instance()->uiComponent()) {
-			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.\n");
+		if (Application::instance()->getUiComponent()) {
+			Application::instance()->getUiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.\n");
 		}
 		ot::JsonDocument dataDoc;
 		ot::JsonArray entries;

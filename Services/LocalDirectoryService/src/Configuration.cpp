@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 
 // std header
@@ -27,7 +27,7 @@
 #define LDS_CFG_LauncherPath "LauncherPath"
 #define LDS_CFG_ServicesLibraryPath "ServicesLibraryPath"
 
-Configuration& Configuration::instance(void) {
+Configuration& Configuration::instance() {
 	static Configuration g_instance;
 	return g_instance;
 }
@@ -43,7 +43,7 @@ void Configuration::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember(LDS_CFG_ServicesLibraryPath, ot::JsonString(m_servicesLibraryPath, _allocator), _allocator);
 
 	ot::JsonArray serviceArr;
-	for (auto s : m_supportedServices) {
+	for (auto& s : m_supportedServices) {
 		ot::JsonObject serviceObj;
 		s.addToJsonObject(serviceObj, _allocator);
 		serviceArr.PushBack(serviceObj, _allocator);
@@ -66,30 +66,38 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	// Load services library path
 	m_servicesLibraryPath = ot::json::getString(_object, LDS_CFG_ServicesLibraryPath);
 	OT_LOG_D("[Configuration]: Services library path set to " + m_servicesLibraryPath);
-	
+
 	// Load supported services
 
 	ot::ConstJsonArray serviceArr = ot::json::getArray(_object, LDS_CFG_SupportedServices);
-		for (rapidjson::SizeType i = 0; i < serviceArr.Size(); i++) {
-		ServiceInformation newEntry;
+	for (rapidjson::SizeType i = 0; i < serviceArr.Size(); i++) {
+
+		SupportedService newEntry;
+		newEntry.setMaxCrashRestarts(m_defaultMaxCrashRestarts);
+		newEntry.setMaxStartupRestarts(m_defaultMaxStartupRestarts);
+
 		if (serviceArr[i].IsString()) {
 			std::string name = ot::json::getString(serviceArr, i);
 
-			if (name.empty()) continue;
-			
+			if (name.empty()) {
+				continue;
+			}
+
 			// Name only (no further options provided)
 			newEntry.setName(name);
 			newEntry.setType(name);
-			newEntry.setMaxCrashRestarts(m_defaultMaxCrashRestarts);
-			newEntry.setMaxStartupRestarts(m_defaultMaxStartupRestarts);
 		}
 		else if (serviceArr[i].IsObject()) {
 			ot::ConstJsonObject serviceObj = ot::json::getObject(serviceArr, i);
 
 			// Name
 			std::string name = ot::json::getString(serviceObj, LDS_CFG_ServiceName);
-			if (name.empty()) continue;
+			if (name.empty()) {
+				OT_LOG_W("Empty service name provided as supported servive");
+				continue;
+			}
 			newEntry.setName(name);
+			newEntry.setType(name);
 
 			// Type
 			if (serviceObj.HasMember(LDS_CFG_ServiceType)) {
@@ -101,23 +109,14 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 				}
 				newEntry.setType(type);
 			}
-			else {
-				newEntry.setType(newEntry.getName());
-			}
 
 			// Is Restartable
 			if (serviceObj.HasMember(LDS_CFG_ServiceMaxCrashRestarts)) {
 				newEntry.setMaxCrashRestarts(ot::json::getUInt(serviceObj, LDS_CFG_ServiceMaxCrashRestarts));
 			}
-			else {
-				newEntry.setMaxCrashRestarts(m_defaultMaxCrashRestarts);
-			}
 
 			if (serviceObj.HasMember(LDS_CFG_ServiceMaxStartupRestarts)) {
 				newEntry.setMaxStartupRestarts(ot::json::getUInt(serviceObj, LDS_CFG_ServiceMaxStartupRestarts));
-			}
-			else {
-				newEntry.setMaxStartupRestarts(m_defaultMaxStartupRestarts);
 			}
 		}
 		else {
@@ -145,7 +144,7 @@ void Configuration::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 // Management
 
-void Configuration::importFromEnvironment(void) {
+void Configuration::importFromEnvironment() {
 	if (m_configurationImported) {
 		return;
 	}
@@ -171,13 +170,13 @@ void Configuration::importFromEnvironment(void) {
 	m_configurationImported = true;
 }
 
-bool Configuration::supportsService(const std::string& _serviceName) const {
-	for (auto s : m_supportedServices) {
+std::optional<SupportedService> Configuration::getSupportedService(const std::string& _serviceName) const {
+	for (const SupportedService& s : m_supportedServices) {
 		if (s.getName() == _serviceName) {
-			return true;
+			return s;
 		}
 	}
-	return false;
+	return std::optional<SupportedService>();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

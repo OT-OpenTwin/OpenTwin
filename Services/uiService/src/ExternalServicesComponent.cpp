@@ -20,7 +20,7 @@
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/Color.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
@@ -72,6 +72,8 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ServiceRunData.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
@@ -130,7 +132,6 @@ namespace ot {
 ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_websocket{ nullptr },
 	m_keepAliveTimer { nullptr },
-	m_isRelayServiceRequired{ false },
 	m_controlsManager{ nullptr },
 	m_lockManager{ nullptr },
 	m_owner{ _owner },
@@ -172,11 +173,6 @@ void ExternalServicesComponent::shutdown(void) {
 // ###################################################################################################
 
 // Configuration
-
-void ExternalServicesComponent::setRelayServiceIsRequired(void) {
-	m_isRelayServiceRequired = true;
-	std::cout << "The relay service parameter was set: True" << std::endl;
-}
 
 void ExternalServicesComponent::setMessagingRelay(const std::string &relayAddress)
 {
@@ -699,8 +695,14 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 		return false;
 	}
 
-	projectUser = response;
-	return true;
+	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(response);
+	if (msg == ot::ReturnMessage::True) {
+		projectUser = msg.getWhat();
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 // ###################################################################################################
@@ -934,9 +936,6 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	AppBase* app{ AppBase::instance() };
 	std::string response;
 
-#ifndef OT_USE_GSS
-	return result;
-#endif
 	// Request a session service from the global session service
 	ot::JsonDocument gssDoc;
 	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetListOfProjectTemplates, gssDoc.GetAllocator()), gssDoc.GetAllocator());
@@ -998,21 +997,20 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		m_currentSessionID.append(":").append(_collectionName);
 		AppBase::instance()->SetCollectionName(_collectionName);
 
-		std::string response;
-#ifdef OT_USE_GSS
 		// Request a session service from the global session service
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), response)) {
+		std::string gssResponse;
+		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), gssResponse)) {
 			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
 			app->showErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(gssResponse);
 		if (responseMessage != ot::ReturnMessage::Ok) {
 			app->showErrorPrompt(responseMessage.getWhat(), "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
@@ -1022,7 +1020,6 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		m_sessionServiceURL = responseMessage.getWhat();
 
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
-#endif
 
 		app->setCurrentProjectName(_projectName);
 		app->setCurrentProjectType(_projectType);
@@ -1046,41 +1043,40 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		// Add service information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(m_uiServiceURL), sessionDoc.GetAllocator()), sessionDoc.GetAllocator()); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
-		sessionDoc.AddMember(OT_ACTION_PARAM_HOST, ot::JsonString(ot::IpConverter::hostFromIp(m_uiServiceURL), sessionDoc.GetAllocator()), sessionDoc.GetAllocator()); // todo: rework -> create session -> send service port (ui uses the websocket and the port is not required)
-		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired, sessionDoc.GetAllocator());
-
+		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_uiServiceURL, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, true, sessionDoc.GetAllocator());
+		
 		// Add user credentials
 		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getCurrentLoginData().getSessionUser(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
-		response.clear();
-		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), response)) {
+		std::string lssResponse;
+		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), lssResponse)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create session. ", response, "Error");
+
+		ot::ReturnMessage lssResult = ot::ReturnMessage::fromJson(lssResponse);
+
+		if (lssResult != ot::ReturnMessage::Ok) {
+			OT_LOG_EAS("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
+			app->showErrorPrompt("Failed to create session. ", lssResult.getWhat(), "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create session.", response, "Error");
-			ot::LogDispatcher::instance().setProjectName("");
-			return false;
-		}
-		
+
 		// Check response
 		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(response);
+		responseDoc.fromJson(lssResult.getWhat());
 
 		// ##################################################################
+
+		ot::ServiceInitData initData;
+		initData.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_IniData));
 
 		if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
 			std::string globalLoggerURL = ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl);
@@ -1094,23 +1090,24 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 			AppBase::instance()->updateLogIntensityInfo();
 		}
 
-		app->setServiceID(ot::json::getUInt(responseDoc, OT_ACTION_PARAM_SERVICE_ID));
+		app->setServiceID(initData.getServiceID());
 
 		// Ensure to update the window title containing the project name
 		app->setCurrentProjectIsModified(false);
 
-		if (m_isRelayServiceRequired) {
-			std::string websocketIP = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
+		std::string websocketIP = ot::json::getString(responseDoc, OT_ACTION_PARAM_WebsocketURL);
 
-			if (m_websocket) delete m_websocket;
-			m_websocket = new WebsocketClient(websocketIP);
-
-			m_websocket->updateLogFlags(ot::LogDispatcher::instance().getLogFlags());
-
-			OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
+		// Create the websocket connection
+		if (m_websocket) {
+			delete m_websocket;
+			m_websocket = nullptr;
 		}
-		response = "";
 
+		m_websocket = new WebsocketClient(websocketIP);
+		m_websocket->updateLogFlags(ot::LogDispatcher::instance().getLogFlags());
+
+		OT_LOG_D("Created websocket client (WebsocketURL = \"" + websocketIP + "\")");
+	
 		// TabToolBar tab order
 		QStringList ttbOrder;
 		std::list<std::string> ttbOrderL = ot::json::getStringList(responseDoc, OT_ACTION_PARAM_UI_ToolBarTabOrder);
@@ -1128,80 +1125,87 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::JsonDocument checkCommandDoc;
 		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 		checkCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+		checkCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), checkCommandDoc.GetAllocator());
 		std::string checkCommandString = checkCommandDoc.toJson();
 
 		OT_LOG_D("Waiting for Startup Completed");
 
-		do
-		{
-			if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
+		do {
+			std::string checkStartupResponse;
+			if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, checkCommandString, checkStartupResponse)) {
 				throw std::exception("Failed to send http request to Session Service");
 			}
-			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+
+			ot::ReturnMessage startupResult = ot::ReturnMessage::fromJson(checkStartupResponse);
+			switch (startupResult.getStatus()) {
+			case ot::ReturnMessage::True:
 				startupReady = true;
-			}
-			else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+				break;
+
+			case ot::ReturnMessage::False:
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1s);
-			}
-			else {
-				OT_LOG_E("Invalid Session Service response: " + response);
-				throw std::exception(("Invalid Session Service response: " + response).c_str());
+				break;
+
+			case ot::ReturnMessage::Failed:
+				OT_LOG_E("Failed check for session startup completed: " + startupResult.getWhat());
+				throw std::exception(("Failed check for session startup completed: " + startupResult.getWhat()).c_str());
+
+			default:
+				OT_LOG_E("Invalid Session Service response: " + checkStartupResponse);
+				throw std::exception(("Invalid Session Service response: " + checkStartupResponse).c_str());
+				break;
 			}
 		} while (!startupReady);
 
 		OT_LOG_D("Startup is completed");
 
-		// Set service visible (will notify others that the UI is available)
+		// Register service since startup is completed
 		ot::JsonDocument visibilityCommand;
-		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShow, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
+		visibilityCommand.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ConfirmService, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), visibilityCommand.GetAllocator());
 		visibilityCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, visibilityCommand.GetAllocator()), visibilityCommand.GetAllocator());
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), response)) {
+		
+		std::string confirmResponse;
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, visibilityCommand.toJson(), confirmResponse)) {
 			throw std::exception("Failed to send http request");
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(response);
-			throw std::exception(ex.c_str());
+
+		ot::ReturnMessage confirmResult = ot::ReturnMessage::fromJson(confirmResponse);
+
+		if (confirmResult != ot::ReturnMessage::Ok) {
+			throw std::exception(("Failed to confirm service at Local Session Service: " + confirmResult.getWhat()).c_str());
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			std::string ex("From ");
-			ex.append(m_sessionServiceURL).append(": ").append(response);
-			throw std::exception(ex.c_str());
-		}	
 
 		// Add services that are running in this session to the services list
 		ot::JsonDocument serviceListDoc;
-		serviceListDoc.fromJson(response);
-		auto serviceList = ot::json::getObjectList(serviceListDoc, OT_ACTION_PARAM_SESSION_SERVICES);
-		for (auto serviceJSON : serviceList) {
-			std::string senderURL = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_URL);
-			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
-			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
-			ot::serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
-			// Dont store this services information
-			if (senderID == AppBase::instance()->getServiceID()) continue;
+		serviceListDoc.fromJson(confirmResult.getWhat());
 
-			if (senderType == OT_INFO_SERVICE_TYPE_MODEL)
-			{
-				determineViews(senderURL);
+		ot::ServiceRunData runData;
+		runData.setFromJsonObject(ot::json::getObject(serviceListDoc, OT_ACTION_PARAM_RunData));
+
+		for (const ot::ServiceBase& service : runData.getServices()) {
+			// Dont store this services information
+			if (service.getServiceID() == AppBase::instance()->getServiceID()) {
+				continue;
 			}
 
-			auto oldService = m_serviceIdMap.find(senderID);
+			auto oldService = m_serviceIdMap.find(service.getServiceID());
 			if (oldService == m_serviceIdMap.end()) {
-				OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
-				m_serviceIdMap.insert_or_assign(senderID, new ServiceDataUi{ senderName, senderType, senderURL, senderID });
+				OT_LOG_D("Service registered { \"ServiceName\": \"" + service.getServiceName() + "\", \"SenderID\": " + std::to_string(service.getServiceID()) + " }");
+				m_serviceIdMap.insert_or_assign(service.getServiceID(), new ServiceDataUi{ service.getServiceName(), service.getServiceType(), service.getServiceURL(), service.getServiceID() });
 			}
 			else {
-				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + senderName + "\", \"Type\": \"" + senderType + "\" }");
+				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + service.getServiceName() + "\", \"Type\": \"" + service.getServiceType() + "\", \"ID\": " + std::to_string(service.getServiceID()) + " }");
+			}
+
+			if (service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
+				this->determineViews(service.getServiceURL());
 			}
 		}
 
-#ifdef OT_USE_GSS
 		// Start the session service health check
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
-#endif // OT_USE_GSS
 
 		assert(m_keepAliveTimer == nullptr);
 		m_keepAliveTimer = new QTimer(this);
@@ -1210,7 +1214,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		uiLock.setNoUnlock();
 
-		OT_LOG_D("Open project completed");
+		OT_LOG_D("Open project completed, waiting for run and startup completed");
 
 		// Process buffered actions
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotProcessActionBuffer, Qt::QueuedConnection);
@@ -1233,7 +1237,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->initializeDefaultUserSettings();
 
-		OT_LOG_D("Closing project { name = \"" + app->getCurrentProjectName() + "\"; SaveChanges = " + (_saveChanges ? "True" : "False"));
+		OT_LOG_D("Closing project { \"Name\": \"" + app->getCurrentProjectName() + "\", \"SaveChanges\": " + (_saveChanges ? "true" : "false") + " }");
 
 		std::string projectName = app->getCurrentProjectName();
 		if (projectName.length() == 0) {
@@ -1261,25 +1265,20 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), shutdownCommand.GetAllocator());
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
 
-		std::string response;
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
-			OT_LOG_EA("Failed to send shutdown session request to LSS");
-		}
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Invalid response: " + response);
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS("Invalid response: " + response);
+		std::string responseStr;
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, responseStr)) {
+			OT_LOG_E("Failed to send shutdown session request to LSS");
 		}
 
-#ifdef OT_USE_GSS
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Failed to close session at LSS: " + response.getWhat());
+		}
+
 		// Stop the session service health check
 		ot::stopSessionServiceHealthCheck();
-#endif // OT_USE_GSS
 
-		if (m_keepAliveTimer != nullptr)
-		{
+		if (m_keepAliveTimer != nullptr) {
 			m_keepAliveTimer->stop();
 			delete m_keepAliveTimer;
 
@@ -1322,7 +1321,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		}
 
 		// Reset all service information
-		for (auto s : m_serviceIdMap) {
+		for (auto& s : m_serviceIdMap) {
 			m_lockManager->cleanService(s.second->getBasicServiceInformation(), true, true);
 			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
 			app->shortcutManager()->creatorDestroyed(s.second);
@@ -1846,14 +1845,8 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	return "";
 }
 
-std::string ExternalServicesComponent::handleMessage(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	
-	std::string msg("Message from ");
-	msg.append(std::to_string(senderID)).append(": ").append(message);
+std::string ExternalServicesComponent::handleRun(ot::JsonDocument& _document) {
 
-	OT_LOG_I(msg);
 
 	return "";
 }
@@ -1926,14 +1919,13 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 
 std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocument& _document) {
 	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
-	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
 	auto itm = m_serviceIdMap.find(senderID);
 	if (itm != m_serviceIdMap.end()) {
 		ServiceDataUi* actualService = itm->second;
 		assert(actualService != nullptr);
+
+		std::string senderName = actualService->getServiceName();
 
 		// Clean up elements
 		m_lockManager->cleanService(actualService->getBasicServiceInformation(), false, true);
@@ -3056,7 +3048,9 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 	app->getViewerComponent()->activateModel(modelID);
 
 	auto service = m_serviceIdMap.find(ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID));
-	if (service == m_serviceIdMap.end()) { throw std::exception("Sender service was not registered"); }
+	if (service == m_serviceIdMap.end()) {
+		throw std::exception("Sender service was not registered");
+	}
 
 	// Write data to JSON string
 	ot::JsonDocument docOut;
@@ -3065,7 +3059,7 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 	docOut.AddMember(OT_ACTION_PARAM_VIEW_ID, viewID, docOut.GetAllocator());
 
 	std::string response;
-	if (!sendRelayedRequest(QUEUE, service->second->getServiceURL(), docOut, response)) {
+	if (!sendRelayedRequest(EXECUTE, service->second->getServiceURL(), docOut, response)) {
 		throw std::exception("Failed to send http request");
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
@@ -4213,13 +4207,16 @@ std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument
 
 // Private functions
 
-void ExternalServicesComponent::determineViews(const std::string& modelServiceURL) {
+void ExternalServicesComponent::determineViews(const std::string& _modelServiceURL) {
 	ot::JsonDocument sendingDoc;
 
 	sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_PARAM_MODEL_ViewsForProjectType, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
 
 	std::string response;
-	sendRelayedRequest(EXECUTE, modelServiceURL, sendingDoc, response);
+	if (!sendRelayedRequest(EXECUTE, _modelServiceURL, sendingDoc, response)) {
+		return;
+	}
+
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR

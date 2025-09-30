@@ -16,7 +16,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -43,7 +43,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseIP, const char * _authURL) {
+	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownIP, const char * _databaseUrl, const char * _authURL) {
 		// Initialize logging
 		std::string loggerServiceURL(_loggerServiceURL);
 
@@ -59,7 +59,7 @@ extern "C"
 			OT_LOG_EA("Service URL not provided");
 			exit(ot::AppExitCode::ServiceUrlMissing);
 		}
-		if (_databaseIP == nullptr) {
+		if (_databaseUrl == nullptr) {
 			OT_LOG_EA("Data Base URL not provided");
 			exit(ot::AppExitCode::DataBaseUrlMissing);
 		}
@@ -71,7 +71,7 @@ extern "C"
 
 		// Create session service and add data to session service
 		GlobalSessionService& gss = GlobalSessionService::instance();
-		gss.setDatabaseUrl(_databaseIP);
+		gss.setDatabaseUrl(_databaseUrl);
 		gss.setServiceURL(_ownIP);
 		gss.setAuthorizationUrl(_authURL);
 

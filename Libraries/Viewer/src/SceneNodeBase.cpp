@@ -7,7 +7,7 @@
 
 #include "FrontendAPI.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 SceneNodeBase::~SceneNodeBase() {
 	// Remove visualiser before deleting to avoid access to visualiser during deletion

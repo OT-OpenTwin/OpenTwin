@@ -48,7 +48,8 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()),
+	visualizationModelID(-1)
 {
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
@@ -62,25 +63,6 @@ Application::~Application()
 // ##################################################################################################################################
 
 // Required functions
-
-void Application::run(void)
-{
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-}
-
-std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
-{
-	return OT_ACTION_RETURN_UnknownAction;
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
@@ -100,63 +82,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
 void Application::modelSelectionChanged()
 {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (m_selectedEntities.size() > 0)
+		if (this->getSelectedEntities().size() > 0)
 		{
 			enabled.push_back("Mesh:Cartesian Mesh:Update Cartesian Mesh");
 		}
@@ -165,7 +97,7 @@ void Application::modelSelectionChanged()
 			disabled.push_back("Mesh:Cartesian Mesh:Update Cartesian Mesh");
 		}
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 }
 
@@ -182,13 +114,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 void Application::createMesh(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -205,7 +131,7 @@ void Application::createMesh(void)
 	} while (std::find(meshItems.begin(), meshItems.end(), meshName) != meshItems.end());
 
 	// Now get a new entity ID for creating the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
 	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
@@ -246,24 +172,17 @@ void Application::createMesh(void)
 
 void Application::updateMesh(void)
 {
-	if (!EnsureDataBaseConnection())
+	if (this->getSelectedEntities().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
-	if (m_selectedEntities.empty())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> mesherRunMap;
-	for (auto& entity : m_selectedEntityInfos)
+	for (auto& entity : this->getSelectedEntityInfos())
 	{
 		if (entity.getEntityType() == "EntityMeshCartesian")
 		{
@@ -290,8 +209,8 @@ void Application::updateMesh(void)
 
 	if (mesherRunList.empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No cartesian mesh item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No cartesian mesh item has been selected.\n");
 		return;
 	}
 
@@ -332,8 +251,6 @@ void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std:
 
 void Application::runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity)
 {
-	if (!EnsureDataBaseConnection()) return;
-
 	CartesianMeshCreation cartesianMesher;
 	cartesianMesher.updateMesh(this, meshEntity);
 }

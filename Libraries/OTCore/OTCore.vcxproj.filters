@@ -82,12 +82,6 @@
     <ClCompile Include="src\EncodingGuesser.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LogModeManager.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\Math.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -138,6 +132,21 @@
     </ClCompile>
     <ClCompile Include="src\JsonObject.cpp">
       <Filter>src\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogDispatcher.cpp">
+      <Filter>src\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogTypes.cpp">
+      <Filter>src\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogNotifierStdCout.cpp">
+      <Filter>src\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogNotifierFileWriter.cpp">
+      <Filter>src\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogMessage.cpp">
+      <Filter>src\Logger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -268,12 +277,6 @@
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\LocalStateStack.hpp">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Logger.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\LogModeManager.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\Math.h">
@@ -411,6 +414,24 @@
     <ClInclude Include="include\OTCore\JSONString.hpp">
       <Filter>include\JSON</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\LogTypes.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LogMessage.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\AbstractLogNotifier.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LogNotifierStdCout.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LogNotifierFileWriter.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\LogDispatcher.h">
+      <Filter>include\Logger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -469,6 +490,12 @@
     </Filter>
     <Filter Include="src\JSON">
       <UniqueIdentifier>{e38094db-c82c-4d82-b234-569f50003059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Logger">
+      <UniqueIdentifier>{ab02b982-9825-4c91-9c33-4aed984abe95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Logger">
+      <UniqueIdentifier>{ed4fcc5a-7178-445c-924c-f70aa04d34c0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

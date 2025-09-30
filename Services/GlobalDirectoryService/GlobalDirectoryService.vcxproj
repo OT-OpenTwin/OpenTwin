@@ -189,16 +189,12 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\LoadInformation.cpp" />
     <ClCompile Include="src\LocalDirectoryService.cpp" />
-    <ClCompile Include="src\ServiceInformation.cpp" />
-    <ClCompile Include="src\SessionInformation.cpp" />
     <ClCompile Include="src\StartupDispatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\LoadInformation.h" />
     <ClInclude Include="include\LocalDirectoryService.h" />
-    <ClInclude Include="include\ServiceInformation.h" />
-    <ClInclude Include="include\SessionInformation.h" />
     <ClInclude Include="include\StartupDispatcher.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

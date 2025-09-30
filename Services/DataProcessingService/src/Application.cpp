@@ -13,6 +13,7 @@
 
 
 // Open twin header
+#include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -28,6 +29,8 @@
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
+#include "EntitySolverDataProcessing.h"
+
 
 #include "OTServiceFoundation/UILockWrapper.h"
 
@@ -59,7 +62,7 @@ Application::~Application()
 
 void Application::runPipeline()
 {
- 	//UILockWrapper lockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+ 	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 	try
 	{
 
@@ -87,20 +90,6 @@ void Application::runPipeline()
 // ##################################################################################################################################################################################################################
 
 // Required functions
-
-
-void Application::run(void)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-
-	// Add code that should be executed when the service is started and may start its work
-}
-
-#include "EntitySolverDataProcessing.h"
-#include "OTCore/EntityName.h"
 
 std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc)
 {
@@ -176,9 +165,9 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 void Application::propertyChanged(ot::JsonDocument& _doc)
 {
 	EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
-	if (m_selectedEntities.size() == 1 && m_selectedEntityInfos.begin()->getEntityType() == dbA.getClassName())
+	if (this->getSelectedEntities().size() == 1 && this->getSelectedEntityInfos().begin()->getEntityType() == dbA.getClassName())
 	{
-		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_selectedEntityInfos.begin()->getEntityID(), m_selectedEntityInfos.begin()->getEntityVersion(), getClassFactory());
+		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(this->getSelectedEntityInfos().begin()->getEntityID(), this->getSelectedEntityInfos().begin()->getEntityVersion(), getClassFactory());
 		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 		if (dbAccess != nullptr)
 		{
@@ -189,11 +178,6 @@ void Application::propertyChanged(ot::JsonDocument& _doc)
 			assert(false);
 		}
 	}
-}
-
-std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -220,11 +204,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
 	_blockEntityHandler.setModelComponent(_model);
@@ -232,46 +211,3 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_pipelineHandler.setModelComponent(_model);
 	m_propertyHandlerDatabaseAccessBlock.setModelComponent(_model);
 }
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
-// ##################################################################################################################################################################################################################

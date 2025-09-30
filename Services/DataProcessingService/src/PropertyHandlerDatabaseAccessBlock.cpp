@@ -114,12 +114,12 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	const std::string projectName = _dbAccessEntity->getSelectedProjectName();
 
 	auto& classFactory = Application::instance()->getClassFactory();
-	const std::string sessionServiceURL = Application::instance()->sessionServiceURL();
-	auto modelComponent = Application::instance()->modelComponent();
+	const std::string sessionServiceURL = Application::instance()->getSessionServiceURL();
+	auto modelComponent = Application::instance()->getModelComponent();
 
 	ProjectToCollectionConverter collectionFinder(sessionServiceURL);
 	std::string loggedInUserName = Application::instance()->getLogInUserName();
-	std::string loggedInUserPsw = Application::instance()->getLogInUserPsw();
+	std::string loggedInUserPsw = Application::instance()->getLogInUserPassword();
 	_collectionName = collectionFinder.NameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
 
 	const std::string thisProjectsName = DataBase::GetDataBase()->getProjectName();
@@ -351,7 +351,7 @@ void PropertyHandlerDatabaseAccessBlock::requestPropertyUpdate(ot::UIDList entit
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs,requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_JSON, ot::JsonString(propertiesAsJSON, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
-	const std::string& modelServiceURL = Application::instance()->modelComponent()->getServiceURL();
+	const std::string& modelServiceURL = Application::instance()->getModelComponent()->getServiceURL();
 
 	std::string response;
 	if (!ot::msg::send("", modelServiceURL, ot::EXECUTE, requestDoc.toJson(), response))

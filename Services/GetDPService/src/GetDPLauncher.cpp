@@ -88,7 +88,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);
 
-	application->uiComponent()->setProgressInformation("Solver running: " + problemType, true);
+	application->getUiComponent()->setProgressInformation("Solver running: " + problemType, true);
 
 	try
 	{
@@ -101,7 +101,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 		controlFile.close();
 
 		// Run the solver
-		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
+		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());
 
 		// Convert the results
 		solver->convertResults(tempDirPath, application, solverEntity);
@@ -111,7 +111,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 		outputText = "ERROR: " + error;
 	}
 
-	application->uiComponent()->closeProgressInformation();
+	application->getUiComponent()->closeProgressInformation();
 
 	// Delete the solver object
 	delete solver;
@@ -150,7 +150,7 @@ void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::E
 
 void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
 {
-	application->modelComponent()->loadMaterialInformation();
+	application->getModelComponent()->loadMaterialInformation();
 
 	std::map<ot::UID, EntityProperties> entityProperties;
 	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", entityProperties);

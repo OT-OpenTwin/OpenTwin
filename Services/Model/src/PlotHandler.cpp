@@ -5,7 +5,7 @@
 #include "EntityResult1DCurve.h"
 #include "EntityMetadataSeries.h"
 #include "Application.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "MetadataEntityInterface.h"
 #include "CurveFactory.h"
 #include "OTModelAPI/NewModelStateInformation.h"

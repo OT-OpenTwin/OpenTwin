@@ -127,7 +127,7 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	DataBase::GetDataBase()->setProjectName(collectionName);
 }
 
-void Model::clearAll(void)
+void Model::clearAll()
 {
 	if (visualizationModelID != 0)
 	{
@@ -163,7 +163,7 @@ void Model::clearAll(void)
 	isModified = true;
 }
 
-void Model::resetToNew(void)
+void Model::resetToNew()
 {
 	clearAll();
 
@@ -313,7 +313,7 @@ Model::~Model()
 	}
 }
 
-void Model::detachAllViewer(void)
+void Model::detachAllViewer()
 {
 	visualizationModelID = 0;
 }
@@ -465,7 +465,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	}
 }
 
-void Model::updateUndoRedoStatus(void)
+void Model::updateUndoRedoStatus()
 {
 	if (!uiCreated) return;
 
@@ -725,7 +725,7 @@ bool Model::entityExists(ot::UID uID)
 	return (entityMap.count(uID) > 0);
 }
 
-ot::UID Model::createEntityUID(void)
+ot::UID Model::createEntityUID()
 {
 	return getStateManager()->createEntityUID();
 }
@@ -847,7 +847,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 	}
 }
 
-void Model::createVisualizationItems(void)
+void Model::createVisualizationItems()
 {
 	if (visualizationModelID == 0) return;
 
@@ -886,7 +886,7 @@ void Model::addVisualizationMeshNode(const std::string &name, ot::UID entityID)
 	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, false);
 }
 
-ot::UID Model::getVisualizationModel(void)
+ot::UID Model::getVisualizationModel()
 {
 	return visualizationModelID;
 }
@@ -1167,7 +1167,7 @@ void Model::updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entity
 	Application::instance()->getNotifier()->updateObjectFacetsFromDataBase(getVisualizationModel(), modelEntityID, entityID, entityVersion);
 }
 
-double Model::calculateDeflectionFromAllEntities(void)
+double Model::calculateDeflectionFromAllEntities()
 {
 	std::list<EntityBase *> entities;
 	getAllEntities(entities);
@@ -1314,7 +1314,7 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 	}
 }
 
-void Model::deleteSelectedShapes(void)
+void Model::deleteSelectedShapes()
 {
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
@@ -1542,7 +1542,7 @@ void Model::keySequenceActivated(const std::string &keySequence) {
 
 }
 
-void Model::updatePropertyGrid(void)
+void Model::updatePropertyGrid()
 {
 	EntityProperties properties;
 	ot::PropertyGridCfg cfg;
@@ -1593,17 +1593,17 @@ void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, 
 	props.addToConfiguration(getRootNode(), visibleOnly, _config);
 }
 
-void Model::refreshAllViews(void)
+void Model::refreshAllViews()
 {
 	Application::instance()->getNotifier()->refreshAllViews(getVisualizationModel());
 }
 
-void Model::clearSelection(void)
+void Model::clearSelection()
 {
 	Application::instance()->getNotifier()->clearSelection(getVisualizationModel());
 }
 
-void Model::resetAllViews(void)
+void Model::resetAllViews()
 {
 	Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 }
@@ -2309,7 +2309,7 @@ void Model::setProperties(const std::list<EntityBase *> &entities, EntityPropert
 	}
 }
 
-bool Model::entitiesNeedUpdate(void)
+bool Model::entitiesNeedUpdate()
 {
 	return (!pendingEntityUpdates.empty());
 }
@@ -2421,7 +2421,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	lockFlag.setFlag(ot::LockNavigationWrite);
 	lockFlag.setFlag(ot::LockViewWrite);
 	lockFlag.setFlag(ot::LockProperties);
-	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	for (auto serviceUpdate : otherServicesUpdate)
 	{
@@ -2968,7 +2968,7 @@ void Model::reportInformation(const std::string &message)
 	Application::instance()->getNotifier()->reportInformation(message);
 }
 
-void Model::showSelectedShapeInformation(void)
+void Model::showSelectedShapeInformation()
 {
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
@@ -3623,7 +3623,7 @@ void Model::projectOpen()
 	updateUndoRedoStatus();
 }
 
-void Model::updateVersionGraph(void)
+void Model::updateVersionGraph()
 {
 	if (isUIAvailable() && !versionGraphCreated && visualizationModelID != 0)
 	{
@@ -3788,7 +3788,7 @@ void Model::prefetchDocumentsFromStorage(std::list<ot::UID> &prefetchIds)
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
 }
 
-void Model::setModified(void) 
+void Model::setModified() 
 { 
 	bool sendNotification = !isModified;
 
@@ -3800,7 +3800,7 @@ void Model::setModified(void)
 	}
 }
 
-void Model::resetModified(void)
+void Model::resetModified()
 { 
 	bool sendNotification = isModified;
 
@@ -3817,12 +3817,12 @@ void Model::modelChangeOperationCompleted(const std::string &description, bool a
 	projectSave(description, !askForCreationOfBranch);
 }
 
-bool Model::isUIAvailable(void)
+bool Model::isUIAvailable()
 {
 	return Application::instance()->getNotifier()->isUIAvailable();
 }
 
-void Model::uiIsAvailable(void)
+void Model::uiIsAvailable()
 {
 	assert(isUIAvailable());
 
@@ -3879,7 +3879,7 @@ void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const
 	}
 }
 
-void Model::setActiveVersionTreeState(void)
+void Model::setActiveVersionTreeState()
 {
 	const std::string& currentVersion = getStateManager()->getModelStateVersion();
 	const std::string& activeBranch   = getStateManager()->getActiveBranch();
@@ -3932,7 +3932,7 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Folder, ot::JsonString(_targetFolder, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_ElementType, ot::JsonString(_elementType, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->uiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::GetDataBase()->getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::GetDataBase()->getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
@@ -3953,7 +3953,7 @@ EntityBase *Model::findEntityFromName(const std::string &name)
 	return entityRoot->getEntityFromName(name);
 }
 
-std::string Model::getCurrentModelVersion(void)
+std::string Model::getCurrentModelVersion()
 {
 	return getStateManager()->getModelStateVersion();
 }
@@ -3998,7 +3998,7 @@ void Model::versionSelected(const std::string& _version) {
 	Application::instance()->getNotifier()->fillPropertyGrid(cfg);
 }
 
-void Model::versionDeselected(void) {
+void Model::versionDeselected() {
 	m_selectedVersion.clear();
 }
 
@@ -4629,7 +4629,7 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	lockFlag.setFlag(ot::LockNavigationWrite);
 	lockFlag.setFlag(ot::LockViewWrite);
 	lockFlag.setFlag(ot::LockProperties);
-	UILockWrapper uiLock(Application::instance()->uiComponent(), lockFlag);
+	UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
 	ot::JsonDocument notify;
 	ot::JsonArray changedEntitiesInfos;
@@ -4702,7 +4702,7 @@ void Model::getEntityTypes(std::list<ot::UID> &entityIDList, std::list<std::stri
 	}
 }
 
-std::list<ot::UID> Model::getAllGeometryEntitiesForMeshing(void)
+std::list<ot::UID> Model::getAllGeometryEntitiesForMeshing()
 {
 	std::list<EntityGeometry *> geometryEntities;
 	getAllGeometryEntities(geometryEntities);
@@ -4729,7 +4729,7 @@ std::list<ot::UID> Model::getAllGeometryEntitiesForMeshing(void)
 	return meshingEntities;
 }
 
-void Model::undoLastOperation(void)
+void Model::undoLastOperation()
 {
 	enableQueuingHttpRequests(true);
 
@@ -4755,7 +4755,7 @@ void Model::undoLastOperation(void)
 	enableQueuingHttpRequests(false);
 }
 
-void Model::redoNextOperation(void)
+void Model::redoNextOperation()
 {
 	enableQueuingHttpRequests(true);
 
@@ -4770,7 +4770,7 @@ void Model::redoNextOperation(void)
 	enableQueuingHttpRequests(false);
 }
 
-void Model::removeAllNonTemplateEntities(void)
+void Model::removeAllNonTemplateEntities()
 {
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
 
@@ -4781,7 +4781,7 @@ void Model::removeAllNonTemplateEntities(void)
 	docBase.DeleteDocuments(std::move(deleteDoc));
 }
 
-void Model::updateModelStateForUndoRedo(void)
+void Model::updateModelStateForUndoRedo()
 {
 	// Loop through all entities of the current model and check whether they are part of the model state and up-to-date
 	std::list<ot::UID> removeFromDisplay;
@@ -4946,7 +4946,7 @@ void Model::hideEntities(std::list<ot::UID> &hiddenEntityIDs)
 	}
 }
 
-void Model::loadDefaultMaterials(void)
+void Model::loadDefaultMaterials()
 {
 	std::string error = TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultMaterials();
 
@@ -5126,20 +5126,20 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 	return notify.toJson();
 }
 
-int Model::getServiceIDAsInt(void)
+int Model::getServiceID()
 {
 	return Application::instance()->getServiceID();
 }
 
-int Model::getSessionCount(void)
+int Model::getSessionCount()
 {
 	return Application::instance()->getSessionCount();
 }
 
-ModelState * Model::getStateManager(void)
+ModelState * Model::getStateManager()
 {
 	if (stateManager == nullptr) {
-		stateManager = new ModelState(getSessionCount(), getServiceIDAsInt());
+		stateManager = new ModelState(getSessionCount(), static_cast<unsigned int>(getServiceID()));
 	}
 	return stateManager;
 }

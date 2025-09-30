@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 template <class T>
 T* ot::GraphicsItem::getItemConfiguration(void) {

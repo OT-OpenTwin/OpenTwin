@@ -23,19 +23,13 @@
 #include <iostream>
 #include <cassert>
 
-ot::components::ModelComponent::ModelComponent(
-	const std::string &			_name,
-	const std::string &			_type,
-	const std::string &			_url,
-	serviceID_t					_id,
-	ApplicationBase *			_application
-)
+ot::components::ModelComponent::ModelComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application)
 	:uniqueUIDGenerator(nullptr),
-	ServiceBase{ _name, _type, _url, _id },  m_application{ _application }
+	ServiceBase(_serviceInfo), m_application(_application)
 { 
 	assert(m_application); 
 
-	uniqueUIDGenerator = new DataStorageAPI::UniqueUIDGenerator(_application->getSessionCount(), _application->getServiceIDAsInt());
+	uniqueUIDGenerator = new DataStorageAPI::UniqueUIDGenerator(_application->getSessionCount(), static_cast<unsigned int>(_application->getServiceID()));
 
 	EntityBase::setUidGenerator(uniqueUIDGenerator);
 }
@@ -109,7 +103,7 @@ void ot::components::ModelComponent::importTableFile(const std::string &itemName
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->getServiceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(m_application->getServiceURL(), this->getServiceURL(), ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}

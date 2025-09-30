@@ -7,7 +7,7 @@
 #include "SVGBrowser.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/SVGWidgetGrid.h"
 #include "OTWidgets/DirectoryBrowser.h"
 

@@ -132,15 +132,9 @@ void LogModeSetter::slotApply(void) {
 	if (m_msgTypeMsgOut->isChecked()) newFlags |= ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS;
 	if (m_msgTypeTest->isChecked()) newFlags |= ot::TEST_LOG;
 
-	ot::LogModeManager newMode;
-
-	if (m_mode->currentText() == LMS_Mode_Global) {
-		newMode.setGlobalLogFlags(newFlags);
-	}
-
 	m_root->setEnabled(false);
 
-	std::thread worker(&LogModeSetter::sendWorker, this, gssUrl, newMode);
+	std::thread worker(&LogModeSetter::sendWorker, this, gssUrl, newFlags);
 	worker.detach();
 }
 
@@ -164,14 +158,8 @@ void LogModeSetter::stopWorker(bool _success) {
 	}
 }
 
-void LogModeSetter::sendWorker(std::string _gss, ot::LogModeManager _newMode) {
-	if (_newMode.getGlobalLogFlagsSet()) {
-		this->stopWorker(this->sendGlobalMode(_gss, _newMode.getGlobalLogFlags()));
-	}
-	else {
-		OT_LOG_E("Unsupported mode");
-		this->stopWorker(false);
-	}
+void LogModeSetter::sendWorker(std::string _gss, ot::LogFlags _newMode) {
+	this->stopWorker(this->sendGlobalMode(_gss, _newMode));
 }
 
 bool LogModeSetter::sendGlobalMode(const std::string& _gss, const ot::LogFlags& _flags) {

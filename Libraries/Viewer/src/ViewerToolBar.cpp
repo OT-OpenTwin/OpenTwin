@@ -4,7 +4,7 @@
 #include "ViewerToolBar.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 ViewerToolBar& ViewerToolBar::instance(void) {
 	static ViewerToolBar g_instance;

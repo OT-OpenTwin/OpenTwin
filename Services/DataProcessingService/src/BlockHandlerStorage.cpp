@@ -59,7 +59,7 @@ bool BlockHandlerStorage::executeSpecialized()
 		ot::NewModelStateInformation modelStateInformation;
 
 		auto& classFactory = Application::instance()->getClassFactory();
-		const auto modelComponent = Application::instance()->modelComponent();
+		const auto modelComponent = Application::instance()->getModelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
 		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
 		resultCollectionExtender.setSaveModel(!m_createPlot); //If a plot shall be added as well, we create more entities later on.

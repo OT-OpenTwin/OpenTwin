@@ -152,7 +152,7 @@ void RangeSelectionVisualisationHandler::bufferSelectionEntities(const std::list
 
 std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisationHandler::extractSelectionRanges(const ot::UIDList& _selectedEntityIDs)
 {
-	auto modelComponent = Application::instance()->modelComponent();
+	auto modelComponent = Application::instance()->getModelComponent();
 	if (modelComponent == nullptr)
 	{
 		assert(0);
@@ -242,7 +242,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
 
 	std::string answer;
-	Application::instance()->uiComponent()->sendMessage(false, document, answer);
+	Application::instance()->getUiComponent()->sendMessage(false, document, answer);
 	return true;
 }
 
@@ -269,7 +269,7 @@ void RangeSelectionVisualisationHandler::requestColouringRanges(bool _clearSelec
 	}
 	doc.AddMember(OT_ACTION_PARAM_Ranges, vectOfRanges, doc.GetAllocator());
 
-	auto uiComponent =	Application::instance()->uiComponent();
+	auto uiComponent =	Application::instance()->getUiComponent();
 	std::string answer;
 	uiComponent->sendMessage(true, doc, answer);
 }

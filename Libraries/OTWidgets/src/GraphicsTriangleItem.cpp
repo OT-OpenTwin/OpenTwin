@@ -5,7 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/GraphicsTriangleItem.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItemFactory.h"

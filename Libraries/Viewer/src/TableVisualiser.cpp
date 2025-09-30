@@ -4,7 +4,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "FrontendAPI.h"
 #include "SceneNodeBase.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode) 
 	: Visualiser(_sceneNode, ot::WidgetViewBase::ViewTable)

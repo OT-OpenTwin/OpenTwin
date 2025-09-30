@@ -43,7 +43,7 @@
 
 #include "OTSystem/Flags.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
@@ -201,7 +201,7 @@ AppBase::AppBase() :
 
 	m_ExternalServicesComponent = new ExternalServicesComponent(this);
 	
-	this->setDeleteLogNotifierLater(true);
+	this->setCustomDeleteLogNotifier(true);
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	ot::MessageBoxManager::instance().setHandler(this);
@@ -1414,7 +1414,7 @@ void AppBase::sessionRefreshTimer(const std::string _sessionUserName, const std:
 	{
 		std::string response;
 		ot::msg::send("", _authorizationUrl, ot::EXECUTE_ONE_WAY_TLS, refreshAction, response);
-		
+
 		OT_LOG_I("Session refresh sent: " + _sessionUserName);
 
 		using namespace std::chrono_literals;

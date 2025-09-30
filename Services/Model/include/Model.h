@@ -47,7 +47,7 @@ public:
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
 
-	ot::UID				createEntityUID(void);
+	ot::UID				createEntityUID();
 	void			addEntityToMap(EntityBase *entity);
 	void			removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren = true);
 	void		    removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, std::list<EntityBase*> &removedEntities);
@@ -55,7 +55,7 @@ public:
 	bool			entityExists(ot::UID uID);
 	void			getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
 	void			setVisualizationModel(ot::UID visModelID);
-	ot::UID				getVisualizationModel(void);
+	ot::UID				getVisualizationModel();
 	void			executeAction(const std::string &action, ot::JsonDocument &doc);
 	void			executeFunction(const std::string &function, const std::string &fileName, bool removeFile);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
@@ -69,29 +69,29 @@ public:
 	void setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configuration);
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 
-	bool entitiesNeedUpdate(void);
+	bool entitiesNeedUpdate();
 	void updateEntities(bool itemsVisible);
 
 	void deleteEntity(EntityBase *entity);
 	void facetEntity(EntityGeometry *entity, double deflection, bool isHidden, bool notifyViewer);
 	double calculateDeflectionFromListOfEntities(std::list<EntityBase *> &entities);
-	double calculateDeflectionFromAllEntities(void);
-	void refreshAllViews(void);
-	void resetAllViews(void);
-	void clearSelection(void);
+	double calculateDeflectionFromAllEntities();
+	void refreshAllViews();
+	void resetAllViews();
+	void clearSelection();
 	void getAllGeometryEntities(std::list<EntityGeometry *> &geometryEntities);
 	void getAllEntities(std::list<EntityBase *> &entities);
 	void addEntityToModel(std::string entityPath, EntityBase *entity, EntityBase *root, bool addVisualizationContainers, std::list<EntityBase *> &newEntities);
-	EntityBase *getRootNode(void) { return entityRoot; };
+	EntityBase *getRootNode() { return entityRoot; };
 
-	std::string getGeometryRootName(void) { return "Geometry"; };
-	std::string getCircuitsRootName(void) { return "Circuits"; };
-	std::string getMaterialRootName(void) { return "Materials"; };
-	std::string getParameterRootName(void) { return "Parameters"; };
-	std::string getMeshRootName(void) { return "Meshes"; };
-	std::string getSolverRootName(void) { return "Solvers"; };
-	std::string getScriptsRootName(void) { return "Scripts"; };
-	std::string getUnitRootName(void) { return "Units"; };
+	std::string getGeometryRootName() { return "Geometry"; };
+	std::string getCircuitsRootName() { return "Circuits"; };
+	std::string getMaterialRootName() { return "Materials"; };
+	std::string getParameterRootName() { return "Parameters"; };
+	std::string getMeshRootName() { return "Meshes"; };
+	std::string getSolverRootName() { return "Solvers"; };
+	std::string getScriptsRootName() { return "Scripts"; };
+	std::string getUnitRootName() { return "Units"; };
 
 	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										   double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
@@ -118,19 +118,19 @@ public:
 	void reportWarning(const std::string &message);
 	void reportInformation(const std::string &message);
 
-	std::string getProjectType(void) { return projectType; }
+	std::string getProjectType() { return projectType; }
 
 	void entitiesSelected(const std::string &selectionAction, const std::string &selectionInfo, std::map<std::string, std::string> &options);
 
 	void         setModelStorageVersion(ot::UID version) { modelStorageVersion = version; };
-	ot::UID getModelStorageVersion(void) { return modelStorageVersion; };
+	ot::UID getModelStorageVersion() { return modelStorageVersion; };
 
-	void setModified(void);
-	void resetModified(void);
-	bool getModified(void) { return isModified; };
+	void setModified();
+	void resetModified();
+	bool getModified() { return isModified; };
 	void setClearUiOnDelete(bool _clear) { clearUiOnDelete = _clear; }
 
-	void resetToNew(void);
+	void resetToNew();
 
 	bool GetDocumentFromEntityID(ot::UID entityID, bsoncxx::builder::basic::document &doc);
 
@@ -142,23 +142,23 @@ public:
 	void addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable);
 	void addVisualizationMeshNode(const std::string &name, ot::UID entityID);
 
-	void projectOpen(void);
+	void projectOpen();
 	void projectSave(const std::string &comment, bool silentlyCreateBranch);
 
-	void detachAllViewer(void);
+	void detachAllViewer();
 
-	void updatePropertyGrid(void);
+	void updatePropertyGrid();
 
 	void enableQueuingHttpRequests(bool flag);
 
 	void modelChangeOperationCompleted(const std::string &description, bool askForCreationOfBranch = true);
 
-	void uiIsAvailable(void);
+	void uiIsAvailable();
 
-	std::string getCurrentModelVersion(void);
+	std::string getCurrentModelVersion();
 	void activateVersion(const std::string &version);
 	void versionSelected(const std::string &version);
-	void versionDeselected(void);
+	void versionDeselected();
 	void setVersionLabel(const std::string& version, const std::string& label);
 
 	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
@@ -184,7 +184,7 @@ public:
 	void getEntityVersions(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersions);
 	void getEntityNames(std::list<ot::UID> &entityIDList, std::list<std::string> &entityNames);
 	void getEntityTypes(std::list<ot::UID> &entityIDList, std::list<std::string> &entityTypes);
-	std::list<ot::UID> getAllGeometryEntitiesForMeshing(void);
+	std::list<ot::UID> getAllGeometryEntitiesForMeshing();
 	void getEntityProperties(ot::UID entityID, bool recursive, const std::string &propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties);
 
 	EntityBase *findEntityFromName(const std::string &name);
@@ -201,10 +201,10 @@ public:
 
 	std::string checkParentUpdates(std::list<ot::UID> &modifiedEntities);
 
-	int getServiceIDAsInt(void);
-	int getSessionCount(void);
+	int getServiceID();
+	int getSessionCount();
 
-	ModelState* getStateManager(void);
+	ModelState* getStateManager();
 	void setStateMangager(ModelState* state);
 
 	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
@@ -215,14 +215,14 @@ public:
 	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return entityMap; }
 private:
 	// Methods
-	void clearAll(void);
+	void clearAll();
 	void setupUIControls();
 	void removeUIControls();
-	void createVisualizationItems(void);
+	void createVisualizationItems();
 	
-	void createNewParameter(void);
+	void createNewParameter();
 	EntityParameter* createNewParameterItem(const std::string &parameterName);
-	void deleteSelectedShapes(void);
+	void deleteSelectedShapes();
 	void addEntityNamesToList(EntityBase *entity, std::map<std::string, bool> &list);
 	void addEntityIDsToList(EntityBase *entity, std::map<std::string, ot::UID> &list);
 	void addEntityUIToList(EntityBase *entity, std::map<ot::UID, bool> &list);
@@ -238,7 +238,7 @@ private:
 	void addAllEntitiesToList(EntityBase *root, std::list<EntityBase *> &allEntities);
 	bool anyMeshItemSelected(std::list<ot::UID> &selectedEntityID);
 	bool anyMaterialItemSelected(std::list<ot::UID> &selectedEntityID);
-	void showSelectedShapeInformation(void);
+	void showSelectedShapeInformation();
 	void getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> &faceCurvatureRadius);
 	void createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName);
 	void updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity);
@@ -250,18 +250,18 @@ private:
 	void addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
 	void addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags);
 	void addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags);
-	bool isUIAvailable(void);
+	bool isUIAvailable();
 	void performSpecialUpdates(EntityBase *entity);
 	void performEntityMeshUpdate(EntityMeshTet *entity);
 	void performEntityMeshUpdate(EntityMeshCartesian *entity);
-	void undoLastOperation(void);
-	void redoNextOperation(void);
-	void removeAllNonTemplateEntities(void);
-	void updateUndoRedoStatus(void);
-	void updateModelStateForUndoRedo(void);
+	void undoLastOperation();
+	void redoNextOperation();
+	void removeAllNonTemplateEntities();
+	void updateUndoRedoStatus();
+	void updateModelStateForUndoRedo();
 
 	void importTableFile(const std::string &fileName, bool removeFile);
-	void loadDefaultMaterials(void);
+	void loadDefaultMaterials();
 	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
 	void recursiveReplaceEntityName(EntityBase *entity, const std::string &oldName, const std::string &newName, std::list<EntityBase*> &entityList);
 	void addChildrenEntitiesToList(EntityGeometry* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
@@ -282,8 +282,8 @@ private:
 	bool checkParameterName(const std::string &parameterName);
 	bool isValidParameterNameCharacter(char c);
 	void sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch);
-	void updateVersionGraph(void);
-	void setActiveVersionTreeState(void);
+	void updateVersionGraph();
+	void setActiveVersionTreeState();
 	void removeVersionGraphVersions(const std::list<std::string> &versions);
 	void addNewVersionTreeStateAndActivate(const std::string& _branch, const ot::VersionGraphVersionCfg& _version);
 	void getIDsOfFolderItemsOfType(EntityContainer *container, const std::string &className, bool recursive, std::list<ot::UID> &itemList);

@@ -10,7 +10,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/AbstractLogNotifier.h"
 
 // Qt header
 #include <QtCore/qthread.h>

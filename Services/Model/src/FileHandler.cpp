@@ -90,13 +90,13 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, ot::JsonValue(true), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadMultiple, ot::JsonValue(true), doc.GetAllocator());
 	std::string response;
-	Application::instance()->uiComponent()->sendMessage(false, doc, response);
+	Application::instance()->getUiComponent()->sendMessage(false, doc, response);
 }
 
 
 void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string& _folderName)
 {
-	auto uiComponent =	Application::instance()->uiComponent();
+	auto uiComponent =	Application::instance()->getUiComponent();
 	UILockWrapper uiLock(uiComponent, ot::LockModelWrite);
 	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
 	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);

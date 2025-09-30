@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/MessageDialog.h"
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDialogCfg& _config, QWidget* _parent) {

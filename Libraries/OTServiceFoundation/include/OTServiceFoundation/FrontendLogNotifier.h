@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/AbstractLogNotifier.h"
 
 namespace ot {
 

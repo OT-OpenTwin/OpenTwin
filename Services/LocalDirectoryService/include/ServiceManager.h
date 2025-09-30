@@ -7,11 +7,16 @@
 
 // LDS header
 #include "Service.h"
+#include "RequestedService.h"
+#include "SessionInformation.h"
+#include "ServiceStartupData.h"
 
 // OpenTwin header
 #include "OTSystem/Network.h"
+#include "OTSystem/RunResult.h"
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
+#include "OTCommunication/ServiceInitData.h"
 
 // std header
 #include <map>
@@ -48,9 +53,9 @@ public:
 	//! @param _sessionInformation Information about the session where the service should be connected to
 	//! @param _serviceInformation Information about the service that should be started
 	//! @param _serviceURL The URL where the service will be running will be written here
-	RequestResult requestStartService(const ServiceInformation& _serviceInformation);
+	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation);
 
-	RequestResult requestStartRelayService(const SessionInformation& _sessionInformation, std::string& _websocketUrl, std::string& _relayServiceURL);
+	RequestResult requestStartRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketUrl);
 
 	//! @brief Will mark all services in the session as expected to shut down.
 	//! Services that are currently requested will be removed from the requested list.
@@ -62,7 +67,7 @@ public:
 	//! @param _sessionID 
 	void sessionClosed(const std::string& _sessionID);
 
-	void serviceDisconnected(const ServiceInformation& _info, const std::string& _serviceURL);
+	void serviceDisconnected(const std::string& _sessionID, ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -72,10 +77,10 @@ public:
 
 	void setServiceIP(const std::string& _ip) { m_servicesIpAddress = _ip; };
 
-	const std::string& lastError(void) const { return m_lastError; };
+	const std::string& lastError() const { return m_lastError; };
 
 	void setSiteID(const std::string& _siteID) { m_siteID = _siteID; };
-	const std::string& siteID(void) const { return m_siteID; };
+	const std::string& siteID() const { return m_siteID; };
 
 	void getSessionInformation(ot::JsonArray& sessionInfo, ot::JsonAllocator& allocator);
 
@@ -85,17 +90,22 @@ public:
 
 private:
 
-	void runThreads(void);
+	void runThreads();
+	void stopThreads();
 	
-	void serviceStartFailed(const ServiceInformation& _info);
+	void serviceStartFailed(const ot::ServiceInitData& _serviceInformation);
 	void sendInitializeMessage(Service&& _info);
-	void serviceInitializeFailed(const Service& _info);
+	void serviceInitializeFailed(Service&& _info);
 
-	std::vector<Service> * sessionServices(const SessionInformation& _sessionInformation);
+	std::list<Service>& sessionServices(const SessionInformation& _sessionInformation);
 
-	bool restartServiceAfterCrash(const Service& _service);
+	bool restartServiceAfterCrash(Service& _service);
 	void notifyServiceShutdownCompleted(const Service& _service);
 	void notifySessionEmergencyShutdown(const Service& _crashedService);
+
+	std::string logInfo(const Service& _service) const;
+	std::string logInfo(const RequestedService& _service) const;
+	std::string logInfo(const ot::ServiceInitData& _serviceInfo) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -103,26 +113,27 @@ private:
 
 	//! @brief Clean up session related information from requested services list.
 	//! @param _sessionID Session info to clean up.
-	void cleanUpSession_RequestedList(const std::string& _sessionID);
+	void cleanUpRequestedList(const std::string& _sessionID);
 
 	//! @brief Send shutdown message to all services that are currently initializing in the given session and clean up information
 	//! @warning The initializing services mutex is expected to be locked when calling this function.
 	//! @param _sessionID Session info to clean up.
-	void cleanUpSession_IniList(const std::string& _sessionID);
+	void cleanUpIniList(const std::string& _sessionID);
 
 	//! @brief Move all services in the given session from the alive list to the stopping list and clean up information.
 	//! @warning The initializing services mutex is expected to be locked when calling this function.
 	//! @param _sessionID Session info to clean up.
-	void cleanUpSession_AliveList(const std::string& _sessionID);
+	void cleanUpAliveList(const std::string& _sessionID);
 	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Worker
 
-	void workerServiceStarter(void);
-	void workerServiceInitializer(void);
-	void workerHealthCheck(void);
-	void workerServiceStopper(void);
+	void workerServiceStarter();
+	void workerServiceInitializer();
+	void workerHealthCheck();
+	void workerHealthCheckFail();
+	void workerServiceStopper();
 
 	ot::PortManager                                      m_portManager;
 
@@ -130,26 +141,31 @@ private:
 	std::string                                          m_lastError;
 	std::string                                          m_siteID;
 	
-	bool                                                 m_isShuttingDown;
+	std::atomic_bool                                     m_workerRunning;
 
 	std::thread *                                        m_threadServiceStarter;
 	std::thread *                                        m_threadServiceInitializer;
 	std::thread *                                        m_threadHealthCheck;
 	std::thread *                                        m_threadServiceStopper;
-
-	std::atomic_bool                                     m_generalWait;
+	std::thread *                                        m_threadHealthCheckFail;
 
 	std::chrono::seconds								 m_serviceCheckAliveFrequency;
 
-	std::map<SessionInformation, std::vector<Service>*>  m_services;
+	std::map<SessionInformation, std::list<Service>>     m_sessions;
 	std::mutex                                           m_mutexServices;
 
-	std::list<ServiceInformation>                        m_requestedServices;
+	std::list<RequestedService>                          m_requestedServices;
 	std::mutex                                           m_mutexRequestedServices;
 
 	std::list<Service>                                   m_initializingServices;
 	std::mutex                                           m_mutexInitializingServices;
 
-	std::list<Service>                                   m_stoppingServices;
+	std::list<std::pair<ot::RunResult, Service>>         m_failedServices;
+	std::mutex                                           m_mutexFailedServices;
+
 	std::mutex                                           m_mutexStoppingServices;
+	std::list<Service>                                   m_newStoppingServices;
+
+	std::mutex                                           m_mutexCurrentStoppingServices;
+	std::list<Service>                                   m_currentStoppingServices;
 };

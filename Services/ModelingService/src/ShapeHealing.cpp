@@ -82,7 +82,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	if (geometryEntities.empty())
 	{
 		std::string messages = "____________________________________________________________\n\nNo valid editable shapes selected for healing.\n\n";
-		application->uiComponent()->displayMessage(messages);
+		application->getUiComponent()->displayMessage(messages);
 
 		return;
 	}	
@@ -101,9 +101,9 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockProperties);
 
-	application->uiComponent()->lockUI(lockFlags);
-	application->uiComponent()->setProgressInformation("Heal shapes", false);
-	application->uiComponent()->setProgress(0);
+	application->getUiComponent()->lockUI(lockFlags);
+	application->getUiComponent()->setProgressInformation("Heal shapes", false);
+	application->getUiComponent()->setProgress(0);
 
 	std::string messages = "____________________________________________________________\n\nShape healing started.\n\n";
 
@@ -131,8 +131,8 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 		geometryEntity->resetBrep();
 		geometryEntity->resetFacets();
 
-		geometryEntity->getBrepEntity()->setEntityID(application->modelComponent()->createEntityUID());
-		geometryEntity->getFacets()->setEntityID(application->modelComponent()->createEntityUID());
+		geometryEntity->getBrepEntity()->setEntityID(application->getModelComponent()->createEntityUID());
+		geometryEntity->getFacets()->setEntityID(application->getModelComponent()->createEntityUID());
 
 		// Add the new brep entity to the geometry entity
 		geometryEntity->setBrep(brep);
@@ -172,19 +172,19 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
 
 		std::string tmp;
-		application->modelComponent()->sendMessage(false, doc, tmp);
+		application->getModelComponent()->sendMessage(false, doc, tmp);
 
 		delete geometryEntity;
 		geometryEntity = nullptr;
 
 		count++;
-		application->uiComponent()->setProgress((int) (100 * count / geometryEntities.size()));
+		application->getUiComponent()->setProgress((int) (100 * count / geometryEntities.size()));
 
 		double seconds = difftime(time(nullptr), timer);
 		if (seconds >= 2.0)
 		{
 			// The last message report is more than two seconds ago
-			application->uiComponent()->displayMessage(messages);
+			application->getUiComponent()->displayMessage(messages);
 			messages.clear();
 
 			timer = time(nullptr);
@@ -198,19 +198,19 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 
 	if (!messages.empty())
 	{
-		application->uiComponent()->displayMessage(messages);
+		application->getUiComponent()->displayMessage(messages);
 	}
 
 	// Finally, store the new model state
 	ot::ModelServiceAPI::modelChangeOperationCompleted("heal shapes");
 	ot::ModelServiceAPI::enableMessageQueueing(false);
-	application->uiComponent()->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
+	application->getUiComponent()->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
-	application->uiComponent()->setProgress(100);
-	application->uiComponent()->closeProgressInformation();
+	application->getUiComponent()->setProgress(100);
+	application->getUiComponent()->closeProgressInformation();
 
 	// Unlock the ui
-	application->uiComponent()->unlockUI(lockFlags);
+	application->getUiComponent()->unlockUI(lockFlags);
 }
 
 void ShapeHealing::healShape(const std::string &name, TopoDS_Shape &myshape, double tolerance, bool fixSmallEdges, bool fixSmallFaces, bool sewFaces, bool makeSolids, std::string &messages)

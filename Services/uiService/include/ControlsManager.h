@@ -10,7 +10,7 @@
 
 // Open twin header
 #include "OTSystem/Flags.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 

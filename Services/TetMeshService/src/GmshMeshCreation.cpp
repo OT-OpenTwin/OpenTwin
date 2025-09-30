@@ -86,7 +86,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	assert(mesh != nullptr);
 	setEntityMesh(mesh);
 
-	application->modelComponent()->clearNewEntityList();
+	application->getModelComponent()->clearNewEntityList();
 
 	deleteMesh();
 
@@ -106,7 +106,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	// Create a new emtpy mesh data entity
 	getEntityMesh()->setModified();
 	getEntityMesh()->getMeshData()->setName(getEntityMesh()->getName() + "/Mesh");
-	getEntityMesh()->getMeshData()->setEntityID(application->modelComponent()->createEntityUID());
+	getEntityMesh()->getMeshData()->setEntityID(application->getModelComponent()->createEntityUID());
 
 	std::time_t totalTimer = time(nullptr);
 	std::time_t timer = time(nullptr);
@@ -384,13 +384,13 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 
 	// Store the mesh data entity
 	getEntityMesh()->storeMeshData();
-	application->modelComponent()->addNewTopologyEntity(getEntityMesh()->getMeshData()->getEntityID(), 
+	application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getMeshData()->getEntityID(), 
 														getEntityMesh()->getMeshData()->getEntityStorageVersion(), 
 														false);
 
 	// Finally, store the mesh entity itself
 	getEntityMesh()->StoreToDataBase();
-	application->modelComponent()->addNewTopologyEntity(getEntityMesh()->getEntityID(), 
+	application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getEntityID(), 
 														getEntityMesh()->getEntityStorageVersion(), 
 														false);
 
@@ -404,7 +404,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	reportTime("\tTime: Mesh items stored to data base", timer, properties.getVerbose());
 
 	// Finally store the new model state with all newly created entities
-	application->modelComponent()->storeNewEntities("update tetrahedral mesh: " + mesh->getName());
+	application->getModelComponent()->storeNewEntities("update tetrahedral mesh: " + mesh->getName());
 
 	closeProgressInformation();
 	setUILock(false, MODEL_CHANGE);
@@ -428,7 +428,7 @@ std::list<ot::UID> GmshMeshCreation::getAllGeometryEntitiesForMeshing(void)
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
-	application->modelComponent()->sendMessage(false, requestDoc, response);
+	application->getModelComponent()->sendMessage(false, requestDoc, response);
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -512,9 +512,9 @@ void GmshMeshCreation::setProgress(int percentage)
 {
 	assert(application != nullptr);
 
-	if (application->uiComponent())
+	if (application->getUiComponent())
 	{
-		application->uiComponent()->setProgress(percentage);
+		application->getUiComponent()->setProgress(percentage);
 	}
 }
 
@@ -522,9 +522,9 @@ void GmshMeshCreation::displayMessage(std::string message)
 {
 	assert(application != nullptr);
 
-	if (application->uiComponent())
+	if (application->getUiComponent())
 	{
-		application->uiComponent()->displayMessage(message);
+		application->getUiComponent()->displayMessage(message);
 	}
 }
 
@@ -532,9 +532,9 @@ void GmshMeshCreation::setProgressInformation(std::string message, bool continuo
 {
 	assert(application != nullptr);
 
-	if (application->uiComponent())
+	if (application->getUiComponent())
 	{
-		application->uiComponent()->setProgressInformation(message, continuous);
+		application->getUiComponent()->setProgressInformation(message, continuous);
 	}
 }
 
@@ -542,9 +542,9 @@ void GmshMeshCreation::closeProgressInformation(void)
 {
 	assert(application != nullptr);
 
-	if (application->uiComponent())
+	if (application->getUiComponent())
 	{
-		application->uiComponent()->closeProgressInformation();
+		application->getUiComponent()->closeProgressInformation();
 	}
 }
 
@@ -552,7 +552,7 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 {
 	assert(application != nullptr);
 
-	if (application->uiComponent())
+	if (application->getUiComponent())
 	{
 		static int count = 0;
 
@@ -578,7 +578,7 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 					f.setFlag(ot::LockAll);
 				}
 
-				application->uiComponent()->lockUI(f);
+				application->getUiComponent()->lockUI(f);
 			}
 
 			count++;
@@ -610,7 +610,7 @@ void GmshMeshCreation::setUILock(bool flag, lockType type)
 						f.setFlag(ot::LockAll);
 					}
 
-					application->uiComponent()->unlockUI(f);
+					application->getUiComponent()->unlockUI(f);
 				}
 			}
 		}
@@ -625,20 +625,20 @@ void GmshMeshCreation::hideAllOtherEntities(EntityMeshTet *thisMesh)
 	docHideGeometry.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Geometry", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
 	std::string tmp;
-	application->uiComponent()->sendMessage(true, docHideGeometry, tmp);
+	application->getUiComponent()->sendMessage(true, docHideGeometry, tmp);
 
 	ot::JsonDocument docHideMeshes;
 	docHideMeshes.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
 	docHideMeshes.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString("Meshes", docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
-	application->uiComponent()->sendMessage(true, docHideMeshes, tmp);
+	application->getUiComponent()->sendMessage(true, docHideMeshes, tmp);
 
 	ot::JsonDocument docShowMesh;
 	docShowMesh.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch, docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ID, ot::ModelServiceAPI::getCurrentVisualizationModelID(), docHideGeometry.GetAllocator());
 	docShowMesh.AddMember(OT_ACTION_PARAM_MODEL_ITM_BRANCH, ot::JsonString(thisMesh->getName(), docHideGeometry.GetAllocator()), docHideGeometry.GetAllocator());
 
-	application->uiComponent()->sendMessage(true, docShowMesh, tmp);
+	application->getUiComponent()->sendMessage(true, docShowMesh, tmp);
 }
 

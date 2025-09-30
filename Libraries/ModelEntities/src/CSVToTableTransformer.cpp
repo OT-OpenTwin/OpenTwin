@@ -1,6 +1,6 @@
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/VariableToStringConverter.h"
 

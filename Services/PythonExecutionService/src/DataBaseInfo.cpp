@@ -7,7 +7,7 @@ DataBaseInfo::DataBaseInfo(const DataBaseInfo& _other) {
 DataBaseInfo& DataBaseInfo::operator=(const DataBaseInfo& _other) {
 	if (this != &_other) {
 		m_dbUrl = _other.m_dbUrl;
-		m_siteId = _other.m_siteId;
+		m_siteID = _other.m_siteID;
 		m_collectionName = _other.m_collectionName;
 
 		m_userName = _other.m_userName;
@@ -18,5 +18,5 @@ DataBaseInfo& DataBaseInfo::operator=(const DataBaseInfo& _other) {
 }
 
 bool DataBaseInfo::hasInfoSet(void) const {
-	return !m_dbUrl.empty() && !m_siteId.empty() && !m_collectionName.empty() && !m_userName.empty() && !m_userPassword.empty();
+	return !m_dbUrl.empty() && !m_siteID.empty() && !m_collectionName.empty() && !m_userName.empty() && !m_userPassword.empty();
 }

@@ -42,7 +42,7 @@ public:
 
 	inline void ensureEssentials();
 	void clearBufferedMetadata();
-	void handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock);
+	void handleChategorisationLock(const std::list<ot::EntityInformation>& _selectedEntities, bool _lock);
 
 private:
 	const std::string m_tableFolder;

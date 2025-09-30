@@ -18,14 +18,8 @@
 
 #include <iostream>
 
-ot::components::UiComponent::UiComponent(
-	const std::string &			_name,
-	const std::string &			_type,
-	const std::string &			_url,
-	serviceID_t					_id,
-	ApplicationBase *			_application
-)
-	: ServiceBase(_name, _type, _url, _id), m_application(_application)
+ot::components::UiComponent::UiComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application)
+	: ServiceBase(_serviceInfo), m_application(_application)
 {
 	assert(m_application != nullptr);	// No application provided
 }
@@ -47,7 +41,7 @@ void ot::components::UiComponent::addMenuPage(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName);
 	}
@@ -66,7 +60,7 @@ void ot::components::UiComponent::addMenuGroup(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName);
 	}
@@ -87,7 +81,7 @@ void ot::components::UiComponent::addMenuSubGroup(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _subgroupName);
 	}
@@ -121,7 +115,7 @@ void ot::components::UiComponent::addMenuButton(
 		}
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _buttonName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _buttonName] = true;
@@ -163,7 +157,7 @@ void ot::components::UiComponent::addMenuButton(
 		}
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _buttonName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _buttonName] = true;
@@ -191,7 +185,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _checkboxName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _checkboxName] = true;
@@ -221,7 +215,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _checkboxName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _checkboxName] = true;
@@ -249,7 +243,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _lineEditName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _lineEditName] = true;
@@ -279,7 +273,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
-		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+		m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _lineEditName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _lineEditName] = true;
@@ -295,7 +289,7 @@ void ot::components::UiComponent::activateMenuPage(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::addShortcut(
@@ -307,7 +301,7 @@ void ot::components::UiComponent::addShortcut(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::createRubberband(
@@ -321,7 +315,7 @@ void ot::components::UiComponent::createRubberband(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 //void ot::components::UiComponent::createBlockEditor(const std::string& _name, const std::string& _title, const std::list<BlockCategoryConfiguration*>& _configuration) {
@@ -338,7 +332,7 @@ void ot::components::UiComponent::createRubberband(
 //	}
 //	ot::rJSON::add(cmdDoc, OT_ACTION_PARAM_BLOCKEDITOR_Categories, categoriesArr);
 //
-//	m_application->sendMessage(true, m_serviceName, cmdDoc);
+//	m_application->sendMessage(true, this->getServiceName(), cmdDoc);
 //}
 
 // #####################################################################################################################
@@ -363,7 +357,7 @@ void ot::components::UiComponent::setControlToolTip(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::setControlToolTip(
@@ -392,7 +386,7 @@ void ot::components::UiComponent::setControlsEnabledState(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::setLineEditValues(
@@ -408,7 +402,7 @@ void ot::components::UiComponent::setLineEditValues(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::setCheckboxValues(
@@ -422,7 +416,7 @@ void ot::components::UiComponent::setCheckboxValues(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::lockUI(
@@ -434,7 +428,7 @@ void ot::components::UiComponent::lockUI(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::unlockUI(
@@ -446,7 +440,7 @@ void ot::components::UiComponent::unlockUI(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::switchMenuTab(
@@ -458,7 +452,7 @@ void ot::components::UiComponent::switchMenuTab(
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::registerForModelEvents(void) const {
@@ -467,7 +461,7 @@ void ot::components::UiComponent::registerForModelEvents(void) const {
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::deregisterForModelEvents(void) const {
@@ -476,7 +470,7 @@ void ot::components::UiComponent::deregisterForModelEvents(void) const {
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::addIconSearchPath(const std::string& _iconPath) {
@@ -490,7 +484,7 @@ void ot::components::UiComponent::addIconSearchPath(const std::string& _iconPath
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 #endif // _DEBUG
 }
 
@@ -500,7 +494,7 @@ void ot::components::UiComponent::notifyUiSetupCompleted(void) {
 	ot::ThisService::addIdToJsonDocument(cmdDoc);
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 // #####################################################################################################################
@@ -516,7 +510,7 @@ void ot::components::UiComponent::displayMessage(
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& _builder, const ot::msg::RequestFlags& _requestFlags) const {
@@ -528,7 +522,7 @@ void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& 
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, builderObject, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response, _requestFlags);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response, _requestFlags);
 }
 
 void ot::components::UiComponent::displayLogMessage(const LogMessage& _message) const {
@@ -549,7 +543,7 @@ void ot::components::UiComponent::displayErrorPrompt(const std::string& _message
 	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::displayWarningPrompt(const std::string& _message, const std::string& _detailedMessage) const {
@@ -560,7 +554,7 @@ void ot::components::UiComponent::displayWarningPrompt(const std::string& _messa
 	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::displayInformationPrompt(const std::string& _message, const std::string& _detailedMessage) const {
@@ -571,7 +565,7 @@ void ot::components::UiComponent::displayInformationPrompt(const std::string& _m
 	cmdDoc.AddMember(OT_ACTION_PARAM_Detailed, JsonString(_detailedMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 // #####################################################################################################################
@@ -588,7 +582,7 @@ void ot::components::UiComponent::setProgressInformation(std::string message, bo
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, continuous, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::setProgress(int percentage)
@@ -599,7 +593,7 @@ void ot::components::UiComponent::setProgress(int percentage)
 	cmdDoc.AddMember(OT_ACTION_PARAM_PERCENT, percentage, cmdDoc.GetAllocator());
 	
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::closeProgressInformation(void)
@@ -612,7 +606,7 @@ void ot::components::UiComponent::closeProgressInformation(void)
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, false, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::addControlNameToList(
@@ -658,7 +652,7 @@ void ot::components::UiComponent::removeUIElements(const std::list<std::string> 
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectNames, JsonArray(_itemList, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 
 	// Clean up entries
 	for (auto itm : _itemList) {
@@ -677,7 +671,7 @@ void ot::components::UiComponent::removeAllUIElements(void)
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectNames, JsonArray(m_uiElements, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 	m_uiElements.clear();
 }
 
@@ -736,7 +730,7 @@ void ot::components::UiComponent::enterEntitySelectionMode(
 	}
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::freeze3DView(UID _visualizationModelUID, bool _flag)
@@ -748,7 +742,7 @@ void ot::components::UiComponent::freeze3DView(UID _visualizationModelUID, bool 
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_BOOLEAN_STATE, _flag, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::refreshSelection(UID _visualizationModelUID)
@@ -759,7 +753,7 @@ void ot::components::UiComponent::refreshSelection(UID _visualizationModelUID)
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::refreshAllViews(UID _visualizationModelUID)
@@ -770,7 +764,7 @@ void ot::components::UiComponent::refreshAllViews(UID _visualizationModelUID)
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
 void ot::components::UiComponent::sendUpdatedControlState(void)
@@ -817,7 +811,7 @@ void ot::components::UiComponent::setControlState(const std::string controlName,
 }
 
 bool ot::components::UiComponent::sendMessage(bool _queue, JsonDocument& _doc, std::string& _response) {
-	return m_application->sendMessage(true, m_serviceName, _doc, _response);
+	return m_application->sendMessage(true, this->getServiceName(), _doc, _response);
 }
 
 // #####################################################################################################################
@@ -841,6 +835,6 @@ void ot::components::UiComponent::sendSettingsData(const PropertyGridCfg& _confi
 	cmdDoc.AddMember(OT_ACTION_PARAM_Config, configObj, cmdDoc.GetAllocator());
 
 	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 

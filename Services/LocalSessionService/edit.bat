@@ -30,7 +30,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_LOCAL_SESSION_SERVICE_ROOT%\LocalSessionService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService\LocalSessionService.vcxproj"
 
 GOTO END
 

@@ -5,7 +5,7 @@
 #include "EntityContainer.h"
 #include "TemplateDefaultManager.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"

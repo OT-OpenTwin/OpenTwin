@@ -88,7 +88,7 @@ std::string ElmerFEMLauncher::startSolver(std::string &logFileText, const std::s
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);
 
-	application->uiComponent()->setProgressInformation("Solver running: " + problemType, true);
+	application->getUiComponent()->setProgressInformation("Solver running: " + problemType, true);
 
 	try
 	{
@@ -101,7 +101,7 @@ std::string ElmerFEMLauncher::startSolver(std::string &logFileText, const std::s
 		controlFile.close();
 
 		// Run the solver
-		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
+		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());
 
 		// Convert the results
 		solver->convertResults(tempDirPath, application, solverEntity);
@@ -111,7 +111,7 @@ std::string ElmerFEMLauncher::startSolver(std::string &logFileText, const std::s
 		outputText = "ERROR: " + error;
 	}
 
-	application->uiComponent()->closeProgressInformation();
+	application->getUiComponent()->closeProgressInformation();
 
 	// Delete the solver object
 	delete solver;
@@ -150,7 +150,7 @@ void ElmerFEMLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot
 
 void ElmerFEMLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
 {
-	application->modelComponent()->loadMaterialInformation();
+	application->getModelComponent()->loadMaterialInformation();
 
 	std::map<ot::UID, EntityProperties> entityProperties;
 	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", entityProperties);

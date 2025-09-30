@@ -3,7 +3,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // std header
 #include <string>

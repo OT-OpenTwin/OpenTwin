@@ -26,7 +26,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "SceneNodeBase.h"
 #include "SceneNodeContainer.h"
 #include "SceneNodeGeometry.h"

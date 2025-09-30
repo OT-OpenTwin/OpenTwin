@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header

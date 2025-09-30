@@ -46,7 +46,7 @@ void testPropertyGrid() {
 	using namespace ot;
 
 	std::thread t([]() {
-		auto uiComp = Application::instance()->uiComponent();
+		auto uiComp = Application::instance()->getUiComponent();
 
 		JsonDocument fillDoc;
 		fillDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_FillPropertyGrid, fillDoc.GetAllocator()), fillDoc.GetAllocator());
@@ -121,20 +121,21 @@ Application::Application() :
 
 	// Enable features (Exit)
 	
-	//this->enableFeature(DebugServiceConfig::ExitOnInit, true);
-	//this->enableFeature(DebugServiceConfig::ExitOnRun, true);
-	//this->enableFeature(DebugServiceConfig::ExitOnPing, true);
-	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown, true);
+	//this->enableFeature(DebugServiceConfig::ExitOnCreation);
+	//this->enableFeature(DebugServiceConfig::ExitOnInit);
+	//this->enableFeature(DebugServiceConfig::ExitOnRun);
+	//this->enableFeature(DebugServiceConfig::ExitOnPing);
+	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown);
 		
 	// Enable features (Other)
 
-	//this->enableFeature(DebugServiceConfig::ExportOnStart, true);
+	//this->enableFeature(DebugServiceConfig::ExportOnStart);
 
 	// --------------------------------------------------------------------------------------------------------+
 
 	// If exit on init is enabled, exit the service
-	if (this->getFeatureEnabled(DebugServiceConfig::ExitOnInit)) {
-		OT_LOG_T("Performing exit on init");
+	if (this->getFeatureEnabled(DebugServiceConfig::ExitOnCreation)) {
+		OT_LOG_T("Performing exit on creation");
 		exit(0);
 	}
 }
@@ -146,7 +147,7 @@ Application::Application() :
 void Application::uiDebugInfo() {
 	using namespace ot;
 
-	auto ui = this->uiComponent();
+	auto ui = this->getUiComponent();
 	if (!ui) {
 		OT_LOG_E("No ui? How?");
 		return;
@@ -161,7 +162,7 @@ void Application::uiDebugInfo() {
 }
 
 void Application::serviceDebugInfo(void) {
-	Application::instance()->uiComponent()->displayMessage(
+	Application::instance()->getUiComponent()->displayMessage(
 		"Hello :-)\n\nThis Computer Info (Debug Service):\n" 
 		+ ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode) + "\n"
 	);
@@ -169,7 +170,7 @@ void Application::serviceDebugInfo(void) {
 
 void Application::testKill(void) {
 	std::thread t([]() {
-		auto ui = Application::instance()->uiComponent();
+		auto ui = Application::instance()->getUiComponent();
 		ui->displayMessage("Killing debug service in 3...\n");
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		ui->displayMessage("Killing debug service in 2..\n");
@@ -201,7 +202,7 @@ void Application::testTableBig(void) {
 void Application::createPlotOneCurve()
 {
 	const std::string collName = Application::instance()->getCollectionName();
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	//Single curve
@@ -236,7 +237,7 @@ void Application::createPlotOneCurve()
 
 void Application::createPlotTwoCurves() {
 	const std::string collName = Application::instance()->getCollectionName();
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	// First curve
@@ -299,7 +300,7 @@ void Application::createPlotTwoCurves() {
 void Application::createFamilyOfCurves()
 {
 	const std::string collName = Application::instance()->getCollectionName();
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -363,7 +364,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 {
 	const std::string collName = Application::instance()->getCollectionName();
 
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -436,7 +437,7 @@ void Application::createFamilyOfCurves3Parameter()
 {
 	const std::string collName = Application::instance()->getCollectionName();
 
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -507,7 +508,7 @@ void Application::createFamilyOfCurves3Parameter()
 
 void Application::createPlotScatter() {
 	const std::string collName = Application::instance()->getCollectionName();
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	//Single curve
@@ -541,7 +542,7 @@ void Application::createPlotScatter() {
 
 void Application::createPlotSinglePoint() {
 	const std::string collName = Application::instance()->getCollectionName();
-	ResultCollectionExtender extender(collName, *Application::instance()->modelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *Application::instance()->getModelComponent(), &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	// First curve
@@ -604,7 +605,7 @@ void Application::createPlotSinglePoint() {
 void Application::sendTableWorker(int _rows, int _columns) {
 	using namespace ot;
 
-	auto ui = this->uiComponent();
+	auto ui = this->getUiComponent();
 	if (!ui) {
 		OT_LOG_E("No ui? How?");
 		return;
@@ -718,27 +719,18 @@ std::string Application::getButtonKey(const ButtonInfo& _info) const {
 
 // Required functions
 
-void Application::run(void) {
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
+void Application::initialize() {
+	if (this->getFeatureEnabled(DebugServiceConfig::ExitOnInit)) {
+		OT_LOG_T("Performing exit on init");
+		exit(0);
 	}
+}
+
+void Application::run() {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnRun)) {
 		OT_LOG_T("Performing exit on run");
 		exit(0);
 	}
-
-
-}
-
-std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -761,58 +753,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
 void Application::preShutdown(void) {
 	if (this->getFeatureEnabled(DebugServiceConfig::FeatureFlag::ExitOnPreShutdown)) {
 		OT_LOG_T("Performing exit on pre shutdown");
 		exit(0);
 	}
 }
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################

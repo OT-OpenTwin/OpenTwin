@@ -25,7 +25,7 @@ SubprocessManager::SubprocessManager(Application* _app)
 	m_subprocessHandler = new SubprocessHandler(this);
 
 	// Start worker thread for Qt event loop
-	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->sessionID());
+	m_workerThread = new std::thread(&SubprocessManager::worker, this, m_app->getSessionID());
 }
 
 SubprocessManager::~SubprocessManager() {

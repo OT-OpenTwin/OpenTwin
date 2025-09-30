@@ -11,8 +11,9 @@
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logger.h"
 #include "OTCore/String.h"
+#include "OTCore/LogDispatcher.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -35,15 +36,15 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	// Read supported services from environment
 	Configuration::instance().importFromEnvironment();
 
-	m_serviceURL = _ownURL;
+	this->setServiceURL(_ownURL);
 
 	// Filter ip and port from own url
-	size_t ix = m_serviceURL.find(':');
+	size_t ix = this->getServiceURL().find(':');
 	if (ix == std::string::npos) {
 		exit(ot::AppExitCode::ServiceUrlInvalid);
 	}
-	std::string ip = m_serviceURL.substr(0, ix);
-	std::string port = m_serviceURL.substr(ix + 1);
+	std::string ip = this->getServiceURL().substr(0, ix);
+	std::string port = this->getServiceURL().substr(ix + 1);
 	if (port.find(':') != std::string::npos) {
 		exit(ot::AppExitCode::ServiceUrlInvalid);
 	}
@@ -79,88 +80,72 @@ std::list<std::string> Application::getSupportedServices(void) const {
 // Action handler
 
 std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
-	std::string serviceName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string serviceType = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
-	std::string sessionServiceURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-
-	OT_LOG_I("Service start requested: (Name = \"" + serviceName + "\"; Type = \"" + serviceType + "\"; SessionID = \"" + sessionID + "\"; LSS-URL = \"" + sessionServiceURL + "\")");
-
-	ServiceInformation serviceInfo(serviceName, serviceType, SessionInformation(sessionID, sessionServiceURL));
-
-	// Get the limits from the configuration
-	for (auto s : Configuration::instance().getSupportedServices()) {
-		if (s.getName() == serviceInfo.getName() && s.getType() == serviceInfo.getType()) {
-			serviceInfo.setMaxCrashRestarts(s.getMaxCrashRestarts());
-			serviceInfo.setMaxStartupRestarts(s.getMaxStartupRestarts());
-			break;
-		}
-	}
+	ot::ServiceInitData initData;
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
-	if (m_serviceManager.requestStartService(serviceInfo) != ServiceManager::RequestResult::Success) {
-		return OT_ACTION_RETURN_INDICATOR_Error + m_serviceManager.lastError();
+	if (m_serviceManager.requestStartService(initData) != ServiceManager::RequestResult::Success) {
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, m_serviceManager.lastError());
 	}
 	else {
-		return OT_ACTION_RETURN_VALUE_OK;
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 	}
 }
 
 std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
-	std::string sessionServiceURL = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
+	ot::ServiceInitData initData;
+	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
-	OT_LOG_I("Relay Service start requested: { SessionID: " + sessionID + "; LSS-URL: " + sessionServiceURL + " }");
-
-	SessionInformation sessionInfo(sessionID, sessionServiceURL);
-
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	
-	for (unsigned int attempt = 0; attempt < Configuration::instance().getDefaultMaxStartupRestarts(); attempt++) {
-		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL);
+	auto supportedService = Configuration::instance().getSupportedService(initData.getServiceName());
+
+	if (!supportedService.has_value()) {
+		OT_LOG_E("The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
+	}
+
+	const unsigned int maxStartupRestarts = supportedService.value().getMaxStartupRestarts();
+
+	for (unsigned int attempt = 0; attempt < maxStartupRestarts; attempt++) {
+		ServiceManager::RequestResult result = m_serviceManager.requestStartRelayService(initData, relayServiceURL, websocketUrl);
+
 		if (result == ServiceManager::RequestResult::Success) {
-			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
+			OT_LOG_D("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
 			ot::JsonDocument responseDoc;
 			responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 			responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-			return responseDoc.toJson();
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
 		}
 		else {
-			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(Configuration::instance().getDefaultMaxStartupRestarts()));
+			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(maxStartupRestarts));
 		}
 	}
 
 	OT_LOG_E("Failed to start relay service: Maximum number of start attempts reached");
-	return OT_ACTION_RETURN_INDICATOR_Error "Maximum number of start attempts reached";
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to start relay service: Maximum number of start attempts reached");
 }
 
 std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	m_serviceManager.sessionClosing(sessionID);
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	m_serviceManager.sessionClosed(sessionID);
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string lssUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-	std::string name = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_NAME);
-	std::string type = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_TYPE);
-	std::string url = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
+	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 
-	ServiceInformation info(name, type);
-	info.setSessionId(sessionID);
-	m_serviceManager.serviceDisconnected(info, url);
-	return OT_ACTION_RETURN_VALUE_OK;
+	m_serviceManager.serviceDisconnected(sessionID, serviceID);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocument) {

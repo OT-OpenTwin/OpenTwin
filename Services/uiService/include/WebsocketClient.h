@@ -1,7 +1,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header
@@ -37,6 +37,7 @@ private Q_SLOTS:
 	void slotProcessMessageQueue();
 
 private:
+	void dispatchExecuteRequest(ot::RelayedMessageHandler::Request& _data);
 	void dispatchQueueRequest(ot::RelayedMessageHandler::Request& _data);
 
 	bool ensureConnection();

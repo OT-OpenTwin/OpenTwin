@@ -54,16 +54,6 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	// This method is called once the service can start its operation
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-	// Add code that should be executed when the service is started and may start its work
-}
-
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
 	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
@@ -75,12 +65,8 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	else {
 		return OT_ACTION_RETURN_UnknownAction;
 	}
-	return "";
-}
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
+	return "";
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
@@ -99,51 +85,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	//enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
 // ##################################################################################################################################
 
 void Application::EnsureVisualizationModelIDKnown(void)
 {
 	if (visualizationModelID > 0) return;
-	if (m_modelComponent == nullptr) {
+	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 	
@@ -198,7 +145,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 	vtkDriver->setProperties(visEntity);
 
 	// Load the data item
-	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), m_modelComponent, &getClassFactory());
+	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent(), &getClassFactory());
 
 	// Now buld the osg node and convert it to a string
 	std::string nodeString = vtkDriver->buildSceneNode(dataItem);
@@ -241,7 +188,7 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 		}
 		catch (std::exception)
 		{
-			uiComponent()->displayMessage("ERROR: Unable to create the data item.");
+			getUiComponent()->displayMessage("ERROR: Unable to create the data item.");
 			return;
 		}
 	}
@@ -252,7 +199,7 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 
 std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_t dataLength)
 {
-	EntityBinaryData *dataItem = new EntityBinaryData(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
 
 	dataItem->setData(data, dataLength);
 	dataItem->StoreToDataBase();

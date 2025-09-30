@@ -1,41 +1,46 @@
-//! @file LogModeManager.h
+//! @file ServiceRunData.h
 //! @author Alexander Kuester (alexk95)
-//! @date August 2024
+//! @date September 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/CommunicationAPIExport.h"
+
+// std header
+#include <list>
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT LogModeManager {
-		OT_DECL_DEFCOPY(LogModeManager)
-		OT_DECL_DEFMOVE(LogModeManager)
+	//! @class ServiceRunData
+	//! @brief The ServiceRunData class is used to provide data to a service when sending the run command.
+	class OT_COMMUNICATION_API_EXPORT ServiceRunData : public Serializable {
+		OT_DECL_DEFCOPY(ServiceRunData)
+		OT_DECL_DEFMOVE(ServiceRunData)
 	public:
-		LogModeManager();
-		virtual ~LogModeManager();
+		ServiceRunData();
+		virtual ~ServiceRunData() {};
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Virtual methods
+
+		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
-		void setGlobalLogFlags(const LogFlags& _flags) { m_globalFlags = _flags; m_globalFlagsSet = true; };
-		const LogFlags& getGlobalLogFlags(void) const { return m_globalFlags; };
-		bool getGlobalLogFlagsSet(void) const { return m_globalFlagsSet; };
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Serialization
-
-		void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
+		void addService(const ServiceBase& _service) { m_services.push_back(_service); };
+		void setServices(const std::list<ServiceBase>& _services) { m_services = _services; };
+		const std::list<ServiceBase>& getServices() const { return m_services; };
 
 	private:
-		bool m_globalFlagsSet;
-		LogFlags m_globalFlags;
+		std::list<ServiceBase> m_services;
 	};
-
 }

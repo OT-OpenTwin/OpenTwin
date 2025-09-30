@@ -8,7 +8,7 @@
 #include "GraphicsItemDesignerScene.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"

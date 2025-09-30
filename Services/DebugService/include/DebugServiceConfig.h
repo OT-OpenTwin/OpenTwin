@@ -17,6 +17,7 @@ public:
 	//! @brief The feature flags are used to configure the debug service behaviour.
 	enum FeatureFlag {
 		FeaturesDisabled  = 0 << 0, //! @brief No feature enabled (default).
+		ExitOnCreation    = 1 << 0, //! @brief Exit the service on creation.
 		ExitOnInit        = 1 << 0, //! @brief Exit the service on initialization action.
 		ExitOnRun         = 1 << 1, //! @brief Exit the service on run action.
 		ExitOnPing        = 1 << 2, //! @brief Exit the service on ping action.

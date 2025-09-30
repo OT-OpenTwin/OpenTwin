@@ -8,7 +8,8 @@
 #include "LocalDirectoryService.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
@@ -53,8 +54,8 @@ bool LocalDirectoryService::updateSystemUsageValues(ot::JsonDocument& _jsonDocum
 
 // Service management
 
-bool LocalDirectoryService::supportsService(const std::string& _serviceName) {
-	for (std::string serviceName : m_supportedServices) {
+bool LocalDirectoryService::supportsService(const std::string& _serviceName) const {
+	for (const std::string& serviceName : m_supportedServices) {
 		if (serviceName == _serviceName) {
 			return true;
 		}
@@ -63,48 +64,46 @@ bool LocalDirectoryService::supportsService(const std::string& _serviceName) {
 	return false;
 }
 
-bool LocalDirectoryService::requestToRunService(const ServiceInformation& _serviceInfo) {
+bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInfo.getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInfo.getType(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
 	
-	std::string response;
-	if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to LDS at \"" + m_serviceURL + "\"");
+	std::string responseStr;
+	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
 		return false;
 	}
-	bool success = (response == OT_ACTION_RETURN_VALUE_OK);
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+	bool success = (response == ot::ReturnMessage::Ok);
 	if (success) {
 		m_services.push_back(_serviceInfo);
 	}
 	return success;
 }
 
-bool LocalDirectoryService::requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
+bool LocalDirectoryService::requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewRelayService, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_serviceInfo.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
-	
-	std::string response;
-	if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to LDS at \"" + m_serviceURL + "\"");
-		return false;
-	}
-	else OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E("Unexpected response: \"" + response + "\"");
-		return false;
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_E("Unexpected response: \"" + response + "\"");
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
 		return false;
 	}
 
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+	if (response != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Unexpected response: \"" + response.getWhat() + "\"");
+		return false;
+	}
+	
 	ot::JsonDocument responseDoc;
-	if (!responseDoc.fromJson(response)) {
+	if (!responseDoc.fromJson(response.getWhat())) {
 		OT_LOG_E("Failed to parse response document");
 		return false;
 	}
@@ -134,26 +133,28 @@ bool LocalDirectoryService::requestToRunRelayService(const ServiceInformation& _
 	return true;
 }
 
-void LocalDirectoryService::sessionClosing(const SessionInformation& _session) {
-	for (const ServiceInformation& service : m_services) {
+void LocalDirectoryService::sessionClosing(const std::string& _sessionID) {
+	for (const ot::ServiceInitData& service : m_services) {
 		
 		// Find the first service in the given session
 		// The notification should only be performed once per session
 
-		if (service.getSessionId() == _session.getId()) {
+		if (service.getSessionID() == _sessionID) {
 			// Create document
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.getId(), doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-
+			doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, doc.GetAllocator()), doc.GetAllocator());
+			
 			// Send message and check response
-			std::string response;
-			if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send session closing notification to LDS at \"" + m_serviceURL + "\"");
+			std::string responseStr;
+			if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				OT_LOG_E("Failed to send session closing notification to LDS at \"" + this->getServiceURL() + "\"");
 			}
-			else if (response != OT_ACTION_RETURN_VALUE_OK) {
-				OT_LOG_E("Invalid response when sending session closing notification to LDS at \"" + m_serviceURL + "\"");
+
+			ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+			if (response != ot::ReturnMessage::Ok) {
+				OT_LOG_E("Invalid response when sending session closing notification to LDS at \"" + this->getServiceURL() + "\"");
 			}
 			else {
 				// Successfully notified the LDS about the session shutdown
@@ -163,71 +164,70 @@ void LocalDirectoryService::sessionClosing(const SessionInformation& _session) {
 	}
 }
 
-void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
+void LocalDirectoryService::sessionClosed(const std::string& _sessionID) {
 	bool notified = false;
-	bool erased = true;
 
-	while (erased) {
-		erased = false;
-		auto it = m_services.begin();
-		for (; it != m_services.end(); it++) {
-			if (it->getSessionInformation() == _session) {
-				// If this is the first match, notify the LDS about the session shutdown
-				if (!notified) {
-					notified = true;
-					// Create document
-					ot::JsonDocument doc;
-					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session.getId(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_session.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, doc.GetAllocator()), doc.GetAllocator());
+	std::string message = doc.toJson();
 
-					// Send message and check response
-					std::string response;
-					if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send session closed notification to LDS at \"" + m_serviceURL + "\"");
-					}
-					else if (response != OT_ACTION_RETURN_VALUE_OK) {
-						OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + m_serviceURL + "\"");
-					}
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
+		if (it->getSessionID() == _sessionID) {
+			// If this is the first match, notify the LDS about the session shutdown
+			if (!notified) {
+				notified = true;
+
+				// Send message and check response
+				std::string responseStr;
+				if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, message, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					OT_LOG_E("Failed to send session closed notification to LDS at \"" + this->getServiceURL() + "\"");
 				}
 
-				// Erase entry
-				m_services.erase(it);
-				erased = true;
-				break;
+				ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 
-			} // if (it->first == _session)
-		} // for (; it != m_services.end(); it++)
-	} // while (erased)
+				if (response != ot::ReturnMessage::Ok) {
+					OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + this->getServiceURL() + "\": " + response.getWhat());
+				}
+			}
+
+			// Erase entry
+			it = m_services.erase(it);
+
+		} // if (it->first == _session)
+		else {
+			it++;
+		}
+	} // for (; it != m_services.end(); it++)
 }
 
-void LocalDirectoryService::serviceClosed(const ServiceInformation& _service, const std::string& _serviceURL) {
+void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID) {
 	bool notified = false;
 	bool erased = true;
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceDisconnected, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceID, doc.GetAllocator());
+	std::string message = doc.toJson();
 
 	while (erased) {
 		erased = false;
 		auto it = m_services.begin();
 		for (; it != m_services.end(); it++) {
-			if (*it == _service) {
+			if (it->getSessionID() == _sessionID && it->getServiceID() == _serviceID) {
 				// If this is the first match, notify the LDS about the session shutdown
 				if (!notified) {
-					// Create document
-					ot::JsonDocument doc;
-					doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceDisconnected, doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_service.getSessionId(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(_service.getSessionServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_service.getName(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_service.getType(), doc.GetAllocator()), doc.GetAllocator());
-					doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(_serviceURL, doc.GetAllocator()), doc.GetAllocator());
-
 					// Send message and check response
-					std::string response;
-					if (!ot::msg::send(Application::instance().getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send service closed notification to LDS at " + m_serviceURL);
+					std::string responseStr;
+					if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, message, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+						OT_LOG_E("Failed to send service closed notification to LDS at " + this->getServiceURL());
 					}
-					else if (response != OT_ACTION_RETURN_VALUE_OK) {
-						OT_LOG_E("Invalid response when sending service closed notification to LDS at " + m_serviceURL);
+
+					ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+					if (response != ot::ReturnMessage::Ok) {
+						OT_LOG_E("Invalid response when sending service closed notification to LDS at \"" + this->getServiceURL() + "\": " + response.getWhat());
 					}
 					else {
 						notified = true;
@@ -252,7 +252,7 @@ void LocalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::Json
 	_jsonObject.AddMember("SupportedServices", ot::JsonArray(m_supportedServices, _allocator), _allocator);
 
 	ot::JsonArray servicesArr;
-	for (const ServiceInformation& service : m_services) {
+	for (const ot::ServiceInitData& service : m_services) {
 		ot::JsonObject serviceObj;
 		service.addToJsonObject(serviceObj, _allocator);
 		servicesArr.PushBack(serviceObj, _allocator);

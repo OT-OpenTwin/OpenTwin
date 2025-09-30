@@ -20,7 +20,7 @@ UIControlsHandler::UIControlsHandler()
 
 void UIControlsHandler::createPages()
 {
-	ot::components::UiComponent* uiComponent = Application::instance()->uiComponent();
+	ot::components::UiComponent* uiComponent = Application::instance()->getUiComponent();
 	assert(uiComponent != nullptr);
 	uiComponent->addMenuPage(m_pageModel);
 	uiComponent->addMenuPage("View");
@@ -28,7 +28,7 @@ void UIControlsHandler::createPages()
 
 void UIControlsHandler::createGroups()
 {
-	ot::components::UiComponent* uiComponent = Application::instance()->uiComponent();
+	ot::components::UiComponent* uiComponent = Application::instance()->getUiComponent();
 	assert(uiComponent != nullptr);
 
 	uiComponent->addMenuGroup(m_pageModel, m_groupEdit);
@@ -51,7 +51,7 @@ void UIControlsHandler::setupButtons()
 
 void UIControlsHandler::createButtons()
 {
-	ot::components::UiComponent* uiComponent = Application::instance()->uiComponent();
+	ot::components::UiComponent* uiComponent = Application::instance()->getUiComponent();
 	assert(uiComponent != nullptr);
 	
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);

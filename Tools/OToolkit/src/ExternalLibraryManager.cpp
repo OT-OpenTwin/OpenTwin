@@ -13,7 +13,7 @@
 #include "ExternalLibraryManager.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // Qt header
 #include <QtCore/qdir.h>

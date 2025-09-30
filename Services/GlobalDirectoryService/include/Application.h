@@ -11,9 +11,9 @@
 // Open twin header
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTServiceFoundation/IDManager.h"
 
 // std header
@@ -24,6 +24,7 @@
 
 // Forward declarations
 class LocalDirectoryService;
+
 namespace ot {
 	namespace components {
 		class UiComponent;
@@ -44,7 +45,7 @@ public:
 
 	// Management
 
-	bool requestToRunService(const ServiceInformation& _serviceInfo);
+	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
 
 	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL);
 
@@ -75,7 +76,9 @@ private:
 	//! @warning It is expected that the mutex is locked when calling this method.
 	//! @param _info Service information.
 	//! @return A pointer to the least loaded directory service that supports the given service, or nullptr if no such service exists.
-	LocalDirectoryService* leastLoadedDirectoryService(const ServiceInformation& _info);
+	LocalDirectoryService* leastLoadedDirectoryService(const ot::ServiceInitData& _info);
+
+	bool canStartService(const ot::ServiceInitData& _info) const;
 
 	Application();
 	virtual ~Application();
@@ -86,5 +89,4 @@ private:
 	std::mutex                         m_mutex;
 	StartupDispatcher                  m_startupDispatcher;
 	ot::SystemInformation              m_systemLoadInformation;
-	ot::LogModeManager                 m_logModeManager;
 };

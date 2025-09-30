@@ -51,31 +51,7 @@
 
 Application * g_instance{ nullptr };
 
-#define EXAMPLE_NAME_BLOCK1 "Resistor"
-#define EXAMPLE_NAME_Block2 "VoltageSource"
-#define EXAMPLE_NAME_Block3 "Diode"
-#define EXAMPLE_NAME_BLOCK4 "Transistor"
-#define EXAMPLE_NAME_BLOCK5 "Connector"
-
 #undef GetObject
-
-namespace ottest {
-	static unsigned long long currentBlockUid = 0;
-
-	static unsigned long long currentResistorUid = 1;
-
-	static unsigned long long currentNodeNumber = 0;
-
-	static unsigned long long currentDiodeID = 1;
-
-	static unsigned long long currentTransistoriD = 1;
-
-	static unsigned long long currenConnectorID = 1;
-
-	static unsigned long long currentEditorID = 1;
-	
-}
-
 
 Application * Application::instance(void) {
 	if (g_instance == nullptr) { g_instance = new Application; }
@@ -101,15 +77,12 @@ Application::~Application() {
 
 }
 
-
 // ##################################################################################################################################################################################################################
 
 // Custom functions
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
-
-
 	if (action == m_buttonAddSolver.GetFullDescription()) {
 		addSolver();
 	}
@@ -143,7 +116,7 @@ void Application::createNewCircuit() {
 
 	EntityContainer* entityCircuitRoot;
 	
-	entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+	entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setName(getCircuitRootName()+circuitName);
 
 	entityCircuitRoot->StoreToDataBase();
@@ -166,7 +139,7 @@ void Application::createNewCircuit() {
 
 	// Message is queued, no response here
 	std::string tmp;
-	m_uiComponent->sendMessage(true, doc, tmp);
+	this->getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::createInitialCircuit() {
@@ -185,7 +158,7 @@ void Application::createInitialCircuit() {
 	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
 	if (circuits.empty()) {
 	
-		EntityContainer* entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuitRoot->setName(getCircuitRootName() + m_blockEntityHandler.getInitialCircuitName());
 
 		entityCircuitRoot->StoreToDataBase();
@@ -194,32 +167,24 @@ void Application::createInitialCircuit() {
 	
 }
 
-
-
 void Application::modelSelectionChanged() {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (m_selectedEntities.size() > 0) {
+		if (this->getSelectedEntities().size() > 0) {
 			enabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 		else {
 			disabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 }
 
-void Application::addSolver()
-{
-	if (!EnsureDataBaseConnection()) {
-		assert(0); // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+void Application::addSolver() {
+	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -227,7 +192,7 @@ void Application::addSolver()
 	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
 	// Get new Entity Id for the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create a unique name for the new solver item
 	int count = 1;
@@ -240,8 +205,6 @@ void Application::addSolver()
 	// Get information about the available circuits 
 	std::string circuitFolderName, circuitName;
 	ot::UID circuitFolderID{ 0 }, circuitID{ 0 };
-
-	
 
 	// Create the new solver item and store it in the data base
 	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
@@ -268,23 +231,15 @@ void Application::addSolver()
 void Application::runCircuitSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	
-
-	if (!EnsureDataBaseConnection()) {
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base. \n");
-		return;
-	}
-
-	if (m_selectedEntities.empty()) {
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+	if (this->getSelectedEntities().empty()) {
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
-	for (auto& entity : m_selectedEntityInfos) {
+	for (auto& entity : this->getSelectedEntityInfos()) {
 		if (entity.getEntityType() == "EntitySolverCircuitSimulator" || entity.getEntityType() == "EntitySolver") {
 			if (entity.getEntityName().substr(0, 8) == "Solvers/") {
 				size_t index = entity.getEntityName().find('/', 8);
@@ -304,8 +259,8 @@ void Application::runCircuitSimulation() {
 	}
 
 	if (solverRunList.empty()) {
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
@@ -336,11 +291,6 @@ void Application::runCircuitSimulation() {
 		runSingleSolver(solver, m_modelVersion, m_solverMap[solver.getEntityName()]);
 		m_solverMap.erase(solver.getEntityName());
 	}
-	
-
-
-
-
 }
 
 void Application::runNextSolvers() {
@@ -353,16 +303,15 @@ void Application::runNextSolvers() {
 		m_solverMap.erase(solver.getEntityName());
 	}
 
-	m_uiComponent->displayMessage("No next solver, simulation completed");
+	this->getUiComponent()->displayMessage("No next solver, simulation completed");
 
 	return;
 }
 
-
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
 
-	m_uiComponent->lockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->lockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = true;
 
 	// Enusre that subprocessHandler is null before starting
@@ -377,8 +326,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	assert(simulationTypeProperty != nullptr);
 
 	
-	m_uiComponent->setProgressInformation("Simulating", false);
-	m_uiComponent->setProgress(0);
+	this->getUiComponent()->setProgressInformation("Simulating", false);
+	this->getUiComponent()->setProgress(0);
 
 
 	// Get only circuit name
@@ -437,7 +386,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 	// Initialization of subprocess
 	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
+	const int serviceID = static_cast<int>(Application::instance()->getServiceID());
 	if (m_subprocessHandler == nullptr) {
 		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
 	}
@@ -483,8 +432,6 @@ void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {
 
 }
 
-
-
 std::string Application::extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence) {
 	size_t pos = 0;
 	size_t count = 0;
@@ -513,9 +460,9 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 
 void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	m_uiComponent->setProgress(100);
-	m_uiComponent->closeProgressInformation();
-	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->setProgress(100);
+	this->getUiComponent()->closeProgressInformation();
+	this->getUiComponent()->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();
@@ -526,8 +473,8 @@ void Application::finishSimulation() {
 void Application::finishFailedSimulation() {
 	OT_LOG_E("Simulation Failed! Shutting down!");
 
-	m_uiComponent->closeProgressInformation();
-	m_uiComponent->unlockUI(ot::LockTypeFlag::LockModelWrite);
+	this->getUiComponent()->closeProgressInformation();
+	this->getUiComponent()->unlockUI(ot::LockTypeFlag::LockModelWrite);
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();
@@ -536,9 +483,6 @@ void Application::finishFailedSimulation() {
 SubprocessHandler* Application::getSubProcessHandler() {
 	return m_subprocessHandler;
 }
-
-
-
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 	//Here we get the Item Information
@@ -558,7 +502,6 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 	
 }
 
-
 std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 	ot::UIDList items;
 
@@ -568,8 +511,6 @@ std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
-
-
 
 std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
 	
@@ -602,7 +543,7 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
 	std::string tmp;
-	if (m_uiComponent->sendMessage(true, reqDoc, tmp)) {
+	if (this->getUiComponent()->sendMessage(true, reqDoc, tmp)) {
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 	}
 	else {
@@ -641,30 +582,17 @@ std::string Application::handleConnectionToConnection(ot::JsonDocument& _documen
 
 // Required functions
 
-void Application::run(void) {
-	if (!EnsureDataBaseConnection()) {
-		assert(0);
-	}
-
+void Application::initialize() {
 #ifdef _DEBUG
 	m_serverName = "TestServerCircuit";
 #else
 	// Encode project name to base64 to avoid issues with special characters
-	const std::string hexString = ot::String::toBase64Url(sessionID());
+	const std::string hexString = ot::String::toBase64Url(getSessionID());
 	m_serverName = OT_INFO_SERVICE_TYPE_CircuitSimulatorService "_" + hexString;
 #endif // _DEBUG
 
 	m_qtWrapper = new QtWrapper();
 	m_qtWrapper->run(m_serverName);
-
-}
-
-std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc) {
-	return ""; // Return empty string if the request does not expect a return
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc) {
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
@@ -693,50 +621,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
-
-}
-
-
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
 	SimulationResults::getInstance()->setModelComponent(_model);
 }
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model) {
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service) {
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service) {
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void) {
-
-}
-
-bool Application::startAsRelayService(void) const {
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
-// ##################################################################################################################################################################################################################

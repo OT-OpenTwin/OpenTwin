@@ -9,7 +9,7 @@
 #include "HandleWheel.h"
 #include "Model.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyDouble.h"

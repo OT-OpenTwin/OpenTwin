@@ -34,20 +34,20 @@ bool ProximityMeshing::fixMeshIntersections(const std::string &meshName, int pro
 	std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo;
 	loadSelfIntersectionObject(intersectionChecker);
 
-	application->uiComponent()->setProgressInformation("Step 2/3: Check for self-intersections", true);
+	application->getUiComponent()->setProgressInformation("Step 2/3: Check for self-intersections", true);
 
 	hasSelfIntersections = checkSelfIntersection(intersectionChecker);
 
 	if (!hasSelfIntersections) 
 	{
-		application->uiComponent()->displayMessage(" No self intersections found\n");
+		application->getUiComponent()->displayMessage(" No self intersections found\n");
 	}
 	else if (proximityMeshing == 1 && hasSelfIntersections) 
 	{
 		IntersectingInfo = intersectionChecker.TrisSelfIntersecting();
 		visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations);
 
-		application->uiComponent()->displayMessage("\nERROR: Self-intersections are detected in the surface mesh, so no volume mesh can be created. Please consider refining the mesh.\n");
+		application->getUiComponent()->displayMessage("\nERROR: Self-intersections are detected in the surface mesh, so no volume mesh can be created. Please consider refining the mesh.\n");
 
 		return false;
 	}
@@ -171,8 +171,8 @@ bool ProximityMeshing::fixMeshIntersections(const std::string &meshName, int pro
 
 			gmsh::model::mesh::clear();  // We do not need to clear the entire mesh, removing the affected faces and edges would be sufficient
 
-			application->uiComponent()->setProgressInformation("Step 2/3: Regenerating surface mesh", false);
-			application->uiComponent()->setProgress(0);
+			application->getUiComponent()->setProgressInformation("Step 2/3: Regenerating surface mesh", false);
+			application->getUiComponent()->setProgress(0);
 
 			logger->startLogger2D(verbose);
 
@@ -291,7 +291,7 @@ bool ProximityMeshing::checkSelfIntersection(SelfIntersectionCheck &checker)
 
 void ProximityMeshing::visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation)
 {
-	EntityAnnotation *annotation = new EntityAnnotation(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityAnnotation *annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 	
 	if (IntersectingInfo.size() != 0) 
 	{
@@ -352,8 +352,8 @@ void ProximityMeshing::storeErrorAnnotations(void)
 	for (auto annotation : errorAnnotations)
 	{
 		annotation->StoreToDataBase();
-		application->modelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
-		application->modelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
+		application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
+		application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
 														annotation->getAnnotationData()->getEntityStorageVersion(), 
 														annotation->getEntityID());		
 	}

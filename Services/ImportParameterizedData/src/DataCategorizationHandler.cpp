@@ -245,7 +245,7 @@ void DataCategorizationHandler::clearBufferedMetadata()
 	m_markedForStorringEntities.clear();
 }
 
-void DataCategorizationHandler::handleChategorisationLock(std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
+void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
 {
 	EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
 
@@ -261,7 +261,7 @@ void DataCategorizationHandler::handleChategorisationLock(std::list<ot::EntityIn
 
 	ot::UIDList selectedCategorisations;
 	
-	for (ot::EntityInformation& selectedEntityInfo : _selectedEntities)
+	for (const ot::EntityInformation& selectedEntityInfo : _selectedEntities)
 	{
 		if (selectedEntityInfo.getEntityType() == temp.getClassName())
 		{
@@ -379,7 +379,7 @@ void DataCategorizationHandler::requestRangeSelection(const std::string& _tableN
 	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
 
 	std::string tmp;
-	Application::instance()->uiComponent()->sendMessage(true, doc, tmp);
+	Application::instance()->getUiComponent()->sendMessage(true, doc, tmp);
 }
 
 

@@ -1,4 +1,4 @@
-//! @file Logger.h
+//! @file LogDispatcher.h
 //! @brief OpenTwin Logging system.
 //! 
 //! This file contains the Log functionallity, 
@@ -11,18 +11,14 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
 #include "OTSystem/OTAssert.h"
-#include "OTCore/JSON.h"
+#include "OTCore/LogTypes.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/LogMessage.h"
 
 // std header
 #include <list>
-#include <mutex>
 #include <string>
-#include <ostream>
 
 //! @brief OpenTwin log macros enabled
 //! If undefined all the OT_LOG macros wont generate any code (empty line)
@@ -313,214 +309,7 @@
 
 namespace ot {
 
-	//! @brief Log message verbouse level
-	enum LogFlag {
-		NO_LOG                          = 0 << 0, //! @brief No log flags.
-		INFORMATION_LOG                 = 1 << 0, //! @brief Information log (few logs).
-		DETAILED_LOG                    = 1 << 1, //! @brief Detailed log (more logs).
-		WARNING_LOG                     = 1 << 2, //! @brief Warning log.
-		ERROR_LOG                       = 1 << 3, //! @brief Error log.
-		
-		//! @brief Mask used to set all general log flags.
-		ALL_GENERAL_LOG_FLAGS           = INFORMATION_LOG | DETAILED_LOG | WARNING_LOG | ERROR_LOG,
-
-		INBOUND_MESSAGE_LOG             = 1 << 4, //! @brief Execute endpoint log.
-		QUEUED_INBOUND_MESSAGE_LOG      = 1 << 5, //! @brief Queue endpoint log
-		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 1 << 6, //! @brief OneWay-TLS endpoint log
-		
-		//! @brief Mask used to set all incoming message log flags.
-		ALL_INCOMING_MESSAGE_LOG_FLAGS = INBOUND_MESSAGE_LOG | QUEUED_INBOUND_MESSAGE_LOG | ONEWAY_TLS_INBOUND_MESSAGE_LOG,
-		
-		OUTGOING_MESSAGE_LOG            = 1 << 7, //! \brief Outgoing message log.
-
-		//! @brief Mask used to set all outgoing message log flags.
-		ALL_OUTGOING_MESSAGE_LOG_FLAGS = OUTGOING_MESSAGE_LOG,
-
-		TEST_LOG                        = 1 << 8,
-		
-		//! @brief Mask used to set all incoming and outgoing message log flags.
-		ALL_MESSAGE_LOG_FLAGS           = ALL_INCOMING_MESSAGE_LOG_FLAGS | ALL_OUTGOING_MESSAGE_LOG_FLAGS,
-
-		//! @brief Mask used to set all log flags.
-		ALL_LOG_FLAGS                   = ALL_GENERAL_LOG_FLAGS | ALL_MESSAGE_LOG_FLAGS
-	};
-
-	typedef Flags<LogFlag> LogFlags;
-
-	OT_CORE_API_EXPORT void addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, JsonAllocator& _allocator);
-
-	OT_CORE_API_EXPORT LogFlags logFlagsFromJsonArray(const ConstJsonArray& _flagsArray);
-
-}
-OT_ADD_FLAG_FUNCTIONS(ot::LogFlag)
-
-namespace ot {
-
-	//! \brief Contains information about the origin and the content of a log message.
-	class OT_CORE_API_EXPORT LogMessage : public Serializable {
-		OT_DECL_DEFCOPY(LogMessage)
-		OT_DECL_DEFMOVE(LogMessage)
-	public:
-		static std::string logTypeInformation() { return "INFO"; };
-		static std::string logTypeDetailed() { return "DETAILED"; };
-		static std::string logTypeWarning() { return "WARNING"; };
-		static std::string logTypeError() { return "ERROR"; };
-		static std::string logTypeTest() { return "TEST"; };
-		static std::string logTypeMTLS() { return "mTLS"; };
-		static std::string logTypeTLS() { return "TLS"; };
-		static std::string logTypeQueued() { return "QUEUED"; };
-		static std::string logTypeOutgoing() { return "OUTGOING"; };
-
-		LogMessage();
-		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags = LogFlags(ot::INFORMATION_LOG));
-		virtual ~LogMessage();
-
-		void setServiceName(const std::string& _serviceName) { m_serviceName = _serviceName; };
-		const std::string& getServiceName(void) const { return m_serviceName; };
-
-		void setFunctionName(const std::string& _functionName) { m_functionName = _functionName; };
-		const std::string& getFunctionName(void) const { return m_functionName; };
-
-		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& getText(void) const { return m_text; };
-
-		void setFlags(const LogFlags& _flags) { m_flags = _flags; };
-		const LogFlags& getFlags(void) const { return m_flags; };
-
-		//! @see getLocalSystemTime
-		void setLocalSystemTime(int64_t _msSinceEpoch) { m_localSystemTime = _msSinceEpoch; };
-
-		//! @brief Milliseconds since epoch when the message was created.
-		int64_t getLocalSystemTime(void) const { return m_localSystemTime; };
-
-		//! @see getGlobalSystemTime
-		void setGlobalSystemTime(int64_t _msSinceEpoch) { m_globalSystemTime = _msSinceEpoch; };
-
-		//! @brief Milliseconds since epoch when the message was received by the logger service.
-		int64_t getGlobalSystemTime(void) const { return m_globalSystemTime; };
-
-		//! @brief Set the current system time as message creation timestamp.
-		void setCurrentTimeAsLocalSystemTime(void);
-
-		//! @brief Set the current system time as message received by logger service timestamp.
-		void setCurrentTimeAsGlobalSystemTime(void);
-
-		void setUserName(const std::string& _userName) { m_userName = _userName; };
-		const std::string& getUserName(void) const { return m_userName; };
-
-		void setProjectName(const std::string& _projectName) { m_projectName = _projectName; };
-		const std::string& getProjectName(void) const { return m_projectName; };
-
-		//! @brief Add the object contents to the provided JSON object.
-		//! @param _document The JSON document (used to get the allocator).
-		//! @param _object The JSON object to add the contents to.
-		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
-
-		//! @brief Will set the object contents from the provided JSON object.
-		//! @param _object The JSON object containing the information.
-		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types).
-		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
-
-		//! @brief Returns a JSON string with the contents of this message.
-		std::string toJson() const;
-
-	private:
-		void setFromVersion1_0(const ConstJsonObject& _object);
-
-		friend OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
-
-		std::string m_serviceName;			//! @brief Name of the message creator.
-		std::string m_functionName;			//! @brief Name of the function that created the message.
-		std::string m_text;					//! @brief The message text.
-		LogFlags    m_flags;				//! @brief Log flags tha describe the type of the message.
-		int64_t m_localSystemTime;		    //! @brief Message creation timestamp (ms since epoch).
-		int64_t m_globalSystemTime;		    //! @brief Message received by LoggerService timestamp (ms since epoch).
-		std::string m_userName;             //! @brief Current user when this message was generated.
-		std::string m_projectName;          //! @brief Project in which this message was generated.
-	};
-
-	//! @brief Writes the log message in a typical "log line" format to the provided output stream.
-	//! @param _stream Output stream to write to.
-	//! @param _msg The log message to write.
-	OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
-
-	OT_CORE_API_EXPORT std::string exportLogMessagesToString(const std::list<LogMessage>& _messages);
-
-	OT_CORE_API_EXPORT bool importLogMessagesFromString(const std::string& _string, std::list<LogMessage>& _messages);
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	//! @brief Used to receive every log message that is generated.
-	class OT_CORE_API_EXPORT AbstractLogNotifier {
-	public:
-		AbstractLogNotifier() : m_deleteLater(false) {};
-		virtual ~AbstractLogNotifier() {};
-
-		//! @brief Will set the delete later flag.
-		//! If delete later is set, the creator keeps ownership of this object even after it is added to the LogDispatcher.
-		void setDeleteLogNotifierLater(bool _deleteLater = true) { m_deleteLater = _deleteLater; };
-
-		//! @brief Returns true if the delete later mode is set.
-		bool getDeleteLogNotifierLater(void) const { return m_deleteLater; };
-
-		//! @brief Called when the a log message was created.
-		virtual void log(const LogMessage& _message) = 0;
-
-	private:
-		bool m_deleteLater; //! \brief If delete later is set, the creator keeps ownership of this object even after it is added to the LogDispatcher.
-	};
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	//! @brief Used to write created log messages to std cout in a way a human could read it.
-	class OT_CORE_API_EXPORT LogNotifierStdCout : public AbstractLogNotifier {
-	public:
-		virtual ~LogNotifierStdCout() {};
-
-		//! @brief Called when the a log message was created.
-		virtual void log(const LogMessage& _message) override;
-	};
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	class OT_CORE_API_EXPORT LogNotifierFileWriter : public AbstractLogNotifier {
-		OT_DECL_NODEFAULT(LogNotifierFileWriter)
-		OT_DECL_NOCOPY(LogNotifierFileWriter)
-	public:
-		static std::string generateFileName(const std::string& _serviceName);
-
-		LogNotifierFileWriter(const std::string& _filePath);
-		virtual ~LogNotifierFileWriter();
-
-		//! @brief Called when the a log message was created.
-		virtual void log(const LogMessage& _message) override;
-
-		void flushAndCloseStream(void);
-
-		void closeStream(void);
-
-	private:
-		std::mutex m_mutex;
-		std::ofstream* m_stream;
-	};
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
-
-	// ######################################################################################################################################################
+	class AbstractLogNotifier;
 
 	//! @brief The LogDispatcher dispatches generated log messages to all registered log notifiers.
 	//! When a log message is dispatched a timestamp for log messages and then forwards them to any registered log notifier.
