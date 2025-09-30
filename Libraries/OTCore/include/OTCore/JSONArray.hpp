@@ -25,6 +25,34 @@ inline ot::JsonArray::JsonArray(const std::vector<bool>& _vec, JsonAllocator& _a
 	}
 }
 
+inline ot::JsonArray::JsonArray(const std::list<int16_t>& _lst, JsonAllocator& _allocator)
+	: JsonValue(rapidjson::kArrayType) {
+	for (auto itm : _lst) {
+		this->PushBack(itm, _allocator);
+	}
+}
+
+inline ot::JsonArray::JsonArray(const std::vector<int16_t>& _vec, JsonAllocator& _allocator)
+	: JsonValue(rapidjson::kArrayType) {
+	for (auto itm : _vec) {
+		this->PushBack(itm, _allocator);
+	}
+}
+
+inline ot::JsonArray::JsonArray(const std::list<uint16_t>& _lst, JsonAllocator& _allocator)
+	: JsonValue(rapidjson::kArrayType) {
+	for (auto itm : _lst) {
+		this->PushBack(itm, _allocator);
+	}
+}
+
+inline ot::JsonArray::JsonArray(const std::vector<uint16_t>& _vec, JsonAllocator& _allocator)
+	: JsonValue(rapidjson::kArrayType) {
+	for (auto itm : _vec) {
+		this->PushBack(itm, _allocator);
+	}
+}
+
 inline ot::JsonArray::JsonArray(const std::list<int32_t>& _lst, JsonAllocator& _allocator)
 	: JsonValue(rapidjson::kArrayType) {
 	for (auto itm : _lst) {
