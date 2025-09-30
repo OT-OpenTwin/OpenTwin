@@ -35,7 +35,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	
 	ot::JsonObject visualisationCfgJson;
 	_visualisationCfg.addToJsonObject(visualisationCfgJson, document.GetAllocator());
-	document.AddMember(visualisationCfgJson, OT_ACTION_PARAM_Visualisation_Config,document.GetAllocator());
+	document.AddMember( OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, document.GetAllocator());
 	
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	info.addToJsonObject(document, document.GetAllocator());
@@ -155,7 +155,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 	visualisationCfg.setOverrideViewerContent(true);
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, documentBase.GetAllocator());
-	documentBase.AddMember( visualisationCfgJson, OT_ACTION_PARAM_Visualisation_Config, documentBase.GetAllocator());
+	documentBase.AddMember( OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, documentBase.GetAllocator());
 
 	if (tableEntity != nullptr && tableEntity->visualiseTable())
 	{

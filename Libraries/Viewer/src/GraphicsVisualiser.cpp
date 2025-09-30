@@ -20,14 +20,16 @@ bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state)
 		{
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator());
+			
 
 			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
 			
 			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+			visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
+
 			ot::JsonObject visualisationCfgJSon;
 			visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-			doc.AddMember(visualisationCfgJSon, OT_ACTION_PARAM_Visualisation_Config, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, doc.GetAllocator());
 
 			FrontendAPI::instance()->messageModelService(doc.toJson());
 			return true;

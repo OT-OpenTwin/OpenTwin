@@ -14,14 +14,15 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_VIEW1D_Setup, doc.GetAllocator());
-	
+		
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
 		ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
 		visualisationCfg.setVisualisingEntities(getVisualizingUIDs(_state));
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+
 		ot::JsonObject visualisationCfgJSon;
 		visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-		doc.AddMember(visualisationCfgJSon, OT_ACTION_PARAM_Visualisation_Config, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, doc.GetAllocator());
 
 		FrontendAPI::instance()->messageModelService(doc.toJson());
 		return true;
