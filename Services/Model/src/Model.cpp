@@ -79,6 +79,7 @@
 #include "MetadataEntityInterface.h"
 
 #include "OTServiceFoundation/UILockWrapper.h"
+#include "OTCore/FolderNames.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -221,6 +222,13 @@ void Model::resetToNew(void)
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
 		entityScriptRoot->setName(getScriptsRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasDataProcessingRoot())
+	{
+		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
+		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
+		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
@@ -4542,6 +4550,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		{
 			removeFromDisplay.push_back(oldEntity->getEntityID());
 
+			//If we have a container entity, we need to adjust the parent/child relationship here in the ModelService. This may not deal with all data entities.
 			EntityContainer*  oldContainer =	dynamic_cast<EntityContainer*>(oldEntity);
 			if (oldContainer != nullptr)
 			{
@@ -4568,6 +4577,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		}
 		else
 		{
+			//Was actually a new entity. HEre is no special handling necessary.
 			entityList.push_back(newEntity);
 			topologyEntityForceVisible.push_back(false);
 		}
@@ -4578,6 +4588,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
+	//Now we can add the new version of the topology entities to the model state
 	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
 
 

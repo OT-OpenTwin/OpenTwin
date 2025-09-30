@@ -6,6 +6,7 @@
 #include "IVisualisationTable.h"
 #include "IVisualisationPlot1D.h"
 #include "IVisualisationCurve.h"
+#include "IVisualisationGraphicsView.h"
 
 #include "OTCore/RuntimeTests.h"
 
@@ -121,6 +122,25 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 		else
 		{
 			OT_LOG_E("Tried visualising an entity as plot which is not a plot.");
+		}
+	}
+	else if (_visualisationType == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor)
+	{
+		IVisualisationGraphicsView* graphicsView = dynamic_cast<IVisualisationGraphicsView*>(baseEntity);
+		if (graphicsView != nullptr && graphicsView->visualiseGraphicsView())
+		{
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+
+			ot::GraphicsNewEditorPackage* editor = graphicsView->getGraphicsEditorPackage();
+			ot::JsonObject pckgObj;
+			editor->addToJsonObject(pckgObj, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+			
+			ot::BasicServiceInformation info(baseEntity->getOwningService());
+			info.addToJsonObject(doc, doc.GetAllocator());
+			std::string response;
+			Application::instance()->queuedRequestToFrontend(doc);
 		}
 	}
 	else

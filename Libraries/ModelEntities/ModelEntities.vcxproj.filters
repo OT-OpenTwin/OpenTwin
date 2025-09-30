@@ -430,6 +430,9 @@
     <ClInclude Include="include\EntitySolverDataProcessing.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\IVisualisationGraphicsView.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">

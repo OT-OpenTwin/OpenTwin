@@ -1,6 +1,8 @@
 #pragma once
 #include "OTCore/JSON.h"
 #include "EntityBase.h"
+
+//! @brief Serialises the visualiser depending on the implemented interfaces. This way the inheriting classes don't need to handle the visualiser. Only necessary for EntityFile so far.  
 class VisualisationTypeSerialiser
 {
 public:

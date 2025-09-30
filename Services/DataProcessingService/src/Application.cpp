@@ -100,6 +100,7 @@ void Application::run(void)
 }
 
 #include "EntitySolverDataProcessing.h"
+#include "OTCore/EntityName.h"
 
 std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc)
 {
@@ -117,7 +118,9 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			{
 				auto modelComponent = Application::instance()->modelComponent();
 				EntitySolverDataProcessing newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
-				newDataprocessing.setName("Data Processing/Pipeline 1");
+				auto allPipelines =	ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
+				newDataprocessing.setName(entityName);
 				newDataprocessing.StoreToDataBase();
 				ot::NewModelStateInformation infos;
 				infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());

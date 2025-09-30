@@ -42,6 +42,7 @@
     <ClInclude Include="include\EntityVisUnstructuredVectorSurface.h" />
     <ClInclude Include="include\InvalidUID.h" />
     <ClInclude Include="include\IVisualisationCurve.h" />
+    <ClInclude Include="include\IVisualisationGraphicsView.h" />
     <ClInclude Include="include\IVisualisationPlot1D.h" />
     <ClInclude Include="include\IVisualisationTable.h" />
     <ClInclude Include="include\IVisualisationText.h" />
