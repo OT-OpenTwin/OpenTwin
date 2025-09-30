@@ -465,9 +465,8 @@ void ServiceManager::sendInitializeMessage(Service&& _info) {
 }
 
 void ServiceManager::serviceInitializeFailed(Service&& _info) {
-	m_mutexRequestedServices.lock();
+	std::lock_guard<std::mutex> lock(m_mutexRequestedServices);
 	m_requestedServices.push_back(RequestedService(std::move(_info.getInfo()), std::move(_info.getStartupData())));
-	m_mutexRequestedServices.unlock();
 }
 
 std::list<Service>& ServiceManager::sessionServices(const SessionInformation& _sessionInformation) {
@@ -612,8 +611,7 @@ void ServiceManager::workerServiceStarter() {
 			m_mutexRequestedServices.unlock();
 
 			// Sleep for 100ms before next check
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(100ms);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		else {
 			// Get next requested service and remove it from list

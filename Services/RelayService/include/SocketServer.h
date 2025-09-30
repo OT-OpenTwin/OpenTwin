@@ -68,6 +68,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void onNewConnection();
 	void messageReceived(const QString& _message);
+	void slotProcessMessage(const QString& _message);
 	void socketDisconnected();
 	void onSslErrors(const QList<QSslError> &errors);
 	void slotSocketClosed();

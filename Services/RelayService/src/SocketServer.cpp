@@ -235,6 +235,11 @@ void SocketServer::onNewConnection()
 
 void SocketServer::messageReceived(const QString& _message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
+	// Add message to processing queue to free the socket thread
+	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, _message));
+}
+
+void SocketServer::slotProcessMessage(const QString& _message) {
 	OT_LOG("Message received trough websocket: " + _message.toStdString(), ot::OUTGOING_MESSAGE_LOG);
 	try {
 		ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
@@ -252,7 +257,7 @@ void SocketServer::messageReceived(const QString& _message) {
 		case ot::RelayedMessageHandler::Execute:
 		{
 			this->relayToHttp(request, response);
-			
+
 			if (m_client) {
 				std::string responseRequest = m_messageHandler.createResponseRequest(request.receiverUrl, response, request.messageId);
 				m_client->sendTextMessage(QString::fromStdString(responseRequest));
@@ -261,7 +266,7 @@ void SocketServer::messageReceived(const QString& _message) {
 				OT_LOG_E("No client connected to websocket");
 			}
 		}
-			break;
+		break;
 
 		case ot::RelayedMessageHandler::Control:
 			if (request.message == "noinactivitycheck") {
@@ -297,7 +302,7 @@ void SocketServer::messageReceived(const QString& _message) {
 			break;
 		}
 	}
-	catch (const std::exception & e) {
+	catch (const std::exception& e) {
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
