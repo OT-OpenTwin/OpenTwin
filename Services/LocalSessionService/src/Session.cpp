@@ -343,10 +343,10 @@ void Session::sendRunCommand() {
 // Session management
 
 void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	m_state.setFlag(Session::ShuttingDown, true);
 	this->stopHealthCheck();
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_state.setFlag(Session::ShuttingDown, true);
 
 	for (auto it = m_services.begin(); it != m_services.end(); it++) {
 		it->setAlive(false);
@@ -581,7 +581,9 @@ void Session::healthCheckWorker() {
 		}
 		else {
 			// Sleep for a while before the next health check
-			std::this_thread::sleep_for(std::chrono::seconds(10));
+			for(int i = 0 ; i < 3000 && m_healthCheckRunning; i++) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			}
 		}
 	}
 }
