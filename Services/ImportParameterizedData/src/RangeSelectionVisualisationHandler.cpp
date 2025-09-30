@@ -222,13 +222,18 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 
 	ot::JsonDocument document;
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	info.addToJsonObject(document, document.GetAllocator());
+	info.addToJsonObject(document, document.GetAllocator()); 
 	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_OverwriteContent, false, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setAsActiveView(true);
+	visualisationCfg.setOverrideViewerContent(false);
+	visualisationCfg.setVisualisingEntities(_visualizingEntities);
+	ot::JsonObject visualisationCfgJSon;
+	visualisationCfg.addToJsonObject(visualisationCfgJSon, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, document.GetAllocator());
 
+	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
+	
 	const bool loadContent = true;
 	ot::TableCfg tableCfg = table->getTableConfig(true);;
 	ot::JsonObject cfgObj;

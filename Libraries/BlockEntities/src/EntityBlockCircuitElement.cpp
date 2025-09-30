@@ -23,17 +23,18 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	}
 
 	// Check if LoadFromLibrary was selected
-	//auto basePropertyModel = getProperties().getProperty("ModelSelection");
-	//auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
-	//if (modelProperty == nullptr) {
-		//OT_LOG_E("Model selection property cast failed");
-		//return false;
-	//
-	//if (modelProperty->getValue() == "LoadFromLibrary") {
+	auto basePropertyModel = getProperties().getProperty("ModelSelection");
+	auto modelProperty = dynamic_cast<EntityPropertiesSelection*>(basePropertyModel);
+	if (modelProperty == nullptr) {
+		OT_LOG_E("Model selection property cast failed");
+		return false;
+	}
+	
+	if (modelProperty->getValue() == "LoadFromLibrary") {
 
 		// if it was selected use observer to send message to LMS
-		//getObserver()->requestConfigForModelDialog(this->getEntityID(),this->getCollectionType(), this->getCircuitModelFolder() + this->getFolderName(), this->getFolderName());
-	//}
+		getObserver()->requestConfigForModelDialog(this->getEntityID(),this->getCollectionType(), this->getCircuitModelFolder() + this->getFolderName(), this->getFolderName());
+	}
 
 	return true;
 }

@@ -42,7 +42,12 @@ bool EntityFileCSV::updateFromProperties(void)
 	requiresDataToBeFetched |= requiresDataUpdate();
 	if (requiresDataToBeFetched)
 	{
-		getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_UI_TABLE_Setup, true, requiresDataToBeFetched);
+
+		ot::VisualisationCfg visualisationCfg;
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+		visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
+		visualisationCfg.setAsActiveView(true);
+		getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
 	}
 
 	getProperties().forceResetUpdateForAllProperties();

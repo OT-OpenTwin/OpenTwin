@@ -1,3 +1,6 @@
+// Open Twin header
+#include "OTCore/Logger.h"
+
 // project header
 #include "Parameter.h"
 
@@ -26,16 +29,16 @@ std::string Parameter::getDataTypeString() const {
 
 void Parameter::printDescription() const {
     for (const std::string& line : m_description) {
-        std::cout << line << "\n";
+        OT_LOG_D(line);
     }
 }
 
 void Parameter::printParameter() const {
-    std::cout << "Printing Parameter: \n";
-    std::cout << "Parameter name: " << m_name << "\n";
-    std::cout << "Parameter macro: " << m_macro << "\n";
-    std::cout << "Parameter data type: " << getDataTypeString() << "\n";
-    std::cout << "Parameter description: \n";
+    OT_LOG_D("Printing Parameter:");
+    OT_LOG_D("Parameter name: " + m_name);
+    OT_LOG_D("Parameter macro: " + m_macro);
+    OT_LOG_D("Parameter data type: " + getDataTypeString());
+    OT_LOG_D("Parameter description:");
     printDescription();
 }
 

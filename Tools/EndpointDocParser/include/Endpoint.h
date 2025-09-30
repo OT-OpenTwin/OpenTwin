@@ -44,8 +44,9 @@ public:
 //	const std::list<Parameter>& getParameters() const { return m_parameters; };
 	std::list<Parameter>& getParameters() { return m_parameters; };
 
-	void setResponseDescription(const std::string& _responseDescription) { m_responseDescription = _responseDescription; };
-	const std::string& getResponseDescription() const { return m_responseDescription; };
+	void addResponseDescription(const std::string& _responseDescription) { m_responseDescription.push_back(_responseDescription); };
+	const std::list<std::string>& getResponseDescription() const { return m_responseDescription; };
+	void printResponseDescription() const;
 
 	void setResponseParameters(const std::list<Parameter>& _responseParameters) { m_responseParameters = _responseParameters; };
 //	const std::list<Parameter>& getResponseParameters() const { return m_responseParameters; };
@@ -63,6 +64,6 @@ private:
 	std::list<std::string> m_detailedDescription;
 	MessageType m_messageType;
 	std::list<Parameter> m_parameters;
-	std::string m_responseDescription;
+	std::list<std::string> m_responseDescription;
 	std::list<Parameter> m_responseParameters;
 };

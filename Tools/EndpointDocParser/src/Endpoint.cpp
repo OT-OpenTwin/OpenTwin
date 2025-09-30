@@ -1,3 +1,6 @@
+// Open Twin header
+#include "OTCore/Logger.h"
+
 // project header
 #include "Endpoint.h"
 
@@ -10,7 +13,7 @@ Endpoint::Endpoint()
 
 void Endpoint::printDetailedDescription() const {
     for (const std::string& line : m_detailedDescription) {
-        std::cout << line << "\n";
+        OT_LOG_D(line);
     }
 }
 
@@ -22,27 +25,35 @@ std::string Endpoint::getMessageTypeString() const {
     }
 }
 
+void Endpoint::printResponseDescription() const {
+    for (const std::string& line : m_responseDescription) {
+        OT_LOG_D(line);
+    }
+}
+
 void Endpoint::printEndpoint() const {
-    std::cout << "\nPrinting Endpoint: \n";
-    std::cout << "================== \n";
-    std::cout << "Endpoint name: " << m_name << "\n";
-    std::cout << "Endpoint action: " << m_action << "\n";
-    std::cout << "Brief description: " << m_briefDescription << "\n";
-//    std::cout << "Detailed description: " << m_detailedDescription << "\n";
-    std::cout << "Detailed description: " << "\n";
+    OT_LOG_D("Printing Endpoint: ");
+    OT_LOG_D("================== ");
+    OT_LOG_D("Endpoint name: " + m_name);
+    OT_LOG_D("Endpoint action: " + m_action);
+    OT_LOG_D("Brief description: " + m_briefDescription);
+    OT_LOG_D("Detailed description: ");
     printDetailedDescription();
-    std::cout << "Message type: " << getMessageTypeString() << "\n";
+    OT_LOG_D("Message type: " + getMessageTypeString());
     
-    std::cout << "\nParameters: \n";
-    std::cout << "----------- \n";
+    OT_LOG_D("Parameters:");
+    OT_LOG_D("----------- ");
     for (const Parameter& param : m_parameters) {
         param.printParameter();
     }
     
-    std::cout << "\nResponse parameters: \n";
-    std::cout << "-------------------- \n";
+    OT_LOG_D("Response parameters:");
+    OT_LOG_D("-------------------- ");
     for (const Parameter& rparam : m_responseParameters) {
         rparam.printParameter();
     }
-    std::cout << "Response description: " << m_responseDescription << "\n\n";
+
+    OT_LOG_D("Response description:");
+    printResponseDescription();
+    OT_LOG_D("\n");
 }

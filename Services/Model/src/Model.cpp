@@ -79,6 +79,7 @@
 #include "MetadataEntityInterface.h"
 
 #include "OTServiceFoundation/UILockWrapper.h"
+#include "OTCore/FolderNames.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -221,6 +222,13 @@ void Model::resetToNew()
 		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
 		entityScriptRoot->setName(getScriptsRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
+	}
+
+	if (typeManager.hasDataProcessingRoot())
+	{
+		EntityContainer* dataProcessingRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &m_classFactory, Application::instance()->getServiceName());
+		dataProcessingRoot->setName(ot::FolderNames::DataProcessingFolder);
+		addEntityToModel(dataProcessingRoot->getName(), dataProcessingRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
@@ -3930,12 +3938,12 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::GetDataBase()->getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	/*Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);*/
+	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
-void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
+void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
-	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationType, _setAsActiveView, _overrideContent);
+	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
 }
 
 EntityBase *Model::findEntityFromName(const std::string &name)
@@ -4542,6 +4550,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		{
 			removeFromDisplay.push_back(oldEntity->getEntityID());
 
+			//If we have a container entity, we need to adjust the parent/child relationship here in the ModelService. This may not deal with all data entities.
 			EntityContainer*  oldContainer =	dynamic_cast<EntityContainer*>(oldEntity);
 			if (oldContainer != nullptr)
 			{
@@ -4568,6 +4577,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		}
 		else
 		{
+			//Was actually a new entity. HEre is no special handling necessary.
 			entityList.push_back(newEntity);
 			topologyEntityForceVisible.push_back(false);
 		}
@@ -4578,6 +4588,7 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 		removeShapesFromVisualization(removeFromDisplay);
 	}
 
+	//Now we can add the new version of the topology entities to the model state
 	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible);
 
 

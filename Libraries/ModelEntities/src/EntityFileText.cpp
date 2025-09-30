@@ -152,7 +152,11 @@ bool EntityFileText::updateFromProperties()
 	bool needsVisualisationUpdate = PropertyHelper::getSelectionProperty(this, "Syntax Highlight", "Text Properties")->needsUpdate();
 	if (m_requiresDataUpdate || needsVisualisationUpdate)
 	{
-		getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_UI_TEXTEDITOR_Setup, true, m_requiresDataUpdate);
+		ot::VisualisationCfg visualisationCfg;
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);
+		visualisationCfg.setOverrideViewerContent(m_requiresDataUpdate);
+		visualisationCfg.setAsActiveView(true);
+		getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
 	}
 
 	getProperties().forceResetUpdateForAllProperties();

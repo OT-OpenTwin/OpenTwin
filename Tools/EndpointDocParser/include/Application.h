@@ -9,6 +9,11 @@
 
 class Application {
 public:
+	enum ParameterType{
+		FunctionParam,
+		ReturnParam
+	};
+
 	// Constructors
 	Application() = default;
 	Application(const Application& _other) = default;
@@ -24,28 +29,30 @@ public:
 	const std::list<Service>& getServices() const { return m_services; };
 
 	// Other methods
-	void run(void);
+	int run(void);
 
-	void searchForServices(void);
+	bool searchForServices(void);
 
-	void searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
+	bool searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
 
-	void searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service);
+	bool searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service);
 
-	void searchIncludeDirectoryFiles(const std::string& _includeDirectory, Service& _service);
+	bool searchIncludeDirectoryFiles(const std::string& _includeDirectory, Service& _service);
 
-	void parseFile(const std::string& _file, Service& _service);
+	bool parseFile(const std::string& _file, Service& _service);
 
 	bool startsWith(const std::string& _line, const std::string& _prefix);
 
-	void parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, const std::string& _parameterType);
+	bool parseParameter(Parameter& _parameter, const std::string& _param, Endpoint& _endpoint, ParameterType _parameterType);
 
 	void addService(const Service& _service);
 
-	void searchInLibrary(void);
+	void importActionTypes(void);
 
 	void parseMacroDefinition(const std::string& _content);
 
+	void addDescriptionToLastParameter(std::list<Parameter>& _paramList, const std::string& _description);
+	
 private:
 	std::list<Service> m_services;
 	std::map<std::string, std::string> m_actionMacros;

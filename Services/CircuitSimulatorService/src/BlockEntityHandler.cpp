@@ -170,6 +170,10 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, doc.GetAllocator());
 
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 

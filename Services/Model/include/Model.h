@@ -17,6 +17,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 
+
 class EntityMesh;
 class EntityMeshTet;
 class EntityMeshCartesian;
@@ -41,7 +42,7 @@ public:
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) override;
-	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) override;
+	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string &_collectionName);
 	virtual ~Model();
@@ -165,6 +166,11 @@ public:
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
 	void updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVersion, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
+	
+	//! @brief Performs an update on a topology entity. The updated entity replaces its old version in the entity map and redirects all parent/child relationships to the updated entity.,
+	//! @param topoEntityID 
+	//! @param topoEntityVersion 
+	//! @param comment 
 	void updateTopologyEntities(ot::UIDList& topoEntityID, ot::UIDList& topoEntityVersion, const std::string& comment);
 	void requestUpdateVisualizationEntity(ot::UID visEntityID);
 	std::list<ot::UID> getNewEntityIDs(unsigned long long count);

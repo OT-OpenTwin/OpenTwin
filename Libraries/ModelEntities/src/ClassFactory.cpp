@@ -65,6 +65,7 @@
 #include "EntityVisUnstructuredVectorVolume.h"
 #include "EntityVisUnstructuredVectorSurface.h"
 #include "EntityBatchImporter.h"
+#include "EntitySolverDataProcessing.h"
 
 #include "OTCore/TypeNames.h"
 
@@ -353,6 +354,10 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	else if (entityType == "EntityBatchImporter")
 	{
 		return new EntityBatchImporter(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntitySolverDataProcessing")
+	{
+		return new EntitySolverDataProcessing(0, nullptr, nullptr, nullptr, this, "");
 	}
 	else
 	{

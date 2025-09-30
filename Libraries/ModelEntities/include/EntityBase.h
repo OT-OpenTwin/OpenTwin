@@ -11,8 +11,10 @@
 #include "EntityProperties.h"
 #include "ModelState.h"
 #include "OldTreeIcon.h"
-#include "OTGui/CopyInformation.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/Logger.h"
+#include "OTGui/CopyInformation.h"
+#include "OTGui/VisualisationCfg.h"
 
 class EntityBase;
 class ClassFactoryHandler;
@@ -29,7 +31,7 @@ public:
 	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
 	virtual void requestConfigForModelDialog(const ot::UID& _entityID, const std::string _collectionType, const std::string& _targetFolder, const std::string& _elementType) {};
-	virtual void requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true) {};
+	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
 };
 

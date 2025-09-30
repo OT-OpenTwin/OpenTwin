@@ -13,6 +13,7 @@
 
 
 // Open twin header
+#include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -28,6 +29,8 @@
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
+#include "EntitySolverDataProcessing.h"
+
 
 #include "OTServiceFoundation/UILockWrapper.h"
 
@@ -95,10 +98,23 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == _buttonRunPipeline.GetFullDescription())
+			if (action == m_buttonRunPipeline.GetFullDescription())
 			{
 				std::thread worker(&Application::runPipeline, this);
 				worker.detach();
+			}
+			else if (action == m_buttonCreatePipeline.GetFullDescription())
+			{
+				auto modelComponent = Application::instance()->modelComponent();
+				EntitySolverDataProcessing newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+				auto allPipelines =	ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
+				newDataprocessing.setName(entityName);
+				newDataprocessing.StoreToDataBase();
+				ot::NewModelStateInformation infos;
+				infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
+				infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
+				ot::ModelServiceAPI::addEntitiesToModel(infos,"Added pipeline");
 			}
 		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
@@ -174,8 +190,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
-	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
-	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "RunSolver");
+	m_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
+	m_buttonCreatePipeline.SetDescription(pageName, groupName, "Create Pipeline");
+	_ui->addMenuButton(m_buttonRunPipeline, modelWrite, "RunSolver");
+	_ui->addMenuButton(m_buttonCreatePipeline, modelWrite, "AddSolver");
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.OrderUIToCreateBlockPicker();
 	

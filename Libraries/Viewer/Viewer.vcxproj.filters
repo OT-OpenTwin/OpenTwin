@@ -163,6 +163,9 @@
     <ClCompile Include="src\IntersectionCapCalculator.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -338,6 +341,9 @@
     </ClInclude>
     <ClInclude Include="include\IntersectionCapCalculator.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsVisualiser.h">
+      <Filter>include\Visualiser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

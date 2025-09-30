@@ -22,21 +22,15 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state)
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, doc.GetAllocator());
 
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
 				
-				ot::UIDList visualizingEntities;
-				visualizingEntities.push_back(this->getSceneNode()->getModelEntityID());
-				doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(visualizingEntities, doc.GetAllocator()), doc.GetAllocator());
+				ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+				visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);
 
-				if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier)) {
-					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, true, doc.GetAllocator());
-				}
-				else {
-					doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, false, doc.GetAllocator());
-				}
+				ot::JsonObject visualisationCfgJSon;
+				visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, doc.GetAllocator());
 
 				FrontendAPI::instance()->messageModelService(doc.toJson());
 				return true;
