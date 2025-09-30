@@ -339,6 +339,7 @@
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
+#define OT_ACTION_PARAM_Visualisation_Config "Config.Visualisation"
 #define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Visible "Visible"
 #define OT_ACTION_PARAM_Content "Content"
@@ -354,11 +355,8 @@
 #define OT_ACTION_PARAM_CallbackAction "CallbackAction"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
-#define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
-#define OT_ACTION_PARAM_VisualizingEntities "VisualizingEntities"
-#define OT_ACTION_PARAM_SuppressViewHandling "SuppressViewHandling"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
@@ -622,8 +620,6 @@
 #define OT_ACTION_CMD_VIEW1D_Setup "View1D.Setup"
 #define OT_ACTION_CMD_UpdateCurvesOfPlot "View1D.UpdateCurves"
 
-
-#define OT_ACTION_PARAM_VIEW_SetActiveView "View.ActiveView.Set"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_Note "View.Rubberband.Note"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_Document "View.Rubberband.Document"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument "View.Rubberband.PointDocument"

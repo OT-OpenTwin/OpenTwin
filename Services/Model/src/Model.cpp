@@ -3941,9 +3941,9 @@ void Model::requestConfigForModelDialog(const ot::UID& _entityID,const std::stri
 	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
-void Model::requestVisualisation(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
+void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
-	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationType, _setAsActiveView, _overrideContent);
+	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
 }
 
 EntityBase *Model::findEntityFromName(const std::string &name)

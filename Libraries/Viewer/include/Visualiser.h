@@ -3,6 +3,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "VisualiserState.h"
+#include "OTGui/VisualisationCfg.h"
 
 class SceneNodeBase;
 
@@ -41,6 +42,8 @@ public:
 	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
+
+	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state);
 
 protected:
 	SceneNodeBase* m_node = nullptr;

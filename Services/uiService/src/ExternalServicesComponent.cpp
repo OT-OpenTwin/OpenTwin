@@ -40,6 +40,7 @@
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
+#include "OTGui/VisualisationCfg.h"
 
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
@@ -3308,15 +3309,11 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
-
-	bool suppressViewHandling = false;
-	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
-		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
-	}
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
+	
+	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
 	}
@@ -3340,10 +3337,9 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
@@ -3404,10 +3400,9 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
@@ -3459,25 +3454,23 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 	info.setFromJsonObject(_document.getConstObject());
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
+	
+	if (!visualisationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 
-	bool refreshData = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
+	bool refreshData = visualisationCfg.getOverrideViewerContent();
 	
 	// Get/create plot view that matches the plot config 
 	ot::Plot1DCfg plotConfig;
 	plotConfig.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
 
-	bool suppressViewHandling = false;
-	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
-		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
-	}
+	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
+	
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
@@ -3605,10 +3598,9 @@ std::string ExternalServicesComponent::handleAddPlot1D_New(ot::JsonDocument& _do
 std::string ExternalServicesComponent::handleUpdateCurve(ot::JsonDocument& _document) {
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
 
 	const ot::PlotView* plotView = AppBase::instance()->findPlot(plotName, visualizingEntities);
 
@@ -3660,25 +3652,22 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.getConstObject());
 
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+	if (!visualisationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 	
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	const bool overwriteContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
+	const bool overwriteContent = visualisationCfg.getOverrideViewerContent();
 	
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
 
-	bool suppressViewHandling = false;
-	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
-		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
-	}
+	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, true);
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
@@ -3754,26 +3743,24 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.getConstObject());
 
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (_document.HasMember(OT_ACTION_PARAM_VIEW_SetActiveView)) {
-		if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
-			insertFlags |= ot::WidgetView::KeepCurrentFocus;
-		}
+	if (visualisationCfg.getSetAsActiveView()) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 	
-	bool overrideCurrentContent = true;
-	if (_document.HasMember(OT_ACTION_PARAM_OverwriteContent)) {
-		overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
-	}
+	
+
+	bool overrideCurrentContent = visualisationCfg.getOverrideViewerContent();
 	
 	bool keepCurrentEntitySelection = false;
 	if (_document.HasMember(OT_ACTION_PARAM_KeepCurrentEntitySelection)) {
 		keepCurrentEntitySelection = ot::json::getBool(_document, OT_ACTION_PARAM_KeepCurrentEntitySelection);
 	}
-	bool suppressViewHandling = false;
-	if (_document.HasMember(OT_ACTION_PARAM_SuppressViewHandling)) {
-		suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
-	}
+	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
+	
 	ot::ViewHandlingFlags viewHandlingFlags = AppBase::instance()->getViewHandlingFlags();
 	if (keepCurrentEntitySelection) {
 		AppBase::instance()->setViewHandlingFlags(viewHandlingFlags | ot::ViewHandlingFlag::SkipEntitySelection);
@@ -3787,10 +3774,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ot::UIDList visualizingEntities;
-	if (_document.HasMember(OT_ACTION_PARAM_VisualizingEntities)) {
-		visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	}
+	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
 
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName(), visualizingEntities);
 	if (table == nullptr) {

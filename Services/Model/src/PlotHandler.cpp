@@ -107,10 +107,12 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 		model->updateTopologyEntities(plotsForUpdate.m_topologyEntityIDs, plotsForUpdate.m_topologyEntityVersions, comment);
 	}
 	
-	const bool overrideContent = true;
 	for (EntityResult1DPlot* selectedPlot : selectedPlots)
-	{	
-		Application::instance()->getVisualisationHandler().handleVisualisationRequest(selectedPlot->getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, overrideContent);
+	{
+		ot::VisualisationCfg visualisationCfg;
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+		visualisationCfg.setOverrideViewerContent(true);
+		Application::instance()->getVisualisationHandler().handleVisualisationRequest(selectedPlot->getEntityID(),visualisationCfg);
 	}
 	return std::string();
 }

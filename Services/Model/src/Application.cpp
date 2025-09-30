@@ -24,6 +24,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "CrossCollectionDatabaseWrapper.h"
+#include "OTGui/VisualisationCfg.h"
 // std header
 #include <thread>
 
@@ -961,13 +962,16 @@ std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 std::string Application::handleShowTable(ot::JsonDocument& _document)
 {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(_document.getConstObject());
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+
 	std::map<std::string,ot::UID> entityMap = m_model->getEntityNameToIDMap();
 	auto entityIDByName	= entityMap.find(tableName);
 	if (entityIDByName != m_model->getEntityNameToIDMap().end())
 	{
 		ot::UID tableID = entityIDByName->second;
-		m_visualisationHandler.handleVisualisationRequest(tableID, OT_ACTION_CMD_UI_TABLE_Setup, setViewAsActive);
+		m_visualisationHandler.handleVisualisationRequest(tableID, visualisationCfg);
 		return ot::ReturnMessage().toJson();
 	}
 	else
@@ -980,14 +984,13 @@ std::string Application::handleShowTable(ot::JsonDocument& _document)
 std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _document)
 {
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
-	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	bool suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(_document.getConstObject());
 	
 	try
 	{
-		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities, suppressViewHandling);
+		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
 	}
 	catch (std::exception& e)
 	{
