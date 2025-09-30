@@ -12,7 +12,6 @@
 #include "ModelState.h"
 #include "OldTreeIcon.h"
 #include "OTCore/LogDispatcher.h"
-#include "OTCore/Logger.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 
