@@ -54,9 +54,9 @@ void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	// Running Services
 	m_mutexServices.lock();
 	ot::JsonArray sessionsArray;
-	for (const auto& s : m_services) {
+	for (const auto& s : m_sessions) {
 		ot::JsonArray serviceArray;
-		for (const Service& service : *s.second) {
+		for (const Service& service : s.second) {
 			ot::JsonObject serviceObj;
 			service.addToJsonObject(serviceObj, _allocator);
 			serviceArray.PushBack(serviceObj, _allocator);
@@ -224,7 +224,7 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	m_mutexRequestedServices.unlock();
 
 	m_mutexServices.lock();
-	sessionServices(_serviceInformation)->push_back(std::move(newService));
+	sessionServices(_serviceInformation).push_back(std::move(newService));
 
 	m_mutexServices.unlock();
 
@@ -239,10 +239,10 @@ void ServiceManager::sessionClosing(const std::string& _sessionID) {
 	this->cleanUpSession_IniList(_sessionID);
 
 	std::lock_guard<std::mutex> servicesLock(m_mutexServices);
-	for (auto& session : m_services) {
+	for (auto& session : m_sessions) {
 		if (session.first.getId() == _sessionID) {
 			// Mark all alive services in the given session as stopping
-			for (auto& service : *session.second) {
+			for (auto& service : session.second) {
 				// Set the service to shutting down
 				service.setShuttingDown(true);
 			}
@@ -294,12 +294,12 @@ void ServiceManager::serviceDisconnected(const std::string& _sessionID, ot::serv
 
 	// Clean up the current services
 	m_mutexServices.lock();
-	for (auto& s : m_services) {
+	for (auto& s : m_sessions) {
 		if (s.first.getId() == _sessionID) {
-			for (auto it = s.second->begin(); it != s.second->end(); it++) {
+			for (auto it = s.second.begin(); it != s.second.end(); it++) {
 				if (it->getInfo().getServiceID() == _serviceID) {
 					m_stoppingServices.push_back(std::move(*it));
-					s.second->erase(it);
+					s.second.erase(it);
 					break;
 				}
 			}
@@ -319,12 +319,11 @@ void ServiceManager::addPortRange(ot::port_t _start, ot::port_t _end) {
 // Setter/Getter
 
 void ServiceManager::getSessionInformation(ot::JsonArray& _sessionInfo, ot::JsonAllocator& _allocator) {
-
-	for (auto& session : m_services) {
+	for (auto& session : m_sessions) {
 
 		ot::JsonArray servicesArr;
 
-		for (Service& service : *session.second) {
+		for (Service& service : session.second) {
 			ot::JsonObject serviceObj;
 			
 			serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_ID, service.getInfo().getServiceID(), _allocator);
@@ -375,7 +374,8 @@ void ServiceManager::serviceStartFailed(const ot::ServiceInitData& _serviceInfor
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInformation.getSessionID(), doc.GetAllocator()), doc.GetAllocator());
 
 	// Fire message
-	ot::msg::sendAsync("", _serviceInformation.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	std::string response;
+	ot::msg::send("", _serviceInformation.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 }
 
 void ServiceManager::sendInitializeMessage(Service&& _info) {
@@ -404,7 +404,7 @@ void ServiceManager::sendInitializeMessage(Service&& _info) {
 	else {
 		// Service was pinged, did its initialization call, so now we move it to alive (doing health check)
 		m_mutexServices.lock();
-		this->sessionServices(_info.getInfo())->push_back(std::move(_info));
+		this->sessionServices(_info.getInfo()).push_back(std::move(_info));
 		m_mutexServices.unlock();
 	}
 }
@@ -415,12 +415,10 @@ void ServiceManager::serviceInitializeFailed(Service&& _info) {
 	m_mutexRequestedServices.unlock();
 }
 
-std::vector<Service> * ServiceManager::sessionServices(const SessionInformation& _sessionInformation) {
-	auto it = m_services.find(_sessionInformation);
-	if (it == m_services.end()) {
-		std::vector<Service> * newEntry = new std::vector<Service>();
-		m_services.insert_or_assign(_sessionInformation, newEntry);
-		return newEntry;
+std::list<Service>& ServiceManager::sessionServices(const SessionInformation& _sessionInformation) {
+	auto it = m_sessions.find(_sessionInformation);
+	if (it == m_sessions.end()) {
+		return m_sessions.insert_or_assign(_sessionInformation, std::list<Service>()).first->second;
 	}
 	else {
 		return it->second;
@@ -464,23 +462,17 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 	bool erased = true;
 
 	// Remove all requested services that are related to the session
-	while (erased) {
-		erased = false;
-		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end() && !erased; it++) {
-			if (it->getInitData().getSessionID() == serviceInfo.getSessionID()) {
-				m_requestedServices.erase(it);
-				erased = true;
-				break;
-			}
+	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end() && !erased; ) {
+		if (it->getInitData().getSessionID() == serviceInfo.getSessionID()) {
+			it = m_requestedServices.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
 	// Clean up running services
-	auto it = m_services.find(serviceInfo);
-	if (it != m_services.end()) {
-		delete it->second;
-	}
-	m_services.erase(serviceInfo);
+	m_sessions.erase(serviceInfo);
 
 	// Notify session service about the crash
 	ot::JsonDocument doc;
@@ -489,7 +481,8 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(serviceInfo.getSessionID(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Fire message
-	ot::msg::sendAsync("", serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	std::string response;
+	ot::msg::send("", serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -499,17 +492,14 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 void ServiceManager::cleanUpSession_RequestedList(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> reqLock(m_mutexRequestedServices);
 
-	bool erased = true;
-	while (erased) {
-		erased = false;
-		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
-			if (it->getInitData().getSessionID() == _sessionID) {
-				OT_LOG_D("Handling session closed (Session: " + _sessionID + "): Removing requested service { \"ID\": " + std::to_string(it->getInitData().getServiceID()) + ", \"Name\": \"" + it->getInitData().getServiceName() + "\" }");
+	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); ) {
+		if (it->getInitData().getSessionID() == _sessionID) {
+			OT_LOG_D("Handling session closed (Session: " + _sessionID + "): Removing requested service { \"ID\": " + std::to_string(it->getInitData().getServiceID()) + ", \"Name\": \"" + it->getInitData().getServiceName() + "\" }");
 
-				m_requestedServices.erase(it);
-				erased = true;
-				break;
-			}
+			it = m_requestedServices.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }
@@ -521,25 +511,21 @@ void ServiceManager::cleanUpSession_IniList(const std::string& _sessionID) {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
 	std::string cmd = doc.toJson();
 
-	bool erased = true;
-	while (erased) {
-		erased = false;
-		for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); it++) {
-			if (it->getInfo().getSessionID() == _sessionID) {
-				// Send shutdown message to the service
-				auto x = m_initializingServices.erase(it);
-
-				std::string response;
-				if (!ot::msg::send("", x->getUrl(), ot::EXECUTE, cmd, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-					OT_LOG_EAS("Failed to send shutdown message to service { "
-						"\"ID\": " + std::to_string(x->getInfo().getServiceID()) + ", \"Name\": \"" + x->getInfo().getServiceName() + "\", \"Type\": \"" +
-						x->getInfo().getServiceType() + "\", \"Url\": \"" + x->getUrl() + "\", \"SessionID\": \"" + x->getInfo().getSessionID() + "\" }");
-				}
-
-				m_stoppingServices.push_back(std::move(*x));
-				erased = true;
-				break;
+	for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); ) {
+		if (it->getInfo().getSessionID() == _sessionID) {
+			// Send shutdown message to the service
+			std::string response;
+			if (!ot::msg::send("", it->getUrl(), ot::EXECUTE, cmd, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				OT_LOG_EAS("Failed to send shutdown message to service { "
+					"\"ID\": " + std::to_string(it->getInfo().getServiceID()) + ", \"Name\": \"" + it->getInfo().getServiceName() + "\", \"Type\": \"" +
+					it->getInfo().getServiceType() + "\", \"Url\": \"" + it->getUrl() + "\", \"SessionID\": \"" + it->getInfo().getSessionID() + "\" }");
 			}
+
+			m_stoppingServices.push_back(std::move(*it));;
+			it = m_initializingServices.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }
@@ -547,12 +533,12 @@ void ServiceManager::cleanUpSession_IniList(const std::string& _sessionID) {
 void ServiceManager::cleanUpSession_AliveList(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> serviceLock(m_mutexServices);
 
-	for (auto s : m_services) {
+	for (auto& s : m_sessions) {
 		if (s.first.getId() == _sessionID) {
-			for (auto& service : *s.second) {
+			for (auto& service : s.second) {
 				m_stoppingServices.push_back(std::move(service));
 			}
-			m_services.erase(s.first);
+			m_sessions.erase(s.first);
 			break;
 		}
 	}
@@ -609,8 +595,10 @@ void ServiceManager::workerServiceStarter(void) {
 				
 				// Clean up port numbers
 				m_portManager.freePort(newService.getPort());
-				m_portManager.freePort(newService.getWebsocketPort());
-
+				if (newService.getWebsocketPort() != ot::invalidPortNumber) {
+					m_portManager.freePort(newService.getWebsocketPort());
+				}
+				
 				// Service start failed
 				this->serviceStartFailed(newService.getInfo());
 			}
@@ -736,13 +724,10 @@ void ServiceManager::workerHealthCheck(void) {
 		// Lock mutex for entire health check
 		{
 			std::lock_guard<std::mutex> lock(m_mutexServices);
-			if (!m_services.empty()) {
-				bool erased = false;
+			if (!m_sessions.empty()) {
 				// Itereate through every service in every session
-				for (auto& session : m_services) {
-					std::vector<Service>*  servicesRunningInSession = session.second;
-					for (auto serviceIt = servicesRunningInSession->begin(); serviceIt != servicesRunningInSession->end(); serviceIt++) {
-
+				for (auto& session : m_sessions) {
+					for (auto serviceIt = session.second.begin(); serviceIt != session.second.end(); ) {
 						// Check if service crashed
 						ot::RunResult result = serviceIt->checkAlive();
 						if (!result.isOk()) {
@@ -763,7 +748,9 @@ void ServiceManager::workerHealthCheck(void) {
 
 								// Remove the service from the session list
 								std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
-								m_stoppingServices.push_back(std::move(*servicesRunningInSession->erase(serviceIt)));
+								m_stoppingServices.push_back(std::move(*serviceIt));
+
+								serviceIt = session.second.erase(serviceIt);
 							}
 							else {
 								OT_LOG_E("Service checkAlive failed. Error code: " + std::to_string(result.getErrorCode()) + "\nMessage: " + result.getErrorMessage());
@@ -774,23 +761,20 @@ void ServiceManager::workerHealthCheck(void) {
 								if (serviceIt->getStartCounter() < serviceIt->getStartupData().getMaxCrashRestarts()) {
 									// Attempt to restart service, if successful the list did not change and we can continue the health check.
 									if (this->restartServiceAfterCrash(*serviceIt)) {
+										serviceIt++;
 										continue;
 									}
 								}
 
 								// Either the restart failed or the restart counter reached its max value.
 								// We notify the session service, clean up the lists and cancel the current health check.
-								// Health check will not be terminated just the current loop will be cancelled.
 								this->notifySessionEmergencyShutdown(*serviceIt);
+								serviceIt++;
 							}
-
-							erased = true;
-							break;
 						}
-					}
-					
-					if (erased) {
-						break;
+						else {
+							serviceIt++;
+						}
 					}
 
 				} // for session
@@ -824,7 +808,9 @@ void ServiceManager::workerServiceStopper(void) {
 
 				// Clean up port numbers
 				m_portManager.freePort(service.getPort());
-				m_portManager.freePort(service.getWebsocketPort());
+				if (service.getWebsocketPort() != ot::invalidPortNumber) {
+					m_portManager.freePort(service.getWebsocketPort());
+				}
 			}
 		}
 

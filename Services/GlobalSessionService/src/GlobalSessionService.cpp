@@ -537,7 +537,7 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 
 	OT_LOG_D("Session was closed (ID = \"" + sessionID + "\")");
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string GlobalSessionService::handleForceHealthcheck(ot::JsonDocument& _doc) {

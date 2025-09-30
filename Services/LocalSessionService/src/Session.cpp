@@ -269,10 +269,6 @@ void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID) {
 
 	for (auto it = m_services.begin(); it != m_services.end(); it++) {
 		if (it->getServiceID() == _serviceID) {
-			it->setRequested(false);
-			it->setAlive(false);
-			it->setShuttingDown(false);
-
 			m_services.erase(it);
 			break;
 		}
@@ -346,26 +342,33 @@ void Session::sendRunCommand() {
 
 // Session management
 
-void Session::prepareSessionForShutdown() {
-	m_state.setFlag(Session::ShuttingDown, true);
-
-	this->stopHealthCheck();
-}
-
-void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown) {
+void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	// Remove the service that initiated the shutdown
+	m_state.setFlag(Session::ShuttingDown, true);
+	this->stopHealthCheck();
+
 	for (auto it = m_services.begin(); it != m_services.end(); it++) {
-		if (it->getServiceID() == _senderServiceID) {
-			m_services.erase(it);
-			break;
+		it->setAlive(false);
+		it->setRunning(false);
+		it->setRequested(false);
+		it->setShuttingDown();
+
+		if (it->getServiceID() == _requestingService && !it->getWebsocketUrl().empty()) {
+			// Remove requesting service except when it has a relay service running
+			it = m_services.erase(it);
 		}
 	}
 
+	
+}
+
+void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown, ot::PortManager& _debugPortManager) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	// In case of regular shutdown send pre shutdown command before shutting down the session.
 	if (!_emergencyShutdown) {
-		this->broadcastBasicAction(_senderServiceID, OT_ACTION_CMD_ServicePreShutdown, false);
+		this->broadcastBasicAction(_senderServiceID, OT_ACTION_CMD_ServicePreShutdown, true);
 	}
 
 	// Prepare the shutdown document
@@ -382,13 +385,21 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 	// Broadcast the shutdown document
 	this->broadcast(_senderServiceID, doc.toJson(), false, true);
 
-	// Flag all services as shutting down
-	for (Service& service : m_services) {
-		service.setRequested(false);
-		service.setAlive(false);
-		service.setShuttingDown(true);
-	}
+	// Remove debug services since the shutdown won't be detected by the LDS
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
+		if (it->isDebug()) {
+			// Free used debug ports
+			for (ot::port_t port : it->getPortNumbers()) {
+				_debugPortManager.freePort(port);
+			}
 
+			// Remove service from session
+			it = m_services.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
 }
 
 void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message) {
@@ -503,7 +514,7 @@ void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.getServiceType(), _doc.GetAllocator()), _doc.GetAllocator());
 		}
 		else {
-			OT_LOG_EAS("Failed to find service { \"id\": \"" + std::to_string(_senderService) + "\", \"SessionID\": \"" + m_id + "\" }");
+			// This may happen when the service was deregistered already
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _senderService, _doc.GetAllocator());
 		}
 	}

@@ -30,7 +30,7 @@ class SessionService {
 	OT_DECL_ACTION_HANDLER(SessionService)
 private:
 	SessionService();
-	~SessionService() {};
+	~SessionService();
 public:
 	static SessionService& instance();
 	static int initialize(const std::string& _ownUrl, const std::string& _gssUrl);
@@ -81,9 +81,12 @@ private:
 
 	// Private: Worker
 
-	void workerShutdownSession();
-	void workerRunServices();
-
+	void startWorkerThreads();
+	void stopWorkerThreads();
+	void shutdownWorker();
+	bool checkShuttingDown();
+	bool checkShutdownCompleted();
+	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action handler
@@ -117,6 +120,7 @@ private:
 
 	std::mutex                                        m_mutex;
 	std::atomic_bool                                  m_workerRunning;
+	std::thread*                                      m_shutdownWorkerThread;
 
 	GlobalSessionService                              m_gss;
 	GlobalDirectoryService                            m_gds;
@@ -133,6 +137,9 @@ private:
 
 	std::map<std::string, Session>                    m_sessions;
 	std::map<std::string, std::list<ot::ServiceBase>> m_mandatoryServicesMap; //! @brief Map containing all names of mandatory services for each session type
+
+	std::list<std::string>                            m_shutdownQueue;
+	std::list<std::string>                            m_shutdownCompletedQueue;
 
 	ot::PortManager                                   m_debugPortManager;
 };

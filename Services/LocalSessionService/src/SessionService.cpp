@@ -83,7 +83,7 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 }
 
 SessionService::SessionService() 
-	: m_id(ot::invalidServiceID)
+	: m_id(ot::invalidServiceID), m_workerRunning(false), m_shutdownWorkerThread(nullptr)
 {
 	//
 	// Development services list (this contains all services together (potentially even including experimental ones) for testing purposes)
@@ -165,6 +165,12 @@ SessionService::SessionService()
 	CircuitSimulationSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
 	CircuitSimulationSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_CIRCUITSIMULATION, std::move(CircuitSimulationSessionServices));
+}
+
+SessionService::~SessionService() {
+	m_mutex.lock();
+	this->stopWorkerThreads();
+	m_mutex.unlock();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -277,13 +283,13 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 
 	// Prepare session information
 	session.removeFailedService(_serviceID);
-	session.prepareSessionForShutdown();
+	session.prepareSessionForShutdown(_serviceID);
 	
 	// Notify the GDS about the shutdown
 	m_gds.notifySessionShuttingDown(_sessionID);
 	
 	// Shutdown the session as emergency
-	session.shutdownSession(_serviceID, true);
+	session.shutdownSession(_serviceID, true, m_debugPortManager);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -331,7 +337,7 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 
 	// Register new service
 	Service& newDebugService = _session.addRequestedService(_serviceInfo);
-	newDebugService.setIsDebug(true);
+	newDebugService.setIsDebug();
 	newDebugService.setServiceURL(serviceURL);
 
 	// Create start params
@@ -456,18 +462,98 @@ bool SessionService::hasMandatoryService(const std::string& _serviceName) const 
 
 // Private: Worker
 
-void SessionService::workerShutdownSession() {
-	while (m_workerRunning) {
-		//! @todo Implement shutdown worker
+void SessionService::startWorkerThreads() {
+	if (m_workerRunning) {
+		return;
 	}
+
+	m_workerRunning = true;
+
+	OTAssert(!m_shutdownWorkerThread, "Shutdown worker thread already running");
+	m_shutdownWorkerThread = new std::thread(&SessionService::shutdownWorker, this);
+}
+
+void SessionService::stopWorkerThreads() {
+	if (!m_workerRunning) {
+		return;
+	}
+
+	OTAssertNullptr(m_shutdownWorkerThread);
+
+	m_workerRunning = false;
+	
+	if (m_shutdownWorkerThread->joinable()) {
+		m_shutdownWorkerThread->join();
+	}
+	delete m_shutdownWorkerThread;
+	m_shutdownWorkerThread = nullptr;
+}
+
+void SessionService::shutdownWorker() {
+	while (m_workerRunning) {
+		bool matched = this->checkShuttingDown();
+		matched |= this->checkShutdownCompleted();
+
+		if (!matched) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+	}
+
 	OT_LOG_D("Shutdown session worker finished");
 }
 
-void SessionService::workerRunServices() {
-	while (m_workerRunning) {
-		//! @todo Implement run services worker
+bool SessionService::checkShuttingDown() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_shutdownQueue.empty()) {
+		return false;
 	}
-	OT_LOG_D("Run services worker finished");
+
+	std::string sessionID = std::move(m_shutdownQueue.front());
+	m_shutdownQueue.pop_front();
+
+	auto it = m_sessions.find(sessionID);
+	if (it == m_sessions.end()) {
+		OT_LOG_E("Session not found \"" + sessionID + "\"");
+		return false;
+	}
+
+	// Grab session and remove it from the list
+	Session& session = it->second;
+
+	session.shutdownSession(ot::invalidServiceID, false, m_debugPortManager);
+
+	// If all services are in debug mode we can remove the session immediately
+	if (!session.hasShuttingDownServices()) {
+		m_shutdownCompletedQueue.push_back(sessionID);
+	}
+
+	return true;
+}
+
+bool SessionService::checkShutdownCompleted() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_shutdownCompletedQueue.empty()) {
+		return false;
+	}
+
+	std::string sessionID = std::move(m_shutdownCompletedQueue.front());
+	m_shutdownCompletedQueue.pop_front();
+
+	auto it = m_sessions.find(sessionID);
+	if (it == m_sessions.end()) {
+		OT_LOG_E("Session not found \"" + sessionID + "\"");
+		return false;
+	}
+
+	// Notify the GDS and GSS about the completed shutdown
+	m_gss.notifySessionShutdownCompleted(sessionID);
+
+	// Remove the session
+	m_sessions.erase(it);
+
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -806,9 +892,14 @@ std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	
 	Session& session = this->getSession(sessionID);
-	session.prepareSessionForShutdown();
+	session.prepareSessionForShutdown(serviceID);
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	m_gds.notifySessionShuttingDown(sessionID);
+
+	m_shutdownQueue.push_back(sessionID);
+	this->startWorkerThreads();
+
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
@@ -832,11 +923,9 @@ std::string SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _co
 	Session& theSession = this->getSession(sessionID);
 	theSession.setServiceShutdownCompleted(serviceID);
 
-	if (!theSession.hasAliveServices()) {
-		// All alive service have been removed, close the session
-		m_gss.notifySessionShutdownCompleted(sessionID);
-		m_gds.notifySessionShutdownCompleted(sessionID);
-		m_sessions.erase(sessionID);
+	if (!theSession.hasShuttingDownServices()) {
+		m_shutdownCompletedQueue.push_back(sessionID);
+		this->startWorkerThreads();
 	}
 
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -983,6 +1072,7 @@ std::string SessionService::handleRegisterNewGlobalDirectoryService(ot::JsonDocu
 	std::string serviceURL(ot::json::getString(_commandDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
 
 	if (m_gds.connect(serviceURL, false)) {
+		m_gss.setGDSUrl(serviceURL);
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
 	else {

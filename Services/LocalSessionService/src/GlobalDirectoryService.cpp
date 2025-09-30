@@ -181,24 +181,6 @@ void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessi
 	}
 }
 
-void GlobalDirectoryService::notifySessionShutdownCompleted(const std::string& _sessionID) {
-	ot::JsonDocument requestDoc;
-	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-
-	std::string responseStr;
-	if (!this->ensureConnection()) {
-		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
-	}
-	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr)) {
-		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
-	}
-	else if (responseStr != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Unexpected GDS response: \"" + responseStr + "\"");
-	}
-}
-
 std::string GlobalDirectoryService::getServiceUrl() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_serviceInfo.getServiceURL();

@@ -166,43 +166,39 @@ void LocalDirectoryService::sessionClosing(const std::string& _sessionID) {
 
 void LocalDirectoryService::sessionClosed(const std::string& _sessionID) {
 	bool notified = false;
-	bool erased = true;
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, doc.GetAllocator()), doc.GetAllocator());
 	std::string message = doc.toJson();
 
-	while (erased) {
-		erased = false;
-		auto it = m_services.begin();
-		for (; it != m_services.end(); it++) {
-			if (it->getSessionID() == _sessionID) {
-				// If this is the first match, notify the LDS about the session shutdown
-				if (!notified) {
-					notified = true;
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
+		if (it->getSessionID() == _sessionID) {
+			// If this is the first match, notify the LDS about the session shutdown
+			if (!notified) {
+				notified = true;
 
-					// Send message and check response
-					std::string responseStr;
-					if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, message, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-						OT_LOG_E("Failed to send session closed notification to LDS at \"" + this->getServiceURL() + "\"");
-					}
-
-					ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-
-					if (response != ot::ReturnMessage::Ok) {
-						OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + this->getServiceURL() + "\": " + response.getWhat());
-					}
+				// Send message and check response
+				std::string responseStr;
+				if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, message, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					OT_LOG_E("Failed to send session closed notification to LDS at \"" + this->getServiceURL() + "\"");
 				}
 
-				// Erase entry
-				m_services.erase(it);
-				erased = true;
-				break;
+				ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 
-			} // if (it->first == _session)
-		} // for (; it != m_services.end(); it++)
-	} // while (erased)
+				if (response != ot::ReturnMessage::Ok) {
+					OT_LOG_E("Invalid response when sending session closed notification to LDS at \"" + this->getServiceURL() + "\": " + response.getWhat());
+				}
+			}
+
+			// Erase entry
+			it = m_services.erase(it);
+
+		} // if (it->first == _session)
+		else {
+			it++;
+		}
+	} // for (; it != m_services.end(); it++)
 }
 
 void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID) {

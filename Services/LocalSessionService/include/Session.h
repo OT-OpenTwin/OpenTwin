@@ -127,7 +127,7 @@ public:
 
 	//! @brief Will prepare the session for shutdown.
 	//! The session will be flagged as shutting down and the health check will be stopped.
-	void prepareSessionForShutdown();
+	void prepareSessionForShutdown(ot::serviceID_t _requestingService);
 
 	//! @brief Will shutdown the session.
 	//! On a regular shutdown a pre shutdown broadcast message will be sent.
@@ -137,7 +137,7 @@ public:
 	//! In case of a emergency shutdown the pre shutdown message will not be send and instead of the regular shutdown message a emergency shutdown broadcast message will be sent.
 	//! @param _senderServiceID The ID of the service that initiated the shutdown.
 	//! @param _emergencyShutdown If true, the session will be shutdown in emergency mode, otherwise a regular shutdown will be performed.
-	void shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown);
+	void shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown, ot::PortManager& _debugPortManager);
 
 	//! @brief Will broadcast the provided message to all services in this session.
 	//! @param _sender The sender of this message. The sender will not receive the broadcast message.

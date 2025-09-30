@@ -129,6 +129,11 @@ bool GlobalSessionService::notifySessionShutdownCompleted(const std::string& _se
 	}
 }
 
+void GlobalSessionService::setGDSUrl(const std::string& _gdsUrl) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_registrationResult.setGdsURL(_gdsUrl);
+}
+
 GSSRegistrationInfo GlobalSessionService::getRegistrationResult() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_registrationResult;

@@ -73,10 +73,6 @@ public:
 	
 	void notifySessionShuttingDown(const std::string& _sessionID);
 
-	//! @brief Notifies the GDS that a session was closed.
-	//! @param _sessionID The ID of the session that was closed.
-	void notifySessionShutdownCompleted(const std::string& _sessionID);
-
 	std::string getServiceUrl();
 
 	// ###########################################################################################################################################################################################################################################################################################################################

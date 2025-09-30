@@ -95,7 +95,7 @@ private:
 	void sendInitializeMessage(Service&& _info);
 	void serviceInitializeFailed(Service&& _info);
 
-	std::vector<Service> * sessionServices(const SessionInformation& _sessionInformation);
+	std::list<Service>& sessionServices(const SessionInformation& _sessionInformation);
 
 	bool restartServiceAfterCrash(const Service& _service);
 	void notifyServiceShutdownCompleted(const Service& _service);
@@ -145,7 +145,7 @@ private:
 
 	std::chrono::seconds								 m_serviceCheckAliveFrequency;
 
-	std::map<SessionInformation, std::vector<Service>*>  m_services;
+	std::map<SessionInformation, std::list<Service>>     m_sessions;
 	std::mutex                                           m_mutexServices;
 
 	std::list<RequestedService>                          m_requestedServices;

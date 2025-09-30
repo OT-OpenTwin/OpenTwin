@@ -1236,7 +1236,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		app->initializeDefaultUserSettings();
 
-		OT_LOG_D("Closing project { name = \"" + app->getCurrentProjectName() + "\"; SaveChanges = " + (_saveChanges ? "True" : "False"));
+		OT_LOG_D("Closing project { \"Name\": \"" + app->getCurrentProjectName() + "\", \"SaveChanges\": " + (_saveChanges ? "true" : "false") + " }");
 
 		std::string projectName = app->getCurrentProjectName();
 		if (projectName.length() == 0) {
@@ -1264,16 +1264,14 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), shutdownCommand.GetAllocator());
 		shutdownCommand.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, shutdownCommand.GetAllocator()), shutdownCommand.GetAllocator());
 
-		std::string response;
-		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, response)) {
-			OT_LOG_EA("Failed to send shutdown session request to LSS");
+		std::string responseStr;
+		if (!sendRelayedRequest(EXECUTE, m_sessionServiceURL, shutdownCommand, responseStr)) {
+			OT_LOG_E("Failed to send shutdown session request to LSS");
 		}
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Invalid response: " + response);
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS("Invalid response: " + response);
+
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Failed to close session at LSS: " + response.getWhat());
 		}
 
 		// Stop the session service health check
