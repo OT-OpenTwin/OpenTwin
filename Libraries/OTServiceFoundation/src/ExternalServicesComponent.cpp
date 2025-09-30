@@ -91,10 +91,12 @@ namespace ot {
 
 //! @brief This function ensures that the service will shutdown if no initialization call is received during startup
 void initChecker() {
-	using namespace std::chrono_literals;
-	std::this_thread::sleep_for(30s);
+	const int iniTimeout = (ot::msg::defaultTimeout * 5) / 1000;
+
+	std::this_thread::sleep_for(std::chrono::seconds(iniTimeout));
+
 	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready) {
-		OT_LOG_E("The component was not initialized after 30 seconds. Shutting down service");
+		OT_LOG_E("The component was not initialized after " + std::to_string(iniTimeout) + " seconds. Shutting down service");
 		exit(ot::AppExitCode::InitializationTimeout);
 	}
 }
