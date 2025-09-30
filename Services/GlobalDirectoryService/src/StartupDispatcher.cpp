@@ -97,35 +97,21 @@ void StartupDispatcher::workerFunction(void) {
 	using namespace std::chrono_literals;
 
 	while (!m_isStopping) {
-		// Check if there are any queued requests
-		while (!m_isStopping) {
-			{
-				std::lock_guard<std::mutex> lock(m_mutex);
-
-				if (!m_requestedServices.empty()) {
-					break;
-				}
-			}
-
-			std::this_thread::sleep_for(100ms);
-		}
-
-		// Dispatch queued requests
-		while (!m_isStopping) {
+		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 
-			if (m_requestedServices.empty()) {
-				break;
-			}
-			
-			// Grab first item
-			ot::ServiceInitData info(std::move(m_requestedServices.front()));
-			m_requestedServices.pop_front();
+			while (!m_requestedServices.empty()) {
+				// Grab first item
+				ot::ServiceInitData info(std::move(m_requestedServices.front()));
+				m_requestedServices.pop_front();
 
-			if (!Application::instance().requestToRunService(info)) {
-				this->serviceStartRequestFailed(info);
+				if (!Application::instance().requestToRunService(info)) {
+					this->serviceStartRequestFailed(info);
+				}
 			}
 		}
+
+		std::this_thread::sleep_for(10ms);
 	}
 }
 
@@ -140,15 +126,12 @@ void StartupDispatcher::serviceStartRequestFailed(const ot::ServiceInitData& _se
 	);
 
 	// Clean up other requests for the same session
-	bool erased = false;
-	while (erased) {
-		erased = false;
-		for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); it++) {
-			if (it->getSessionID() == _serviceInfo.getSessionID() && it->getServiceID() == _serviceInfo.getServiceID()) {
-				m_requestedServices.erase(it);
-				erased = true;
-				break;
-			}
+	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); ) {
+		if (it->getSessionID() == _serviceInfo.getSessionID()) {
+			it = m_requestedServices.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 

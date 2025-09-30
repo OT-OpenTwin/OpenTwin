@@ -377,6 +377,7 @@ std::string Application::handleGetDebugInformation(ot::JsonDocument& _doc) {
 
 LocalDirectoryService* Application::leastLoadedDirectoryService(const ot::ServiceInitData& _info) {
 	if (m_localDirectoryServices.empty()) {
+		OT_LOG_E("Failed to determine least loaded directory service: No LDS connected");
 		return nullptr;
 	}
 

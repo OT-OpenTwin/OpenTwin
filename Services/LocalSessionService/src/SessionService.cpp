@@ -961,6 +961,12 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 
 	ot::JsonDocument doc;
 
+	// Service information
+	doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString(m_siteID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, doc.GetAllocator());
+
+	// Global services information
 	ot::JsonObject gssObj;
 	m_gss.addToJsonObject(gssObj, doc.GetAllocator());
 	doc.AddMember("GSS", gssObj, doc.GetAllocator());
@@ -969,17 +975,10 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 	m_gds.addToJsonObject(gdsObj, doc.GetAllocator());
 	doc.AddMember("GDS", gdsObj, doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_PARAM_SITE_ID, ot::JsonString(m_siteID, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("AuthUrl", ot::JsonString(m_authUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("DatabaseUrl", ot::JsonString(m_dataBaseUrl, doc.GetAllocator()), doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, doc.GetAllocator());
-
-	ot::JsonArray dbgArr;
-	for (const std::string& dbg : m_debugServices) {
-		dbgArr.PushBack(ot::JsonString(dbg, doc.GetAllocator()), doc.GetAllocator());
-	}
-	doc.AddMember("DebugServices", dbgArr, doc.GetAllocator());
-
+	// Config information
 	ot::JsonArray mandatoryArr;
 	for (const auto& mandatory : m_mandatoryServicesMap) {
 		ot::JsonObject mandatoryObj;
@@ -997,6 +996,7 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 	}
 	doc.AddMember("MandatoryServices", mandatoryArr, doc.GetAllocator());
 
+	// Sessions information
 	ot::JsonArray sessionArr;
 	for (auto& session : m_sessions) {
 		ot::JsonObject sessionObj;
@@ -1004,6 +1004,28 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 		sessionArr.PushBack(sessionObj, doc.GetAllocator());
 	}
 	doc.AddMember("Sessions", sessionArr, doc.GetAllocator());
+
+	doc.AddMember("ShutdownQueue", ot::JsonArray(m_shutdownQueue, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("ShutdownCompletedQueue", ot::JsonArray(m_shutdownCompletedQueue, doc.GetAllocator()), doc.GetAllocator());
+
+	// Debug information
+	ot::JsonArray dbgArr;
+	for (const std::string& dbg : m_debugServices) {
+		dbgArr.PushBack(ot::JsonString(dbg, doc.GetAllocator()), doc.GetAllocator());
+	}
+	doc.AddMember("DebugServices", dbgArr, doc.GetAllocator());
+
+	ot::JsonObject portManagerObj;
+	ot::JsonArray portRangesArr;
+	for (const auto& range : m_debugPortManager.getPortRanges()) {
+		ot::JsonObject rangeObj;
+		rangeObj.AddMember("Min", range.first, doc.GetAllocator());
+		rangeObj.AddMember("Max", range.second, doc.GetAllocator());
+		portRangesArr.PushBack(rangeObj, doc.GetAllocator());
+	}
+	portManagerObj.AddMember("PortRanges", portRangesArr, doc.GetAllocator());
+	portManagerObj.AddMember("BlockedPorts", ot::JsonArray(m_debugPortManager.getBlockedPorts(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("DebugPortManager", portManagerObj, doc.GetAllocator());
 
 	return doc.toJson();
 }

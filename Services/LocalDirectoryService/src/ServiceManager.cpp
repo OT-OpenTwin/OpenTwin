@@ -40,6 +40,18 @@ void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	_object.AddMember("Initializer.ThreadRunning", (m_threadServiceInitializer != nullptr), _allocator);
 	_object.AddMember("HealthCheck.ThreadRunning", (m_threadHealthCheck != nullptr), _allocator);
 	
+	ot::JsonObject portManagerObj;
+	ot::JsonArray portRangesArr;
+	for (const auto& range : m_portManager.getPortRanges()) {
+		ot::JsonObject rangeObj;
+		rangeObj.AddMember("Min", range.first, _allocator);
+		rangeObj.AddMember("Max", range.second, _allocator);
+		portRangesArr.PushBack(rangeObj, _allocator);
+	}
+	portManagerObj.AddMember("PortRanges", portRangesArr, _allocator);
+	portManagerObj.AddMember("BlockedPorts", ot::JsonArray(m_portManager.getBlockedPorts(), _allocator), _allocator);
+	_object.AddMember("DebugPortManager", portManagerObj, _allocator);
+
 	// Stopping Services
 	m_mutexStoppingServices.lock();
 	ot::JsonArray stoppingArray;
@@ -591,7 +603,12 @@ void ServiceManager::workerServiceStarter(void) {
 			ot::RunResult result = newService.run(m_servicesIpAddress, m_portManager.determineAndBlockAvailablePort());
 			
 			if (!result.isOk()) {
-				OT_LOG_E("Service start failed with error code: " + std::to_string(result.getErrorCode()) + " and error message: " + result.getErrorMessage());
+				OT_LOG_E("Service start failed { \"ErrorCode\": " + std::to_string(result.getErrorCode()) + ", \"ErrorMessage\": \"" + result.getErrorMessage() + "\", "
+					"\"ServiceID\": " + std::to_string(newService.getInfo().getServiceID()) + ", "
+					"\"ServiceName\": \"" + newService.getInfo().getServiceName() + "\", "
+					"\"ServiceType\": \"" + newService.getInfo().getServiceType() + "\", "
+					"\"SessionID\": \"" + newService.getInfo().getSessionID() + "\" }"
+				);
 				
 				// Clean up port numbers
 				m_portManager.freePort(newService.getPort());

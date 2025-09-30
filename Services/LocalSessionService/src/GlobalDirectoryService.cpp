@@ -93,11 +93,6 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _s
 }
 
 bool GlobalDirectoryService::requestToStartServices(const ot::ServiceInitData& _generalData, const std::list<ot::ServiceBase>& _serviceInformation) {
-	if (!this->isConnected()) {
-		OT_LOG_E("Failed to start services in session \"" + _generalData.getSessionID() + "\". Reason: Not connected to GDS");
-		return false;
-	}
-
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewServices, requestDoc.GetAllocator()), requestDoc.GetAllocator());
