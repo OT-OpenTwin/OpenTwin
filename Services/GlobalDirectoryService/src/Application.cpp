@@ -254,6 +254,8 @@ std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	m_startupDispatcher.sessionClosing(sessionID);
+
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		lds.sessionClosing(sessionID);
 	}
@@ -265,6 +267,8 @@ std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_startupDispatcher.sessionClosing(sessionID);
 
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		lds.sessionClosed(sessionID);

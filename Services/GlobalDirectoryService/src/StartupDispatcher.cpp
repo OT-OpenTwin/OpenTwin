@@ -44,6 +44,11 @@ void StartupDispatcher::addRequest(std::list<ot::ServiceInitData>&& _info) {
 	this->run();
 }
 
+void StartupDispatcher::sessionClosing(const std::string& _sessionID) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	this->removeRequestedServices(_sessionID);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Serialization
@@ -94,8 +99,6 @@ void StartupDispatcher::stop(void) {
 }
 
 void StartupDispatcher::workerFunction(void) {
-	using namespace std::chrono_literals;
-
 	while (!m_isStopping) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -111,7 +114,18 @@ void StartupDispatcher::workerFunction(void) {
 			}
 		}
 
-		std::this_thread::sleep_for(10ms);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
+
+void StartupDispatcher::removeRequestedServices(const std::string& _sessionID) {
+	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); ) {
+		if (it->getSessionID() == _sessionID) {
+			it = m_requestedServices.erase(it);
+		}
+		else {
+			it++;
+		}
 	}
 }
 
@@ -126,14 +140,7 @@ void StartupDispatcher::serviceStartRequestFailed(const ot::ServiceInitData& _se
 	);
 
 	// Clean up other requests for the same session
-	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); ) {
-		if (it->getSessionID() == _serviceInfo.getSessionID()) {
-			it = m_requestedServices.erase(it);
-		}
-		else {
-			it++;
-		}
-	}
+	this->removeRequestedServices(_serviceInfo.getSessionID());
 
 	// Notify session service about the failed startup
 	ot::JsonDocument doc;
@@ -141,6 +148,7 @@ void StartupDispatcher::serviceStartRequestFailed(const ot::ServiceInitData& _se
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _serviceInfo.getServiceID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.getSessionID(), doc.GetAllocator()), doc.GetAllocator());
 	
-	// Send message asynchronously
-	ot::msg::sendAsync(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+	// Send message
+	std::string response;
+	ot::msg::send(Application::instance().getServiceURL(), _serviceInfo.getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
 }

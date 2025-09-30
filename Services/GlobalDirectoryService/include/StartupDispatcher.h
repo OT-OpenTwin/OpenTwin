@@ -39,6 +39,9 @@ public:
 	//! @param _info List of service information objects to start.
 	void addRequest(std::list<ot::ServiceInitData>&& _info);
 
+	//! @brief Remove requests associated with a specific session ID.
+	void sessionClosing(const std::string& _sessionID);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
@@ -58,6 +61,9 @@ private:
 
 	//! @brief The worker function that processes service start requests.
 	void workerFunction(void);
+
+	//! @brief Remove all service start requests associated with the given session ID.
+	void removeRequestedServices(const std::string& _sessionID);
 
 	//! @brief Will notify the session service about a failed service start request.
 	//! @warning It is assumed that the mutex is locked when calling this method.
