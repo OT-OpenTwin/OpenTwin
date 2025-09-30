@@ -50,3 +50,7 @@ ot::port_t ot::PortManager::determineAndBlockAvailablePort(void) {
 	OTAssert(0, "No available port found in the defined port ranges.");
 	return invalidPortNumber;
 }
+
+std::list<ot::port_t> ot::PortManager::getBlockedPorts() const {
+	return std::list<port_t>(m_portsInUse.begin(), m_portsInUse.end());
+}

@@ -21,6 +21,8 @@ namespace ot {
 	//! @brief The PortManager is used to store and check blocked ports.
 	class OT_SYS_API_EXPORT PortManager {
 	public:
+		typedef std::pair<ot::port_t, ot::port_t> PortRange;
+
 		PortManager() {};
 		PortManager(ot::port_t _startingPort, ot::port_t _maxPort = static_cast<ot::port_t>(ot::maxPortNumber));
 		PortManager(const PortManager&) = default;
@@ -47,9 +49,11 @@ namespace ot {
 
 		bool hasPortRanges() const { return !m_ranges.empty(); };
 
-	private:
-		using PortRange = std::pair<ot::port_t, ot::port_t>;
+		std::list<port_t> getBlockedPorts() const;
 
+		const std::list<PortRange>& getPortRanges() const { return m_ranges; };
+
+	private:
 		std::list<PortRange>           m_ranges;     //! @brief Available ranges.
 		std::unordered_set<ot::port_t> m_portsInUse; //! @brief Blocked ports.
 	};
