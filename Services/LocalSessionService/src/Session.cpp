@@ -558,7 +558,7 @@ void Session::healthCheckWorker() {
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			// Perform health check
-			for (auto it = m_services.begin(); it != m_services.end(); it++) {
+			for (auto it = m_services.begin(); it != m_services.end() && m_healthCheckRunning; it++) {
 				if (it->isAlive() && !it->isShuttingDown()) {
 					std::string response;
 					if (!ot::msg::send(lssUrl, it->getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -575,7 +575,7 @@ void Session::healthCheckWorker() {
 			}
 		} // lock guard scope
 
-		if (failureDetected) {
+		if (failureDetected && m_healthCheckRunning) {
 			std::thread notificationThread(&Session::healthCheckFailedNotifier, m_id, failedServiceID);
 			notificationThread.detach();
 		}

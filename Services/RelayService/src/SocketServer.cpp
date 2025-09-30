@@ -130,13 +130,16 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
 		}
 		else if (action == OT_ACTION_CMD_Ping) {
-			std::string response;
+			return OT_ACTION_CMD_Ping;
+			/*
+				std::string response;
 			if (this->sendProcessWSMessage(_senderIP, _json, response)) {
 				return QString::fromStdString(response);
 			}
 			else {
 				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send ping action document trough websocket"));
 			}
+			*/
 		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
