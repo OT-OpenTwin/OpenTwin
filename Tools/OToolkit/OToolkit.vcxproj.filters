@@ -243,6 +243,9 @@
     <ClCompile Include="src\LogServiceDebugInfoDialog.cpp">
       <Filter>Source Files\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\LogVisualizerColumnWidthSaveDialog.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -413,6 +416,9 @@
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
     <QtMoc Include="include\LogServiceDebugInfo.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h">
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
   </ItemGroup>

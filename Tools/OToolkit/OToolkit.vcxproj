@@ -51,6 +51,7 @@
     <ClCompile Include="src\LogServiceDebugInfo.cpp" />
     <ClCompile Include="src\LogServiceDebugInfoDialog.cpp" />
     <ClCompile Include="src\LogVisualizationItemViewDialog.cpp" />
+    <ClCompile Include="src\LogVisualizerColumnWidthSaveDialog.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
     <ClCompile Include="src\PortBlockerServer.cpp" />
@@ -102,6 +103,7 @@
     <QtMoc Include="include\SVGBrowser.h" />
     <QtMoc Include="include\LogServiceDebugInfo.h" />
     <ClInclude Include="include\LogServiceDebugInfoDialog.h" />
+    <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

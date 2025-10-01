@@ -13,13 +13,16 @@
 #include "FileLogImporterDialog.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
+#include "LogVisualizerColumnWidthSaveDialog.h"
 
 // OT header
 #include "OTSystem/DateTime.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTWidgets/Label.h"
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/ComboBox.h"
 #include "OTWidgets/Positioning.h"
 
 // Qt header
@@ -76,7 +79,7 @@ Logging::Logging()
 	: m_warningCount(0), m_errorCount(0), m_filterView(nullptr), m_columnWidthTimer(nullptr), m_autoConnect(nullptr),
 	m_autoScrollToBottom(nullptr), m_connectButton(nullptr), m_errorCountLabel(nullptr), m_exportButton(nullptr),
 	m_ignoreNewMessages(nullptr), m_convertToLocalTime(nullptr), m_importButton(nullptr), m_messageCountLabel(nullptr), m_table(nullptr),
-	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr), m_serviceDebugInfo(nullptr)
+	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr), m_serviceDebugInfo(nullptr), m_cellWidthMode(nullptr)
 {
 	m_columnWidthTimer = new QTimer(this);
 	m_columnWidthTimer->setInterval(0);
@@ -117,6 +120,10 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
+	m_cellWidthMode = new ot::ComboBox;
+	m_cellWidthMode->setEditable(false);
+	m_cellWidthMode->setPlaceholderText("Restore Columns");
+
 	m_convertToLocalTime = new QCheckBox("Convert to Local Time");
 	m_ignoreNewMessages = new QCheckBox("Ignore new messages");
 	m_autoScrollToBottom = new QCheckBox("Auto scroll to bottom");
@@ -143,6 +150,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	centralLayout->addLayout(buttonLayout);
 
 	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(m_cellWidthMode, 0);
 	buttonLayout->addWidget(m_convertToLocalTime, 0);
 	buttonLayout->addWidget(m_ignoreNewMessages, 0);
 	buttonLayout->addWidget(m_autoScrollToBottom, 0);
@@ -185,7 +193,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	// Connect signals
 	connect(m_autoScrollToBottom, &QCheckBox::stateChanged, this, &Logging::slotAutoScrollToBottomChanged);
-
+	connect(m_cellWidthMode, &QComboBox::currentTextChanged, this, &Logging::slotColumnWidthModeChanged);
 	connect(m_table, &QTableWidget::itemDoubleClicked, this, &Logging::slotViewCellContent);
 
 	// Create menu bar
@@ -213,6 +221,37 @@ void Logging::restoreToolSettings(QSettings& _settings) {
 	m_autoScrollToBottom->setChecked(_settings.value("Logging.AutoScrollToBottom", true).toBool());
 	m_columnWidthTmp = _settings.value("Logging.Table.ColumnWidth", "").toString();
 	
+	m_columnWidthData.clear();
+	QByteArray columnWidthData = _settings.value("Logging.Table.ColumnWidthData", "").toByteArray();
+	if (!columnWidthData.isEmpty()) {
+		QJsonDocument doc = QJsonDocument::fromJson(columnWidthData);
+		if (doc.isArray()) {
+			QJsonArray arr = doc.array();
+			for (int i = 0; i < arr.count(); i++) {
+				if (arr.at(i).isObject()) {
+					QJsonObject it = arr.at(i).toObject();
+					if (it.isEmpty() || !it.contains("Name") || !it.value("Name").isString() || !it.contains("Widths") || !it.value("Widths").isArray()) {
+						continue;
+					}
+					QJsonArray wArr = it.value("Widths").toArray();
+					std::list<int> lst;
+					for (int j = 0; j < wArr.count(); j++) {
+						if (wArr.at(j).isDouble()) {
+							lst.push_back(wArr.at(j).toInt());
+						}
+					}
+					if (lst.empty()) {
+						continue;
+					}
+
+					m_columnWidthData.insert_or_assign(it.value("Name").toString(), std::move(lst));
+				}
+			}
+		}
+	}
+
+	this->rebuildColumnWidthData();
+
 	m_logModeSetter->restoreSettings(_settings);
 	m_filterView->restoreSettings(_settings);
 
@@ -237,6 +276,19 @@ bool Logging::prepareToolShutdown(QSettings& _settings) {
 
 	m_logModeSetter->saveSettings(_settings);
 	m_filterView->saveSettings(_settings);
+
+	QJsonArray arr;
+	for (const auto& it : m_columnWidthData) {
+		QJsonObject obj;
+		obj.insert("Name", it.first);
+		QJsonArray wArr;
+		for (int w : it.second) {
+			wArr.append(w);
+		}
+		obj.insert("Widths", wArr);
+		arr.append(obj);
+	}
+	_settings.setValue("Logging.Table.ColumnWidthData", QJsonDocument(arr).toJson(QJsonDocument::Compact));
 
 	if (this->disconnectFromLogger()) {
 		return true;
@@ -431,6 +483,83 @@ void Logging::slotScrollToItem(int _row) {
 		}
 	}
 	
+}
+
+void Logging::slotColumnWidthModeChanged(const QString& _text) {
+	if (_text.isEmpty() || _text == "> Restore Columns <") {
+		return;
+	}
+
+	if (_text == "< Save >") {
+		QStringList existingNames;
+		for (const auto& it : m_columnWidthData) {
+			existingNames.push_back(it.first);
+		}
+		LogVisualizerColumnWidthSaveDialog dia(existingNames);
+		ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), static_cast<QWidget*>(&dia));
+		if (dia.showDialog() != ot::Dialog::Ok) {
+			m_cellWidthMode->setCurrentIndex(0);
+			return;
+		}
+
+		existingNames = dia.getExistingNames();
+
+		for (auto it = m_columnWidthData.begin(); it != m_columnWidthData.end(); ) {
+			bool exists = false;
+			for (const QString& n : existingNames) {
+				if (n == it->first) {
+					exists = true;
+					break;
+				}
+			}
+			if (!exists) {
+				it = m_columnWidthData.erase(it);
+			}
+			else {
+				it++;
+			}
+		}
+
+		std::list<int> widths;
+		for (int i = 0; i < m_table->columnCount(); i++) {
+			widths.push_back(m_table->columnWidth(i));
+		}
+		m_columnWidthData.insert_or_assign(dia.getNewName(), std::move(widths));
+	}
+	else if (_text == "< Default >") {
+		std::list<int> widths;
+		for (int i = 0; i < m_table->columnCount(); i++) {
+			switch (i) {
+			case tIcon: widths.push_back(30); break;
+			case tTimeGlobal: widths.push_back(140); break;
+			case tTimeLocal: widths.push_back(140); break;
+			case tUser: widths.push_back(100); break;
+			case tProject: widths.push_back(100); break;
+			case tService: widths.push_back(150); break;
+			case tType: widths.push_back(80); break;
+			case tFunction: widths.push_back(150); break;
+			case tMessage: widths.push_back(600); break;
+			default:
+				widths.push_back(50);
+				break;
+			}
+		}
+		this->applyColumnWidthData(widths);
+	}
+	else {
+		auto it = m_columnWidthData.find(_text);
+		if (it == m_columnWidthData.end()) {
+			LOGVIS_LOGE("Failed to find column width data for name \"" + _text + "\"");
+			return;
+		}
+		else {
+			if (!this->applyColumnWidthData(it->second)) {
+				m_columnWidthData.erase(it);
+			}
+		}
+	}
+
+	this->rebuildColumnWidthData();
 }
 
 void Logging::appendLogMessage(const ot::LogMessage& _msg) {
@@ -694,4 +823,38 @@ bool Logging::disconnectFromLogger() {
 	m_connectButton->setIcon(QIcon(":/images/Disconnected.png"));
 
 	return true;
+}
+
+void Logging::rebuildColumnWidthData() {
+	m_cellWidthMode->clear();
+	m_cellWidthMode->addItem("> Restore Columns <");
+	m_cellWidthMode->addItem("< Default >");
+	for (const auto& it : m_columnWidthData) {
+		m_cellWidthMode->addItem(it.first);
+	}
+	m_cellWidthMode->addItem("< Save >");
+	m_cellWidthMode->setCurrentIndex(0);
+}
+
+bool Logging::applyColumnWidthData(const std::list<int>& _widths) {
+	int ix = 0;
+	if (_widths.empty()) {
+		LOGVIS_LOGE("No column width data");
+		return false;
+	}
+
+	for (int w : _widths) {
+		if (w <= 0) {
+			LOGVIS_LOGE("Invalid column width data");
+			return false;
+		}
+		if (ix < m_table->columnCount()) {
+			m_table->setColumnWidth(ix++, w);
+		}
+		else {
+			return false;
+		}
+	}
+
+	return ix == m_table->columnCount();
 }

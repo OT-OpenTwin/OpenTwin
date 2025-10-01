@@ -38,6 +38,7 @@ class QTableWidget;
 class QPlainTextEdit;
 class QTableWidgetItem;
 
+namespace ot { class ComboBox; }
 
 class Logging : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -95,12 +96,15 @@ public Q_SLOTS:
 	void slotToggleAutoConnect();
 	void slotViewCellContent(QTableWidgetItem* _itm);
 	void slotScrollToItem(int _row);
+	void slotColumnWidthModeChanged(const QString& _text);
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem* _itm);
 	void updateCountLabels();
 	void connectToLogger(bool _isAutoConnect);
 	bool disconnectFromLogger();
+	void rebuildColumnWidthData();
+	bool applyColumnWidthData(const std::list<int>& _widths);
 
 	// Data
 
@@ -119,6 +123,9 @@ private:
 
 	ot::WidgetView* m_root;
 
+	std::map<QString, std::list<int>> m_columnWidthData;
+
+	ot::ComboBox* m_cellWidthMode;
 	QCheckBox* m_convertToLocalTime;
 	QCheckBox* m_ignoreNewMessages;
 	QCheckBox* m_autoScrollToBottom;
