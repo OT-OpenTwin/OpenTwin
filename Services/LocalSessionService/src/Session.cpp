@@ -21,7 +21,7 @@ Session::Session(const std::string& _id, const std::string& _userName, const std
 {
 	OTAssert(!_id.empty(), "Session ID must not be empty");
 
-	OT_LOG_D("New session created { \"ID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" + 
+	OT_LOG_D("New session created { \"SessionID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" + 
 		m_projectName + "\", \"CollectionName\": \"" + m_collectionName + "\", \"SessionType\": \"" + m_type + "\" }");
 }
 
@@ -35,7 +35,7 @@ Session::~Session() {
 	this->stopHealthCheck();
 	
 	if (!m_id.empty()) {
-		OT_LOG_D("Session destroyed { \"ID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" +
+		OT_LOG_D("Session destroyed { \"SessionID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" +
 			m_projectName + "\", \"CollectionName\": \"" + m_collectionName + "\", \"SessionType\": \"" + m_type + "\" }");
 	}
 }
@@ -268,10 +268,12 @@ ot::ServiceBase Session::getServiceInfo(ot::serviceID_t _serviceID) {
 void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (auto it = m_services.begin(); it != m_services.end(); it++) {
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		if (it->getServiceID() == _serviceID) {
-			m_services.erase(it);
-			break;
+			it = m_services.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }
@@ -279,8 +281,10 @@ void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID) {
 void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (auto it = m_services.begin(); it != m_services.end(); ++it) {
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		if (it->getServiceID() == _serviceID) {
+			OT_LOG_D("Removing service from session { " + it->debugLogString(m_id) + " }");
+
 			// Update state
 			it->setAlive(false);
 			it->setShuttingDown(false);
@@ -289,11 +293,10 @@ void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers
 				this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceDisconnected, false);
 			}
 
-			m_services.erase(it);
-
-			OT_LOG_D("Service was removed from session { \"ServiceID\": " + std::to_string(_serviceID) + ", \"SessionID\": \"" + m_id + "\" }");
-
-			return;
+			it = m_services.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }
@@ -344,12 +347,20 @@ void Session::sendRunCommand() {
 // Session management
 
 void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
+	OT_LOG_D("Preparing session for shutdown { \"SessionID\": \"" + m_id + "\", \"RequestingServiceID\": " + std::to_string(_requestingService) + " }");
+
 	this->stopHealthCheck();
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_state.setFlag(Session::ShuttingDown, true);
 
-	for (auto it = m_services.begin(); it != m_services.end(); it++) {
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
+		// Remove requested services
+		if (it->isRequested()) {
+			it = m_services.erase(it);
+			continue;
+		}
+
 		it->setAlive(false);
 		it->setRunning(false);
 		it->setRequested(false);
@@ -358,6 +369,9 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
 		if (it->getServiceID() == _requestingService && !it->getWebsocketUrl().empty()) {
 			// Remove requesting service except when it has a relay service running
 			it = m_services.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -412,14 +426,13 @@ void Session::removeFailedService(ot::serviceID_t _failedServiceID) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Perform health check
-	for (auto it = m_services.begin(); it != m_services.end(); it++) {
+	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		if (it->getServiceID() == _failedServiceID) {
-			it->setAlive(false);
-			it->setShuttingDown(false);
-			it->setRequested(false);
-			m_services.erase(it);
-
-			break;
+			OT_LOG_D("Removing failed service from session { " + it->debugLogString(m_id) + " }");
+			it = m_services.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }
@@ -450,8 +463,9 @@ void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _me
 
 Service& Session::addService(Service&& _service) {
 	if (this->hasService(_service.getServiceID())) {
-		OT_LOG_E("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
-		throw ot::Exception::ObjectAlreadyExists("Service already registered { \"ServiceID\": " + std::to_string(_service.getServiceID()) + ", \"SessionID\": \"" + m_id + "\" }");
+		std::string msg = "Service already registered { " + _service.debugLogString(m_id) + " }";
+		OT_LOG_E(msg);
+		throw ot::Exception::ObjectAlreadyExists(msg);
 	}
 
 	m_services.push_back(std::move(_service));
@@ -475,7 +489,7 @@ Service& Session::getServiceFromID(ot::serviceID_t _serviceID) {
 		}
 	}
 
-	OT_LOG_D("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
+	OT_LOG_E("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + ", \"SessionID\": \"" + m_id + "\" }");
 	throw ot::Exception::ObjectNotFound("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
 }
 
@@ -486,7 +500,7 @@ const Service& Session::getServiceFromID(ot::serviceID_t _serviceID) const {
 		}
 	}
 
-	OT_LOG_D("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
+	OT_LOG_E("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + ", \"SessionID\": \"" + m_id + "\" }");
 	throw ot::Exception::ObjectNotFound("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
 }
 
@@ -497,7 +511,7 @@ void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string&
 		if (!service.getServiceURL().empty() && (_forceSend || (service.isRunning() && !service.isShuttingDown())) && service.getServiceID() != _senderServiceID) {
 			std::string response;
 			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send broadcast message to service { \"ID\": \"" + std::to_string(service.getServiceID()) + "\", \"Url\": \"" + service.getServiceURL() + "\" }");
+				OT_LOG_E("Failed to send broadcast message to service { " + service.debugLogString(m_id) + " }");
 			}
 		}
 	}
@@ -565,11 +579,13 @@ void Session::healthCheckWorker() {
 					if (!ot::msg::send(lssUrl, it->getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 						failureDetected = true;
 						failedServiceID = it->getServiceID();
+						OT_LOG_E("Service health check failed { " + it->debugLogString(m_id) + ", \"Reason\": \"Ping message could not be delivered\" }");
 						break;
 					}
 					else if (response != OT_ACTION_CMD_Ping) {
 						failureDetected = true;
 						failedServiceID = it->getServiceID();
+						OT_LOG_E("Service health check failed { " + it->debugLogString(m_id) + ", \"Reason\": \"Invalid ping response\", \"PingResponse\": \"" + response + "\" }");
 						break;
 					}
 				}
@@ -608,7 +624,7 @@ void Session::runWorker() {
 
 			std::string response;
 			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, runDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send run command to service { \"id\": \"" + std::to_string(service.getServiceID()) + "\", \"url\": \"" + service.getServiceURL() + "\" }");
+				OT_LOG_E("Failed to send run command to service { " + service.debugLogString(m_id) + " }");
 			}
 			else {
 				service.setRunning();
@@ -627,7 +643,7 @@ void Session::showWorker(ot::serviceID_t _visibleService) {
 
 		Service& service = this->getServiceFromID(_visibleService);
 		if (!service.isHidden()) {
-			OT_LOG_W("Service is not hidden { \"ServiceID\": " + std::to_string(service.getServiceID()) + ", \"ServiceName\": \"" + service.getServiceName() + "\", \"SessionID\": \"" + m_id + "\"");
+			OT_LOG_W("Service is not hidden { " + service.debugLogString(m_id) + " }");
 			return;
 		}
 
@@ -636,7 +652,9 @@ void Session::showWorker(ot::serviceID_t _visibleService) {
 		this->broadcastBasicAction(_visibleService, OT_ACTION_CMD_ServiceConnected, false);
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
+		OT_LOG_E("Show worker failed with exception { \"ServiceID\": " + std::to_string(_visibleService) + 
+			", \"SessionID\": \"" + m_id + "\", \"Exception\": \"" + _e.what() + "\" }");
+
 		this->healthCheckFailedNotifier(m_id, _visibleService);
 	}
 }

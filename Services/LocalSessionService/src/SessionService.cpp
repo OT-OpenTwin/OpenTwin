@@ -217,7 +217,7 @@ Session& SessionService::getSession(const std::string& _sessionID) {
 bool SessionService::runMandatoryServices(Session& _session) {
 	auto it = m_mandatoryServicesMap.find(_session.getType());
 	if (it == m_mandatoryServicesMap.end()) {
-		OT_LOG_E("No mandatory services registered for the session { \"Type\": \"" + _session.getType() + "\" }");
+		OT_LOG_E("No mandatory services registered for the session { \"SessionType\": \"" + _session.getType() + "\" }");
 		throw ot::Exception::ObjectNotFound("No mandatory services registered for the session { \"Type\": \"" + _session.getType() + "\" }");
 	}
 
@@ -248,7 +248,7 @@ bool SessionService::runMandatoryServices(Session& _session) {
 			serviceInfo.setServiceID(newService.getServiceID());
 		}
 
-		OT_LOG_D("Starting services via DirectoryService (Service.Count = \"" + std::to_string(releaseServices.size()) + "\")");
+		OT_LOG_D("Starting services via DirectoryService { \"ServiceCount\": " + std::to_string(releaseServices.size()) + " }");
 
 		ot::ServiceInitData generalData = _session.createServiceInitData(1);
 
@@ -280,6 +280,8 @@ void SessionService::updateLogMode(const ot::LogFlags& _newData) {
 void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	OT_LOG_W("Handling service failure { \"ServiceID\"" + std::to_string(_serviceID) + ", \"SessionID\": \"" + _sessionID + "\" }");
+
 	Session& session = this->getSession(_sessionID);
 
 	// Prepare session information
@@ -291,6 +293,9 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 	
 	// Shutdown the session as emergency
 	session.shutdownSession(_serviceID, true, m_debugPortManager);
+
+	m_shutdownQueue.push_back(_sessionID);
+	this->startWorkerThreads();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -304,7 +309,7 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 // Private: Helper
 
 Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session) {
-	OT_LOG_D("Starting service in debug mode { \"Name\": \"" + _serviceInfo.getServiceName() + "\", \"Type\": \"" + _serviceInfo.getServiceType() + "\" }");
+	OT_LOG_D("Starting service in debug mode { " + Service::debugLogString(_serviceInfo, _session.getID()) + "}");
 
 	// Get dev root path
 	char* buffer = nullptr;
@@ -325,8 +330,9 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	// Create new service url
 	size_t colonIndex = m_url.rfind(':');
 	if (colonIndex == std::string::npos) {
-		OT_LOG_EA("Unable to determine own port");
-		throw ot::Exception::InvalidArgument("Unable to determine own port");
+		std::string msg = "Unable to determine own port { \"Url\": \"" + m_url + "\" }";
+		OT_LOG_EAS(msg);
+		throw ot::Exception::InvalidArgument(msg);
 	}
 	std::string serviceURL = m_url.substr(0, colonIndex);
 	std::string websocketURL = serviceURL;
@@ -377,7 +383,7 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	stream << statupParams.toJson();
 	stream.close();
 
-	OT_LOG_D("Debug service params written to file { \"Service\": \"" + newDebugService.getServiceName() + "\", \"File\": \"" + path + "\" }");
+	OT_LOG_D("Debug service params written to file { " + newDebugService.debugLogString(_session.getID()) + ", \"File\": \"" + path + "\" }");
 
 	return newDebugService;
 }
@@ -737,7 +743,7 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 		creatingServiceID = relayService.getServiceID();
 
-		OT_LOG_D("Relay service started { \"Service.URL\": \"" + relayService.getServiceURL() + "\", \"Websocket.URL\": \"" + relayService.getWebsocketUrl() + "\" }");
+		OT_LOG_D("Relay service started { " + relayService.debugLogString(sessionID) + " }");
 
 		responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(relayService.getWebsocketUrl(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
@@ -904,11 +910,11 @@ std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 }
 
 std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
-	OT_LOG_D("Service failure: Received.. Locking service...");
-
 	// Get information of the service that failed
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
+
+	OT_LOG_E("Service failure reported { \"ServiceID\": " + std::to_string(serviceID) + ", \"SessionID\": \"" + sessionID + "\" }");
 
 	this->serviceFailure(sessionID, serviceID);
 
@@ -1082,7 +1088,7 @@ std::string SessionService::handleAddMandatoryService(ot::JsonDocument& _command
 		ot::ServiceBase info(serviceName, serviceType);
 		data->push_back(std::move(info));
 
-		OT_LOG_D("Mandatory service for prject type \"" + sessionType + "\": Added service \"" + serviceName + "\"");
+		OT_LOG_D("Mandatory service for project type \"" + sessionType + "\": Added service \"" + serviceName + "\"");
 		
 		return OT_ACTION_RETURN_VALUE_OK;
 	}
@@ -1126,6 +1132,8 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
 	
+	OT_LOG_W("Service startup failed received { \"ServiceID\": " + std::to_string(serviceID) + ", \"SessionID\": \"" + sessionID + "\" }");
+
 	this->serviceFailure(sessionID, serviceID);
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);

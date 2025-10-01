@@ -66,6 +66,9 @@ public:
 	//! @brief Will return the port numbers used by this service.
 	std::list<ot::port_t> getPortNumbers(void) const;
 
+	static std::string debugLogString(const ot::ServiceBase& _serviceInfo, const std::string& _sessionID);
+	std::string debugLogString(const std::string& _sessionID) const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization

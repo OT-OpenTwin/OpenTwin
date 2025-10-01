@@ -70,6 +70,17 @@ std::list<ot::port_t> Service::getPortNumbers(void) const {
 	return ports;
 }
 
+std::string Service::debugLogString(const ot::ServiceBase& _serviceInfo, const std::string& _sessionID) {
+	return "\"ServiceID\": " + std::to_string(_serviceInfo.getServiceID()) + ", \"ServiceName\": \"" + _serviceInfo.getServiceName() +
+		"\", \"ServiceType\": \"" + _serviceInfo.getServiceType() + "\"" +
+		(_serviceInfo.getServiceURL().empty() ? std::string() : ", \"ServiceUrl\": \"" + _serviceInfo.getServiceURL() + "\"") +
+		", \"SessionID\": \"" + _sessionID + "\"";
+}
+
+std::string Service::debugLogString(const std::string& _sessionID) const {
+	return Service::debugLogString(*this, _sessionID) + (m_websocketUrl.empty() ? std::string() : ", \"WebsocketUrl\": \"" + m_websocketUrl + "\"");
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Serialization
