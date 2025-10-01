@@ -4568,8 +4568,30 @@ void Model::updateTopologyEntities(ot::UIDList& topoEntityIDs, ot::UIDList& topo
 				}
 			}
 
-			// Remove the entity from the entity map and also from the model state
+			//First we remove possible data entities from the entity map that have the old entity as their parent.
+			//ot::UIDList dataChildren;
+			for (auto entityByID : entityMap)
+			{
+				EntityBase* entity = entityByID.second;
+				if (entity->getEntityType() == EntityBase::DATA)
+				{
+					if (entity->getParent() == oldEntity)
+					{
+						entity->setParent(newEntity);
+						//dataChildren.push_back(entity->getEntityID());
+					}
+				}
+			}
+			/*for (ot::UID dataChild : dataChildren)
+			{
+				entityMap.erase(dataChild);
+			}*/
+			
+			// Remove the topo entity from the entity map and also from the model state
 			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
+
+			
+
 			delete oldEntity;
 
 			entityList.push_back(newEntity);
