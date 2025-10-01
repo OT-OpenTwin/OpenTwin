@@ -91,12 +91,12 @@ void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _alloca
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(this->getServiceName(), _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(this->getServiceType(), _allocator), _allocator);
 
-	_object.AddMember("Running", static_cast<bool>(m_state & Service::IsRunning), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_Alive, static_cast<bool>(m_state & Service::Alive), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_Debug, static_cast<bool>(m_state & Service::IsDebug), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_Requested, static_cast<bool>(m_state & Service::Requested), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_IsShutdown, static_cast<bool>(m_state & Service::ShuttingDown), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_Hidden, static_cast<bool>(m_state & Service::IsHidden), _allocator);
+	_object.AddMember("IsRunning", static_cast<bool>(m_state & Service::Running), _allocator);
+	_object.AddMember("IsAlive", static_cast<bool>(m_state & Service::Alive), _allocator);
+	_object.AddMember("IsDebug", static_cast<bool>(m_state & Service::IsDebug), _allocator);
+	_object.AddMember("IsRequested", static_cast<bool>(m_state & Service::Requested), _allocator);
+	_object.AddMember("IsShuttingDown", static_cast<bool>(m_state & Service::ShuttingDown), _allocator);
+	_object.AddMember("IsHidden", static_cast<bool>(m_state & Service::Hidden), _allocator);
 
 	if (!m_websocketUrl.empty()) {
 		_object.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(m_websocketUrl, _allocator), _allocator);

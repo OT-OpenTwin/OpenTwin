@@ -111,6 +111,8 @@ private:
 
 	// Private: Cleanup
 
+	void cleanUp(const std::string& _sessionID);
+
 	//! @brief Clean up session related information from requested services list.
 	//! @param _sessionID Session info to clean up.
 	void cleanUpRequestedList(const std::string& _sessionID);

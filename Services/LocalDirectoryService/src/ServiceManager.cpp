@@ -269,9 +269,7 @@ void ServiceManager::sessionClosing(const std::string& _sessionID) {
 }
 
 void ServiceManager::sessionClosed(const std::string& _sessionID) {
-	this->cleanUpRequestedList(_sessionID);
-	this->cleanUpIniList(_sessionID);
-	this->cleanUpAliveList(_sessionID);
+	this->cleanUp(_sessionID);
 }
 
 void ServiceManager::serviceDisconnected(const std::string& _sessionID, ot::serviceID_t _serviceID) {
@@ -506,13 +504,6 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 
 	OT_LOG_E("Preparing session emergency shutdown. Reason: Service crashed { " + logInfo(_crashedService) + " }");
 
-	// Remove all requested services that are related to the session
-	this->cleanUpRequestedList(serviceInfo.getSessionID());
-	this->cleanUpIniList(serviceInfo.getSessionID());
-
-	// Clean up running services
-	m_sessions.erase(serviceInfo);
-
 	// Notify session service about the crash
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceFailure, doc.GetAllocator()), doc.GetAllocator());
@@ -541,12 +532,18 @@ std::string ServiceManager::logInfo(const ot::ServiceInitData& _serviceInfo) con
 
 // Private: Cleanup
 
+void ServiceManager::cleanUp(const std::string& _sessionID) {
+	this->cleanUpRequestedList(_sessionID);
+	this->cleanUpIniList(_sessionID);
+	this->cleanUpAliveList(_sessionID);
+}
+
 void ServiceManager::cleanUpRequestedList(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> reqLock(m_mutexRequestedServices);
 
 	for (auto it = m_requestedServices.begin(); it != m_requestedServices.end(); ) {
 		if (it->getInitData().getSessionID() == _sessionID) {
-			OT_LOG_D("Removing requested service { \"ID\": " + std::to_string(it->getInitData().getServiceID()) + ", \"Name\": \"" + it->getInitData().getServiceName() + "\", \"SessionID\": \"" + it->getInitData().getSessionID() + "\" }");
+			OT_LOG_D("Removing requested service { " + logInfo(*it) + " }");
 			it = m_requestedServices.erase(it);
 		}
 		else {
@@ -559,7 +556,7 @@ void ServiceManager::cleanUpIniList(const std::string& _sessionID) {
 	std::lock_guard<std::mutex> iniLock(m_mutexInitializingServices);
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
 	std::string cmd = doc.toJson();
 
 	for (auto it = m_initializingServices.begin(); it != m_initializingServices.end(); ) {
@@ -845,6 +842,9 @@ void ServiceManager::workerHealthCheckFail() {
 				// Either the restart failed or the restart counter reached its max value.
 				// We notify the session service, clean up the lists and cancel the current health check.
 				this->notifySessionEmergencyShutdown(serviceData.second);
+
+				// Remove all requested services that are related to the session
+				this->cleanUp(serviceData.second.getInfo().getSessionID());
 			}
 		}
 	}

@@ -291,10 +291,8 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 	// Notify the GDS about the shutdown
 	m_gds.notifySessionShuttingDown(_sessionID);
 	
-	// Shutdown the session as emergency
-	session.shutdownSession(_serviceID, true, m_debugPortManager);
+	m_shutdownQueue.push_back(std::make_pair(_sessionID, true));
 
-	m_shutdownQueue.push_back(_sessionID);
 	this->startWorkerThreads();
 }
 
@@ -516,23 +514,22 @@ bool SessionService::checkShuttingDown() {
 		return false;
 	}
 
-	std::string sessionID = std::move(m_shutdownQueue.front());
+	std::pair<std::string, bool> shutdownInfo = std::move(m_shutdownQueue.front());
 	m_shutdownQueue.pop_front();
 
-	auto it = m_sessions.find(sessionID);
+	auto it = m_sessions.find(shutdownInfo.first);
 	if (it == m_sessions.end()) {
-		OT_LOG_E("Session not found \"" + sessionID + "\"");
+		OT_LOG_E("Session not found \"" + shutdownInfo.first + "\"");
 		return false;
 	}
 
-	// Grab session and remove it from the list
+	// Grab session and shut it down
 	Session& session = it->second;
-
-	session.shutdownSession(ot::invalidServiceID, false, m_debugPortManager);
+	session.shutdownSession(ot::invalidServiceID, shutdownInfo.second, m_debugPortManager);
 
 	// If all services are in debug mode we can remove the session immediately
 	if (!session.hasShuttingDownServices()) {
-		m_shutdownCompletedQueue.push_back(sessionID);
+		m_shutdownCompletedQueue.push_back(std::move(shutdownInfo.first));
 	}
 
 	return true;
@@ -903,7 +900,7 @@ std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 
 	m_gds.notifySessionShuttingDown(sessionID);
 
-	m_shutdownQueue.push_back(sessionID);
+	m_shutdownQueue.push_back(std::make_pair(sessionID, false));
 	this->startWorkerThreads();
 
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
@@ -1012,7 +1009,14 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 	}
 	doc.AddMember("Sessions", sessionArr, doc.GetAllocator());
 
-	doc.AddMember("ShutdownQueue", ot::JsonArray(m_shutdownQueue, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonArray shutdownArr;
+	for (const auto& shutdownInfo : m_shutdownQueue) {
+		ot::JsonObject shutdownObj;
+		shutdownObj.AddMember("SessionID", ot::JsonString(shutdownInfo.first, doc.GetAllocator()), doc.GetAllocator());
+		shutdownObj.AddMember("IsEmergency", shutdownInfo.second, doc.GetAllocator());
+		shutdownArr.PushBack(shutdownObj, doc.GetAllocator());
+	}
+	doc.AddMember("ShutdownQueue", shutdownArr, doc.GetAllocator());
 	doc.AddMember("ShutdownCompletedQueue", ot::JsonArray(m_shutdownCompletedQueue, doc.GetAllocator()), doc.GetAllocator());
 
 	// Debug information

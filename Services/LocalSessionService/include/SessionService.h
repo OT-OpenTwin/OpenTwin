@@ -142,7 +142,7 @@ private:
 	std::map<std::string, Session>                    m_sessions;
 	std::map<std::string, std::list<ot::ServiceBase>> m_mandatoryServicesMap; //! @brief Map containing all names of mandatory services for each session type
 
-	std::list<std::string>                            m_shutdownQueue;
+	std::list<std::pair<std::string, bool>>           m_shutdownQueue; //! @brief List of sessions that are currently shutting down, second = emergency shutdown
 	std::list<std::string>                            m_shutdownCompletedQueue;
 
 	ot::PortManager                                   m_debugPortManager;

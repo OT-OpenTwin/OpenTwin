@@ -39,7 +39,7 @@ Service::~Service() {
 #if defined(OT_OS_WINDOWS)
 		CloseHandle(m_processHandle);
 #else
-		assert(0); // Not implemented
+		OT_LOG_EA("Not implemented");
 #endif
 	}
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;

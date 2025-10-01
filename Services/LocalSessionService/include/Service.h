@@ -26,9 +26,9 @@ public:
 		IsDebug      = 1 << 0, //! @brief Service is in debug mode.
 		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
 		Alive        = 1 << 2, //! @brief Service is registered in the session.
-		IsRunning    = 1 << 3, //! @brief Service is running (received run command).
+		Running      = 1 << 3, //! @brief Service is running (received run command).
 		ShuttingDown = 1 << 4, //! @brief Service is shutting down, waiting for confirmation.
-		IsHidden     = 1 << 5  //! @brief Service is invisible to other services in the session.s
+		Hidden       = 1 << 5  //! @brief Service is invisible to other services in the session.s
 	};
 	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.
 
@@ -54,14 +54,14 @@ public:
 	void setAlive(bool _alive = true) { m_state.setFlag(Service::Alive, _alive); };
 	bool isAlive() const { return m_state & Service::Alive; };
 
-	void setRunning(bool _running = true) { m_state.setFlag(Service::IsRunning, _running); };
-	bool isRunning() const { return m_state & Service::IsRunning; };
+	void setRunning(bool _running = true) { m_state.setFlag(Service::Running, _running); };
+	bool isRunning() const { return m_state & Service::Running; };
 
 	void setShuttingDown(bool _shuttingDown = true) { m_state.setFlag(Service::ShuttingDown, _shuttingDown); };
 	bool isShuttingDown() const { return m_state & Service::ShuttingDown; };
 
-	void setHidden(bool _hidden) { m_state.setFlag(Service::IsHidden, _hidden); };
-	bool isHidden() const { return m_state & Service::IsHidden; };
+	void setHidden(bool _hidden) { m_state.setFlag(Service::Hidden, _hidden); };
+	bool isHidden() const { return m_state & Service::Hidden; };
 
 	//! @brief Will return the port numbers used by this service.
 	std::list<ot::port_t> getPortNumbers(void) const;
