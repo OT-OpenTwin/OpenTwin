@@ -26,7 +26,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
 
-	std::string entName = CreateNewUniqueTopologyName(_blockFolder+"/"+ editorName, blockEntity->getBlockTitle());
+	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + _blockFolder, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
@@ -45,13 +45,13 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& editorName)
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& _baseFolderName)
 {
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	ot::UIDList topoEntIDs, topoEntVers;
-	const std::string connectionFolderName = _blockFolder + "/" + editorName + "/" + _connectionFolder;
+	const std::string connectionFolderName = _baseFolderName + "/" + _connectionFolder;
 	for (auto& connection : connections)
 	{
 		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
@@ -234,9 +234,11 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName)
 {
-	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_blockFolder + "/" + _packageName, true);
+	const std::string fullBlockFolderFile = _folderName + "/" + _blockFolder;
+	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullBlockFolderFile);
+
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);

@@ -72,5 +72,5 @@ private:
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
-	void runPipeline();
+	void runPipeline(ot::UIDList _selectedSolverIDs);
 };

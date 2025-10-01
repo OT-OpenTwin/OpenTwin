@@ -33,6 +33,7 @@
 
 
 #include "OTServiceFoundation/UILockWrapper.h"
+#include "EntitySolverDataProcessing.h"
 
 Application * g_instance{ nullptr };
 
@@ -60,19 +61,29 @@ Application::~Application()
 
 }
 
-void Application::runPipeline()
+void Application::runPipeline(ot::UIDList _selectedSolverIDs)
 {
  	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 	try
 	{
-
-		auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-		const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
-		if (isValid)
+		Application::instance()->prefetchDocumentsFromStorage(_selectedSolverIDs);
+		ClassFactory& classFactory = Application::instance()->getClassFactory();
+		
+		for (ot::UID entityID : _selectedSolverIDs)
 		{
-			const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-			const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-			_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+			ot::UID entityVersion =	Application::instance()->getPrefetchedEntityVersion(entityID);
+			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
+			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
+			const std::string folderName = solver->getName();
+			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
+			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+
+			if (isValid)
+			{
+				const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+				const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+			}
 		}
 	}
 	catch (const std::exception& e)
@@ -100,8 +111,24 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == m_buttonRunPipeline.GetFullDescription())
 			{
-				std::thread worker(&Application::runPipeline, this);
-				worker.detach();
+				EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+				ot::UIDList selectedSolverIDs;
+				for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
+				{
+					if (selectedEntity.getEntityType() == solver.getClassName())
+					{
+						selectedSolverIDs.push_back(selectedEntity.getEntityID());
+					}
+				}
+				if (selectedSolverIDs.size() == 0)
+				{
+					Application::instance()->uiComponent()->displayMessage("No solver selected to run.");
+				}
+				else
+				{
+					std::thread worker(&Application::runPipeline, this, selectedSolverIDs);
+					worker.detach();
+				}
 			}
 			else if (action == m_buttonCreatePipeline.GetFullDescription())
 			{
@@ -142,7 +169,25 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			ot::GraphicsConnectionPackage pckg;
 			pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 			const std::string editorName = pckg.name();
+
 			_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
+			//EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+			//std::list<std::string> selectedSolverName;
+			//for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
+			//{
+			//	if (selectedEntity.getEntityType() == solver.getClassName())
+			//	{
+			//		selectedSolverName.push_back(selectedEntity.getEntityName());
+			//	}
+			//}
+
+			//if (selectedSolverName.size() == 1)
+			//{
+			//}
+			//else
+			//{
+			//	assert(0); //A connection should be drawn in only one graphics view.
+			//}
 		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged)
 		{
