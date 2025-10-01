@@ -504,7 +504,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 	// Clean up startup requests
 	ot::ServiceInitData serviceInfo = _crashedService.getInfo();
 
-	OT_LOG_E("Preparing session emergency shutdown. Reason: Service crashed { " + logInfo(serviceInfo) + " }");
+	OT_LOG_E("Preparing session emergency shutdown. Reason: Service crashed { " + logInfo(_crashedService) + " }");
 
 	// Remove all requested services that are related to the session
 	this->cleanUpRequestedList(serviceInfo.getSessionID());
@@ -525,7 +525,7 @@ void ServiceManager::notifySessionEmergencyShutdown(const Service& _crashedServi
 }
 
 std::string ServiceManager::logInfo(const Service& _service) const {
-	return logInfo(_service.getInfo());
+	return logInfo(_service.getInfo()) + ", \"ServiceUrl\": \"" + _service.getUrl() + "\"" + (_service.getWebsocketUrl().empty() ? std::string() : ", \"WebsocketUrl\": " + _service.getWebsocketUrl() + "\"");
 }
 
 std::string ServiceManager::logInfo(const RequestedService& _service) const {
@@ -533,7 +533,7 @@ std::string ServiceManager::logInfo(const RequestedService& _service) const {
 }
 
 std::string ServiceManager::logInfo(const ot::ServiceInitData& _serviceInfo) const {
-	return "\"ServiceID\": " + std::to_string(_serviceInfo.getServiceID()) + ", \"Name\": \"" + _serviceInfo.getServiceName() + "\", \"Type\": \"" +
+	return "\"ServiceID\": " + std::to_string(_serviceInfo.getServiceID()) + ", \"ServiceName\": \"" + _serviceInfo.getServiceName() + "\", \"ServiceType\": \"" +
 		_serviceInfo.getServiceType() + "\", \"SessionID\": \"" + _serviceInfo.getSessionID() + "\"";
 }
 
