@@ -96,7 +96,7 @@ unsigned long long ModelState::createEntityUID(void)
 	return m_uniqueUIDGenerator->getUID();
 }
 
-void ModelState::storeEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
+void ModelState::storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	if (m_entities.count(entityID) == 0)
 	{
@@ -109,7 +109,7 @@ void ModelState::storeEntity(ModelStateEntity::EntityID entityID, ModelStateEnti
 	}
 }
 
-void ModelState::addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
+void ModelState::addNewEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	ModelStateEntity newEntity;
 	newEntity.setParentEntityID(parentEntityID);
@@ -125,11 +125,11 @@ void ModelState::addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 	m_stateModified = true;
 }
 
-void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
+void ModelState::modifyEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	if (m_entities.count(entityID) > 0)
 	{
-		ModelStateEntity::EntityID previousParentID = m_entities[entityID].getParentEntityID();
+		ot::UID previousParentID = m_entities[entityID].getParentEntityID();
 
 		// This entity is a topology entity
 		ModelStateEntity modifiedEntity = m_entities[entityID];
@@ -154,7 +154,7 @@ void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 	}
 }
 
-void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityVersion entityVersion)
+void ModelState::modifyEntityVersion(ot::UID entityID, ot::UID entityVersion)
 {
 	if (m_entities.count(entityID) > 0)
 	{
@@ -172,7 +172,7 @@ void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelS
 	}
 }
 
-void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID)
+void ModelState::modifyEntityParent(ot::UID entityID, ot::UID parentEntityID)
 {
 	if (m_entities.count(entityID) > 0)
 	{
@@ -190,7 +190,7 @@ void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelSt
 	}
 }
 
-void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren)
+void ModelState::removeEntity(ot::UID entityID, bool considerChildren)
 {
 	//std::cout << "remove entity: " << entityID << std::endl;
 
@@ -213,7 +213,7 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 
 		if (m_entityChildrenList.count(entityID) > 0)
 		{
-			std::list<ModelStateEntity::EntityID> children = m_entityChildrenList[entityID];
+			std::list<ot::UID> children = m_entityChildrenList[entityID];
 
 			for (auto child : children)
 			{
@@ -283,7 +283,7 @@ void ModelState::buildChildrenInformation(void)
 	}
 }
 
-void ModelState::addEntityToParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
+void ModelState::addEntityToParent(ot::UID entityID, ot::UID parentID)
 {
 	if (m_entityChildrenList.count(parentID) > 0)
 	{
@@ -291,14 +291,14 @@ void ModelState::addEntityToParent(ModelStateEntity::EntityID entityID, ModelSta
 	}
 	else
 	{
-		std::list<ModelStateEntity::EntityID> childList;
+		std::list<ot::UID> childList;
 		childList.push_back(entityID);
 
 		m_entityChildrenList[parentID] = childList;
 	}
 }
 
-void ModelState::removeEntityFromParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
+void ModelState::removeEntityFromParent(ot::UID entityID, ot::UID parentID)
 {
 	if (m_entityChildrenList.count(parentID) > 0)
 	{
@@ -373,7 +373,7 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	return true;
 }
 
-ModelStateEntity::EntityVersion ModelState::getCurrentEntityVersion(ModelStateEntity::EntityID entityID)
+ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 {
 	// If the entity is not part of the current state, return invalid UID
 	if (m_entities.count(entityID) == 0)
@@ -388,7 +388,7 @@ ModelStateEntity::EntityVersion ModelState::getCurrentEntityVersion(ModelStateEn
 	return m_entities[entityID].getEntityVersion();
 }
 
-ModelStateEntity::EntityID ModelState::getCurrentEntityParent(ModelStateEntity::EntityID entityID)
+ot::UID ModelState::getCurrentEntityParent(ot::UID entityID)
 {
 	// Ensure that the entity exists
 	assert(m_entities.count(entityID) > 0);
@@ -735,7 +735,7 @@ bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 	bool extension = (numberEntities > m_maxNumberArrayEntitiesPerState);
 	assert(extension);
 
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> entitiesLeft = m_entities;
+	std::map<ot::UID, ModelStateEntity> entitiesLeft = m_entities;
 
 	writeMainDocument(entitiesLeft, saveComment);
 
@@ -750,7 +750,7 @@ bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 	return true;
 }
 
-bool ModelState::writeMainDocument(std::map<ModelStateEntity::EntityID, ModelStateEntity> &entitiesLeft, const std::string &saveComment)
+bool ModelState::writeMainDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft, const std::string &saveComment)
 {
 	// Create a document and write the header information
 	auto doc = bsoncxx::builder::basic::document{};
@@ -778,7 +778,7 @@ bool ModelState::writeMainDocument(std::map<ModelStateEntity::EntityID, ModelSta
 		auto data_parent = bsoncxx::builder::basic::array();
 		auto data_version = bsoncxx::builder::basic::array();
 
-		std::map<ModelStateEntity::EntityID, ModelStateEntity> entitiesLocal = entitiesLeft;
+		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
 
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
@@ -832,7 +832,7 @@ bool ModelState::writeMainDocument(std::map<ModelStateEntity::EntityID, ModelSta
 	return true;
 }
 
-bool ModelState::writeExtensionDocument(std::map<ModelStateEntity::EntityID, ModelStateEntity> &entitiesLeft)
+bool ModelState::writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft)
 {
 	// Create a document and write the header information
 	auto doc = bsoncxx::builder::basic::document{};
@@ -856,7 +856,7 @@ bool ModelState::writeExtensionDocument(std::map<ModelStateEntity::EntityID, Mod
 		auto data_parent = bsoncxx::builder::basic::array();
 		auto data_version = bsoncxx::builder::basic::array();
 
-		std::map<ModelStateEntity::EntityID, ModelStateEntity> entitiesLocal = entitiesLeft;
+		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
 
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;

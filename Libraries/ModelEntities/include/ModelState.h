@@ -11,29 +11,28 @@
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
+#include "OTCore/CoreTypes.h"
 
 class __declspec(dllexport) ModelStateEntity
 {
 public:
-	typedef unsigned long long EntityID;
-	typedef long long EntityVersion;
 
 	enum tEntityType { TOPOLOGY, DATA };
 
 	ModelStateEntity() : m_entityVersion(0), m_parentEntityID(0), m_entityType(tEntityType::DATA) {};
 	~ModelStateEntity() {};
 
-	void setParentEntityID(EntityID id) { m_parentEntityID = id; };
-	void setVersion(EntityVersion version) { m_entityVersion = version; };
+	void setParentEntityID(ot::UID id) { m_parentEntityID = id; };
+	void setVersion(ot::UID version) { m_entityVersion = version; };
 	void setEntityType(tEntityType type) { m_entityType = type; };
 
-	EntityID getParentEntityID(void) const { return m_parentEntityID; };
-	EntityVersion getEntityVersion(void) const { return m_entityVersion; };
+	ot::UID getParentEntityID(void) const { return m_parentEntityID; };
+	ot::UID getEntityVersion(void) const { return m_entityVersion; };
 	tEntityType getEntityType(void) const { return m_entityType; };
 
 private:
-	EntityVersion m_entityVersion;
-	EntityID m_parentEntityID;
+	ot::UID m_entityVersion;
+	ot::UID m_parentEntityID;
 	tEntityType m_entityType;
 };
 
@@ -68,22 +67,22 @@ public:
 	bool loadModelState(const std::string& _version);
 
 	// Store an entity to the data base (it will be automatically determine whetehr the entity is new or modified)
-	void storeEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType);
+	void storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
 
 	// Add new entity to model state
-	void addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType);
+	void addNewEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
 
 	// Mark entity as modified (new version and parent)
-	void modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType);
+	void modifyEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
 
 	// Mark entity as modified (new version)
-	void modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityVersion entityVersion);
+	void modifyEntityVersion(ot::UID entityID, ot::UID entityVersion);
 
 	// Mark entity as modified (new parent)
-	void modifyEntityParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID);
+	void modifyEntityParent(ot::UID entityID, ot::UID parentEntityID);
 
 	// Remove entity from model state
-	void removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren = true);
+	void removeEntity(ot::UID entityID, bool considerChildren = true);
 
 	// Determine the current modelStateVersion (the last saved one)
 	const std::string& getModelStateVersion(void) const { return m_graphCfg.getActiveVersionName(); };
@@ -95,10 +94,10 @@ public:
 	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
 
 	// Determine the current version of an entity
-	ModelStateEntity::EntityVersion getCurrentEntityVersion(ModelStateEntity::EntityID entityID);
+	ot::UID getCurrentEntityVersion(ot::UID entityID);
 
 	// Determine the parent of an entity
-	ModelStateEntity::EntityID getCurrentEntityParent(ModelStateEntity::EntityID entityID);
+	ot::UID getCurrentEntityParent(ot::UID entityID);
 
 	// Get a list of all topology entities in the model
 	void getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities);
@@ -160,10 +159,10 @@ private:
 	void buildChildrenInformation(void);
 	
 	// Add an entity to the child list of its parent entity
-	void addEntityToParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID);
+	void addEntityToParent(ot::UID entityID, ot::UID parentID);
 
 	// Remove an entity from the child list of its former parent entity
-	void removeEntityFromParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID);
+	void removeEntityFromParent(ot::UID entityID, ot::UID parentID);
 
 	// This function loads an incremental (relative) model state from a given ModelState document
 	bool loadIncrementalState(bsoncxx::document::view docView);
@@ -187,10 +186,10 @@ private:
 	bool saveIncrementalState(const std::string &saveComment);
 
 	// Write the main document of an absolute state with extensions
-	bool writeMainDocument(std::map<ModelStateEntity::EntityID, ModelStateEntity> &entitiesLeft, const std::string &saveComment);
+	bool writeMainDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft, const std::string &saveComment);
 
 	// Write an extension document of an absolute state
-	bool writeExtensionDocument(std::map<ModelStateEntity::EntityID, ModelStateEntity> &entitiesLeft);
+	bool writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft);
 
 	// Helper function to determine non-modelstate entries in a list of results
 	bool getListOfNonModelStateEntities(mongocxx::cursor &cursor, bsoncxx::builder::basic::array &entityArray);
@@ -251,14 +250,14 @@ private:
 	std::string m_currentModelBaseStateVersion;
 
 	// Information regarding the entities which are currently part of the model
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_entities;
+	std::map<ot::UID, ModelStateEntity> m_entities;
 
 	// Information about the added / modified / removed entities with regard to the last saved model state
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_addedOrModifiedEntities;
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_removedEntities;
+	std::map<ot::UID, ModelStateEntity> m_addedOrModifiedEntities;
+	std::map<ot::UID, ModelStateEntity> m_removedEntities;
 
 	// Information about entity children
-	std::map<ModelStateEntity::EntityID, std::list<ModelStateEntity::EntityID>> m_entityChildrenList;
+	std::map<ot::UID, std::list<ot::UID>> m_entityChildrenList;
 
 	// A flag which indicates whether the model state has been modified compared to the last stored state.
 	bool m_stateModified;
