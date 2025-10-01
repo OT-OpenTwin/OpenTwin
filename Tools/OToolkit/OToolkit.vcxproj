@@ -48,6 +48,8 @@
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\LoggingFilterView.cpp" />
     <ClCompile Include="src\LogModeSetter.cpp" />
+    <ClCompile Include="src\LogServiceDebugInfo.cpp" />
+    <ClCompile Include="src\LogServiceDebugInfoDialog.cpp" />
     <ClCompile Include="src\LogVisualizationItemViewDialog.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
@@ -98,6 +100,8 @@
     <QtMoc Include="include\LogModeSetter.h" />
     <QtMoc Include="include\QuickLogExport.h" />
     <QtMoc Include="include\SVGBrowser.h" />
+    <QtMoc Include="include\LogServiceDebugInfo.h" />
+    <ClInclude Include="include\LogServiceDebugInfoDialog.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

@@ -21,6 +21,7 @@
 
 class LogModeSetter;
 class LoggingFilterView;
+class LogServiceDebugInfo;
 
 class QTimer;
 class QLabel;
@@ -56,7 +57,7 @@ public:
 
 	//! @brief Return the unique tool name
 	//! The name will be used to create all required menu entries
-	virtual QString getToolName(void) const override;
+	virtual QString getToolName() const override;
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
 	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
@@ -76,35 +77,36 @@ public:
 	void appendLogMessages(const std::list<ot::LogMessage>& _messages);
 
 public Q_SLOTS:
-	void slotUpdateColumnWidth(void);
+	void slotUpdateColumnWidth();
 
 	void slotImportFileLogs();
-	void runQuickExport(void);
-	void slotConnect(void);
-	void slotAutoConnect(void);
-	void slotImport(void);
-	void slotExport(void);
+	void runQuickExport();
+	void slotConnect();
+	void slotAutoConnect();
+	void slotImport();
+	void slotExport();
 
-	void slotRefillData(void);
-	void slotClear(void);
-	void slotClearAll(void);
-	void slotFilterChanged(void);
-	void slotAutoScrollToBottomChanged(void);
-	void slotUpdateCheckboxColors(void);
-	void slotToggleAutoConnect(void);
+	void slotRefillData();
+	void slotClear();
+	void slotClearAll();
+	void slotFilterChanged();
+	void slotAutoScrollToBottomChanged();
+	void slotUpdateCheckboxColors();
+	void slotToggleAutoConnect();
 	void slotViewCellContent(QTableWidgetItem* _itm);
 	void slotScrollToItem(int _row);
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem* _itm);
-	void updateCountLabels(void);
+	void updateCountLabels();
 	void connectToLogger(bool _isAutoConnect);
-	bool disconnectFromLogger(void);
+	bool disconnectFromLogger();
 
 	// Data
 
 	LogModeSetter* m_logModeSetter;
 	LoggingFilterView* m_filterView;
+	LogServiceDebugInfo* m_serviceDebugInfo;
 
 	std::list<ot::LogMessage>	m_messages;
 	int							m_errorCount;

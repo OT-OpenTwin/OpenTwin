@@ -9,12 +9,14 @@
 #include "LogModeSetter.h"
 #include "QuickLogExport.h"
 #include "LoggingFilterView.h"
+#include "LogServiceDebugInfo.h"
 #include "FileLogImporterDialog.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
 
 // OT header
 #include "OTSystem/DateTime.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTWidgets/Splitter.h"
@@ -74,7 +76,7 @@ Logging::Logging()
 	: m_warningCount(0), m_errorCount(0), m_filterView(nullptr), m_columnWidthTimer(nullptr), m_autoConnect(nullptr),
 	m_autoScrollToBottom(nullptr), m_connectButton(nullptr), m_errorCountLabel(nullptr), m_exportButton(nullptr),
 	m_ignoreNewMessages(nullptr), m_convertToLocalTime(nullptr), m_importButton(nullptr), m_messageCountLabel(nullptr), m_table(nullptr),
-	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr)
+	m_warningCountLabel(nullptr), m_logModeSetter(nullptr), m_root(nullptr), m_serviceDebugInfo(nullptr)
 {
 	m_columnWidthTimer = new QTimer(this);
 	m_columnWidthTimer->setInterval(0);
@@ -86,7 +88,7 @@ Logging::~Logging() {
 
 }
 
-QString Logging::getToolName(void) const {
+QString Logging::getToolName() const {
 	return QString("Logging");
 }
 
@@ -109,6 +111,9 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	m_filterView = new LoggingFilterView;
 	_content.addView(this->createSideWidgetView(m_filterView->getRootWidget(), "Log Filter"));
+
+	m_serviceDebugInfo = new LogServiceDebugInfo;
+	_content.addView(this->createSideWidgetView(m_serviceDebugInfo->getRootWidget(), "Service Info"));
 
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
@@ -264,15 +269,15 @@ bool Logging::eventFilter(QObject* _obj, QEvent* _event) {
 	return false;
 }
 
-void Logging::slotConnect(void) {
+void Logging::slotConnect() {
 	this->connectToLogger(false);
 }
 
-void Logging::slotAutoConnect(void) {
+void Logging::slotAutoConnect() {
 	this->connectToLogger(true);
 }
 
-void Logging::slotImport(void) {
+void Logging::slotImport() {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 	QString fn = QFileDialog::getOpenFileName(m_table, "Import Log Messages", settings->value("Logging.LastExportedFile", "").toString(), "OpenTwin Log (*.otlog.json)");
 	if (fn.isEmpty()) return;
@@ -310,7 +315,7 @@ void Logging::slotImport(void) {
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
 }
 
-void Logging::slotExport(void) {
+void Logging::slotExport() {
 	if (m_messages.empty()) {
 		LOGVIS_LOGW("No messages to export");
 		return;
@@ -335,7 +340,7 @@ void Logging::slotExport(void) {
 	LOGVIS_LOG("Log Messages successfully exported to file \"" + fn + "\"");
 }
 
-void Logging::slotRefillData(void) {
+void Logging::slotRefillData() {
 	std::list<ot::LogMessage> messages = std::move(m_messages);
 	this->slotClear();
 
@@ -349,7 +354,7 @@ void Logging::slotRefillData(void) {
 	m_ignoreNewMessages->setChecked(isIgnoring);
 }
 
-void Logging::slotClear(void) {
+void Logging::slotClear() {
 	m_table->setRowCount(0);
 	m_messages.clear();
 	m_errorCount = 0;
@@ -357,13 +362,13 @@ void Logging::slotClear(void) {
 	this->updateCountLabels();
 }
 
-void Logging::slotClearAll(void) {
+void Logging::slotClearAll() {
 	this->slotClear();
 	m_filterView->reset();
 	LOGVIS_LOG("Logging Clear All completed");
 }
 
-void Logging::slotFilterChanged(void) {
+void Logging::slotFilterChanged() {
 	int r = 0;
 	QList<QTableWidgetItem*> lst = m_table->selectedItems();
 	int focusedRow = -1;
@@ -386,11 +391,11 @@ void Logging::slotFilterChanged(void) {
 	}
 }
 
-void Logging::slotAutoScrollToBottomChanged(void) {
+void Logging::slotAutoScrollToBottomChanged() {
 	if (m_autoScrollToBottom->isChecked()) m_table->scrollToBottom();
 }
 
-void Logging::slotUpdateCheckboxColors(void) {
+void Logging::slotUpdateCheckboxColors() {
 	QString red("QCheckBox { color: #c02020; }");
 	QString green("QCheckBox { color: #20c020; }");
 	QString def("");
@@ -400,7 +405,7 @@ void Logging::slotUpdateCheckboxColors(void) {
 	m_autoScrollToBottom->setStyleSheet(m_autoScrollToBottom->isChecked() ? green : def);
 }
 
-void Logging::slotToggleAutoConnect(void) {
+void Logging::slotToggleAutoConnect() {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 	bool is = !settings->value("Logging.AutoConnect", false).toBool();
 	m_autoConnect->setIcon(is ? QIcon(":/images/True.png") : QIcon(":/images/False.png"));
@@ -429,7 +434,19 @@ void Logging::slotScrollToItem(int _row) {
 }
 
 void Logging::appendLogMessage(const ot::LogMessage& _msg) {
-	if (m_ignoreNewMessages->isChecked()) { return; };
+	if (m_serviceDebugInfo && _msg.getText().find(ot::DebugHelper::getSetupCompletedMessagePrefix()) == 0) {
+		ot::JsonDocument debugInfoDoc;
+		if (debugInfoDoc.fromJson(_msg.getText().substr(ot::DebugHelper::getSetupCompletedMessagePrefix().length()))) {
+			ot::ServiceDebugInformation debugInfo;
+			debugInfo.setFromJsonObject(debugInfoDoc.getConstObject());
+
+			m_serviceDebugInfo->appendServiceDebugInfo(debugInfo);
+		}
+	}
+
+	if (m_ignoreNewMessages->isChecked()) {
+		return;
+	};
 
 	m_filterView->setFilterLock(true);
 
@@ -492,6 +509,9 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 }
 
 void Logging::appendLogMessages(const std::list<ot::LogMessage>& _messages) {
+	if (!m_table) {
+		return;
+	}
 	bool actb = m_autoScrollToBottom->isChecked();
 	m_autoScrollToBottom->setChecked(false);
 	for (const ot::LogMessage& msg : _messages) {
@@ -500,7 +520,7 @@ void Logging::appendLogMessages(const std::list<ot::LogMessage>& _messages) {
 	m_autoScrollToBottom->setChecked(actb);
 }
 
-void Logging::slotUpdateColumnWidth(void) {
+void Logging::slotUpdateColumnWidth() {
 	QStringList tableColumnWidthsList = m_columnWidthTmp.split(";", Qt::SkipEmptyParts);
 	m_columnWidthTmp.clear();
 	if (tableColumnWidthsList.count() == m_table->columnCount()) {
@@ -526,7 +546,7 @@ void Logging::slotImportFileLogs() {
 	}
 }
 
-void Logging::runQuickExport(void) {
+void Logging::runQuickExport() {
 	if (m_loggerUrl.empty()) {
 		ConnectToLoggerDialog dia;
 		dia.queueConnectRequest();
@@ -607,7 +627,7 @@ void Logging::iniTableItem(int _row, int _column, QTableWidgetItem* _itm) {
 	m_table->setItem(_row, _column, _itm);
 }
 
-void Logging::updateCountLabels(void) {
+void Logging::updateCountLabels() {
 	//m_errorCountLabel->setHidden(m_errorCount == 0);
 	//m_warningCountLabel->setHidden(m_warningCount == 0);
 
@@ -654,7 +674,7 @@ void Logging::connectToLogger(bool _isAutoConnect) {
 	LOGVIS_LOG("Done.");
 }
 
-bool Logging::disconnectFromLogger(void) {
+bool Logging::disconnectFromLogger() {
 	if (m_loggerUrl.empty()) return true;
 
 	std::string response;
