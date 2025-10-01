@@ -113,7 +113,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			{
 				EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
 				ot::UIDList selectedSolverIDs;
-				for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
+				for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
 				{
 					if (selectedEntity.getEntityType() == solver.getClassName())
 					{
@@ -122,7 +122,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				}
 				if (selectedSolverIDs.size() == 0)
 				{
-					Application::instance()->uiComponent()->displayMessage("No solver selected to run.");
+					Application::instance()->getUiComponent()->displayMessage("No solver selected to run.");
 				}
 				else
 				{
@@ -162,7 +162,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
 			}
 
-			_blockEntityHandler.CreateBlockEntity(editorName, itemName, position);
+			_blockEntityHandler.createBlockEntity(editorName, itemName, position);
 		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 		{
@@ -170,7 +170,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 			const std::string editorName = pckg.name();
 
-			_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
+			_blockEntityHandler.addBlockConnection(pckg.connections(), editorName);
 			//EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
 			//std::list<std::string> selectedSolverName;
 			//for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
@@ -196,7 +196,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			if (!itemConfig) return "";
 
 			const ot::UID blockID = itemConfig->getUid();
-			_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
+			_blockEntityHandler.updateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
 
 		}
 	}
@@ -240,7 +240,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(m_buttonRunPipeline, modelWrite, "RunSolver");
 	_ui->addMenuButton(m_buttonCreatePipeline, modelWrite, "AddSolver");
 	_blockEntityHandler.setUIComponent(_ui);
-	_blockEntityHandler.OrderUIToCreateBlockPicker();
+	_blockEntityHandler.orderUIToCreateBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 

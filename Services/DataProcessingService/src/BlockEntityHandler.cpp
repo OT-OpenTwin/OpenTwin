@@ -19,19 +19,19 @@
 #include "OTCore/ComparisionSymbols.h"
 
 
-void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
+void BlockEntityHandler::createBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
 	ClassFactory& factory = Application::instance()->getClassFactory();
 	EntityBase* baseEntity = factory.CreateEntity(blockName);
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
 
-	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + _blockFolder, blockEntity->getBlockTitle());
+	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + m_blockFolder, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	blockEntity->SetGraphicsScenePackageName(_packageName);
+	blockEntity->SetGraphicsScenePackageName(m_packageName);
 	blockEntity->setEditable(true);
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
@@ -45,13 +45,13 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& _baseFolderName)
+void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& _baseFolderName)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	ot::UIDList topoEntIDs, topoEntVers;
-	const std::string connectionFolderName = _baseFolderName + "/" + _connectionFolder;
+	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionFolder;
 	for (auto& connection : connections)
 	{
 		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
@@ -65,7 +65,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
-		connectionEntity.SetGraphicsScenePackageName(_packageName);
+		connectionEntity.SetGraphicsScenePackageName(m_packageName);
 		connectionEntity.createProperties();
 
 		connectionEntity.StoreToDataBase();
@@ -122,7 +122,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	}
 }
 
-void BlockEntityHandler::OrderUIToCreateBlockPicker()
+void BlockEntityHandler::orderUIToCreateBlockPicker()
 {
 	auto graphicsEditorPackage = BuildUpBlockPicker();
 	ot::JsonDocument doc;
@@ -143,7 +143,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
+void BlockEntityHandler::updateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
 {
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };
@@ -200,7 +200,7 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
-	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
+	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(m_packageName, m_packageName);
 	ot::GraphicsPickerCollectionCfg* controlBlockCollection = new ot::GraphicsPickerCollectionCfg("Control Blocks", "Control Blocks");
 	ot::GraphicsPickerCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsPickerCollectionCfg("Database", "Database");
 	ot::GraphicsPickerCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsPickerCollectionCfg("Visualization", "Visualization");
@@ -236,7 +236,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 
 std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName)
 {
-	const std::string fullBlockFolderFile = _folderName + "/" + _blockFolder;
+	const std::string fullBlockFolderFile = _folderName + "/" + m_blockFolder;
 	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullBlockFolderFile);
 
 	std::list<ot::EntityInformation> entityInfos;
