@@ -123,8 +123,8 @@ Application::Application() :
 	
 	//this->enableFeature(DebugServiceConfig::ExitOnCreation);
 	//this->enableFeature(DebugServiceConfig::ExitOnInit);
-	//this->enableFeature(DebugServiceConfig::ExitOnRun);
 	//this->enableFeature(DebugServiceConfig::ExitOnPing);
+	//this->enableFeature(DebugServiceConfig::ExitOnRun);
 	//this->enableFeature(DebugServiceConfig::ExitOnPreShutdown);
 		
 	// Enable features (Other)

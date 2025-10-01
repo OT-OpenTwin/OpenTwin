@@ -509,6 +509,11 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	return "";
 }
 
+std::string ot::ApplicationBase::handleRegisterNewLMS(JsonDocument& _document) {
+	m_lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+}
+
 // ##########################################################################################################################################
 
 // Private: Internal functions

@@ -58,6 +58,9 @@ namespace ot {
 		void setSessionType(const std::string& _sessionType) { m_sessionType = _sessionType; };
 		const std::string& getSessionType() const { return m_sessionType; };
 
+		void setLMSUrl(const std::string& _lmsUrl) { m_lmsUrl = _lmsUrl; };
+		const std::string& getLMSUrl() const { return m_lmsUrl; };
+
 		void setAuthorizationUrl(const std::string& _authUrl) { m_authUrl = _authUrl; };
 		const std::string& getAuthorizationUrl() const { return m_authUrl; };
 
@@ -92,6 +95,7 @@ namespace ot {
 		std::string     m_sessionType;
 
 		std::string     m_authUrl;
+		std::string     m_lmsUrl;
 
 		std::string     m_databaseUrl;
 		std::string     m_username;

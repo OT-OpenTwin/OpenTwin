@@ -170,6 +170,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	m_application->setSessionIDPrivate(_initData.getSessionID());
 	m_application->setProjectType(_initData.getSessionType());
 	m_application->setServiceID(_initData.getServiceID());
+	m_application->m_lmsUrl = _initData.getLMSUrl();
 
 	ot::ThisService::instance().setServiceID(m_application->getServiceID());
 	ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());

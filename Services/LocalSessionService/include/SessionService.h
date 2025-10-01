@@ -47,6 +47,8 @@ public:
 
 	const std::string& getSiteID() const { return m_siteID; };
 
+	const std::string& getLMSUrl() const { return m_lmsUrl; };
+
 	std::list<std::string> getSessionIDs();
 
 	void serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID);
@@ -114,6 +116,7 @@ private:
 	OT_HANDLER(handleCheckStartupCompleted, SessionService, OT_ACTION_CMD_CheckStartupCompleted, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMandatoryService, SessionService, OT_ACTION_CMD_AddMandatoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterNewGlobalDirectoryService, SessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleRegisterNewLibraryManagementService, SessionService, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES)
 
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
@@ -128,6 +131,7 @@ private:
 	std::string                                       m_authUrl;
 	std::string                                       m_dataBaseUrl;
 	std::string                                       m_siteID; //! @brief Site ID
+	std::string                                       m_lmsUrl;
 
 	std::string                                       m_url;
 	ot::serviceID_t                                   m_id;

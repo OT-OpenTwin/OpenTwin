@@ -31,6 +31,9 @@ public:
 	void setGdsURL(const std::string& _url) { m_gdsURL = _url; };
 	const std::string& getGdsURL() const { return m_gdsURL; };
 
+	void setLMSURL(const std::string& _url) { m_lmsURL = _url; };
+	const std::string& getLMSURL() const { return m_lmsURL; };
+
 	void setLoggingURL(const std::string& _url) { m_loggingURL = _url; };
 	const std::string& getLoggingURL() const { return m_loggingURL; };
 
@@ -49,5 +52,6 @@ private:
 	std::string        m_authURL;
 	std::string        m_gdsURL;
 	std::string        m_loggingURL;
+	std::string        m_lmsURL;
 	ot::LogFlags       m_logFlags;
 };

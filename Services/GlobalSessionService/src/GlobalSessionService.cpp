@@ -480,6 +480,9 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	if (!m_globalDirectoryUrl.empty()) {
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
+	if (!m_libraryManagementUrl.empty()) {
+		reply.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, reply.GetAllocator()), reply.GetAllocator());
+	}
 
 	reply.AddMember(OT_ACTION_PARAM_GlobalLoggerUrl, ot::JsonString(ot::ServiceLogNotifier::instance().loggingServiceURL(), reply.GetAllocator()), reply.GetAllocator());
 
@@ -493,8 +496,25 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 std::string GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	// Register logic
+	m_libraryManagementUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	
+	ot::JsonDocument lssDoc;
+	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	lssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	std::string lssMessage = lssDoc.toJson();
+
+	for (const auto& lss : m_lssMap) {
+		std::string responseStr;
+		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
+			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")";
+		}
+
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok) {
+			OT_LOG_EAS("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
+		}
+	}
 
 
 	// Send DBUrl and AuthUrl

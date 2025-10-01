@@ -111,6 +111,8 @@ namespace ot {
 		//! @brief Will return the session service URL.
 		std::string getSessionServiceURL() const { return (m_sessionService ? m_sessionService->getServiceURL() : ""); };
 
+		const std::string& getLMSUrl() const { return m_lmsUrl; };
+
 		//! @brief Will return the session ID this service is running in.
 		const std::string& getSessionID() const { return m_sessionID; }
 		
@@ -305,6 +307,7 @@ namespace ot {
 
 		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleRegisterNewLMS, ApplicationBase, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
 
 		// ##########################################################################################################################################
 
@@ -335,6 +338,7 @@ namespace ot {
 		std::string                         m_authUrl;
 		std::string                         m_databaseURL;
 		std::string                         m_siteID;
+		std::string                         m_lmsUrl;
 
 		std::string                         m_sessionID;
 		std::string                         m_projectName;

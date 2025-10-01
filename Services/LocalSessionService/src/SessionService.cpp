@@ -65,6 +65,7 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 #endif
 
 	lss.m_authUrl = regInfo.getAuthURL();
+	lss.m_lmsUrl = regInfo.getLMSURL();
 
 	// Initialize log flags
 	ot::LogDispatcher::instance().setLogFlags(regInfo.getLogFlags());
@@ -1100,6 +1101,24 @@ std::string SessionService::handleRegisterNewGlobalDirectoryService(ot::JsonDocu
 	else {
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
+}
+
+std::string SessionService::handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	m_lmsUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_lmsUrl, doc.GetAllocator()), doc.GetAllocator());
+	const std::string message = doc.toJson();
+
+	// Notify all sessions about the new LMS
+	for (auto& session : m_sessions) {
+		session.second.sendBroadcast(ot::invalidServiceID, message);
+	}
+	
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _commandDoc) {

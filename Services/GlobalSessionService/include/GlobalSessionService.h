@@ -149,7 +149,8 @@ private:
 	std::string m_databaseUrl;                //! @brief Database url.
 	std::string m_authorizationUrl;           //! @brief Authorization Service url.
 	std::string m_globalDirectoryUrl;         //! @brief Global Directory Service url.
-	
+	std::string m_libraryManagementUrl;       //! @brief Library Management Service url.
+
 	std::atomic_bool m_workerRunning;         //! @brief If true the workers are running, otherwise they still might be shutting down but will terminate if not set back to true in time.
 	std::atomic_bool m_forceHealthCheck;      //! @brief If true the next health check cycle will perform a health check even if the timeout of the next health check is not reached yet.
 

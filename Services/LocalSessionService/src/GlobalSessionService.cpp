@@ -319,6 +319,9 @@ void GlobalSessionService::healthCheck() {
 			if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
 				info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
 			}
+			if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL)) {
+				info.setLMSURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL));
+			}
 
 			// Get global logger info
 			info.setLoggingURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
