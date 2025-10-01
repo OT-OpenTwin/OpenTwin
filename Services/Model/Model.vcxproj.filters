@@ -111,6 +111,9 @@
     <ClCompile Include="src\LibraryManagementWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockHandler.cpp">
+      <Filter>Source Files\Handler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="include\LibraryManagementWrapper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandler.h">
+      <Filter>Header Files\Handler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -610,18 +610,6 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	}
 }
 
-std::string Application::handleItemChanged(ot::JsonDocument& _document) {
-	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_document, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
-	if (!itemConfig) return "";
-
-	const ot::UID blockID = itemConfig->getUid();
-	const ot::Transform transform = itemConfig->getTransform();
-	m_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), transform, &getClassFactory());
-
-	return "";
-}
-
 std::string Application::handleConnectionToConnection(ot::JsonDocument& _document) {
 
 	ot::GraphicsConnectionPackage pckg;

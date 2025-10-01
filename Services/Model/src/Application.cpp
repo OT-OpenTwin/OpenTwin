@@ -1324,7 +1324,14 @@ Application::Application()
 	m_fileHandler.setNextHandler(&m_materialHandler);
 
 	m_plotHandler.setDontDeleteHandler();
-	m_materialHandler.setNextHandler(&m_plotHandler);	
+	m_materialHandler.setNextHandler(&m_plotHandler);
+
+	m_blockHandler.setDontDeleteHandler();
+	m_plotHandler.setNextHandler(&m_blockHandler);
+
+
+
+
 }
 
 Application::~Application() {

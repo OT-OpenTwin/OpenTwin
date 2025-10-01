@@ -2328,17 +2328,18 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged,doc.GetAllocator());
 
 	ot::JsonObject configObj;
 	_newConfig->addToJsonObject(configObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
-		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
 			OT_LOG_E("Failed to send http request");
 			return;
 		}
