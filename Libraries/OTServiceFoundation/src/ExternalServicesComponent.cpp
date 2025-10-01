@@ -10,8 +10,9 @@
 #include "OTSystem/AppExitCodes.h"
 
 #include "OTCore/JSON.h"
-#include "OTCore/LogDispatcher.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/ThisService.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
@@ -141,8 +142,6 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 
 	m_componentState = WaitForInit;
 
-	OT_LOG_D("Foundation startup completed { \"ServiceName\": \"" + m_application->getServiceName() + "\", \"ServiceType\": \"" + m_application->getServiceType() + "\", \"ServiceURL\": \"" + m_application->getServiceURL() + "\" }");
-
 	// Run the init checker thread to ensure that the service will shutdown if the lds died during the startup of this service
 	std::thread t{ initChecker };
 	t.detach();
@@ -189,6 +188,8 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	db->setSiteIDString("1");
 	db->setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
 	
+	ot::DebugHelper::serviceSetupCompleted(*m_application);
+
 	// Register this service as a service in the session service
 	JsonDocument newServiceCommandDoc;
 	newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());

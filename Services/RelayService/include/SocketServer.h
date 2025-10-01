@@ -3,6 +3,7 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
+#include "OTCore/ServiceDebugInformation.h"
 #include "OTCommunication/RelayedMessageHandler.h"
 
 // Qt header
@@ -47,6 +48,8 @@ public:
 
 	void setServiceId(ot::serviceID_t _id) { m_serviceId = _id; };
 	ot::serviceID_t getServiceId() const { return m_serviceId; };
+
+	ot::ServiceDebugInformation getServiceDebugInformation() const;
 
 Q_SIGNALS:
 	void responseReceived();

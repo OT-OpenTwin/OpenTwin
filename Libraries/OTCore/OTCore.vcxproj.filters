@@ -148,6 +148,12 @@
     <ClCompile Include="src\LogMessage.cpp">
       <Filter>src\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\DebugHelper.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ServiceDebugInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -431,6 +437,12 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\LogDispatcher.h">
       <Filter>include\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\DebugHelper.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ServiceDebugInformation.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

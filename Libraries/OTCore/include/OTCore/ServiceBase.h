@@ -5,7 +5,7 @@
 
 #pragma once
 
-// Open Twin header
+// OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"

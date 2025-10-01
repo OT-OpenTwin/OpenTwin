@@ -9,6 +9,7 @@
 // Open Twin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"					// rapidjson wrapper
+#include "OTCore/DebugHelper.h"
 #include "OTCore/LogDispatcher.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
 #include "OTCommunication/Msg.h"
@@ -58,8 +59,7 @@ void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort
 		server.setWebsocketIp(_websocketIp);
 		server.setWebsocketPort(_websocketPort);
 		
-		OT_LOG_D("Relay url set to: " + server.getRelayUrl());
-		OT_LOG_D("Websocket set to: " + server.getWebsocketIp() + ":" + std::to_string(server.getWebsocketPort()));
+		ot::DebugHelper::serviceSetupCompleted(server.getServiceDebugInformation());
 
 		// Start session service health check if LSS URL is given
 		if (!_lssUrl.empty()) {

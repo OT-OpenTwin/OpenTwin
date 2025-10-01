@@ -9,6 +9,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -56,6 +57,8 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	setSiteID(_siteID);
 	setServiceURL(_ownURL);
 	m_globalSessionServiceURL = _globalSessionServiceURL;
+
+	ot::DebugHelper::serviceSetupCompleted(*this);
 
 	// Register at global session service
 	ot::JsonDocument gssDoc;

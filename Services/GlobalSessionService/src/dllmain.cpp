@@ -16,6 +16,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
@@ -89,7 +90,7 @@ extern "C"
 			exit(ot::AppExitCode::AuthUrlInvalid);
 		}
 
-		OT_LOG_I("Service initialized");
+		ot::DebugHelper::serviceSetupCompleted(gss);
 
 		return ot::AppExitCode::Success;
 	}

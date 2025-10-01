@@ -33,32 +33,32 @@ namespace ot {
 		Table(int _rows, int _columns, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~Table();
 
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
 		virtual void setupFromConfig(const TableCfg& _config);
-		virtual TableCfg createConfig(void) const;
+		virtual TableCfg createConfig() const;
 
 		void setContentChanged(bool _changed = true);
-		bool getContentChanged(void) const { return m_contentChanged; };
+		bool getContentChanged() const { return m_contentChanged; };
 
 		void setSelectedCellsBackground(const ot::Color& _color);
 		void setSelectedCellsBackground(const QColor& _color);
 
-		void prepareForDataChange(void);
+		void prepareForDataChange();
 
-		QRect getSelectionBoundingRect(void) const { return Table::getSelectionBoundingRect(this->selectedRanges()); };
+		QRect getSelectionBoundingRect() const { return Table::getSelectionBoundingRect(this->selectedRanges()); };
 
 		//! @brief Enables multiline handling for cells.
 		//! This must be called before filling the table since it affects the text edit created by the item delegate.
 		void setMultilineCells(bool _multiline = true) { m_multilineCells = _multiline; };
-		bool getMultilineCells(void) const { return m_multilineCells; };
+		bool getMultilineCells() const { return m_multilineCells; };
 
-		//! @brief  Creates a default item and palaces it at the given coordinates.
+		//! @brief Creates a default item and palaces it at the given coordinates.
 		//! @return Default item. The table keeps ownership of the item.
 		TableItem* addItem(int _row, int _column, const QString& _text, const QString& _sortHint = QString());
 
@@ -67,11 +67,11 @@ namespace ot {
 		TableItem* addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint = QString());
 
 	Q_SIGNALS:
-		void saveRequested(void);
+		void saveRequested();
 		void modifiedChanged(bool _isModified);
 
 	public Q_SLOTS:
-		void slotSaveRequested(void);
+		void slotSaveRequested();
 		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -89,10 +89,10 @@ namespace ot {
 		void slotResizeRowToContent(int _row);
 		
 	private:
-		void ini(void);
-		void resizeColumnsToContentIfNeeded(void);
-		void resizeRowsToContentIfNeeded(void);
-		void setResizeRequired(void);
+		void ini();
+		void resizeColumnsToContentIfNeeded();
+		void resizeRowsToContentIfNeeded();
+		void setResizeRequired();
 
 		TableItemDelegate* m_itemDelegate;
 

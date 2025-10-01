@@ -12,6 +12,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -56,6 +57,8 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 
 	m_serviceManager.setServiceIP(ip);
 	m_serviceManager.addPortRange(portNr + 1, ot::maxPortNumber);
+
+	ot::DebugHelper::serviceSetupCompleted(*this);
 
 	m_globalDirectoryService.connect(_globalDirectoryServiceURL);
 

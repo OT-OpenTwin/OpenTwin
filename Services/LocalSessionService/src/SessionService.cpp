@@ -12,6 +12,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
@@ -63,6 +64,8 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 #else
 	ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_LocalSessionService, regInfo.getLoggingURL(), false);
 #endif
+
+	ot::DebugHelper::serviceSetupCompleted(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, lss.getUrl(), ot::invalidServiceID));
 
 	lss.m_authUrl = regInfo.getAuthURL();
 	lss.m_lmsUrl = regInfo.getLMSURL();

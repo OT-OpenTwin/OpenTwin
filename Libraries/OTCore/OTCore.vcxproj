@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\BasicServiceInformation.cpp" />
     <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="src\DebugHelper.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\LogNotifierFileWriter.cpp" />
     <ClCompile Include="src\LogNotifierStdCout.cpp" />
     <ClCompile Include="src\LogTypes.cpp" />
+    <ClCompile Include="src\ServiceDebugInformation.cpp" />
     <ClCompile Include="src\ThisComputerInfo.cpp" />
     <ClCompile Include="src\OTObject.cpp" />
     <ClCompile Include="src\RuntimeTests.cpp" />
@@ -80,6 +82,7 @@
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.hpp" />
+    <ClInclude Include="include\OTCore\DebugHelper.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\EntityName.h" />
@@ -109,6 +112,7 @@
     <ClInclude Include="include\OTCore\Matrix2.hpp" />
     <ClInclude Include="include\OTCore\Matrix2Factory.h" />
     <ClInclude Include="include\OTCore\Matrix2Factory.hpp" />
+    <ClInclude Include="include\OTCore\ServiceDebugInformation.h" />
     <ClInclude Include="include\OTCore\ThisComputerInfo.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
     <ClInclude Include="include\OTCore\SystemServiceConfigInfo.h" />
