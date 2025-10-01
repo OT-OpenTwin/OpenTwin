@@ -64,7 +64,8 @@ void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
 
 	// Here update block positition
 	ot::UID positionID = blockEnt->getCoordinateEntityID();
-	auto coordinateEntBase = _model->readEntityFromEntityID(blockEnt, positionID, _model->getAllEntitiesByUID());
+	std::map<ot::UID, EntityBase*> map;
+	auto coordinateEntBase = _model->readEntityFromEntityID(blockEnt, positionID, map);
 
 	EntityCoordinates2D* coordinateEntity = dynamic_cast<EntityCoordinates2D*>(coordinateEntBase);
 	auto parent = coordinateEntity->getParent();
@@ -77,11 +78,34 @@ void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
 		_positionChanged = true;
 	}
 
-	// Checking
+
 
 
 	// Now check the cases and do the update or add 
-	if (_rotationChanged || _flipChanged) {
+	if ((_rotationChanged || _flipChanged) && _positionChanged) {
+		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
+		std::list<bool> forceVis;
+
+		blockEnt->StoreToDataBase();
+
+		dataEntID.push_back(coordinateEntity->getEntityID());
+		dataEntVers.push_back(coordinateEntity->getEntityStorageVersion());
+		dataEntParent.push_back(parent->getEntityID());
+		topoEntID.clear();
+		topoEntVers.clear();
+		forceVis.clear();
+
+		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false);
+
+		coordinateEntity->StoreToDataBase();
+		topoEntID.push_back(blockEnt->getEntityID());
+		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
+		forceVis.push_back(false);
+
+		_model->updateTopologyEntities(topoEntID, topoEntVers, "Rotation and blockitem position changed");
+
+	}
+	else if (_rotationChanged || _flipChanged) {
 		blockEnt->StoreToDataBase();
 		const std::string comment = "Rotation and Flip updated";
 		std::list<ot::UID>  topologyEntityIDList{ blockEnt->getEntityID() };
