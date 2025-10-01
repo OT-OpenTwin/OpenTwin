@@ -45,7 +45,7 @@ private:
 	const std::string m_initialCircuitName = "Circuit 1";
 
 	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
-	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
+	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
 };
 
 

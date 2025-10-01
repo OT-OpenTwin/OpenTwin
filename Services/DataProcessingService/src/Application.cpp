@@ -141,6 +141,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				ot::NewModelStateInformation infos;
 				infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
 				infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
+				infos.m_forceVisible.push_back(false);
 				ot::ModelServiceAPI::addEntitiesToModel(infos,"Added pipeline");
 			}
 		}

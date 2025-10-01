@@ -168,13 +168,9 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 	ot::JsonObject pckgObj;
 	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
-	ot::VisualisationCfg visualisationCfg;
-	ot::JsonObject visualisationCfgJson;
-	visualisationCfg.addToJsonObject(visualisationCfgJson, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, doc.GetAllocator());
-
+	
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
 	// Message is queued, no response here
@@ -446,8 +442,8 @@ std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_
 
 
 
-ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker() {
-	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(this->getInitialCircuitName(), this->getInitialCircuitName());
+ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
+	std::unique_ptr<ot::GraphicsPickerCollectionPackage> graphicsPicker(new ot::GraphicsPickerCollectionPackage());
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	ot::GraphicsPickerCollectionCfg* a2 = new ot::GraphicsPickerCollectionCfg("Meter Elements", "Meter Elements");
@@ -483,8 +479,8 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	
 
 	a4->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
-	pckg->addCollection(a);
-	return pckg;
+	graphicsPicker->addCollection(a);
+	return graphicsPicker.release();
 }
 
 

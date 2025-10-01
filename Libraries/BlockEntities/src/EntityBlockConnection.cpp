@@ -72,6 +72,10 @@ void EntityBlockConnection::CreateConnections()
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+
 	ot::JsonObject pckgObj;
 	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());

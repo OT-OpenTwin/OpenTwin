@@ -225,6 +225,11 @@ void EntityBlock::CreateBlockItem()
 
 	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
 
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, reqDoc.GetAllocator());
+
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
