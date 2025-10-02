@@ -42,55 +42,6 @@ GlobalSessionService& GlobalSessionService::instance(void) {
 	return g_instance;
 }
 
-// ###################################################################################################
-
-// Service handling
-
-void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	// General info
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(this->getServiceName(), _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, _allocator), _allocator);
-
-	// Runtime info
-	bool workerRunning = m_workerRunning;
-	bool forceHealth = m_forceHealthCheck;
-	_object.AddMember("WorkerRunning", workerRunning, _allocator);
-	_object.AddMember("ForceHealthcheck", forceHealth, _allocator);
-
-	ot::JsonArray sessionArr;
-	for (const auto& it : m_sessionMap) {
-		ot::JsonObject pairObj;
-		pairObj.AddMember("Key.Session.ID", ot::JsonString(it.first, _allocator), _allocator);
-		pairObj.AddMember("Value.LSS.ID", it.second, _allocator);
-		sessionArr.PushBack(pairObj, _allocator);
-	}
-	_object.AddMember("SessionMap", sessionArr, _allocator);
-
-	ot::JsonArray lssArr;
-	for (const auto& it : m_lssMap) {
-		ot::JsonObject pairObj;
-		pairObj.AddMember("Key.LSS.ID", it.first, _allocator);
-
-		ot::JsonObject lssObj;
-		it.second.addToJsonObject(lssObj, _allocator);
-		pairObj.AddMember("Value.LSS.Obj", lssObj, _allocator);
-		lssArr.PushBack(pairObj, _allocator);
-	}
-	_object.AddMember("LSSMap", lssArr, _allocator);
-
-	ot::JsonArray logFlagsArr;
-	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlagsArr, _allocator);
-	_object.AddMember("LogFlags", logFlagsArr, _allocator);
-	
-	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
-}
-
-void GlobalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	OT_LOG_E("The GSS is currently not supposed be deserialized");
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -101,6 +52,28 @@ void GlobalSessionService::setDatabaseUrl(const std::string& _url) {
 	 {
 		 m_databaseUrl = m_databaseUrl.substr(4);
 	 }
+}
+
+ot::GSSDebugInfo GlobalSessionService::getDebugInformation() {
+	ot::GSSDebugInfo info;
+	
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	info.setAuthorizationUrl(m_authorizationUrl);
+	info.setDatabaseUrl(m_databaseUrl);
+	info.setGlobalDirectoryUrl(m_globalDirectoryUrl);
+	info.setLibraryManagementUrl(m_libraryManagementUrl);
+
+	info.setWorkerRunning(m_workerRunning);
+
+	for (const auto& idEntry : m_sessionMap) {
+		info.addSessionToLSSEntry(idEntry.first, idEntry.second);
+	}
+	for (const auto& lssEntry : m_lssMap) {
+		info.addLSS(lssEntry.second.getDebugInformation());
+	}
+
+	return info;
 }
 
 // ###################################################################################################
@@ -423,9 +396,10 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 }
 
 std::string GlobalSessionService::handleGetDebugInformation(ot::JsonDocument& _doc) {
-	ot::JsonDocument dbg;
-	this->addToJsonObject(dbg, dbg.GetAllocator());
-	return dbg.toJson();
+	ot::GSSDebugInfo dbg = this->getDebugInformation();
+	ot::JsonDocument doc;
+	dbg.addToJsonObject(doc, doc.GetAllocator());
+	return doc.toJson();
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {

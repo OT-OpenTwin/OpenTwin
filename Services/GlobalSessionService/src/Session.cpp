@@ -70,3 +70,20 @@ void Session::setFromJsonObject(const ot::ConstJsonObject& _object) {
 		}
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+ot::GSSDebugInfo::SessionData Session::getDebugInformation() const {
+	ot::GSSDebugInfo::SessionData data;
+	data.sessionID = m_id;
+	data.userName = m_userName;
+
+	std::list<std::string> flagsArr;
+	if (m_state & SessionStateFlag::LssConfirmed) { flagsArr.push_back("LssConfirmed"); }
+
+	data.flags = std::move(flagsArr);
+
+	return data;
+}

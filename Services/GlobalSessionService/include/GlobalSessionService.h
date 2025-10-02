@@ -13,6 +13,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/GSSDebugInfo.h"
 #include "OTCommunication/ActionHandler.h"
 
 #include "OTServiceFoundation/IDManager.h"
@@ -39,14 +40,6 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Serialization
-
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
 	// Setter / Getter
 
 	void setDatabaseUrl(const std::string& _url);
@@ -57,6 +50,8 @@ public:
 
 	void setGlobalDirectoryUrl(const std::string& _url) { m_globalDirectoryUrl = _url; };
 	const std::string& getGlobalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
+
+	ot::GSSDebugInfo getDebugInformation();
 
 private:
 

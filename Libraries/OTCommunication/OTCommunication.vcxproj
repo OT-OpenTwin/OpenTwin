@@ -26,7 +26,11 @@
     <ClCompile Include="src\ActionHandleConnector.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\GDSDebugInfo.cpp" />
+    <ClCompile Include="src\GSSDebugInfo.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
+    <ClCompile Include="src\LDSDebugInfo.cpp" />
+    <ClCompile Include="src\LSSDebugInfo.cpp" />
     <ClCompile Include="src\Msg.cpp" />
     <ClCompile Include="src\RelayedMessageHandler.cpp" />
     <ClCompile Include="src\ServiceInitData.cpp" />
@@ -47,7 +51,11 @@
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />
+    <ClInclude Include="include\OTCommunication\GDSDebugInfo.h" />
+    <ClInclude Include="include\OTCommunication\GSSDebugInfo.h" />
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
+    <ClInclude Include="include\OTCommunication\LDSDebugInfo.h" />
+    <ClInclude Include="include\OTCommunication\LSSDebugInfo.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
     <ClInclude Include="include\OTCommunication\RelayedMessageHandler.h" />
     <ClInclude Include="include\OTCommunication\ServiceInitData.h" />
