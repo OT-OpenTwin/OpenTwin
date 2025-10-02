@@ -69,6 +69,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\ExpanderWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
     <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
     <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp" />
@@ -254,6 +255,7 @@
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
+    <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />

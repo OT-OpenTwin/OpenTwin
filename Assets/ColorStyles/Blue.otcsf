@@ -1123,7 +1123,9 @@ QToolButton:hover {
 }
 
 QToolButton:pressed {
-    background-color: rgba(0,64,128,255);
+    /*background-color: rgba(0,64,128,255);*/
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QToolButton:selected {
@@ -2594,6 +2596,16 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 
 #OT_ViewTabPinButton[IsPinned="false"]:disabled {
     image: url('%root%/icons/window_pin_disabled.png');
+}
+
+/* ##################################################################################### */
+
+/* ExpanderWidget */
+
+#OT_ExpanderWidgetHeaderLine {
+    background-color: rgba(0,100,180,255);
+    min-height: 1px;
+    max-height: 1px;
 }
 
 /* ##################################################################################### */

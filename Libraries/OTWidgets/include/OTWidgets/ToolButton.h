@@ -20,9 +20,9 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ToolButton)
 	public:
-		ToolButton();
-		ToolButton(const QString& _text);
-		ToolButton(const QIcon& _icon, const QString& _text);
+		ToolButton(QWidget* _parent = (QWidget*)nullptr);
+		ToolButton(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
+		ToolButton(const QIcon& _icon, const QString& _text, QWidget* _parent = (QWidget*)nullptr);
 
 		virtual ~ToolButton();
 

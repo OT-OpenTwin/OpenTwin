@@ -553,6 +553,9 @@
     <ClCompile Include="src\SelectionData.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\ExpanderWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1257,6 +1260,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h">
       <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ExpanderWidget.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
