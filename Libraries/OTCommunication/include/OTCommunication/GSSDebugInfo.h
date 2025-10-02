@@ -46,6 +46,9 @@ namespace ot {
 
 		// Setter / Getter
 
+		void setUrl(const std::string& _url) { m_url = _url; };
+		const std::string& getUrl() const { return m_url; };
+
 		void setDatabaseUrl(const std::string& _url) { m_databaseUrl = _url; };
 		const std::string& getDatabaseUrl() const { return m_databaseUrl; };
 
@@ -78,6 +81,7 @@ namespace ot {
 		void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator, const SessionData& _data) const;
 		void setFromJsonObject(const ot::ConstJsonObject& _jsonObject, SessionData& _data);
 
+		std::string m_url;
 		std::string m_databaseUrl;
 		std::string m_authorizationUrl;
 		std::string m_globalDirectoryUrl;

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\BackendInfo.cpp" />
     <ClCompile Include="src\ColorStyleEditor.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -89,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\SettingsManager.h" />
+    <QtMoc Include="include\BackendInfo.h" />
     <ClInclude Include="include\ExternalLibrary.h" />
     <ClInclude Include="include\ExternalLibraryManager.h" />
     <QtMoc Include="include\FileLogImporterDialog.h" />

@@ -59,6 +59,7 @@ ot::GSSDebugInfo GlobalSessionService::getDebugInformation() {
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	info.setUrl(this->getServiceURL());
 	info.setAuthorizationUrl(m_authorizationUrl);
 	info.setDatabaseUrl(m_databaseUrl);
 	info.setGlobalDirectoryUrl(m_globalDirectoryUrl);

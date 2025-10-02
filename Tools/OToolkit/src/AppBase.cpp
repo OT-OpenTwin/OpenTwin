@@ -9,6 +9,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "Randomizer.h"
+#include "BackendInfo.h"
 #include "ToolManager.h"
 #include "MenuManager.h"
 #include "ImageEditor.h"
@@ -428,6 +429,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new FAR);
+	m_toolManager->addTool(new BackendInfo);
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new ImageEditor);

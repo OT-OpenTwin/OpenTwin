@@ -11,6 +11,7 @@
 // Virtual methods
 
 void ot::GSSDebugInfo::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("Url", JsonString(m_url, _allocator), _allocator);
 	_jsonObject.AddMember("DatabaseUrl", JsonString(m_databaseUrl, _allocator), _allocator);
 	_jsonObject.AddMember("AuthorizationUrl", JsonString(m_authorizationUrl, _allocator), _allocator);
 	_jsonObject.AddMember("GlobalDirectoryUrl", JsonString(m_globalDirectoryUrl, _allocator), _allocator);
@@ -37,6 +38,7 @@ void ot::GSSDebugInfo::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _a
 }
 
 void ot::GSSDebugInfo::setFromJsonObject(const ConstJsonObject& _jsonObject) {
+	m_url = json::getString(_jsonObject, "Url");
 	m_databaseUrl = json::getString(_jsonObject, "DatabaseUrl");
 	m_authorizationUrl = json::getString(_jsonObject, "AuthorizationUrl");
 	m_globalDirectoryUrl = json::getString(_jsonObject, "GlobalDirectoryUrl");
