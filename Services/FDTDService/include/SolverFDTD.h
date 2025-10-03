@@ -14,6 +14,12 @@ public:
 	//virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity) override;
 
 private:
+	tinyxml2::XMLElement* appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node);
+	bool wirteXML(const std::string& fileName, const XmlEntry& rootNode);
+	XmlEntry FDTDTemplate(const FDTDConfig& config);
+	std::string vecToString(const std::vector<int>& vector);
+	XmlEntry generateXML(const XmlEntry FDTD);
+	std::map<std::string, std::string> getBoundaryAttributes(const FDTDConfig& config) const;
 	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
 	void getBoundaryConditions(std::map<std::string, double>& boundaryConditionsDefinition);
 	void buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap);

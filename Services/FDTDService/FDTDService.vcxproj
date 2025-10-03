@@ -102,7 +102,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCD)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(TINYXML2_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -112,7 +112,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(ZLIB_LIBPATHD);$(TINYXML2_ROOT);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;zlibd.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -149,7 +149,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCR);$(TINYXML2_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -161,7 +161,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(ZLIB_LIBPATHR);$(OT_FOUNDATION_ROOT)\$(OT_LIBR);$(TINYXML2_ROOT);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(ZLIB_LIBR);Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
@@ -196,19 +196,24 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FDTDConfig.cpp" />
     <ClCompile Include="src\FDTDLauncher.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\SolverBase.cpp" />
     <ClCompile Include="src\SolverFDTD.cpp" />
+    <ClCompile Include="src\tinyxml2.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
+    <ClCompile Include="src\XmlEntry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\FDTDConfig.h" />
     <ClInclude Include="include\FDTDLauncher.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverFDTD.h" />
     <ClInclude Include="include\UiNotifier.h" />
+    <ClInclude Include="include\XmlEntry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

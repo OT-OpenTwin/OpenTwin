@@ -3,9 +3,19 @@
 #include "OTCore/TypeNames.h"
 #include "EntityInformation.h"
 
+// TINYXML2
+#include "tinyxml2.h"
+
+// XmlEntry and FDTDConfig
+#include "FDTDConfig.h"
+#include "XmlEntry.h"
+
 #include <fstream>
+#include <cstdint>
 #include <map>
+#include <vector>
 #include <list>
+#include <array>
 #include <string>
 #include <sstream>
 #include <windows.h> 

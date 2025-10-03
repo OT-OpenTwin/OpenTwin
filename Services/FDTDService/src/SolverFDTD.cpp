@@ -63,9 +63,108 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
 
 std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
 {
+    //FDTDConfig cfg;
+    //cfg.timesteps = getTimeSteps()
     runSolverExe("model", "FDTD_XML", "Map", tempDirPath, uiComponent);
 
     return solverOutput.str();
+}
+
+tinyxml2::XMLElement* SolverFDTD::appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node) {
+    tinyxml2::XMLElement* elem = doc->NewElement(node.getTag().c_str());
+
+    for (auto& [key, value] : node.getAttributes()) {
+        elem->SetAttribute(key.c_str(), value.c_str());
+    }
+
+    if (!node.getText().empty()) {
+        elem->SetText(node.getText().c_str());
+    }
+
+    for (auto& _node : node.getNodes()) {
+        elem->InsertEndChild(appendNode(doc, _node));
+    }
+    return elem;
+}
+
+bool SolverFDTD::wirteXML(const std::string& fileName, const XmlEntry& rootNode) {
+    tinyxml2::XMLDocument doc;
+
+    doc.InsertFirstChild(doc.NewDeclaration(R"(xml version="1.0" encoding="utf-8")"));
+    tinyxml2::XMLElement* root = appendNode(&doc, rootNode);
+    doc.InsertEndChild(root);
+    return doc.SaveFile(fileName.c_str()) == tinyxml2::XML_SUCCESS;
+}
+
+std::string SolverFDTD::vecToString(const std::vector<int>& vector) {
+    std::string s;
+    for (size_t i = 0; i < vector.size(); ++i) {
+        s += std::to_string(vector[i]);
+        if (i + 1 < vector.size()) s += ",";
+    }
+    return s;
+}
+
+XmlEntry SolverFDTD::FDTDTemplate(const FDTDConfig& config) {
+    auto vecToStr = [this](const std::vector<int>& v) {return this->vecToString(v); };
+    std::array<std::string, 6> boundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
+
+    XmlEntry FDTD("FDTD");
+    FDTD.setAttributes("NumberOfTimeSteps", std::to_string(config.getTimeSteps()));
+    FDTD.setAttributes("OverSampling", std::to_string(config.getOversampling()));
+    FDTD.setAttributes("endCriteria", std::to_string(config.getEndCriteria()));
+    FDTD.setAttributes("f_max", std::to_string(config.getFrequencyStop()));
+
+    //// Excitation node
+    //XmlEntry excitation("Excitation");
+    //excitation.setAttributes("Type", std::to_string(config.getExcitationType()));
+    //excitation.setAttributes("f0", std::to_string((config.getFrequencyStart() + config.getFrequencyStop() / 2.0)));
+    //excitation.setAttributes("fc", std::to_string((config.getFrequencyStop() - config.getFrequencyStart()) / 2.0));
+    //FDTD.addNode(excitation);
+
+    //// BoundaryCond node
+    //XmlEntry boundary("BoundaryCond");
+    //boundary.setAttributes("xmax", std::to_string(config.getBoundaryConditions(0)));
+    //boundary.setAttributes("xmin", std::to_string(config.getBoundaryConditions(1)));
+    //boundary.setAttributes("ymax", std::to_string(config.getBoundaryConditions(2)));
+    //boundary.setAttributes("ymin", std::to_string(config.getBoundaryConditions(3)));
+    //boundary.setAttributes("zmax", std::to_string(config.getBoundaryConditions(4)));
+    //boundary.setAttributes("zmin", std::to_string(config.getBoundaryConditions(5)));
+    //FDTD.addNode(boundary);
+
+
+    XmlEntry* excitation = FDTD.addNode(XmlEntry("Excitation"));
+    excitation->setAttributes("Type", std::to_string(config.getExcitationType()));
+    excitation->setAttributes("f0", std::to_string((config.getFrequencyStart() + config.getFrequencyStop() / 2.0)));
+    excitation->setAttributes("fc", std::to_string((config.getFrequencyStop() - config.getFrequencyStart()) / 2.0));
+
+
+    XmlEntry* boundary = FDTD.addNode(XmlEntry("BoundaryCond"));
+    for (size_t i = 0; i < boundaryNames.size(); ++i) {
+        boundary->setAttributes(boundaryNames[i], config.getBoundaryConditions(i));
+    }
+
+    return FDTD;
+}
+
+XmlEntry SolverFDTD::generateXML(const XmlEntry FDTD) {
+    auto vecToStr = [this](const std::vector<int>& v) {return this->vecToString(v); };
+
+    XmlEntry openEMS;
+    openEMS.setTag("openEMS");
+
+    openEMS.addNode(FDTD);
+    return openEMS;
+}
+
+std::map<std::string, std::string> SolverFDTD::getBoundaryAttributes(const FDTDConfig& config) const {
+    const std::array<std::string, 6> boundaryConditionNames = { "xmin", "xmax", "ymin", "ymax", "zmin", "zmax" };
+    std::map<std::string, std::string> boundaryAttributes;
+
+    for (size_t i = 0; i < boundaryConditionNames.size(); ++i) {
+        boundaryAttributes[boundaryConditionNames[i]] = config.getBoundaryConditions(i);
+    }
+    return boundaryAttributes;
 }
 
 void SolverFDTD::getBoundaryConditions(std::map<std::string, double>& boundaryConditionDefinitions) {
