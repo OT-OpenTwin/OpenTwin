@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/AbstractPlot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -36,7 +36,7 @@ namespace ot {
 	class CartesianPlot;
 	class PolarPlotData;
 
-	class OT_WIDGETS_API_EXPORT PlotBase : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PlotBase : public QObject, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PlotBase)
 		OT_DECL_NOMOVE(PlotBase)

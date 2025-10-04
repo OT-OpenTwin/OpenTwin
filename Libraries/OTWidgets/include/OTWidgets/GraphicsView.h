@@ -11,7 +11,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -34,7 +34,7 @@ namespace ot {
 
 	//! @brief View widget used to display GraphicsItems
 	//! Note that the View creates its own scene.
-	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public WidgetBase {
 		Q_OBJECT
 	public:
 		enum GraphicsViewFlag {

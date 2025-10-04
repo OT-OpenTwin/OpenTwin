@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/Positioning.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtGui/qscreen.h>
@@ -177,7 +177,7 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreen
 	return fittedRect;
 }
 
-bool ot::Positioning::centerWidgetOnParent(const QWidgetInterface* _parentWidget, QWidgetInterface* _childWidget) {
+bool ot::Positioning::centerWidgetOnParent(const WidgetBase* _parentWidget, WidgetBase* _childWidget) {
 	OTAssertNullptr(_childWidget);
 	const QWidget* parentWidget = nullptr;
 	if (_parentWidget) {
@@ -201,7 +201,7 @@ bool ot::Positioning::centerWidgetOnParent(const QWidget* _parentWidget, QWidget
 	}
 }
 
-QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidgetInterface* _parentWidget, QWidgetInterface* _childWidget) {
+QRect ot::Positioning::getCenterWidgetOnParentRect(const WidgetBase* _parentWidget, WidgetBase* _childWidget) {
 	OTAssertNullptr(_childWidget);
 	const QWidget* parentWidget = nullptr;
 	if (_parentWidget) {

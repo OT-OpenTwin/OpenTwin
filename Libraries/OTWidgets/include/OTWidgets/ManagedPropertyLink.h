@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class QWidgetInterface;
+	class WidgetBase;
 	class WidgetPropertyManager;
 
 	//! @class ManagedPropertyLink

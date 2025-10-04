@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -15,7 +15,7 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT ImagePreview : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ImagePreview : public QFrame, public WidgetBase {
 		Q_OBJECT
 	public:
 		ImagePreview();

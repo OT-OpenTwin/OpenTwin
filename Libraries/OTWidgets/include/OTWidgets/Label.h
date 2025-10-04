@@ -7,14 +7,14 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qlabel.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT Label : public QLabel, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Label : public QLabel, public ot::WidgetBase {
 		Q_OBJECT
 	public:
 		Label(QWidget* _parentWidget = (QWidget*)nullptr);

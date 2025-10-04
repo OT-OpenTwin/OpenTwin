@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -33,7 +33,7 @@ namespace ot {
 	class GraphicsItemPreview;
 	class GraphicsPickerCollectionPackage;
 
-	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject, public WidgetBase {
 		Q_OBJECT
 	public:
 		GraphicsPicker(Qt::Orientation _orientation = Qt::Vertical);

@@ -1,4 +1,4 @@
-//! @file QWidgetInterface.h
+//! @file WidgetBase.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -17,10 +17,10 @@ namespace ot {
 
 	class WidgetView;
 
-	class OT_WIDGETS_API_EXPORTONLY QWidgetInterface {
+	class OT_WIDGETS_API_EXPORTONLY WidgetBase {
 	public:
-		QWidgetInterface() : m_parentView(nullptr) {};
-		virtual ~QWidgetInterface() {};
+		WidgetBase() : m_parentView(nullptr) {};
+		virtual ~WidgetBase() {};
 
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget() = 0;
@@ -31,6 +31,10 @@ namespace ot {
 
 		void setParentWidgetView(WidgetView* _view) { m_parentView = _view; };
 		WidgetView* getParentWidgetView() const { return m_parentView; };
+
+		void setSuccessForeground(bool _enabled = true);
+		void setWarningForeground(bool _enabled = true);
+		void setErrorForeground(bool _enabled = true);
 
 	protected:
 		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};

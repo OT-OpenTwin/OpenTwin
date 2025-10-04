@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -22,7 +22,7 @@ namespace ot {
 	class TreeWidget;
 	class LineEdit;
 
-	class OT_WIDGETS_API_EXPORT TreeWidgetFilter : public QObject, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT TreeWidgetFilter : public QObject, public ot::WidgetBase {
 		Q_OBJECT
 	public:
 		TreeWidgetFilter(ot::TreeWidget * _tree = (ot::TreeWidget *)nullptr, int _filterColumn = 0);

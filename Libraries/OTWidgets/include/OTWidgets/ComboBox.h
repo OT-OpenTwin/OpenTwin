@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT ComboBox : public QComboBox, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ComboBox : public QComboBox, public WidgetBase {
 		Q_OBJECT
 	public:
 		ComboBox(QWidget* _parent = (QWidget*)nullptr);

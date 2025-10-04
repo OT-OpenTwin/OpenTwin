@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -17,7 +17,7 @@ class QTimer;
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT DoubleSpinBox : public QDoubleSpinBox, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT DoubleSpinBox : public QDoubleSpinBox, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(DoubleSpinBox)
 	public:

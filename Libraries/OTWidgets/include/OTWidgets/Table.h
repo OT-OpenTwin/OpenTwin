@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/TableRange.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -23,7 +23,7 @@ namespace ot {
 	class TableItem;
 	class TableItemDelegate;
 
-	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Table)
 	public:

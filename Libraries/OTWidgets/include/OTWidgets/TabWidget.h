@@ -7,14 +7,14 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qtabwidget.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT TabWidget : public QTabWidget, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT TabWidget : public QTabWidget, public ot::WidgetBase {
 		Q_OBJECT
 	public:
 		TabWidget();

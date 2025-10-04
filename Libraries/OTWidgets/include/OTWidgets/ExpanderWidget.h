@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
@@ -23,7 +23,7 @@ namespace ot {
 
 	//! @brief The ExpanderWidget is a widget that can expand and collapse to show or hide its content.
 	//! It consists of a header with a toggle button and a content area that can hold any widget.
-	class OT_WIDGETS_API_EXPORT ExpanderWidget : public QWidget, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ExpanderWidget : public QWidget, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ExpanderWidget)
 	public:

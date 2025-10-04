@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/TreeWidgetItemInfo.h"
 
@@ -21,7 +21,7 @@ namespace ot {
 
 	class TreeItemDelegate;
 
-	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::WidgetBase {
 		Q_OBJECT
 	public:
 		struct ItemInformation {

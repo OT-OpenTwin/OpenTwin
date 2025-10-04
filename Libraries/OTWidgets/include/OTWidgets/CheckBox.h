@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT CheckBox : public QCheckBox, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT CheckBox : public QCheckBox, public WidgetBase {
 		Q_OBJECT
 	public:
 		CheckBox(QWidget* _parent = (QWidget*)nullptr);

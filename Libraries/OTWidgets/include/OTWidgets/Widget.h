@@ -9,11 +9,11 @@
 #include "OTCore/OTObject.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT Widget : public OTObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Widget : public OTObject, public WidgetBase {
 		OT_DECL_NOCOPY(Widget)
 		OT_DECL_NOMOVE(Widget)
 	public:

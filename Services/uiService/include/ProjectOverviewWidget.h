@@ -10,7 +10,7 @@
 #include "ProjectInformation.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -68,7 +68,7 @@ private:
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-class ProjectOverviewWidget : public QObject, public ot::QWidgetInterface, public LockableWidget {
+class ProjectOverviewWidget : public QObject, public ot::WidgetBase, public LockableWidget {
 	Q_OBJECT
 	OT_DECL_NODEFAULT(ProjectOverviewWidget)
 public:

@@ -73,7 +73,7 @@
     <ClCompile Include="src\ToolTipHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\QWidgetInterface.cpp">
+    <ClCompile Include="src\WidgetBase.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\EventNotifier.cpp">
@@ -556,6 +556,9 @@
     <ClCompile Include="src\ExpanderWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\IndicatorWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -674,7 +677,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTWidgets\QWidgetInterface.h">
+    <ClInclude Include="include\OTWidgets\WidgetBase.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\OTWidgetsAPIExport.h">
@@ -1262,6 +1265,9 @@
       <Filter>include\Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\IndicatorWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
