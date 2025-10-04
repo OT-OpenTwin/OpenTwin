@@ -168,8 +168,7 @@ public:
 	// ###################################################################################################
 
 	// File operations
-	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
-
+	
 	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
 	//########################################################################################################

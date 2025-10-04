@@ -1389,35 +1389,6 @@ void ExternalServicesComponent::saveProject() {
 
 // File operations
 
-std::list<std::string> ExternalServicesComponent::RequestFileNames(const std::string& dialogTitle, const std::string& fileMask)
-{
-	std::list<std::string> selectedFilesStd;
-
-	try {
-		QFileDialog dialog(nullptr);
-		dialog.setFileMode(QFileDialog::ExistingFiles);
-		dialog.setWindowTitle(dialogTitle.c_str());
-		dialog.setWindowFilePath(QDir::currentPath());
-		dialog.setNameFilter(QString(fileMask.c_str()) + " ;; All files (*.*)");
-		
-		if (dialog.exec())
-		{
-			QStringList selectedFiles = dialog.selectedFiles();
-			for (QString& file : selectedFiles)
-			{
-				selectedFilesStd.push_back(file.toStdString());
-			}
-			return selectedFilesStd;
-		}
-	}
-	catch (std::exception& e)
-	{
-		throw std::exception(("File could not be loaded due to this exeption: " + std::string(e.what())).c_str());
-	}
-
-	return selectedFilesStd; // This is just to keep the compiler happy.
-}
-
 void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength)
 {
 	fileContent.clear();
@@ -1757,7 +1728,7 @@ std::string ExternalServicesComponent::handleSetLogFlags(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
-	m_actionProfiler.setCompound();
+	m_actionProfiler.ignoreCurrent();
 
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	rapidjson::Value documents = _document[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
@@ -2061,6 +2032,8 @@ std::string ExternalServicesComponent::handleGenerateUIDs(ot::JsonDocument& _doc
 }
 
 std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
 
 	ImportFileWorkerData data;
@@ -4039,6 +4012,8 @@ std::string ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _do
 
 // Dialogs
 std::string ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 
 	ot::PropertyDialogCfg pckg;
@@ -4055,6 +4030,8 @@ std::string ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _d
 }
 
 std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.getConstObject());
 
@@ -4080,6 +4057,8 @@ std::string ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.getConstObject());
 
@@ -4102,6 +4081,7 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 }
 
 std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
