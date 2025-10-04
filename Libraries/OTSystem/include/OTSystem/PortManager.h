@@ -23,7 +23,7 @@ namespace ot {
 	public:
 		typedef std::pair<ot::port_t, ot::port_t> PortRange;
 
-		PortManager() {};
+		PortManager() : m_lastPort(invalidPortNumber) {};
 		PortManager(ot::port_t _startingPort, ot::port_t _maxPort = static_cast<ot::port_t>(ot::maxPortNumber));
 		PortManager(const PortManager&) = default;
 		PortManager(PortManager&&) = default;
@@ -54,6 +54,7 @@ namespace ot {
 		const std::list<PortRange>& getPortRanges() const { return m_ranges; };
 
 	private:
+		port_t                         m_lastPort;
 		std::list<PortRange>           m_ranges;     //! @brief Available ranges.
 		std::unordered_set<ot::port_t> m_portsInUse; //! @brief Blocked ports.
 	};

@@ -7,7 +7,9 @@
 #include "OTSystem/OTAssert.h"
 #include "OTSystem/PortManager.h"
 
-ot::PortManager::PortManager(ot::port_t _startingPort, ot::port_t _maxPort) {
+#undef max
+
+ot::PortManager::PortManager(ot::port_t _startingPort, ot::port_t _maxPort) : m_lastPort(invalidPortNumber) {
 	this->addPortRange(_startingPort, _maxPort);
 }
 
@@ -31,18 +33,32 @@ ot::port_t ot::PortManager::determineAndBlockAvailablePort(void) {
 		return invalidPortNumber;
 	}
 
-	// Find an available port in the defined ranges
+	// Start searching at m_lastPort + 1
+	ot::port_t startPort = m_lastPort + 1;
+
+	// First pass: search from startPort to end of ranges
 	for (const PortRange& range : m_ranges) {
-		ot::port_t portNumber = range.first;
+		ot::port_t portNumber = std::max(startPort, range.first);
 		while (portNumber <= range.second) {
 			if (!this->isPortInUse(portNumber)) {
-				// Block port
 				m_portsInUse.insert(portNumber);
+				m_lastPort = portNumber;
 				return portNumber;
 			}
-			else {
-				portNumber++;
+			portNumber++;
+		}
+	}
+
+	// Second pass: wrap around and search from beginning of ranges up to m_lastPort
+	for (const PortRange& range : m_ranges) {
+		ot::port_t portNumber = range.first;
+		while (portNumber <= range.second && portNumber < startPort) {
+			if (!this->isPortInUse(portNumber)) {
+				m_portsInUse.insert(portNumber);
+				m_lastPort = portNumber;
+				return portNumber;
 			}
+			portNumber++;
 		}
 	}
 
