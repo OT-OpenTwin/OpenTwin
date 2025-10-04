@@ -386,6 +386,12 @@ private:
 	ServiceDataUi * getService(ot::serviceID_t _serviceID);
 	ServiceDataUi * getService(const ot::BasicServiceInformation& _serviceInfo);
 
+	void addService(const ot::ServiceBase& _info);
+
+	//! @brief Removes all data related to a service that is not available anymore.
+	//! @param _serviceID The ID of the service that is not available anymore.
+	void cleanUpService(ot::serviceID_t _serviceID);
+
 	void determineViews(const std::string& _modelServiceURL);
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);

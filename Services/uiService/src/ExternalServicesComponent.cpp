@@ -16,20 +16,24 @@
 #include "SelectEntitiesDialog.h"
 #include "ExternalServicesComponent.h"	// Corresponding header
 
-// OpenTwin header
+// OpenTwin System header
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
 
-#include "OTCore/LogDispatcher.h"
+// OpenTwin Core header
 #include "OTCore/Color.h"
+#include "OTCore/String.h"
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/LogDispatcher.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/ReturnMessage.h"
 
+// OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/GraphicsPackage.h"
@@ -42,6 +46,7 @@
 #include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGui/VisualisationCfg.h"
 
+// OpenTwin Widgets header
 #include "OTWidgets/Table.h"
 #include "OTWidgets/PlotView.h"
 #include "OTWidgets/QtFactory.h"
@@ -69,6 +74,7 @@
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
+// OpenTwin Communication header
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
@@ -77,9 +83,8 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
+// OpenTwin header
 #include "CurveDatasetFactory.h"
-#include "OTCore/String.h"
-
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 #include "ProgressUpdater.h"
@@ -1185,23 +1190,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		runData.setFromJsonObject(ot::json::getObject(serviceListDoc, OT_ACTION_PARAM_RunData));
 
 		for (const ot::ServiceBase& service : runData.getServices()) {
-			// Dont store this services information
-			if (service.getServiceID() == AppBase::instance()->getServiceID()) {
-				continue;
-			}
-
-			auto oldService = m_serviceIdMap.find(service.getServiceID());
-			if (oldService == m_serviceIdMap.end()) {
-				OT_LOG_D("Service registered { \"ServiceName\": \"" + service.getServiceName() + "\", \"SenderID\": " + std::to_string(service.getServiceID()) + " }");
-				m_serviceIdMap.insert_or_assign(service.getServiceID(), new ServiceDataUi{ service.getServiceName(), service.getServiceType(), service.getServiceURL(), service.getServiceID() });
-			}
-			else {
-				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + service.getServiceName() + "\", \"Type\": \"" + service.getServiceType() + "\", \"ID\": " + std::to_string(service.getServiceID()) + " }");
-			}
-
-			if (service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
-				this->determineViews(service.getServiceURL());
-			}
+			this->addService(service);
 		}
 
 		// Start the session service health check
@@ -1321,12 +1310,11 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		}
 
 		// Reset all service information
-		for (auto& s : m_serviceIdMap) {
-			m_lockManager->cleanService(s.second->getBasicServiceInformation(), true, true);
-			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
-			app->shortcutManager()->creatorDestroyed(s.second);
-			delete s.second;
+		auto serviceIDs = ot::ContainerHelper::getKeys(m_serviceIdMap);
+		for (auto serviceID : serviceIDs) {
+			this->cleanUpService(serviceID);
 		}
+
 		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation(), true, true);
 		m_controlsManager->serviceDisconnected(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
 
@@ -1345,7 +1333,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			app->closeAllViewerTabs();
 		}
 
-		//NOTE, add service notification to close the session, or deregister the uiService
 		app->setServiceID(ot::invalidServiceID);
 		m_currentSessionID = "";
 		app->clearSessionInformation();
@@ -1891,28 +1878,8 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
-	if (senderName.empty()) {
-		OT_LOG_EA("Service name is empty");
-		return "";
-	}
-
-	if (senderType.empty()) {
-		OT_LOG_EA("Service type is empty");
-		return "";
-	}
-
-	// Check for duplicate service names
-	for (const auto& it : m_serviceIdMap) {
-		if (it.second->getBasicServiceInformation().serviceName() == senderName) {
-			OT_LOG_EAS("Service with the name  \"" +  senderName + "\" already registered.");
-			return "";
-		}
-	}
-
-	ServiceDataUi* connectedService = new ServiceDataUi(senderName, senderType, senderURL, senderID);
-	m_serviceIdMap.insert_or_assign(senderID, connectedService);
-
-	OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
+	ot::ServiceBase info(senderName, senderType, senderURL, senderID);
+	this->addService(info);
 
 	return "";
 }
@@ -1920,26 +1887,7 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocument& _document) {
 	ot::serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
-	auto itm = m_serviceIdMap.find(senderID);
-	if (itm != m_serviceIdMap.end()) {
-		ServiceDataUi* actualService = itm->second;
-		assert(actualService != nullptr);
-
-		std::string senderName = actualService->getServiceName();
-
-		// Clean up elements
-		m_lockManager->cleanService(actualService->getBasicServiceInformation(), false, true);
-		m_controlsManager->serviceDisconnected(actualService->getBasicServiceInformation());
-		AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
-
-		// Clean up entry
-		m_serviceIdMap.erase(actualService->getServiceID());
-		removeServiceFromList(m_modelViewNotifier, actualService);
-
-		OT_LOG_D("Service deregistered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
-
-		delete actualService;
-	}
+	this->cleanUpService(senderID);
 
 	return "";
 }
@@ -2066,10 +2014,6 @@ std::string ExternalServicesComponent::handleRegisterForModelEvents(ot::JsonDocu
 		ex.append(std::to_string(senderID));
 		ex.append("\" was not registered before");
 		throw std::exception(ex.c_str());
-	}
-	if (s->second->getServiceName() == OT_INFO_SERVICE_TYPE_MODEL)
-	{
-		m_modelServiceURL = s->second->getServiceURL();
 	}
 		
 	m_modelViewNotifier.push_back(s->second);
@@ -4206,6 +4150,62 @@ std::string ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument
 // ###################################################################################################
 
 // Private functions
+
+void ExternalServicesComponent::addService(const ot::ServiceBase& _info) {
+	// Dont store this services information
+	if (_info.getServiceID() == AppBase::instance()->getServiceID()) {
+		return;
+	}
+
+	auto oldService = m_serviceIdMap.find(_info.getServiceID());
+	if (oldService != m_serviceIdMap.end()) {
+		OT_LOG_W("Service already registered. Ignoring... { \"Name\": \"" + _info.getServiceName() + "\", \"Type\": \"" + _info.getServiceType() + "\", \"ID\": " + std::to_string(_info.getServiceID()) + " }");
+		return;	
+	}
+
+	ServiceDataUi* newService = new ServiceDataUi{ _info.getServiceName(), _info.getServiceType(), _info.getServiceURL(), _info.getServiceID() };
+	m_serviceIdMap.insert_or_assign(_info.getServiceID(), newService);
+
+	OT_LOG_D("Service registered { \"Name\": \"" + _info.getServiceName() + "\", \"ID\": " + std::to_string(_info.getServiceID()) + ", \"Url\": \"" + _info.getServiceURL() + "\" }");
+
+	if (_info.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
+		if (!m_modelServiceURL.empty()) {
+			OT_LOG_W("Multiple model services detected. Overwriting the previous one. { \"PreviousURL\": \"" + m_modelServiceURL + "\", \"NewURL\": \"" + _info.getServiceURL() + "\" }");
+		}
+		m_modelServiceURL = _info.getServiceURL();
+		this->determineViews(_info.getServiceURL());
+	}
+}
+
+void ExternalServicesComponent::cleanUpService(ot::serviceID_t _serviceID) {
+	auto itm = m_serviceIdMap.find(_serviceID);
+	if (itm == m_serviceIdMap.end()) {
+		OT_LOG_E("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
+		return;
+	}
+
+	ServiceDataUi* actualService = itm->second;
+	OTAssertNullptr(actualService);
+
+	std::string senderName = actualService->getServiceName();
+
+	if (actualService->getServiceURL() == m_modelServiceURL) {
+		m_modelServiceURL.clear();
+	}
+
+	// Clean up elements
+	m_lockManager->cleanService(actualService->getBasicServiceInformation(), false, true);
+	m_controlsManager->serviceDisconnected(actualService->getBasicServiceInformation());
+	AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
+
+	// Clean up entry
+	m_serviceIdMap.erase(actualService->getServiceID());
+	this->removeServiceFromList(m_modelViewNotifier, actualService);
+
+	OT_LOG_D("Service deregistered { \"Name\": \"" + senderName + "\", \"ID\": " + std::to_string(_serviceID) + " }");
+
+	delete actualService;
+}
 
 void ExternalServicesComponent::determineViews(const std::string& _modelServiceURL) {
 	ot::JsonDocument sendingDoc;
