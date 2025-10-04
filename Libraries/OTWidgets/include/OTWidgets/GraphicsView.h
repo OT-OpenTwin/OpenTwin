@@ -145,6 +145,8 @@ namespace ot {
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
+		void notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection);
+
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name
@@ -163,6 +165,8 @@ namespace ot {
 		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
 
 		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);
+
+		void connectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 

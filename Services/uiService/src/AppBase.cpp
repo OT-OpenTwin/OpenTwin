@@ -2460,6 +2460,50 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 	}
 }
 
+void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject configObj;
+	_newConfig.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
 void AppBase::slotGraphicsSelectionChanged(void) {
 	OT_SLECTION_TEST_LOG("Graphics selection changed");
 

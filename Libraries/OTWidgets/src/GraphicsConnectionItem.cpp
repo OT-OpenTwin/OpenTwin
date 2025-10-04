@@ -42,7 +42,7 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 // QGraphicsItem
 
-QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
+QRectF ot::GraphicsConnectionItem::boundingRect() const {
 	if (m_dest == nullptr || m_origin == nullptr) {
 		return m_lastRect;
 	}
@@ -164,11 +164,11 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF
 	return distance;
 }
 
-QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem(void) {
+QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() {
 	return this;
 }
 
-const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem(void) const {
+const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
 	return this;
 }
 
@@ -197,7 +197,7 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	this->updateConnectionView();
 }
 
-void ot::GraphicsConnectionItem::disconnectItems(void) {
+void ot::GraphicsConnectionItem::disconnectItems() {
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
@@ -221,18 +221,18 @@ void ot::GraphicsConnectionItem::setHandleState(bool _handlesState) {
 	m_config.setHandlesState(_handlesState);
 }
 
-bool ot::GraphicsConnectionItem::getHandleState(void) const {
+bool ot::GraphicsConnectionItem::getHandleState() const {
 	return m_config.getHandleState();
 }
 
-void ot::GraphicsConnectionItem::updateConnectionView(void) {
+void ot::GraphicsConnectionItem::updateConnectionView() {
 	if (m_origin && m_dest) {
 		this->prepareGeometryChange();
 		this->update();
 	}
 }
 
-void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
+void ot::GraphicsConnectionItem::updateConnectionInformation() {
 	if (m_origin) {
 		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
 		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
@@ -497,7 +497,7 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointAutoXY(const Q
 	}
 }
 
-ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculateAutoXYShape(void) const
+ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculateAutoXYShape() const
 {
 	OTAssertNullptr(m_origin);
 	OTAssertNullptr(m_dest);
@@ -525,7 +525,7 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculate
 	}
 }
 
-ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment(void) const {
+ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment() const {
 	OTAssertNullptr(m_origin);
 	OTAssertNullptr(m_dest);
 

@@ -444,6 +444,14 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 }
 
+void ot::GraphicsView::notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection) {
+	if (m_viewStateFlags & ItemMoveInProgress) {
+		return;
+	}
+
+	Q_EMIT connectionChanged(_connection->getConfiguration());
+}
+
 // ########################################################################################################
 
 // Protected: Events

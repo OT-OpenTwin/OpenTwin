@@ -187,6 +187,8 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	ot::Table* sessionTable = new ot::Table(_info.getSessionToLssList().size(), 2);
 	sessionTable->verticalHeader()->setVisible(false);
 	sessionTable->setHorizontalHeaderLabels({ "Session", "LSS ID" });
+	sessionTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+	sessionTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
 	r = 0;
 	for (const auto& it : _info.getSessionToLssList()) {
 		sessionTable->addItem(r, 0, QString::fromStdString(it.first))->setFlags(cellFlags);
@@ -323,9 +325,10 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 	
 	for (const auto& it : _info.getMandatoryServices()) {
 		QListWidget* mandatoryWidget = new QListWidget;
-		
 		for (const auto& service : it.second) {
-			mandatoryWidget->addItem(QString::fromStdString(service));
+			QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(service));
+			itm->setFlags(Qt::ItemIsEnabled);
+			mandatoryWidget->addItem(itm);
 		}
 
 		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Madatory Services (" + it.first + ")"));
@@ -358,7 +361,9 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 
 	QListWidget* debugServicesList = new QListWidget;
 	for (const auto& it : _info.getDebugServices()) {
-		debugServicesList->addItem(QString::fromStdString(it));
+		QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(it));
+		itm->setFlags(Qt::ItemIsEnabled);
+		debugServicesList->addItem(itm);
 	}
 	ot::ExpanderWidget* debugServicesExpander = new ot::ExpanderWidget("Debug Services (" + QString::number(_info.getDebugServices().size()) + ")");
 	debugServicesExpander->setWidget(debugServicesList);
@@ -379,7 +384,9 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 
 	QListWidget* shutdownCompletedList = new QListWidget;
 	for (const auto& it : _info.getShutdownCompletedQueue()) {
-		shutdownCompletedList->addItem(QString::fromStdString(it));
+		QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(it));
+		itm->setFlags(Qt::ItemIsEnabled);
+		shutdownCompletedList->addItem(itm);
 	}
 	ot::ExpanderWidget* shutdownCompletedExpander = new ot::ExpanderWidget("Shutdown Completed (" + QString::number(_info.getShutdownCompletedQueue().size()) + ")");
 	shutdownCompletedExpander->setWidget(shutdownCompletedList);
@@ -387,7 +394,9 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 
 	QListWidget* blockedPortsList = new QListWidget;
 	for (const auto& it : _info.getBlockedPorts()) {
-		blockedPortsList->addItem(QString::number(it));
+		QListWidgetItem* itm = new QListWidgetItem(QString::number(it));
+		itm->setFlags(Qt::ItemIsEnabled);
+		blockedPortsList->addItem(itm);
 	}
 	ot::ExpanderWidget* blockedPortsExpander = new ot::ExpanderWidget("Blocked Ports (" + QString::number(_info.getBlockedPorts().size()) + ")");
 	blockedPortsExpander->setWidget(blockedPortsList);
@@ -542,7 +551,9 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 		ldsLayout->addWidget(new ot::Label("Supported Services:"));
 		QListWidget* supportedServicesList = new QListWidget;
 		for (const auto& service : it.supportedServices) {
-			supportedServicesList->addItem(QString::fromStdString(service));
+			QListWidgetItem* itm = new QListWidgetItem(QString::fromStdString(service));
+			itm->setFlags(Qt::ItemIsEnabled);
+			supportedServicesList->addItem(itm);
 		}
 		ldsLayout->addWidget(supportedServicesList);
 
@@ -599,7 +610,9 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	generalInfoLayout->addWidget(new ot::Label("Used Ports:"), r, 0);
 	QListWidget* usedPortsList = new QListWidget;
 	for (const auto& it : _info.getUsedPorts()) {
-		usedPortsList->addItem(QString::number(it));
+		QListWidgetItem* itm = new QListWidgetItem(QString::number(it));
+		itm->setFlags(Qt::ItemIsEnabled);
+		usedPortsList->addItem(itm);
 	}
 	generalInfoLayout->addWidget(usedPortsList, r++, 1);
 	generalInfoLayout->setRowStretch(r, 1);
@@ -882,6 +895,8 @@ ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::
 	ot::Table* table = new ot::Table(_sessionData.size(), 3);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels({ "Session ID", "User Name", "Flags" });
+	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 	int r = 0;
 	for (const auto& session : _sessionData) {
 		table->addItem(r, 0, QString::fromStdString(session.sessionID))->setFlags(cellFlags);

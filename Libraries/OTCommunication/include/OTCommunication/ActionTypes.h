@@ -287,6 +287,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection "UI.GraphicsEditor.Connection.AddToConnection"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged "UI.GraphicsEditor.ConnectionChanged"
 #define OT_ACTION_CMD_SelectedEntitiesSerialise "SerialiseSelectedEntities"
 #define OT_ACTION_CMD_PasteEntities "PasteEntities"
 
