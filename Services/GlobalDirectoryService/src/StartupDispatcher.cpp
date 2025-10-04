@@ -53,6 +53,17 @@ void StartupDispatcher::sessionClosing(const std::string& _sessionID) {
 
 // Serialization
 
+void StartupDispatcher::getDebugInformation(ot::GDSDebugInfo& _debugInfo) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	_debugInfo.setStartupWorkerRunning(m_workerThread != nullptr);
+	_debugInfo.setStartupWorkerStopping(m_isStopping);
+
+	for (const ot::ServiceInitData& info : m_requestedServices) {
+		_debugInfo.addRequestedService(_debugInfo.infoFromInitData(info));
+	}
+}
+
 void StartupDispatcher::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 

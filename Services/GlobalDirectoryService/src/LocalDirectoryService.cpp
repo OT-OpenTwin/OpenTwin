@@ -248,6 +248,16 @@ void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::ser
 
 // Serialization
 
+void LocalDirectoryService::getDebugInformation(ot::GDSDebugInfo::LDSInfo& _info) const {
+	_info.serviceID = this->getServiceID();
+	_info.url = this->getServiceURL();
+	_info.supportedServices = m_supportedServices;
+
+	for (const ot::ServiceInitData& service : m_services) {
+		_info.services.push_back(ot::GDSDebugInfo::infoFromInitData(service));
+	}
+}
+
 void LocalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
 	_jsonObject.AddMember("SupportedServices", ot::JsonArray(m_supportedServices, _allocator), _allocator);
 

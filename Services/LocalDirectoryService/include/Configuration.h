@@ -11,6 +11,7 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/LDSDebugInfo.h"
 
 // std header
 #include <list>
@@ -25,6 +26,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
+
+	void getDebugInformation(ot::LDSDebugInfo& _info);
 
 	//! @brief Add the object contents to the provided JSON object
 	//! @param _object Json object reference

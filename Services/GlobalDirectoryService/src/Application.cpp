@@ -13,6 +13,7 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/GDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -355,27 +356,19 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 std::string Application::handleGetDebugInformation(ot::JsonDocument& _doc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	ot::JsonDocument doc;
+	ot::GDSDebugInfo info;
 
-	doc.AddMember("GSS.URL", ot::JsonString(m_globalSessionServiceURL, doc.GetAllocator()), doc.GetAllocator());
+	info.setURL(this->getServiceURL());
+	info.setGSSUrl(m_globalSessionServiceURL);
+	m_startupDispatcher.getDebugInformation(info);
 
-	ot::JsonArray ldsArr;
 	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
-		ot::JsonObject ldsObj;
-		lds.addToJsonObject(ldsObj, doc.GetAllocator());
-		ldsArr.PushBack(ldsObj, doc.GetAllocator());
+		ot::GDSDebugInfo::LDSInfo ldsInfo;
+		lds.getDebugInformation(ldsInfo);
+		info.addLocalDirectoryService(std::move(ldsInfo));
 	}
-	doc.AddMember("LDS.Info", ldsArr, doc.GetAllocator());
 
-	ot::JsonObject startupObj;
-	m_startupDispatcher.addToJsonObject(startupObj, doc.GetAllocator());
-	doc.AddMember("StartupDispatcher", startupObj, doc.GetAllocator());
-
-	ot::JsonArray logFlagsArr;
-	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logFlagsArr, doc.GetAllocator());
-	doc.AddMember("LogFlags", logFlagsArr, doc.GetAllocator());
-
-	return doc.toJson();
+	return info.toJson();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -180,7 +180,33 @@ ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Service management
+// Serialization
+
+void Session::getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	_info.id = m_id;
+	_info.type = m_type;
+	_info.userName = m_userName;
+	_info.projectName = m_projectName;
+	_info.collectionName = m_collectionName;
+
+	_info.userCollection = m_userCollection;
+	_info.userCredName = m_userCredentials.getUserName();
+	_info.userCredPassword = m_userCredentials.getEncryptedPassword();
+	_info.dataBaseCredName = m_dbCredentials.getUserName();
+	_info.dataBaseCredPassword = m_dbCredentials.getEncryptedPassword();
+
+	_info.isHealthCheckRunning = m_healthCheckRunning;
+	_info.isShuttingDown = m_state.flagIsSet(Session::ShuttingDown);
+
+	_info.services.clear();
+	for (const Service& service : m_services) {
+		ot::LSSDebugInfo::ServiceInfo serviceInfo;
+		service.getDebugInfo(serviceInfo);
+		_info.services.push_back(std::move(serviceInfo));
+	}
+}
 
 void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -214,6 +240,10 @@ void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _al
 	}
 	_jsonObject.AddMember("Services", servicesArr, _allocator);
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Service management
 
 Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation) {
 	std::lock_guard<std::mutex> lock(m_mutex);

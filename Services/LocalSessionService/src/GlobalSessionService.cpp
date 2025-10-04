@@ -73,6 +73,11 @@ bool GlobalSessionService::connect(const std::string& _url) {
 	return true;
 }
 
+std::string GlobalSessionService::getServiceUrl() {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_serviceInfo.getServiceURL();
+}
+
 bool GlobalSessionService::isConnected() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return (m_connectionStatus == Connected);

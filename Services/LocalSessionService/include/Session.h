@@ -13,6 +13,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/LSSDebugInfo.h"
 #include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"
 #include "OTServiceFoundation/UserCredentials.h"
@@ -91,6 +92,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
+
+	void getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info);
 
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator);
 
@@ -222,10 +225,11 @@ private:
 	SessionState				   m_state;
 
 	std::string                    m_id;
+	std::string                    m_type;
+
 	std::string                    m_userName;
 	std::string                    m_projectName;
 	std::string                    m_collectionName;
-	std::string                    m_type;
 	
 	ot::UserCredentials            m_userCredentials;
 	ot::UserCredentials            m_dbCredentials;

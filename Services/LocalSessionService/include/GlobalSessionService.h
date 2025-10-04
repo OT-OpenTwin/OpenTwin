@@ -37,6 +37,8 @@ public:
 	//! @warning This function will block until the connection is established or fails.
 	//! @param _url Global Directory Service url.
 	bool connect(const std::string& _url);
+	
+	std::string getServiceUrl();
 
 	bool isConnected();
 

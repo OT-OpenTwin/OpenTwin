@@ -9,6 +9,11 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
+#undef Object
+#undef ObjectW
+#undef GetObject
+#undef GetObjectW
+
 #define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_EAS("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
 
 #define OT_JSON_createMemberIterator(___object, ___memberName, ___iteratorName) ot::JsonMemberIterator ___iteratorName = ___object.FindMember(___memberName)

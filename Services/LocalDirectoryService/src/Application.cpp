@@ -152,17 +152,16 @@ std::string Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
 }
 
 std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocument) {
-	ot::JsonDocument doc;
+	ot::LDSDebugInfo info;
+	info.setURL(this->getServiceURL());
+	info.setId(this->getServiceID());
+	info.setGDSURL(m_globalDirectoryService.getServiceURL());
+	info.setGDSConnected(m_globalDirectoryService.isConnected());
+
+	m_serviceManager.getDebugInformation(info);
+	Configuration::instance().getDebugInformation(info);
 	
-	ot::JsonObject configObj;
-	Configuration::instance().addToJsonObject(configObj, doc.GetAllocator());
-	doc.AddMember("Configuration", configObj, doc.GetAllocator());
-
-	ot::JsonObject serviceManagerObj;
-	m_serviceManager.addToJsonObject(serviceManagerObj, doc.GetAllocator());
-	doc.AddMember("ServiceManager", serviceManagerObj, doc.GetAllocator());
-
-	return doc.toJson();
+	return info.toJson();
 }
 
 std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {

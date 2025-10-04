@@ -397,10 +397,7 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 }
 
 std::string GlobalSessionService::handleGetDebugInformation(ot::JsonDocument& _doc) {
-	ot::GSSDebugInfo dbg = this->getDebugInformation();
-	ot::JsonDocument doc;
-	dbg.addToJsonObject(doc, doc.GetAllocator());
-	return doc.toJson();
+	return this->getDebugInformation().toJson();
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {

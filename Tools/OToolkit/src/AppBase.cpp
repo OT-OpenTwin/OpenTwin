@@ -54,6 +54,8 @@
 
 #define BUILD_INFO "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n"
 
+#undef FAR
+
 enum InternLogType {
 	InternInfo,
 	InternWarning,

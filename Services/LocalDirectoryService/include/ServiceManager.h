@@ -16,6 +16,7 @@
 #include "OTSystem/RunResult.h"
 #include "OTSystem/PortManager.h"
 #include "OTCore/JSON.h"
+#include "OTCommunication/LDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"
 
 // std header
@@ -39,6 +40,8 @@ public:
 
 	ServiceManager();
 	virtual ~ServiceManager();
+
+	void getDebugInformation(ot::LDSDebugInfo& _info);
 
 	//! @brief Add the object contents to the provided JSON object
 	//! @param _document The JSON document (used to get the allocator)
@@ -106,6 +109,11 @@ private:
 	std::string logInfo(const Service& _service) const;
 	std::string logInfo(const RequestedService& _service) const;
 	std::string logInfo(const ot::ServiceInitData& _serviceInfo) const;
+
+	ot::LDSDebugInfo::ServiceInfo toDebugInfo(const ot::ServiceInitData& _serviceInfo) const;
+	ot::LDSDebugInfo::ServiceInfo toDebugInfo(const Service& _service) const;
+	ot::LDSDebugInfo::ServiceInfo toDebugInfo(const RequestedService& _service) const;
+	void addDebugInfo(const ServiceStartupData& _startupData, ot::LDSDebugInfo::ServiceInfo& _info) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

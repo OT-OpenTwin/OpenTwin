@@ -11,6 +11,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/GDSDebugInfo.h"
 #include "OTCommunication/ServiceInitData.h"
 
 // std header
@@ -55,6 +56,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
+
+	void getDebugInformation(ot::GDSDebugInfo::LDSInfo& _info) const;
 
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 

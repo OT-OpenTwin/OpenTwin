@@ -62,6 +62,7 @@ namespace ot {
 		void expand();
 		void collapse();
 		void toggle();
+		void animationFinished();
 
 	private:
 		ot::ToolButton* m_toggleButton;

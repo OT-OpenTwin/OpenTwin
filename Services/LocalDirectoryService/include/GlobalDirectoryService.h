@@ -11,7 +11,7 @@
 // std header
 #include <string>
 
-class GlobalDirectoryService : ot::ServiceBase {
+class GlobalDirectoryService : public ot::ServiceBase {
 public:
 	enum ConnectionStatus {
 		Connected,

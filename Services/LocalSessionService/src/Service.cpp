@@ -85,6 +85,22 @@ std::string Service::debugLogString(const std::string& _sessionID) const {
 
 // Serialization
 
+void Service::getDebugInfo(ot::LSSDebugInfo::ServiceInfo& _info) const {
+	_info.id = this->getServiceID();
+	_info.name = this->getServiceName();
+	_info.type = this->getServiceType();
+	_info.url = this->getServiceURL();
+	_info.websocketUrl = this->getWebsocketUrl();
+	_info.connectedType = m_connectedType;
+
+	_info.isDebug = static_cast<bool>(m_state & Service::IsDebug);
+	_info.isRequested = static_cast<bool>(m_state & Service::Requested);
+	_info.isAlive = static_cast<bool>(m_state & Service::Alive);
+	_info.isRunning = static_cast<bool>(m_state & Service::Running);
+	_info.isShuttingDown = static_cast<bool>(m_state & Service::ShuttingDown);
+	_info.isHidden = static_cast<bool>(m_state & Service::Hidden);
+}
+
 void Service::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(this->getServiceURL(), _allocator), _allocator);

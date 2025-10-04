@@ -36,6 +36,26 @@ Configuration& Configuration::instance() {
 
 // Serialization
 
+void Configuration::getDebugInformation(ot::LDSDebugInfo& _info) {
+	ot::LDSDebugInfo::ConfigInfo configInfo;
+	configInfo.configImported = m_configurationImported;
+	configInfo.defaultMaxCrashRestarts = m_defaultMaxCrashRestarts;
+	configInfo.defaultMaxStartupRestarts = m_defaultMaxStartupRestarts;
+	configInfo.launcherPath = m_launcherPath;
+	configInfo.servicesLibraryPath = m_servicesLibraryPath;
+
+	for (const SupportedService& s : m_supportedServices) {
+		ot::LDSDebugInfo::SupportedServiceInfo serviceInfo;
+		serviceInfo.name = s.getName();
+		serviceInfo.type = s.getType();
+		serviceInfo.maxCrashRestarts = s.getMaxCrashRestarts();
+		serviceInfo.maxStartupRestarts = s.getMaxStartupRestarts();
+		configInfo.supportedServices.push_back(std::move(serviceInfo));
+	}
+
+	_info.setConfig(std::move(configInfo));
+}
+
 void Configuration::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember(LDS_CFG_DefaultMaxCrashRestarts, m_defaultMaxCrashRestarts, _allocator);
 	_object.AddMember(LDS_CFG_DefaultMaxStartupRestarts, m_defaultMaxStartupRestarts, _allocator);

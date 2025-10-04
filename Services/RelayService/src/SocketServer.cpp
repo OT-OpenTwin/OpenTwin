@@ -514,7 +514,7 @@ void SocketServer::lssHealthCheckWorker() {
 		// Try to send message and check the response
 		std::string ret;
 		try {
-			if (!ot::msg::send("", m_lssUrl, ot::EXECUTE, ping, ret)) {
+			if (!ot::msg::send(m_relayUrl, m_lssUrl, ot::EXECUTE, ping, ret)) {
 				alive = false;
 				break;
 			}

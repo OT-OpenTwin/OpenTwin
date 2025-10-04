@@ -30,6 +30,59 @@ ServiceManager::~ServiceManager() {
 	this->stopThreads();
 }
 
+void ServiceManager::getDebugInformation(ot::LDSDebugInfo& _info) {
+	_info.setUsedPorts(m_portManager.getBlockedPorts());
+	_info.setServicesIPAddress(m_servicesIpAddress);
+	_info.setLastError(m_lastError);
+
+	_info.setServiceCheckAliveFrequency(m_serviceCheckAliveFrequency.count());
+	_info.setWorkerRunning(m_workerRunning);
+
+	{
+		std::lock_guard<std::mutex> lock(m_mutexRequestedServices);
+		for (const RequestedService& s : m_requestedServices) {
+			_info.addRequestedService(this->toDebugInfo(s));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_mutexInitializingServices);
+		for (const Service& s : m_initializingServices) {
+			_info.addInitializingService(this->toDebugInfo(s));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_mutexServices);
+		for (const auto& s : m_sessions) {
+			std::list<ot::LDSDebugInfo::ServiceInfo> services;
+			for (const Service& service : s.second) {
+				services.push_back(this->toDebugInfo(service));
+			}
+			ot::LDSDebugInfo::SessionInfo sessionInfo;
+			sessionInfo.lssUrl = s.first.getSessionServiceURL();
+			sessionInfo.sessionID = s.first.getId();
+			_info.addAliveSession(std::move(sessionInfo), std::move(services));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_mutexFailedServices);
+		for (const auto& s : m_failedServices) {
+			_info.addFailedService(this->toDebugInfo(s.second));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_mutexStoppingServices);
+		for (const Service& s : m_newStoppingServices) {
+			_info.addNewStoppingService(this->toDebugInfo(s));
+		}
+	}
+	{
+		std::lock_guard<std::mutex> lock(m_mutexCurrentStoppingServices);
+		for (const Service& s : m_currentStoppingServices) {
+			_info.addStoppingService(this->toDebugInfo(s));
+		}
+	}
+}
+
 void ServiceManager::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) {
 	// Info
 	_object.AddMember("Services.IP", ot::JsonString(m_servicesIpAddress, _allocator), _allocator);
@@ -526,6 +579,44 @@ std::string ServiceManager::logInfo(const RequestedService& _service) const {
 std::string ServiceManager::logInfo(const ot::ServiceInitData& _serviceInfo) const {
 	return "\"ServiceID\": " + std::to_string(_serviceInfo.getServiceID()) + ", \"ServiceName\": \"" + _serviceInfo.getServiceName() + "\", \"ServiceType\": \"" +
 		_serviceInfo.getServiceType() + "\", \"SessionID\": \"" + _serviceInfo.getSessionID() + "\"";
+}
+
+ot::LDSDebugInfo::ServiceInfo ServiceManager::toDebugInfo(const ot::ServiceInitData& _serviceInfo) const {
+	ot::LDSDebugInfo::ServiceInfo info;
+
+	info.id = _serviceInfo.getServiceID();
+	info.name = _serviceInfo.getServiceName();
+	info.type = _serviceInfo.getServiceType();
+	info.sessionID = _serviceInfo.getSessionID();
+	info.lssUrl = _serviceInfo.getSessionServiceURL();
+
+	return info;
+}
+
+ot::LDSDebugInfo::ServiceInfo ServiceManager::toDebugInfo(const Service& _service) const {
+	ot::LDSDebugInfo::ServiceInfo info = toDebugInfo(_service.getInfo());
+
+	info.url = _service.getUrl();
+	info.websocketUrl = _service.getWebsocketUrl();
+	info.isShuttingDown = _service.isShuttingDown();
+
+	this->addDebugInfo(_service.getStartupData(), info);
+
+	return info;
+}
+
+ot::LDSDebugInfo::ServiceInfo ServiceManager::toDebugInfo(const RequestedService& _service) const {
+	ot::LDSDebugInfo::ServiceInfo info = toDebugInfo(_service.getInitData());
+	this->addDebugInfo(_service.getStartupData(), info);
+
+	return info;
+}
+
+void ServiceManager::addDebugInfo(const ServiceStartupData& _startupData, ot::LDSDebugInfo::ServiceInfo& _info) const {
+	_info.startCounter = _startupData.getStartCounter();
+	_info.iniAttempt = _startupData.getIniAttempt();
+	_info.maxCrashRestarts = _startupData.getMaxCrashRestarts();
+	_info.maxStartupRestarts = _startupData.getMaxStartupRestarts();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

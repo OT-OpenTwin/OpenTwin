@@ -11,6 +11,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/LSSDebugInfo.h"
 
 // std header
 #include <list>
@@ -72,6 +73,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
+
+	void getDebugInfo(ot::LSSDebugInfo::ServiceInfo& _info) const;
 
 	void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 

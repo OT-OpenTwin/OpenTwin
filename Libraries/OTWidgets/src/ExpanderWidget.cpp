@@ -67,6 +67,7 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent) :
 	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     this->connect(m_toggleButton, &QToolButton::clicked, this, &ExpanderWidget::toggle);
+	this->connect(m_toggleAnimation, &QPropertyAnimation::finished, this, &ExpanderWidget::animationFinished);
 }
 
 ot::ExpanderWidget::~ExpanderWidget() {
@@ -173,5 +174,11 @@ void ot::ExpanderWidget::toggle() {
     }
     else {
         this->expand();
+    }
+}
+
+void ot::ExpanderWidget::animationFinished() {
+    if (m_expanded) {
+        m_childAreaWidget->setMaximumHeight(QWIDGETSIZE_MAX);
     }
 }

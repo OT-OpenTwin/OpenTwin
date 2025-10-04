@@ -966,6 +966,45 @@ std::string SessionService::handleDisableServiceDebug(ot::JsonDocument& _command
 std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _commandDoc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	ot::LSSDebugInfo info;
+	info.setWorkerRunning(m_workerRunning);
+	info.setURL(m_url);
+	info.setID(m_id);
+
+	info.setGSSUrl(m_gss.getServiceUrl());
+	info.setGSSConnected(m_gss.isConnected());
+
+	info.setGDSUrl(m_gds.getServiceUrl());
+	info.setGDSConnected(m_gds.isConnected());
+
+	info.setAuthUrl(m_authUrl);
+	info.setDataBaseUrl(m_dataBaseUrl);
+	info.setLMSUrl(m_lmsUrl);
+
+	info.setDebugServices(std::list<std::string>(m_debugServices.begin(), m_debugServices.end()));
+	
+	for (const auto& mandatory : m_mandatoryServicesMap) {
+		std::list<std::string> serviceNames;
+		for (const ot::ServiceBase& serviceInfo : mandatory.second) {
+			serviceNames.push_back(serviceInfo.getServiceName());
+		}
+		info.addMandatoryService(mandatory.first, serviceNames);
+	}
+
+	info.setShutdownQueue(m_shutdownQueue);
+	info.setShutdownCompletedQueue(m_shutdownCompletedQueue);
+
+	info.setBlockedPorts(m_debugPortManager.getBlockedPorts());
+
+	for (auto& session : m_sessions) {
+		ot::LSSDebugInfo::SessionInfo sessionInfo;
+		session.second.getDebugInfo(sessionInfo);
+		info.addSession(std::move(sessionInfo));
+	}
+
+	return info.toJson();
+
+	/*
 	ot::JsonDocument doc;
 
 	// Service information
@@ -1040,8 +1079,9 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 	portManagerObj.AddMember("PortRanges", portRangesArr, doc.GetAllocator());
 	portManagerObj.AddMember("BlockedPorts", ot::JsonArray(m_debugPortManager.getBlockedPorts(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember("DebugPortManager", portManagerObj, doc.GetAllocator());
-
+	
 	return doc.toJson();
+	*/
 }
 
 std::string SessionService::handleCheckStartupCompleted(ot::JsonDocument& _commandDoc) {
