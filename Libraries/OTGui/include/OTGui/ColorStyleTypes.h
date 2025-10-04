@@ -240,6 +240,8 @@ namespace ot {
 		PlotCurveHighlight,
 		PlotCurveSymbol,
 
+		SuccessForeground,
+		WarningForeground,
 		ErrorForeground,
 
 		//! \brief Used to determine the last entry.

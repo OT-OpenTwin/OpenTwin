@@ -412,6 +412,8 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::PlotCurveHighlight: return "Plot Curve Highlight";
 	case ot::ColorStyleValueEntry::PlotCurveSymbol: return "Plot Curve Symbol";
 
+	case ot::ColorStyleValueEntry::SuccessForeground: return "Success Foreground";
+	case ot::ColorStyleValueEntry::WarningForeground: return "Warning Foreground";
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
@@ -502,6 +504,8 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveHighlight)) return ColorStyleValueEntry::PlotCurveHighlight;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveSymbol)) return ColorStyleValueEntry::PlotCurveSymbol;
 
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::SuccessForeground)) return ColorStyleValueEntry::SuccessForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WarningForeground)) return ColorStyleValueEntry::WarningForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
 		OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
