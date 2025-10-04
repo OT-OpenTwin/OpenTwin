@@ -796,22 +796,6 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
-std::string SessionService::handleCheckProjectOpen(ot::JsonDocument& _commandDoc) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	// Required session params
-	std::string projectName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_PROJECT_NAME);
-	
-	// Check session
-	for (auto& session : m_sessions) {
-		if (session.second.getProjectName() == projectName) {
-			return ot::ReturnMessage::toJson(ot::ReturnMessage::True, session.second.getUserName());
-		}
-	}
-
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::False);
-}
-
 std::string SessionService::handleConfirmService(ot::JsonDocument& _commandDoc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 

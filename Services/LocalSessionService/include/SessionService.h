@@ -101,7 +101,6 @@ private:
 	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES)
 
 	OT_HANDLER(handleCreateNewSession, SessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCheckProjectOpen, SessionService, OT_ACTION_CMD_IsProjectOpen, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleConfirmService, SessionService, OT_ACTION_CMD_ConfirmService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleShowService, SessionService, OT_ACTION_CMD_ShowService, ot::SECURE_MESSAGE_TYPES)
 
