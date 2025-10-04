@@ -15,7 +15,7 @@ namespace ot {
 	//! @class Serializable
 	//! @brief The Serializable class is the default interface of serializable objects.
 	//! It provides the default virtual addToJsonObject and setFromJsonObject methods.
-	class OT_CORE_API_EXPORTONLY Serializable {
+	class OT_CORE_API_EXPORT Serializable {
 		OT_DECL_DEFCOPY(Serializable)
 		OT_DECL_DEFMOVE(Serializable)
 	public:
@@ -33,5 +33,8 @@ namespace ot {
 		//! @param _jsonObject JSON object containing the information.
 		//! @ref Serializable::setFromJsonObject
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) = 0;
+
+		//! @brief Create a JSON string from the object data.
+		virtual std::string toJson() const;
 	};
 }

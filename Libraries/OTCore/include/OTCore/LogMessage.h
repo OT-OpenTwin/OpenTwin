@@ -82,9 +82,6 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		//! @brief Returns a JSON string with the contents of this message.
-		std::string toJson() const;
-
 	private:
 		void setFromVersion1_0(const ConstJsonObject& _object);
 

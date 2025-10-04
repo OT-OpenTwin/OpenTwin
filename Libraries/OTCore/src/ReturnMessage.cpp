@@ -144,9 +144,3 @@ void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
 std::string ot::ReturnMessage::getStatusString(void) const {
 	return ReturnMessage::statusToString(m_status);
 }
-
-std::string ot::ReturnMessage::toJson(void) const {
-	JsonDocument doc;
-	this->addToJsonObject(doc, doc.GetAllocator());
-	return doc.toJson();
-}

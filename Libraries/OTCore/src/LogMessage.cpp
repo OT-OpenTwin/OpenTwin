@@ -77,12 +77,6 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_flags = logFlagsFromJsonArray(flagsArr);
 }
 
-std::string ot::LogMessage::toJson() const {
-	JsonDocument doc;
-	this->addToJsonObject(doc, doc.GetAllocator());
-	return doc.toJson();
-}
-
 void ot::LogMessage::setFromVersion1_0(const ConstJsonObject& _object) {
 	m_serviceName = json::getString(_object, OT_ACTION_PARAM_LOG_Service);
 	m_functionName = json::getString(_object, OT_ACTION_PARAM_LOG_Function);
