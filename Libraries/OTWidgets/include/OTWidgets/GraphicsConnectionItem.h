@@ -21,6 +21,7 @@
 namespace ot {
 	
 	class GraphicsItem;
+	class GraphicsConnectionConnectorItem;
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
@@ -93,6 +94,10 @@ namespace ot {
 		//! Calls GraphicsConnectionItem::updateConnectionInformation.
 		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
 
+		void setOriginItem(GraphicsItem* _origin);
+
+		void setDestItem(GraphicsItem* _dest);
+
 		//! \brief Unsets the origin and destination items.
 		//! Will call GraphicsItem::forgetConnection for every connected item.
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
@@ -113,9 +118,17 @@ namespace ot {
 		void updateConnectionInformation();
 
 	protected:
+		virtual void graphicsSceneSet(GraphicsScene* _scene) override;
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) override;
 
 	private:
+		QPointF calculateOriginPos() const;
+		QPointF calculateDestPos() const;
+		ConnectionDirection calculateOriginDirection() const;
+		ConnectionDirection calculateDestDirection() const;
+
+		void updateConnectors();
+
 		void calculatePainterPath(QPainterPath& _path) const;
 		void calculateDirectLinePath(QPainterPath& _path) const;
 		void calculateSmoothLinePath(QPainterPath& _path) const;
@@ -136,7 +149,10 @@ namespace ot {
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;
+		GraphicsConnectionConnectorItem* m_originConnector;
+
 		GraphicsItem* m_dest;
+		GraphicsConnectionConnectorItem* m_destConnector;
 
 		QRectF m_lastRect;
 

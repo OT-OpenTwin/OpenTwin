@@ -70,6 +70,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\ExpanderWidget.cpp" />
+    <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
     <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
     <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
@@ -257,6 +258,7 @@
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <QtMoc Include="include\OTWidgets\IndicatorWidget.h" />

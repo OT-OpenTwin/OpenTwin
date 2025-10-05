@@ -186,6 +186,7 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 
 	ot::Table* sessionTable = new ot::Table(_info.getSessionToLssList().size(), 2);
 	sessionTable->verticalHeader()->setVisible(false);
+	sessionTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	sessionTable->setHorizontalHeaderLabels({ "Session", "LSS ID" });
 	sessionTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 	sessionTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
@@ -654,6 +655,7 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	supportedServicesTable->setHorizontalHeaderLabels(supportedServicesHeader);
 	supportedServicesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 	supportedServicesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+	supportedServicesTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	r = 0;
 	for (const auto& it : _info.getConfig().supportedServices) {
@@ -897,6 +899,7 @@ ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::
 	table->setHorizontalHeaderLabels({ "Session ID", "User Name", "Flags" });
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+	table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	int r = 0;
 	for (const auto& session : _sessionData) {
 		table->addItem(r, 0, QString::fromStdString(session.sessionID))->setFlags(cellFlags);
@@ -924,6 +927,7 @@ ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo:
 	table->setSelectionBehavior(ot::Table::SelectRows);
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+	table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	int r = 0;
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -960,6 +964,7 @@ ot::Table* BackendInfo::createGdsServicesTable(const std::list<ot::GDSDebugInfo:
 	table->setSelectionBehavior(ot::Table::SelectRows);
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+	table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	int r = 0;
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -1031,6 +1036,7 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 	table->setSelectionBehavior(ot::Table::SelectRows);
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+	table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	int r = 0;
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;

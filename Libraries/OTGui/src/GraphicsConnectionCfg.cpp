@@ -69,17 +69,17 @@ bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other) 
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_Member_Uid, m_uid, _allocator);
 	_object.AddMember(OT_JSON_Member_HandleState, m_handlesState, _allocator);
+	
 	_object.AddMember(OT_JSON_Member_SourceUid, m_originUID, _allocator);
 	_object.AddMember(OT_JSON_Member_SourcePos, JsonObject(m_originPos, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_SourceName, JsonString(m_originConnectable, _allocator), _allocator);
+	
 	_object.AddMember(OT_JSON_Member_DestinationUid, m_destUID, _allocator);
 	_object.AddMember(OT_JSON_Member_DestinationPos, JsonObject(m_destPos, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_DestinationName, JsonString(m_destConnectable, _allocator), _allocator);
-	_object.AddMember(OT_JSON_Member_Shape, JsonString(this->shapeToString(this->m_lineShape), _allocator), _allocator);
 
-	JsonObject styleObj;
-	m_lineStyle.addToJsonObject(styleObj, _allocator);
-	_object.AddMember(OT_JSON_Member_Style, styleObj, _allocator);
+	_object.AddMember(OT_JSON_Member_Shape, JsonString(this->shapeToString(this->m_lineShape), _allocator), _allocator);
+	_object.AddMember(OT_JSON_Member_Style, JsonObject(m_lineStyle, _allocator), _allocator);
 }
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {

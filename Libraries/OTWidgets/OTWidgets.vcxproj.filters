@@ -559,6 +559,9 @@
     <ClCompile Include="src\IndicatorWidget.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1051,6 +1054,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SelectionData.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -65,12 +65,6 @@ void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
-void ot::GraphicsLayoutItem::setGraphicsScene(GraphicsScene* _scene) {
-	OTAssertNullptr(m_layoutWrap);
-	GraphicsItem::setGraphicsScene(_scene);
-	m_layoutWrap->setGraphicsScene(_scene);
-}
-
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
@@ -178,6 +172,11 @@ std::list<ot::GraphicsElement*> ot::GraphicsLayoutItem::getAllDirectChildElement
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
+
+void ot::GraphicsLayoutItem::graphicsSceneSet(GraphicsScene* _scene) {
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setGraphicsScene(_scene);
+}
 
 void ot::GraphicsLayoutItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
 	OTAssertNullptr(m_layoutWrap);
