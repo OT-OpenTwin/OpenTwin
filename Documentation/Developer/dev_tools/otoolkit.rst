@@ -1,70 +1,67 @@
 OToolkit
-========
+########
 
-The OToolkit is a "still in progress" project, therefore any locally stored data may be lost or may become invalid.
-Check the Discord channel or the new versions of this documentation for updates.
+The OToolkit is a work-in-progress project. Data stored locally may be lost or become invalid during development.
 
-When working with/for OpenTwin the OToolkit application is a handy tool which implements some key features that will decrease the work load.
-The OToolkit application is running as a OpenTwin Service, therefore the port number must be passed as a start argument.
-
+OToolkit is a handy debugging tool that implements key features for OpenTwin development. It runs as an OpenTwin service and requires a port number as a startup argument.
 
 .. warning::
-   If you are running the OToolkit application in Debug Mode one particular assertion may fail. This assertion (as stated in the assertion message) will tell you that the logging service could not be reached.
-   This happens if a Logging Service URL is set in the Environment, but the :doc:`Logger Service</services/logger_service>` is not running.
+   When running OToolkit in Debug Mode, an assertion may fail indicating the logging service is unreachable. This occurs when a Logging Service URL is set in the environment but the :doc:`Logger Service</services/logger_service>` isn't running.
    
-   Since the OToolkit has an internal Logging functionality the :doc:`Logger Service</services/logger_service>` is not required to be running.
-   Therefore the assertion may simply be ignored.
+   Since OToolkit includes internal logging functionality, the :doc:`Logger Service</services/logger_service>` is optional. You can safely ignore this assertion.
 
-========
+Configuration
+*************
+
+Start Arguments
+===============
+
+OToolkit accepts startup arguments passed as the fourth parameter. Alternatively, use the ``OpenTwin_toolkit`` script, which properly formats and passes arguments to OToolkit.
+
+.. note::
+    Each argument must start with a hyphen ``-`` and be separated by at least one space.
+
+.. list-table:: 
+    :header-rows: 1
+
+    *   - Argument
+        - Description
+    *   - ``logexport``
+        - Automatically starts the :ref:`Log Visualization tool<otoolkit_log_visualization>`, connects to the logger service, and exports logs after fetching messages.
+    *   - ``noauto``
+        - Suppresses automatic tool startup when launching OToolkit. Useful if a tool causes issues during startup.
+
 Features
-========
+********
 
-------
 Output
-------
+======
 
-The output window is used for the OToolkit internal logging.
-When developing a custom tool for the OToolkit ensure that you use the provided OToolkit logging macros and NOT the OpenTwin ServiceLogger macros.
+The output window displays OToolkit's internal logs. When developing custom tools, use OToolkit's logging macros instead of OpenTwin ServiceLogger macros.
 
------------------
-Log Visualisation
------------------
+.. _otoolkit_log_visualization:
 
-The Log Visualisation tool does what the name says,
-it displays the log messages that are currently buffered in the :doc:`Logger Service</services/logger_service>`.
+Log Visualization
+=================
 
-A filter can be applied to get a better overview.
-If the "Message contains" filter is used, ensure that you confirm it by pressing the return key.
-If you remove the filter text from the "Message contains" filter, ensure that you confirm this by pressing the return key aswell.
+The Log Visualization tool displays messages currently buffered in the :doc:`Logger Service</services/logger_service>`.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Apply filters to improve log message overview:
+
+- **Message contains**: Enter text and press Return to apply the filter
+- **Clear filter**: Remove text and press Return to show all messages
+
 Connect to Logger Service
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
-To connect to the :doc:`Logger Service</services/logger_service>` press ``Connect Button`` in the ``Log Visualisation`` menu bar menu.
-After pressing the button a Dialog will appear and will ask you to type in the Logger Service URL.
+To connect to the :doc:`Logger Service</services/logger_service>`:
 
-After successfully establishing a connection to the :doc:`Logger Service</services/logger_service>` its current buffer will be returned to the OToolkit application.
+1. Click the **Connect** button in the Log Visualization menu bar
+2. Enter the Logger Service URL in the dialog that appears
 
----------
+After successfully connecting, OToolkit retrieves the current log buffer from the Logger Service.
+
 OTerminal
----------
+=========
 
-The OTerminal can be used to send messages to any OpenTwin Service by using the OpenTwin message API.
-
-^^^^^^^^^^^^^^^^^^^
-Request Collections
-^^^^^^^^^^^^^^^^^^^
-
-Working on it :-)
-
-
-
-
-==========
-Appearance
-==========
-
-A custom stylesheet can be set for the OToolkit application.
-Simply place a file with the name ``OToolkit.style.qss`` in the same directory where the OToolkit is located at.
-This file must contain a `Qt Stylesheet <https://doc.qt.io/qt-5/stylesheet-reference.html>`_.
+Use OTerminal to send messages to any OpenTwin service using the OpenTwin message API.

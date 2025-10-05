@@ -20,18 +20,31 @@ REM ===========================================================================
 REM Launch the OToolkit
 REM ===========================================================================
 
+IF "%OPEN_TWIN_OTOOLKIT_ARGS%"=="" (
+	goto PARSE_ARGS
+)
+goto SKIP_ARGS
+
+:PARSE_ARGS
+
 IF "%1"=="-logexport" (
-	SET OPEN_TWIN_OTOOLKIT_ARGS=-logexport
+	SET "OPEN_TWIN_OTOOLKIT_ARGS=-logexport"
 )
 IF "%2"=="-logexport" (
-	SET OPEN_TWIN_OTOOLKIT_ARGS=-logexport
+	SET "OPEN_TWIN_OTOOLKIT_ARGS=-logexport"
 )
 
-REM Arguments of open_twin.exe:
-REM 1) Name of the DLL containing the service logic
-REM 2) -
-REM 3) IP address of the service
+IF "%1"=="-noauto" (
+	SET "OPEN_TWIN_OTOOLKIT_ARGS=%OPEN_TWIN_OTOOLKIT_ARGS% -noauto"
+)
+IF "%2"=="-noauto" (
+	SET "OPEN_TWIN_OTOOLKIT_ARGS=%OPEN_TWIN_OTOOLKIT_ARGS% -noauto"
+)
 
+:SKIP_ARGS
+
+REM Arguments ('/' = Unused argument):
+REM                                             Framework     Library      /   OToolkitUrl                                            /   Start arguments
 START "OPEN TWIN TOOLKIT SERVICE" %pause_prefix%open_twin.exe OToolkit.dll "" "%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_TOOLKIT_PORT%" "" "%OPEN_TWIN_OTOOLKIT_ARGS%"%pause_suffix%
 
 GOTO END

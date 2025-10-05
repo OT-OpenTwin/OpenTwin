@@ -29,6 +29,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/String.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
@@ -204,7 +205,12 @@ void AppBase::setUrl(const QString& _url) {
 void AppBase::parseStartArgs(const std::string& _args) {
 	std::list<std::string> tmp = ot::String::split(_args, ' ', true);
 	for (const std::string& arg : tmp) {
-		if (arg == "-logexport") m_startArgs.push_back(StartOption::LogExport);
+		if (arg == "-logexport") {
+			m_startArgs.push_back(StartOption::LogExport);
+		}
+		else if (arg == "-noauto") {
+			m_startArgs.push_back(StartOption::NoAutoStart);
+		}
 		else {
 			OT_LOG_W("Unknown start argument \"" + arg + "\"");
 		}
@@ -426,6 +432,15 @@ void AppBase::slotInitialize(void) {
 
 void AppBase::slotInitializeTools(void) {
 	// Create tools
+	ot::BasicScopedBoolWrapper autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
+
+	for (StartOption opt : m_startArgs) {
+		if (opt == AppBase::NoAutoStart) {
+			m_ignoreToolAutoStart = true;
+			break;
+		}
+	}
+
 	m_logger = new Logging;
 	
 	m_toolManager->addTool(m_logger);

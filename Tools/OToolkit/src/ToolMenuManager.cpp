@@ -4,12 +4,19 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
-#include "ToolMenuManager.h"
 #include "AppBase.h"
+#include "ToolMenuManager.h"
+
+// OToolkitAPI header
+#include "OToolkitAPI/OToolkitAPI.h"
 
 // Qt header
 #include <QtCore/qsettings.h>
 #include <QtWidgets/qaction.h>
+
+#define TOOLMENU_LOG(___msg) OTOOLKIT_LOG("ToolMenu", ___msg)
+#define TOOLMENU_LOGW(___msg) OTOOLKIT_LOGW("ToolMenu", ___msg)
+#define TOOLMENU_LOGE(___msg) OTOOLKIT_LOGE("ToolMenu", ___msg)
 
 ToolMenuManager::ToolMenuManager(const QString& _toolName)
 	: QMenu(_toolName), m_toolName(_toolName)
@@ -19,14 +26,20 @@ ToolMenuManager::ToolMenuManager(const QString& _toolName)
 	this->addSeparator();
 	m_autorun->setCheckable(true);
 
-	auto settings = AppBase::instance()->createSettingsInstance();
+	AppBase* app = AppBase::instance();
+	auto settings = app->createSettingsInstance();
 	m_autorun->setChecked(settings->value("AutostartOption_" + m_toolName + "_", false).toBool());
 
 	this->connect(m_run, &QAction::triggered, this, &ToolMenuManager::slotRun);
 	this->connect(m_autorun, &QAction::triggered, this, &ToolMenuManager::slotAutorun);
 
-	if (m_autorun->isChecked()) {
-		QMetaObject::invokeMethod(this, &ToolMenuManager::slotRun, Qt::QueuedConnection);
+	if (m_autorun->isChecked() ) {
+		if (app->getIgnoreToolAutoStart()) {
+			TOOLMENU_LOGW("Tool autorun ignored { \"ToolName\": " + _toolName + "\" }");
+		}
+		else {
+			QMetaObject::invokeMethod(this, &ToolMenuManager::slotRun, Qt::QueuedConnection);
+		}
 	}
 }
 
