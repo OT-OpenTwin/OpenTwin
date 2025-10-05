@@ -29,7 +29,9 @@ public:
 	FileLogImporterDialog(QWidget* _parent = (QWidget*)nullptr);
 	virtual ~FileLogImporterDialog();
 
-	const std::list<ot::LogMessage>& getLogMessages() const { return m_logMessages; };
+	//! @brief Move the buffered log messages to the provided list.
+	//! @param _messages List to which the messages will be moved.
+	void grabLogMessages(std::list<ot::LogMessage>& _messages) { _messages = std::move(m_logMessages); m_logMessages.clear(); };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

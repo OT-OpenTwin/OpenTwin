@@ -28,7 +28,9 @@ public:
 	ConnectToLoggerDialog();
 	virtual ~ConnectToLoggerDialog();
 
-	const std::list<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
+	//! @brief Moves all messages from the internal message buffer to the provided list.
+	//! @param _messages List that will receive the messages. The list will be cleared before adding the new messages.
+	void grabMessageBuffer(std::list<ot::LogMessage>& _messages) { _messages = std::move(m_messageBuffer); m_messageBuffer.clear(); };
 
 	QString loggerServiceUrl(void) const;
 

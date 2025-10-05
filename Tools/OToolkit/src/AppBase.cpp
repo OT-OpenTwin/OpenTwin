@@ -274,7 +274,7 @@ void AppBase::slotProcessMessage(const QString& _json) {
 						messages.push_back(msg);
 					}
 					
-					m_logger->appendLogMessages(messages);
+					m_logger->newMessages(std::move(messages));
 				}
 			}
 			else if (action == "DisplayData") {
@@ -511,7 +511,8 @@ void AppBase::slotColorStyleChanged(void) {
 }
 
 AppBase::AppBase(QApplication* _app) 
-	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
+	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true),
+	m_ignoreToolAutoStart(false)
 {
 	this->setCustomDeleteLogNotifier(true);
 	ot::LogDispatcher::instance().addReceiver(this);

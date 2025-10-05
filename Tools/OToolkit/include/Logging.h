@@ -74,8 +74,10 @@ public:
 
 	// Log Visualization
 
-	void appendLogMessage(const ot::LogMessage& _msg);
-	void appendLogMessages(const std::list<ot::LogMessage>& _messages);
+	void appendLogMessage(ot::LogMessage&& _msg);
+	void appendLogMessages(std::list<ot::LogMessage>&& _messages);
+
+	void newMessages(std::list<ot::LogMessage>&& _messages);
 
 public Q_SLOTS:
 	void slotUpdateColumnWidth();
@@ -97,6 +99,10 @@ public Q_SLOTS:
 	void slotViewCellContent(QTableWidgetItem* _itm);
 	void slotScrollToItem(int _row);
 	void slotColumnWidthModeChanged(const QString& _text);
+	void slotMessageLimitChanged(int _limit);
+	void slotUseIntervalChanged();
+
+	void slotIntervalTimeout();
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem* _itm);
@@ -105,6 +111,9 @@ private:
 	bool disconnectFromLogger();
 	void rebuildColumnWidthData();
 	bool applyColumnWidthData(const std::list<int>& _widths);
+
+	void resizeMessageBuffer(std::list<ot::LogMessage>& _buffer);
+	void resizeNewMessageBuffer();
 
 	// Data
 
@@ -115,6 +124,9 @@ private:
 	std::list<ot::LogMessage>	m_messages;
 	int							m_errorCount;
 	int							m_warningCount;
+
+	QTimer*                     m_intervalTimer;
+	std::list<ot::LogMessage>	m_newMessages;
 
 	std::string                 m_loggerUrl;
 

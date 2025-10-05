@@ -85,6 +85,11 @@ Logging::Logging()
 	m_columnWidthTimer->setInterval(0);
 	m_columnWidthTimer->setSingleShot(true);
 	this->connect(m_columnWidthTimer, &QTimer::timeout, this, &Logging::slotUpdateColumnWidth);
+
+	m_intervalTimer = new QTimer(this);
+	m_intervalTimer->setInterval(1000);
+	m_intervalTimer->setSingleShot(false);
+	this->connect(m_intervalTimer, &QTimer::timeout, this, &Logging::slotIntervalTimeout);
 }
 
 Logging::~Logging() {
@@ -113,7 +118,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	_content.addView(this->createSideWidgetView(m_logModeSetter->getRootWidget(), "Log Switch"));
 
 	m_filterView = new LoggingFilterView;
-	_content.addView(this->createSideWidgetView(m_filterView->getRootWidget(), "Log Filter"));
+	_content.addView(this->createSideWidgetView(m_filterView->getRootWidget(), "Log Options"));
 
 	m_serviceDebugInfo = new LogServiceDebugInfo;
 	_content.addView(this->createSideWidgetView(m_serviceDebugInfo->getRootWidget(), "Service Info"));
@@ -184,6 +189,8 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	this->updateCountLabels();
 
 	this->connect(m_filterView, &LoggingFilterView::filterChanged, this, &Logging::slotFilterChanged);
+	this->connect(m_filterView, &LoggingFilterView::messageLimitChanged, this, &Logging::slotMessageLimitChanged);
+	this->connect(m_filterView, &LoggingFilterView::useIntervalChaged, this, &Logging::slotUseIntervalChanged);
 
 	// Connect checkbox color signals
 	connect(m_convertToLocalTime, &QCheckBox::stateChanged, this, &Logging::slotUpdateCheckboxColors);
@@ -359,7 +366,7 @@ void Logging::slotImport() {
 	m_ignoreNewMessages->setChecked(false);
 
 	this->slotClear();
-	this->appendLogMessages(messages);
+	this->appendLogMessages(std::move(messages));
 
 	m_ignoreNewMessages->setChecked(isIgnoring);
 
@@ -401,7 +408,7 @@ void Logging::slotRefillData() {
 	bool isIgnoring = m_ignoreNewMessages->isChecked();
 	m_ignoreNewMessages->setChecked(false);
 
-	this->appendLogMessages(messages);
+	this->appendLogMessages(std::move(messages));
 
 	m_ignoreNewMessages->setChecked(isIgnoring);
 }
@@ -562,7 +569,51 @@ void Logging::slotColumnWidthModeChanged(const QString& _text) {
 	this->rebuildColumnWidthData();
 }
 
-void Logging::appendLogMessage(const ot::LogMessage& _msg) {
+void Logging::slotMessageLimitChanged(int _limit) {
+	_limit = std::max(10, _limit);
+	
+	size_t limit = static_cast<size_t>(_limit);
+
+	while (m_messages.size() > limit) {
+		if (m_table->rowCount() > 0) {
+			m_table->removeRow(0);
+		}
+		
+		const ot::LogMessage& msg = m_messages.front();
+		if (msg.getFlags() & ot::WARNING_LOG) {
+			m_warningCount--;
+		}
+		else if (msg.getFlags() & ot::ERROR_LOG) {
+			m_errorCount--;
+		}
+		m_messages.pop_front();
+	}
+	this->updateCountLabels();
+}
+
+void Logging::slotUseIntervalChanged() {
+	m_intervalTimer->stop();
+
+	if (m_filterView->getUseInterval()) {	
+		m_intervalTimer->setInterval(m_filterView->getIntervalMilliseconds());
+		m_intervalTimer->start();
+	}
+	else {
+		if (!m_newMessages.empty()) {
+			this->resizeNewMessageBuffer();
+			this->appendLogMessages(std::move(m_newMessages));
+			m_newMessages.clear();
+		}
+	}
+}
+
+void Logging::slotIntervalTimeout() {
+	this->resizeNewMessageBuffer();
+	this->appendLogMessages(std::move(m_newMessages));
+	m_newMessages.clear();
+}
+
+void Logging::appendLogMessage(ot::LogMessage&& _msg) {
 	if (m_serviceDebugInfo && _msg.getText().find(ot::DebugHelper::getSetupCompletedMessagePrefix()) == 0) {
 		ot::JsonDocument debugInfoDoc;
 		if (debugInfoDoc.fromJson(_msg.getText().substr(ot::DebugHelper::getSetupCompletedMessagePrefix().length()))) {
@@ -575,9 +626,23 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 
 	if (m_ignoreNewMessages->isChecked()) {
 		return;
-	};
+	}
 
 	m_filterView->setFilterLock(true);
+
+	// Check if we reached the message limit
+	if (m_messages.size() >= m_filterView->getMessageLimit()) {
+		// Remove first entry
+		m_table->removeRow(0);
+		const ot::LogMessage& msg = m_messages.front();
+		if (msg.getFlags() & ot::WARNING_LOG) {
+			m_warningCount--;
+		}
+		else if (msg.getFlags() & ot::ERROR_LOG) {
+			m_errorCount--;
+		}
+		m_messages.pop_front();
+	}
 
 	int r = m_table->rowCount();
 	m_table->insertRow(r);
@@ -622,7 +687,7 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 	this->iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.getText())));
 
 	// Store message
-	m_messages.push_back(_msg);
+	m_messages.push_back(std::move(_msg));
 
 	// If required scroll to the last entry in the table
 	if (m_autoScrollToBottom->isChecked()) m_table->scrollToBottom();
@@ -634,19 +699,35 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 	this->updateCountLabels();
 
 	// Check the filter for the new entry
-	m_table->setRowHidden(r, !m_filterView->filterMessage(_msg));
+	m_table->setRowHidden(r, !m_filterView->filterMessage(m_messages.back()));
 }
 
-void Logging::appendLogMessages(const std::list<ot::LogMessage>& _messages) {
+void Logging::appendLogMessages(std::list<ot::LogMessage>&& _messages) {
 	if (!m_table) {
 		return;
 	}
+
+	this->resizeMessageBuffer(_messages);
+
 	bool actb = m_autoScrollToBottom->isChecked();
 	m_autoScrollToBottom->setChecked(false);
-	for (const ot::LogMessage& msg : _messages) {
-		this->appendLogMessage(msg);
+	for (ot::LogMessage& msg : _messages) {
+		this->appendLogMessage(std::move(msg));
 	}
 	m_autoScrollToBottom->setChecked(actb);
+}
+
+void Logging::newMessages(std::list<ot::LogMessage>&& _messages) {
+	if (_messages.empty() && m_ignoreNewMessages->isChecked()) {
+		return;
+	}
+
+	if (m_filterView->getUseInterval()) {
+		m_newMessages.splice(m_newMessages.end(), std::move(_messages));
+	}
+	else {
+		this->appendLogMessages(std::move(_messages));
+	}
 }
 
 void Logging::slotUpdateColumnWidth() {
@@ -663,14 +744,16 @@ void Logging::slotUpdateColumnWidth() {
 void Logging::slotImportFileLogs() {
 	FileLogImporterDialog dia(m_table);
 	if (dia.showDialog() == ot::Dialog::Ok) {
-		if (dia.getLogMessages().empty()) {
+		std::list<ot::LogMessage> messages;
+		dia.grabLogMessages(messages);
+		if (messages.empty()) {
 			return;
 		}
 
 		QSignalBlocker blocker(m_ignoreNewMessages);
 		bool isIgnoring = m_ignoreNewMessages->isChecked();
 		m_ignoreNewMessages->setChecked(false);
-		this->appendLogMessages(dia.getLogMessages());
+		this->appendLogMessages(std::move(messages));
 		m_ignoreNewMessages->setChecked(isIgnoring);
 	}
 }
@@ -693,7 +776,10 @@ void Logging::runQuickExport() {
 		m_connectButton->setText("Disconnect");
 		m_connectButton->setIcon(QIcon(":/images/Connected.png"));
 		this->slotClear();
-		this->appendLogMessages(dia.messageBuffer());
+
+		std::list<ot::LogMessage> buffer;
+		dia.grabMessageBuffer(buffer);
+		this->appendLogMessages(std::move(buffer));
 	}
 
 	if (m_messages.empty()) {
@@ -790,10 +876,12 @@ void Logging::connectToLogger(bool _isAutoConnect) {
 	m_connectButton->setIcon(QIcon(":/images/Connected.png"));
 	this->slotClear();
 
-	const std::list<ot::LogMessage>& buffer = dia.messageBuffer();
+
+	std::list<ot::LogMessage> buffer;
+	dia.grabMessageBuffer(buffer);
 
 	if (!buffer.empty()) {
-		this->appendLogMessages(buffer);
+		this->appendLogMessages(std::move(buffer));
 	}
 	
 	if (!m_columnWidthTmp.isEmpty()) {
@@ -857,4 +945,17 @@ bool Logging::applyColumnWidthData(const std::list<int>& _widths) {
 	}
 
 	return ix == m_table->columnCount();
+}
+
+void Logging::resizeMessageBuffer(std::list<ot::LogMessage>& _buffer) {
+	size_t limit = static_cast<size_t>(m_filterView->getMessageLimit());
+	size_t size = _buffer.size();
+	while (size > limit) {
+		_buffer.pop_front();
+		size--;
+	}
+}
+
+void Logging::resizeNewMessageBuffer() {
+	this->resizeMessageBuffer(m_newMessages);
 }

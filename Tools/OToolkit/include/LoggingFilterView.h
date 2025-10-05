@@ -14,10 +14,12 @@
 
 class QTimer;
 class QWidget;
-class QCheckBox;
 class QComboBox;
 class QLineEdit;
 class QListWidget;
+
+namespace ot { class SpinBox; }
+namespace ot { class CheckBox; }
 
 class LoggingFilterView : public QObject {
 	Q_OBJECT
@@ -38,30 +40,49 @@ public:
 	void setFilterLock(bool _active) { m_filterLock = _active; };
 	bool getFilterLock(void) const { return m_filterLock; };
 
+	int getMessageLimit() const;
+
+	bool getUseInterval() const;
+
+	int getIntervalMilliseconds() const;
+	
 Q_SIGNALS:
-	void filterChanged(void);
+	void filterChanged();
+	void messageLimitChanged(int _limit);
+	void useIntervalChaged();
 
 public Q_SLOTS:
 	void slotUpdateCheckboxColors(void);
 
 private Q_SLOTS:
-	void slotFilterChanged(void);
-	void slotSelectAllServices(void);
-	void slotDeselectAllServices(void);
+	void slotFilterChanged();
+	void slotSelectAllServices();
+	void slotDeselectAllServices();
+	void slotMessageLimitChanged();
+	void slotIntervalChanged();
 
 private:
+	void updateMessageLimitColor();
+	void updateIntervalColor();
+
 	QWidget* m_root;
 
 	bool m_filterLock;
 	QTimer* m_filterTimer;
 
-	QCheckBox* m_msgTypeFilterDetailed;
-	QCheckBox* m_msgTypeFilterInfo;
-	QCheckBox* m_msgTypeFilterWarning;
-	QCheckBox* m_msgTypeFilterError;
-	QCheckBox* m_msgTypeFilterMsgIn;
-	QCheckBox* m_msgTypeFilterMsgOut;
-	QCheckBox* m_msgTypeFilterTest;
+	ot::CheckBox* m_msgTypeFilterDetailed;
+	ot::CheckBox* m_msgTypeFilterInfo;
+	ot::CheckBox* m_msgTypeFilterWarning;
+	ot::CheckBox* m_msgTypeFilterError;
+	ot::CheckBox* m_msgTypeFilterMsgIn;
+	ot::CheckBox* m_msgTypeFilterMsgOut;
+	ot::CheckBox* m_msgTypeFilterTest;
+
+	ot::CheckBox* m_messageLimitEnabled;
+	ot::SpinBox* m_messageLimit;
+
+	ot::CheckBox* m_useInterval;
+	ot::SpinBox* m_intervalMilliseconds;
 
 	QComboBox* m_userFilter;
 	QComboBox* m_sessionFilter;
