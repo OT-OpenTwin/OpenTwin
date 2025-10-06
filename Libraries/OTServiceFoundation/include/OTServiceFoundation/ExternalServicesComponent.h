@@ -51,9 +51,7 @@ namespace ot {
 			int startup(ApplicationBase* _application, const std::string& _ownURL);
 
 			//! @brief Will initialize the service.
-			//! @param _explicitDebug If true, the debug initialization will be performed.
-			//! The process ID will be added to the registration request.
-			ot::ReturnMessage init(const ot::ServiceInitData& _initData, bool _explicitDebug);
+			ot::ReturnMessage init(const ot::ServiceInitData& _initData);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter

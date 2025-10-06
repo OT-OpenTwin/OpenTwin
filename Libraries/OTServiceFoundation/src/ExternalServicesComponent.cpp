@@ -149,7 +149,7 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	return 0;
 }
 
-ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData, bool _explicitDebug) {
+ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData) {
 	OTAssertNullptr(m_application);
 
 	if (m_componentState != WaitForInit) {
@@ -187,7 +187,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	db->setDataBaseServerURL(_initData.getDatabaseUrl());
 	db->setSiteIDString("1");
 	db->setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
-	
+
 	ot::DebugHelper::serviceSetupCompleted(*m_application);
 
 	// Register this service as a service in the session service
@@ -197,27 +197,19 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
 	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 
-#ifdef _DEBUG
-	bool useDebug = true;
-#else
-	bool useDebug = _explicitDebug;
-#endif
-
 	// In debug mode add the process ID to the confirmation request
-	if (useDebug) {
-		auto handle = GetCurrentProcess();
-		if (handle != nullptr) {
-			unsigned long handleID = GetProcessId(handle);
-			if (handleID == 0) {
-				OT_LOG_EA("Failed to get current process id");
-			}
-			else {
-				newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-			}
+	auto handle = GetCurrentProcess();
+	if (handle != nullptr) {
+		unsigned long handleID = GetProcessId(handle);
+		if (handleID == 0) {
+			OT_LOG_EA("Failed to get current process id");
 		}
 		else {
-			OT_LOG_EA("Failed to get current process handle");
+			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		}
+	}
+	else {
+		OT_LOG_EA("Failed to get current process handle");
 	}
 
 	// Send request
@@ -406,7 +398,7 @@ std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocumen
 std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_IniData));
-	return this->init(initData, false).toJson();
+	return this->init(initData).toJson();
 }
 
 std::string ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {

@@ -42,6 +42,24 @@ namespace ot {
 
 			return retVal;
 		}
+
+		void debugInitializeWorker(ot::ServiceInitData&& _data, bool _explicitDebug) {
+			try {
+				ot::JsonDocument iniDoc;
+				iniDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, iniDoc.GetAllocator()), iniDoc.GetAllocator());
+				iniDoc.AddMember(OT_ACTION_PARAM_IniData, JsonObject(_data, iniDoc.GetAllocator()), iniDoc.GetAllocator());
+				ot::ActionDispatcher::instance().dispatch(OT_ACTION_CMD_Init, iniDoc, ot::EXECUTE);
+			}
+			catch (const std::exception& _e) {
+				OT_LOG_EAS(_e.what());
+				exit(ot::AppExitCode::GeneralError);
+			}
+			catch (...) {
+				OT_LOG_EA("Unknown error");
+				exit(ot::AppExitCode::UnknownError);
+			}
+		}
+
 	}
 }
 
@@ -141,13 +159,11 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 					return startupResult;
 				}
 
-				ot::ReturnMessage initResult = intern::ExternalServicesComponent::instance().init(iniData, _explicitDebug);
-				if (initResult != ot::ReturnMessage::Ok) {
-					return -23;
-				}
-				else {
-					return 0;
-				}
+				// Use a thread to initialize the service since the init call might take some time and we want to return
+				std::thread iniWorker(intern::debugInitializeWorker, std::move(iniData), _explicitDebug);
+				iniWorker.detach();
+
+				return 0;
 			}
 			else {
 				return -24;
