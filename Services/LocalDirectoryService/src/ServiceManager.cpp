@@ -936,6 +936,9 @@ void ServiceManager::workerHealthCheckFail() {
 
 				// Remove all requested services that are related to the session
 				this->cleanUp(serviceData.second.getInfo().getSessionID());
+
+				std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
+				m_newStoppingServices.push_back(std::move(serviceData.second));
 			}
 		}
 	}
