@@ -10,6 +10,7 @@
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
 // std header
@@ -17,7 +18,7 @@
 #include <string>
 #include <functional>
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 	OT_DECL_ACTION_HANDLER(Application)
 private:
 	//! @brief Constructor
@@ -109,7 +110,7 @@ public:
 
 	// ##################################################################################################################################################################################################################
 		
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	//OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
 	
 	// ##################################################################################################################################################################################################################
 

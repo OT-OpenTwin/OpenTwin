@@ -694,6 +694,7 @@ Application::~Application()
 
 }
 
+/*
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 
@@ -707,7 +708,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	
 	OT_LOG_WAS("Unknown model action \"" + action + "\"");
 	return std::string();
-}
+}*/
 
 // ##################################################################################################################################################################################################################
 
@@ -748,6 +749,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 		}
 
 		_ui->addMenuButton(OT_DEBUG_SERVICE_PAGE_NAME, it.group, it.name, it.title, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, it.icon);
+		this->connectButton(it.callback, OT_DEBUG_SERVICE_PAGE_NAME ":" + it.group + ":" + it.name);
 	}
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
