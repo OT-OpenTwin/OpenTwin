@@ -34,7 +34,7 @@
 
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "EntitySolverDataProcessing.h"
-
+#include "EntityGraphicsScene.h"
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -133,7 +133,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			else if (action == m_buttonCreatePipeline.GetFullDescription())
 			{
 				auto modelComponent = Application::instance()->getModelComponent();
-				EntitySolverDataProcessing newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+				EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 				auto allPipelines =	ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
 				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
 				newDataprocessing.setName(entityName);
