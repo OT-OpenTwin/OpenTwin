@@ -11,4 +11,5 @@ public:
 	void handleRenaming(ot::UID _entityID);
 private:
 	void setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView);
+	void setupGraphicsScene(EntityBase* _container);
 };

@@ -7,7 +7,8 @@
 #include "IVisualisationPlot1D.h"
 #include "IVisualisationCurve.h"
 #include "IVisualisationGraphicsView.h"
-
+#include "EntityBlock.h"
+#include "EntityBlockConnection.h"
 #include "OTCore/RuntimeTests.h"
 
 
@@ -103,8 +104,6 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 
 				document.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgs, document.GetAllocator());
 			}
-
-			std::string response;
 		}
 		else
 		{
@@ -125,7 +124,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			
 			ot::BasicServiceInformation info(baseEntity->getOwningService());
 			info.addToJsonObject(document, document.GetAllocator());
-			std::string response;
+			setupGraphicsScene(baseEntity);
 		}
 	}
 	else
@@ -230,4 +229,34 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView)
 {
 
+}
+
+void ViewVisualisationHandler::setupGraphicsScene(EntityBase* _container)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(_container);
+	if (container != nullptr)
+	{
+		std::list<EntityBase*> children = container->getChildrenList();
+		for (EntityBase* child : children)
+		{
+			EntityBlock* childBlock = dynamic_cast<EntityBlock*>(child);
+			if (childBlock != nullptr)
+			{
+				childBlock->CreateBlockItem();
+			}
+			else
+			{
+				EntityBlockConnection* connection = dynamic_cast<EntityBlockConnection*>(child);
+				if (connection != nullptr)
+				{
+					connection->CreateConnections();
+				}
+				else
+				{
+					//Maybe we have another folder inbetween the scene entity and the block entities.
+					setupGraphicsScene(child);
+				}
+			}
+		}
+	}
 }
