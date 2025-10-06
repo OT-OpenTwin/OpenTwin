@@ -154,8 +154,8 @@ std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	auto id = m_sessionMap.find(sessionID);
-	auto lss = m_lssMap.end();
+	const auto id = m_sessionMap.find(sessionID);
+	const auto lss = m_lssMap.find(lssId);
 
 	ot::ReturnMessage response(ot::ReturnMessage::Failed);
 	OT_LOG_D("Confirming session... { \"Session\": \"" + sessionID + "\", \"User\": \"" + userName + "\", \"LSS\": " + std::to_string(lssId) + " }");
@@ -173,7 +173,7 @@ std::string GlobalSessionService::handleConfirmSession(ot::JsonDocument& _doc) {
 	}
 
 	// Ensure LSS is stored
-	else if ((lss = m_lssMap.find(lssId)) == m_lssMap.end()) {
+	else if (lss == m_lssMap.end()) {
 		response = "[FATAL] LSS data mismatch.";
 		OT_LOG_E(response.getWhat());
 	}
@@ -645,6 +645,7 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot:
 
 			found = true;
 			_newId = it->first;
+			_service.setId(_newId);
 
 			// Remove sessions from session map
 			for (const std::string& session : it->second.getSessionIds()) {
