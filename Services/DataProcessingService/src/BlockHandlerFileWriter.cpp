@@ -15,6 +15,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "OTCore/EntityName.h"
+#include "PipelineHandler.h"
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
@@ -64,7 +65,10 @@ bool BlockHandlerFileWriter::executeSpecialized()
 
 void BlockHandlerFileWriter::createFile()
 {
-	const std::string fileName = CreateNewUniqueTopologyName(ot::FolderNames::FilesFolder, m_fileName);
+
+	const std::string solverName =	PipelineHandler::getSolverName();
+	const std::string resultFolder = solverName + "/" + ot::FolderNames::FilesFolder;
+	const std::string fileName = CreateNewUniqueTopologyName(resultFolder, m_fileName);
 
 	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
 	textFile.setName(fileName);
