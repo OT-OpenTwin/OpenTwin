@@ -930,12 +930,13 @@ void ServiceManager::workerHealthCheckFail() {
 					}
 				}
 
+				// Remove all requested services that are related to the session
+				this->cleanUpRequestedList(serviceData.second.getInfo().getSessionID());
+				this->cleanUpIniList(serviceData.second.getInfo().getSessionID());
+
 				// Either the restart failed or the restart counter reached its max value.
 				// We notify the session service, clean up the lists and cancel the current health check.
 				this->notifySessionEmergencyShutdown(serviceData.second);
-
-				// Remove all requested services that are related to the session
-				this->cleanUp(serviceData.second.getInfo().getSessionID());
 
 				std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
 				m_newStoppingServices.push_back(std::move(serviceData.second));

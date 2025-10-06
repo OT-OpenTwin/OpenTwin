@@ -101,8 +101,8 @@ namespace ot {
 		void setWorkerRunning(bool _running) { m_workerRunning = _running; };
 		bool getWorkerRunning() const { return m_workerRunning; };
 
-		void setServiceCheckAliveFrequency(unsigned int _frequency) { m_serviceCheckAliveFrequency = _frequency; };
-		unsigned int getServiceCheckAliveFrequency() const { return m_serviceCheckAliveFrequency; };
+		void setServiceCheckAliveFrequency(int64_t _frequency) { m_serviceCheckAliveFrequency = _frequency; };
+		int64_t getServiceCheckAliveFrequency() const { return m_serviceCheckAliveFrequency; };
 
 		void addAliveSession(const SessionInfo& _sessionInfo, const std::list<ServiceInfo>& _services) { m_aliveSessions.push_back(std::make_pair(_sessionInfo, _services)); };
 		void addAliveSession(SessionInfo&& _sessionInfo, std::list<ServiceInfo>&& _services) { m_aliveSessions.push_back(std::make_pair(std::move(_sessionInfo), std::move(_services))); };
@@ -149,7 +149,7 @@ namespace ot {
 		std::list<ot::port_t> m_usedPorts;
 
 		bool m_workerRunning = false;
-		unsigned int m_serviceCheckAliveFrequency = 0;
+		int64_t m_serviceCheckAliveFrequency = 0;
 
 		std::list<std::pair<SessionInfo, std::list<ServiceInfo>>> m_aliveSessions;
 

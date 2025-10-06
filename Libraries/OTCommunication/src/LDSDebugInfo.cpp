@@ -106,7 +106,7 @@ void ot::LDSDebugInfo::setFromJsonObject(const ConstJsonObject& _jsonObject) {
 	}
 
 	m_workerRunning = json::getBool(_jsonObject, "WorkerRunning");
-	m_serviceCheckAliveFrequency = json::getUInt(_jsonObject, "ServiceCheckAliveFrequency");
+	m_serviceCheckAliveFrequency = json::getInt64(_jsonObject, "ServiceCheckAliveFrequency");
 
 	m_aliveSessions.clear();
 	for (const ConstJsonObject& sessionObj : json::getObjectList(_jsonObject, "AliveSessions")) {

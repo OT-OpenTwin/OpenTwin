@@ -161,8 +161,7 @@ ot::RunResult Service::checkAlive() {
 			result.addToErrorMessage("Checked for process state but process is not active anymore.");
 		}
 	}
-	else {		
-		OT_LOG_E("Failed to get exit code");
+	else {
 		result.setAsError(exitCode);
 		result.setErrorMessage("Failed to get service exit code { \"ServiceID\": " + std::to_string(m_initData.getServiceID()) + ", \"" + m_initData.getServiceName() + "\"; \"Type\": \"" + m_initData.getServiceType() + "\"; \"URL\": \"" + m_url + "\", \"SessionID\": \"" + m_initData.getSessionID() + "\" }.");
 	}
