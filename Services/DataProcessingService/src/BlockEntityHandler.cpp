@@ -139,25 +139,6 @@ void BlockEntityHandler::orderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-void BlockEntityHandler::updateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
-{
-	std::list<ot::EntityInformation> entityInfos;
-	ot::UIDList entityIDList{ blockID };
-	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
-	auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
-	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
-	
-	ot::UID positionID = blockEnt->getCoordinateEntityID();
-	entityInfos.clear();
-	entityIDList = { positionID };
-	ot::ModelServiceAPI::getEntityInformation(entityIDList, entityInfos);
-	entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
-	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
-	coordinateEnt->setCoordinates(position);
-	coordinateEnt->StoreToDataBase();
-	ot::ModelServiceAPI::addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
-}
-
 void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
 {
 	EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEntity.get());

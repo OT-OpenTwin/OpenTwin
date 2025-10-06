@@ -190,16 +190,6 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			//	assert(0); //A connection should be drawn in only one graphics view.
 			//}
 		}
-		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged)
-		{
-			std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-			ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
-			if (!itemConfig) return "";
-
-			const ot::UID blockID = itemConfig->getUid();
-			_blockEntityHandler.updateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
-
-		}
 	}
 	catch (const std::exception& e)
 	{

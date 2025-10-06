@@ -70,7 +70,6 @@ public:
 	OT_HANDLER(handleRemoveGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleItemChanged, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleConnectionToConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, ot::SECURE_MESSAGE_TYPES)
 
 	void createNewCircuit();

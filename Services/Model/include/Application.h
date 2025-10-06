@@ -14,6 +14,7 @@
 #include "CopyPasteHandler.h"
 #include "PlotHandler.h"
 #include "MaterialHandler.h"
+#include "BlockHandler.h"
 #include "LibraryManagementWrapper.h"
 
 // std header
@@ -165,6 +166,7 @@ private:
 	MaterialHandler m_materialHandler;
 	ViewVisualisationHandler m_visualisationHandler;
 	CopyPasteHandler m_copyPasteHandler;
+	BlockHandler m_blockHandler;
 	LibraryManagementWrapper m_libraryManagementWrapper;
 
 	Application();
