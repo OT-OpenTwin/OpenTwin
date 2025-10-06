@@ -24,7 +24,7 @@ private:
 	const std::string m_connectionFolder = "Connections";
 	const std::string m_packageName = "Data Processing";
 
-	void InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);
+	void initSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 };

@@ -18,6 +18,7 @@
 #include "PipelineHandler.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "GraphHandler.h"
+#include "InvalidUID.h"
 
 // Forward declaration
 namespace ot {
@@ -67,10 +68,13 @@ private:
 	virtual ~Application();
 
 	ot::MenuButtonDescription m_buttonRunPipeline;
-	ot::MenuButtonDescription m_buttonCreatePipeline;
+	ot::MenuButtonDescription m_buttonCreateSolver;
+	ot::MenuButtonDescription m_buttonGraphicsScene;
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
 	void runPipeline(ot::UIDList _selectedSolverIDs);
+
+	ot::UID m_dataProcessingFolderID = ot::getInvalidUID();
 };

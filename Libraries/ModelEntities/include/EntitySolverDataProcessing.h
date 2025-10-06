@@ -9,4 +9,6 @@ public:
 	virtual ~EntitySolverDataProcessing() = default;
 	virtual std::string getClassName(void) override { return "EntitySolverDataProcessing"; };
 
+	void createProperties(const std::string& _graphicsSceneFolder, const ot::UID _graphicsSceneFolderID);
+
 };

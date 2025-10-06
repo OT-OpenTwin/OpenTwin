@@ -9,6 +9,7 @@ namespace ot
 		const std::string FilesFolder = "Text Files";
 		const std::string DatasetFolder = "Dataset";
 		const std::string DataProcessingFolder = "Data Processing";
+		const std::string SolverFolder = "Solvers";
 		const std::string BlockFolder = "Blocks";
 		const std::string ResultFolder = "Results";
 		const std::string DataCategorisationFolder = "Data Categorization";

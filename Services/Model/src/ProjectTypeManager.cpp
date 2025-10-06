@@ -76,7 +76,7 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	m_hasCircuit					= false;
 	m_hasMaterialRoot				= false;
 	m_hasMeshRoot					= false;
-	m_hasSolverRoot					= false;
+	m_hasSolverRoot					= true;
 	m_hasScriptsRoot				= true;
 	m_hasUnitRoot					= true;
 	m_hasDataCategorizationRoot		= true;

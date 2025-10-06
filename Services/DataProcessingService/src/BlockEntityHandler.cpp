@@ -39,7 +39,7 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 	
-	InitSpecialisedBlockEntity(blockEntity);
+	initSpecialisedBlockEntity(blockEntity);
 
 	blockEntity->StoreToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
@@ -139,7 +139,8 @@ void BlockEntityHandler::orderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
+
+void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock> blockEntity)
 {
 	EntityBlockPython* pythonBlock = dynamic_cast<EntityBlockPython*>(blockEntity.get());
 	if (pythonBlock != nullptr)
@@ -215,7 +216,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 {
 	const std::string fullBlockFolderFile = _folderName + "/" + m_blockFolder;
 	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullBlockFolderFile);
-
+	
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);

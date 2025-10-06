@@ -12,6 +12,7 @@
 #include "EntityBase.h"
 #include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
+#include "OTCore/FolderNames.h"
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -89,8 +90,8 @@ public:
 	std::string getMaterialRootName() { return "Materials"; };
 	std::string getParameterRootName() { return "Parameters"; };
 	std::string getMeshRootName() { return "Meshes"; };
-	std::string getSolverRootName() { return "Solvers"; };
-	std::string getScriptsRootName() { return "Scripts"; };
+	std::string getSolverRootName() { return ot::FolderNames::SolverFolder; };
+	std::string getScriptsRootName() { return ot::FolderNames::PythonScriptFolder; };
 	std::string getUnitRootName() { return "Units"; };
 
 	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,

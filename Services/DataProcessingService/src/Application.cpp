@@ -130,7 +130,32 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 					worker.detach();
 				}
 			}
-			else if (action == m_buttonCreatePipeline.GetFullDescription())
+			else if (action == m_buttonCreateSolver.GetFullDescription())
+			{
+				auto modelComponent = Application::instance()->getModelComponent();
+				EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+				
+				if (m_dataProcessingFolderID == ot::getInvalidUID())
+				{
+					ot::EntityInformation entityInfo;
+					ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::DataProcessingFolder, entityInfo);
+					m_dataProcessingFolderID = entityInfo.getEntityID();
+				}				
+				newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
+
+				auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
+
+
+				newSolver.StoreToDataBase();
+				ot::NewModelStateInformation entityInfos;
+				entityInfos.m_topologyEntityIDs.push_back(newSolver.getEntityID());
+				entityInfos.m_topologyEntityVersions.push_back(newSolver.getEntityStorageVersion());
+				entityInfos.m_forceVisible.push_back(false);
+				ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
+
+			}
+			else if (action == m_buttonGraphicsScene.GetFullDescription())
 			{
 				auto modelComponent = Application::instance()->getModelComponent();
 				EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
@@ -227,9 +252,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
 	m_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
-	m_buttonCreatePipeline.SetDescription(pageName, groupName, "Create Pipeline");
+	m_buttonCreateSolver.SetDescription(pageName, groupName, "Add Solver");
+	m_buttonGraphicsScene.SetDescription(pageName, groupName, "Create Pipeline");
+
 	_ui->addMenuButton(m_buttonRunPipeline, modelWrite, "RunSolver");
-	_ui->addMenuButton(m_buttonCreatePipeline, modelWrite, "AddSolver");
+	_ui->addMenuButton(m_buttonCreateSolver, modelWrite, "AddSolver");
+	_ui->addMenuButton(m_buttonGraphicsScene, modelWrite, "AddSolver");
+
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.orderUIToCreateBlockPicker();
 	
