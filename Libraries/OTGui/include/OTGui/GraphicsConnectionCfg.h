@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/PenCfg.h"
@@ -20,6 +21,8 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsConnectionCfg : public ot::Serializable {
+		OT_DECL_DEFCOPY(GraphicsConnectionCfg)
+		OT_DECL_DEFMOVE(GraphicsConnectionCfg)
 	public:
 		enum class ConnectionShape {
 			DirectLine,
@@ -34,10 +37,8 @@ namespace ot {
 
 		GraphicsConnectionCfg();
 		GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName);
-		GraphicsConnectionCfg(const GraphicsConnectionCfg& _other);
 		virtual ~GraphicsConnectionCfg();
 
-		GraphicsConnectionCfg& operator = (const GraphicsConnectionCfg& _other);
 		bool operator==(const GraphicsConnectionCfg& _other) const;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -59,11 +60,19 @@ namespace ot {
 		void setOriginConnectable(const std::string& _name) { m_originConnectable = _name; };
 		const std::string& getOriginConnectable(void) const { return m_originConnectable; };
 
+		void setOriginPos(double _x, double _y) { m_originPos.set(_x, _y); };
+		void setOriginPos(const ot::Point2DD& _pos) { m_originPos = _pos; };
+		const ot::Point2DD& getOriginPos(void) const { return m_originPos; };
+
 		void setDestUid(const ot::UID& _uid) { m_destUID = _uid; };
 		const ot::UID& getDestinationUid(void) const { return m_destUID; };
 
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
 		const std::string& getDestConnectable(void) const { return m_destConnectable; };
+
+		void setDestPos(double _x, double _y) { m_destPos.set(_x, _y); };
+		void setDestPos(const ot::Point2DD& _pos) { m_destPos = _pos; };
+		const ot::Point2DD& getDestPos(void) const { return m_destPos; };
 
 		void setUid(const ot::UID& _uid) { m_uid = _uid; };
 		const ot::UID& getUid(void) const { return m_uid; };
@@ -97,9 +106,11 @@ namespace ot {
 	private:
 		ot::UID m_originUID;
 		std::string m_originConnectable;
+		ot::Point2DD m_originPos;
 
 		ot::UID m_destUID;
 		std::string m_destConnectable;
+		ot::Point2DD m_destPos;
 
 		ot::UID m_uid;
 

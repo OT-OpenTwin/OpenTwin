@@ -7,7 +7,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/BasicWidgetView.h"
 
 otoolkit::Tool::Tool() 

@@ -16,7 +16,8 @@ public:
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
 	void SetGraphicsScenePackageName(const std::string& name) { m_graphicsScenePackage = name; }
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
-	
+	void CreateConnections();
+
 	void createProperties();
 	virtual bool updateFromProperties() override;
 	virtual void addVisualizationNodes(void) override;
@@ -36,7 +37,6 @@ private:
 	
 	
 	void CreateNavigationTreeEntry();
-	void CreateConnections();
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

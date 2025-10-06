@@ -13,6 +13,7 @@
 
 
 // Open twin header
+#include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
@@ -28,9 +29,12 @@
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
+#include "EntitySolverDataProcessing.h"
+
 
 #include "OTServiceFoundation/UILockWrapper.h"
-
+#include "EntitySolverDataProcessing.h"
+#include "EntityGraphicsScene.h"
 Application * g_instance{ nullptr };
 
 Application * Application::instance(void) {
@@ -57,19 +61,29 @@ Application::~Application()
 
 }
 
-void Application::runPipeline()
+void Application::runPipeline(ot::UIDList _selectedSolverIDs)
 {
- 	//UILockWrapper lockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
+ 	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 	try
 	{
-
-		auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-		const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
-		if (isValid)
+		Application::instance()->prefetchDocumentsFromStorage(_selectedSolverIDs);
+		ClassFactory& classFactory = Application::instance()->getClassFactory();
+		
+		for (ot::UID entityID : _selectedSolverIDs)
 		{
-			const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-			const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-			_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+			ot::UID entityVersion =	Application::instance()->getPrefetchedEntityVersion(entityID);
+			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
+			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
+			const std::string folderName = solver->getName();
+			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
+			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+
+			if (isValid)
+			{
+				const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+				const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+			}
 		}
 	}
 	catch (const std::exception& e)
@@ -88,17 +102,6 @@ void Application::runPipeline()
 
 // Required functions
 
-
-void Application::run(void)
-{
-	if (!EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-
-	// Add code that should be executed when the service is started and may start its work
-}
-
 std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc)
 {
 	try
@@ -106,10 +109,40 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == _buttonRunPipeline.GetFullDescription())
+			if (action == m_buttonRunPipeline.GetFullDescription())
 			{
-				std::thread worker(&Application::runPipeline, this);
-				worker.detach();
+				EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+				ot::UIDList selectedSolverIDs;
+				for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
+				{
+					if (selectedEntity.getEntityType() == solver.getClassName())
+					{
+						selectedSolverIDs.push_back(selectedEntity.getEntityID());
+					}
+				}
+				if (selectedSolverIDs.size() == 0)
+				{
+					Application::instance()->getUiComponent()->displayMessage("No solver selected to run.");
+				}
+				else
+				{
+					std::thread worker(&Application::runPipeline, this, selectedSolverIDs);
+					worker.detach();
+				}
+			}
+			else if (action == m_buttonCreatePipeline.GetFullDescription())
+			{
+				auto modelComponent = Application::instance()->getModelComponent();
+				EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+				auto allPipelines =	ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
+				newDataprocessing.setName(entityName);
+				newDataprocessing.StoreToDataBase();
+				ot::NewModelStateInformation infos;
+				infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
+				infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
+				infos.m_forceVisible.push_back(false);
+				ot::ModelServiceAPI::addEntitiesToModel(infos,"Added pipeline");
 			}
 		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
@@ -130,14 +163,32 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
 			}
 
-			_blockEntityHandler.CreateBlockEntity(editorName, itemName, position);
+			_blockEntityHandler.createBlockEntity(editorName, itemName, position);
 		}
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
 		{
 			ot::GraphicsConnectionPackage pckg;
 			pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 			const std::string editorName = pckg.name();
-			_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
+
+			_blockEntityHandler.addBlockConnection(pckg.connections(), editorName);
+			//EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+			//std::list<std::string> selectedSolverName;
+			//for (ot::EntityInformation& selectedEntity : m_selectedEntityInfos)
+			//{
+			//	if (selectedEntity.getEntityType() == solver.getClassName())
+			//	{
+			//		selectedSolverName.push_back(selectedEntity.getEntityName());
+			//	}
+			//}
+
+			//if (selectedSolverName.size() == 1)
+			//{
+			//}
+			//else
+			//{
+			//	assert(0); //A connection should be drawn in only one graphics view.
+			//}
 		}
 	}
 	catch (const std::exception& e)
@@ -150,9 +201,9 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 void Application::propertyChanged(ot::JsonDocument& _doc)
 {
 	EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
-	if (m_selectedEntities.size() == 1 && m_selectedEntityInfos.begin()->getEntityType() == dbA.getClassName())
+	if (this->getSelectedEntities().size() == 1 && this->getSelectedEntityInfos().begin()->getEntityType() == dbA.getClassName())
 	{
-		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_selectedEntityInfos.begin()->getEntityID(), m_selectedEntityInfos.begin()->getEntityVersion(), getClassFactory());
+		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(this->getSelectedEntityInfos().begin()->getEntityID(), this->getSelectedEntityInfos().begin()->getEntityVersion(), getClassFactory());
 		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 		if (dbAccess != nullptr)
 		{
@@ -165,11 +216,6 @@ void Application::propertyChanged(ot::JsonDocument& _doc)
 	}
 }
 
-std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -180,21 +226,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
-	_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
-	_ui->addMenuButton(_buttonRunPipeline, modelWrite, "RunSolver");
+	m_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
+	m_buttonCreatePipeline.SetDescription(pageName, groupName, "Create Pipeline");
+	_ui->addMenuButton(m_buttonRunPipeline, modelWrite, "RunSolver");
+	_ui->addMenuButton(m_buttonCreatePipeline, modelWrite, "AddSolver");
 	_blockEntityHandler.setUIComponent(_ui);
-	_blockEntityHandler.OrderUIToCreateBlockPicker();
+	_blockEntityHandler.orderUIToCreateBlockPicker();
 	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
 	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
-}
-
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
@@ -204,46 +247,3 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_pipelineHandler.setModelComponent(_model);
 	m_propertyHandlerDatabaseAccessBlock.setModelComponent(_model);
 }
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
-}
-
-// ##################################################################################################################################################################################################################

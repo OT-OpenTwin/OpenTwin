@@ -157,7 +157,7 @@ void InfoFileManager::writeInformation()
 	if (!ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The item does not exist -> create a new item
-		fileEntity = new EntityFile(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+		fileEntity = new EntityFile(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 
 		fileEntity->setName("Files/Information");
 		fileEntity->setFileProperties("", "", "Absolute");
@@ -170,7 +170,7 @@ void InfoFileManager::writeInformation()
 	}
 
 	// Now create a new data item
-	EntityBinaryData* dataEntity = new EntityBinaryData(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	EntityBinaryData* dataEntity = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 
 	// Store the data in the item
 	std::stringstream dataContent;
@@ -197,8 +197,8 @@ void InfoFileManager::writeInformation()
 	fileEntity->StoreToDataBase();
 
 	// And add them to the model
-	application->modelComponent()->addNewTopologyEntity(fileEntity->getEntityID(), fileEntity->getEntityStorageVersion(), false);
-	application->modelComponent()->addNewDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion(), fileEntity->getEntityID());
+	application->getModelComponent()->addNewTopologyEntity(fileEntity->getEntityID(), fileEntity->getEntityStorageVersion(), false);
+	application->getModelComponent()->addNewDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion(), fileEntity->getEntityID());
 
 	delete fileEntity;
 	fileEntity = nullptr;

@@ -1,7 +1,7 @@
 #include "EntityBlockCircuitConnector.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 #include "OTGui/BasicGraphicsIntersectionItem.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)

@@ -9,6 +9,7 @@
 #include "OTSystem/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/GSSDebugInfo.h"
 
 // std header
 #include <string>
@@ -69,6 +70,8 @@ public:
 
 	//! @brief Returns the session user name.
 	const std::string& getUserName(void) const { return m_userName; };
+
+	ot::GSSDebugInfo::SessionData getDebugInformation() const;
 
 private:
 	SessionState m_state;   //! @brief Session state flags.

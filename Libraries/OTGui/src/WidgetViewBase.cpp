@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/WidgetViewBase.h"
 
 std::string ot::WidgetViewBase::toString(ViewFlag _flag) {

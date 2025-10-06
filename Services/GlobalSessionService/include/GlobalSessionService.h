@@ -7,12 +7,13 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
+#include "OTCore/LogTypes.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/LogModeManager.h"
 #include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/GSSDebugInfo.h"
 #include "OTCommunication/ActionHandler.h"
 
 #include "OTServiceFoundation/IDManager.h"
@@ -29,31 +30,13 @@ class LocalSessionService;
 //! @class GlobalSessionService
 //! @brief The GlobalSessionService is the central class of this service.
 //! It is responsible for managing all LocalSessionServices and the sessions in them.
-class GlobalSessionService : public ot::ServiceBase, public ot::Serializable {
+class GlobalSessionService : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(GlobalSessionService)
 	OT_DECL_NOCOPY(GlobalSessionService)
 	OT_DECL_NOMOVE(GlobalSessionService)
 public:
 	//! @brief Returns the global instance of the GlobalSessionService.
 	static GlobalSessionService& instance(void);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Serialization
-
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Service handling
-
-	//! @brief Add the session service to the list of session services.
-	//! @param _service The session service to add.
-	//! @param _newId The new id assigned to the session service.
-	//! @return True if the service was added successfully, false otherwise.
-	bool addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -67,6 +50,8 @@ public:
 
 	void setGlobalDirectoryUrl(const std::string& _url) { m_globalDirectoryUrl = _url; };
 	const std::string& getGlobalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
+
+	ot::GSSDebugInfo getDebugInformation();
 
 private:
 
@@ -99,6 +84,17 @@ private:
 	
 	GlobalSessionService();
 	~GlobalSessionService();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Service handling
+
+	//! @brief Add the session service to the list of session services.
+	//! @note The mutex must be locked before calling this function.
+	//! @param _service The session service to add.
+	//! @param _newId The new id assigned to the session service.
+	//! @return True if the service was added successfully, false otherwise.
+	bool addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId);
 
 	//! @brief Will remove the service from the service map aswell as all sessions in this service
 	void removeSessionService(const LocalSessionService& _service);
@@ -148,7 +144,8 @@ private:
 	std::string m_databaseUrl;                //! @brief Database url.
 	std::string m_authorizationUrl;           //! @brief Authorization Service url.
 	std::string m_globalDirectoryUrl;         //! @brief Global Directory Service url.
-	
+	std::string m_libraryManagementUrl;       //! @brief Library Management Service url.
+
 	std::atomic_bool m_workerRunning;         //! @brief If true the workers are running, otherwise they still might be shutting down but will terminate if not set back to true in time.
 	std::atomic_bool m_forceHealthCheck;      //! @brief If true the next health check cycle will perform a health check even if the timeout of the next health check is not reached yet.
 
@@ -158,6 +155,5 @@ private:
 	ot::IDManager<ot::serviceID_t>				m_lssIdManager;          //! @brief ID generator used to assign IDs to the LSS.
 	ot::SystemInformation						m_systemLoadInformation; //! @brief Current system load information.
 
-	ot::LogModeManager m_logModeManager;                                 //! @brief Log mode manager.
 	std::string m_frontendInstallerFileContent;                          //! @brief Contents of the installer that will be provided to the frontend.
 };

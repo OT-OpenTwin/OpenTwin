@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/UserCredentials.h"
 #include "Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"

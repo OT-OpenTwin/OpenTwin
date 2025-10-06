@@ -3,7 +3,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
@@ -38,7 +38,7 @@ namespace osg		{ class Group; }
 namespace ot        { class Property; }
 namespace ot        { class PlotManagerView; }
 
-class Viewer : public QOpenGLWidget, public ot::QWidgetInterface
+class Viewer : public QOpenGLWidget, public ot::WidgetBase
 {
 	Q_OBJECT
 public:

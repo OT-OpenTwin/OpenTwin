@@ -13,9 +13,13 @@ namespace ot
 	class OT_CORE_API_EXPORT ReturnMessage : public ot::Serializable
 	{
 	public:
+		using Serializable::toJson;
+
 		enum ReturnMessageStatus {
-			Ok, //! @brief Ok
-			Failed //! @brief Error
+			Ok,     //! @brief Ok
+			Failed, //! @brief Error
+			True,
+			False
 		};
 
 		static std::string statusToString(ReturnMessageStatus _status);
@@ -94,10 +98,6 @@ namespace ot
 
 		//! @brief Returns a string representation of the status
 		std::string getStatusString(void) const;
-
-		//! @brief Returns a JSON String
-		//! Will create a JSON document, call addToJSONObject and return the JSON string created by the document
-		std::string toJson(void) const;
 
 	private:
 		ReturnMessageStatus m_status;

@@ -40,7 +40,7 @@ void ObjectManager::storeVolumeFaces(EntityBase *entity, gmsh::vectorpair &meshE
 			if (volumeTag != 0 && volumeTag != tag.second)
 			{
 				// We have obtained two volumes for this shape -> incorrect topology
-				application->uiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (multiple volume tags found, try healing the shape): " + entity->getName() + "\n");
+				application->getUiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (multiple volume tags found, try healing the shape): " + entity->getName() + "\n");
 				return;
 			}
 
@@ -50,13 +50,13 @@ void ObjectManager::storeVolumeFaces(EntityBase *entity, gmsh::vectorpair &meshE
 
 	if (volumeTagToFacesMap.count(volumeTag) != 0)
 	{ 
-		application->uiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (multiple volumes found, try healing the shape): " + entity->getName() + "\n");
+		application->getUiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (multiple volumes found, try healing the shape): " + entity->getName() + "\n");
 		return;
 	}
 	
 	if (volumeTag == 0)
 	{ 
-		application->uiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (no volume found, try healing the shape): " + entity->getName() + "\n");
+		application->getUiComponent()->displayMessage("ERROR: Topology error - no volume coud be built for shape (no volume found, try healing the shape): " + entity->getName() + "\n");
 	}
 	else
 	{

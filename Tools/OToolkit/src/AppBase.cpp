@@ -9,6 +9,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "Randomizer.h"
+#include "BackendInfo.h"
 #include "ToolManager.h"
 #include "MenuManager.h"
 #include "ImageEditor.h"
@@ -28,6 +29,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/String.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
@@ -52,6 +54,8 @@
 #include <QtWidgets/qmessagebox.h>
 
 #define BUILD_INFO "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n"
+
+#undef FAR
 
 enum InternLogType {
 	InternInfo,
@@ -201,7 +205,12 @@ void AppBase::setUrl(const QString& _url) {
 void AppBase::parseStartArgs(const std::string& _args) {
 	std::list<std::string> tmp = ot::String::split(_args, ' ', true);
 	for (const std::string& arg : tmp) {
-		if (arg == "-logexport") m_startArgs.push_back(StartOption::LogExport);
+		if (arg == "-logexport") {
+			m_startArgs.push_back(StartOption::LogExport);
+		}
+		else if (arg == "-noauto") {
+			m_startArgs.push_back(StartOption::NoAutoStart);
+		}
 		else {
 			OT_LOG_W("Unknown start argument \"" + arg + "\"");
 		}
@@ -265,7 +274,7 @@ void AppBase::slotProcessMessage(const QString& _json) {
 						messages.push_back(msg);
 					}
 					
-					m_logger->appendLogMessages(messages);
+					m_logger->newMessages(std::move(messages));
 				}
 			}
 			else if (action == "DisplayData") {
@@ -423,11 +432,21 @@ void AppBase::slotInitialize(void) {
 
 void AppBase::slotInitializeTools(void) {
 	// Create tools
+	ot::BasicScopedBoolWrapper autoStarting(m_ignoreToolAutoStart, m_ignoreToolAutoStart);
+
+	for (StartOption opt : m_startArgs) {
+		if (opt == AppBase::NoAutoStart) {
+			m_ignoreToolAutoStart = true;
+			break;
+		}
+	}
+
 	m_logger = new Logging;
 	
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new FAR);
+	m_toolManager->addTool(new BackendInfo);
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new ImageEditor);
@@ -492,9 +511,10 @@ void AppBase::slotColorStyleChanged(void) {
 }
 
 AppBase::AppBase(QApplication* _app) 
-	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
+	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true),
+	m_ignoreToolAutoStart(false)
 {
-	this->setDeleteLogNotifierLater(true);
+	this->setCustomDeleteLogNotifier(true);
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	// Initialize dock manager

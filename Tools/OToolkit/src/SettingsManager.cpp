@@ -8,6 +8,7 @@
 #include "SettingsManager.h"
 
 // OpenTwin header
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyPath.h"
 #include "OTGui/PropertyGroup.h"

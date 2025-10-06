@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTGui/PropertyBase.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -20,7 +20,7 @@ namespace ot {
 	class Property;
 	class PropertyGridItem;
 
-	class OT_WIDGETS_API_EXPORT PropertyInput : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PropertyInput : public QObject, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInput)
 	public:

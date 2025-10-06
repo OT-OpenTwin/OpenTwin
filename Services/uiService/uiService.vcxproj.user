@@ -27,22 +27,22 @@
     <LocalDebuggerCommandArguments />
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2025-05-09T17:38:38.4266367Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-09-30T10:39:05.4592262Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2025-05-09T17:38:38.2649515Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-09-30T10:39:05.3328375Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2025-05-09T17:38:38.5461502Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-09-30T10:39:05.5636460Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2025-05-09T17:38:38.0609127Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2025-09-30T10:39:05.2187174Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>

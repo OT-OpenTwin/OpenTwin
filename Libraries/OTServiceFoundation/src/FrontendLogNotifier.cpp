@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/FrontendLogNotifier.h"
@@ -23,8 +23,8 @@ ot::FrontendLogNotifier::~FrontendLogNotifier() {
 void ot::FrontendLogNotifier::log(const LogMessage& _message) {
 	if (_message.getFlags() & m_flags) {
 		if (m_app->isUiConnected()) {
-			OTAssertNullptr(m_app->uiComponent());
-			m_app->uiComponent()->displayLogMessage(_message);
+			OTAssertNullptr(m_app->getUiComponent());
+			m_app->getUiComponent()->displayLogMessage(_message);
 		}
 	}
 }

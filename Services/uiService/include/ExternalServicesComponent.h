@@ -93,8 +93,6 @@ public:
 
 	void setUiServiceURL(const std::string& _url) { m_uiServiceURL = _url; }
 
-	void setRelayServiceIsRequired(void);
-
 	void setMessagingRelay(const std::string& _relayAddress);
 
 	// ###################################################################################################
@@ -170,8 +168,7 @@ public:
 	// ###################################################################################################
 
 	// File operations
-	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
-
+	
 	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
 	//########################################################################################################
@@ -190,7 +187,7 @@ public:
 
 	OT_HANDLER(handleSetLogFlags, ExternalServicesComponent, OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleCompound, ExternalServicesComponent, OT_ACTION_CMD_Compound, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -388,7 +385,13 @@ private:
 	ServiceDataUi * getService(ot::serviceID_t _serviceID);
 	ServiceDataUi * getService(const ot::BasicServiceInformation& _serviceInfo);
 
-	void determineViews(const std::string& modelServiceURL);
+	void addService(const ot::ServiceBase& _info);
+
+	//! @brief Removes all data related to a service that is not available anymore.
+	//! @param _serviceID The ID of the service that is not available anymore.
+	void cleanUpService(ot::serviceID_t _serviceID);
+
+	void determineViews(const std::string& _modelServiceURL);
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
@@ -416,7 +419,6 @@ private:
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;
 	std::string										m_currentSessionID;
-	bool											m_isRelayServiceRequired;
 	ControlsManager *								m_controlsManager;
 	LockManager *									m_lockManager;
 	AppBase *										m_owner;

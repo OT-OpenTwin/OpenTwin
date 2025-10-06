@@ -72,11 +72,11 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockProperties);
 
-	application->uiComponent()->lockUI(lockFlags);
-	application->uiComponent()->setProgressInformation("Read STEP file", false);
-	application->uiComponent()->setProgress(0);
+	application->getUiComponent()->lockUI(lockFlags);
+	application->getUiComponent()->setProgressInformation("Read STEP file", false);
+	application->getUiComponent()->setProgress(0);
 
-	application->uiComponent()->displayMessage("____________________________________________________________\n\nReading STEP file\n\n");
+	application->getUiComponent()->displayMessage("____________________________________________________________\n\nReading STEP file\n\n");
 
 	std::string rootName = determineUniqueRootName(originalName);
 
@@ -91,7 +91,7 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 
 	// Disable write caching to database (this will also flush all pending writes)
 	DataBase::GetDataBase()->queueWriting(false);
-	application->uiComponent()->setProgress(95);
+	application->getUiComponent()->setProgress(95);
 
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
@@ -120,17 +120,17 @@ void STEPReader::importSTEPFileWorker(const std::string &fileName, bool removeFi
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "import STEP file" );
 
 	messages = std::to_string(entityList.size()) + " shape(s) imported.\n\n" + messages;
-	application->uiComponent()->displayMessage(messages);
+	application->getUiComponent()->displayMessage(messages);
 
 	// Disable message queueing. This will send all messages.
 	ot::ModelServiceAPI::enableMessageQueueing(false);
 
 	// Refresh the view
-	application->uiComponent()->refreshAllViews(ot::ModelServiceAPI::getCurrentVisualizationModelID());
+	application->getUiComponent()->refreshAllViews(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 
-	application->uiComponent()->setProgress(100);
-	application->uiComponent()->closeProgressInformation();
-	application->uiComponent()->unlockUI(lockFlags);
+	application->getUiComponent()->setProgress(100);
+	application->getUiComponent()->closeProgressInformation();
+	application->getUiComponent()->unlockUI(lockFlags);
 }
 
 void STEPReader::analyzeGeometry(EntityGeometry *entityGeom, std::string &messages)
@@ -481,9 +481,9 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					int colorB = (int)(blue * 255 + 0.5);
 
 					// Store entity
-					ot::UID entityID = application->modelComponent()->createEntityUID();
-					ot::UID brepID = application->modelComponent()->createEntityUID();
-					ot::UID facetsID = application->modelComponent()->createEntityUID();
+					ot::UID entityID = application->getModelComponent()->createEntityUID();
+					ot::UID brepID = application->getModelComponent()->createEntityUID();
+					ot::UID facetsID = application->getModelComponent()->createEntityUID();
 
 					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
 					entityGeom->setName(thisName);
@@ -520,7 +520,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 
 				// Set progress
 				int percent = 20 + (int)(75.0 * shapesIndex / numberOfShapes);
-				application->uiComponent()->setProgress(percent);
+				application->getUiComponent()->setProgress(percent);
 			}
 
 			shapesIndex++;
@@ -551,7 +551,7 @@ void STEPReader::readStepFile(std::string fileName, const std::string &rootName,
 	reader.SetColorMode(true);
 
 	reader.ReadFile((Standard_CString)fileName.c_str());
-	application->uiComponent()->setProgress(5);
+	application->getUiComponent()->setProgress(5);
 
 	Handle(TDocStd_Document) doc;
 	Handle(XCAFApp_Application) anApp = XCAFApp_Application::GetApplication();
@@ -568,7 +568,7 @@ void STEPReader::readStepFile(std::string fileName, const std::string &rootName,
 	{
 	}
 
-	application->uiComponent()->setProgress(20);
+	application->getUiComponent()->setProgress(20);
 	
 	if (removeFile)
 	{

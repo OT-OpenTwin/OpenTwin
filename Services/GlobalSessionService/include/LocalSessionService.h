@@ -9,6 +9,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCommunication/GSSDebugInfo.h"
 
 // std header
 #include <list>
@@ -31,6 +32,13 @@ public:
 
 	LocalSessionService& operator = (const LocalSessionService& _other);
 	LocalSessionService& operator = (LocalSessionService&& _other) noexcept;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Virtual methods
+
+	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -75,6 +83,8 @@ public:
 	//! The list will contain the session ids of all sessions in all containers.
 	std::list<std::string> getSessionIds(void) const;
 
+	ot::GSSDebugInfo::LSSData getDebugInformation() const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Getter / Setter
@@ -99,14 +109,6 @@ public:
 
 	//! @brief Clears all containers that hold sessions.
 	void clearSessions(void);
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Serialization
-
-	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-
-	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

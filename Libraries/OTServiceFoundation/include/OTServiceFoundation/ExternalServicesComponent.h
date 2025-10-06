@@ -10,6 +10,8 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ServiceRunData.h"
+#include "OTCommunication/ServiceInitData.h"
 #include "OTSystem/SystemInformation.h"
 
 // std header
@@ -42,21 +44,14 @@ namespace ot {
 
 			// Mandatory functions
 
-			int startup(ApplicationBase * _application, const std::string& _localDirectoryServiceURL, const std::string& _ownURL);
+			//! @brief Will initialize the component.
+			//! @param _application The application object that is using this component.
+			//! @param _ownURL The URL of this service.
+			//! @return 0 if successful, otherwise an error code.
+			int startup(ApplicationBase* _application, const std::string& _ownURL);
 
-			//! @brief Will initialize the service
-			//! @param _siteID The site ID this service is running on
-			//! @param _ownIP The IP address of this service
-			//! @param _sessionServiceIP The IP address of the session service this service was started from/ should interact with
-			//! @param _sessionID The ID of the session this service is running at
-			std::string init(
-				const std::string &					_sessionServiceURL,
-				const std::string &					_sessionID
-			);			
-			std::string initDebugExplicit(
-				const std::string &					_sessionServiceURL,
-				const std::string &					_sessionID
-			);
+			//! @brief Will initialize the service.
+			ot::ReturnMessage init(const ot::ServiceInitData& _initData);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter
@@ -85,9 +80,6 @@ namespace ot {
 			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
 			std::string handleGetSystemInformation();
 
-			std::string getLoggedInUserName(void) { return credentialsUsername; }
-			std::string getLoggedInUserPassword(void) { return credentialsPassword; }
-
 		private:
 			// #####################################################################################################################################
 
@@ -98,7 +90,6 @@ namespace ot {
 			OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleShutdownRequestByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleServiceShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
@@ -106,15 +97,12 @@ namespace ot {
 
 			// #####################################################################################################################################
 
-				// Private member
+			// Private member
 			std::mutex m_actionDispatching;
 
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
 			SystemInformation m_systemLoad;
-
-			std::string credentialsUsername;
-			std::string credentialsPassword;
 			
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();

@@ -31,8 +31,6 @@ namespace ot {
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) override;
 
-		virtual void setGraphicsScene(GraphicsScene* _scene) override;
-
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
@@ -65,6 +63,8 @@ namespace ot {
 		// Protected
 
 	protected:
+		virtual void graphicsSceneSet(GraphicsScene* _scene) override;
+
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
 
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;

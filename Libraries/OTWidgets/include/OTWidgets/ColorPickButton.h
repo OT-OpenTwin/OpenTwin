@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -19,7 +19,7 @@ namespace ot {
 	class PushButton;
 	class ColorPreviewBox;
 
-	class OT_WIDGETS_API_EXPORT ColorPickButton : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ColorPickButton : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ColorPickButton)
 	public:

@@ -307,6 +307,9 @@ namespace ot {
 		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
 		QRectF getTriggerBoundingRect(void) const;
 
+		//! @brief If enabled the item does not send any notifications to the view.
+		bool isSilencingConfigNotifications() const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected notifier

@@ -11,7 +11,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -34,7 +34,7 @@ namespace ot {
 
 	//! @brief View widget used to display GraphicsItems
 	//! Note that the View creates its own scene.
-	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public WidgetBase {
 		Q_OBJECT
 	public:
 		enum GraphicsViewFlag {
@@ -145,6 +145,8 @@ namespace ot {
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
+		void notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection);
+
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name
@@ -163,6 +165,8 @@ namespace ot {
 		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
 
 		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);
+
+		void connectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 

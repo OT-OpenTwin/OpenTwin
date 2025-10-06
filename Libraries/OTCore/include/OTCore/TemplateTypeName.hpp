@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OTCore/TemplateTypeName.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 namespace ot
 {

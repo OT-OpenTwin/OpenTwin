@@ -5,11 +5,11 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewDock.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/WidgetViewManager.h"
 
 // ADS header
@@ -119,7 +119,7 @@ void ot::WidgetView::getDebugInformation(JsonObject& _object, JsonAllocator& _al
 
 // Protected
 
-void ot::WidgetView::addWidgetInterfaceToDock(QWidgetInterface* _interface) {
+void ot::WidgetView::addWidgetInterfaceToDock(WidgetBase* _interface) {
 	_interface->setParentWidgetView(this);
 	this->addWidgetToDock(_interface->getQWidget());
 }

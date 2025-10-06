@@ -3,6 +3,6 @@
 
 TEST(OperatingSystem, GetCurrentPath) {
   
-	auto path = ot::OperatingSystem::getExecutablePath();
+	auto path = ot::OperatingSystem::getCurrentExecutableDirectory();
 	EXPECT_NE(path, "");
 }

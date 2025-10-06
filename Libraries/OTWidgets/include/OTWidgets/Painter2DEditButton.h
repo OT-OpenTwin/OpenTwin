@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Painter2DDialogFilter.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qframe.h>
@@ -19,7 +19,7 @@ namespace ot{
 	class PushButton;
 	class Painter2DPreview;
 
-	class OT_WIDGETS_API_EXPORT Painter2DEditButton : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Painter2DEditButton : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DEditButton)
 	public:

@@ -1117,7 +1117,9 @@ QToolButton:hover {
 }
 
 QToolButton:pressed {
-    background-color: %color:Widget Background%;
+    /*background-color: %color:Widget Background%;*/
+    background: %color:Widget Selection Background%;
+    color: %color:Widget Selection Foreground%;
 }
 
 QToolButton:selected {
@@ -2592,6 +2594,42 @@ ads--CDockWidgetTab #tabCloseButton::disabled {
 
 /* ##################################################################################### */
 
+/* ExpanderWidget */
+
+ot--ExpanderWidget #OT_ExpanderWidgetHeaderLine {
+    background-color: %color:Border Color%;
+    min-height: 1px;
+    max-height: 1px;
+}
+
+/* ##################################################################################### */
+
+/* IndicatorWidget */
+
+ot--IndicatorWidget {
+    color: %color:Widget Foreground%;
+    background: %color:Transparent%;
+    border: 1px solid %color:Border Color%;
+    border-radius: %double:Border Radius Small%;
+}
+
+ot--IndicatorWidget:hover {
+    color: %color:Widget Hover Background%;
+    border-color: %color:Border Hover Color%;
+}
+
+ot--IndicatorWidget:pressed {
+    color: %color:Widget Selection Background%;
+    border-color: %color:Border Selection Color%;
+}
+
+ot--IndicatorWidget:disabled {
+    color: %color:Widget Disabled Foreground%;
+    border-color: %color:Border Disabled Color%;
+}
+
+/* ##################################################################################### */
+
 /* Special Properties */
 
 QWidget[OT_TransparentBackground="true"]:!hover:!pressed {
@@ -2608,4 +2646,16 @@ QWidget[OT_TransparentPressedBackground="true"]:pressed {
 
 QWidget[OT_Borderless="true"] {
     border: 1px solid transparent;
+}
+
+QWidget[SuccessForeground="true"] {
+    color: %color:Success Foreground%;
+}
+
+QWidget[WarningForeground="true"] {
+    color: %color:Warning Foreground%;
+}
+
+QWidget[ErrorForeground="true"] {
+    color: %color:Error Foreground%;
 }

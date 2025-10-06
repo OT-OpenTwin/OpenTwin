@@ -28,16 +28,17 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsElement)
 	public:
-		//! \enum GraphicsElementState
-		//! \brief The GraphicsElementState is used to describe the current state of a GraphicsElement.
+		//! @enum GraphicsElementState
+		//! @brief The GraphicsElementState is used to describe the current state of a GraphicsElement.
 		enum GraphicsElementState {
-			NoState = 0x00, //! \brief Default state.
-			HoverState = 0x01, //! \brief Item is hovered over by user.
-			SelectedState = 0x02, //! \brief Item is selected.
+			NoState         = 0 << 0, //! @brief Default state.
+			HoverState      = 1 << 0, //! @brief Item is hovered over by user.
+			SelectedState   = 1 << 1, //! @brief Item is selected.
+			DestroyingState = 1 << 2  //! @brief Item is being destroyed.
 		};
-		//! \typedef GraphicsItemStateFlags
-		//! \brief Flags used to manage GraphicsItemState.
-		//! \see GraphicsItem, GraphicsItemState
+		//! @typedef GraphicsItemStateFlags
+		//! @brief Flags used to manage GraphicsItemState.
+		//! @see GraphicsItem, GraphicsItemState
 		typedef Flags<GraphicsElementState> GraphicsElementStateFlags;
 
 		GraphicsElement();
@@ -47,42 +48,45 @@ namespace ot {
 
 		// Public helper
 
-		//! \brief Calculates and returns the shortest distance to the given point.
+		//! @brief Calculates and returns the shortest distance to the given point.
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
-		//! \param _pt Point in scene coordinates.
+		//! @param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const { return -1.; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
-		//! \brief Returns the QGraphicsItem.
+		//! @brief Returns the QGraphicsItem.
 		virtual QGraphicsItem* getQGraphicsItem() = 0;
 
-		//! \brief Returns the const QGraphicsItem.
+		//! @brief Returns the const QGraphicsItem.
 		virtual const QGraphicsItem* getQGraphicsItem() const = 0;
 
-		//! \brief Set the GraphicsScene this element is placed at.
-		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
+		//! @brief Set the GraphicsScene this element is placed at.
+		void setGraphicsScene(GraphicsScene* _scene);
 
-		//! \brief Returns the GraphicsScene this item is placed at.
+		//! @brief Returns the GraphicsScene this item is placed at.
 		virtual GraphicsScene* getGraphicsScene() const { return m_scene; };
 
-		//! \brief Sets the provided state flag.
-		//! \see GraphicsItem, GraphicsItemState
-		//! \param _state The state to set.
-		//! \param _active If true the flag will be set, otherwise unset.
+		//! @brief Sets the provided state flag.
+		//! @see GraphicsItem, GraphicsItemState
+		//! @param _state The state to set.
+		//! @param _active If true the flag will be set, otherwise unset.
 		void setGraphicsElementState(GraphicsElementState _state, bool _active = true);
 
-		//! \brief Replaces the flags with the flags provided.
-		//! \param _flags Flags to set.
+		//! @brief Replaces the flags with the flags provided.
+		//! @param _flags Flags to set.
 		void setGraphicsElementStateFlags(const GraphicsElementStateFlags& _state);
 
-		//! \brief Returns the current GraphicsItemStateFlags set.
-		//! \see GraphicsItem, GraphicsItemStateFlags
+		//! @brief Sets the DestroyingState flag.
+		void setGraphicsElementDestroying() { this->setGraphicsElementState(DestroyingState, true); };
+
+		//! @brief Returns the current GraphicsItemStateFlags set.
+		//! @see GraphicsItem, GraphicsItemStateFlags
 		const GraphicsElementStateFlags& getGraphicsElementState() const { return m_state; };
 
-		//! \brief Returns all graphics elements nested in this element.
+		//! @brief Returns all graphics elements nested in this element.
 		//! The result contains this element and all of its childs.
 		virtual std::list<GraphicsElement*> getAllGraphicsElements();
 
@@ -93,6 +97,8 @@ namespace ot {
 		// Protected notifier
 
 	protected:
+		virtual void graphicsSceneSet(GraphicsScene* _scene) {};
+		virtual void graphicsSceneRemoved() {};
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {};
 
 	private:

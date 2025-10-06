@@ -8,7 +8,7 @@
 #include "LocalSessionService.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 
 // std header
@@ -52,6 +52,70 @@ LocalSessionService& LocalSessionService::operator=(LocalSessionService&& _other
 	}
 
 	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Virtual methods
+
+void LocalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	// Create active session array
+	ot::JsonArray activeArr;
+	for (const Session& session : m_activeSessions) {
+		ot::JsonObject sessionObj;
+		session.addToJsonObject(sessionObj, _allocator);
+	}
+
+	// Create initialize session array
+	ot::JsonArray iniArr;
+	for (const IniSessionType& session : m_iniSessions) {
+		ot::JsonObject sessionObj;
+		session.second.addToJsonObject(sessionObj, _allocator);
+
+		ot::JsonObject pairObj;
+		pairObj.AddMember("T", ot::JsonValue(std::chrono::duration_cast<std::chrono::nanoseconds>(session.first.time_since_epoch()).count()), _allocator);
+		pairObj.AddMember("S", sessionObj, _allocator);
+
+		iniArr.PushBack(pairObj, _allocator);
+	}
+
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_Sessions, activeArr, _allocator);
+	_object.AddMember(OT_ACTION_PARAM_IniList, iniArr, _allocator);
+}
+
+void LocalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	this->clearSessions();
+
+	// Get information
+	if (_object.HasMember(OT_ACTION_ADD_GROUP_TO_PROJECT)) {
+		m_id = ot::json::getUInt(_object, OT_ACTION_PARAM_SERVICE_ID);
+	}
+	else {
+		m_id = ot::invalidServiceID;
+	}
+
+	m_url = ot::json::getString(_object, OT_ACTION_PARAM_SERVICE_URL);
+
+	// Get active sessions
+	for (const ot::ConstJsonObject& sessionObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_Sessions)) {
+		Session session;
+		session.setFromJsonObject(sessionObj);
+		m_activeSessions.push_back(std::move(session));
+	}
+
+	// Get initialize sessions
+	for (const ot::ConstJsonObject& pairObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_IniList)) {
+		// Get time
+		auto time = std::chrono::steady_clock::time_point(std::chrono::nanoseconds(ot::json::getInt(pairObj, "T")));
+
+		// Get session
+		Session session;
+		session.setFromJsonObject(ot::json::getObject(pairObj, "S"));
+		m_iniSessions.push_back(std::make_pair(time, std::move(session)));
+	}
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -172,68 +236,20 @@ void LocalSessionService::clearSessions(void) {
 	m_iniSessions.clear();
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
+ot::GSSDebugInfo::LSSData LocalSessionService::getDebugInformation() const {
+	ot::GSSDebugInfo::LSSData data;
 
-// Serialization
+	data.id = m_id;
+	data.url = m_url;
 
-void LocalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	// Create active session array
-	ot::JsonArray activeArr;
-	for (const Session& session : m_activeSessions) {
-		ot::JsonObject sessionObj;
-		session.addToJsonObject(sessionObj, _allocator);
+	for (const IniSessionType& s : m_iniSessions) {
+		data.initializingSessions.push_back(s.second.getDebugInformation());
+	}
+	for (const Session& s : m_activeSessions) {
+		data.activeSessions.push_back(s.getDebugInformation());
 	}
 
-	// Create initialize session array
-	ot::JsonArray iniArr;
-	for (const IniSessionType& session : m_iniSessions) {
-		ot::JsonObject sessionObj;
-		session.second.addToJsonObject(sessionObj, _allocator);
-
-		ot::JsonObject pairObj;
-		pairObj.AddMember("T", ot::JsonValue(std::chrono::duration_cast<std::chrono::nanoseconds>(session.first.time_since_epoch()).count()), _allocator);
-		pairObj.AddMember("S", sessionObj, _allocator);
-
-		iniArr.PushBack(pairObj, _allocator);
-	}
-
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_id, _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_url, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_Sessions, activeArr, _allocator);
-	_object.AddMember(OT_ACTION_PARAM_IniList, iniArr, _allocator);
-}
-
-void LocalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	this->clearSessions();
-
-	// Get information
-	if (_object.HasMember(OT_ACTION_ADD_GROUP_TO_PROJECT)) {
-		m_id = ot::json::getUInt(_object, OT_ACTION_PARAM_SERVICE_ID);
-	}
-	else {
-		m_id = ot::invalidServiceID;
-	}
-	
-	m_url = ot::json::getString(_object, OT_ACTION_PARAM_SERVICE_URL);
-
-	// Get active sessions
-	for (const ot::ConstJsonObject& sessionObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_Sessions)) {
-		Session session;
-		session.setFromJsonObject(sessionObj);
-		m_activeSessions.push_back(std::move(session));
-	}
-
-	// Get initialize sessions
-	for (const ot::ConstJsonObject& pairObj : ot::json::getObjectList(_object, OT_ACTION_PARAM_IniList)) {
-		// Get time
-		auto time = std::chrono::steady_clock::time_point(std::chrono::nanoseconds(ot::json::getInt(pairObj, "T")));
-
-		// Get session
-		Session session;
-		session.setFromJsonObject(ot::json::getObject(pairObj, "S"));
-		m_iniSessions.push_back(std::make_pair(time, std::move(session)));
-	}
-
+	return data;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

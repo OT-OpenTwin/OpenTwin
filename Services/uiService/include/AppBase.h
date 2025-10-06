@@ -13,11 +13,13 @@
 #include "LoginData.h"
 #include "NavigationSelectionManager.h"
 
-// OpenTwin header
-#include "OTCore/Logger.h"
+// OpenTwin Core header
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/AbstractLogNotifier.h"
+
+// OpenTwin Gui header
 #include "OTGui/CopyInformation.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
@@ -28,6 +30,8 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
+
+// OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetTypes.h"
 #include "OTWidgets/MessageBoxHandler.h"
@@ -84,6 +88,7 @@ namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
 namespace ot { class NavigationTreeView; }
 namespace ot { class AbstractSettingsItem; }
+namespace ot { class GraphicsConnectionCfg; }
 namespace ot { class VersionGraphManagerView; }
 
 struct structModelViewInfo {
@@ -496,6 +501,7 @@ public Q_SLOTS:
 	void slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig);
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
+	void slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
 	void slotGraphicsSelectionChanged(void);
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 

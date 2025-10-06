@@ -1,7 +1,7 @@
 // OpenTwin header
 #include "stdafx.h"
 #include "ActionAndFunctionHandler.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 ActionAndFunctionHandler::ActionAndFunctionHandler() 
 	: m_nextHandler(nullptr), m_dontDeleteHandler(false)

@@ -16,7 +16,7 @@ namespace ot {
 	class LineEdit;
 	class ComboBox;
 
-	class OT_WIDGETS_API_EXPORT VersionGraphManager : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT VersionGraphManager : public QObject, public WidgetBase {
 		Q_OBJECT
 	public:
 		enum ViewMode {

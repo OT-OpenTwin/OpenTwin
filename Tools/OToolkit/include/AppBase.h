@@ -10,7 +10,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/AbstractLogNotifier.h"
 
 // Qt header
 #include <QtCore/qthread.h>
@@ -35,7 +35,8 @@ class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::Ab
 	Q_OBJECT
 public:
 	enum StartOption {
-		LogExport
+		LogExport,
+		NoAutoStart
 	};
 
 	// Static functions
@@ -60,9 +61,9 @@ public:
 
 	virtual void removeToolActivityNotifier(otoolkit::ToolActivityNotifier* _notifier) override;
 
-	virtual otoolkit::SettingsRef createSettingsInstance(void) override;
+	virtual otoolkit::SettingsRef createSettingsInstance() override;
 
-	virtual const QWidget* rootWidget(void) const override { return this; };
+	virtual const QWidget* rootWidget() const override { return this; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -75,16 +76,18 @@ public:
 	// Setter / Getter
 
 	void setUrl(const QString& _url);
-	const QString& url(void) const { return m_url; };
+	const QString& url() const { return m_url; };
 
 	void parseStartArgs(const std::string& _args);
 
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
-	QApplication* applicationInstance(void) { return m_app; };
+	QApplication* applicationInstance() { return m_app; };
 
 	void setUpdateTransparentColorStyleValueEnabled(bool _enabled);
-	bool getUpdateTransparentColorStyleValueEnabled(void) const { return m_replaceTransparentColorStyleValue; };
-	void updateTransparentColorStyleValue(void);
+	bool getUpdateTransparentColorStyleValueEnabled() const { return m_replaceTransparentColorStyleValue; };
+	void updateTransparentColorStyleValue();
+
+	bool getIgnoreToolAutoStart() const { return m_ignoreToolAutoStart; };
 
 public Q_SLOTS:
 	void slotProcessMessage(const QString& _json);
@@ -99,16 +102,18 @@ private Q_SLOTS:
 	void slotLogError(const QString& _sender, const QString& _message);
 	void slotSetStatus(const QString& _text);
 	void slotSetErrorStatus(const QString& _text);
-	void slotInitialize(void);
-	void slotInitializeTools(void);
-	void slotRecenter(void);
-	void slotFinalizeInit(void);
-	void slotColorStyleChanged(void);
+	void slotInitialize();
+	void slotInitializeTools();
+	void slotRecenter();
+	void slotFinalizeInit();
+	void slotColorStyleChanged();
 
 private:
 	AppBase(QApplication* _app = (QApplication*)nullptr);
 
 	Qt::HANDLE				m_mainThread;
+
+	bool                    m_ignoreToolAutoStart;
 
 	QString					m_url;
 

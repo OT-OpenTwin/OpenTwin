@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -17,7 +17,7 @@ class QSvgWidget;
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT SVGWidget : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT SVGWidget : public QObject, public WidgetBase {
 		Q_OBJECT
 	public:
 		SVGWidget(QWidget* _parent = (QWidget*)nullptr) : SVGWidget(QByteArray(), _parent) {};

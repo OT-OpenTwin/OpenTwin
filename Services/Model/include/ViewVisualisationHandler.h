@@ -2,12 +2,14 @@
 #include "OTCore/CoreTypes.h"
 #include <string>
 #include "EntityBase.h"
+#include "OTGui/VisualisationCfg.h"
 
 class ViewVisualisationHandler
 {
 public:
-	void handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent = true, const ot::UIDList& _visualizingEntities = ot::UIDList(), bool _suppressViewHandling = false);
+	void handleVisualisationRequest(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg);
 	void handleRenaming(ot::UID _entityID);
 private:
 	void setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView);
+	void setupGraphicsScene(EntityBase* _container);
 };

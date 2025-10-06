@@ -23,3 +23,22 @@ void Visualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator&
 	_object.AddMember("ViewIsOpen", m_viewIsOpen, _allocator);
 	_object.AddMember("ViewType", ot::JsonString(ot::WidgetViewBase::toString(m_viewType), _allocator), _allocator);
 }
+
+ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _state)
+{
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setAsActiveView(_state.m_setFocus);
+
+	ot::UIDList visualizingEntities;
+	visualizingEntities.push_back(this->getSceneNode()->getModelEntityID());
+	visualisationCfg.setVisualisingEntities(visualizingEntities);
+
+	if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier))
+	{
+		visualisationCfg.setSupressViewHandling(true);
+	}
+	else {
+		visualisationCfg.setSupressViewHandling(false);
+	}
+	return visualisationCfg;
+}

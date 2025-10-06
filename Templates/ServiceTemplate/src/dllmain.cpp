@@ -1,15 +1,16 @@
-/*
- * dllmain.cpp
- */
+//! @file dllmain.cpp
+//! @author 
+//! @date 
+// ###########################################################################################################################################################################################################################################################################################################################
 
-// C++ header
-#include <Windows.h>
+// Service header
+#include "Application.h"
 
 // OpenTwin header
 #include "OTServiceFoundation/Foundation.h"
 
-// Service header
-#include "Application.h"
+// std header
+#include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -29,15 +30,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 extern "C" {
 
-	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
-	{
+	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
-	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
-	{
-		//ToDo: If you want to actually queue the command implement the queueing logic here
-		// At this point we are simply forwarding the message to the perform action function to execute the action immediatly
+	// If you want to actually queue the command implement the queueing logic here.
+	// At this point we are simply forwarding the message to the perform action function to execute the action immediatly.
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
@@ -46,20 +45,16 @@ extern "C" {
 		return ot::foundation::getServiceURL();
 	}
 
+	// This code will deallocate the memory of the return values from the perform- and queueAction calls.
 	_declspec(dllexport) void deallocateData(const char * _data)
 	{
-		// *****************
-		// This code will deallocate the memory of the return values from the perform- and queueAction calls
-		if (_data != nullptr)
-		{
+		if (_data != nullptr) {
 			delete[] _data;
 		}
-		// *****************
 	};
 
-	// This function is called once upon startup of this service
-	_declspec(dllexport) int init(const char * _localDirectoryServiceURL, const char * _ownIP, const char * _sessionServiceIP, const char * _sessionID)
-	{
-		return ot::foundation::init(_localDirectoryServiceURL, _ownIP, _sessionServiceIP, _sessionID, Application::instance());
-	};
+	// This function is called once upon startup of this service.
+	_declspec(dllexport) int init(const char* _ownUrl, const char* _unused1, const char* _unused2, const char* _unused3) {
+		return ot::foundation::init(_ownUrl, Application::instance(), false);
+	}
 }

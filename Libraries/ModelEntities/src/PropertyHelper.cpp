@@ -1,5 +1,5 @@
 #include "PropertyHelper.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 bool PropertyHelper::hasProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {

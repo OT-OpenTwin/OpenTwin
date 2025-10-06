@@ -541,7 +541,7 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 	auto pipelines = _solver->GetResultPipelines();
 
 	const std::string collectionName = Application::instance().getCollectionName();
-	ot::components::ModelComponent* modelComponent = Application::instance().modelComponent();
+	ot::components::ModelComponent* modelComponent = Application::instance().getModelComponent();
 	ClassFactory& classFactory = Application::instance().getClassFactory();
 	const std::string serviceName = Application::instance().getServiceName();
 

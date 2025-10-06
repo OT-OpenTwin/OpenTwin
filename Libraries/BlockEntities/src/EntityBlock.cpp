@@ -1,5 +1,5 @@
 #include "EntityBlock.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -224,6 +224,11 @@ void EntityBlock::CreateBlockItem()
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
 	m_info.addToJsonObject(reqDoc, reqDoc.GetAllocator());
+
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());

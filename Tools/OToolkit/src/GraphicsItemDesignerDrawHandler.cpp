@@ -22,7 +22,7 @@
 #include "WrappedTriangleItem.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // QtWidgets
 #include <QtWidgets/qscrollbar.h>

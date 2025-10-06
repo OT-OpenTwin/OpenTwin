@@ -73,7 +73,7 @@
     <ClCompile Include="src\ToolTipHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\QWidgetInterface.cpp">
+    <ClCompile Include="src\WidgetBase.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\EventNotifier.cpp">
@@ -553,6 +553,15 @@
     <ClCompile Include="src\SelectionData.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\ExpanderWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndicatorWidget.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -671,7 +680,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTWidgets\QWidgetInterface.h">
+    <ClInclude Include="include\OTWidgets\WidgetBase.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\OTWidgetsAPIExport.h">
@@ -1046,6 +1055,9 @@
     <ClInclude Include="include\OTWidgets\SelectionData.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -1257,6 +1269,12 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ModelLibraryDialog.h">
       <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ExpanderWidget.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\IndicatorWidget.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

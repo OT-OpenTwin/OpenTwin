@@ -7,7 +7,7 @@
 #include "Session.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 
 Session::Session() : m_state(NoStateFlags) {}
@@ -69,4 +69,21 @@ void Session::setFromJsonObject(const ot::ConstJsonObject& _object) {
 			OT_LOG_EAS("Unknown state flag \"" + state + "\"");
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+ot::GSSDebugInfo::SessionData Session::getDebugInformation() const {
+	ot::GSSDebugInfo::SessionData data;
+	data.sessionID = m_id;
+	data.userName = m_userName;
+
+	std::list<std::string> flagsArr;
+	if (m_state & SessionStateFlag::LssConfirmed) { flagsArr.push_back("LssConfirmed"); }
+
+	data.flags = std::move(flagsArr);
+
+	return data;
 }

@@ -68,10 +68,10 @@ void MeshWriter::convertAndStoreNodes(void)
 
 	// Now we store the nodes and add it to the list of new data entities
 	EntityMeshTetNodes *meshNodes = entityMesh->getMeshData()->getMeshNodes();
-	meshNodes->setEntityID(application->modelComponent()->createEntityUID());
+	meshNodes->setEntityID(application->getModelComponent()->createEntityUID());
 	entityMesh->getMeshData()->storeMeshNodes();
 
-	application->modelComponent()->addNewDataEntity(meshNodes->getEntityID(), meshNodes->getEntityStorageVersion(), entityMesh->getMeshData()->getEntityID());
+	application->getModelComponent()->addNewDataEntity(meshNodes->getEntityID(), meshNodes->getEntityStorageVersion(), entityMesh->getMeshData()->getEntityID());
 }
 
 void MeshWriter::convertFaces(void)
@@ -97,7 +97,7 @@ void MeshWriter::convertFaces(void)
 		assert(!faceInverted);
 
 		// Create a new mesh face object to store the triangles
-		EntityMeshTetFace *meshFace = new EntityMeshTetFace(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+		EntityMeshTetFace *meshFace = new EntityMeshTetFace(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 
 		meshFace->setSurfaceId(faceTag.second);
 
@@ -172,20 +172,20 @@ void MeshWriter::convertFaces(void)
 	}
 
 	// Assign a new entity id to the mesh data faces object (which was implicitly created when adding the faces above)
-	entityMesh->getMeshData()->getMeshFaces()->setEntityID(application->modelComponent()->createEntityUID());
+	entityMesh->getMeshData()->getMeshFaces()->setEntityID(application->getModelComponent()->createEntityUID());
 }
 
 void MeshWriter::storeFaces(void)
 {
 	// Now we store all mesh faces in the data base (IDs are already assigned to all objects)
 	entityMesh->getMeshData()->storeMeshFaces();
-	application->modelComponent()->addNewDataEntity(entityMesh->getMeshData()->getMeshFaces()->getEntityID(), 
+	application->getModelComponent()->addNewDataEntity(entityMesh->getMeshData()->getMeshFaces()->getEntityID(), 
 													entityMesh->getMeshData()->getMeshFaces()->getEntityStorageVersion(), 
 													entityMesh->getMeshData()->getEntityID());
 
 	for (auto face : entityMesh->getMeshData()->getMeshFaces()->getAllFaces())
 	{
-		application->modelComponent()->addNewDataEntity(face.second->getEntityID(), 
+		application->getModelComponent()->addNewDataEntity(face.second->getEntityID(), 
 														face.second->getEntityStorageVersion(), 
 														entityMesh->getMeshData()->getMeshFaces()->getEntityID());
 	}
@@ -254,7 +254,7 @@ void MeshWriter::storeMeshEntity(const std::string &entityName, EntityBase *enti
 	}
 	catch (std::string)
 	{
-		application->uiComponent()->displayMessage("ERROR: No tetrahedrons generated for shape: " + entityName + "\n");
+		application->getUiComponent()->displayMessage("ERROR: No tetrahedrons generated for shape: " + entityName + "\n");
 	}
 	catch (int)
 	{
@@ -353,34 +353,34 @@ void MeshWriter::storeMeshEntity(const std::string &entityName, EntityBase *enti
 	meshItem->updateStatistics();
 
 	// Assign entities to the new object and its childs
-	meshItem->setEntityID(application->modelComponent()->createEntityUID());
+	meshItem->setEntityID(application->getModelComponent()->createEntityUID());
 
 	if (meshItem->getMeshDataTets() != nullptr)
 	{
-		meshItem->getMeshDataTets()->setEntityID(application->modelComponent()->createEntityUID());
+		meshItem->getMeshDataTets()->setEntityID(application->getModelComponent()->createEntityUID());
 	}
 
 	if (meshItem->getMeshDataTetEdges() != nullptr)
 	{
-		meshItem->getMeshDataTetEdges()->setEntityID(application->modelComponent()->createEntityUID());
+		meshItem->getMeshDataTetEdges()->setEntityID(application->getModelComponent()->createEntityUID());
 	}
 
 	// Store the new object and its childs
 	meshItem->StoreToDataBase();
 
 	// and finally add the new entities to the lists
-	application->modelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), !isBackgroundMeshEntity);
+	application->getModelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), !isBackgroundMeshEntity);
 
 	if (meshItem->getMeshDataTets() != nullptr)
 	{
-		application->modelComponent()->addNewDataEntity(meshItem->getMeshDataTets()->getEntityID(),
+		application->getModelComponent()->addNewDataEntity(meshItem->getMeshDataTets()->getEntityID(),
 														meshItem->getMeshDataTets()->getEntityStorageVersion(),
 														meshItem->getEntityID());
 	}
 
 	if (meshItem->getMeshDataTetEdges() != nullptr)
 	{
-		application->modelComponent()->addNewDataEntity(meshItem->getMeshDataTetEdges()->getEntityID(),
+		application->getModelComponent()->addNewDataEntity(meshItem->getMeshDataTetEdges()->getEntityID(),
 														meshItem->getMeshDataTetEdges()->getEntityStorageVersion(),
 														meshItem->getEntityID());
 	}
@@ -620,8 +620,8 @@ void MeshWriter::checkForInvalidFaceMeshes(const std::string &entityName, gmsh::
 				else invalidFaceList = std::to_string(faceTag);
 
 				// Create an error annotation
-				EntityAnnotation *annotation = new EntityAnnotation(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
-				annotation->getAnnotationData()->setEntityID(application->modelComponent()->createEntityUID());
+				EntityAnnotation *annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+				annotation->getAnnotationData()->setEntityID(application->getModelComponent()->createEntityUID());
 
 				std::vector<int> elementTypes2;
 				std::vector<std::vector<size_t>> elementTags2;
@@ -702,8 +702,8 @@ void MeshWriter::checkForInvalidFaceMeshes(const std::string &entityName, gmsh::
 				annotation->setInitiallyHidden(true);
 				annotation->StoreToDataBase();
 
-				application->modelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
-				application->modelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
+				application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
+				application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
 																annotation->getAnnotationData()->getEntityStorageVersion(), 
 																annotation->getEntityID());			
 			}
@@ -712,7 +712,7 @@ void MeshWriter::checkForInvalidFaceMeshes(const std::string &entityName, gmsh::
 
 	if (invalidFaceMesh)
 	{
-		application->uiComponent()->displayMessage("ERROR: Invalid face mesh for shape: " + entityName + " (" + invalidFaceList + ")\n");
+		application->getUiComponent()->displayMessage("ERROR: Invalid face mesh for shape: " + entityName + " (" + invalidFaceList + ")\n");
 	}
 }
 
@@ -731,7 +731,7 @@ void MeshWriter::displayShapesWithoutTets(void)
 {
 	if (meshElementsWithoutTets != "")
 	{
-		application->uiComponent()->displayMessage("  Mesh objects without tetrahedrons: \n" + meshElementsWithoutTets + "\n\n");
+		application->getUiComponent()->displayMessage("  Mesh objects without tetrahedrons: \n" + meshElementsWithoutTets + "\n\n");
 	}
 }
 
@@ -772,7 +772,7 @@ void MeshWriter::analyzeErrorPoints(BoundingBox *boundingBox)
 
 	if (!message.empty())
 	{
-		application->uiComponent()->displayMessage(message);
+		application->getUiComponent()->displayMessage(message);
 	}
 }
 
@@ -839,7 +839,7 @@ bool MeshWriter::storeMeshFile(void)
 	gmsh::write(meshFileName);
 
 	// Save the file to the database
-	EntityBinaryData *fileData = new EntityBinaryData(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityBinaryData *fileData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 
 	// Read the file content to the entity
 	readMeshFile(meshFileName, fileData);
@@ -847,7 +847,7 @@ bool MeshWriter::storeMeshFile(void)
 	// Store the data and add it to the data model
 	fileData->StoreToDataBase();
 
-	application->modelComponent()->addNewDataEntity(fileData->getEntityID(),
+	application->getModelComponent()->addNewDataEntity(fileData->getEntityID(),
 													fileData->getEntityStorageVersion(),
 													entityMesh->getMeshData()->getEntityID());
 
@@ -978,7 +978,7 @@ void MeshWriter::storeMeshEntityFromPhysicalGroup(const std::string& entityName,
 	}
 	catch (std::string)
 	{
-		application->uiComponent()->displayMessage("ERROR: No tetrahedrons available for shape: " + entityName + "\n");
+		application->getUiComponent()->displayMessage("ERROR: No tetrahedrons available for shape: " + entityName + "\n");
 	}
 	catch (int)
 	{
@@ -1046,34 +1046,34 @@ void MeshWriter::storeMeshEntityFromPhysicalGroup(const std::string& entityName,
 	meshItem->updateStatistics();
 
 	// Assign entities to the new object and its childs
-	meshItem->setEntityID(application->modelComponent()->createEntityUID());
+	meshItem->setEntityID(application->getModelComponent()->createEntityUID());
 
 	if (meshItem->getMeshDataTets() != nullptr)
 	{
-		meshItem->getMeshDataTets()->setEntityID(application->modelComponent()->createEntityUID());
+		meshItem->getMeshDataTets()->setEntityID(application->getModelComponent()->createEntityUID());
 	}
 
 	if (meshItem->getMeshDataTetEdges() != nullptr)
 	{
-		meshItem->getMeshDataTetEdges()->setEntityID(application->modelComponent()->createEntityUID());
+		meshItem->getMeshDataTetEdges()->setEntityID(application->getModelComponent()->createEntityUID());
 	}
 
 	// Store the new object and its childs
 	meshItem->StoreToDataBase();
 
 	// and finally add the new entities to the lists
-	application->modelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), true);
+	application->getModelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), true);
 
 	if (meshItem->getMeshDataTets() != nullptr)
 	{
-		application->modelComponent()->addNewDataEntity(meshItem->getMeshDataTets()->getEntityID(),
+		application->getModelComponent()->addNewDataEntity(meshItem->getMeshDataTets()->getEntityID(),
 			meshItem->getMeshDataTets()->getEntityStorageVersion(),
 			meshItem->getEntityID());
 	}
 
 	if (meshItem->getMeshDataTetEdges() != nullptr)
 	{
-		application->modelComponent()->addNewDataEntity(meshItem->getMeshDataTetEdges()->getEntityID(),
+		application->getModelComponent()->addNewDataEntity(meshItem->getMeshDataTetEdges()->getEntityID(),
 			meshItem->getMeshDataTetEdges()->getEntityStorageVersion(),
 			meshItem->getEntityID());
 	}

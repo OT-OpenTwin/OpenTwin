@@ -1,5 +1,5 @@
 //! @file dllmain.cpp
-//! @author Peter Thoma
+//! @author Peter Thoma, Alexander Kuester
 //! @date April 2020
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -9,7 +9,8 @@
 // Open Twin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"					// rapidjson wrapper
-#include "OTCore/Logger.h"				// Logger
+#include "OTCore/DebugHelper.h"
+#include "OTCore/LogDispatcher.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
@@ -46,52 +47,26 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	return TRUE;
 }
 
-void sessionServiceHealthChecker(std::string _sessionServiceURL) {
-	// Create ping request
-	ot::JsonDocument pingDoc;
-	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-	std::string ping = pingDoc.toJson();
-
-	OT_LOG_D("Starting LSS health check at \"" + _sessionServiceURL + "\"");
-
-	bool alive = true;
-	while (alive) {
-		// Wait for 20s
-		using namespace std::chrono_literals;
-		std::this_thread::sleep_for(20s);
-
-		// Try to send message and check the response
-		std::string ret;
-		try {
-			if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE, ping, ret)) { alive = false; }
-			else OT_ACTION_IF_RESPONSE_ERROR(ret) { alive = false; }
-			else OT_ACTION_IF_RESPONSE_WARNING(ret) { alive = false; }
-			else if (ret != OT_ACTION_CMD_Ping) { alive = false; }
-		}
-		catch (...) {
-			alive = false;
-		}
-	}
-
-	OT_LOG_E("Session service \"" + _sessionServiceURL + "\" has died unexpectedly. Shutting down...");
-	exit(ot::AppExitCode::LSSNotRunning);
-}
-
-void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort, std::string _relayUrl)
+void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort, std::string _relayUrl, std::string _lssUrl)
 {
 	try {
 		// Launch the Websocket Server
 		int argc = 0;
 		QCoreApplication application(argc, nullptr);
 
-		SocketServer::instance().setRelayUrl(_relayUrl);
-		SocketServer::instance().setWebsocketIp(_websocketIp);
-		SocketServer::instance().setWebsocketPort(_websocketPort);
+		SocketServer& server = SocketServer::instance();
+		server.setRelayUrl(_relayUrl);
+		server.setWebsocketIp(_websocketIp);
+		server.setWebsocketPort(_websocketPort);
+		
+		ot::DebugHelper::serviceSetupCompleted(server.getServiceDebugInformation());
 
-		OT_LOG_D("Relay url set to: " + SocketServer::instance().getRelayUrl());
-		OT_LOG_D("Websocket set to: " + SocketServer::instance().getWebsocketIp() + ":" + std::to_string(SocketServer::instance().getWebsocketPort()));
+		// Start session service health check if LSS URL is given
+		if (!_lssUrl.empty()) {
+			server.startSessionServiceHealthCheck(_lssUrl);
+		}
 
-		if (SocketServer::instance().startServer()) {
+		if (server.startServer()) {
 			g_appStartMutex.lock();
 			g_appStartCompleted = true;
 			g_appStartMutex.unlock();
@@ -119,7 +94,7 @@ void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _localDirectoryServiceURL, const char * _ownIP, const char * _websocketIP, const char * _sessionServiceIP)
+	_declspec(dllexport) int init(const char * _ownUrl, const char * _websocketUrl, const char * _unused1, const char * _unused2)
 	{
 		try {
 			std::string logUrl = qgetenv("OPEN_TWIN_LOGGING_URL").toStdString();
@@ -133,7 +108,7 @@ extern "C"
 			std::string relayUrl;
 			std::string websocketIp;
 			unsigned int websocketPort = 0;
-			std::string lssUlr = _sessionServiceIP;
+			std::string lssUrl;
 			
 #ifdef _DEBUG
 			{
@@ -164,18 +139,17 @@ extern "C"
 				std::string websocketUrl = ot::json::getString(params, OT_ACTION_PARAM_WebsocketURL);
 				websocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
 				websocketIp = websocketUrl.substr(0, websocketUrl.rfind(":"));
-				lssUlr = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-				//globalDirectoryServiceIP = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
+				lssUrl = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 			}
 #else
-			std::string websocketUrl(_websocketIP);
+			std::string websocketUrl(_websocketUrl);
 			websocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
 			websocketIp = websocketUrl.substr(0, websocketUrl.rfind(":"));
-			relayUrl = _ownIP;
+			relayUrl = _ownUrl;
 #endif
 
 			// Start session service health check
-			std::thread mainThread(mainApplicationThread, websocketIp, websocketPort, relayUrl);
+			std::thread mainThread(mainApplicationThread, websocketIp, websocketPort, relayUrl, lssUrl);
 			mainThread.detach();
 
 			// The following while loop ensures that the main application thread started and the QApplication was created and the websocket started.
@@ -188,10 +162,6 @@ extern "C"
 				}
 				g_appStartMutex.unlock();
 			}
-
-			std::thread t(sessionServiceHealthChecker, lssUlr);
-			t.detach();
-
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS(e.what());

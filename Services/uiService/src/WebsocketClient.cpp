@@ -11,8 +11,9 @@
 // OpenTwin header
 #include "OTSystem/DateTime.h"
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -199,7 +200,7 @@ void WebsocketClient::slotMessageReceived(const QString& _message) {
 		break;
 
 	case ot::RelayedMessageHandler::Execute:
-		OT_LOG_EA("No execute requests to frontend allowed");
+		this->dispatchExecuteRequest(request);
 		break;
 
 	case ot::RelayedMessageHandler::Queue:
@@ -293,6 +294,27 @@ void WebsocketClient::slotProcessMessageQueue() {
 // ###############################################################################################################################################
 
 // Private helper
+
+void WebsocketClient::dispatchExecuteRequest(ot::RelayedMessageHandler::Request& _data) {
+	ot::JsonDocument doc;
+	doc.fromJson(_data.message);
+
+	std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
+	std::string response;
+
+	if (action == OT_ACTION_CMD_Ping) {
+		response = std::move(action);
+	}
+	else {
+		response = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Frontend only supports \"" OT_ACTION_CMD_Ping "\" as execute requests. Received request: \"" + action + "\"");
+	}
+
+	const std::string responseData = m_messageHandler.createResponseRequest(_data.receiverUrl, response, _data.messageId);
+
+	// Send the message
+	m_webSocket.sendTextMessage(QString::fromStdString(responseData));
+	m_webSocket.flush();
+}
 
 void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _request) {
 	// Dispatch the action to the external services component

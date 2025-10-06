@@ -69,6 +69,9 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\ExpanderWidget.cpp" />
+    <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
+    <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
     <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
     <ClCompile Include="src\Painter2DEditDialogFillEntry.cpp" />
@@ -186,7 +189,7 @@
     <ClCompile Include="src\PropertyInputString.cpp" />
     <ClCompile Include="src\PropertyInputStringList.cpp" />
     <ClCompile Include="src\PushButton.cpp" />
-    <ClCompile Include="src\QWidgetInterface.cpp" />
+    <ClCompile Include="src\WidgetBase.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
     <ClCompile Include="src\StatusBarManager.cpp" />
@@ -254,8 +257,11 @@
     <QtMoc Include="include\OTWidgets\DirectoryBrowser.h" />
     <QtMoc Include="include\OTWidgets\GlobalShortcutWrapper.h" />
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
+    <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
+    <QtMoc Include="include\OTWidgets\IndicatorWidget.h" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
     <QtMoc Include="include\OTWidgets\ManagedPropertyLink.h" />
@@ -426,7 +432,7 @@
     <QtMoc Include="include\OTWidgets\PropertyInput.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputInt.h" />
     <QtMoc Include="include\OTWidgets\PushButton.h" />
-    <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
+    <ClInclude Include="include\OTWidgets\WidgetBase.h" />
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h" />
     <QtMoc Include="include\OTWidgets\TextEditor.h" />

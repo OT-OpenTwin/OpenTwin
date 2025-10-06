@@ -455,6 +455,9 @@
     <ClInclude Include="include\OTGui\FileExtension.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\VisualisationCfg.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -806,6 +809,9 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\FileExtension.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VisualisationCfg.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>

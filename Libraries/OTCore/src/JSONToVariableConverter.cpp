@@ -68,6 +68,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	}
 	else
 	{
+		assert(false);
 		throw std::exception("Cast to variant not possible due to unknown type name");
 	}
 }

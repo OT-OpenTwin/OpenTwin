@@ -12,7 +12,7 @@
 #include <optional>
 
 #include "EntityInformation.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 class PythonLoadedModules
 {

@@ -20,12 +20,12 @@ void ot::ActionDispatchProfiler::startAction() {
 bool ot::ActionDispatchProfiler::endAction() {
 	OTAssert(!m_entries.empty(), "No action to end");
 	m_lastInterval = DateTime::msSinceEpoch() - m_entries.top().timestamp;
-	const bool isTimeout = !m_entries.top().isCompound && m_lastInterval > m_timeout;
+	const bool isTimeout = !m_entries.top().isIgnored && m_lastInterval > m_timeout;
 	m_entries.pop();
 	return isTimeout;
 }
 
-void ot::ActionDispatchProfiler::setCompound() {
-	OTAssert(!m_entries.empty(), "No action to set compound");
-	m_entries.top().isCompound = true;
+void ot::ActionDispatchProfiler::ignoreCurrent() {
+	OTAssert(!m_entries.empty(), "No action to set ignored");
+	m_entries.top().isIgnored = true;
 }

@@ -5,7 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ThisService.h"
 
 #include "OTGui/Property.h"
@@ -46,7 +46,8 @@
 #define OT_INFO_SERVICE_ID_SessionService ""
 
 ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier)
-	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier), m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false)
+	: ServiceBase(_serviceName, _serviceType), m_modelComponent(nullptr), m_uiComponent(nullptr), m_uiNotifier(_uiNotifier),
+	m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false), m_sessionService(nullptr), m_directoryService(nullptr)
 {
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 }
@@ -57,39 +58,9 @@ ot::ApplicationBase::~ApplicationBase()
 	if (m_modelNotifier) { delete m_modelNotifier; }
 }
 
-std::string ot::ApplicationBase::deploymentPath(void) const {
-	char * buffer = new char[100];
-	if (buffer == nullptr) {
-		return "";
-	}
-	size_t bufferSize = 100;
-	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0) {
-		std::cout << "[ERROR] Please specify the environment variable \"OPENTWIN_DEV_ROOT\"" << std::endl;
-		return std::string();
-	}
-	std::string path = buffer;
-	delete[] buffer;
-
-	path.append("\\Deployment\\");
-	return path;
-}
-
 // ##########################################################################################################################################
 
 // Setter
-
-void ot::ApplicationBase::setDirectoryServiceURL(const std::string& _url) 
-{
-	if (m_directoryService != nullptr)
-	{
-		delete m_directoryService;
-		m_directoryService = nullptr;
-	}
-	
-	m_directoryService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService, _url, invalidServiceID);
-	
-	m_serviceIdMap.insert_or_assign(invalidServiceID - 1, m_directoryService);
-}
 
 void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 {
@@ -99,27 +70,29 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 		m_sessionService = nullptr;
 	}
 	
-	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_SessionService, OT_INFO_SERVICE_TYPE_SessionService, _url, invalidServiceID);
-	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
-}
-
-void ot::ApplicationBase::setSessionID(const std::string& _id)
-{
-	m_sessionID = _id;
-	size_t index = m_sessionID.find(':');
-	if (index == std::string::npos) {
-		OT_LOG_EAS("Invalid session id format: \"" + _id + "\"");
-	}
-	else {
-		m_projectName = m_sessionID.substr(0, index);
-		m_collectionName = m_sessionID.substr(index + 1);
-		LogDispatcher::instance().setProjectName(m_projectName);
-	}	
+	m_sessionService = new ServiceBase(OT_INFO_SERVICE_TYPE_LocalSessionService, OT_INFO_SERVICE_TYPE_LocalSessionService, _url, invalidServiceID);
 }
 
 // ##########################################################################################################################################
 
 // Getter
+
+std::string ot::ApplicationBase::deploymentPath() const {
+	char* buffer = new char[100];
+	if (buffer == nullptr) {
+		return "";
+	}
+	size_t bufferSize = 100;
+	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0) {
+		OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
+		return std::string();
+	}
+	std::string path = buffer;
+	delete[] buffer;
+
+	path.append("\\Deployment\\");
+	return path;
+}
 
 ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByID(serviceID_t _id) {
 	auto itm{ m_serviceIdMap.find(_id) };
@@ -137,6 +110,38 @@ ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByName(const std::stri
 		return nullptr;
 	}
 	return itm->second;
+}
+
+void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<UID>& _entities) {
+	// First get the version information for all entities
+	std::list<ot::EntityInformation> entityInfo;
+	ModelServiceAPI::getEntityInformation(_entities, entityInfo);
+
+	// Now prefetch the documents
+	prefetchDocumentsFromStorage(entityInfo);
+}
+
+void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& _entityInfo) {
+	std::list<std::pair<UID, UID>> prefetchIdandVersion;
+
+	for (const auto& entity : _entityInfo) {
+		if (entity.getEntityID() != ot::getInvalidUID() && entity.getEntityVersion() != ot::getInvalidUID()) {
+			m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
+
+			prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
+		}
+	}
+
+	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+}
+
+ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID _entityID) {
+	if (m_prefetchedEntityVersions.count(_entityID) == 0) {
+		return ot::getInvalidUID();
+	}
+	else {
+		return m_prefetchedEntityVersions[_entityID];
+	}
 }
 
 // ##########################################################################################################################################
@@ -185,8 +190,8 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 {
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
-		OTAssert(0, "Destination service not found");
-		return "";
+		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
+		return false;
 	}
 	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
 	
@@ -194,27 +199,12 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 
 	if (!messageWasQueued)
 	{
-		return ot::msg::send(m_serviceURL, destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
+		return ot::msg::send(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response, 0, _requestFlags);
 	}
 	else
 	{
 		return true;
 	}
-}
-
-bool ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _message) {
-	JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_SendBroadcastMessage, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_serviceID, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_sessionID, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	return ot::msg::send(m_serviceURL, m_sessionService->getServiceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
-}
-
-bool ot::ApplicationBase::broadcastMessage(bool _queue, const JsonDocument& _doc) {
-	return this->broadcastMessage(_queue, _doc.toJson());
 }
 
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
@@ -269,7 +259,7 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 
 		modelSelectionChanged();
 
-		uiComponent()->sendUpdatedControlState();
+		getUiComponent()->sendUpdatedControlState();
 
 		return "";  // No further processing necessary
 	}
@@ -315,11 +305,8 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 
 // Protected functions
 
-bool ot::ApplicationBase::EnsureDataBaseConnection(void)
-{
-	DataBase::GetDataBase()->setProjectName(m_collectionName);
-
-	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL);;
+void ot::ApplicationBase::initializeDefaultTemplate() {
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 }
 
 bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
@@ -480,7 +467,7 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 
 // ##########################################################################################################################################
 
-// Private functions
+// Private: Action handler
 
 std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _document) {
 	if (m_uiNotifier) {
@@ -493,7 +480,6 @@ std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _docum
 		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
 	}
 }
-
 
 std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
 	PropertyGridCfg gridConfig;
@@ -512,7 +498,7 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	PropertyGridCfg newSettings = this->createSettings();
 	if (newSettings.isEmpty()) return "";
 
-	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_DBuserCollection)) {
+	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_dbUserCollection)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to store settings";
 	}
 
@@ -523,167 +509,133 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	return "";
 }
 
-void ot::ApplicationBase::__serviceConnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
+std::string ot::ApplicationBase::handleRegisterNewLMS(JsonDocument& _document) {
+	m_lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+}
+
+// ##########################################################################################################################################
+
+// Private: Internal functions
+
+void ot::ApplicationBase::setSessionIDPrivate(const std::string& _id) {
+	m_sessionID = _id;
+	size_t index = m_sessionID.find(':');
+	if (index == std::string::npos) {
+		OT_LOG_EAS("Invalid session id format: \"" + _id + "\"");
+	}
+	else {
+		m_projectName = m_sessionID.substr(0, index);
+		m_collectionName = m_sessionID.substr(index + 1);
+		LogDispatcher::instance().setProjectName(m_projectName);
+		DataBase::GetDataBase()->setProjectName(m_collectionName);
+	}
+}
+
+bool ot::ApplicationBase::initializeDataBaseConnectionPrivate() {
+	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL);;
+}
+
+void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _service) {
 	// Prepare information to store data
-	
+
 	// Check for duplicate
-	if (m_serviceIdMap.find(_id) != m_serviceIdMap.end()) {
-		OT_LOG_EAS("Service already registered { \"Name\": \"" + _name + "\", \"Type\": \"" + _type + "\", \"URL\": \"" + _url + "\", \"ID\": " + std::to_string(_id) + " }");
+	if (m_serviceIdMap.find(_service.getServiceID()) != m_serviceIdMap.end()) {
+		OT_LOG_EAS("Service already registered { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
 		return;
 	}
 
-	if (_type == OT_INFO_SERVICE_TYPE_UI) {
+	if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 		if (m_uiComponent) {
 			OT_LOG_EA("UI component already registered. Multiple UIs not supported");
 			return;
 		}
 		// Store information
-		m_uiComponent = new components::UiComponent(_name, _type, _url, _id, this);
-		
+		m_uiComponent = new components::UiComponent(_service, this);
 
-		m_serviceIdMap.insert_or_assign(_id, m_uiComponent);
-		m_serviceNameMap.insert_or_assign(_name, m_uiComponent);
+		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
+
+		m_serviceIdMap.insert_or_assign(_service.getServiceID(), m_uiComponent);
+		m_serviceNameMap.insert_or_assign(_service.getServiceName(), m_uiComponent);
+
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), true);
 
 		m_uiComponent->sendSettingsData(this->createSettings());
-		
+
 		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
 		m_uiComponent->notifyUiSetupCompleted();
 		this->enableMessageQueuing(m_uiComponent->getServiceName(), false);
-
-		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
 	}
-	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
+	else if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
 		assert(m_modelComponent == nullptr);
-		ot::ModelAPIManager::setModelServiceURL(_url);
-		m_modelComponent = new components::ModelComponent(_name, _type, _url, _id, this);
-		
-		m_serviceIdMap.insert_or_assign(_id, m_modelComponent);
-		m_serviceNameMap.insert_or_assign(_name, m_modelComponent);
+		ot::ModelAPIManager::setModelServiceURL(_service.getServiceURL());
+		m_modelComponent = new components::ModelComponent(_service, this);
+
+		m_serviceIdMap.insert_or_assign(_service.getServiceID(), m_modelComponent);
+		m_serviceNameMap.insert_or_assign(_service.getServiceName(), m_modelComponent);
+
 		modelConnected(m_modelComponent);
 	}
 	else {
 		// Store information
-		auto newServiceInformation = new ServiceBase(_name, _type, _url, _id);
-		
-		m_serviceIdMap.insert_or_assign(_id, newServiceInformation);
-		m_serviceNameMap.insert_or_assign(_name, newServiceInformation);
-		serviceConnected(newServiceInformation);
+		ot::ServiceBase* newService = new ServiceBase(_service);
+		m_serviceIdMap.insert_or_assign(_service.getServiceID(), newService);
+		m_serviceNameMap.insert_or_assign(_service.getServiceName(), newService);
+
+		serviceConnected(*newService);
 	}
 }
 
-void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
+void ot::ApplicationBase::serviceDisconnectedPrivate(serviceID_t _id) {
 	auto serviceByID = m_serviceIdMap.find(_id);
 	assert(serviceByID != m_serviceIdMap.end());
 	auto& serviceInfo = serviceByID->second;
+	std::string serviceName = serviceInfo->getServiceName();
 
-	if (_type == OT_INFO_SERVICE_TYPE_UI) {
+	if (serviceInfo->getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 
 		assert(serviceInfo == (ServiceBase*)m_uiComponent);
 
 		uiDisconnected(m_uiComponent);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
-		
-		if (m_uiComponent != nullptr)
-		{
+
+		if (m_uiComponent != nullptr) {
 			delete m_uiComponent;
 			m_uiComponent = nullptr;
 		}
-		
+
 		GuiAPIManager::instance().frontendDisconnected();
 	}
-	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
+	else if (serviceInfo->getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
 		assert(serviceInfo == (ServiceBase*)m_modelComponent);
 		ot::ModelAPIManager::setModelServiceURL(std::string());
 		modelDisconnected(m_modelComponent);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
 
-		if(m_modelComponent != nullptr)
-		{
+		if (m_modelComponent != nullptr) {
 			delete m_modelComponent;
 			m_modelComponent = nullptr;
 		}
 
 	}
 	else {
-		serviceDisconnected(serviceInfo);
+		serviceDisconnected(*serviceInfo);
 		MessageQueueHandler::instance().clearServiceBuffer(serviceInfo);
-		if (serviceInfo != nullptr)
-		{
+		if (serviceInfo != nullptr) {
 			delete serviceInfo;
 			serviceInfo = nullptr;
 		}
 	}
-	
+
 	m_serviceIdMap.erase(_id);
-	m_serviceNameMap.erase(_name);
+	m_serviceNameMap.erase(serviceName);
 }
 
-void ot::ApplicationBase::__shuttingDown(bool _requestedAsCommand) {
+void ot::ApplicationBase::shuttingDownPrivate(bool _requestedAsCommand) {
 	if (!_requestedAsCommand) preShutdown();
 	else shuttingDown();
 }
-
-std::string ot::ApplicationBase::__processMessage(const std::string & _message, JsonDocument& _doc, serviceID_t _senderID) {
-#ifdef _DEBUG
-	auto sender{ getConnectedServiceByID(_senderID) };
-	assert(sender != nullptr); // Sender was not registered
-	return processMessage(sender, _message, _doc);
-#else
-	return processMessage(getConnectedServiceByID(_senderID), _message, _doc);
-#endif // _DEBUG
-}
-
-void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<UID> &entities)
-{
-	// First get the version information for all entities
-	std::list<ot::EntityInformation> entityInfo;
-	ModelServiceAPI::getEntityInformation(entities, entityInfo);
-
-	// Now prefetch the documents
-	prefetchDocumentsFromStorage(entityInfo);
-}
-
-void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo)
-{
-	std::list<std::pair<UID, UID>> prefetchIdandVersion;
-
-	for (auto entity : entityInfo)
-	{
-		if (entity.getEntityID() != ot::getInvalidUID() && entity.getEntityVersion() != ot::getInvalidUID())
-		{
-			m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
-
-			prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
-		}
-	}
-
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
-}
-
-ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID entityID)
-{
-	if (m_prefetchedEntityVersions.count(entityID) == 0)
-	{
-		return ot::getInvalidUID();
-	}
-	else
-	{
-		return m_prefetchedEntityVersions[entityID];
-	}
-}
-
-std::string ot::ApplicationBase::getLogInUserName() const
-{
-	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserName();
-}
-
-std::string ot::ApplicationBase::getLogInUserPsw() const
-{
-	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserPassword(); 
-}
-

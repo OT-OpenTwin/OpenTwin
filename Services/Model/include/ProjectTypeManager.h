@@ -15,6 +15,7 @@ public:
 	bool hasMeshRoot(void)					{ return m_hasMeshRoot; }
 	bool hasSolverRoot(void)				{ return m_hasSolverRoot; }
 	bool hasScriptsRoot(void)				{ return m_hasScriptsRoot; }
+	bool hasDataProcessingRoot(void)		{ return m_hasDataProcessingRoot; }
 	bool hasUnitRoot(void)					{ return m_hasUnitRoot; }
 	bool hasDataCategorizationRoot(void)	{ return m_hasDataCategorizationRoot; }
 	bool hasRMDCategorization(void)			{ return m_hasRMDCategorization; }
@@ -49,7 +50,8 @@ private:
 	bool m_hasDataCategorizationRoot	= true;
 	bool m_hasRMDCategorization			= true;
 	bool m_hasRMDCategorizationPreview	= true;
-	
+	bool m_hasDataProcessingRoot		= true;
+
 	//Became now mandatory since plot data and solver results in general are also stored in the result data base.
 	const bool m_hasDatasetRoot				= true;
 	const bool m_hasDatasetRMD				= true;

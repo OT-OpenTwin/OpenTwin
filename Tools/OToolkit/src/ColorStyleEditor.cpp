@@ -11,7 +11,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyBool.h"
@@ -431,6 +431,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnection), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnectionConnectable), new PropertyPainter2D(new FillPainter2D(Color(255, 48, 124))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
@@ -455,6 +456,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Orange)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
@@ -641,6 +644,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(Color(100, 100, 100))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnection), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnectionConnectable), new PropertyPainter2D(new FillPainter2D(Color(255, 48, 124))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
@@ -665,6 +669,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Yellow)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
@@ -852,6 +858,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(Color(200, 200, 200))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnection), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnectionConnectable), new PropertyPainter2D(new FillPainter2D(Color(255, 48, 124))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
@@ -876,6 +883,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveHighlight), new PropertyPainter2D(new FillPainter2D(255, 255, 128)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PlotCurveSymbol), new PropertyPainter2D(new FillPainter2D(0, 255, 0)));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::SuccessForeground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WarningForeground), new PropertyPainter2D(new FillPainter2D(ot::Yellow)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));

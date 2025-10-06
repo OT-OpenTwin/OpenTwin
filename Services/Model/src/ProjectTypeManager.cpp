@@ -62,6 +62,7 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	m_hasDataCategorizationRoot		= false;
 	m_hasRMDCategorization			= false;
 	m_hasRMDCategorizationPreview	= false;
+	m_hasDataProcessingRoot			= false;
 	
 	m_has3DView						= true;
 	m_has1DView						= true;
@@ -99,6 +100,7 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	m_hasUnitRoot = true;
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
+	m_hasDataProcessingRoot = false;
 	m_hasRMDCategorizationPreview = false;
 	
 	m_has3DView = true;
@@ -119,6 +121,7 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
 	m_hasRMDCategorizationPreview = false;
+	m_hasDataProcessingRoot = false;
 
 	m_has3DView = false;
 	m_has1DView = true;
@@ -140,6 +143,7 @@ void ProjectTypeManager::initializeProjectTypePyrit(void)
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
 	m_hasRMDCategorizationPreview = false;
+	m_hasDataProcessingRoot = false;
 	
 	m_has3DView = true;
 	m_has1DView = true;
@@ -159,6 +163,7 @@ void ProjectTypeManager::initializeProjectTypeCircuitSimulation(void)
 	m_hasDataCategorizationRoot = false;
 	m_hasRMDCategorization = false;
 	m_hasRMDCategorizationPreview = false;
+	m_hasDataProcessingRoot = false;
 	
 
 	m_has3DView = false;

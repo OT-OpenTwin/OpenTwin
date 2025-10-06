@@ -123,7 +123,7 @@ namespace DataStorageAPI
 		if (explicitCertPath == nullptr)
 		{
 			// Second choice, check the file relative to the local executable 
-			certKeyPath = ot::OperatingSystem::getExecutablePath();
+			certKeyPath = ot::OperatingSystem::getCurrentExecutableDirectory();
 			certKeyPath += "\\Certificates\\certificateKeyFile.pem";
 
 			if (!std::filesystem::exists(certKeyPath))

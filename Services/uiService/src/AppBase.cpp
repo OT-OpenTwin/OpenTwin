@@ -43,7 +43,7 @@
 
 #include "OTSystem/Flags.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
@@ -201,7 +201,7 @@ AppBase::AppBase() :
 
 	m_ExternalServicesComponent = new ExternalServicesComponent(this);
 	
-	this->setDeleteLogNotifierLater(true);
+	this->setCustomDeleteLogNotifier(true);
 	ot::LogDispatcher::instance().addReceiver(this);
 
 	ot::MessageBoxManager::instance().setHandler(this);
@@ -1402,14 +1402,18 @@ void AppBase::startSessionRefreshTimer(void)
 
 void AppBase::sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl)
 {
-	while (1)
+	std::string refreshAction;
 	{
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REFRESH_SESSION, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionUserName, doc.GetAllocator()), doc.GetAllocator());
+		refreshAction = doc.toJson();
+	}
 
+	while (1)
+	{
 		std::string response;
-		m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _authorizationUrl, doc, response);
+		ot::msg::send("", _authorizationUrl, ot::EXECUTE_ONE_WAY_TLS, refreshAction, response);
 
 		OT_LOG_I("Session refresh sent: " + _sessionUserName);
 
@@ -1927,7 +1931,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle/* | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable*/));
+	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable));
 	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
 
 	ot::GraphicsView* graphics = newEditor->getGraphicsView();
@@ -2448,6 +2452,50 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 			OT_LOG_E("Request failed: " + responseObj.getWhat());
 			return;
 		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject configObj;
+	_newConfig.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());

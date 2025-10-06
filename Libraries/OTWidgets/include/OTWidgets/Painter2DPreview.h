@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -17,7 +17,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_WIDGETS_API_EXPORT Painter2DPreview : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Painter2DPreview : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DPreview)
 	public:

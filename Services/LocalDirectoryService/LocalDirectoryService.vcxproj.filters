@@ -30,13 +30,19 @@
     <ClCompile Include="src\ServiceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ServiceInformation.cpp">
+    <ClCompile Include="src\ServiceStartupData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SessionInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SupportedService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RequestedService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,13 +59,19 @@
     <ClInclude Include="include\ServiceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ServiceInformation.h">
+    <ClInclude Include="include\ServiceStartupData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SessionInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SupportedService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RequestedService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

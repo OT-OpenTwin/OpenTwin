@@ -139,6 +139,7 @@
     <ClInclude Include="include\OTGui\Transform.h" />
     <ClInclude Include="include\OTGui\VersionGraphCfg.h" />
     <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h" />
+    <ClInclude Include="include\OTGui\VisualisationCfg.h" />
     <ClInclude Include="include\OTGui\VisualisationTypes.h" />
     <ClInclude Include="include\OTGui\WidgetBaseCfg.h" />
     <ClInclude Include="include\OTGui\WidgetBaseCfgFactory.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\VersionGraphCfg.cpp" />
     <ClCompile Include="src\VersionGraphVersionCfg.cpp" />
+    <ClCompile Include="src\VisualisationCfg.cpp" />
     <ClCompile Include="src\VisualisationTypes.cpp" />
     <ClCompile Include="src\WidgetBaseCfg.cpp" />
     <ClCompile Include="src\WidgetBaseCfgFactory.cpp" />

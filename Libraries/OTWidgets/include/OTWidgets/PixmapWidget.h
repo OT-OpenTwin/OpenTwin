@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -16,7 +16,7 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PixmapWidget : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PixmapWidget : public QFrame, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PixmapWidget)
 		OT_DECL_NOMOVE(PixmapWidget)

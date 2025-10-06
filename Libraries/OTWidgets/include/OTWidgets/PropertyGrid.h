@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
@@ -26,7 +26,7 @@ namespace ot {
 	class PropertyGridTree;
 	class PropertyGridGroup;
 
-	class OT_WIDGETS_API_EXPORT PropertyGrid : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PropertyGrid : public QObject, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGrid)
 		OT_DECL_NOMOVE(PropertyGrid)

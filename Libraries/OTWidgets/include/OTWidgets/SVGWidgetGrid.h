@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -23,7 +23,7 @@ namespace ot {
 
 	class SVGWidget;
 
-	class OT_WIDGETS_API_EXPORT SVGWidgetGrid : public QScrollArea, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT SVGWidgetGrid : public QScrollArea, public WidgetBase {
 		Q_OBJECT
 	public:
 		SVGWidgetGrid();

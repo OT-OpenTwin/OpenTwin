@@ -152,7 +152,7 @@ void RangeSelectionVisualisationHandler::bufferSelectionEntities(const std::list
 
 std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisationHandler::extractSelectionRanges(const ot::UIDList& _selectedEntityIDs)
 {
-	auto modelComponent = Application::instance()->modelComponent();
+	auto modelComponent = Application::instance()->getModelComponent();
 	if (modelComponent == nullptr)
 	{
 		assert(0);
@@ -222,13 +222,18 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 
 	ot::JsonDocument document;
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	info.addToJsonObject(document, document.GetAllocator());
+	info.addToJsonObject(document, document.GetAllocator()); 
 	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_OverwriteContent, false, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(_visualizingEntities, document.GetAllocator()), document.GetAllocator());
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setAsActiveView(true);
+	visualisationCfg.setOverrideViewerContent(false);
+	visualisationCfg.setVisualisingEntities(_visualizingEntities);
+	ot::JsonObject visualisationCfgJSon;
+	visualisationCfg.addToJsonObject(visualisationCfgJSon, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, document.GetAllocator());
 
+	document.AddMember(OT_ACTION_PARAM_KeepCurrentEntitySelection, true, document.GetAllocator());
+	
 	const bool loadContent = true;
 	ot::TableCfg tableCfg = table->getTableConfig(true);;
 	ot::JsonObject cfgObj;
@@ -237,7 +242,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
 
 	std::string answer;
-	Application::instance()->uiComponent()->sendMessage(false, document, answer);
+	Application::instance()->getUiComponent()->sendMessage(false, document, answer);
 	return true;
 }
 
@@ -264,7 +269,7 @@ void RangeSelectionVisualisationHandler::requestColouringRanges(bool _clearSelec
 	}
 	doc.AddMember(OT_ACTION_PARAM_Ranges, vectOfRanges, doc.GetAllocator());
 
-	auto uiComponent =	Application::instance()->uiComponent();
+	auto uiComponent =	Application::instance()->getUiComponent();
 	std::string answer;
 	uiComponent->sendMessage(true, doc, answer);
 }

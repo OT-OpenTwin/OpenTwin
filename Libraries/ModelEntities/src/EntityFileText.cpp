@@ -4,7 +4,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/EncodingGuesser.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
@@ -152,7 +152,11 @@ bool EntityFileText::updateFromProperties()
 	bool needsVisualisationUpdate = PropertyHelper::getSelectionProperty(this, "Syntax Highlight", "Text Properties")->needsUpdate();
 	if (m_requiresDataUpdate || needsVisualisationUpdate)
 	{
-		getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_UI_TEXTEDITOR_Setup, true, m_requiresDataUpdate);
+		ot::VisualisationCfg visualisationCfg;
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TEXTEDITOR_Setup);
+		visualisationCfg.setOverrideViewerContent(m_requiresDataUpdate);
+		visualisationCfg.setAsActiveView(true);
+		getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
 	}
 
 	getProperties().forceResetUpdateForAllProperties();

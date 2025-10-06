@@ -13,11 +13,27 @@ ot::GraphicsElement::GraphicsElement() :
 }
 
 ot::GraphicsElement::~GraphicsElement() {
+	m_state |= DestroyingState;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
+
+void ot::GraphicsElement::setGraphicsScene(GraphicsScene* _scene) {
+	if (m_scene == _scene) {
+		return;
+	}
+
+	m_scene = _scene;
+	
+	if (m_scene) {
+		this->graphicsSceneSet(m_scene);
+	}
+	else {
+		this->graphicsSceneRemoved();
+	}
+}
 
 void ot::GraphicsElement::setGraphicsElementState(GraphicsElementState _state, bool _active) {
 	if (m_state.flagIsSet(_state) == _active) return;

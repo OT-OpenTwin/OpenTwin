@@ -64,33 +64,21 @@ void Application::run(void) {
 	// Create new subprocess manager
 	m_subprocessManager = new SubprocessManager(this);
 
-	if (EnsureDataBaseConnection()) {
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
 	DataBaseInfo info;
-	info.setSiteId(this->siteID());
+	info.setSiteID(this->getSiteID());
 	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
-	info.setCollectionName(this->m_collectionName);
+	info.setCollectionName(this->getCollectionName());
 	info.setUserName(DataBase::GetDataBase()->getUserName());
 	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
 
 	m_subprocessManager->setDataBaseInfo(info);
 
-	if (this->uiComponent()) {
-		m_subprocessManager->setFrontendUrl(this->uiComponent()->getServiceURL());
+	if (this->getUiComponent()) {
+		m_subprocessManager->setFrontendUrl(this->getUiComponent()->getServiceURL());
 	}
-	if (this->modelComponent()) {
-		m_subprocessManager->setModelUrl(this->modelComponent()->getServiceURL());
+	if (this->getModelComponent()) {
+		m_subprocessManager->setModelUrl(this->getModelComponent()->getServiceURL());
 	}
-}
-
-
-std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc) {
-	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) {
-	return ""; // Return empty string if the request does not expect a return
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
@@ -115,38 +103,6 @@ void Application::modelDisconnected(const ot::components::ModelComponent * _mode
 	if (m_subprocessManager) {
 		m_subprocessManager->setModelUrl("");
 	}
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service) {
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service) {
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void) {
-
-}
-
-bool Application::startAsRelayService(void) const {
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property * _item) {
-	return false;
 }
 
 void Application::logFlagsChanged(const ot::LogFlags& _flags) {

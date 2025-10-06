@@ -25,8 +25,8 @@ ParametricResult1DManager::ParametricResult1DManager(Application *app) :
 	m_resultFolderName(ot::FolderNames::DatasetFolder),
 	m_application(app)
 {
-	setModelComponent(m_application->modelComponent());
-	setUIComponent(m_application->uiComponent());
+	setModelComponent(m_application->getModelComponent());
+	setUIComponent(m_application->getUiComponent());
 }
 
 ParametricResult1DManager::~ParametricResult1DManager()
@@ -85,7 +85,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::GetDataBase()->getProjectName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->modelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 	resultCollectionExtender.setSaveModel(false);
 
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);

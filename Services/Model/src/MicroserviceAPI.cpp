@@ -16,7 +16,7 @@
 #include <chrono>
 #include <thread>
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/PropertyGridCfg.h"

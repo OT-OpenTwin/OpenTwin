@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/Plot1DCfg.h"
 
 std::string ot::Plot1DCfg::plotTypeToString(PlotType _type) {

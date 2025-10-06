@@ -7,11 +7,12 @@
 
 // GDS header
 #include "LoadInformation.h"
-#include "ServiceInformation.h"
 
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCommunication/GDSDebugInfo.h"
+#include "OTCommunication/ServiceInitData.h"
 
 // std header
 #include <string>
@@ -43,23 +44,25 @@ public:
 	// Service management
 
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
-	bool supportsService(const std::string& _serviceName);
+	bool supportsService(const std::string& _serviceName) const;
 
-	bool requestToRunService(const ServiceInformation& _serviceInfo);
-	bool requestToRunRelayService(const ServiceInformation& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
+	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
+	bool requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
 
-	void sessionClosing(const SessionInformation& _session);
-	void sessionClosed(const SessionInformation& _session);
-	void serviceClosed(const ServiceInformation& _service, const std::string& _serviceURL);
+	void sessionClosing(const std::string& _sessionID);
+	void sessionClosed(const std::string& _sessionID);
+	void serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Serialization
 
+	void getDebugInformation(ot::GDSDebugInfo::LDSInfo& _info) const;
+
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 
 private:
-	std::list<std::string>        m_supportedServices; //! @brief List of supported services by the LDS.
-	LoadInformation               m_loadInformation; //! @brief Latest system load information of the LDS.
-	std::list<ServiceInformation> m_services; //! @brief List of services started by the LDS.
+	std::list<std::string>         m_supportedServices; //! @brief List of supported services by the LDS.
+	LoadInformation                m_loadInformation; //! @brief Latest system load information of the LDS.
+	std::list<ot::ServiceInitData> m_services; //! @brief List of services started by the LDS.
 };

@@ -359,7 +359,7 @@ void StepWidthManager::applyUserDefinedRefinmentsToFacesAndPoints(double refinem
 		}
 		else
 		{
-			application->uiComponent()->displayMessage("WARNING: Invalid mesh refinement specification: " + refinement + "\n");
+			application->getUiComponent()->displayMessage("WARNING: Invalid mesh refinement specification: " + refinement + "\n");
 		}
 
 		refinement = getRefinementFromString(refinementList);

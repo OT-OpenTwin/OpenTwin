@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/EntityName.h"
 
 std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEntityName, int32_t _topologyLevel) {
@@ -74,4 +74,17 @@ std::string ot::EntityName::changeParentPath(const std::string& _currentEntityPa
 
 std::string ot::EntityName::changeParentWithTopo(const std::string& _currentEntityPath, const std::string& _newParentPath) {
 	return _newParentPath + "/" + EntityName::getSubName(_currentEntityPath, -1).value();
+}
+
+std::string ot::EntityName::createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames)
+{
+	std::string fullEntityName = _nameRoot + "/" + _nameBase;
+	int count = 1;
+	
+	while (std::find(_takenEntityNames.begin(), _takenEntityNames.end(), fullEntityName) != _takenEntityNames.end())
+	{
+		fullEntityName = _nameRoot + "/" + _nameBase + "_" + std::to_string(count);
+		count++;
+	}
+	return fullEntityName;
 }

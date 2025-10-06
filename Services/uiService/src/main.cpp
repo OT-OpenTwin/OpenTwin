@@ -11,7 +11,7 @@
 
 // OT header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
@@ -116,7 +116,6 @@ QApplication* initializeQt(int &_argc, char* _argv[]) {
 void initializeAppBase(void) {
 	AppBase* app = AppBase::instance();
 	app->setSiteID(0);
-	app->getExternalServicesComponent()->setRelayServiceIsRequired();
 }
 
 bool initializeOpenGL(bool checkGraphics) {

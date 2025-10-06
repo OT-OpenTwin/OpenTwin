@@ -13,7 +13,7 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
@@ -42,91 +42,6 @@ GlobalSessionService& GlobalSessionService::instance(void) {
 	return g_instance;
 }
 
-// ###################################################################################################
-
-// Service handling
-
-void GlobalSessionService::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	// General info
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(this->getServiceName(), _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, _allocator), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, _allocator), _allocator);
-
-	// Runtime info
-	bool workerRunning = m_workerRunning;
-	bool forceHealth = m_forceHealthCheck;
-	_object.AddMember("WorkerRunning", workerRunning, _allocator);
-	_object.AddMember("ForceHealthcheck", forceHealth, _allocator);
-
-	ot::JsonArray sessionArr;
-	for (const auto& it : m_sessionMap) {
-		ot::JsonObject pairObj;
-		pairObj.AddMember("Key.Session.ID", ot::JsonString(it.first, _allocator), _allocator);
-		pairObj.AddMember("Value.LSS.ID", it.second, _allocator);
-		sessionArr.PushBack(pairObj, _allocator);
-	}
-	_object.AddMember("SessionMap", sessionArr, _allocator);
-
-	ot::JsonArray lssArr;
-	for (const auto& it : m_lssMap) {
-		ot::JsonObject pairObj;
-		pairObj.AddMember("Key.LSS.ID", it.first, _allocator);
-
-		ot::JsonObject lssObj;
-		it.second.addToJsonObject(lssObj, _allocator);
-		pairObj.AddMember("Value.LSS.Obj", lssObj, _allocator);
-		lssArr.PushBack(pairObj, _allocator);
-	}
-	_object.AddMember("LSSMap", lssArr, _allocator);
-
-	ot::JsonObject logManagerObj;
-	m_logModeManager.addToJsonObject(logManagerObj, _allocator);
-	_object.AddMember("LogModeManager", logManagerObj, _allocator);
-	
-	_object.AddMember("FrontendInstallerSize", m_frontendInstallerFileContent.size(), _allocator);
-}
-
-void GlobalSessionService::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	OT_LOG_E("The GSS is currently not supposed be deserialized");
-}
-
-bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId) {
-	// Check URL duplicate
-	for (auto& it : m_lssMap) {
-		if (it.second.getUrl() == _service.getUrl()) {
-			OT_LOG_WAS("LSS with given url already registered. Url: \"" + _service.getUrl() + "\"");
-			return true;
-		}
-	}
-
-	// Create copy and assign uid
-	_newId = m_lssIdManager.grabNextID();
-	_service.setId(_newId);
-
-	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(_service.getId()) + ", \"URL\": \"" + _service.getUrl() + "\" }");
-
-	// Register already opened sessions
-	for (const std::string& session : _service.getSessionIds()) {
-		m_sessionMap.insert_or_assign(session, _service.getId());
-		OT_LOG_D("Adding already running session: \"" + session + "\"");
-	}
-	m_lssMap.insert_or_assign(_newId, std::move(_service));
-
-	// Check if the health check is aready running, otherwise start it
-	if (!m_workerRunning) {
-		m_workerRunning = true;
-
-		std::thread healthWorker(&GlobalSessionService::workerHealthCheck, this);
-		healthWorker.detach();
-
-		std::thread iniWorker(&GlobalSessionService::workerSessionIni, this);
-		iniWorker.detach();
-	}
-
-	return true;
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -137,6 +52,29 @@ void GlobalSessionService::setDatabaseUrl(const std::string& _url) {
 	 {
 		 m_databaseUrl = m_databaseUrl.substr(4);
 	 }
+}
+
+ot::GSSDebugInfo GlobalSessionService::getDebugInformation() {
+	ot::GSSDebugInfo info;
+	
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	info.setUrl(this->getServiceURL());
+	info.setAuthorizationUrl(m_authorizationUrl);
+	info.setDatabaseUrl(m_databaseUrl);
+	info.setGlobalDirectoryUrl(m_globalDirectoryUrl);
+	info.setLibraryManagementUrl(m_libraryManagementUrl);
+
+	info.setWorkerRunning(m_workerRunning);
+
+	for (const auto& idEntry : m_sessionMap) {
+		info.addSessionToLSSEntry(idEntry.first, idEntry.second);
+	}
+	for (const auto& lssEntry : m_lssMap) {
+		info.addLSS(lssEntry.second.getDebugInformation());
+	}
+
+	return info;
 }
 
 // ###################################################################################################
@@ -273,16 +211,16 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 	auto it = m_sessionMap.find(projectName);
 	if (it == m_sessionMap.end()) {
 		// Session does not exist
-		return std::string();
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::False);
 	}
 	else {
 		try {
 			// Get user (may throw if not found...)
-			return this->getLssFromSessionId(projectName).getSessionUser(projectName);
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::True, this->getLssFromSessionId(projectName).getSessionUser(projectName));
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());
-			return std::string("<error while searching for user>");
+			return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "<error while searching for user>");
 		}
 	}
 }
@@ -459,9 +397,7 @@ std::string GlobalSessionService::handleGetFrontendInstaller(ot::JsonDocument& _
 }
 
 std::string GlobalSessionService::handleGetDebugInformation(ot::JsonDocument& _doc) {
-	ot::JsonDocument dbg;
-	this->addToJsonObject(dbg, dbg.GetAllocator());
-	return dbg.toJson();
+	return this->getDebugInformation().toJson();
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
@@ -505,7 +441,7 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	// Add to GSS
 	ot::serviceID_t newId = ot::invalidServiceID;
 	if (!this->addSessionService(std::move(nService), newId)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to attach service information";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to attach service information");
 	}
 
 	// Create reply
@@ -516,21 +452,41 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	if (!m_globalDirectoryUrl.empty()) {
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
-
-	if (m_logModeManager.getGlobalLogFlagsSet()) {
-		ot::JsonArray flagsArr;
-		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, reply.GetAllocator());
-		reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
+	if (!m_libraryManagementUrl.empty()) {
+		reply.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
 
-	return reply.toJson();
+	reply.AddMember(OT_ACTION_PARAM_GlobalLoggerUrl, ot::JsonString(ot::ServiceLogNotifier::instance().loggingServiceURL(), reply.GetAllocator()), reply.GetAllocator());
+
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
+
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, reply.toJson());
 }
 
 std::string GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	// Register logic
+	m_libraryManagementUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	
+	ot::JsonDocument lssDoc;
+	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	lssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	std::string lssMessage = lssDoc.toJson();
+
+	for (const auto& lss : m_lssMap) {
+		std::string responseStr;
+		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
+			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")";
+		}
+
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok) {
+			OT_LOG_EAS("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
+		}
+	}
 
 
 	// Send DBUrl and AuthUrl
@@ -573,7 +529,7 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 
 	OT_LOG_D("Session was closed (ID = \"" + sessionID + "\")");
 
-	return OT_ACTION_RETURN_VALUE_OK;
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 std::string GlobalSessionService::handleForceHealthcheck(ot::JsonDocument& _doc) {
@@ -607,13 +563,14 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 	ot::JsonDocument lssDoc;
 	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
 	lssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	std::string lssMessage = lssDoc.toJson();
 
 	// Notify connected Local Session Services
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string response;
-	for (auto& lss : m_lssMap) {
-		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	for (const auto& lss : m_lssMap) {
+		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")";
 		}
@@ -627,15 +584,14 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 
 std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
-	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
 
 	// Update existing session services
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());
+
 	ot::JsonArray flagsArr;
-	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 	
 	std::string json = doc.toJson();
@@ -677,6 +633,56 @@ GlobalSessionService::GlobalSessionService() :
 
 GlobalSessionService::~GlobalSessionService() {
 
+}
+
+bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot::serviceID_t& _newId) {
+	// Check URL duplicate
+	bool found = false;
+
+	for (auto it = m_lssMap.begin(); it != m_lssMap.end(); it++) {
+		if (it->second.getUrl() == _service.getUrl()) {
+			OT_LOG_W("LSS with given url already registered, replacing data. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
+
+			found = true;
+			_newId = it->first;
+
+			// Remove sessions from session map
+			for (const std::string& session : it->second.getSessionIds()) {
+				m_sessionMap.erase(session);
+			}
+			
+			m_lssMap.erase(it);
+			break;
+		}
+	}
+
+	// Create copy and assign uid
+	if (!found) {
+		_newId = m_lssIdManager.nextID();
+		_service.setId(_newId);
+	}
+
+	OT_LOG_D("New LSS registered. { \"ID\": " + std::to_string(_service.getId()) + ", \"URL\": \"" + _service.getUrl() + "\" }");
+
+	// Register already opened sessions
+	for (const std::string& session : _service.getSessionIds()) {
+		m_sessionMap.insert_or_assign(session, _service.getId());
+		OT_LOG_D("Adding already running session: \"" + session + "\"");
+	}
+	m_lssMap.insert_or_assign(_newId, std::move(_service));
+
+	// Check if the health check is aready running, otherwise start it
+	if (!m_workerRunning) {
+		m_workerRunning = true;
+
+		std::thread healthWorker(&GlobalSessionService::workerHealthCheck, this);
+		healthWorker.detach();
+
+		std::thread iniWorker(&GlobalSessionService::workerSessionIni, this);
+		iniWorker.detach();
+	}
+
+	return true;
 }
 
 void GlobalSessionService::removeSessionService(const LocalSessionService& _service) {

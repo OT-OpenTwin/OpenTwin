@@ -1,4 +1,4 @@
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/CommunicationTypes.h"
 
 ot::LogFlag ot::messageTypeToLogFlag(ot::MessageType _type) {

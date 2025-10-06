@@ -26,7 +26,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "SceneNodeBase.h"
 #include "SceneNodeContainer.h"
 #include "SceneNodeGeometry.h"
@@ -50,6 +50,7 @@
 #include "PlotVisualiser.h"
 #include "CurveVisualiser.h"
 #include "RangeVisualiser.h"
+#include "GraphicsVisualiser.h"
 
 #include "IntersectionCapCalculator.h"
 
@@ -505,6 +506,12 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 		containerNode->addVisualiser(rangeVis);
 	}
 
+	if (_visualisationTypes.visualiseAsGraphicsView())
+	{
+		auto graphicsVis = new GraphicsVisualiser(containerNode);
+		containerNode->addVisualiser(graphicsVis);
+	}
+
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(treeName);
 	assert(parentNode != nullptr); // We assume that the parent node already exists
@@ -886,6 +893,12 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	if (_visualisationTypes.visualiseAsRange()) {
 		auto rangeVis = new RangeVisualiser(sceneNode);
 		sceneNode->addVisualiser(rangeVis);
+	}
+
+	if (_visualisationTypes.visualiseAsGraphicsView())
+	{
+		auto graphicsVis = new GraphicsVisualiser(sceneNode);
+		sceneNode->addVisualiser(graphicsVis);
 	}
 
 	// Get the parent scene node

@@ -6,12 +6,12 @@
 #pragma once
 
 // LDS header
-#include "ServiceInformation.h"
-#include "SessionInformation.h"
+#include "RequestedService.h"
 
 // OpenTwin header
 #include "OTSystem/Network.h"
 #include "OTSystem/SystemProcess.h"
+#include "OTCommunication/ServiceInitData.h"
 
 // std header
 #include <map>
@@ -26,7 +26,7 @@ class Service {
 	OT_DECL_NOCOPY(Service)
 	OT_DECL_NODEFAULT(Service)
 public:
-	Service(ServiceManager * _owner, const ServiceInformation& _info);
+	Service(ServiceManager* _owner, RequestedService&& _requestedService);
 	Service(Service&& _other) noexcept;
 	virtual ~Service();
 
@@ -53,38 +53,43 @@ public:
 	ot::RunResult run(const std::string& _url, ot::port_t _port, ot::port_t _websocketPort = 0);
 
 	//! @brief Will terminate the service process.
-	ot::RunResult shutdown(void);
+	ot::RunResult shutdown();
 
 	//! @brief Will check if the service process is still running.
-	ot::RunResult checkAlive(void);
+	ot::RunResult checkAlive();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter/Getter
 
-	const ServiceInformation& getInfo(void) const { return m_info; };
+	ServiceStartupData& getStartupData() { return m_counters; };
+	const ServiceStartupData& getStartupData() const { return m_counters; };
+
+	ot::ServiceInitData& getInfo() { return m_initData; };
+	const ot::ServiceInitData& getInfo() const { return m_initData; };
 
 	void setShuttingDown(bool _isShuttingDown) { m_isShuttingDown = _isShuttingDown; };
-	bool isShuttingDown(void) const { return m_isShuttingDown; };
+	bool isShuttingDown() const { return m_isShuttingDown; };
 
-	const std::string& getUrl(void) const { return m_url; };
-	ot::port_t getPort(void) const { return m_port; };
+	const std::string& getUrl() const { return m_url; };
+	ot::port_t getPort() const { return m_port; };
 
-	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
-	ot::port_t getWebsocketPort(void) const { return m_websocketPort; };
+	const std::string& getWebsocketUrl() const { return m_websocketUrl; };
+	ot::port_t getWebsocketPort() const { return m_websocketPort; };
 
-	void resetIniAttempt(void) { m_info.resetIniAttempt(); };
-	void incrIniAttempt(void) { m_info.incrIniAttempt(); };
-	unsigned int getIniAttempt(void) const { return m_info.getIniAttempt(); };
+	void resetIniAttempt() { m_counters.resetIniAttempt(); };
+	unsigned int incrIniAttempt() { return m_counters.incrIniAttempt(); };
+	unsigned int getIniAttempt() const { return m_counters.getIniAttempt(); };
 
-	void resetStartCounter(void) { m_info.resetStartCounter(); };
-	void incrStartCounter(void) { m_info.incrStartCounter(); };
-	unsigned int getStartCounter(void) const { return m_info.getStartCounter(); };
+	void resetStartCounter() { m_counters.resetStartCounter(); };
+	unsigned int incrStartCounter() { return m_counters.incrStartCounter(); };
+	unsigned int getStartCounter() const { return m_counters.getStartCounter(); };
 
 private:
-	ServiceInformation	m_info;
-	
-	ServiceManager *	m_owner;
+	ServiceStartupData  m_counters;
+	ot::ServiceInitData m_initData;
+
+	ServiceManager*     m_owner;
 	bool                m_isShuttingDown;
 	std::string			m_url;
 	ot::port_t			m_port;

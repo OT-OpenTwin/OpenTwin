@@ -27,16 +27,13 @@
     <ClCompile Include="src\Session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RelayService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GlobalSessionService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GlobalDirectoryService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ServiceRunStarter.cpp">
+    <ClCompile Include="src\GSSRegistrationInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,16 +47,13 @@
     <ClInclude Include="include\Session.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RelayService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GlobalSessionService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GlobalDirectoryService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ServiceRunStarter.h">
+    <ClInclude Include="include\GSSRegistrationInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -73,7 +73,12 @@ bool EntityResult1DPlot::updateFromProperties(void)
 
 	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->needsUpdate();
 
-	getObserver()->requestVisualisation(getEntityID(), OT_ACTION_CMD_VIEW1D_Setup, true, requiresDataToBeFetched);
+
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+	visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
+	visualisationCfg.setAsActiveView(true);
+	getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
 
 	getProperties().forceResetUpdateForAllProperties();
 

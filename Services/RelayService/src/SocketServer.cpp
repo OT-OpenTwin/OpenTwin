@@ -4,9 +4,11 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"						// rapidjson wrapper
-#include "OTCore/Logger.h"						// Logger
-#include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTCore/LogDispatcher.h"						// Logger
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"				// message sending
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTCommunication/ServiceInitData.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -73,6 +75,29 @@ bool SocketServer::startServer() {
 	}
 }
 
+void SocketServer::startSessionServiceHealthCheck(const std::string& _lssUrl) {
+	if (m_lssHealthCheckRunning || m_lssHealthCheckThread) {
+		OT_LOG_W("Local session service health check already running");
+		return;
+	}
+
+	m_lssUrl = _lssUrl;
+	m_lssHealthCheckRunning = true;
+	m_lssHealthCheckThread = new std::thread(&SocketServer::lssHealthCheckWorker, this);
+}
+
+ot::ServiceDebugInformation SocketServer::getServiceDebugInformation() const {
+	ot::ServiceDebugInformation info;
+	
+	info.setServiceID(m_serviceId);
+	info.setServiceName(OT_INFO_SERVICE_TYPE_RelayService);
+	info.setServiceUrl(m_relayUrl);
+	info.setServiceWebsocketUrl(m_websocketIp + ":" + std::to_string(m_websocketPort));
+	info.setCurrentProcessID();
+
+	return info;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots
@@ -93,18 +118,40 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 		}
 		else if (action == OT_ACTION_CMD_CheckRelayStartupCompleted) {
 			if (!m_pWebSocketServer) {
-				return OT_ACTION_RETURN_VALUE_FALSE;
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::False));
 			}
 			else if (m_pWebSocketServer->isListening()) {
-				return OT_ACTION_RETURN_VALUE_TRUE;
+				ot::ServiceInitData initData;
+				initData.setFromJsonObject(ot::json::getObject(doc, OT_ACTION_PARAM_IniData));
+
+				m_serviceId = initData.getServiceID();
+				this->startSessionServiceHealthCheck(initData.getSessionServiceURL());
+				
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::True));
 			}
 			else {
-				return OT_ACTION_RETURN_VALUE_FALSE;
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::False));
 			}
 		}
-		else if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
+		else if (action == OT_ACTION_CMD_ShutdownRequestedByService || action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
 			shutdown();
 			return OT_ACTION_RETURN_VALUE_OK;
+		}
+		else if (action == OT_ACTION_CMD_Init || action == OT_ACTION_CMD_Run) {
+			this->sendQueueWSMessage(_senderIP, _json);
+			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
+		}
+		else if (action == OT_ACTION_CMD_Ping) {
+			return OT_ACTION_CMD_Ping;
+			/*
+				std::string response;
+			if (this->sendProcessWSMessage(_senderIP, _json, response)) {
+				return QString::fromStdString(response);
+			}
+			else {
+				return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to send ping action document trough websocket"));
+			}
+			*/
 		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
@@ -203,6 +250,12 @@ void SocketServer::onNewConnection()
 
 void SocketServer::messageReceived(const QString& _message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
+	// Add message to processing queue to free the socket thread
+	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, _message));
+}
+
+void SocketServer::slotProcessMessage(const QString& _message) {
+	OT_LOG("Message received trough websocket: " + _message.toStdString(), ot::OUTGOING_MESSAGE_LOG);
 	try {
 		ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
 		std::string response;
@@ -219,7 +272,7 @@ void SocketServer::messageReceived(const QString& _message) {
 		case ot::RelayedMessageHandler::Execute:
 		{
 			this->relayToHttp(request, response);
-			
+
 			if (m_client) {
 				std::string responseRequest = m_messageHandler.createResponseRequest(request.receiverUrl, response, request.messageId);
 				m_client->sendTextMessage(QString::fromStdString(responseRequest));
@@ -228,7 +281,7 @@ void SocketServer::messageReceived(const QString& _message) {
 				OT_LOG_E("No client connected to websocket");
 			}
 		}
-			break;
+		break;
 
 		case ot::RelayedMessageHandler::Control:
 			if (request.message == "noinactivitycheck") {
@@ -264,7 +317,7 @@ void SocketServer::messageReceived(const QString& _message) {
 			break;
 		}
 	}
-	catch (const std::exception & e) {
+	catch (const std::exception& e) {
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
@@ -325,21 +378,24 @@ void SocketServer::keepAlive() const
 // Private: Helper
 
 SocketServer::SocketServer()
-	: QObject(nullptr), m_pWebSocketServer(nullptr), m_websocketPort(0), m_keepAliveTimer(nullptr), m_client(nullptr)
+	: QObject(nullptr), m_pWebSocketServer(nullptr), m_websocketPort(0), m_keepAliveTimer(nullptr), 
+	m_client(nullptr), m_serviceId(ot::invalidServiceID), m_lssHealthCheckThread(nullptr), m_lssHealthCheckRunning(false)
 {
 
 }
 
 SocketServer::~SocketServer() {
-	
-	if (m_keepAliveTimer != nullptr)
-	{
+	m_lssHealthCheckRunning = false;
+
+	// Stop keep alive timer
+	if (m_keepAliveTimer != nullptr) {
 		m_keepAliveTimer->stop();
 		delete m_keepAliveTimer;
 
 		m_keepAliveTimer = nullptr;
 	}
 
+	// Disconnect client
 	if (m_client) {
 		disconnect(m_client, &QWebSocket::disconnected, this, &SocketServer::socketDisconnected);
 		m_client->close();
@@ -347,10 +403,20 @@ SocketServer::~SocketServer() {
 		m_client = nullptr;
 	}
 
+	// Close server
 	if (m_pWebSocketServer) {
 		m_pWebSocketServer->close();
 		delete m_pWebSocketServer;
 		m_pWebSocketServer = nullptr;
+	}
+
+	// Stop LSS health check
+	if (m_lssHealthCheckThread) {
+		if (m_lssHealthCheckThread->joinable()) {
+			m_lssHealthCheckThread->join();
+		}
+		delete m_lssHealthCheckThread;
+		m_lssHealthCheckThread = nullptr;
 	}
 }
 
@@ -395,7 +461,7 @@ bool SocketServer::sendProcessWSMessage(const std::string& _senderIP, const std:
 	OT_LOG_D("Relaying received execute message to websocket and wait for response");
 
 	m_client->sendTextMessage(QString::fromStdString(request));
-	
+
 	while (m_messageHandler.isWaitingForResponse(messageId) && m_pWebSocketServer) {
 		QEventLoop loop;
 		connect(this, &SocketServer::responseReceived, &loop, &QEventLoop::quit);
@@ -435,6 +501,45 @@ bool SocketServer::relayToHttp(const ot::RelayedMessageHandler::Request& _reques
 	}
 
 	return false;
+}
+
+void SocketServer::lssHealthCheckWorker() {
+	// Create ping request
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	std::string ping = pingDoc.toJson();
+
+	OT_LOG_D("Starting LSS health check at \"" + m_lssUrl + "\"");
+
+	bool alive = true;
+	while (m_lssHealthCheckRunning) {
+		// Try to send message and check the response
+		std::string ret;
+		try {
+			if (!ot::msg::send(m_relayUrl, m_lssUrl, ot::EXECUTE, ping, ret)) {
+				alive = false;
+				break;
+			}
+			else if (ret != OT_ACTION_CMD_Ping) {
+				alive = false;
+				break;
+			}
+		}
+		catch (...) {
+			alive = false;
+			break;
+		}
+
+		int ct = 0;
+		while (++ct <= 6000 && m_lssHealthCheckRunning) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
+
+	if (!alive) {
+		OT_LOG_E("Local session service \"" + m_lssUrl + "\" has died unexpectedly. Shutting down...");
+		exit(ot::AppExitCode::LSSNotRunning);
+	}
 }
 
 std::string SocketServer::getSystemInformation() {

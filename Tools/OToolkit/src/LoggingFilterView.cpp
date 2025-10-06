@@ -6,6 +6,10 @@
 // OToolkit header
 #include "LoggingFilterView.h"
 
+// OpenTwin header
+#include "OTWidgets/SpinBox.h"
+#include "OTWidgets/CheckBox.h"
+
 // Qt header
 #include <QtCore/qjsonarray.h>
 #include <QtCore/qjsonobject.h>
@@ -37,43 +41,76 @@ LoggingFilterView::LoggingFilterView()
 
 	QHBoxLayout* messageContainsLayout = new QHBoxLayout;
 
-	QGroupBox* filterByMessageTypeBox = new QGroupBox("Message Type");
+	QGroupBox* filterByMessageTypeBox = new QGroupBox("Message Type Filter");
 	QVBoxLayout* filterByMessageTypeLayout = new QVBoxLayout(filterByMessageTypeBox);
 
-	QGroupBox* filterByUserBox = new QGroupBox("User");
+	QGroupBox* filterByUserBox = new QGroupBox("User Filter");
 	QVBoxLayout* filterByUserLayout = new QVBoxLayout(filterByUserBox);
 
-	QGroupBox* filterByProjectBox = new QGroupBox("Project");
+	QGroupBox* filterByProjectBox = new QGroupBox("Project Filter");
 	QVBoxLayout* filterByProjectLayout = new QVBoxLayout(filterByProjectBox);
 
-	QGroupBox* filterByServiceBox = new QGroupBox("Service Type");
+	QGroupBox* filterByServiceBox = new QGroupBox("Service Type Filter");
 	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
+
+	QGroupBox* settingsBox = new QGroupBox("Settings");
+	QVBoxLayout* settingsLayout = new QVBoxLayout(settingsBox);
 
 	// Create controls
 	QLabel* messageFilterL = new QLabel("Message contains:");
 	m_messageFilter = new QLineEdit;
 	m_messageFilter->setPlaceholderText("<Confirm by pressing return>");
-	
+	m_messageFilter->setToolTip("Only messages containing the specified text will be displayed. Case insensitive.");
+
 	m_userFilter = new QComboBox;
+	m_userFilter->setToolTip("Only messages from the selected user will be displayed.");
 	m_userFilter->addItem(LFV_Filter_AllNames);
 	filterByUserLayout->addWidget(m_userFilter);
 
 	m_sessionFilter = new QComboBox;
+	m_sessionFilter->setToolTip("Only messages from the selected project will be displayed.");
 	m_sessionFilter->addItem(LFV_Filter_AllNames);
 	filterByProjectLayout->addWidget(m_sessionFilter);
 
-	m_msgTypeFilterDetailed = new QCheckBox("Detailed");
-	m_msgTypeFilterInfo = new QCheckBox("Info");
-	m_msgTypeFilterWarning = new QCheckBox("Warning");
-	m_msgTypeFilterError = new QCheckBox("Error");
-	m_msgTypeFilterMsgIn = new QCheckBox("Inbound Message");
-	m_msgTypeFilterMsgOut = new QCheckBox("Outgoing Message");
-	m_msgTypeFilterTest = new QCheckBox("Testing");
+	m_msgTypeFilterDetailed = new ot::CheckBox("Detailed");
+	m_msgTypeFilterInfo = new ot::CheckBox("Info");
+	m_msgTypeFilterWarning = new ot::CheckBox("Warning");
+	m_msgTypeFilterError = new ot::CheckBox("Error");
+	m_msgTypeFilterMsgIn = new ot::CheckBox("Inbound Message");
+	m_msgTypeFilterMsgOut = new ot::CheckBox("Outgoing Message");
+	m_msgTypeFilterTest = new ot::CheckBox("Testing");
 
 	m_serviceFilter = new QListWidget;
 	QPushButton* btnSelectAllServices = new QPushButton("Select All");
+	btnSelectAllServices->setToolTip("Select all services in the list");
 
 	QPushButton* btnDeselectAllServices = new QPushButton("Deselect All");
+	btnDeselectAllServices->setToolTip("Deselect all services in the list");
+
+	// Settings
+	m_messageLimitEnabled = new ot::CheckBox("Enable Message Limit");
+	m_messageLimitEnabled->setToolTip("If enabled, only the specified number of messages will be kept in the log. Older messages will be removed.");
+
+	QHBoxLayout* messageLimitLayout = new QHBoxLayout;
+	messageLimitLayout->setContentsMargins(0, 0, 0, 0);
+	m_messageLimit = new ot::SpinBox(100, std::numeric_limits<int>::max(), 20000);
+	m_messageLimit->setToolTip("Maximum number of messages that will be kept in the log.");
+	messageLimitLayout->addWidget(new QLabel("Limit:"));
+	messageLimitLayout->addWidget(m_messageLimit, 1);
+	settingsLayout->addWidget(m_messageLimitEnabled);
+	settingsLayout->addLayout(messageLimitLayout);
+
+	m_useInterval = new ot::CheckBox("Use Interval");
+	m_useInterval->setToolTip("If enabled, the log will be updated only in the specified intervals. This can help to reduce the load on the GUI when a lot of messages are incoming.");
+	QHBoxLayout* intervalLayout = new QHBoxLayout;
+	intervalLayout->setContentsMargins(0, 0, 0, 0);
+	m_intervalMilliseconds = new ot::SpinBox(10, 10000, 1000);
+	m_intervalMilliseconds->setToolTip("Interval in milliseconds that will be used to update the log view.");
+	m_intervalMilliseconds->setSuffix(" ms");
+	intervalLayout->addWidget(new QLabel("Interval:"));
+	intervalLayout->addWidget(m_intervalMilliseconds, 1);
+	settingsLayout->addWidget(m_useInterval);
+	settingsLayout->addLayout(intervalLayout);
 
 	// Setup controls
 	m_msgTypeFilterDetailed->setChecked(true);
@@ -87,6 +124,7 @@ LoggingFilterView::LoggingFilterView()
 	centralLayout->addWidget(filterByUserBox, 0);
 	centralLayout->addWidget(filterByProjectBox, 0);
 	centralLayout->addWidget(filterByServiceBox, 1);
+	centralLayout->addWidget(settingsBox, 0);
 
 	messageContainsLayout->addWidget(messageFilterL);
 	messageContainsLayout->addWidget(m_messageFilter, 1);
@@ -127,6 +165,11 @@ LoggingFilterView::LoggingFilterView()
 
 	this->connect(m_serviceFilter, &QListWidget::itemChanged, this, &LoggingFilterView::slotFilterChanged);
 
+	this->connect(m_messageLimitEnabled, &QCheckBox::stateChanged, this, &LoggingFilterView::slotMessageLimitChanged);
+	this->connect(m_messageLimit, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotMessageLimitChanged);
+	this->connect(m_useInterval, &QCheckBox::stateChanged, this, &LoggingFilterView::slotIntervalChanged);
+	this->connect(m_intervalMilliseconds, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotIntervalChanged);
+
 	this->connect(btnSelectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotSelectAllServices);
 	this->connect(btnDeselectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotDeselectAllServices);
 }
@@ -135,7 +178,7 @@ LoggingFilterView::~LoggingFilterView() {
 
 }
 
-void LoggingFilterView::reset(void) {
+void LoggingFilterView::reset() {
 	m_serviceFilter->clear();
 }
 
@@ -253,6 +296,11 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	m_msgTypeFilterMsgOut->setChecked(_settings.value("LoggingFilterView.FilterActive.Message.Out", false).toBool());
 	m_msgTypeFilterTest->setChecked(_settings.value("LoggingFilterView.FilterActive.Test", false).toBool());
 
+	m_messageLimitEnabled->setChecked(_settings.value("LoggingFilterView.MessageLimitActive", false).toBool());
+	m_messageLimit->setValue(_settings.value("LoggingFilterView.MessageLimit", 20000).toInt());
+	m_useInterval->setChecked(_settings.value("LoggingFilterView.IntervalActive", false).toBool());
+	m_intervalMilliseconds->setValue(_settings.value("LoggingFilterView.IntervalMilliseconds", 1000).toInt());
+
 	QByteArray serviceFilter = _settings.value("LoggingFilterView.ServiceFilter.List", QByteArray()).toByteArray();
 	if (!serviceFilter.isEmpty()) {
 		QJsonDocument serviceFilterDoc = QJsonDocument::fromJson(serviceFilter);
@@ -278,6 +326,12 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	}
 
 	this->slotUpdateCheckboxColors();
+	this->updateMessageLimitColor();
+	this->updateIntervalColor();
+
+	Q_EMIT filterChanged();
+	Q_EMIT messageLimitChanged(this->getMessageLimit());
+	Q_EMIT useIntervalChaged();
 }
 
 void LoggingFilterView::saveSettings(QSettings& _settings) {
@@ -289,6 +343,11 @@ void LoggingFilterView::saveSettings(QSettings& _settings) {
 	_settings.setValue("LoggingFilterView.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
 	_settings.setValue("LoggingFilterView.FilterActive.Test", m_msgTypeFilterTest->isChecked());
 
+	_settings.setValue("LoggingFilterView.MessageLimitActive", m_messageLimitEnabled->isChecked());
+	_settings.setValue("LoggingFilterView.MessageLimit", m_messageLimit->value());
+	_settings.setValue("LoggingFilterView.IntervalActive", m_useInterval->isChecked());
+	_settings.setValue("LoggingFilterView.IntervalMilliseconds", m_intervalMilliseconds->value());
+
 	QJsonArray serviceFilterArr;
 	for (int i = 0; i < m_serviceFilter->count(); i++) {
 		QJsonObject serviceObj;
@@ -297,38 +356,83 @@ void LoggingFilterView::saveSettings(QSettings& _settings) {
 		serviceFilterArr.push_back(serviceObj);
 	}
 	QJsonDocument serviceFilterDoc(serviceFilterArr);
-	_settings.setValue("LoggingFilterView.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
+	_settings.setValue("LoggingFilterView.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));}
 
+int LoggingFilterView::getMessageLimit() const {
+	if (m_messageLimitEnabled->isChecked()) {
+		return m_messageLimit->value();
+	}
+	else {
+		return std::numeric_limits<int>::max();
+	}
 }
 
-void LoggingFilterView::slotUpdateCheckboxColors(void) {
-	QString red("QCheckBox { color: #c02020; }");
-	QString green("QCheckBox { color: #20c020; }");
-
-	m_msgTypeFilterDetailed->setStyleSheet(m_msgTypeFilterDetailed->isChecked() ? green : red);
-	m_msgTypeFilterInfo->setStyleSheet(m_msgTypeFilterInfo->isChecked() ? green : red);
-	m_msgTypeFilterWarning->setStyleSheet(m_msgTypeFilterWarning->isChecked() ? green : red);
-	m_msgTypeFilterError->setStyleSheet(m_msgTypeFilterError->isChecked() ? green : red);
-	m_msgTypeFilterMsgIn->setStyleSheet(m_msgTypeFilterMsgIn->isChecked() ? green : red);
-	m_msgTypeFilterMsgOut->setStyleSheet(m_msgTypeFilterMsgOut->isChecked() ? green : red);
-	m_msgTypeFilterTest->setStyleSheet(m_msgTypeFilterTest->isChecked() ? green : red);
+bool LoggingFilterView::getUseInterval() const {
+	return m_useInterval->isChecked();
 }
 
-void LoggingFilterView::slotFilterChanged(void) {
+int LoggingFilterView::getIntervalMilliseconds() const {
+	return m_intervalMilliseconds->value();
+}
+
+void LoggingFilterView::slotUpdateCheckboxColors() {
+	m_msgTypeFilterDetailed->setSuccessForeground(m_msgTypeFilterDetailed->isChecked());
+	m_msgTypeFilterDetailed->setErrorForeground(!m_msgTypeFilterDetailed->isChecked());
+
+	m_msgTypeFilterInfo->setSuccessForeground(m_msgTypeFilterInfo->isChecked());
+	m_msgTypeFilterInfo->setErrorForeground(!m_msgTypeFilterInfo->isChecked());
+
+	m_msgTypeFilterWarning->setSuccessForeground(m_msgTypeFilterWarning->isChecked());
+	m_msgTypeFilterWarning->setErrorForeground(!m_msgTypeFilterWarning->isChecked());
+
+	m_msgTypeFilterError->setSuccessForeground(m_msgTypeFilterError->isChecked());
+	m_msgTypeFilterError->setErrorForeground(!m_msgTypeFilterError->isChecked());
+
+	m_msgTypeFilterMsgIn->setSuccessForeground(m_msgTypeFilterMsgIn->isChecked());
+	m_msgTypeFilterMsgIn->setErrorForeground(!m_msgTypeFilterMsgIn->isChecked());
+
+	m_msgTypeFilterMsgOut->setSuccessForeground(m_msgTypeFilterMsgOut->isChecked());
+	m_msgTypeFilterMsgOut->setErrorForeground(!m_msgTypeFilterMsgOut->isChecked());
+
+	m_msgTypeFilterTest->setSuccessForeground(m_msgTypeFilterTest->isChecked());
+	m_msgTypeFilterTest->setErrorForeground(!m_msgTypeFilterTest->isChecked());
+}
+
+void LoggingFilterView::slotFilterChanged() {
 	if (m_filterLock) return;
 	Q_EMIT filterChanged();
 }
 
-void LoggingFilterView::slotSelectAllServices(void) {
+void LoggingFilterView::slotSelectAllServices() {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Checked);
 	m_filterLock = false;
 	this->slotFilterChanged();
 }
 
-void LoggingFilterView::slotDeselectAllServices(void) {
+void LoggingFilterView::slotDeselectAllServices() {
 	m_filterLock = true;
 	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
 	m_filterLock = false;
 	this->slotFilterChanged();
+}
+
+void LoggingFilterView::slotMessageLimitChanged() {
+	this->updateMessageLimitColor();
+	Q_EMIT messageLimitChanged(this->getMessageLimit());
+}
+
+void LoggingFilterView::slotIntervalChanged() {
+	this->updateIntervalColor();
+	Q_EMIT useIntervalChaged();
+}
+
+void LoggingFilterView::updateMessageLimitColor() {
+	m_messageLimitEnabled->setSuccessForeground(m_messageLimitEnabled->isChecked());
+	m_messageLimitEnabled->setErrorForeground(!m_messageLimitEnabled->isChecked());
+}
+
+void LoggingFilterView::updateIntervalColor() {
+	m_useInterval->setSuccessForeground(m_useInterval->isChecked());
+	m_useInterval->setErrorForeground(!m_useInterval->isChecked());
 }

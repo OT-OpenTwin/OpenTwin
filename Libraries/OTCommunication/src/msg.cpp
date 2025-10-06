@@ -7,7 +7,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/String.h"
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTCore/ThisComputerInfo.h"
@@ -118,7 +118,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 	// Ensure receiver url was provided
 	if (_receiverIP.empty()) {
 		if (_flags & msg::CreateLogMessage) {
-			OT_LOG_W("Receiver url is empty. Ignoring message...");
+			OT_LOG_WA("Receiver url is empty. Ignoring message...");
 		}
 		return false;
 	}
@@ -133,7 +133,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 
 	// If log message should be generated, do so now
 	if (_flags & msg::CreateLogMessage) {
-		OT_LOG("Sending message to (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Message = \"" + _message + "\"", ot::OUTGOING_MESSAGE_LOG);
+		OT_LOG("Sending message to { \"Sender\": \"" + _senderIP + "\", \"Receiver\": \"" + _receiverIP + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Message: \"" + _message + "\"", ot::OUTGOING_MESSAGE_LOG);
 	}
 
 	// Update timeout if needed
@@ -269,7 +269,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 
 	if (errorCode == CURLE_OK) {
 		if (_flags & msg::CreateLogMessage)  {
-			OT_LOG(".. Message sent successful (Receiver = \"" + _receiverIP + "\"; Endpoint = " + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "). Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG); 
+			OT_LOG(".. Message sent successful { \"Sender\": \"" + _senderIP + "\", \"Receiver\": \"" + _receiverIP + "\", \"Endpoint\": \"" + (_type == ot::EXECUTE ? "Execute" : (_type == ot::QUEUE ? "Queue" : "Execute one way TLS")) + "\" }. Response = \"" + _response + "\"", ot::OUTGOING_MESSAGE_LOG);
 		}
 		return true;
 	}
@@ -277,6 +277,7 @@ bool ot::msg::send(const std::string& _senderIP, const std::string& _receiverIP,
 		// Store last error as error string
 		g_lastError = "{ \"Error message\": \"" + std::string(curl_easy_strerror(errorCode)) +
 			"\", \"Error buffer\": \"" + errbuf +
+			"\", \"Sender\": \"" + _senderIP +
 			"\", \"Receiver\": \"" + _receiverIP +
 			"\", \"Endpoint\": " + (_type == ot::EXECUTE ? "\"Execute\"" : (_type == ot::QUEUE ? "\"Queue\"" : "\"Execute one way TLS\"")) +
 			" }";

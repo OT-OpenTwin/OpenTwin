@@ -237,6 +237,18 @@
     <ClCompile Include="src\FileLogImporterDialog.cpp">
       <Filter>Source Files\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\LogServiceDebugInfo.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogServiceDebugInfoDialog.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogVisualizerColumnWidthSaveDialog.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BackendInfo.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -307,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="include\ExternalLibraryManager.h">
       <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogServiceDebugInfoDialog.h">
+      <Filter>Header Files\Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -402,6 +417,15 @@
     </QtMoc>
     <QtMoc Include="include\FileLogImporterDialog.h">
       <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogServiceDebugInfo.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\BackendInfo.h">
+      <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

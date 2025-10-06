@@ -37,7 +37,7 @@ namespace ot {
 		bool endAction();
 
 		//! @brief Marks the current action as compound action.
-		void setCompound();
+		void ignoreCurrent();
 
 		//! @brief Returns the last interval in milliseconds.
 		int64_t getLastInterval() const { return m_lastInterval; };
@@ -45,10 +45,10 @@ namespace ot {
 	private:
 		struct ProfilerEntry {
 			OT_DECL_NODEFAULT(ProfilerEntry)
-			ProfilerEntry(int64_t _time) : timestamp(_time), isCompound(false) {};
+			ProfilerEntry(int64_t _time) : timestamp(_time), isIgnored(false) {};
 
 			int64_t timestamp;
-			bool isCompound;
+			bool isIgnored;
 		};
 
 		std::stack<ProfilerEntry> m_entries;

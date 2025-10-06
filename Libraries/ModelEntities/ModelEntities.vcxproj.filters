@@ -427,6 +427,15 @@
     <ClInclude Include="include\PropertyBundleDataHandleVisUnstructuredVectorSurface.h">
       <Filter>Header Files\PropertyBundleDataHandle</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntitySolverDataProcessing.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IVisualisationGraphicsView.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityGraphicsScene.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -725,6 +734,12 @@
     </ClCompile>
     <ClCompile Include="src\PropertyBundleDataHandleVisUnstructuredVectorSurface.cpp">
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntitySolverDataProcessing.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityGraphicsScene.cpp">
+      <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

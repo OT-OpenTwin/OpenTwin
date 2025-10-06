@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/CoreAPIExport.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // std header
 #include <string>

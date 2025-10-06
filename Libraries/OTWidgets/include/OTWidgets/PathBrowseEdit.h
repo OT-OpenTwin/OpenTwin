@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -21,7 +21,7 @@ namespace ot {
 	class LineEdit;
 	class PushButton;
 
-	class OT_WIDGETS_API_EXPORT PathBrowseEdit : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PathBrowseEdit : public QObject, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NODEFAULT(PathBrowseEdit)
 		OT_DECL_NOCOPY(PathBrowseEdit)

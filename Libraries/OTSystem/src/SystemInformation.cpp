@@ -1,5 +1,6 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTSystem/SystemInformation.h"
 
 // std header
@@ -129,7 +130,7 @@ std::string ot::SystemInformation::getBuildInformation()
 {
 	std::string buildInfo;
 
-	std::string fileName = ot::SystemProcess::getCurrentExecutableDirectory() + "\\BuildInfo.txt";
+	std::string fileName = ot::OperatingSystem::getCurrentExecutableDirectory() + "\\BuildInfo.txt";
 
 	// Chyeck whether local build information file exists
 	if (!std::filesystem::exists(fileName))

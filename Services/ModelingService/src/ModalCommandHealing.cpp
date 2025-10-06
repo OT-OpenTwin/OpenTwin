@@ -70,11 +70,11 @@ void ModalCommandHealing::modelSelectionChanged(std::list< ot::UID> &selectedEnt
 {
 	if (selectedEntityID.size() > 0)
 	{
-		application->uiComponent()->setControlState("Healing:Operation:Perform", true);
+		application->getUiComponent()->setControlState("Healing:Operation:Perform", true);
 	}
 	else
 	{
-		application->uiComponent()->setControlState("Healing:Operation:Perform", false);
+		application->getUiComponent()->setControlState("Healing:Operation:Perform", false);
 	}
 }
 

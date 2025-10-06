@@ -6,7 +6,7 @@
 #include "ClassFactory.h"
 #include "OTCore/String.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 

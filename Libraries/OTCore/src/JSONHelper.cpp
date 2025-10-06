@@ -4,16 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/JSONHelper.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
-#define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
+#undef Object
+#undef ObjectW
+#undef GetObject
+#undef GetObjectW
+
+#define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_EAS("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
 
 #define OT_JSON_createMemberIterator(___object, ___memberName, ___iteratorName) ot::JsonMemberIterator ___iteratorName = ___object.FindMember(___memberName)
 
-#define OT_JSON_checkMemberIteratorType(___it, ___memberName, ___memberType, ___errorAction) if (!___it->value.Is##___memberType()) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" is not a " #___memberType); ___errorAction; }
+#define OT_JSON_checkMemberIteratorType(___it, ___memberName, ___memberType, ___errorAction) if (!___it->value.Is##___memberType()) { OT_LOG_EAS("JSON object member \"" + std::string(___memberName) + "\" is not a " #___memberType); ___errorAction; }
 
 #define OT_JSON_getFromObject(___object, ___memberName, ___memberType, ___errorAction) \
 OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction); \

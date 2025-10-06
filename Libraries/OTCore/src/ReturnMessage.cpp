@@ -1,12 +1,14 @@
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageStatus _status) {
 	switch (_status)
 	{
 	case ot::ReturnMessage::Ok: return "Ok";
 	case ot::ReturnMessage::Failed: return "Failed";
+	case ot::ReturnMessage::True: return "True";
+	case ot::ReturnMessage::False: return "False";
 	default:
 		OT_LOG_EA("Unknown Return Message Status");
 		return "Failed";
@@ -16,6 +18,8 @@ std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageSt
 ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const std::string& _status) {
 	if (_status == statusToString(ReturnMessage::Ok)) return ReturnMessage::Ok;
 	else if (_status == statusToString(ReturnMessage::Failed)) return ReturnMessage::Failed;
+	else if (_status == statusToString(ReturnMessage::True)) return ReturnMessage::True;
+	else if (_status == statusToString(ReturnMessage::False)) return ReturnMessage::False;
 	else {
 		OT_LOG_EAS("Unknown Return Message Status \"" + _status + "\"");
 		return ReturnMessage::Failed;
@@ -139,10 +143,4 @@ void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
 
 std::string ot::ReturnMessage::getStatusString(void) const {
 	return ReturnMessage::statusToString(m_status);
-}
-
-std::string ot::ReturnMessage::toJson(void) const {
-	JsonDocument doc;
-	this->addToJsonObject(doc, doc.GetAllocator());
-	return doc.toJson();
 }

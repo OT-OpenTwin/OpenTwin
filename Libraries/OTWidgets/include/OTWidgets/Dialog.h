@@ -9,7 +9,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/DialogCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qdialog.h>
@@ -27,7 +27,7 @@ namespace ot {
 	//! - Handling of dialog results with predefined result types.
 	//! - Automatic button generation and signal-slot connections for user interactions.
 	//! 
-	class OT_WIDGETS_API_EXPORT Dialog : public QDialog, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Dialog : public QDialog, public ot::WidgetBase {
 		Q_OBJECT
 			OT_DECL_NOCOPY(Dialog)
 	public:

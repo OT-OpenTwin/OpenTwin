@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/ColorStyleTypes.h"
 
 std::string ot::toString(ColorStyleName _colorStyleName) {
@@ -388,6 +388,7 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 
 	case ot::ColorStyleValueEntry::GraphicsItemBorder: return "GraphicsItem Border Color";
 	case ot::ColorStyleValueEntry::GraphicsItemConnection: return "GraphicsItem Connection Color";
+	case ot::ColorStyleValueEntry::GraphicsItemConnectionConnectable: return "GraphicsItem Connection Connectable Color";
 	case ot::ColorStyleValueEntry::GraphicsItemBackground: return "GraphicsItem Background";
 	case ot::ColorStyleValueEntry::GraphicsItemForeground: return "GraphicsItem Foreground";
 	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
@@ -412,6 +413,8 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::PlotCurveHighlight: return "Plot Curve Highlight";
 	case ot::ColorStyleValueEntry::PlotCurveSymbol: return "Plot Curve Symbol";
 
+	case ot::ColorStyleValueEntry::SuccessForeground: return "Success Foreground";
+	case ot::ColorStyleValueEntry::WarningForeground: return "Warning Foreground";
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
@@ -478,6 +481,7 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBorder)) return ColorStyleValueEntry::GraphicsItemBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemConnection)) return ColorStyleValueEntry::GraphicsItemConnection;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemConnectionConnectable)) return ColorStyleValueEntry::GraphicsItemConnectionConnectable;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBackground)) return ColorStyleValueEntry::GraphicsItemBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemForeground)) return ColorStyleValueEntry::GraphicsItemForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemSelectionBorder)) return ColorStyleValueEntry::GraphicsItemSelectionBorder;
@@ -502,6 +506,8 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveHighlight)) return ColorStyleValueEntry::PlotCurveHighlight;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PlotCurveSymbol)) return ColorStyleValueEntry::PlotCurveSymbol;
 
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::SuccessForeground)) return ColorStyleValueEntry::SuccessForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WarningForeground)) return ColorStyleValueEntry::WarningForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
 		OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");

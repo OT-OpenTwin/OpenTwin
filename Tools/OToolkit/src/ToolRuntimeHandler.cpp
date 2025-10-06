@@ -8,7 +8,7 @@
 #include "ToolRuntimeHandler.h"
 
 // OpenTwin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 ToolRuntimeHandler::ToolRuntimeHandler(otoolkit::Tool* _tool, ToolManager* _manager) 
 	: m_tool(_tool), m_manager(_manager)

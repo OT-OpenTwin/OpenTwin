@@ -7,14 +7,14 @@
 
 // OpenTwin header
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qlineedit.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT LineEdit : public QLineEdit, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT LineEdit : public QLineEdit, public ot::WidgetBase {
 		Q_OBJECT
 	public:
 		LineEdit(QWidget* _parentWidget = (QWidget*)nullptr);

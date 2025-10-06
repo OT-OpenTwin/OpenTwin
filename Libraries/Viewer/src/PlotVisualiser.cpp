@@ -14,21 +14,15 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state) {
 		m_alreadyRequestedVisualisation = true;
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, OT_ACTION_CMD_VIEW1D_Setup, doc.GetAllocator());
-	
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _state.m_setFocus, doc.GetAllocator());
-
-		if (_state.m_selectionData.getKeyboardModifiers() & (Qt::KeyboardModifier::ControlModifier | Qt::KeyboardModifier::ShiftModifier)) {
-			doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, true, doc.GetAllocator());
-		}
-		else {
-			doc.AddMember(OT_ACTION_PARAM_SuppressViewHandling, false, doc.GetAllocator());
-		}
-
-		// Find all selected entities for this plot
 		
-		doc.AddMember(OT_ACTION_PARAM_VisualizingEntities, ot::JsonArray(getVisualizingUIDs(_state), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, getSceneNode()->getModelEntityID(), doc.GetAllocator());
+		ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state);
+		visualisationCfg.setVisualisingEntities(getVisualizingUIDs(_state));
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+
+		ot::JsonObject visualisationCfgJSon;
+		visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJSon, doc.GetAllocator());
 
 		FrontendAPI::instance()->messageModelService(doc.toJson());
 		return true;

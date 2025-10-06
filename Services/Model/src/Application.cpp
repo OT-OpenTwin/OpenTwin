@@ -18,16 +18,17 @@
 #include "OTCore/ReturnMessage.h"
 // OpenTwin header
 #include "DataBase.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "CrossCollectionDatabaseWrapper.h"
+#include "OTGui/VisualisationCfg.h"
 // std header
 #include <thread>
 
-Application* Application::instance(void) {
+Application* Application::instance() {
 	static Application* g_instance{ nullptr };
 	if (g_instance == nullptr) { g_instance = new Application; }
 	return g_instance;
@@ -847,7 +848,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	std::string actualOpenedProject = DataBase::GetDataBase()->getProjectName();
 	CrossCollectionDatabaseWrapper wrapper(collectionName);
 		
-	ModelState secondary(m_model->getSessionCount(), m_model->getServiceIDAsInt());
+	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	secondary.openProject();
 
 	std::list<ot::UID> prefetchIds;
@@ -893,8 +894,6 @@ std::string Application::handleViewsFromProjectType(ot::JsonDocument& _document)
 	ProjectTypeManager typeManager(m_model->getProjectType());
 	return typeManager.getViews();
 }
-
-
 
 // Versions
 
@@ -961,13 +960,16 @@ std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 std::string Application::handleShowTable(ot::JsonDocument& _document)
 {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+
 	std::map<std::string,ot::UID> entityMap = m_model->getEntityNameToIDMap();
 	auto entityIDByName	= entityMap.find(tableName);
 	if (entityIDByName != m_model->getEntityNameToIDMap().end())
 	{
 		ot::UID tableID = entityIDByName->second;
-		m_visualisationHandler.handleVisualisationRequest(tableID, OT_ACTION_CMD_UI_TABLE_Setup, setViewAsActive);
+		m_visualisationHandler.handleVisualisationRequest(tableID, visualisationCfg);
 		return ot::ReturnMessage().toJson();
 	}
 	else
@@ -980,14 +982,13 @@ std::string Application::handleShowTable(ot::JsonDocument& _document)
 std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _document)
 {
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
-	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
-	ot::UIDList visualizingEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VisualizingEntities);
-	bool suppressViewHandling = ot::json::getBool(_document, OT_ACTION_PARAM_SuppressViewHandling);
+
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document,OT_ACTION_PARAM_Visualisation_Config));
 	
 	try
 	{
-		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationType, setViewAsActive, true, visualizingEntities, suppressViewHandling);
+		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
 	}
 	catch (std::exception& e)
 	{
@@ -1075,43 +1076,20 @@ void Application::flushRequestsToFrontEnd()
 
 // Required functions
 
-void Application::run(void) {
+void Application::initialize() {
 	if (m_model) {
 		OT_LOG_E("Model already created!");
 		return;
 	}
 
-	size_t index = this->sessionID().find(':');
-	if (index == std::string::npos) {
-		OT_LOG_E("Invalid session id format");
-		return;
-	}
-
-	std::string projectName(this->sessionID().substr(0, index));
-	std::string collectionName(this->sessionID().substr(index + 1));
-
-	this->EnsureDataBaseConnection();
-
-	m_model = new Model(projectName, this->projectType(), collectionName);
-}
-
-std::string Application::processAction(const std::string& _action, ot::JsonDocument& _doc) {
-	
-	return "";
-}
-
-std::string Application::processMessage(ServiceBase* _sender, const std::string& _message, ot::JsonDocument& _doc) {
-
-	return "";
+	m_model = new Model(this->getProjectName(), this->getProjectType(), this->getCollectionName());
 }
 
 void Application::uiConnected(ot::components::UiComponent* _ui) {
 	ot::JsonDocument registerDoc;
 	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(this->getServiceURL()), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_RegisterForModelEvents, true, registerDoc.GetAllocator());
-
+	
 	std::string response;
 	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, registerDoc, response)) {
 		OT_LOG_E("Failed to send request");
@@ -1123,6 +1101,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), commandDoc.GetAllocator());
 
 	response.clear();
+
 	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, commandDoc, response)) {
 		OT_LOG_E("Failed to send request");
 		return;
@@ -1136,27 +1115,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	m_model->uiIsAvailable();
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent* _ui) {
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent* _model) {
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent* _model) {
-
-}
-
-void Application::serviceConnected(ot::ServiceBase* _service) {
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase* _service) {
-
-}
-
-void Application::preShutdown(void) {
+void Application::preShutdown() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
 		return;
@@ -1174,26 +1133,10 @@ void Application::preShutdown(void) {
 	m_model = nullptr;
 }
 
-void Application::shuttingDown(void) {
+void Application::shuttingDown() {
 	m_asyncActionMutex.lock();
 	m_continueAsyncActionWorker = false;
 	m_asyncActionMutex.unlock();
-}
-
-bool Application::startAsRelayService(void) const {
-	return false;
-}
-
-ot::PropertyGridCfg Application::createSettings(void) const {
-	return ot::PropertyGridCfg();
-}
-
-void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
-
-}
-
-bool Application::settingChanged(const ot::Property* _item) {
-	return false;
 }
 
 // ##################################################################################################################################################################################################################
@@ -1203,12 +1146,12 @@ bool Application::settingChanged(const ot::Property* _item) {
 void Application::addButtons()
 {
 	const std::string pageName = "Model";
-	m_fileHandler.addButtons(uiComponent(), pageName);
+	m_fileHandler.addButtons(getUiComponent(), pageName);
 	
-	m_plotHandler.addButtons(uiComponent(), pageName);
+	m_plotHandler.addButtons(getUiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_plotHandler);
 
-	m_materialHandler.addButtons(uiComponent(), pageName);
+	m_materialHandler.addButtons(getUiComponent(), pageName);
 	m_selectionHandler.subscribe(&m_materialHandler);
 }
 
@@ -1222,7 +1165,7 @@ void Application::queueAction(ActionType _type, const ot::JsonDocument& _documen
 	m_asyncActionMutex.unlock();
 }
 
-void Application::asyncActionWorker(void) {
+void Application::asyncActionWorker() {
 	while (this->getContinueAsyncActionWorker()) {
 		// Check if a action is present
 		m_asyncActionMutex.lock();
@@ -1301,7 +1244,7 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 	m_selectionHandler.processSelectionChanged(selectedEntityIDsVerified, selectedVisibleEntityIDsVerified);
 }
 
-bool Application::getContinueAsyncActionWorker(void) {
+bool Application::getContinueAsyncActionWorker() {
 	bool ret = false;
 	m_asyncActionMutex.lock();
 	ret = m_continueAsyncActionWorker;

@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTGui/NavigationTreePackage.h"
 
 std::string ot::NavigationTreePackage::toString(NavigationTreePackageFlag _flag) {

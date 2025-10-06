@@ -7,14 +7,14 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/WidgetBase.h"
 
 // Qt header
 #include <QtWidgets/qplaintextedit.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT PlainTextEdit : public QPlainTextEdit, public ot::QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT PlainTextEdit : public QPlainTextEdit, public ot::WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PlainTextEdit)
 	public:

@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcherBase.h"
 #include "OTCommunication/ActionHandleConnector.h"
@@ -69,7 +70,7 @@ std::string ot::ActionDispatcherBase::dispatch(JsonDocument& _document, MessageT
 
 	if (action.empty()) {
 		OT_LOG_EA("Action member not found");
-		return OT_ACTION_RETURN_INDICATOR_Error "Action syntax error";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Provided action is empty");
 	}
 
 	bool handlerFound = false;
@@ -78,7 +79,7 @@ std::string ot::ActionDispatcherBase::dispatch(JsonDocument& _document, MessageT
 	// Check if a handler was found or an error occured (non empty result);
 	if (!handlerFound && result.empty()) {
 		OT_LOG_WAS("Unknown action received: " + action);
-		result = OT_ACTION_RETURN_UnknownAction;
+		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Unknown action received: \"" + action + "\"");
 	}
 
 	return result;
@@ -118,11 +119,11 @@ std::string ot::ActionDispatcherBase::dispatchImpl(const std::string& _action, J
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
-		result = std::string(OT_ACTION_RETURN_INDICATOR_Error) + _e.what();
+		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, _e.what());
 	}
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error occured");
-		result = OT_ACTION_RETURN_INDICATOR_Error "Unknown error";
+		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Unknown error occured");
 	}
 
 	if (_handlerFound) {

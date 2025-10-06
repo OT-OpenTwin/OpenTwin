@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // std header
 #include <map>
