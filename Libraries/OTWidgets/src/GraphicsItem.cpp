@@ -4,11 +4,16 @@
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin header
+// OpenTwin Core header
 #include "OTCore/Math.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/BasicScopedBoolWrapper.h"
+
+// OpenTwin Gui header
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
+
+// OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/Positioning.h"
@@ -73,7 +78,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	OTAssertNullptr(this->getQGraphicsItem());
 	
-	m_blockConfigurationNotifications = true;
+	BasicScopedBoolWrapper configBlock(m_blockConfigurationNotifications, true);
 	this->setConfiguration(_cfg->createCopy());
 
 	OTAssertNullptr(m_config);
@@ -83,7 +88,6 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		this->setGraphicsItemName(this->getGraphicsItemName());
 		if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
 	}
-	m_blockConfigurationNotifications = false;
 
 	return true;
 }
@@ -94,8 +98,10 @@ void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsI
 }
 
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
-	if (m_blockConfigurationNotifications) return;
-	if (!this->getGraphicsScene()) return;
+	if (this->isSilencingConfigNotifications() || !this->getGraphicsScene()) {
+		return;
+	}
+
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
 	this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 }
@@ -395,7 +401,9 @@ void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
 	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(m_config->getPosition()));
 	this->applyGraphicsItemTransform();
 
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 void ot::GraphicsItem::setGraphicsItemPos(const QPointF& _pos) {
@@ -410,7 +418,9 @@ void ot::GraphicsItem::setGraphicsItemPos(const Point2DD& _pos) {
 	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(_pos));
 	this->getQGraphicsLayoutItem()->updateGeometry();
 
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
@@ -421,15 +431,23 @@ const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
 void ot::GraphicsItem::setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active) {
 	OTAssertNullptr(m_config);
 	m_config->setGraphicsItemFlag(_flag, _active);
-	if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!m_blockFlagNotifications) {
+		this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+	}
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {
 	OTAssertNullptr(m_config);
 	m_config->setGraphicsItemFlags(_flags);
-	if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!m_blockFlagNotifications) {
+		this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+	}
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::GraphicsItemCfg::GraphicsItemFlags& ot::GraphicsItem::getGraphicsItemFlags(void) const {
@@ -440,7 +458,9 @@ const ot::GraphicsItemCfg::GraphicsItemFlags& ot::GraphicsItem::getGraphicsItemF
 void ot::GraphicsItem::setGraphicsItemUid(const ot::UID& _uid) {
 	OTAssertNullptr(m_config);
 	m_config->setUid(_uid);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::UID& ot::GraphicsItem::getGraphicsItemUid(void) const {
@@ -451,7 +471,9 @@ const ot::UID& ot::GraphicsItem::getGraphicsItemUid(void) const {
 void ot::GraphicsItem::setGraphicsItemName(const std::string& _name) {
 	OTAssertNullptr(m_config);
 	m_config->setName(_name);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const std::string& ot::GraphicsItem::getGraphicsItemName(void) const {
@@ -462,7 +484,9 @@ const std::string& ot::GraphicsItem::getGraphicsItemName(void) const {
 void ot::GraphicsItem::setGraphicsItemToolTip(const std::string& _toolTip) {
 	OTAssertNullptr(m_config);
 	m_config->setToolTip(_toolTip);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const std::string& ot::GraphicsItem::getGraphicsItemToolTip(void) const {
@@ -473,7 +497,9 @@ const std::string& ot::GraphicsItem::getGraphicsItemToolTip(void) const {
 void ot::GraphicsItem::setAdditionalTriggerDistance(const ot::MarginsD& _distance) {
 	OTAssertNullptr(m_config);
 	m_config->setAdditionalTriggerDistance(_distance);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::MarginsD& ot::GraphicsItem::getAdditionalTriggerDistance(void) const {
@@ -489,7 +515,9 @@ double ot::GraphicsItem::getMaxAdditionalTriggerDistance(void) const {
 void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
 	OTAssertNullptr(m_config);
 	m_config->setMinimumSize(Size2DD(_size.width(), _size.height()));
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize(void) const {
@@ -500,7 +528,9 @@ QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize(void) const {
 void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
 	OTAssertNullptr(m_config);
 	m_config->setMaximumSize(Size2DD(_size.width(), _size.height()));
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize(void) const {
@@ -511,7 +541,9 @@ QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize(void) const {
 void ot::GraphicsItem::setGraphicsItemSizePolicy(ot::SizePolicy _policy) {
 	OTAssertNullptr(m_config);
 	m_config->setSizePolicy(_policy);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 ot::SizePolicy ot::GraphicsItem::getGraphicsItemSizePolicy(void) const {
@@ -522,7 +554,9 @@ ot::SizePolicy ot::GraphicsItem::getGraphicsItemSizePolicy(void) const {
 void ot::GraphicsItem::setGraphicsItemAlignment(ot::Alignment _align) {
 	OTAssertNullptr(m_config);
 	m_config->setAlignment(_align);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 ot::Alignment ot::GraphicsItem::getGraphicsItemAlignment(void) const {
@@ -533,7 +567,9 @@ ot::Alignment ot::GraphicsItem::getGraphicsItemAlignment(void) const {
 void ot::GraphicsItem::setGraphicsItemMargins(const ot::MarginsD& _margins) {
 	OTAssertNullptr(m_config);
 	m_config->setMargins(_margins);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::MarginsD& ot::GraphicsItem::getGraphicsItemMargins(void) const {
@@ -544,7 +580,9 @@ const ot::MarginsD& ot::GraphicsItem::getGraphicsItemMargins(void) const {
 void ot::GraphicsItem::setConnectionDirection(ot::ConnectionDirection _direction) {
 	OTAssertNullptr(m_config);
 	m_config->setConnectionDirection(_direction);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
@@ -566,7 +604,9 @@ ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
 void ot::GraphicsItem::setStringMap(const std::map<std::string, std::string>& _map) {
 	OTAssertNullptr(m_config);
 	m_config->setStringMap(_map);
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const std::map<std::string, std::string>& ot::GraphicsItem::getStringMap(void) const {
@@ -582,7 +622,9 @@ void ot::GraphicsItem::setGraphicsItemTransform(const Transform& _transform) {
 	for (GraphicsConnectionItem* con : m_connections) {
 		con->update();
 	}
-	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+	if (!this->isSilencingConfigNotifications()) {
+		this->graphicsItemConfigurationChanged(m_config);
+	}
 }
 
 const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform(void) const {
@@ -667,13 +709,16 @@ void ot::GraphicsItem::setCurrentPosAsMoveStart(void) {
 }
 
 void ot::GraphicsItem::notifyMoveIfRequired(void) {
-	if (m_blockConfigurationNotifications) return;
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getGraphicsScene());
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
 	QPointF newPos = this->getQGraphicsItem()->pos();
 	if (m_moveStartPt != newPos) {
 		m_moveStartPt = newPos;
+
+		if (this->isSilencingConfigNotifications()) {
+			return;
+		}
 		this->getGraphicsScene()->getGraphicsView()->notifyItemMoved(this);
 		this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 	}
@@ -700,6 +745,15 @@ QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
 	OTAssertNullptr(this->getConfiguration());
 	QRectF rec = this->getQGraphicsItem()->mapRectToScene(this->getQGraphicsItem()->boundingRect());
 	return rec.marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
+}
+
+bool ot::GraphicsItem::isSilencingConfigNotifications() const {
+	if (m_config) {
+		return m_config->getGraphicsItemFlags() & GraphicsItemCfg::ItemSilencesNotifcations || m_blockConfigurationNotifications;
+	}
+	else {
+		return m_blockConfigurationNotifications;
+	}
 }
 
 void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {

@@ -35,36 +35,38 @@ namespace ot {
 
 		//! @brief GraphicsItemFlag
 		enum GraphicsItemFlag {
-			NoFlags                    = 0x0000, //! @brief No item flags.
-			ItemIsMoveable             = 0x0001, //! @brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item.
-			ItemIsSelectable           = 0x0002, //! @brief The item can be selected by the user.
-			ItemIsConnectable          = 0x0004, //! @brief Item can be used as source or destination of a conncetion.
+			NoFlags                    = 0 << 0, //! @brief No item flags.
+			ItemIsMoveable             = 1 << 0, //! @brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item.
+			ItemIsSelectable           = 1 << 1, //! @brief The item can be selected by the user.
+			ItemIsConnectable          = 1 << 2, //! @brief Item can be used as source or destination of a conncetion.
 
-			ItemSnapsToGridTopLeft     = 0x0010, //! @brief Item snaps to grid on the top left corner of the bounding rect.
-			ItemSnapsToGridCenter      = 0x0020, //! @brief Item snaps to grid at the center of the bounding rect (will be ignored if ItemSnapsToGridTopLeft is set).
+			ItemSnapsToGridTopLeft     = 1 << 3, //! @brief Item snaps to grid on the top left corner of the bounding rect.
+			ItemSnapsToGridCenter      = 1 << 4, //! @brief Item snaps to grid at the center of the bounding rect (will be ignored if ItemSnapsToGridTopLeft is set).
 
 			//! @brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item.
 			//! @note If this flag is not set this item also wont forward tooltip requests from child items.
-			ItemForwardsTooltip        = 0x0100,
+			ItemForwardsTooltip        = 1 << 5,
 
 			//! @brief User transform and transform shortcuts are enabled for this item.
 			//! The user can rotate and flip the item by using the shortcuts or actions.
-			ItemUserTransformEnabled   = 0x0200,
+			ItemUserTransformEnabled   = 1 << 6,
 
 			//! @brief Item transformations to the parent item will not affect this item.
 			//! If the item is located in a group for example, any transformations to the group won't affect this item.
 			//! The item will apply the inverse transformation to keep its transformation.
-			ItemIgnoresParentTransform = 0x0400,
+			ItemIgnoresParentTransform = 1 << 7,
 
 			//! @brief Item receives state changes.
 			//! The item will paint its border and/or background differently if the item is selected or is hovered by the user.
 			//! A StyleRefPainter2D will be used for painting the state.
 			//! @ref enum class ot::ColorStyleValueEntry
-			ItemHandlesState           = 0x1000,
+			ItemHandlesState           = 1 << 8,
 
 			//! @brief Item forwards state changes to child items.
 			//! If the root item is a container item (e.g. GraphicsGroupItem) it have this flag set in order to forward the state change to its child items.
-			ItemForwardsState          = 0x2000
+			ItemForwardsState          = 1 << 9,
+
+			ItemSilencesNotifcations   = 1 << 10 //! @brief Item will not send notifications to the scene when it is changed.
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 

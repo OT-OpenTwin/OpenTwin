@@ -38,7 +38,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	this->setBlockConfigurationNotifications(true);
 	this->setContentsMargins(_cfg->getMargins().left(), _cfg->getMargins().top(), _cfg->getMargins().right(), _cfg->getMargins().bottom());
 
-	for (auto itm : cfg->items()) {
+	for (auto& itm : cfg->items()) {
 		if (itm.first) {
 			ot::GraphicsItem* i = ot::GraphicsItemFactory::itemFromConfig(itm.first);
 			if (i == nullptr) {
@@ -49,7 +49,9 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			i->setParentGraphicsItem(this);
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
-			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
+			if (itm.second > 0) {
+				this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
+			}
 			this->setAlignment(i->getQGraphicsLayoutItem(), QtFactory::toQAlignment(i->getGraphicsItemAlignment()));
 		}
 		else {

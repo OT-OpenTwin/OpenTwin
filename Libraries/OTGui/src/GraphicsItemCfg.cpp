@@ -50,6 +50,7 @@
 #define OT_JSON_VALUE_IgnoreParentTransform "IgnoreParentTransform" 
 #define OT_JSON_VALUE_HandleState "HandleState"
 #define OT_JSON_VALUE_ForwardState "ForwardState"
+#define OT_JSON_VALUE_SilencesNotifications "SilencesNotifications"
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
@@ -87,16 +88,17 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember(OT_JSON_MEMBER_AdditionalTriggerDistance, addTrigDistObj, _allocator);
 
 	JsonArray flagArr;
-	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Moveable, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemIsSelectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Selectable, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemSnapsToGridTopLeft) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGridTopLeft, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemSnapsToGridCenter) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGridCenter, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemUserTransformEnabled) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_TransformEnabled, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemIgnoresParentTransform) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_IgnoreParentTransform, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemHandlesState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_HandleState, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemForwardsState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardState, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(JsonString(OT_JSON_VALUE_Moveable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(JsonString(OT_JSON_VALUE_Connectable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIsSelectable) flagArr.PushBack(JsonString(OT_JSON_VALUE_Selectable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(JsonString(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemSnapsToGridTopLeft) flagArr.PushBack(JsonString(OT_JSON_VALUE_SnapsToGridTopLeft, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemSnapsToGridCenter) flagArr.PushBack(JsonString(OT_JSON_VALUE_SnapsToGridCenter, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemUserTransformEnabled) flagArr.PushBack(JsonString(OT_JSON_VALUE_TransformEnabled, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIgnoresParentTransform) flagArr.PushBack(JsonString(OT_JSON_VALUE_IgnoreParentTransform, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemHandlesState) flagArr.PushBack(JsonString(OT_JSON_VALUE_HandleState, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemForwardsState) flagArr.PushBack(JsonString(OT_JSON_VALUE_ForwardState, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemSilencesNotifcations) flagArr.PushBack(JsonString(OT_JSON_VALUE_SilencesNotifications, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
 
 	JsonArray stringMapArr;
@@ -153,6 +155,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_IgnoreParentTransform) m_flags |= ItemIgnoresParentTransform;
 		else if (f == OT_JSON_VALUE_HandleState) m_flags |= ItemHandlesState;
 		else if (f == OT_JSON_VALUE_ForwardState) m_flags |= ItemForwardsState;
+		else if (f == OT_JSON_VALUE_SilencesNotifications) m_flags |= ItemSilencesNotifcations;
 		else {
 			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
 		}

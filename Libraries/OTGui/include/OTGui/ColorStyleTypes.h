@@ -216,6 +216,7 @@ namespace ot {
 
 		GraphicsItemBorder,
 		GraphicsItemConnection,
+		GraphicsItemConnectionConnectable,
 		GraphicsItemBackground,
 		GraphicsItemForeground,
 		GraphicsItemSelectionBorder,

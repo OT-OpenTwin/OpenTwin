@@ -394,6 +394,9 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 			if (this->getGraphicsScene()) {
 				this->getGraphicsScene()->addItem(m_originConnector);
 			}
+			m_originConnector->setGraphicsScene(this->getGraphicsScene());
+			m_originConnector->finalizeGraphicsItem();
+
 			m_originConnector->storeConnection(this);
 			m_originConnector->setPos(QtFactory::toQPoint(m_config.getOriginPos()) - QPointF(m_originConnector->getRadiusX(), m_originConnector->getRadiusY()));
 		}
@@ -416,6 +419,9 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 			if (this->getGraphicsScene()) {
 				this->getGraphicsScene()->addItem(m_destConnector);
 			}
+			m_destConnector->setGraphicsScene(this->getGraphicsScene());
+			m_destConnector->finalizeGraphicsItem();
+
 			m_destConnector->storeConnection(this);
 			m_destConnector->setPos(QtFactory::toQPoint(m_config.getDestPos()) - QPointF(m_destConnector->getRadiusX(), m_destConnector->getRadiusY()));
 		}
