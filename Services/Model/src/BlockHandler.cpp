@@ -129,7 +129,10 @@ void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
 		}
 		std::list<ot::UID> dataEntityParentList{ parent->getEntityID()};
 		
-		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", true, true);
+		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntityParentList, "Update BlockItem position", false, false);
+		topoEntID.push_back(blockEnt->getEntityID());
+		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
+		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated");
 	}
 
 	int x = 10;
