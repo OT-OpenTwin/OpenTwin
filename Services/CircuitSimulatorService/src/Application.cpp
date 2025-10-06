@@ -39,7 +39,7 @@
 #include "ClassFactory.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-
+#include "EntityGraphicsScene.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -114,32 +114,17 @@ void Application::createNewCircuit() {
 
 	circuitName = extractStringAfterDelimiter(circuitName, '/', 1);
 
-	EntityContainer* entityCircuitRoot;
+	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	
-	entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	entityCircuitRoot->setName(getCircuitRootName()+circuitName);
 
 	entityCircuitRoot->StoreToDataBase();
-	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
+	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added new circuit");
 	
-	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
-	ot::JsonDocument doc;
-	ot::JsonObject pckgObj;
-	editor->addToJsonObject(pckgObj, doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
-
-	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-
 	Circuit circuit;
-	circuit.setEditorName(editor->title());
-	circuit.setId(editor->name());
-	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editor->name(), circuit);
-
-	// Message is queued, no response here
-	std::string tmp;
-	this->getUiComponent()->sendMessage(true, doc, tmp);
+	circuit.setEditorName(circuitName);
+	circuit.setId(circuitName);
+	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(circuitName, circuit);
 }
 
 void Application::createInitialCircuit() {

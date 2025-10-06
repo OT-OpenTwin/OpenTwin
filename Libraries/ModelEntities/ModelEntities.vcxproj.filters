@@ -433,6 +433,9 @@
     <ClInclude Include="include\IVisualisationGraphicsView.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityGraphicsScene.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -733,6 +736,9 @@
       <Filter>Source Files\PropertyBundleDataHandle</Filter>
     </ClCompile>
     <ClCompile Include="src\EntitySolverDataProcessing.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityGraphicsScene.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

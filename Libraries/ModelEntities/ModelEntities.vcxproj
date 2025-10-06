@@ -31,6 +31,7 @@
     <ClInclude Include="include\EntityAPI.h" />
     <ClInclude Include="include\EntityBatchImporter.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityResult1DCurve.h" />
     <ClInclude Include="include\EntityResult1DPlot.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
+    <ClCompile Include="src\EntityGraphicsScene.cpp" />
     <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
     <ClCompile Include="src\EntityMetadataSeries.cpp" />

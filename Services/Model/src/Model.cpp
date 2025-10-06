@@ -80,6 +80,7 @@
 
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTCore/FolderNames.h"
+#include "EntityGraphicsScene.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -191,7 +192,7 @@ void Model::resetToNew()
 
 	if (typeManager.hasCircuit())
 	{
-		EntityBase* entityCircuit = new EntityContainer(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityBase* entityCircuit = new EntityGraphicsScene(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuit->setName(typeManager.getCircuitName());
 		addEntityToModel(entityCircuit->getName(), entityCircuit, entityRoot, true, allNewEntities);
 	}

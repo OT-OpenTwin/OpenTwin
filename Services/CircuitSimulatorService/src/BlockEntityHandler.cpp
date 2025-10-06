@@ -79,13 +79,13 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 		std::string circuitItemName;
 		std::string circuitAbbraviationName;
 		do {
-			circuitAbbraviationName = _blockFolder + "/" + editorName +"/"+ elementName + std::to_string(count);
+			circuitAbbraviationName = editorName +"/"+ elementName + std::to_string(count);
 			count++;
 		} while (std::find(circuitItems.begin(), circuitItems.end(), circuitAbbraviationName) != circuitItems.end());
 		blockEntity->setName(circuitAbbraviationName);
 	}
 	else {
-		std::string entName = CreateNewUniqueTopologyName(_blockFolder + "/" + editorName, blockEntity->getBlockTitle());
+		std::string entName = CreateNewUniqueTopologyName(editorName, blockEntity->getBlockTitle());
 		blockEntity->setName(entName);
 	}
 
