@@ -21,6 +21,7 @@ namespace PropertyHelper
 	__declspec(dllexport) EntityPropertiesColor* getColourProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	__declspec(dllexport) EntityPropertiesInteger* getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	__declspec(dllexport) EntityPropertiesGuiPainter* getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	__declspec(dllexport) EntityPropertiesEntityList* getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	__declspec(dllexport) void setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	__declspec(dllexport) void setStringPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");

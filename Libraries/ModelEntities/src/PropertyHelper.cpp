@@ -190,6 +190,23 @@ EntityPropertiesGuiPainter* PropertyHelper::getPainterProperty(EntityBase* _base
 	return painter;
 }
 
+EntityPropertiesEntityList* PropertyHelper::getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	EntityPropertiesBase* propertyBase = _base->getProperties().getProperty(_name, _groupName);
+	if (propertyBase == nullptr)
+	{
+		throw std::exception(("Failed to access property " + _name).c_str());
+	}
+
+	EntityPropertiesEntityList* entitySelection = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
+	if (entitySelection == nullptr)
+	{
+		throw std::exception(("Tried to cast property " + _name + " to wrong type: entity selection").c_str());
+	}
+
+	return entitySelection;
+}
+
 void PropertyHelper::setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	EntityPropertiesDouble* doubleProperty = getDoubleProperty(_base, _name, _groupName);

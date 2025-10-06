@@ -74,7 +74,7 @@ void Application::runPipeline(ot::UIDList _selectedSolverIDs)
 			ot::UID entityVersion =	Application::instance()->getPrefetchedEntityVersion(entityID);
 			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
 			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
-			const std::string folderName = solver->getName();
+			const std::string folderName = solver->getSelectedPipeline();
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
 			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
 
@@ -82,6 +82,7 @@ void Application::runPipeline(ot::UIDList _selectedSolverIDs)
 			{
 				const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
 				const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+				Application::instance()->getUiComponent()->displayMessage("\nRunning pipeline: " + solver->getName() + "\n");
 				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
 			}
 		}
@@ -143,9 +144,9 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				}				
 				newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
 
-				auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+				auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::SolverFolder);
 				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
-
+				newSolver.setName(entityName);
 
 				newSolver.StoreToDataBase();
 				ot::NewModelStateInformation entityInfos;

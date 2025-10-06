@@ -11,4 +11,6 @@ public:
 
 	void createProperties(const std::string& _graphicsSceneFolder, const ot::UID _graphicsSceneFolderID);
 
+	const std::string getSelectedPipeline() ;
+
 };
