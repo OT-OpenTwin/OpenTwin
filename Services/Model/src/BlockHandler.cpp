@@ -12,7 +12,7 @@
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
 	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
