@@ -2602,6 +2602,12 @@ ot--ExpanderWidget #OT_ExpanderWidgetHeaderLine {
     max-height: 1px;
 }
 
+ot--ExpanderWidget #OT_ExpanderWidgetResizeHandle {
+    background-color: %color:Input Background%;
+    min-height: 5px;
+    max-height: 5px;
+}
+
 /* ##################################################################################### */
 
 /* IndicatorWidget */

@@ -2608,6 +2608,12 @@ ot--ExpanderWidget #OT_ExpanderWidgetHeaderLine {
     max-height: 1px;
 }
 
+ot--ExpanderWidget #OT_ExpanderWidgetResizeHandle {
+    background-color: rgba(50,50,50,255);
+    min-height: 5px;
+    max-height: 5px;
+}
+
 /* ##################################################################################### */
 
 /* IndicatorWidget */

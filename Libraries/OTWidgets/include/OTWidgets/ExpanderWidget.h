@@ -15,7 +15,7 @@
 class QFrame;
 class QScrollArea;
 class QVBoxLayout;
-class QPropertyAnimation;
+class QParallelAnimationGroup;
 
 namespace ot {
 
@@ -50,30 +50,54 @@ namespace ot {
 		void setTitle(const QString& _title);
 		QString getTitle() const;
 
-		void setMinExpandedHeight(int _height);
-		int getMinExpandedHeight() const { return m_minExpandedHeight; }
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Public: Slots
 
 	public Q_SLOTS:
-		void updateAnimationLimits();
 		void expand();
 		void collapse();
 		void toggle();
 		void animationFinished();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Events
+
+	protected:
+
+		void resizeEvent(QResizeEvent* _event) override;
+		void mousePressEvent(QMouseEvent* _event) override;
+		void mouseMoveEvent(QMouseEvent* _event) override;
+		void mouseReleaseEvent(QMouseEvent* _event) override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
+
 	private:
+		bool isInResizeHandleArea(const QPoint& _pos) const;
+		void updateChild();
+
 		ot::ToolButton* m_toggleButton;
 		QFrame* m_headerLine;
-		QPropertyAnimation* m_toggleAnimation;
+		QParallelAnimationGroup* m_toggleAnimation;
 		QWidget* m_childAreaWidget;
 		QVBoxLayout* m_childArea;
+		QFrame* m_handle;
 		QWidget* m_currentWidget;
+
 		int m_animationDuration;
+
 		bool m_expanded;
-		int m_lastHeightHint;
-		int m_minExpandedHeight;
+		int m_minimumExpandedHeight;
+		int m_expandedHeight;
+
+		bool m_resizing;
+		QPoint m_dragStartPosition;
+		int m_dragStartHeight;
+
+		const int c_titleHeight;
+		const int c_handleHeight;
 	};
 }

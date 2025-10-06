@@ -33,7 +33,7 @@
 #define BACKINFO_LOGE(___message) OTOOLKIT_LOGE("Backend Info", ___message)
 
 BackendInfo::BackendInfo() 
-	: m_sectionsSplitter(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
+	: m_sectionsLayout(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
 	m_clearButton(nullptr), m_gssUrl(nullptr), m_loadThread(nullptr), m_stretchWidget(nullptr)
 {
 
@@ -78,9 +78,10 @@ bool BackendInfo::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QScrollArea* scrollArea = new QScrollArea;
 	scrollArea->setWidgetResizable(true);
 
-	m_sectionsSplitter = new QSplitter(Qt::Vertical);
-	scrollArea->setWidget(m_sectionsSplitter);
-
+	QWidget* scrollContent = new QWidget;
+	scrollArea->setWidget(scrollContent);
+	
+	m_sectionsLayout = new QVBoxLayout(scrollContent);
 	layout->addWidget(scrollArea, 1);
 
 	_content.addView(this->createCentralWidgetView(root, this->getToolName()));
@@ -106,15 +107,17 @@ void BackendInfo::slotClear() {
 	for (ot::ExpanderWidget* w : m_sections) {
 		if (w) {
 			w->setVisible(false);
+			m_sectionsLayout->removeWidget(w);
 			delete w;
 		}
 	}
-	
+
 	if (m_stretchWidget) {
+		m_sectionsLayout->removeWidget(m_stretchWidget);
 		delete m_stretchWidget;
 		m_stretchWidget = nullptr;
 	}
-
+	
 	m_sections.clear();
 
 	m_gssInfos.clear();
@@ -149,6 +152,7 @@ void BackendInfo::slotCancel() {
 
 void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	QSplitter* mainSplitter = new QSplitter;
+	mainSplitter->setMinimumHeight(400);
 
 	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
 	mainSplitter->addWidget(generalInfoGroup);
@@ -214,15 +218,17 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	lssArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	lssInfoGroupLayout->addWidget(lssArea);
 
-	QVBoxLayout* lssMainLayout = new QVBoxLayout;
+	QWidget* lssMainLayoutWidget = new QWidget;
+	QVBoxLayout* lssMainLayout = new QVBoxLayout(lssMainLayoutWidget);
 	lssMainLayout->setContentsMargins(0, 0, 0, 0);
-	lssArea->setLayout(lssMainLayout);
+	lssArea->setWidget(lssMainLayoutWidget);
 
 	for (const auto& it : _info.getLSSList()) {
 		QScrollArea* lssWidget = new QScrollArea;
 		lssWidget->setWidgetResizable(true);
 		lssWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 		lssWidget->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+		lssWidget->setMinimumHeight(200);
 
 		QWidget* lssContent = new QWidget;
 		lssWidget->setWidget(lssContent);
@@ -248,7 +254,7 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 		lssLayout->addWidget(this->createGssSessionTable(it.initializingSessions));
 	
 		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LSS { \"ID\": " + std::to_string(it.id) + ", \"URL\": \"" + it.url + "\" }"));
-		expander->setMinExpandedHeight(450);
+		//expander->setMinExpandedHeight(450);
 		expander->setWidget(lssWidget);
 		lssMainLayout->addWidget(expander);
 	}
@@ -256,16 +262,16 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	lssMainLayout->addStretch(1);
 
 	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GSS { \"URL\": \"" + QString::fromStdString(_info.getUrl()) + "\" }");
-	mainExpander->setMinExpandedHeight(500);
+	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
-	m_sectionsSplitter->addWidget(mainExpander);
-	m_sectionsSplitter->setStretchFactor(m_sectionsSplitter->count() - 1, 0);
+	m_sectionsLayout->addWidget(mainExpander);
 	m_sections.push_back(mainExpander);
 }
 
 void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 	QSplitter* mainSplitter = new QSplitter;
+	mainSplitter->setMinimumHeight(400);
 
 	// General Info
 
@@ -480,22 +486,22 @@ void BackendInfo::slotAddLSS(const ot::LSSDebugInfo& _info) {
 		sessionLayout->addWidget(this->createLssServicesTable(it.services));
 
 		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("Session { \"ID\": \"" + it.id + "\" }"));
-		expander->setMinExpandedHeight(800);
+		//expander->setMinExpandedHeight(800);
 		expander->setWidget(sessionArea);
 		sessionsAreaLayout->addWidget(expander);
 	}
 
 	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LSS { \"ID\": " + QString::number(_info.getID()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
-	mainExpander->setMinExpandedHeight(500);
+	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
-	m_sectionsSplitter->addWidget(mainExpander);
-	m_sectionsSplitter->setStretchFactor(m_sectionsSplitter->count() - 1, 0);
+	m_sectionsLayout->addWidget(mainExpander);
 	m_sections.push_back(mainExpander);
 }
 
 void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 	QSplitter* mainSplitter = new QSplitter;
+	mainSplitter->setMinimumHeight(400);
 
 	QGroupBox* generalInfoGroup = new QGroupBox("General Info");
 	mainSplitter->addWidget(generalInfoGroup);
@@ -559,26 +565,26 @@ void BackendInfo::slotAddGDS(const ot::GDSDebugInfo& _info) {
 		ldsLayout->addWidget(supportedServicesList);
 
 		ldsLayout->addWidget(new ot::Label("Services:"));
-		ldsLayout->addWidget(this->createGdsServicesTable(it.services));
+		ldsLayout->addWidget(this->createGdsServicesTable(it.services), 1);
 
 		ot::ExpanderWidget* expander = new ot::ExpanderWidget(QString::fromStdString("LDS { \"ID\": " + std::to_string(it.serviceID) + ", \"URL\": \"" + it.url + "\" }"));
-		expander->setMinExpandedHeight(450);
+		//expander->setMinExpandedHeight(450);
 		expander->setWidget(ldsWidget);
 		ldsMainLayout->addWidget(expander);
 	}
 	ldsMainLayout->addStretch(1);
 	
 	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("GDS { \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
-	mainExpander->setMinExpandedHeight(500);
+	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 
-	m_sectionsSplitter->addWidget(mainExpander);
-	m_sectionsSplitter->setStretchFactor(m_sectionsSplitter->count() - 1, 0);
+	m_sectionsLayout->addWidget(mainExpander);
 	m_sections.push_back(mainExpander);
 }
 
 void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	QSplitter* mainSplitter = new QSplitter;
+	mainSplitter->setMinimumHeight(400);
 
 	// General Info
 
@@ -650,7 +656,7 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	configLayout->addWidget(new ot::Label("Supported Services:"));
 	QStringList supportedServicesHeader = { "Name", "Type", "Crash Restarts", "Startup Restarts" };
 	ot::Table* supportedServicesTable = new ot::Table(_info.getConfig().supportedServices.size(), supportedServicesHeader.size());
-	configLayout->addWidget(supportedServicesTable);
+	configLayout->addWidget(supportedServicesTable, 1);
 	supportedServicesTable->verticalHeader()->setVisible(false);
 	supportedServicesTable->setHorizontalHeaderLabels(supportedServicesHeader);
 	supportedServicesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
@@ -665,7 +671,6 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 		supportedServicesTable->addItem(r, 3, QString::number(it.maxStartupRestarts))->setFlags(cellFlags);
 		r++;
 	}
-	configLayout->addStretch(1);
 
 	// Services
 	QGroupBox* servicesGroup = new QGroupBox("Service Manager");
@@ -695,7 +700,7 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	}
 	ot::ExpanderWidget* aliveSessionsExpander = new ot::ExpanderWidget("Alive Sessions (" + QString::number(_info.getAliveSessions().size()) + ")");
 	aliveSessionsExpander->setWidget(aliveSessionsWidget);
-	aliveSessionsExpander->setMinExpandedHeight(minHeight + 100);
+	//aliveSessionsExpander->setMinExpandedHeight(minHeight + 100);
 	servicesLayout->addWidget(aliveSessionsExpander);
 
 	createLDSServiceInfo(dummySession, _info.getFailedServices(), LDSServiceInfoMode::FailedServices, servicesLayout);
@@ -705,11 +710,10 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 	servicesLayout->addStretch(1);
 	
 	ot::ExpanderWidget* mainExpander = new ot::ExpanderWidget("LDS { \"ID\": " + QString::number(_info.getId()) + ", \"URL\": \"" + QString::fromStdString(_info.getURL()) + "\" }");
-	mainExpander->setMinExpandedHeight(500);
+	//mainExpander->setMinExpandedHeight(500);
 	mainExpander->setWidget(mainSplitter);
 	
-	m_sectionsSplitter->addWidget(mainExpander);
-	m_sectionsSplitter->setStretchFactor(m_sectionsSplitter->count() - 1, 0);
+	m_sectionsLayout->addWidget(mainExpander);
 	m_sections.push_back(mainExpander);
 	
 }
@@ -729,8 +733,7 @@ void BackendInfo::loadWorkerFinished() {
 
 	if (!m_stretchWidget) {
 		m_stretchWidget = new QWidget;
-		m_sectionsSplitter->addWidget(m_stretchWidget);
-		m_sectionsSplitter->setStretchFactor(m_sectionsSplitter->count() - 1, 1);
+		m_sectionsLayout->addWidget(m_stretchWidget, 1);
 	}
 
 	BACKINFO_LOG("Getting Backend data worker finished");
@@ -1071,7 +1074,7 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 	minHeight += 50;
 
 	ot::ExpanderWidget* expander = new ot::ExpanderWidget(expanderTitle);
-	expander->setMinExpandedHeight(minHeight);
+	//expander->setMinExpandedHeight(minHeight);
 	expander->setWidget(table);
 	_layout->addWidget(expander);
 

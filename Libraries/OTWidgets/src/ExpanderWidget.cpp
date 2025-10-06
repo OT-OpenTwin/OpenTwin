@@ -10,14 +10,16 @@
 
 // Qt header
 #include <QtCore/qpropertyanimation.h>
+#include <QtCore/qparallelanimationgroup.h>
 #include <QtGui/qevent.h>
 #include <QtWidgets/qframe.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qscrollarea.h>
 
-ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent) :
-	QWidget(_parent), m_animationDuration(300), m_toggleAnimation(nullptr), m_expanded(false),
-    m_currentWidget(nullptr), m_lastHeightHint(0), m_minExpandedHeight(0)
+ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent) 
+    : QWidget(_parent), m_animationDuration(300), m_toggleAnimation(nullptr), m_expanded(false),
+	m_currentWidget(nullptr), m_expandedHeight(0), m_dragStartHeight(0), m_resizing(false),
+	c_titleHeight(25), c_handleHeight(5), m_minimumExpandedHeight(20)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -29,40 +31,64 @@ ot::ExpanderWidget::ExpanderWidget(const QString& _title, QWidget* _parent) :
     m_toggleButton->setArrowType(Qt::ArrowType::RightArrow);
     m_toggleButton->setText(_title);
     m_toggleButton->setCheckable(false);
+    m_toggleButton->setFixedHeight(25);
 
 	// Header line
     m_headerLine = new QFrame;
 	m_headerLine->setObjectName("OT_ExpanderWidgetHeaderLine");
 
-	// Title layout
-    QHBoxLayout* titleLayout = new QHBoxLayout;
+	// Title
+	QWidget* titleWidget = new QWidget;
+	titleWidget->setObjectName("OT_ExpanderWidgetTitle");
+    titleWidget->setFixedHeight(c_titleHeight);
+    titleWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	titleWidget->setContentsMargins(0, 0, 0, 0);
+	mainLayout->addWidget(titleWidget);
+
+    QHBoxLayout* titleLayout = new QHBoxLayout(titleWidget);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->addWidget(m_toggleButton, 0, Qt::AlignLeft);
     titleLayout->addWidget(m_headerLine, 1);
-    
-    mainLayout->addLayout(titleLayout);
 
 	// Child area
 	m_childAreaWidget = new QWidget;
     m_childAreaWidget->setObjectName("OT_ExpanderWidgetChildArea");
 	m_childAreaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_childAreaWidget->setContentsMargins(0, 0, 0, 0);
+    mainLayout->addWidget(m_childAreaWidget);
 
 	m_childArea = new QVBoxLayout(m_childAreaWidget);
 	m_childArea->setContentsMargins(0, 0, 0, 0);
+
+	// Resize handle
+    m_handle = new QFrame;
+    m_handle->setObjectName("OT_ExpanderWidgetResizeHandle");
+	m_handle->setFixedHeight(c_handleHeight);
+	m_handle->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_handle->setCursor(Qt::SizeVerCursor);
+    m_handle->setVisible(false);
+	mainLayout->addWidget(m_handle);
 
     // Start out collapsed
 	m_expanded = false;
     m_childAreaWidget->setMaximumHeight(0);
     m_childAreaWidget->setMinimumHeight(0);
 
-    mainLayout->addWidget(m_childAreaWidget);
     mainLayout->addStretch(1);
 
 	// Animation
-	m_toggleAnimation = new QPropertyAnimation(m_childAreaWidget, "maximumHeight");
-    
+	m_toggleAnimation = new QParallelAnimationGroup(this);
+	m_toggleAnimation->addAnimation(new QPropertyAnimation(m_childAreaWidget, "minimumHeight"));
+	m_toggleAnimation->addAnimation(new QPropertyAnimation(m_childAreaWidget, "maximumHeight"));
+
+    for (int i = 0; i < m_toggleAnimation->animationCount(); i++) {
+        QPropertyAnimation* animation = static_cast<QPropertyAnimation*>(m_toggleAnimation->animationAt(i));
+        animation->setDuration(m_animationDuration);
+        animation->setEasingCurve(QEasingCurve::InOutQuad);
+	}
+
 	// Finalize
+	this->setContentsMargins(0, 0, 0, 0);
 	this->setObjectName("OT_ExpanderWidget");
 	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -94,7 +120,11 @@ void ot::ExpanderWidget::setWidget(QWidget* _widget) {
 
     m_childArea->addWidget(m_currentWidget);
     m_currentWidget->setParent(m_childAreaWidget);
-	this->updateAnimationLimits();
+
+	m_minimumExpandedHeight = std::max(20, m_currentWidget->minimumHeight());
+    m_expandedHeight = std::max(m_currentWidget->sizeHint().height(), m_minimumExpandedHeight);
+
+	this->updateChild();
 }
 
 void ot::ExpanderWidget::setTitle(const QString& _title) {
@@ -105,35 +135,9 @@ QString ot::ExpanderWidget::getTitle() const {
     return m_toggleButton->text();
 }
 
-void ot::ExpanderWidget::setMinExpandedHeight(int _height) {
-    m_minExpandedHeight = _height;
-	this->updateAnimationLimits();
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots
-
-void ot::ExpanderWidget::updateAnimationLimits() {
-    if (!m_currentWidget) {
-        return;
-    }
-
-    int heightHint = std::max(m_currentWidget->sizeHint().height(), m_minExpandedHeight);
-    if (m_lastHeightHint == heightHint) {
-        return;
-    }
-    m_lastHeightHint = heightHint;
-
-    m_toggleAnimation->setDuration(m_animationDuration);
-    m_toggleAnimation->setStartValue(0);
-    m_toggleAnimation->setEndValue(m_lastHeightHint);
-
-    if (m_expanded) {
-        m_childAreaWidget->setMaximumHeight(m_lastHeightHint);
-        m_childAreaWidget->resize(m_childAreaWidget->width(), m_lastHeightHint);
-    }
-}
 
 void ot::ExpanderWidget::expand() {
     if (!m_currentWidget || m_expanded) {
@@ -178,7 +182,92 @@ void ot::ExpanderWidget::toggle() {
 }
 
 void ot::ExpanderWidget::animationFinished() {
+	m_handle->setVisible(m_expanded);
+}
+
+void ot::ExpanderWidget::resizeEvent(QResizeEvent* _event) {
+    QWidget::resizeEvent(_event);
+
+    if (m_expanded && m_currentWidget) {
+        // Update expanded height when widget is resized
+        //m_expandedHeight = this->height() - (c_handleHeight + c_titleHeight);
+        //updateChild();
+    }
+}
+
+void ot::ExpanderWidget::mousePressEvent(QMouseEvent* _event) {
+    if (isInResizeHandleArea(_event->pos())) {
+        if (m_expanded) {
+            m_resizing = true;
+            m_dragStartPosition = _event->globalPosition().toPoint();
+            m_dragStartHeight = m_childAreaWidget->height();
+            setCursor(Qt::SizeVerCursor);
+        }
+        _event->accept();
+        return;
+    }
+
+    QWidget::mousePressEvent(_event);
+}
+
+void ot::ExpanderWidget::mouseMoveEvent(QMouseEvent* _event) {
+    if (m_resizing) {
+        QPoint delta = _event->globalPosition().toPoint() - m_dragStartPosition;
+
+        int newHeight = std::max(m_minimumExpandedHeight, m_dragStartHeight + delta.y());
+		newHeight = std::min(newHeight, this->maximumHeight() - (c_handleHeight + c_titleHeight));
+
+        if (m_expandedHeight != newHeight) {
+            m_expandedHeight = newHeight;
+            updateChild();
+		}
+
+        _event->accept();
+        return;
+    }
+
+    QWidget::mouseMoveEvent(_event);
+}
+
+void ot::ExpanderWidget::mouseReleaseEvent(QMouseEvent* _event) {
+    if (m_resizing) {
+        m_resizing = false;
+        unsetCursor();
+        _event->accept();
+        return;
+    }
+
+    QWidget::mouseReleaseEvent(_event);
+}
+
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+bool ot::ExpanderWidget::isInResizeHandleArea(const QPoint& _pos) const {
+	return m_handle->geometry().contains(_pos);
+}
+
+void ot::ExpanderWidget::updateChild() {
+    if (!m_currentWidget) {
+        return;
+    }
+
+    for (int i = 0; i < m_toggleAnimation->animationCount(); i++) {
+        QPropertyAnimation* animation = static_cast<QPropertyAnimation*>(m_toggleAnimation->animationAt(i));
+        animation->setStartValue(0);
+        animation->setEndValue(m_expandedHeight);
+    }
+
     if (m_expanded) {
-        m_childAreaWidget->setMaximumHeight(QWIDGETSIZE_MAX);
+        m_childAreaWidget->setMinimumHeight(m_expandedHeight);
+        m_childAreaWidget->setMaximumHeight(m_expandedHeight);
+        m_childAreaWidget->resize(m_childAreaWidget->width(), m_expandedHeight);
+    }
+    else {
+        m_childAreaWidget->setMinimumHeight(0);
+        m_childAreaWidget->setMaximumHeight(0);
+        m_childAreaWidget->resize(m_childAreaWidget->width(), 0);
     }
 }

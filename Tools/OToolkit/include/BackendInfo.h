@@ -107,8 +107,7 @@ private:
 	std::list<ot::LDSDebugInfo> m_ldsInfos;
 
 	std::list<ot::ExpanderWidget*> m_sections;
-	QSplitter* m_sectionsSplitter;
-	//QVBoxLayout* m_sectionsLayout;
+	QVBoxLayout* m_sectionsLayout;
 
 	ot::LineEdit* m_gssUrl;
 
