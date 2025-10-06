@@ -38,4 +38,10 @@ void EntityGraphicsScene::addVisualizationNodes()
 	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
+
+	for (auto child : getChildrenList())
+	{
+		child->addVisualizationNodes();
+	}
+
 }
