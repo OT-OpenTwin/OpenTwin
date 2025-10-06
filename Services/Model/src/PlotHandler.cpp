@@ -17,13 +17,11 @@ void PlotHandler::addButtons(ot::components::UiComponent* _uiComponent, const st
 	const std::string groupName = "Plots";
 	_uiComponent->addMenuGroup(_pageName, groupName);
 	
-	m_btnCreatePlot.SetDescription(_pageName, groupName, "CreatePlot", "Create Plot");
-	_uiComponent->addMenuButton(m_btnCreatePlot, ot::LockModelWrite, "Plot1DVisible");
-	
-	m_btnAddCurveToPlot.SetDescription(_pageName, groupName, "AddCurveToPlot", "Add Curve to Plot");
-	_uiComponent->addMenuButton(m_btnAddCurveToPlot, ot::LockModelWrite, "Plot1DVisible");
+	m_btnCreatePlot = ot::ToolBarButtonCfg(_pageName, groupName, "Create Plot", "Default/Plot1DVisible");
+	_uiComponent->addMenuButton(m_btnCreatePlot.setButtonLockFlags(ot::LockModelWrite));
 
-	//m_connectionManager.bindHandler(this, &PlotHandler::createPlotAction, m_btnCreatePlot.GetFullDescription(), ot::SECURE_MESSAGE_TYPES); //crashes because of action handler
+	m_btnAddCurveToPlot = ot::ToolBarButtonCfg(_pageName, groupName, "Add Curve to Plot", "Default/Plot1DVisible");
+	_uiComponent->addMenuButton(m_btnAddCurveToPlot.setButtonLockFlags(ot::LockModelWrite));
 }
 
 std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
@@ -121,12 +119,12 @@ bool PlotHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 {
 	bool actionIsHandled = false;
 
-	if (_action == m_btnCreatePlot.GetFullDescription())
+	if (_action == m_btnCreatePlot.getFullPath())
 	{
 		createPlotAction(_doc);
 		actionIsHandled = true;
 	}
-	else if (_action == m_btnAddCurveToPlot.GetFullDescription())
+	else if (_action == m_btnAddCurveToPlot.getFullPath())
 	{
 		addCurvesToPlot(_doc);
 		actionIsHandled = true;
@@ -268,20 +266,20 @@ void PlotHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities, st
 
 	if (seriesSelected)
 	{
-		_enabledButtons.push_back(m_btnCreatePlot.GetFullDescription());
+		_enabledButtons.push_back(m_btnCreatePlot.getFullPath());
 	}
 	else
 	{
-		_disabledButtons.push_back(m_btnCreatePlot.GetFullDescription());
+		_disabledButtons.push_back(m_btnCreatePlot.getFullPath());
 	}
 
 	if (seriesSelected && plotSelected)
 	{
-		_enabledButtons.push_back(m_btnAddCurveToPlot.GetFullDescription());
+		_enabledButtons.push_back(m_btnAddCurveToPlot.getFullPath());
 	}
 	else
 	{
-		_disabledButtons.push_back(m_btnAddCurveToPlot.GetFullDescription());
+		_disabledButtons.push_back(m_btnAddCurveToPlot.getFullPath());
 	}
 }
 

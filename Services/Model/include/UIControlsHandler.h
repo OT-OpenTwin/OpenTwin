@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
 
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
 #include <atomic>
 
 class UIControlsHandler
@@ -22,13 +22,13 @@ private:
 	const std::string m_groupEdit = "Edit";
 	const std::string m_groupImport = "File Imports";
 	
-	ot::MenuButtonDescription m_buttonGeometryInfo;
+	ot::ToolBarButtonCfg m_buttonGeometryInfo;
 
-	ot::MenuButtonDescription m_buttonCreateParameter;
+	ot::ToolBarButtonCfg m_buttonCreateParameter;
 	
-	ot::MenuButtonDescription m_buttonRedo;
-	ot::MenuButtonDescription m_buttonUndo;
-	ot::MenuButtonDescription m_buttonDelete;
+	ot::ToolBarButtonCfg m_buttonRedo;
+	ot::ToolBarButtonCfg m_buttonUndo;
+	ot::ToolBarButtonCfg m_buttonDelete;
 	
 	void createPages();
 	void createGroups();

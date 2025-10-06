@@ -10,7 +10,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
 // C++ header
 #include <string>
 
@@ -67,9 +67,10 @@ private:
 	Application();
 	virtual ~Application();
 
-	ot::MenuButtonDescription m_buttonRunPipeline;
-	ot::MenuButtonDescription m_buttonCreateSolver;
-	ot::MenuButtonDescription m_buttonGraphicsScene;
+	ot::ToolBarButtonCfg m_buttonRunPipeline;
+	ot::ToolBarButtonCfg m_buttonCreatePipeline;
+	ot::ToolBarButtonCfg m_buttonGraphicsScene;
+	
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;

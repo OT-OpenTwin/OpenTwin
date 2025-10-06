@@ -1,13 +1,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTServiceFoundation/MenuButtonDescription.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "ActionAndFunctionHandler.h"
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTGui/TableCfg.h"
+#include "OTGui/ToolBarButtonCfg.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
 class FileHandler : public ActionAndFunctionHandler, public BusinessLogicHandler
@@ -27,8 +27,8 @@ protected:
 	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
 
 private:
-	ot::MenuButtonDescription m_buttonFileImport;
-	ot::MenuButtonDescription m_buttonPythonImport;
+	ot::ToolBarButtonCfg m_buttonFileImport;
+	ot::ToolBarButtonCfg m_buttonPythonImport;
 
 	ot::UIDList m_entityIDsTopo;
 	ot::UIDList m_entityVersionsTopo;

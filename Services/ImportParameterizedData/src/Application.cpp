@@ -117,37 +117,41 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	m_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
-	m_buttonAutomaticCreationMSMD.SetDescription(pageName, groupNameImport, "Auto Create Series Metadata");
-	m_buttonAddBatchCreator.SetDescription(pageName, groupNameImport, "Add Batch Importer");
-	m_buttonCreateDataCollection.SetDescription(pageName, groupNameImport, "Create Data Collection");
+	m_buttonImportTouchstone = ot::ToolBarButtonCfg(pageName, groupNameImport, "Import Touchstone", "Default/regional-indicator-symbol-letter-s");
+	_ui->addMenuButton(m_buttonImportTouchstone.setButtonLockFlags(modelWrite));
 
-	m_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
-	m_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
-	m_buttonCreateParameterEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Parameter");
-	m_buttonCreateQuantityEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Quantity");
-	
-	m_buttonLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Lock Data Characterisation");
-	m_buttonUnLockCharacterisation.SetDescription(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation");
+	m_buttonAutomaticCreationMSMD = ot::ToolBarButtonCfg(pageName, groupNameImport, "Auto Create Series Metadata", "Default/RunSolver");
+	_ui->addMenuButton(m_buttonAutomaticCreationMSMD.setButtonLockFlags(modelWrite));
 
-	_ui->addMenuButton(m_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
-	_ui->addMenuButton(m_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
-	_ui->addMenuButton(m_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
-	_ui->addMenuButton(m_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
-	_ui->addMenuButton(m_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
-	_ui->addMenuButton(m_buttonAddBatchCreator, modelWrite, "BatchProcessing");
-	_ui->addMenuButton(m_buttonLockCharacterisation, modelWrite, "Lock");
-	_ui->addMenuButton(m_buttonUnLockCharacterisation, modelWrite, "Unlock");
+	m_buttonAddBatchCreator = ot::ToolBarButtonCfg(pageName, groupNameImport, "Add Batch Importer", "Default/BatchProcessing");
+	_ui->addMenuButton(m_buttonAddBatchCreator.setButtonLockFlags(modelWrite));
 
-	_ui->addMenuButton(m_buttonAutomaticCreationMSMD, modelWrite, "RunSolver");
-	_ui->addMenuButton(m_buttonCreateDataCollection, modelWrite, "database");
+	m_buttonCreateDataCollection = ot::ToolBarButtonCfg(pageName, groupNameImport, "Create Data Collection", "Default/database");
+	_ui->addMenuButton(m_buttonCreateDataCollection.setButtonLockFlags(modelWrite));
 
-	if (isUiConnected()) {
-		std::list<std::string> enabled;
-		std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .GetFullDescription(), m_buttonLockCharacterisation.GetFullDescription(), m_buttonUnLockCharacterisation.GetFullDescription()};
+	m_buttonCreateRMDEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Campaign Metadata", "Default/SelectionRMD");
+	_ui->addMenuButton(m_buttonCreateRMDEntry.setButtonLockFlags(modelWrite));
 
-		this->getUiComponent()->setControlsEnabledState(enabled, disabled);
-	}
+	m_buttonCreateMSMDEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Series Metadata", "Default/SelectionMSMD");
+	_ui->addMenuButton(m_buttonCreateMSMDEntry.setButtonLockFlags(modelWrite));
+
+	m_buttonCreateParameterEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Parameter", "Default/SelectionParameter");
+	_ui->addMenuButton(m_buttonCreateParameterEntry.setButtonLockFlags(modelWrite));
+
+	m_buttonCreateQuantityEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Quantity", "Default/SelectionQuantity");
+	_ui->addMenuButton(m_buttonCreateQuantityEntry.setButtonLockFlags(modelWrite));
+
+	m_buttonLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Lock Data Characterisation", "Default/Lock");
+	_ui->addMenuButton(m_buttonLockCharacterisation.setButtonLockFlags(modelWrite));
+
+	m_buttonUnLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation", "Default/Unlock");
+	_ui->addMenuButton(m_buttonUnLockCharacterisation.setButtonLockFlags(modelWrite));
+
+	std::list<std::string> enabled;
+	std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .getFullPath(), m_buttonLockCharacterisation.getFullPath(), m_buttonUnLockCharacterisation.getFullPath()};
+
+	_ui->setControlsEnabledState(enabled, disabled);
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
@@ -183,22 +187,22 @@ void Application::modelSelectionChanged(void)
 	std::list<std::string> enabled, disabled;
 	if (batchImporterSelected)
 	{
-		enabled.push_back(m_buttonAutomaticCreationMSMD.GetFullDescription());
+		enabled.push_back(m_buttonAutomaticCreationMSMD.getFullPath());
 	}
 	else
 	{
-		disabled.push_back(m_buttonAutomaticCreationMSMD.GetFullDescription());
+		disabled.push_back(m_buttonAutomaticCreationMSMD.getFullPath());
 	}
 
 	if (categorisationSelected)
 	{
-		enabled.push_back(m_buttonLockCharacterisation.GetFullDescription());
-		enabled.push_back(m_buttonUnLockCharacterisation.GetFullDescription());
+		enabled.push_back(m_buttonLockCharacterisation.getFullPath());
+		enabled.push_back(m_buttonUnLockCharacterisation.getFullPath());
 	}
 	else
 	{
-		disabled.push_back(m_buttonLockCharacterisation.GetFullDescription());
-		disabled.push_back(m_buttonUnLockCharacterisation.GetFullDescription());
+		disabled.push_back(m_buttonLockCharacterisation.getFullPath());
+		disabled.push_back(m_buttonUnLockCharacterisation.getFullPath());
 	}
 
 	getUiComponent()->setControlsEnabledState(enabled, disabled);
@@ -216,9 +220,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			assert(m_buttonCreateRMDEntry.GetGroupName() == m_buttonCreateMSMDEntry.GetGroupName() && m_buttonCreateParameterEntry.GetGroupName() == m_buttonCreateQuantityEntry.GetGroupName() && m_buttonCreateMSMDEntry.GetGroupName() == m_buttonCreateQuantityEntry.GetGroupName());
+			assert(m_buttonCreateRMDEntry.getGroup() == m_buttonCreateMSMDEntry.getGroup() && m_buttonCreateParameterEntry.getGroup() == m_buttonCreateQuantityEntry.getGroup() && m_buttonCreateMSMDEntry.getGroup() == m_buttonCreateQuantityEntry.getGroup());
 
-			if (action == m_buttonImportTouchstone.GetFullDescription())
+			if (action == m_buttonImportTouchstone.getFullPath())
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
@@ -231,29 +235,29 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string tmp;
 				getUiComponent()->sendMessage(true, doc, tmp);
 			}
-			else if (action.find(m_buttonCreateRMDEntry.GetGroupName()) != std::string::npos)
+			else if (action.find(m_buttonCreateRMDEntry.getGroup()) != std::string::npos)
 			{
 				EntityParameterizedDataCategorization::DataCategorie category = EntityParameterizedDataCategorization::DataCategorie::UNKNOWN;
 				
-				if (action == m_buttonLockCharacterisation.GetFullDescription() || action == m_buttonUnLockCharacterisation.GetFullDescription())
+				if (action == m_buttonLockCharacterisation.getFullPath() || action == m_buttonUnLockCharacterisation.getFullPath())
 				{
-					m_parametrizedDataHandler->handleChategorisationLock(this->getSelectedEntityInfos(), action == m_buttonLockCharacterisation.GetFullDescription());
+					m_parametrizedDataHandler->handleChategorisationLock(this->getSelectedEntityInfos(), action == m_buttonLockCharacterisation.getFullPath());
 				}
 				else
 				{
-					if (action == m_buttonCreateMSMDEntry.GetFullDescription())
+					if (action == m_buttonCreateMSMDEntry.getFullPath())
 					{
 						category = EntityParameterizedDataCategorization::measurementSeriesMetadata;
 					}
-					else if (action == m_buttonCreateRMDEntry.GetFullDescription())
+					else if (action == m_buttonCreateRMDEntry.getFullPath())
 					{
 						category = EntityParameterizedDataCategorization::researchMetadata;
 					}
-					else if (action == m_buttonCreateParameterEntry.GetFullDescription())
+					else if (action == m_buttonCreateParameterEntry.getFullPath())
 					{
 						category = EntityParameterizedDataCategorization::parameter;
 					}
-					else if (action == m_buttonCreateQuantityEntry.GetFullDescription())
+					else if (action == m_buttonCreateQuantityEntry.getFullPath())
 					{
 						category = EntityParameterizedDataCategorization::quantity;
 					}
@@ -272,12 +276,12 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					}
 				}
 			}
-			else if (action == m_buttonAutomaticCreationMSMD.GetFullDescription())
+			else if (action == m_buttonAutomaticCreationMSMD.getFullPath())
 			{				
 				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, std::ref(m_batchedCategorisationHandler), _selectedEntities);
 				worker.detach();
 			}
-			else if (action == m_buttonCreateDataCollection.GetFullDescription())
+			else if (action == m_buttonCreateDataCollection.getFullPath())
 			{
 				UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockModelWrite);
 				this->getUiComponent()->displayMessage("===========================================================================\n");
@@ -286,7 +290,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				this->getUiComponent()->displayMessage("Creation of dataset finished\n");
 				this->getUiComponent()->displayMessage("===========================================================================\n\n");
 			}
-			else if (action == m_buttonAddBatchCreator.GetFullDescription())
+			else if (action == m_buttonAddBatchCreator.getFullPath())
 			{
 				m_batchedCategorisationHandler.addCreator();
 			}

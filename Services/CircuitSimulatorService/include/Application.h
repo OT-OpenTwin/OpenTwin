@@ -16,7 +16,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
 
 // C++ header
 #include <string>
@@ -109,8 +109,8 @@ public:
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
 	QtWrapper* m_qtWrapper = nullptr;
-	ot::MenuButtonDescription m_buttonRunSimulation;
-	ot::MenuButtonDescription m_buttonAddCircuit;
-	ot::MenuButtonDescription m_buttonAddSolver;
+	ot::ToolBarButtonCfg m_buttonRunSimulation;
+	ot::ToolBarButtonCfg m_buttonAddCircuit;
+	ot::ToolBarButtonCfg m_buttonAddSolver;
 	
 };

@@ -40,13 +40,24 @@ void UIControlsHandler::createGroups()
 
 void UIControlsHandler::setupButtons()
 {
-	m_buttonGeometryInfo.SetDescription(m_pageModel, m_groupGeometry,"Info", "Info");
+	m_buttonGeometryInfo = ot::ToolBarButtonCfg(m_pageModel, m_groupGeometry, "Info", "Default/Information");
+	m_buttonGeometryInfo.setButtonLockFlags(ot::LockModelRead);
+	m_buttonGeometryInfo.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_I));
 	
-	m_buttonCreateParameter.SetDescription(m_pageModel,m_groupParameters, "Create Parameter", "Create Parameter");
+	m_buttonCreateParameter = ot::ToolBarButtonCfg(m_pageModel, m_groupParameters, "Create Parameter", "Default/CreateParameter");
+	m_buttonCreateParameter.setButtonLockFlags(ot::LockModelRead);
 	
-	m_buttonDelete.SetDescription(m_pageModel, m_groupEdit, "Delete", "Delete");
-	m_buttonRedo.SetDescription(m_pageModel, m_groupEdit, "Redo", "Redo");
-	m_buttonUndo.SetDescription(m_pageModel, m_groupEdit, "Undo", "Undo");
+	m_buttonDelete = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Delete", "Default/Delete");
+	m_buttonDelete.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonDelete.setButtonKeySequence(ot::KeySequence(ot::Key_Delete));
+
+	m_buttonRedo = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Redo", "Default/Redo");
+	m_buttonRedo.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonRedo.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Y));
+
+	m_buttonUndo = ot::ToolBarButtonCfg(m_pageModel, m_groupEdit, "Undo", "Default/Undo");
+	m_buttonUndo.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonUndo.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Z));
 }
 
 void UIControlsHandler::createButtons()
@@ -54,14 +65,11 @@ void UIControlsHandler::createButtons()
 	ot::components::UiComponent* uiComponent = Application::instance()->getUiComponent();
 	assert(uiComponent != nullptr);
 	
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
-	ot::LockTypeFlags modelRead (ot::LockModelRead);
+	uiComponent->addMenuButton(m_buttonGeometryInfo);
 
-	uiComponent->addMenuButton(m_buttonGeometryInfo,modelRead,"Information","Default", ot::KeySequence(ot::Key_Control, ot::Key_I));
+	uiComponent->addMenuButton(m_buttonCreateParameter);
 
-	uiComponent->addMenuButton(m_buttonCreateParameter,modelRead, "CreateParameter");
-
-	uiComponent->addMenuButton(m_buttonUndo,modelWrite,"Undo","Default", ot::KeySequence(ot::Key_Control, ot::Key_Z));
-	uiComponent->addMenuButton(m_buttonRedo,modelWrite,"Redo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Y));
-	uiComponent->addMenuButton(m_buttonDelete,modelWrite,"Delete", "Default", ot::KeySequence(ot::Key_Delete));
+	uiComponent->addMenuButton(m_buttonUndo);
+	uiComponent->addMenuButton(m_buttonRedo);
+	uiComponent->addMenuButton(m_buttonDelete);
 }

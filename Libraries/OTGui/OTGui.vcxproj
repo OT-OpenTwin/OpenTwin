@@ -135,6 +135,7 @@
     <ClInclude Include="include\OTGui\TableIndexSchemata.h" />
     <ClInclude Include="include\OTGui\TableRange.h" />
     <ClInclude Include="include\OTGui\TextEditorCfg.h" />
+    <ClInclude Include="include\OTGui\ToolBarButtonCfg.h" />
     <ClInclude Include="include\OTGui\ToolButtonCfg.h" />
     <ClInclude Include="include\OTGui\Transform.h" />
     <ClInclude Include="include\OTGui\VersionGraphCfg.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="src\TableIndexSchemata.cpp" />
     <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TextEditorCfg.cpp" />
+    <ClCompile Include="src\ToolBarButtonCfg.cpp" />
     <ClCompile Include="src\ToolButtonCfg.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\VersionGraphCfg.cpp" />

@@ -458,6 +458,9 @@
     <ClInclude Include="include\OTGui\VisualisationCfg.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\ToolBarButtonCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -813,6 +816,9 @@
     </ClCompile>
     <ClCompile Include="src\VisualisationCfg.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ToolBarButtonCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
 
 // C++ header
 #include <list>
@@ -80,19 +80,19 @@ private:
 	std::mutex m_onlyOneActionPerTime;
 	UILockWrapper* m_twoPartsAction = nullptr;
 
-	ot::MenuButtonDescription m_buttonImportTouchstone;
+	ot::ToolBarButtonCfg m_buttonImportTouchstone;
 	
-	ot::MenuButtonDescription m_buttonCreateMSMDEntry;
-	ot::MenuButtonDescription m_buttonCreateRMDEntry;
-	ot::MenuButtonDescription m_buttonCreateParameterEntry;
-	ot::MenuButtonDescription m_buttonCreateQuantityEntry;
-	ot::MenuButtonDescription m_buttonLockCharacterisation;
-	ot::MenuButtonDescription m_buttonUnLockCharacterisation;
+	ot::ToolBarButtonCfg m_buttonCreateMSMDEntry;
+	ot::ToolBarButtonCfg m_buttonCreateRMDEntry;
+	ot::ToolBarButtonCfg m_buttonCreateParameterEntry;
+	ot::ToolBarButtonCfg m_buttonCreateQuantityEntry;
+	ot::ToolBarButtonCfg m_buttonLockCharacterisation;
+	ot::ToolBarButtonCfg m_buttonUnLockCharacterisation;
 
-	ot::MenuButtonDescription m_buttonAutomaticCreationMSMD;
-	ot::MenuButtonDescription m_buttonAddBatchCreator;
+	ot::ToolBarButtonCfg m_buttonAutomaticCreationMSMD;
+	ot::ToolBarButtonCfg m_buttonAddBatchCreator;
 
-	ot::MenuButtonDescription m_buttonCreateDataCollection;
+	ot::ToolBarButtonCfg m_buttonCreateDataCollection;
 
 	const std::string _dataSourcesFolder = "Files";
 	const std::string _scriptsFolder = ot::FolderNames::PythonScriptFolder;

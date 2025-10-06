@@ -122,11 +122,6 @@ void ot::components::UiComponent::addMenuButton(
 	}
 }
 
-void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const LockTypeFlags& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence)
-{
-	this->addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetSubgroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence);
-}
-
 void ot::components::UiComponent::addMenuButton(
 	const std::string &			_pageName,
 	const std::string &			_groupName,
@@ -138,7 +133,7 @@ void ot::components::UiComponent::addMenuButton(
 	const std::string &			_iconFolder,
 	const std::string &			_keySequence
 ) {
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _buttonName))
+	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _subgroupName, _buttonName))
 	{
 		JsonDocument cmdDoc;
 		cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddMenuButton, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -161,6 +156,43 @@ void ot::components::UiComponent::addMenuButton(
 
 		m_uiElements.push_back(_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _buttonName);
 		m_uiControlStateInUI[_pageName + ":" + _groupName + ":" + _subgroupName + ":" + _buttonName] = true;
+	}
+}
+
+void ot::components::UiComponent::addMenuButton(const ot::ToolBarButtonCfg& _buttonCfg) {
+	size_t ix = _buttonCfg.getButtonIconPath().rfind("/");
+	std::string iconFolder = "Default";
+	std::string iconName = _buttonCfg.getButtonIconPath();
+
+	if (ix != std::string::npos) {
+		iconFolder = _buttonCfg.getButtonIconPath().substr(0, ix);
+		iconName = _buttonCfg.getButtonIconPath().substr(ix + 1);
+	}
+
+	if (_buttonCfg.getSubGroup().empty()) {
+		this->addMenuButton(
+			_buttonCfg.getPage(),
+			_buttonCfg.getGroup(),
+			_buttonCfg.getButtonName(),
+			_buttonCfg.getButtonText(),
+			_buttonCfg.getButtonLockFlags(),
+			iconName,
+			iconFolder,
+			_buttonCfg.getButtonKeySequence()
+		);
+	}
+	else {
+		this->addMenuButton(
+			_buttonCfg.getPage(),
+			_buttonCfg.getGroup(),
+			_buttonCfg.getSubGroup(),
+			_buttonCfg.getButtonName(),
+			_buttonCfg.getButtonText(),
+			_buttonCfg.getButtonLockFlags(),
+			iconName,
+			iconFolder,
+			_buttonCfg.getButtonKeySequence()
+		);
 	}
 }
 

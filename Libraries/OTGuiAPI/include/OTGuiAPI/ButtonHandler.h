@@ -9,6 +9,9 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
 
+// OpenTwin Gui header
+#include "OTGui/ToolBarButtonCfg.h"
+
 // OpenTwin Communication header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
@@ -32,9 +35,6 @@ namespace ot {
 		ButtonHandler() = default;
 		virtual ~ButtonHandler() = default;
 		
-        std::unordered_map<std::string, std::function<void()>> m_callbacks;
-
-    public:
 		//! @brief Connect a button click handler.
 		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _buttonKey The key of the button to connect the handler to.
@@ -42,8 +42,18 @@ namespace ot {
 
 		//! @brief Connect a button click handler.
 		//! @param _callback The callback function to be called when the button is clicked.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		void connectButton(void(*_callback)(), const ToolBarButtonCfg& _button) { this->connectButton(_callback, _button.getFullPath()); };
+
+		//! @brief Connect a button click handler.
+		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _buttonKey The key of the button to connect the handler to.
         void connectButton(const std::function<void()>& _callback, const std::string& _buttonKey);
+
+		//! @brief Connect a button click handler.
+		//! @param _callback The callback function to be called when the button is clicked.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		void connectButton(const std::function<void()>& _callback, const ToolBarButtonCfg& _button) { this->connectButton(_callback, _button.getFullPath()); };
 
 		//! @brief Connect a button click handler.
 		//! @tparam T The class type of the object.
@@ -57,9 +67,25 @@ namespace ot {
 		//! @tparam T The class type of the object.
 		//! @param _object The object to connect the handler to.
 		//! @param _method The member function to be called when the button is clicked.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		template<typename T>
+		void connectButton(T* _object, void(T::* _method)(), const ToolBarButtonCfg& _button) { this->connectButton(_object, _method, _button.getFullPath()); };
+
+		//! @brief Connect a button click handler.
+		//! @tparam T The class type of the object.
+		//! @param _object The object to connect the handler to.
+		//! @param _method The member function to be called when the button is clicked.
 		//! @param _buttonKey The key of the button to connect the handler to.
         template<typename T>
         void connectButton(T* _object, void(T::* _method)() const, const std::string& _buttonKey);
+
+		//! @brief Connect a button click handler.
+		//! @tparam T The class type of the object.
+		//! @param _object The object to connect the handler to.
+		//! @param _method The member function to be called when the button is clicked.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		template<typename T>
+		void connectButton(T* _object, void(T::* _method)() const, const ToolBarButtonCfg& _button) { this->connectButton(_object, _method, _button.getFullPath()); };
 
 		//! @brief Disconnect a button click handler.
 		//! @param _buttonKey The key of the button to disconnect the handler from.
@@ -79,6 +105,8 @@ namespace ot {
 
 	private:
 		OT_HANDLER(handleButtonClicked, ButtonHandler, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+
+		std::unordered_map<std::string, std::function<void()>> m_callbacks;
 	};
 }
 

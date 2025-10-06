@@ -111,7 +111,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == m_buttonRunPipeline.GetFullDescription())
+			if (action == m_buttonRunPipeline.getFullPath())
 			{
 				EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
 				ot::UIDList selectedSolverIDs;
@@ -132,7 +132,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 					worker.detach();
 				}
 			}
-			else if (action == m_buttonCreateSolver.GetFullDescription())
+			else if (action == m_buttonCreateSolver.getFullPath())
 			{
 				auto modelComponent = Application::instance()->getModelComponent();
 				EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
@@ -157,7 +157,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
 
 			}
-			else if (action == m_buttonGraphicsScene.GetFullDescription())
+			else if (action == m_buttonGraphicsScene.getFullPath())
 			{
 				auto modelComponent = Application::instance()->getModelComponent();
 				EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
@@ -253,13 +253,15 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
-	m_buttonRunPipeline.SetDescription(pageName, groupName, "Run");
-	m_buttonCreateSolver.SetDescription(pageName, groupName, "Add Solver");
-	m_buttonGraphicsScene.SetDescription(pageName, groupName, "Create Pipeline");
+	
+	m_buttonCreatePipeline = ot::ToolBarButtonCfg(pageName, groupName, "Run", "Default/RunSolver");
+	_ui->addMenuButton(m_buttonCreatePipeline.setButtonLockFlags(modelWrite));
 
-	_ui->addMenuButton(m_buttonRunPipeline, modelWrite, "RunSolver");
-	_ui->addMenuButton(m_buttonCreateSolver, modelWrite, "AddSolver");
-	_ui->addMenuButton(m_buttonGraphicsScene, modelWrite, "AddSolver");
+	m_buttonRunPipeline = ot::ToolBarButtonCfg(pageName, groupName, "Add Solver", "Default/AddSolver");
+	_ui->addMenuButton(m_buttonRunPipeline.setButtonLockFlags(modelWrite));
+
+	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/AddSolver");
+	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
 
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.orderUIToCreateBlockPicker();

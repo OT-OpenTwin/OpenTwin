@@ -221,7 +221,6 @@
     <ClInclude Include="include\OTServiceFoundation\Foundation.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationAPIExport.h" />
     <ClInclude Include="include\OTServiceFoundation\IDManager.h" />
-    <ClInclude Include="include\OTServiceFoundation\MenuButtonDescription.h" />
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />

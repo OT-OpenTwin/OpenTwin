@@ -200,7 +200,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 
 	// In debug mode add the process ID to the confirmation request
 
-	unsigned long handleID = ot::OperatingSystem::getCurrentProcessID();
+	unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
 	if (handleID == 0) {
 		OT_LOG_EA("Failed to get current process id");
 	}

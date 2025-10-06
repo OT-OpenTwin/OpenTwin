@@ -11,7 +11,8 @@
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
+#include "OTGuiAPI/ButtonHandler.h"
 
 // C++ header
 #include <string>
@@ -31,7 +32,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	virtual ~Application();
 
@@ -40,11 +41,6 @@ public:
 	// ##################################################################################################################################
 
 	// Required functions
-
-	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
-	//! @param _action The action that should be processed
-	//! @param _doc The document containing all the information
-	virtual std::string processAction(const std::string & _action, ot::JsonDocument& _doc) override;
 
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
@@ -67,11 +63,11 @@ public:
 private:
 	ot::UID					visualizationModelID = 1;
 
-	ot::MenuButtonDescription _buttonCreateSolver;
-	ot::MenuButtonDescription _buttonRunSolver;
-	ot::MenuButtonDescription _buttonAddPort;
-	ot::MenuButtonDescription _buttonAddMonitor;
-	ot::MenuButtonDescription _buttonCreateSignal;
+	ot::ToolBarButtonCfg _buttonCreateSolver;
+	ot::ToolBarButtonCfg _buttonRunSolver;
+	ot::ToolBarButtonCfg _buttonAddPort;
+	ot::ToolBarButtonCfg _buttonAddMonitor;
+	ot::ToolBarButtonCfg _buttonCreateSignal;
 
 	Application();
 

@@ -62,39 +62,6 @@ Application& Application::instance(void)
 
 // Required functions
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
-{
-	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-	{
-		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-		if (action == _buttonCreateSolver.GetFullDescription())
-		{
-			addSolver();
-		}
-		else if (action == _buttonRunSolver.GetFullDescription())
-		{
-			runSolver();
-		}
-		else if (action == _buttonAddPort.GetFullDescription())
-		{
-			addPort();
-		}
-		else if (action == _buttonAddMonitor.GetFullDescription())
-		{
-			addMonitor();
-		}
-		else if (action == _buttonCreateSignal.GetFullDescription())
-		{
-			addSignalType();
-		}
-		else assert(0); // Unhandled button action
-	}
-	else {
-		return OT_ACTION_RETURN_UnknownAction;
-	}
-	return "";
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -114,17 +81,35 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	_buttonCreateSolver.SetDescription(pageName, groupNameSolver, "Create Solver");
-	_buttonRunSolver.SetDescription(pageName, groupNameSolver, "Run Solver");
-	_buttonAddPort.SetDescription(pageName, groupNamePort, "Add Port");
-	_buttonAddMonitor.SetDescription(pageName, groupNameMonitor, "Add Monitor");
-	_buttonCreateSignal.SetDescription(pageName, groupNameSignal, "Create Signal");
+	// Setup buttons
+	_buttonRunSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Run Solver", "Default/RunSolver");
+	_buttonRunSolver.setButtonLockFlags(modelWrite);
 
-	_ui->addMenuButton( _buttonRunSolver, modelWrite, "RunSolver");
-	_ui->addMenuButton(_buttonCreateSolver, modelWrite, "AddSolver");
-	_ui->addMenuButton( _buttonAddPort, modelWrite, "Port");
-	_ui->addMenuButton( _buttonAddMonitor, modelWrite, "Monitor");
-	_ui->addMenuButton(_buttonCreateSignal, modelWrite, "Signal");
+	_buttonCreateSolver = ot::ToolBarButtonCfg(pageName, groupNameSolver, "Create Solver", "Default/AddSolver");
+	_buttonCreateSolver.setButtonLockFlags(modelWrite);
+
+	_buttonAddPort = ot::ToolBarButtonCfg(pageName, groupNamePort, "Add Port", "Default/Port");
+	_buttonAddPort.setButtonLockFlags(modelWrite);
+
+	_buttonAddMonitor = ot::ToolBarButtonCfg(pageName, groupNameMonitor, "Add Monitor", "Default/Monitor");
+	_buttonAddMonitor.setButtonLockFlags(modelWrite);
+
+	_buttonCreateSignal = ot::ToolBarButtonCfg(pageName, groupNameSignal, "Create Signal", "Default/Signal");
+	_buttonCreateSignal.setButtonLockFlags(modelWrite);
+
+	// Add buttons to UI
+	_ui->addMenuButton(_buttonRunSolver);
+	_ui->addMenuButton(_buttonCreateSolver);
+	_ui->addMenuButton(_buttonAddPort);
+	_ui->addMenuButton(_buttonAddMonitor);
+	_ui->addMenuButton(_buttonCreateSignal);
+
+	// Connect button handlers
+	connectButton(this, &Application::addSolver, _buttonCreateSolver);
+	connectButton(this, &Application::runSolver, _buttonRunSolver);
+	connectButton(this, &Application::addPort, _buttonAddPort);
+	connectButton(this, &Application::addMonitor, _buttonAddMonitor);
+	connectButton(this, &Application::addSignalType, _buttonCreateSignal);
 
 	modelSelectionChanged();
 
@@ -135,11 +120,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::modelSelectionChanged(void)
 {
-	getUiComponent()->setControlState(_buttonRunSolver.GetFullDescription(), (this->getSelectedEntities().size() > 0));
+	getUiComponent()->setControlState(_buttonRunSolver.getFullPath(), (this->getSelectedEntities().size() > 0));
 
-	getUiComponent()->setControlState(_buttonCreateSignal.GetFullDescription(), (this->getSelectedEntities().size() == 1));
-	getUiComponent()->setControlState(_buttonAddMonitor.GetFullDescription(), (this->getSelectedEntities().size() == 1));
-	getUiComponent()->setControlState(_buttonAddPort.GetFullDescription(), (this->getSelectedEntities().size() == 1));
+	getUiComponent()->setControlState(_buttonCreateSignal.getFullPath(), (this->getSelectedEntities().size() == 1));
+	getUiComponent()->setControlState(_buttonAddMonitor.getFullPath(), (this->getSelectedEntities().size() == 1));
+	getUiComponent()->setControlState(_buttonAddPort.getFullPath(), (this->getSelectedEntities().size() == 1));
 }
 	
 void Application::EnsureVisualizationModelIDKnown(void)

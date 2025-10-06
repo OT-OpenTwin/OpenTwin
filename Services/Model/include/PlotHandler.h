@@ -1,11 +1,11 @@
 #pragma once
-#include "OTServiceFoundation/MenuButtonDescription.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "ActionAndFunctionHandler.h"
 #include "SelectionChangedObserver.h"
 #include "EntityMetadataSeries.h"
 #include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
+#include "OTGui/ToolBarButtonCfg.h"
 #include "OTModelAPI/NewModelStateInformation.h"
 
 class PlotHandler :public ActionAndFunctionHandler, public SelectionChangedObserver
@@ -19,8 +19,8 @@ public:
 protected:
 	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
 private:
-	ot::MenuButtonDescription m_btnCreatePlot;
-	ot::MenuButtonDescription m_btnAddCurveToPlot;
+	ot::ToolBarButtonCfg m_btnCreatePlot;
+	ot::ToolBarButtonCfg m_btnAddCurveToPlot;
 	
 	void updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons) override;
 	std::list<EntityMetadataSeries*> getSelectedSeriesMetadata();

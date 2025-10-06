@@ -317,6 +317,19 @@ bool TemplateDefaultManager::isUIMenuGroupVisible(const std::string &page, const
 	return true; 
 }
 
+bool TemplateDefaultManager::isUIMenuSubGroupVisible(const std::string& page, const std::string& group, const std::string& _subgroup) {
+	// Check whether menu page is visible at all
+	if (!isUIMenuPageVisible(page)) return false;
+
+	// Now check whether the specified group is visible
+	DefaultValue result = getDefaultValue("UI Configuration", page + ":" + group + ":" + _subgroup);
+
+	if (result.type == DefaultValue::BOOL) return result.b;
+
+	// If no setting is defined, the group shall be visible
+	return true;
+}
+
 bool TemplateDefaultManager::isUIMenuActionVisible(const std::string &page, const std::string &group, const std::string &action)
 {
 	// Check whether menu page is visible at all
@@ -326,12 +339,28 @@ bool TemplateDefaultManager::isUIMenuActionVisible(const std::string &page, cons
 	if (!isUIMenuGroupVisible(page, group)) return false;
 
 	// Now check whether the specified action is visible
-	DefaultValue result = getDefaultValue("UI Configuration", page + ":" + group + ":" + action);
+	DefaultValue result = getDefaultValue("UI Configuration", page + ":" + group + "::" + action);
 
 	if (result.type == DefaultValue::BOOL) return result.b;
 
 	// If no setting is defined, the action shall be visible
 	return true; 
+}
+
+bool TemplateDefaultManager::isUIMenuActionVisible(const std::string& _page, const std::string& _group, const std::string& _subgroup, const std::string& _action) {
+	// Check whether menu page is visible at all
+	if (!isUIMenuPageVisible(_page)) return false;
+
+	// Check whether menu group is visible at all
+	if (!isUIMenuGroupVisible(_page, _group)) return false;
+
+	// Now check whether the specified action is visible
+	DefaultValue result = getDefaultValue("UI Configuration", _page + ":" + _group + ":" + _subgroup + ":" + _action);
+
+	if (result.type == DefaultValue::BOOL) return result.b;
+
+	// If no setting is defined, the action shall be visible
+	return true;
 }
 
 std::string TemplateDefaultManager::loadDefaultMaterials(void)

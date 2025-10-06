@@ -8,20 +8,28 @@
 
 #pragma once
 
-// OpenTwin header
+// OpenTwin System header
 #include "OTSystem/Flags.h"
+
+// OpenTwin Core header
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"			// Base class
+
+// OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/ToolBarButtonCfg.h"
 #include "OTGui/StyledTextBuilder.h"
-#include "OTCommunication/Msg.h"
-#include "OTServiceFoundation/FoundationAPIExport.h"
-#include "OTServiceFoundation/MenuButtonDescription.h"
 
-// C++ header
-#include <list>
+// OpenTwin Communication header
+#include "OTCommunication/Msg.h"
+
+// OpenTwin ServiceFoundation header
+#include "OTServiceFoundation/FoundationAPIExport.h"
+
+// std header
 #include <map>
+#include <list>
 #include <string>
 
 namespace ot {
@@ -101,14 +109,6 @@ namespace ot {
 				const std::string &			_keySequence = std::string("")
 			);
 
-			void addMenuButton(
-				ot::MenuButtonDescription&	_menuButtonDescription,
-				const LockTypeFlags&		_lockTypes,
-				const std::string &			_iconName,
-				const std::string &			_iconFolder = std::string("Default"),
-				const std::string &			_keySequence = std::string("")
-			);
-
 			//! @brief Will add a new ToolButton in the specified menu sub group at the UI
 			//! @param _pageName The name of the page the group is located at
 			//! @param _groupName The name of the group the subgroup is located at
@@ -130,6 +130,8 @@ namespace ot {
 				const std::string &			_iconFolder = std::string("Default"),
 				const std::string &			_keySequence = std::string("")
 			);
+
+			void addMenuButton(const ot::ToolBarButtonCfg& _buttonCfg);
 
 			//! @brief Will add a new CheckBox in the specified menu group at the UI
 			//! @param _pageName The name of the page the group is located at

@@ -50,7 +50,9 @@ public:
 
 	bool isUIMenuPageVisible(const std::string &page);
 	bool isUIMenuGroupVisible(const std::string &page, const std::string &group);
+	bool isUIMenuSubGroupVisible(const std::string &page, const std::string &group, const std::string& _subgroup);
 	bool isUIMenuActionVisible(const std::string &page, const std::string &group, const std::string &action);
+	bool isUIMenuActionVisible(const std::string &page, const std::string &group, const std::string& _subgroup, const std::string &action);
 
 	const std::map < std::string, std::map<std::string, DefaultValue>> &getDefaultMaterials(void) { return defaultMaterialsMap; }
 

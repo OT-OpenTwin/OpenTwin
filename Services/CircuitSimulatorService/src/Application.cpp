@@ -83,15 +83,15 @@ Application::~Application() {
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
-	if (action == m_buttonAddSolver.GetFullDescription()) {
+	if (action == m_buttonAddSolver.getFullPath()) {
 		addSolver();
 	}
-	else if (action == m_buttonRunSimulation.GetFullDescription()) {
+	else if (action == m_buttonRunSimulation.getFullPath()) {
 
 		runCircuitSimulation();	
 		
 	}
-	else if (action == m_buttonAddCircuit.GetFullDescription()) {
+	else if (action == m_buttonAddCircuit.getFullPath()) {
 		createNewCircuit();
 	}
 	else {
@@ -570,18 +570,26 @@ void Application::initialize() {
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
-	_ui->addMenuPage("Circuit Simulator");
-	_ui->addMenuGroup("Circuit Simulator", "Edit");
-	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 
-	m_buttonAddSolver.SetDescription("Circuit Simulator", "Edit", "Add Solver");
-	_ui->addMenuButton(m_buttonAddSolver, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
+	const std::string page = "Circuit Simulator";
 
-	m_buttonRunSimulation.SetDescription("Circuit Simulator", "Simulate", "Run Simulation");
-	_ui->addMenuButton(m_buttonRunSimulation, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "RunSolver", "Default");
+	const std::string groupEdit = "Edit";
+	const std::string groupSimulate = "Simulate";
 
-	m_buttonAddCircuit.SetDescription("Circuit Simulator", "Edit", "Add Circuit");
-	_ui->addMenuButton(m_buttonAddCircuit, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
+	_ui->addMenuPage(page);
+	_ui->addMenuGroup(page, groupEdit);
+	_ui->addMenuGroup(page, groupSimulate);
+
+	auto flags = ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite;
+
+	m_buttonAddSolver = ot::ToolBarButtonCfg(page, groupEdit, "Add Solver", "Default/Add");
+	_ui->addMenuButton(m_buttonAddSolver.setButtonLockFlags(flags));
+
+	m_buttonAddCircuit = ot::ToolBarButtonCfg(page, groupEdit, "Add Circuit", "Default/Add");
+	_ui->addMenuButton(m_buttonAddCircuit.setButtonLockFlags(flags));
+
+	m_buttonRunSimulation = ot::ToolBarButtonCfg(page, groupSimulate, "Run Simulation", "Default/RunSolver");
+	_ui->addMenuButton(m_buttonRunSimulation.setButtonLockFlags(flags));
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	

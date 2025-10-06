@@ -75,9 +75,6 @@
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\MenuButtonDescription.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h">
       <Filter>include</Filter>
     </ClInclude>

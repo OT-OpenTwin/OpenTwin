@@ -21,18 +21,19 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const st
 	const std::string groupName = "File Imports";
 
 	_uiComponent->addMenuGroup(_pageName,groupName);
-	m_buttonFileImport.SetDescription(_pageName, groupName, "Import Text File");
-	m_buttonPythonImport.SetDescription(_pageName, groupName, "Import Python Script");
 
-	_uiComponent->addMenuButton(m_buttonPythonImport, ot::LockModelWrite, "python");
-	_uiComponent->addMenuButton(m_buttonFileImport, ot::LockModelWrite, "TextVisible");
+	m_buttonPythonImport = ot::ToolBarButtonCfg(_pageName, groupName, "Import Python Script", "Default/python");
+	m_buttonFileImport = ot::ToolBarButtonCfg(_pageName, groupName, "Import Text File", "Default/TextVisible");
+
+	_uiComponent->addMenuButton(m_buttonPythonImport.setButtonLockFlags(ot::LockModelWrite));
+	_uiComponent->addMenuButton(m_buttonFileImport.setButtonLockFlags(ot::LockModelWrite));
 }
 
 bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc)
 {
 	bool actionIsHandled= false;
 	
-	if (_action == m_buttonFileImport.GetFullDescription())
+	if (_action == m_buttonFileImport.getFullPath())
 	{
 		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
 		const std::string fileDialogTitle = "Import Text File";
@@ -40,7 +41,7 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 		importFile(fileMask,fileDialogTitle,subsequentFunction);
 		actionIsHandled = true;
 	}
-	else if (_action == m_buttonPythonImport.GetFullDescription())
+	else if (_action == m_buttonPythonImport.getFullPath())
 	{
 		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
 		const std::string fileDialogTitle = "Import Python Script";

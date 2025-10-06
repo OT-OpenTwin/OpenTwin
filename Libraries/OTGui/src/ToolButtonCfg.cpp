@@ -26,18 +26,17 @@ ot::ToolButtonCfg::~ToolButtonCfg() {
 void ot::ToolButtonCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	WidgetBaseCfg::addToJsonObject(_object, _allocator);
 
-	JsonObject menuObj;
-	m_menu.addToJsonObject(menuObj, _allocator);
-
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("Icon", JsonString(m_iconPath, _allocator), _allocator);
-	_object.AddMember("Menu", menuObj, _allocator);
+	_object.AddMember("KeySequence", JsonString(m_keySequence, _allocator), _allocator);
+	_object.AddMember("Menu", JsonObject(m_menu, _allocator), _allocator);
 }
 
 void ot::ToolButtonCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	WidgetBaseCfg::setFromJsonObject(_object);
 
 	m_text = json::getString(_object, "Text");
-	m_text = json::getString(_object, "Icon");
+	m_iconPath = json::getString(_object, "Icon");
+	m_keySequence = json::getString(_object, "KeySequence");
 	m_menu.setFromJsonObject(json::getObject(_object, "Menu"));
 }

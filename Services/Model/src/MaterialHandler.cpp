@@ -11,14 +11,13 @@ void MaterialHandler::addButtons(ot::components::UiComponent* _uiComponent, cons
 {
 	_uiComponent->addMenuGroup(_pageName, m_groupMaterial);
 
-	m_buttonCreateMaterial.SetDescription(_pageName, m_groupMaterial, "Create Material", "Create Material");
-	m_buttonShowByMaterial.SetDescription(_pageName, m_groupMaterial, "Show By Material", "Show By Material");
-	m_buttonMaterialMissing.SetDescription(_pageName, m_groupMaterial, "Material Missing", "Material Missing");
+	m_buttonCreateMaterial = ot::ToolBarButtonCfg(_pageName, m_groupMaterial, "Create Material", "Default/AddMaterial");
+	m_buttonShowByMaterial = ot::ToolBarButtonCfg(_pageName, m_groupMaterial, "Show By Material", "Default/ShowByMaterial");
+	m_buttonMaterialMissing = ot::ToolBarButtonCfg(_pageName, m_groupMaterial, "Material Missing", "Default/ShowMaterialMissing");
 
-	_uiComponent->addMenuButton(m_buttonCreateMaterial, ot::LockModelWrite, "AddMaterial");
-	_uiComponent->addMenuButton(m_buttonShowByMaterial, ot::LockModelRead, "ShowByMaterial");
-	_uiComponent->addMenuButton(m_buttonMaterialMissing, ot::LockModelRead, "ShowMaterialMissing");
-	// m_connectionManager.bindHandler(this, &MaterialHandler::showByMaterial, m_buttonShowByMaterial.GetFullDescription(), ot::SECURE_MESSAGE_TYPES); crashes because of action dispatcher
+	_uiComponent->addMenuButton(m_buttonCreateMaterial.setButtonLockFlags(ot::LockModelWrite));
+	_uiComponent->addMenuButton(m_buttonShowByMaterial.setButtonLockFlags(ot::LockModelRead));
+	_uiComponent->addMenuButton(m_buttonMaterialMissing.setButtonLockFlags(ot::LockModelRead));
 }
 
 std::string MaterialHandler::showByMaterial(ot::JsonDocument& _document)
@@ -273,17 +272,17 @@ bool MaterialHandler::handleAction(const std::string& _action, ot::JsonDocument&
 {
 	bool actionIsHandled = false;
 
-	if (_action == m_buttonShowByMaterial.GetFullDescription())
+	if (_action == m_buttonShowByMaterial.getFullPath())
 	{
 		showByMaterial(_doc);
 		actionIsHandled = true;
 	}
-	else if (_action == m_buttonMaterialMissing.GetFullDescription())
+	else if (_action == m_buttonMaterialMissing.getFullPath())
 	{
 		showMaterialMissing(_doc);
 		actionIsHandled = true;
 	}
-	else if (_action == m_buttonCreateMaterial.GetFullDescription())
+	else if (_action == m_buttonCreateMaterial.getFullPath())
 	{
 		createNewMaterial(_doc);
 		actionIsHandled = true;
@@ -306,11 +305,11 @@ void MaterialHandler::updatedSelection(std::list<EntityBase*>& _selectedEntities
 
 	if (seriesSelected)
 	{
-		_enabledButtons.push_back(m_buttonShowByMaterial.GetFullDescription());
+		_enabledButtons.push_back(m_buttonShowByMaterial.getFullPath());
 	}
 	else
 	{
-		_disabledButtons.push_back(m_buttonShowByMaterial.GetFullDescription());
+		_disabledButtons.push_back(m_buttonShowByMaterial.getFullPath());
 	}
 }
 

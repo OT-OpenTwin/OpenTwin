@@ -1,6 +1,6 @@
 #pragma once
 #include "SelectionChangedObserver.h"
-#include "OTServiceFoundation/MenuButtonDescription.h"
+#include "OTGui/ToolBarButtonCfg.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "ActionAndFunctionHandler.h"
 #include "EntityMaterial.h"
@@ -19,9 +19,9 @@ protected:
 
 private:
 	const std::string m_groupMaterial = "Material";
-	ot::MenuButtonDescription m_buttonCreateMaterial;
-	ot::MenuButtonDescription m_buttonShowByMaterial;
-	ot::MenuButtonDescription m_buttonMaterialMissing;
+	ot::ToolBarButtonCfg m_buttonCreateMaterial;
+	ot::ToolBarButtonCfg m_buttonShowByMaterial;
+	ot::ToolBarButtonCfg m_buttonMaterialMissing;
 
 	// Inherited via SelectionChangedObserver
 	void updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons) override;
