@@ -75,6 +75,7 @@ void EntityBlockConnection::CreateConnections()
 	ot::VisualisationCfg visualisationCfg;
 	ot::JsonObject visualisationCfgJson;
 	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, reqDoc.GetAllocator());
 
 	ot::JsonObject pckgObj;
 	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());

@@ -28,7 +28,7 @@ public:
 	std::shared_ptr<EntityFileText> getCircuitModel(const std::string& _folderName, std::string _modelName);
 
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
-	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
+	void addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string _baseFolderName);
 	void AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos);
 	//Function for resultCurves of Simulation
 	void createResultCurves(std::string solverName,std::string simulationType,std::string circuitName);

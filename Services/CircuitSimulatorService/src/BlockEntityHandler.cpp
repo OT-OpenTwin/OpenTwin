@@ -73,7 +73,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	if (elementName != "") {
 	//Create block Titles
 	//First get a list of all folder items of the Circuit folder
-		std::list<std::string> circuitItems = ot::ModelServiceAPI::getListOfFolderItems("Circuits/" + editorName);
+		std::list<std::string> circuitItems = ot::ModelServiceAPI::getListOfFolderItems(editorName);
 		// Create a unique name for the new circuit item
 		int count = 1;
 		std::string circuitItemName;
@@ -179,7 +179,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 }
 
 std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID() {
-	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_blockFolder + "/" + _packageName, true);
+	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
@@ -199,7 +199,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 }
 
 std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections() {
-	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems("Circuits/" + _packageName + "/Connections");
+	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems(_packageName + "/Connections");
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
@@ -250,7 +250,7 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 
 
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name) {
+void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& _connections,std::string _baseFolderName) {
 	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 	//auto entityBlockConnectionsByBlockID = findAllEntityBlockConnections();
@@ -265,17 +265,19 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	std::string blockName = "EntityBlockConnection";
 	int count = 1;
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
-	for (auto& connection : connections) {
+	const std::string connectionFolderName = _baseFolderName + "/Connections";
+	for (auto& connection : _connections) {
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
-		std::list<std::string> connectionItems = ot::ModelServiceAPI::getListOfFolderItems("Circuits/" + name + "/Connections");
+		std::list<std::string> connectionItems = ot::ModelServiceAPI::getListOfFolderItems(connectionFolderName);
 
 		//Now I first create the needed parameters for entName
 		ot::UID entityID = _modelComponent->createEntityUID();
 		
 		std::string connectionName;
+		
 		do {
-			connectionName = "Circuits/" + name + "/Connections/" + "Connection" + std::to_string(count);
+			connectionName = connectionFolderName + "/Connection" + std::to_string(count);
 			count++;
 		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
 
@@ -285,7 +287,6 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity->createProperties();
 		
 		
-	
 		//Now i create the GraphicsConnectionCfg and set it with the information
 
 		ot::GraphicsConnectionCfg connectionCfg;
@@ -299,7 +300,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
 		connectionEntity->setName(connectionName);
-		connectionEntity->SetGraphicsScenePackageName(name);
+		connectionEntity->SetGraphicsScenePackageName(_baseFolderName);
 		connectionEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->StoreToDataBase();
@@ -416,7 +417,7 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 			connectedElements.pop();
 		}
 
-		AddBlockConnection(connectionsNew, editorName);	
+		addBlockConnection(connectionsNew, editorName);	
 	}
 }
 

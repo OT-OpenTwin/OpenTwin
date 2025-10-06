@@ -502,7 +502,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 	m_blockEntityHandler.setPackageName(pckg.name());
-	m_blockEntityHandler.AddBlockConnection(pckg.connections(),pckg.name());
+	m_blockEntityHandler.addBlockConnection(pckg.connections(),pckg.name());
 	
 	return "";
 	
