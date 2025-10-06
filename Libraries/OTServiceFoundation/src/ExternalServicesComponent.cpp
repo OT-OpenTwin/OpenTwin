@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/OperatingSystem.h"
 
 #include "OTCore/JSON.h"
 #include "OTCore/DebugHelper.h"
@@ -198,18 +199,13 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 
 	// In debug mode add the process ID to the confirmation request
-	auto handle = GetCurrentProcess();
-	if (handle != nullptr) {
-		unsigned long handleID = GetProcessId(handle);
-		if (handleID == 0) {
-			OT_LOG_EA("Failed to get current process id");
-		}
-		else {
-			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-		}
+
+	unsigned long handleID = ot::OperatingSystem::getCurrentProcessID();
+	if (handleID == 0) {
+		OT_LOG_EA("Failed to get current process id");
 	}
 	else {
-		OT_LOG_EA("Failed to get current process handle");
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 	}
 
 	// Send request

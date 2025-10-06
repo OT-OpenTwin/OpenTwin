@@ -27,6 +27,7 @@ enum TableColumns {
 	tcName,
 	tcUrl,
 	tcID,
+	tcPID,
 	tcAdditionalInfo,
 	tcCount
 };
@@ -43,7 +44,7 @@ LogServiceDebugInfo::LogServiceDebugInfo() {
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setAlternatingRowColors(true);
 
-	m_table->setHorizontalHeaderLabels({ "Name", "URL", "ID", "Info" });
+	m_table->setHorizontalHeaderLabels({ "Name", "URL", "ID", "PID", "Info" });
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(tcAdditionalInfo, QHeaderView::ResizeMode::Stretch);
 
@@ -78,11 +79,13 @@ void LogServiceDebugInfo::appendServiceDebugInfo(const ot::ServiceDebugInformati
 	QString name = QString::fromStdString(_info.getServiceName());
 	QString url = QString::fromStdString(_info.getServiceUrl());
 	QString id = (_info.getServiceID() == ot::invalidServiceID ? QString() : QString::number(_info.getServiceID()));
+	QString pid = QString::number(_info.getProcessID());
 
 	for (int i = 0; i < r; i++) {
 		if (m_table->item(i, tcName)->text() == name &&
 			m_table->item(i, tcUrl)->text() == url &&
-			m_table->item(i, tcID)->text() == id)
+			m_table->item(i, tcID)->text() == id &&
+			m_table->item(i, tcPID)->text() == pid)
 		{
 			ot::JsonDocument doc;
 			_info.addToJsonObject(doc, doc.GetAllocator());
@@ -100,6 +103,7 @@ void LogServiceDebugInfo::appendServiceDebugInfo(const ot::ServiceDebugInformati
 	m_table->addItem(r, tcName, name)->setFlags(itemFlags);
 	m_table->addItem(r, tcUrl, url)->setFlags(itemFlags);
 	m_table->addItem(r, tcID, id)->setFlags(itemFlags);
+	m_table->addItem(r, tcPID, pid)->setFlags(itemFlags);
 	m_table->addItem(r, tcAdditionalInfo, QString::fromStdString(_info.getAdditionalInformationJson()))->setFlags(itemFlags);
 
 	m_table->setSortingEnabled(true);
@@ -109,6 +113,7 @@ void LogServiceDebugInfo::slotItemDoubleClicked(QTableWidgetItem* _item) {
 	QString name = m_table->item(_item->row(), tcName)->text();
 	QString url = m_table->item(_item->row(), tcUrl)->text();
 	QString id = m_table->item(_item->row(), tcID)->text();
+	QString pid = m_table->item(_item->row(), tcPID)->text();
 	QString info = m_table->item(_item->row(), tcAdditionalInfo)->text();
 
 	if (_item->column() == tcUrl) {
@@ -116,7 +121,7 @@ void LogServiceDebugInfo::slotItemDoubleClicked(QTableWidgetItem* _item) {
 		LOGVIS_LOG("Copied URL of service \"" + name + "\" to clipboard: " + url);
 	}
 	else {
-		LogServiceDebugInfoDialog dia(name, url, id, info, m_root);
+		LogServiceDebugInfoDialog dia(name, url, id, pid, info, m_root);
 		dia.showDialog();
 	}
 }

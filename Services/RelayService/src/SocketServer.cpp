@@ -88,10 +88,12 @@ void SocketServer::startSessionServiceHealthCheck(const std::string& _lssUrl) {
 
 ot::ServiceDebugInformation SocketServer::getServiceDebugInformation() const {
 	ot::ServiceDebugInformation info;
+	
 	info.setServiceID(m_serviceId);
 	info.setServiceName(OT_INFO_SERVICE_TYPE_RelayService);
 	info.setServiceUrl(m_relayUrl);
 	info.setServiceWebsocketUrl(m_websocketIp + ":" + std::to_string(m_websocketPort));
+	info.setCurrentProcessID();
 
 	return info;
 }

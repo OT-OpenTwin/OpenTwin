@@ -4,11 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTSystem/Exception.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
 #include <codecvt>
+#include <algorithm>
 
 #if defined(OT_OS_WINDOWS)
 // Windows header
@@ -128,21 +130,41 @@ std::string ot::OperatingSystem::getEnvironmentVariableString(const char* _varia
 	return result;
 }
 
-std::string ot::OperatingSystem::getExecutablePath(void) {
-#if defined(OT_OS_WINDOWS)
-	TCHAR buffer[MAX_PATH] = { 0 };
-	GetModuleFileName(NULL, buffer, MAX_PATH);
-	
-	//Separate directory path from executable name
-	std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
-	std::wstring path = (std::wstring(buffer).substr(0, pos));
-	
-	//Only UTF8 character are supported by OpenTwin so far.
-	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-	return myconv.to_bytes(path);
-		
-#else
-	#error "Not supported yet"
-#endif
+std::string ot::OperatingSystem::getCurrentExecutableDirectory() {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
+	return strconverter.to_bytes(getCurrentExecutableDirectoryW());
 }
 
+std::wstring ot::OperatingSystem::getCurrentExecutableDirectoryW() {
+	std::wstring currentDir = getCurrentExecutableFilePathW();
+
+	// Trim the executable name
+	size_t index = currentDir.find_last_of(L"\\/");
+	if (index != std::wstring::npos) {
+		currentDir = currentDir.substr(0, index);
+	}
+
+	return currentDir;
+}
+
+std::string ot::OperatingSystem::getCurrentExecutableFilePath() {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
+	return strconverter.to_bytes(getCurrentExecutableFilePathW());
+}
+
+std::wstring ot::OperatingSystem::getCurrentExecutableFilePathW() {
+	WCHAR currentExeFileName[MAX_PATH];
+	GetModuleFileName(NULL, currentExeFileName, MAX_PATH);
+
+	return std::wstring(currentExeFileName);
+}
+
+unsigned long long ot::OperatingSystem::getCurrentProcessID() {
+	unsigned long long processID = 0;
+	HANDLE handle = GetCurrentProcess();
+	if (handle != nullptr) {
+		processID = GetProcessId(handle);
+		CloseHandle(handle);
+	}
+	return processID;
+}

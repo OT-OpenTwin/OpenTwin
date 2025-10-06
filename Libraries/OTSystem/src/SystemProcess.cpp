@@ -113,30 +113,3 @@ bool ot::SystemProcess::isApplicationRunning(OT_PROCESS_HANDLE& _processHandle) 
 }
 
 #endif
-
-std::string ot::SystemProcess::getCurrentExecutableDirectory(void) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return strconverter.to_bytes(getCurrentExecutableDirectoryW());
-}
-
-std::wstring ot::SystemProcess::getCurrentExecutableDirectoryW(void) {
-	std::wstring currentDir = getCurrentExecutableFilePathW();
-
-	// Trim the executable name
-	size_t index = currentDir.rfind(L'\\');
-	if (index != std::wstring::npos) currentDir = currentDir.substr(0, index);
-
-	return currentDir;
-}
-
-std::string ot::SystemProcess::getCurrentExecutableFilePath(void) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return strconverter.to_bytes(getCurrentExecutableFilePathW());
-}
-
-std::wstring ot::SystemProcess::getCurrentExecutableFilePathW(void) {
-	WCHAR currentExeFileName[MAX_PATH];
-	GetModuleFileName(NULL, currentExeFileName, MAX_PATH);
-
-	return std::wstring(currentExeFileName);
-}

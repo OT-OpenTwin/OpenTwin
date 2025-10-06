@@ -1,6 +1,6 @@
-//! \file OperatingSystem.h
-//! \author Alexander Kuester (alexk95)
-//! \date April 2023
+//! @file OperatingSystem.h
+//! @author Alexander Kuester (alexk95)
+//! @date April 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -37,7 +37,19 @@ namespace ot {
 		//! @param _variableName Name of the variable.
 		static std::string getEnvironmentVariableString(const char* _variableName);
 
-		//! \brief Returns the path of the current executable.
-		static std::string getExecutablePath(void);
+		//! @brief Will return a string in native format containing the current directory where the current executable is located at.
+		static std::string getCurrentExecutableDirectory();
+
+		//! @brief Will return a wide string in native format containing the current directory where the current executable is located at.
+		static std::wstring getCurrentExecutableDirectoryW();
+
+		//! @brief Will return a string in native format containing the path of the current executable.
+		static std::string getCurrentExecutableFilePath();
+
+		//! @brief Will return a wide string in native format containing the path of the current executable.
+		static std::wstring getCurrentExecutableFilePathW();
+
+		//! @brief Returns the current process ID.
+		static unsigned long long getCurrentProcessID();
 	};
 }

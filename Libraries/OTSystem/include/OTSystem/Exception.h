@@ -18,6 +18,7 @@ namespace ot {
         explicit GeneralException(const std::string& _message) : std::exception(_message.c_str()) {};
         explicit GeneralException(const char* _message) : std::exception(_message) {};
     };
+    namespace Exception { typedef ot::GeneralException General; }
 
     // ###########################################################################################################################################################################################################################################################################################################################
 

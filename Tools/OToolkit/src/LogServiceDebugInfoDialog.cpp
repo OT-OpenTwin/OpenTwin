@@ -17,7 +17,7 @@
 #include <QtCore/qjsondocument.h>
 #include <QtWidgets/qlayout.h>
 
-LogServiceDebugInfoDialog::LogServiceDebugInfoDialog(const QString& _name, const QString& _url, const QString& _id, const QString& _info, QWidget* _parent)
+LogServiceDebugInfoDialog::LogServiceDebugInfoDialog(const QString& _name, const QString& _url, const QString& _id, const QString& _pid, const QString& _info, QWidget* _parent)
 	: ot::Dialog(_parent)
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -37,6 +37,11 @@ LogServiceDebugInfoDialog::LogServiceDebugInfoDialog(const QString& _name, const
 	ot::LineEdit* idEdit = new ot::LineEdit(_id);
 	idEdit->setReadOnly(true);
 	grid->addWidget(idEdit, 2, 1);
+
+	grid->addWidget(new ot::Label("PID:"), 3, 0);
+	ot::LineEdit* pidEdit = new ot::LineEdit(_pid);
+	pidEdit->setReadOnly(true);
+	grid->addWidget(pidEdit, 3, 1);
 
 	mainLayout->addLayout(grid);
 
