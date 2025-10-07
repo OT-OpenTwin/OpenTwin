@@ -3319,7 +3319,7 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
 
 	for (const auto& connection : pckg.connections()) {
-		editor->getGraphicsView()->addConnectionIfConnectedItemsExist(connection);
+		editor->getGraphicsView()->addConnection(connection);
 	}
 
 	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);

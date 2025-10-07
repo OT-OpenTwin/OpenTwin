@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/VersionGraphItem.h"
 #include "OTWidgets/GraphicsTextItem.h"
 #include "OTWidgets/GraphicsGridLayoutItem.h"
@@ -105,7 +106,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	centralLayout->setRowStretchFactor(2, 1);
 	centralLayout->setColumnStretchFactor(1, 1);
 
-	this->setZValue(2);
+	this->setZValue(GraphicsZValues::Item);
 
 	if (m_config.getLabel().empty()) {
 		m_nameItem->setText("");
@@ -133,7 +134,7 @@ ot::VersionGraphItem::~VersionGraphItem() {
 
 	// Forget parent connection
 	if (m_parentConnection) {
-		m_parentConnection->disconnectItems();
+		m_parentConnection->disconnectItems(false);
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
 	}
@@ -180,7 +181,6 @@ void ot::VersionGraphItem::connectToParent(void) {
 	connectionConfig.setHandlesState(false);
 	m_parentConnection->setConfiguration(connectionConfig);
 	m_parentConnection->connectItems(m_parentVersion->m_outConnector, m_inConnector);
-	m_parentConnection->setZValue(1);
 	OTAssertNullptr(this->getGraphicsScene());
 	this->getGraphicsScene()->addItem(m_parentConnection);
 
@@ -190,7 +190,7 @@ void ot::VersionGraphItem::connectToParent(void) {
 
 void ot::VersionGraphItem::disconnectFromParent(void) {
 	if (m_parentConnection) {
-		m_parentConnection->disconnectItems();
+		m_parentConnection->disconnectItems(false);
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
 	}

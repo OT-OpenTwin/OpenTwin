@@ -176,7 +176,7 @@ void ViewerComponent::removeGraphicsElements(ot::UID _modelID) {
 	//If entity is has a block item associated, it gets removed from all editors.
 	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 	for (auto view : views) {
-		view->getGraphicsView()->removeItem(_modelID, true);
+		view->getGraphicsView()->removeItem(_modelID);
 		view->getGraphicsView()->removeConnection(_modelID);
 	}
 

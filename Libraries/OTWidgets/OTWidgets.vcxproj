@@ -259,6 +259,7 @@
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsZValues.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <QtMoc Include="include\OTWidgets\IndicatorWidget.h" />

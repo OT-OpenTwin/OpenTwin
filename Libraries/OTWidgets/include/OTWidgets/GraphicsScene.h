@@ -43,10 +43,10 @@ namespace ot {
 		//! @param _item Origin item
 		void startConnection(ot::GraphicsItem* _item);
 
-		//! \brief Will request a connection from the currently set origin to the provided target connection.
+		//! @brief Will request a connection from the currently set origin to the provided target connection.
 		//! The new control point is pos and should be the mouse press position.
-		//! \param _targetConnection The destination for the connection request.
-		//! \param _pos The new control point position.
+		//! @param _targetConnection The destination for the connection request.
+		//! @param _pos The new control point position.
 		void startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos);
 
 		void stopConnection(void);
@@ -94,7 +94,7 @@ namespace ot {
 
 		QPointF snapToGrid(const QPointF& _pt) const;
 
-		//! \brief Snaps the item to the grid according to the item flags and returns the top left pos.
+		//! @brief Snaps the item to the grid according to the item flags and returns the top left pos.
 		QPointF snapToGrid(const GraphicsItem* _item) const;
 
 		void deselectAll(void);

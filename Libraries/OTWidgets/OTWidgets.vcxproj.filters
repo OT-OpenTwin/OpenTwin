@@ -1058,6 +1058,9 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsZValues.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">

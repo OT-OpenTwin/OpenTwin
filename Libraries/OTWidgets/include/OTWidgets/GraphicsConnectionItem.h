@@ -45,15 +45,15 @@ namespace ot {
 
 		// Graphics Base
 
-		//! \brief Calculates and returns the closest distance to the given point.
+		//! @brief Calculates and returns the closest distance to the given point.
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
-		//! \param _pt Point in scene coordinates.
+		//! @param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 
-		//! \brief Returns the QGraphicsItem.
+		//! @brief Returns the QGraphicsItem.
 		virtual QGraphicsItem* getQGraphicsItem() override;
 
-		//! \brief Returns the const QGraphicsItem.
+		//! @brief Returns the const QGraphicsItem.
 		virtual const QGraphicsItem* getQGraphicsItem() const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -75,11 +75,11 @@ namespace ot {
 
 		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
 
-		//! \brief Sets the line painter.
+		//! @brief Sets the line painter.
 		//! The item takes ownership of the painter.
 		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); this->update(); };
 
-		//! \brief Returns the current line painter.
+		//! @brief Returns the current line painter.
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter() const { return m_config.getLinePainter(); };
 
@@ -93,25 +93,41 @@ namespace ot {
 
 		// Item handling
 
-		//! \brief Sets the origin and destination items.
+		//! @brief Sets the origin and destination items.
 		//! Will call GraphicsItem::storeConnection for every connected item.
 		//! Calls GraphicsConnectionItem::updateConnectionInformation.
 		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
 
+		//! @brief Set the origin item.
+		//! Will call GraphicsItem::storeConnection for the connected item.
+		//! @param _origin Origin item to connect to.
 		void setOriginItem(GraphicsItem* _origin);
+		
+		//! @brief Set the origin position.
+		//! This should only be used if no origin item is set.
+		//! @param _pos Position in scene coordinates.
+		void setOriginPos(const Point2DD& _pos);
 
+		//! @brief Set the destination item.
+		//! Will call GraphicsItem::storeConnection for the connected item.
+		//! @param _dest Destination item to connect to.
 		void setDestItem(GraphicsItem* _dest);
 
-		//! \brief Unsets the origin and destination items.
+		//! @brief Set the destination position.
+		//! This should only be used if no destination item is set.
+		//! @param _pos Position in scene coordinates.
+		void setDestPos(const Point2DD& _pos);
+
+		//! @brief Unsets the origin and destination items.
 		//! Will call GraphicsItem::forgetConnection for every connected item.
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
-		void disconnectItems();
+		void disconnectItems(bool _updateConfig = false);
 
-		//! \brief Sets the origin and/or destination to null.
+		//! @brief Sets the origin and/or destination to null.
 		//! If the item is the origin item, origin will be set to null.
 		//! If the item is the destination item, destination will be set to null.
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
-		void forgetItem(const GraphicsItem* _item);
+		void disconnectItem(const GraphicsItem* _item, bool _updateConfig = false);
 
 		GraphicsItem* getOriginItem() const { return m_origin; };
 		GraphicsItem* getDestItem() const { return m_dest; };
@@ -120,7 +136,7 @@ namespace ot {
 
 		void updateConnectionView();
 
-		//! \brief Updates the configuration according to the origin and/or destination item.
+		//! @brief Updates the configuration according to the origin and/or destination item.
 		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
 		//! Same applies to the destination.
 		void updateConnectionInformation();
@@ -154,7 +170,6 @@ namespace ot {
 
 		ot::Alignment calculateConnectionDirectionAlignment() const;
 
-		bool m_configChanged;
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;

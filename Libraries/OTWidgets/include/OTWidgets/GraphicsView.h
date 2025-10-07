@@ -38,9 +38,9 @@ namespace ot {
 		Q_OBJECT
 	public:
 		enum GraphicsViewFlag {
-			NoViewFlags            = 0x00, //! \brief No flags.
-			ViewManagesSceneRect   = 0x01, //! \brief If set the view manages the scene rect when zooming or panning.
-			IgnoreConnectionByUser = 0x02  //! \brief If set the user can not create connections.
+			NoViewFlags            = 0x00, //! @brief No flags.
+			ViewManagesSceneRect   = 0x01, //! @brief If set the view manages the scene rect when zooming or panning.
+			IgnoreConnectionByUser = 0x02  //! @brief If set the user can not create connections.
 		};
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 
@@ -114,8 +114,18 @@ namespace ot {
 
 		bool connectionAlreadyExists(const ot::GraphicsConnectionCfg& connection);
 
+		//! @brief Adds the given item to the view and scene.
+		//! If an item with the same UID already exists it will be removed first.
+		//! The item will be owned by the view and will be deleted when removed from the view or when the view is deleted.
+		//! Existing connections will connect to the item if the UIDs match.
+		//! @param _item Item to add.
 		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
+
+		//! @brief Removes the item with the given UID from the view and scene.
+		//! The item will be deleted.
+		//! The item will also be removed from all connections and the connections will update their configuration.
+		//! @param _itemUid Item UID to remove.
+		void removeItem(const ot::UID& _itemUid);
 		
 		//! @brief Selects the item with the given UID.
 		//! Items not in the list will be deselected.
@@ -126,15 +136,34 @@ namespace ot {
 		std::list<ot::UID> getSelectedItemUIDs() const;
 		std::list<GraphicsItem*> getSelectedGraphicsItems() const;
 
-		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Connection handling
+
+		//! @brief Adds the given connection to the view and scene.
+		//! If a connection with the same UID already exists it will be removed first.
+		//! The connection will be owned by the view and will be deleted when removed from the view or when the view is deleted.
+		//! Existing items will connect to the connection if the UIDs match.
+		//! @param _config Connection configuration to add.
+		void addConnection(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
 		ot::UIDList getSelectedConnectionUIDs() const;
 		std::list<GraphicsConnectionItem*> getSelectedConnectionItems() const;
 
+		//! @brief Emits the connectionRequested signal if the connection does not already exist.
+		//! @param _fromUid Origin item UID.
+		//! @param _fromConnector Origin connector (child of origin item).
+		//! @param _toUid Destination item UID.
+		//! @param _toConnector Destination connector (child of destination item).
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 
+		//! @brief Emits the connectionToConnectionRequested signal.
+		//! @param _fromItemUid Origin item UID.
+		//! @param _fromItemConnector Origin connector (child of origin item).
+		//! @param _toConnectionUid Destination connection UID.
+		//! @param _newControlPoint New control point in scene coordinates.
 		void requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -146,18 +175,23 @@ namespace ot {
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
 	Q_SIGNALS:
-		//! @brief Will be emitted when an item was dropped into the scene by the user
-		//! @param _name Item name
-		//! @param _pos Item scene position
+		//! @brief Will be emitted when an item was dropped into the scene by the user.
+		//! @param _name Item name.
+		//! @param _pos Item scene position.
 		void itemRequested(const QString& _name, const QPointF& _pos);
 
-		//! @brief Will be emitted when a connection was "dropped" by the user
-		//! @param _fromUid Source item UID
-		//! @param _fromConnector Source connector (child of source item)
-		//! @param _toUid Destination item UID
-		//! @param _toConnector Destination connector (child of destination item)
+		//! @brief Will be emitted when a connection was "dropped" by the user.
+		//! @param _fromUid Source item UID.
+		//! @param _fromConnector Source connector (child of source item).
+		//! @param _toUid Destination item UID.
+		//! @param _toConnector Destination connector (child of destination item).
 		void connectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		
+		//! @brief Will be emitted when a connection to a connection was "dropped" by the user.
+		//! @param _fromItemUid Origin item UID.
+		//! @param _fromItemConnector Origin connector (child of origin item).
+		//! @param _toConnectionUid Destination connection UID.
+		//! @param _newControlPoint New control point in scene coordinates.
 		void connectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
 		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
@@ -202,18 +236,15 @@ namespace ot {
 		// Private: Helper
 
 	private:
-		//! \brief Begins the item move handling if needed.
+		//! @brief Begins the item move handling if needed.
 		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is set the function instantly returns.
 		//! All currently selected items will update their move start point.
 		void beginItemMove();
 
-		//! \brief Ends the item move handling if needed.
+		//! @brief Ends the item move handling if needed.
 		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is not set the function instantly returns.
 		//! All currently selected items will notify a move change and configuration change if their position has changed.
 		void endItemMove();
-
-		void addConnection(const GraphicsConnectionCfg& _config);
-		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 
 		BasicServiceInformation m_owner;
 
@@ -231,8 +262,6 @@ namespace ot {
 	
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
 		std::map<ot::UID, ot::GraphicsConnectionItem*> m_connections;
-		std::list<GraphicsConnectionCfg> m_connectionCreationBuffer;
-		std::list<GraphicsConnectionCfg> m_itemRemovalConnectionBuffer;
 	};
 
 }

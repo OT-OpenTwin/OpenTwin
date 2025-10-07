@@ -9,9 +9,10 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/WidgetView.h"
+#include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
@@ -161,23 +162,21 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 			break;
 		}
 	}
-	return (alreadyExisting);
+	return alreadyExisting;
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	auto it = m_items.find(_item->getGraphicsItemUid());
-	bool removeConnectionBufferApplied = !m_itemRemovalConnectionBuffer.empty();
 	if (it != m_items.end()) {
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
-		removeConnectionBufferApplied = true;
-		this->removeItem(_item->getGraphicsItemUid(), removeConnectionBufferApplied);
+		this->removeItem(_item->getGraphicsItemUid());
 	}
 
 	_item->setBlockConfigurationNotifications(true);
 
 	m_items.insert_or_assign(_item->getGraphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
-	_item->getRootItem()->getQGraphicsItem()->setZValue(2);
+	_item->getRootItem()->getQGraphicsItem()->setZValue(GraphicsZValues::Item);
 	_item->setGraphicsScene(m_scene);
 
 	QPointF pt = m_scene->snapToGrid(_item);
@@ -192,58 +191,49 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	OT_LOG_D("Item added { \"UID\": " + std::to_string(_item->getGraphicsItemUid()) + " }");
 
-	if (removeConnectionBufferApplied) {
-		std::list<GraphicsConnectionCfg> newBuffer;
-		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
-			if (!this->addConnectionIfConnectedItemsExist(bufferedConnection)) {
-				newBuffer.push_back(bufferedConnection);
+	// Check if any connection in the buffer can be created now
+	for (auto connection : m_connections) {
+		if (connection.second->getConfiguration().getOriginUid() == _item->getGraphicsItemUid()) {
+			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getOriginConnectable());
+			if (connector) {
+				connection.second->setOriginItem(connector);
 			}
 		}
-		m_itemRemovalConnectionBuffer = newBuffer;
-	}
-
-	auto currentConnection = m_connectionCreationBuffer.begin();
-	while (currentConnection !=  m_connectionCreationBuffer.end()) {
-		const bool connectionCreated = addConnectionIfConnectedItemsExist(*currentConnection);
-		if (connectionCreated) {
-			currentConnection =	m_connectionCreationBuffer.erase(currentConnection);
-		}
-		else {
-			currentConnection++;
+		else if (connection.second->getConfiguration().getDestinationUid() == _item->getGraphicsItemUid()) {
+			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getDestConnectable());
+			if (connector) {
+				connection.second->setDestItem(connector);
+			}
 		}
 	}
 }
 
-void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnections) {
+void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
 	auto graphicsItemByUID = m_items.find(_itemUid);
 	if (graphicsItemByUID == m_items.end()) {
-		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
 		return;
 	}
 	
-	this->blockSignals(true);
-	m_scene->blockSignals(true);
+	QSignalBlocker viewBlocker(this);
+	QSignalBlocker sceneBlocker(m_scene);
 
 	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
 	OTAssertNullptr(graphicsItem);
-	if (bufferConnections)
-	{
-		m_itemRemovalConnectionBuffer = graphicsItem->getConnectionCfgs();
-		m_itemRemovalConnectionBuffer.unique();
+
+	for (GraphicsConnectionItem* connection : graphicsItem->getAllConnections()) {
+		connection->disconnectItem(graphicsItem, true);
 	}
 
 	m_scene->itemAboutToBeRemoved(graphicsItem);
-	graphicsItem->removeAllConnections();
+	//graphicsItem->removeAllConnections();
 	m_scene->removeItem(graphicsItem->getQGraphicsItem());
+
 	graphicsItem->setGraphicsScene(nullptr);
 	delete graphicsItem;
 	graphicsItem = nullptr;
 	m_items.erase(_itemUid);
 	
 	OT_LOG_D("Item removed { \"UID\": " + std::to_string(_itemUid) + " }");
-
-	m_scene->blockSignals(false);
-	this->blockSignals(false);
 }
 
 void ot::GraphicsView::setSelectedElements(const ot::UIDList& _uids) {
@@ -295,58 +285,55 @@ void ot::GraphicsView::setGraphicsSceneRect(const QRectF& _rect) {
 	this->verticalScrollBar()->setRange(rec.top(), rec.bottom());
 }
 
-bool ot::GraphicsView::addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config)
-{
-	if (connectedGraphicItemsExist(_config)) {
-		addConnection(_config);
-		return true;
-	}
-	else {
-		if (std::find(m_connectionCreationBuffer.begin(), m_connectionCreationBuffer.end(), _config) == m_connectionCreationBuffer.end()) {
-			m_connectionCreationBuffer.push_back(_config);
-		}
-		return false;
-	}
-}
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Connection handling
 
 void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	this->removeConnection(_config.getUid());
+
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
-	if (!src) {
-		OT_LOG_EAS("Connection source not found { \"UID\": " + std::to_string(_config.getOriginUid()) + " }");
-		return;
-	}
-	if (!dest) {
-		OT_LOG_EAS("Connection destination not found { \"UID\": " + std::to_string(_config.getDestinationUid()) + " }");
-		return;
-	}
-	ot::GraphicsItem* srcConn = src->findItem(_config.getOriginConnectable());
-	ot::GraphicsItem* destConn = dest->findItem(_config.getDestConnectable());
-
-	if (!srcConn || !destConn) {
-		OT_LOG_EA("Invalid connectable name");
-		return;
-	}
+	
+	ot::GraphicsItem* srcConn = nullptr;
+	ot::GraphicsItem* destConn = nullptr;
 
 	// Create and add new connection
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
+	m_scene->addItem(newConnection);
+	newConnection->setGraphicsScene(m_scene);
+
 	newConnection->setConfiguration(_config);
 	
-	m_scene->addItem(newConnection);
-	newConnection->connectItems(srcConn, destConn);
-	newConnection->setZValue(1);
+	if (src) {
+		srcConn = src->findItem(_config.getOriginConnectable());
+		if (!srcConn) {
+			OT_LOG_E("Origin connector not found { \"ItemUID\": " + std::to_string(_config.getOriginUid()) + ", \"Connector\": \"" + _config.getOriginConnectable() + "\" }");
+		}
+	}
+	if (dest) {
+		destConn = dest->findItem(_config.getDestConnectable());
+		if (!destConn) {
+			OT_LOG_E("Destination connector not found { \"ItemUID\": " + std::to_string(_config.getDestinationUid()) + ", \"Connector\": \"" + _config.getDestConnectable() + "\" }");
+		}
+	}
+
+	if (srcConn) {
+		newConnection->setOriginItem(srcConn);
+	}
+	else {
+		newConnection->setOriginPos(_config.getOriginPos());
+	}
+	if (destConn) {
+		newConnection->setDestItem(destConn);
+	}
+	else {
+		newConnection->setDestPos(_config.getDestPos());
+	}
 
 	m_connections.insert_or_assign(_config.getUid(), newConnection);
 
 	OT_LOG_D("New connection added { \"UID\": " + std::to_string(_config.getUid()) + " }");
-}
-
-bool ot::GraphicsView::connectedGraphicItemsExist(const GraphicsConnectionCfg& _config) {
-	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
-	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
-
-	return src != nullptr && dest != nullptr;
 }
 
 void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
@@ -368,7 +355,7 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
 	OTAssertNullptr(connection);
 
 	m_scene->connectionAboutToBeRemoved(connection);
-	connection->disconnectItems();
+	connection->disconnectItems(false);
 
 	// Destroy connection
 	m_scene->removeItem(connection);

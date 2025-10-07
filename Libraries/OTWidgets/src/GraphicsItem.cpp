@@ -65,8 +65,10 @@ ot::GraphicsItem::~GraphicsItem() {
 		sc->itemAboutToBeRemoved(this);
 	}
 
-	for (GraphicsConnectionItem* connection : m_connections) {
-		connection->forgetItem(this);
+	auto connections = std::move(m_connections);
+	m_connections.clear();
+	for (GraphicsConnectionItem* connection : connections) {
+		connection->disconnectItem(this, false);
 	}
 }
 
@@ -638,10 +640,13 @@ void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 }
 
 void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
-	auto connection = std::find(m_connections.begin(), m_connections.end(), _connection);
-	while (connection != m_connections.end()) {
-		m_connections.erase(connection);
-		connection = std::find(m_connections.begin(), m_connections.end(), _connection);
+	for (auto it = m_connections.begin(); it != m_connections.end(); ) {
+		if (*it == _connection) {
+			it = m_connections.erase(it);
+		}
+		else {
+			it++;
+		}
 	}
 }
 

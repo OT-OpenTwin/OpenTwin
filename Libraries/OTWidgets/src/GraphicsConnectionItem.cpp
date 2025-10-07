@@ -14,6 +14,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
@@ -27,6 +28,8 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
 	this->updateConnectors();
+	this->updateConnectionInformation();
+	this->setZValue(GraphicsZValues::Connection);
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
@@ -63,10 +66,6 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 // QGraphicsItem
 
 QRectF ot::GraphicsConnectionItem::boundingRect() const {
-	if (m_dest == nullptr || m_origin == nullptr) {
-		return m_lastRect;
-	}
-
 	QPainterPath path;
 	this->calculatePainterPath(path);
 	double margs = m_config.getLineWidth() / 2.;
@@ -198,7 +197,7 @@ const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
 
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
 	m_config = _cfg;
-
+	this->updateConnectionInformation();
 	return true;
 }
 
@@ -239,38 +238,81 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 
 	this->updateConnectors();
 	this->updateConnectionInformation();
-	this->updateConnectionView();
+	this->update();
+
 }
 
 void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
 	OTAssertNullptr(_origin);
-	OTAssert(m_origin == nullptr, "Origin already set");
+	OTAssert(m_origin != _origin, "Origin already set to the given item");
+	OTAssert(m_dest != _origin, "Given item is already set as destination");
 
 	this->prepareGeometryChange();
+
+	if (m_origin) {
+		OT_LOG_WA("Origin item already set. Replacing...");
+		m_origin->forgetConnection(this);
+	}
 
 	m_origin = _origin;
 	m_origin->storeConnection(this);
 
 	this->updateConnectors();
 	this->updateConnectionInformation();
-	this->updateConnectionView();
+	this->update();
+}
+
+void ot::GraphicsConnectionItem::setOriginPos(const Point2DD& _pos) {
+	if (m_origin) {
+		OT_LOG_WA("Origin item is set. Ignoring position change.");
+		return;
+	}
+	else {
+		OTAssertNullptr(m_originConnector);
+		this->prepareGeometryChange();
+		m_config.setOriginPos(_pos);
+		m_originConnector->setPos(QtFactory::toQPoint(_pos) - QPointF(m_originConnector->boundingRect().width() / 2., m_originConnector->boundingRect().height() / 2.));
+		this->update();
+	}
 }
 
 void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
 	OTAssertNullptr(_dest);
-	OTAssert(m_dest == nullptr, "Destination already set");
-
+	OTAssert(m_dest != _dest, "Destination already set to the given item");
+	OTAssert(m_origin != _dest, "Given item is already set as origin");
+	
 	this->prepareGeometryChange();
+	
+	if (m_dest) {
+		OT_LOG_WA("Destination item already set. Replacing...");
+		m_dest->forgetConnection(this);
+	}
 
 	m_dest = _dest;
 	m_dest->storeConnection(this);
 
 	this->updateConnectors();
 	this->updateConnectionInformation();
-	this->updateConnectionView();
+	this->update();
 }
 
-void ot::GraphicsConnectionItem::disconnectItems() {
+void ot::GraphicsConnectionItem::setDestPos(const Point2DD& _pos) {
+	if (m_dest) {
+		OT_LOG_WA("Destination item is set. Ignoring position change.");
+		return;
+	}
+	else {
+		OTAssertNullptr(m_destConnector);
+		this->prepareGeometryChange();
+		m_config.setDestPos(_pos);
+		m_destConnector->setPos(QtFactory::toQPoint(_pos) - QPointF(m_destConnector->boundingRect().width() / 2., m_destConnector->boundingRect().height() / 2.));
+		this->update();
+	}
+}
+
+void ot::GraphicsConnectionItem::disconnectItems(bool _updateConfig) {
+	this->prepareGeometryChange();
+
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
@@ -279,17 +321,35 @@ void ot::GraphicsConnectionItem::disconnectItems() {
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
+	
 	this->updateConnectors();
+	
+	if (_updateConfig) {
+		this->updateConnectionInformation();
+	}
+
+	this->update();
 }
 
-void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
+void ot::GraphicsConnectionItem::disconnectItem(const GraphicsItem* _item, bool _updateConfig) {
+	this->prepareGeometryChange();
+
 	if (m_origin == _item) {
+		m_origin->forgetConnection(this);
 		m_origin = nullptr;
 	}
 	if (m_dest == _item) {
+		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
+	
 	this->updateConnectors();
+
+	if (_updateConfig) {
+		this->updateConnectionInformation();
+	}
+
+	this->update();
 }
 
 void ot::GraphicsConnectionItem::updatePositionsFromItems() {
@@ -331,10 +391,16 @@ void ot::GraphicsConnectionItem::updateConnectionInformation() {
 void ot::GraphicsConnectionItem::graphicsSceneSet(GraphicsScene* _scene) {
 	if (m_originConnector) {
 		_scene->addItem(m_originConnector);
+		m_originConnector->setGraphicsScene(_scene);
+		m_originConnector->finalizeGraphicsItem();
 	}
 	if (m_destConnector) {
 		_scene->addItem(m_destConnector);
+		m_destConnector->setGraphicsScene(_scene);
+		m_destConnector->finalizeGraphicsItem();
 	}
+
+	this->update();
 }
 
 void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) {
@@ -412,14 +478,15 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		// Origin not set
 		if (!m_originConnector) {
 			m_originConnector = new GraphicsConnectionConnectorItem;
-			if (this->getGraphicsScene()) {
-				this->getGraphicsScene()->addItem(m_originConnector);
+			GraphicsScene* sc = this->getGraphicsScene();
+			if (sc) {
+				sc->addItem(m_originConnector);
+				m_originConnector->setGraphicsScene(sc);
+				m_originConnector->finalizeGraphicsItem();
 			}
-			m_originConnector->setGraphicsScene(this->getGraphicsScene());
-			m_originConnector->finalizeGraphicsItem();
 
-			m_originConnector->storeConnection(this);
 			m_originConnector->setPos(QtFactory::toQPoint(m_config.getOriginPos()) - QPointF(m_originConnector->getRadiusX(), m_originConnector->getRadiusY()));
+			m_originConnector->storeConnection(this);
 		}
 
 	}
@@ -437,14 +504,15 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		// Destination not set
 		if (!m_destConnector) {
 			m_destConnector = new GraphicsConnectionConnectorItem;
-			if (this->getGraphicsScene()) {
-				this->getGraphicsScene()->addItem(m_destConnector);
+			GraphicsScene* sc = this->getGraphicsScene();
+			if (sc) {
+				sc->addItem(m_destConnector);
+				m_destConnector->setGraphicsScene(sc);
+				m_destConnector->finalizeGraphicsItem();
 			}
-			m_destConnector->setGraphicsScene(this->getGraphicsScene());
-			m_destConnector->finalizeGraphicsItem();
 
-			m_destConnector->storeConnection(this);
 			m_destConnector->setPos(QtFactory::toQPoint(m_config.getDestPos()) - QPointF(m_destConnector->getRadiusX(), m_destConnector->getRadiusY()));
+			m_destConnector->storeConnection(this);
 		}
 	}
 }
