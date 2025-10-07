@@ -4,14 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcherBase.h"
 #include "OTCommunication/ActionHandleConnector.h"
 
-ot::ActionDispatcherBase::ActionDispatcherBase() {
-
-}
+ot::ActionDispatcherBase::ActionDispatcherBase() : m_defaultMessageType(ot::SECURE_MESSAGE_TYPES) {}
 
 ot::ActionDispatcherBase::~ActionDispatcherBase() {
 	for (auto& it : m_data) {
@@ -22,39 +21,59 @@ ot::ActionDispatcherBase::~ActionDispatcherBase() {
 	m_data.clear();
 }
 
+void ot::ActionDispatcherBase::setDefaultMessageTypes(const MessageTypeFlags& _type) {
+	if (_type == ot::DEFAULT_MESSAGE_TYPE) {
+		OT_LOG_EA("Invalid message type provided as default message type");
+	}
+	else {
+		std::lock_guard<std::mutex> mtxLock(m_mutex);
+		m_defaultMessageType = _type;
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Connector management
 
-std::optional<std::shared_ptr<ot::ActionHandleConnector>> ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFlags& _insertFlags) {
+bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFlags& _insertFlags) {
 	OTAssertNullptr(_item);
 
+	if (_item->actionNames().empty()) {
+		OT_LOG_EA("No action names provided. Cancelling add...");
+		return false;
+	}
+
 	std::lock_guard<std::mutex> mtxLock(m_mutex);
+
+	_item->m_actionDispatcher = this;
+
+	// Set default message type if required
+	if (_item->m_messageFlags == ot::DEFAULT_MESSAGE_TYPE) {
+		_item->m_messageFlags = m_defaultMessageType;
+	}
 
 	// First check if we can add the item
 	for (const std::string& action : _item->actionNames()) {
 		auto it = m_data.find(action);
 		if (it != m_data.end() && !(_insertFlags & InsertFlag::ExpectMultiple)) {
 			OT_LOG_EAS("Handler for \"" + action + "\" already exist. Cancelling add...");
-			return std::nullopt;
+			return false;
 		}
 	}
-
-	std::shared_ptr<ot::ActionHandleConnector> ptr(_item);
 
 	for (const std::string& action : _item->actionNames()) {
 		auto it = m_data.find(action);
 		if (it == m_data.end() ) {
-			std::list<std::shared_ptr<ot::ActionHandleConnector>> lst;
-			lst.push_back(ptr);
+			std::list<ot::ActionHandleConnector*> lst;
+			lst.push_back(_item);
 			m_data.insert_or_assign(action, std::move(lst));
 		}
 		else {
-			it->second.push_back(ptr);
+			it->second.push_back(_item);
 		}
 	}
 
-	return ptr;
+	return true;
 }
 
 void ot::ActionDispatcherBase::remove(ActionHandleConnector* _item) {
@@ -69,7 +88,7 @@ void ot::ActionDispatcherBase::remove(ActionHandleConnector* _item) {
 		}
 
 		for (auto conIt = it->second.begin(); conIt != it->second.end(); ) {
-			if (conIt->get() == _item) {
+			if (*conIt == _item) {
 				conIt = it->second.erase(conIt);
 			}
 			else {
@@ -188,25 +207,4 @@ std::string ot::ActionDispatcherBase::dispatchImpl(const std::string& _action, J
 	}
 
 	return result;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Connect implementation
-
-std::shared_ptr<ot::ActionHandleConnector> ot::ActionDispatcherBase::connectImpl(const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method, const InsertFlags& _insertFlags) {
-	ot::ActionHandleConnector* con = new ot::ActionHandleConnector(_actionNames, _messageFlags, _method);
-
-	// Set the action dispatcher before adding, this ensures the connector destructor will clean up properly if add fails
-	con->m_actionDispatcher = this;
-
-	auto res = this->add(con, _insertFlags);
-
-	if (!res.has_value()) {
-		delete con;
-		return nullptr;
-	}
-	else {
-		return res.value();
-	}
 }

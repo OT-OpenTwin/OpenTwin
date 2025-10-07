@@ -72,18 +72,14 @@ Application::Application()
 	classFactoryBlock->SetChainRoot(&classFactory);
 	classFactory.SetNextHandler(classFactoryBlock);
 	m_SimulationRunning = false;
-
-	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
-	ot::MessageType types = ot::SECURE_MESSAGE_TYPES;
-
-	disp.connect(OT_ACTION_CMD_MODEL_ExecuteAction, types, this, &Application::handleExecuteModelAction);
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, types, this, &Application::handleNewGraphicsItem);
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, types, this, &Application::handleRemoveGraphicsItem);
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, types, this, &Application::handleNewGraphicsItemConnection);
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, types, this, &Application::handleRemoveGraphicsItemConnection);
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, types, this, &Application::handleConnectionToConnection);	
-	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, types, this, &Application::handleConnectionChanged);
-
+	
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &Application::handleNewGraphicsItem);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, this, &Application::handleRemoveGraphicsItem);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &Application::handleNewGraphicsItemConnection);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, this, &Application::handleRemoveGraphicsItemConnection);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, this, &Application::handleConnectionToConnection);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &Application::handleConnectionChanged);
 }
 
 Application::~Application() {

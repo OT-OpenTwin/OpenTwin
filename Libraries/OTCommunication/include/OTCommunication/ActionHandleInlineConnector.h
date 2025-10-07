@@ -18,8 +18,8 @@ namespace ot {
 		OT_DECL_NOMOVE(ActionHandleInlineConnector)
 		OT_DECL_NODEFAULT(ActionHandleInlineConnector)
 	public:
-		ActionHandleInlineConnector(T* _object, typename ActionHandleConnectorManager<T>::HandlerMethodType _method, const std::string& _actionName, MessageType _messageType, ActionHandleConnectorManager<T>& _manager);
-		ActionHandleInlineConnector(T* _object, typename ActionHandleConnectorManager<T>::HandlerMethodType _method, const std::list<std::string>& _actionNames, MessageType _messageType, ActionHandleConnectorManager<T>& _manager);
+		ActionHandleInlineConnector(T* _object, typename ActionHandleConnectorManager<T>::HandlerMethodType _method, const std::string& _actionName, ActionHandleConnectorManager<T>& _manager, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
+		ActionHandleInlineConnector(T* _object, typename ActionHandleConnectorManager<T>::HandlerMethodType _method, const std::list<std::string>& _actionNames, ActionHandleConnectorManager<T>& _manager, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
 		~ActionHandleInlineConnector() = default;
 	};
 }

@@ -9,24 +9,24 @@
 #include "OTCommunication/ActionDispatcherBase.h"
 #include "OTCommunication/ActionHandleConnector.h"
 
-ot::ActionHandleConnector::ActionHandleConnector(const std::string& _actionName, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method) 
+ot::ActionHandleConnector::ActionHandleConnector(const std::string& _actionName, const DispatchMethodType& _method, const MessageTypeFlags& _messageFlags)
 	: m_messageFlags(_messageFlags), m_actionNames({ _actionName }), m_actionDispatcher(nullptr), m_method(_method)
 {}
 
-ot::ActionHandleConnector::ActionHandleConnector(const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method) 
+ot::ActionHandleConnector::ActionHandleConnector(const std::list<std::string>& _actionNames, const DispatchMethodType& _method, const MessageTypeFlags& _messageFlags)
 	: m_messageFlags(_messageFlags), m_actionNames(_actionNames), m_actionDispatcher(nullptr), m_method(_method)
 {
 	m_actionNames.unique();
 }
 
-ot::ActionHandleConnector::ActionHandleConnector(const std::string& _actionName, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher)
+ot::ActionHandleConnector::ActionHandleConnector(const std::string& _actionName, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher, const MessageTypeFlags& _messageFlags)
 	: m_messageFlags(_messageFlags), m_actionNames({ _actionName }), m_actionDispatcher(_dispatcher), m_method(_method)
 {	
 	OTAssertNullptr(m_actionDispatcher);
 	m_actionDispatcher->add(this);
 }
 
-ot::ActionHandleConnector::ActionHandleConnector(const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher)
+ot::ActionHandleConnector::ActionHandleConnector(const std::list<std::string>& _actionNames, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher, const MessageTypeFlags& _messageFlags)
 	: m_messageFlags(_messageFlags), m_actionNames(_actionNames), m_actionDispatcher(_dispatcher), m_method(_method)
 {
 	m_actionNames.unique();

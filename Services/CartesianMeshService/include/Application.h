@@ -29,7 +29,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ActionHandler {
 	OT_DECL_NOCOPY(Application)
 public:
 	static Application * instance(void);

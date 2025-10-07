@@ -26,7 +26,7 @@
 
 #include "ModelState.h"
 
-#include <thread>	
+#include <thread>
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_CartesianMeshService
@@ -56,7 +56,7 @@ Application::Application()
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
 
-	ot::ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteModelAction);
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 }
 
 Application::~Application()

@@ -10,10 +10,9 @@
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTCommunication/ActionHandleConnector.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"
-#include "OTCommunication/ActionHandleConnectorContainer.h"
 
 // std header
 #include <string> // string
@@ -85,7 +84,7 @@ namespace ot {
 
 			// Private functions
 
-			ot::ActionHandleConnectorContainer m_actionHandleConnectors;
+			ActionHandler m_actionHandler;
 
 			void handleSetLogFlags(JsonDocument& _document);
 			std::string handleInitialize(JsonDocument& _document);

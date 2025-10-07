@@ -60,7 +60,9 @@ Application::Application() :
 	updateManager(nullptr),
 	transformationManager(nullptr),
 	removeFaces(nullptr),
-	stepReader(nullptr)
+	stepReader(nullptr),
+	blendEdges(nullptr),
+	chamferEdges(nullptr)
 {
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));

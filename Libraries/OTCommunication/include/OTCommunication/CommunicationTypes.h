@@ -8,11 +8,12 @@ namespace ot {
 
 	//! @brief The message types describes how a message should be delivered
 	enum MessageType {
-		QUEUE							= 0x01,
-		EXECUTE							= 0x02,
-		EXECUTE_ONE_WAY_TLS				= 0x04,
-		SECURE_MESSAGE_TYPES			= 0x03,
-		ALL_MESSAGE_TYPES				= 0xFF
+		DEFAULT_MESSAGE_TYPE            = 0 << 0, // Default message type.
+		QUEUE							= 1 << 0,
+		EXECUTE							= 1 << 1,
+		EXECUTE_ONE_WAY_TLS				= 1 << 2,
+		SECURE_MESSAGE_TYPES			= QUEUE | EXECUTE,
+		ALL_MESSAGE_TYPES				= SECURE_MESSAGE_TYPES | EXECUTE_ONE_WAY_TLS
 	};
 
 	//! @brief The message types describes how a message should be delivered

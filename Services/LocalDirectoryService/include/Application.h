@@ -13,12 +13,13 @@
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCommunication/ActionHandler.h"
 
 // std header
 #include <list>
 #include <string>
 
-class Application : public ot::ServiceBase {
+class Application : public ot::ServiceBase, public ot::ActionHandler {
 public:
 	static Application& instance(void);
 

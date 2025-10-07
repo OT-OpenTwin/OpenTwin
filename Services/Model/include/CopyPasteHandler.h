@@ -16,7 +16,7 @@ private:
 	void storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName);
 
 	ot::ActionHandleConnectorManager<CopyPasteHandler> m_connectionManager{ this, &ot::ActionDispatcher::instance() };
-	ot::ActionHandleInlineConnector<CopyPasteHandler> m_blockHandlerSerialise{ this, &CopyPasteHandler::selectedEntitiesSerialiseAction, OT_ACTION_CMD_SelectedEntitiesSerialise, ot::SECURE_MESSAGE_TYPES, m_connectionManager };
-	ot::ActionHandleInlineConnector<CopyPasteHandler> m_blockHandlerCopy{ this, &CopyPasteHandler::pasteEntitiesAction, OT_ACTION_CMD_PasteEntities, ot::SECURE_MESSAGE_TYPES, m_connectionManager };
+	ot::ActionHandleInlineConnector<CopyPasteHandler> m_blockHandlerSerialise{ this, &CopyPasteHandler::selectedEntitiesSerialiseAction, OT_ACTION_CMD_SelectedEntitiesSerialise, m_connectionManager, ot::SECURE_MESSAGE_TYPES };
+	ot::ActionHandleInlineConnector<CopyPasteHandler> m_blockHandlerCopy{ this, &CopyPasteHandler::pasteEntitiesAction, OT_ACTION_CMD_PasteEntities, m_connectionManager, ot::SECURE_MESSAGE_TYPES };
 
 };

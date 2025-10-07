@@ -19,7 +19,6 @@
 #include "MeshImport.h"
 
 // Open twin header
-#include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -57,9 +56,8 @@ Application::Application()
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
 
-	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
-	disp.connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteModelAction);
-	disp.connect(OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteFunction);
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteFunction, this, &Application::handleExecuteFunction);
 }
 
 Application::~Application()

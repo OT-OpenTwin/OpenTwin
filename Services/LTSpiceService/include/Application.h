@@ -46,7 +46,7 @@ struct LTSpiceData {
 	bool isComplex = false;
 };
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ActionHandler {
 public:
 	Application();
 	virtual ~Application();

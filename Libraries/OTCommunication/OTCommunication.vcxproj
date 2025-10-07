@@ -50,6 +50,7 @@
     <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleInlineConnector.hpp" />
     <ClInclude Include="include\OTCommunication\ActionHandler.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandler.hpp" />
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />

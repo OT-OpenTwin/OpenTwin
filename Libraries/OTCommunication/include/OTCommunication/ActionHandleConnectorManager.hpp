@@ -26,11 +26,11 @@ ot::ActionHandleConnectorManager<T>::~ActionHandleConnectorManager() {
 }
 
 template<class T>
-inline void ot::ActionHandleConnectorManager<T>::bindHandler(T* _object, HandlerMethodType _method, const std::string& _actionName, MessageType _messageTypes) {
-	m_connectors.push_back(new ActionHandleConnector(_actionName, _messageTypes, ActionHandleConnector::DispatchMethodType(std::bind(_method, _object, std::placeholders::_1)), m_dispatcher));
+inline void ot::ActionHandleConnectorManager<T>::bindHandler(T* _object, HandlerMethodType _method, const std::string& _actionName, const MessageTypeFlags& _messageFlags) {
+	m_connectors.push_back(new ActionHandleConnector(_actionName, ActionHandleConnector::DispatchMethodType(std::bind(_method, _object, std::placeholders::_1)), m_dispatcher, _messageFlags));
 }
 
 template<class T>
-inline void ot::ActionHandleConnectorManager<T>::bindHandler(T* _object, HandlerMethodType _method, const std::list<std::string>& _actionNames, MessageType _messageTypes) {
-	m_connectors.push_back(new ActionHandleConnector(_actionNames, _messageTypes, ActionHandleConnector::DispatchMethodType(std::bind(_method, _object, std::placeholders::_1)), m_dispatcher));
+inline void ot::ActionHandleConnectorManager<T>::bindHandler(T* _object, HandlerMethodType _method, const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags) {
+	m_connectors.push_back(new ActionHandleConnector(_actionNames, ActionHandleConnector::DispatchMethodType(std::bind(_method, _object, std::placeholders::_1)), m_dispatcher, _messageFlags));
 }

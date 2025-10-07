@@ -12,7 +12,9 @@
 #include "OTGuiAPI/ButtonHandler.h"
 
 ot::ButtonHandler::ButtonHandler() {
-	m_actionHandleConnector = ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &ButtonHandler::handleButtonClicked, ActionDispatcher::ExpectMultiple);
+	if (!m_actionHandler.connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &ButtonHandler::handleButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
+		OT_LOG_EA("Failed to register button click handler");
+	}
 }
 
 void ot::ButtonHandler::connectButton(void(*_callback)(), const std::string& _buttonKey) {

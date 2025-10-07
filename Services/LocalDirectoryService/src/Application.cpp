@@ -17,9 +17,6 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTServiceFoundation/UiComponent.h"
-#include "OTServiceFoundation/ModelComponent.h"
 
 // std header
 #include <thread>
@@ -206,17 +203,14 @@ Application::Application() :
 {
 	m_systemLoadInformation.initialize();
 
-	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
-	ot::MessageType type = ot::SECURE_MESSAGE_TYPES;
-
-	disp.connect(OT_ACTION_CMD_StartNewService, type, this, &Application::handleStartNewService);
-	disp.connect(OT_ACTION_CMD_StartNewRelayService, type, this, &Application::handleStartNewRelayService);
-	disp.connect(OT_ACTION_CMD_ShutdownSession, type, this, &Application::handleSessionClosing);
-	disp.connect(OT_ACTION_CMD_ShutdownSessionCompleted, type, this, &Application::handleSessionClosed);
-	disp.connect(OT_ACTION_CMD_ServiceDisconnected, type, this, &Application::handleServiceClosed);
-	disp.connect(OT_ACTION_CMD_GetDebugInformation, type, this, &Application::handleGetDebugInformation);
-	disp.connect(OT_ACTION_CMD_GetSystemInformation, type, this, &Application::handleGetSystemInformation);
-	disp.connect(OT_ACTION_CMD_SetGlobalLogFlags, type, this, &Application::handleSetGlobalLogFlags);
+	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartNewService);
+	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartNewRelayService);
+	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
+	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);
+	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceClosed);
+	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &Application::handleGetDebugInformation);
+	connectAction(OT_ACTION_CMD_GetSystemInformation, this, &Application::handleGetSystemInformation);
+	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &Application::handleSetGlobalLogFlags);
 }
 
 Application::~Application() {}

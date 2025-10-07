@@ -107,17 +107,15 @@ ot::intern::ExternalServicesComponent::ExternalServicesComponent()
 	: m_application(nullptr), m_componentState(WaitForStartup) 
 {
 	// Connect action handlers
-	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
-
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleSetLogFlags));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_Init, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleInitialize));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceConnected));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceDisconnected));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleShutdownRequestByService));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceShutdown));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleRun));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handlePreShutdown));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleEmergencyShutdown));
+	m_actionHandler.connectAction(OT_ACTION_CMD_SetLogFlags, this, &ExternalServicesComponent::handleSetLogFlags, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_Init, this, &ExternalServicesComponent::handleInitialize, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ServiceConnected, this, &ExternalServicesComponent::handleServiceConnected, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &ExternalServicesComponent::handleServiceDisconnected, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ShutdownRequestedByService, this, &ExternalServicesComponent::handleShutdownRequestByService, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ServiceShutdown, this, &ExternalServicesComponent::handleServiceShutdown, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_Run, this, &ExternalServicesComponent::handleRun, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ServicePreShutdown, this, &ExternalServicesComponent::handlePreShutdown, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ServiceEmergencyShutdown, this, &ExternalServicesComponent::handleEmergencyShutdown, ot::SECURE_MESSAGE_TYPES);
 }
 
 ot::intern::ExternalServicesComponent::~ExternalServicesComponent()

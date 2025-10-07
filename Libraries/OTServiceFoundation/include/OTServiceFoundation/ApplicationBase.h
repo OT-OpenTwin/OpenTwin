@@ -20,8 +20,7 @@
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"                     // Message related methods and types
-#include "OTCommunication/ActionHandleConnector.h"   // Action handle connectors
-#include "OTCommunication/ActionHandleConnectorContainer.h"
+#include "OTCommunication/ActionHandler.h"           // Action handle connection
 
 // OpenTwin ServiceFoundation header
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT
@@ -303,8 +302,7 @@ namespace ot {
 
 	private:
 		friend class intern::ExternalServicesComponent;
-
-		ot::ActionHandleConnectorContainer m_actionHandleConnectors;
+		ActionHandler m_actionHandler;
 		std::string handleKeySequenceActivated(JsonDocument& _document);
 		ot::ReturnMessage handleSettingsItemChanged(JsonDocument& _document);
 		ot::ReturnMessage handleRegisterNewLMS(JsonDocument& _document);

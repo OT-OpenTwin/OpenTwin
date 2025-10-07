@@ -26,7 +26,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ActionHandler {
 public:
 	Application();
 	virtual ~Application();

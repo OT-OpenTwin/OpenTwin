@@ -16,7 +16,6 @@
 #include "OTCore/Variable.h"
 #include "OTCore/TypeNames.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "TemplateDefaultManager.h"
@@ -38,7 +37,7 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, new UiNotifier(), new ModelNotifier()),
 	m_subprocessManager(nullptr)
 {
-	ot::ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteAction);
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteAction);
 }
 
 Application::~Application()

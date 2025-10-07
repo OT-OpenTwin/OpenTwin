@@ -35,14 +35,14 @@ namespace ot {
 		//! @param _actionName The name of the action to connect to.
 		//! @param _messageFlags The message type flags this connector will accept.
 		//! @param _method The method to be called when a message is received.
-		ActionHandleConnector(const std::string& _actionName, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method);
+		ActionHandleConnector(const std::string& _actionName, const DispatchMethodType& _method, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
 
 		//! @brief Constructor.
 		//! The created connector will not be registered with any dispatcher.
 		//! @param _actionNames The names of the actions to connect to.
 		//! @param _messageFlags The message type flags this connector will accept.
 		//! @param _method The method to be called when a message is received.
-		ActionHandleConnector(const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method);
+		ActionHandleConnector(const std::list<std::string>& _actionNames, const DispatchMethodType& _method, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
 
 		//! @brief Constructor.
 		//! The created connector will be registered with the specified dispatcher.
@@ -52,7 +52,7 @@ namespace ot {
 		//! @param _dispatcher The dispatcher to register this connector with.
 		//! @param _expectMultiple If true the dispatcher will expect multiple connectors for the same action name.
 		//! @param _skipConnect If true the connector will not be registered with the dispatcher.
-		ActionHandleConnector(const std::string& _actionName, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher);
+		ActionHandleConnector(const std::string& _actionName, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
 
 		//! @brief Constructor.
 		//! The created connector will be registered with the specified dispatcher.
@@ -62,7 +62,7 @@ namespace ot {
 		//! @param _dispatcher The dispatcher to register this connector with.
 		//! @param _expectMultiple If true the dispatcher will expect multiple connectors for the same action name.
 		//! @param _skipConnect If true the connector will not be registered with the dispatcher.
-		ActionHandleConnector(const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher);
+		ActionHandleConnector(const std::list<std::string>& _actionNames, const DispatchMethodType& _method, ActionDispatcherBase* _dispatcher, const MessageTypeFlags& _messageFlags = ot::DEFAULT_MESSAGE_TYPE);
 
 		virtual ~ActionHandleConnector();
 

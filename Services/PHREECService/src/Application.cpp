@@ -15,7 +15,6 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
-#include "OTCommunication/ActionDispatcher.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
@@ -40,7 +39,7 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(-1)
 {
-	ot::ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteModelAction);
+	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 }
 
 Application::~Application()

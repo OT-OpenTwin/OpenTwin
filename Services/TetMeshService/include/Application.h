@@ -30,7 +30,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ActionHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

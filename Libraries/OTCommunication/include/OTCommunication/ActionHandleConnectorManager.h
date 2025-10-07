@@ -32,8 +32,8 @@ namespace ot {
 
 		typedef std::string(T::*HandlerMethodType)(JsonDocument& _document);
 
-		virtual void bindHandler(T* _object, HandlerMethodType _method, const std::string& _actionName, MessageType _messageTypes);
-		virtual void bindHandler(T* _object, HandlerMethodType _method, const std::list<std::string>& _actionNames, MessageType _messageTypes);
+		virtual void bindHandler(T* _object, HandlerMethodType _method, const std::string& _actionName, const MessageTypeFlags& _messageFlags);
+		virtual void bindHandler(T* _object, HandlerMethodType _method, const std::list<std::string>& _actionNames, const MessageTypeFlags& _messageFlags);
 
 	private:
 		T* m_obj;

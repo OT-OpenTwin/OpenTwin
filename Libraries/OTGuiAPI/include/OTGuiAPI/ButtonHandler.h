@@ -5,14 +5,11 @@
 
 #pragma once
 
-// OpenTwin Core header
+// OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OTClassHelper.h"
-
-// OpenTwin Gui header
 #include "OTGui/ToolBarButtonCfg.h"
-
-// OpenTwin GuiAPI header
+#include "OTCommunication/ActionHandler.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 // std header
@@ -29,7 +26,7 @@ namespace ot {
 	class OT_GUIAPI_API_EXPORT ButtonHandler {
 		OT_DECL_NOCOPY(ButtonHandler)
 		OT_DECL_NOMOVE(ButtonHandler)
-	public:
+	public:	
 		ButtonHandler();
 		virtual ~ButtonHandler() = default;
 		
@@ -102,7 +99,7 @@ namespace ot {
 		// Handler
 
 	private:
-		std::shared_ptr<ActionHandleConnector> m_actionHandleConnector;
+		ActionHandler m_actionHandler;
 		void handleButtonClicked(JsonDocument& _document);
 
 		std::unordered_map<std::string, std::function<void()>> m_callbacks;

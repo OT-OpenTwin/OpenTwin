@@ -54,10 +54,9 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 
 	// Connect actions
-	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleKeySequenceActivated));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleSettingsItemChanged));
-	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleRegisterNewLMS));
+	m_actionHandler.connectAction(OT_ACTION_CMD_KeySequenceActivated, this, &ApplicationBase::handleKeySequenceActivated, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_SettingsItemChanged, this, &ApplicationBase::handleSettingsItemChanged, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &ApplicationBase::handleRegisterNewLMS, ot::SECURE_MESSAGE_TYPES);
 }
 
 ot::ApplicationBase::~ApplicationBase()
