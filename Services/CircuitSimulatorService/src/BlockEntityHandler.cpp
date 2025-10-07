@@ -110,8 +110,8 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID() {
-	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_packageName, true);
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName) {
+	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(_folderName, true);
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
@@ -130,8 +130,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	return blockEntitiesByBlockID;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections() {
-	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems(_packageName + "/Connections");
+std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections(const std::string& _folderName) {
+	const std::string fullFolderName = _folderName + "/" + m_connectionsFolder;
+	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullFolderName);
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
@@ -184,7 +185,7 @@ bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockE
 
 void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& _connections,std::string _baseFolderName) {
 	
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
 	//auto entityBlockConnectionsByBlockID = findAllEntityBlockConnections();
 
 	std::list<ot::UID> topologyEntityIDList;
@@ -197,7 +198,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	std::string blockName = "EntityBlockConnection";
 	int count = 1;
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
-	const std::string connectionFolderName = _baseFolderName + "/" + m_ConnectionsFolder;
+	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionsFolder;
 	for (auto& connection : _connections) {
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
@@ -226,7 +227,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
 		connectionEntity->setName(connectionName);
-		connectionEntity->setGraphicsScenePackageChildName(m_ConnectionsFolder);
+		connectionEntity->setGraphicsScenePackageChildName(m_connectionsFolder);
 		connectionEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->StoreToDataBase();
@@ -273,8 +274,10 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos)
 {
 	
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
-	auto connectionEntitiesByID = findAllEntityBlockConnections();
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(editorName);
+	const std::string fullConnectionsFolderName = editorName + "/" + m_connectionsFolder;
+
+	auto connectionEntitiesByID = findAllEntityBlockConnections(fullConnectionsFolderName);
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	std::list<std::string> entitiesToDelete;
 	std::list<ot::UID> topologyEntityIDList;

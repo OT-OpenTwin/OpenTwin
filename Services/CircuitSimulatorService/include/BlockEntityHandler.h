@@ -22,8 +22,8 @@ class BlockEntityHandler : public BusinessLogicHandler
 public:
 	std::shared_ptr<EntityBlock> CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void OrderUIToCreateBlockPicker();
-	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
-	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections();
+	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID(const std::string& _folderName);
+	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections(const std::string& _folderName);
 	std::shared_ptr<EntityFileText> getCircuitModel(const std::string& _folderName, std::string _modelName);
 
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
@@ -43,7 +43,7 @@ private:
 	std::string _packageName = "Circuit Simulator";
 	const std::string m_initialCircuitName = "Circuit 1";
 
-	const std::string m_ConnectionsFolder = "Connections";
+	const std::string m_connectionsFolder = "Connections";
 
 	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();

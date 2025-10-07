@@ -331,8 +331,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 
 	// Get all Entities
 
-	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
-	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
+	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID(circuitName->getValueName());
+	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections(circuitName->getValueName());
 
 	if (allEntitiesByBlockID.empty()) {
 		OT_LOG_E("The " + name + " is empty!");
