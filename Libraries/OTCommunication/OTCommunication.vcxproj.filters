@@ -62,6 +62,9 @@
     <ClCompile Include="src\LSSDebugInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActionHandleConnectorContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCommunication\ActionTypes.h">
@@ -131,6 +134,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\LDSDebugInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

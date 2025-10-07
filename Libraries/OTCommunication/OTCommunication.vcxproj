@@ -24,6 +24,7 @@
     <ClCompile Include="src\ActionDispatcherBase.cpp" />
     <ClCompile Include="src\ActionDispatchProfiler.cpp" />
     <ClCompile Include="src\ActionHandleConnector.cpp" />
+    <ClCompile Include="src\ActionHandleConnectorContainer.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\GDSDebugInfo.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatcherBase.h" />
     <ClInclude Include="include\OTCommunication\ActionDispatchProfiler.h" />
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorContainer.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.hpp" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnector.h" />
     <ClInclude Include="include\OTCommunication\ActionHandleConnectorManager.h" />
