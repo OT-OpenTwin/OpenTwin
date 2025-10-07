@@ -14,6 +14,7 @@
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTCore/EntityName.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTGui/PainterRainbowIterator.h"
 #include "CurveFactory.h"
 #include "OTModelAPI/NewModelStateInformation.h"

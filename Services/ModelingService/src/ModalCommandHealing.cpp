@@ -3,6 +3,7 @@
 #include "ShapeHealing.h"
 #include "Application.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 #include <thread>	

@@ -103,13 +103,26 @@ void initChecker() {
 	}
 }
 
-ot::intern::ExternalServicesComponent::ExternalServicesComponent() : m_application(nullptr), m_componentState(WaitForStartup) {}
+ot::intern::ExternalServicesComponent::ExternalServicesComponent()
+	: m_application(nullptr), m_componentState(WaitForStartup) 
+{
+	// Connect action handlers
+	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
+
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleSetLogFlags));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_Init, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleInitialize));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceConnected));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceDisconnected));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleShutdownRequestByService));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleServiceShutdown));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleRun));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handlePreShutdown));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES, this, &ExternalServicesComponent::handleEmergencyShutdown));
+}
 
 ot::intern::ExternalServicesComponent::~ExternalServicesComponent()
-{ 
-	if (m_application != nullptr) delete m_application; 
+{
 	m_application = nullptr;
-	
 }
 
 ot::intern::ExternalServicesComponent& ot::intern::ExternalServicesComponent::instance() {
@@ -383,12 +396,10 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 
 // Private functions
 
-std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
 	ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(logFlagsFromJsonArray(flags));
 	m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
@@ -397,36 +408,30 @@ std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument
 	return this->init(initData).toJson();
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {
 	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
 
 	m_application->serviceConnectedPrivate(ot::ServiceBase(senderName, senderType, senderURL, senderID));
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceDisconnected(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleServiceDisconnected(JsonDocument& _document) {
 	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
 	m_application->serviceDisconnectedPrivate(senderID);
-	
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleShutdownRequestByService(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleShutdownRequestByService() {
 	shutdown(false);
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleServiceShutdown(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleServiceShutdown() {
 	shutdown(true);
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
 	ot::ServiceRunData runData;
 	runData.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_RunData));
 
@@ -437,19 +442,15 @@ std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _docu
 	}
 
 	m_application->run();
-
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string ot::intern::ExternalServicesComponent::handlePreShutdown(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handlePreShutdown() {
 	m_application->preShutdown();
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string ot::intern::ExternalServicesComponent::handleEmergencyShutdown(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleEmergencyShutdown() {
 	std::thread t(ot::intern::exitWorker, ot::AppExitCode::EmergencyShutdown);
 	t.detach();
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad)

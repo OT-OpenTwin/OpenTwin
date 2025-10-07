@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcherBase.h"
 
 namespace ot {

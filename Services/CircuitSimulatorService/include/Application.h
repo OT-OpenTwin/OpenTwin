@@ -34,7 +34,6 @@ namespace ot {
 class QtWrapper;
 
 class Application : public ot::ApplicationBase {
-	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -59,18 +58,12 @@ public:
 
 	// Add your custom functions/ members here
 
-	// A handler can be created to handle the the specified action
-	// In this example the first parameter is the name of the callback function
-	// The second parameter is the class name where the handler is created at
-	// The third parameter is a String containing the action name
-	// The last parameter are flags describing the allowed message types for this handler
-	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleNewGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveGraphicsItem, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleNewGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveGraphicsItemConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleConnectionToConnection, Application, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, ot::SECURE_MESSAGE_TYPES)
+	void handleExecuteModelAction(ot::JsonDocument& _document);
+	void handleNewGraphicsItem(ot::JsonDocument& _document);
+	void handleRemoveGraphicsItem(ot::JsonDocument& _document);
+	void handleNewGraphicsItemConnection(ot::JsonDocument& _document);
+	ot::ReturnMessage handleRemoveGraphicsItemConnection(ot::JsonDocument& _document);
+	void handleConnectionToConnection(ot::JsonDocument& _document);
 
 	void createNewCircuit();
 	void createInitialCircuit();

@@ -1,13 +1,11 @@
-/*
- *  ModelComponent.cpp
- *
- *  Created on: 08/02/2021
- *	Author: Alexander Kuester, Peter Thoma
- *  Copyright (c) 2021, OpenTwin
- */
+//! @file ModelComponent.cpp
+//! @authors Alexander Kuester (alexk95), Peter Thoma
+//! @date March 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"

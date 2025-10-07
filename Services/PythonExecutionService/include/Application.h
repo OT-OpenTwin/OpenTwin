@@ -17,7 +17,6 @@
 class SubprocessManager;
 
 class Application : public ot::ApplicationBase {
-	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application* instance(void);
 	static void deleteInstance(void);
@@ -60,7 +59,7 @@ public:
 	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
 
 	// Handler
-	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	std::string handleExecuteAction(ot::JsonDocument& _doc);
 
 private:
 	SubprocessManager* m_subprocessManager;

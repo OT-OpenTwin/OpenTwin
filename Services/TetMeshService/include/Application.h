@@ -31,7 +31,6 @@ namespace ot {
 }
 
 class Application : public ot::ApplicationBase {
-	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -50,8 +49,8 @@ public:
 
 	// ##################################################################################################################################
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleExecuteFunction, Application, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES)
+	void handleExecuteModelAction(ot::JsonDocument& _document);
+	void handleExecuteFunction(ot::JsonDocument& _document);
 
 	// Add your custom functions/ members here
 	virtual void modelSelectionChanged() override;

@@ -20,8 +20,8 @@
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"                     // Message related methods and types
-#include "OTCommunication/ActionTypes.h"             // Action types
-#include "OTCommunication/ActionHandler.h"           // OT_DECL_ACTION_HANDLER and OT_HANDLER
+#include "OTCommunication/ActionHandleConnector.h"   // Action handle connectors
+#include "OTCommunication/ActionHandleConnectorContainer.h"
 
 // OpenTwin ServiceFoundation header
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT
@@ -59,7 +59,6 @@ namespace ot {
 		OT_DECL_NOCOPY(ApplicationBase)
 		OT_DECL_NOMOVE(ApplicationBase)
 		OT_DECL_NODEFAULT(ApplicationBase)
-		OT_DECL_ACTION_HANDLER(ApplicationBase)
 	public:
 		//! @brief Constructor
 		//! @param _serviceName The name of the service.
@@ -305,9 +304,10 @@ namespace ot {
 	private:
 		friend class intern::ExternalServicesComponent;
 
-		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleRegisterNewLMS, ApplicationBase, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
+		ot::ActionHandleConnectorContainer m_actionHandleConnectors;
+		std::string handleKeySequenceActivated(JsonDocument& _document);
+		ot::ReturnMessage handleSettingsItemChanged(JsonDocument& _document);
+		ot::ReturnMessage handleRegisterNewLMS(JsonDocument& _document);
 
 		// ##########################################################################################################################################
 
@@ -324,6 +324,7 @@ namespace ot {
 		void shuttingDownPrivate(bool _requestedAsCommand);
 
 		bool                                m_uiMessageQueuingEnabled;
+
 
 		std::map<std::string, ServiceBase*>	m_serviceNameMap;
 		std::map<serviceID_t, ServiceBase*>	m_serviceIdMap;

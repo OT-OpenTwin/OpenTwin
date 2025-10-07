@@ -8,6 +8,7 @@
 #include "EntityResultUnstructuredMesh.h"
 #include "EntityResultUnstructuredMeshData.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include <cassert>

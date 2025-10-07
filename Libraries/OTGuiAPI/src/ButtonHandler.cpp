@@ -3,14 +3,17 @@
 //! @date October 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin System header
+// OpenTwin header
 #include "OTSystem/OTAssert.h"
-
-// OpenTwin Core header
 #include "OTCore/LogDispatcher.h"
-
-// OpenTwin GuiAPI header
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTGuiAPI/ButtonHandler.h"
+
+ot::ButtonHandler::ButtonHandler() {
+	m_actionHandleConnector = ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &ButtonHandler::handleButtonClicked, ActionDispatcher::ExpectMultiple);
+}
 
 void ot::ButtonHandler::connectButton(void(*_callback)(), const std::string& _buttonKey) {
     OTAssertNullptr(_callback);
@@ -29,7 +32,7 @@ void ot::ButtonHandler::buttonClicked(const std::string& _buttonKey) {
 	OT_LOG_W("Unhandled button click event { \"ButtonKey\": \"" + _buttonKey + "\" }");
 }
 
-std::string ot::ButtonHandler::handleButtonClicked(JsonDocument& _document) {
+void ot::ButtonHandler::handleButtonClicked(JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
 	auto it = m_callbacks.find(action);
@@ -39,6 +42,4 @@ std::string ot::ButtonHandler::handleButtonClicked(JsonDocument& _document) {
 	else {
 		this->buttonClicked(action);
 	}
-
-	return std::string();
 }

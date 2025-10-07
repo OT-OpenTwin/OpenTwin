@@ -31,7 +31,6 @@ namespace ot {
 
 class Application : public ot::ApplicationBase {
 	OT_DECL_NOCOPY(Application)
-	OT_DECL_ACTION_HANDLER(Application)
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -52,7 +51,7 @@ public:
 
 	// ##################################################################################################################################
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	void handleExecuteModelAction(ot::JsonDocument& _document);
 
 	// Add your custom functions/ members here
 	void createMesh(void);

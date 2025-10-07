@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
+#include "OTCommunication/ActionTypes.h"
 
 // Qt header
 #include <QtCore/qcoreapplication.h>

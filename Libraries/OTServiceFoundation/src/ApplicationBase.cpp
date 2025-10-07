@@ -12,9 +12,11 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
-#include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
+#include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/IpConverter.h"
+#include "OTCommunication/ActionTypes.h"        // Action types
+#include "OTCommunication/ActionDispatcher.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelAPI/ModelAPIManager.h"
@@ -50,6 +52,12 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_modelNotifier(_modelNotifier), m_uiMessageQueuingEnabled(false), m_sessionService(nullptr), m_directoryService(nullptr)
 {
 	new FrontendLogNotifier(this); // Log Dispatcher gets the ownership of the notifier.
+
+	// Connect actions
+	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleKeySequenceActivated));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleSettingsItemChanged));
+	m_actionHandleConnectors.store(disp.connect(OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES, this, &ApplicationBase::handleRegisterNewLMS));
 }
 
 ot::ApplicationBase::~ApplicationBase()
@@ -481,12 +489,14 @@ std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _docum
 	}
 }
 
-std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
+ot::ReturnMessage ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
 	PropertyGridCfg gridConfig;
 	gridConfig.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	std::list<Property*> properties = gridConfig.getAllProperties();
-	if (properties.empty()) return std::string();
+	if (properties.empty()) {
+		return ot::ReturnMessage::Ok;
+	}
 
 	bool requireSettingsUpdate = false;
 	for (const Property* prop : properties) {
@@ -496,22 +506,24 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	}
 
 	PropertyGridCfg newSettings = this->createSettings();
-	if (newSettings.isEmpty()) return "";
+	if (newSettings.isEmpty()) {
+		return ot::ReturnMessage::Ok;
+	}
 
 	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_dbUserCollection)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to store settings";
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to store settings");
 	}
 
 	if (requireSettingsUpdate) {
 		m_uiComponent->sendSettingsData(newSettings);
 	}
 
-	return "";
+	return ot::ReturnMessage::Ok;
 }
 
-std::string ot::ApplicationBase::handleRegisterNewLMS(JsonDocument& _document) {
+ot::ReturnMessage ot::ApplicationBase::handleRegisterNewLMS(JsonDocument& _document) {
 	m_lmsUrl = ot::json::getString(_document, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
 // ##########################################################################################################################################

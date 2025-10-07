@@ -13,12 +13,13 @@
 #include "QtWrapper.h"
 #include "SimulationResults.h"
 
-// Open twin header
+// OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
@@ -71,7 +72,16 @@ Application::Application()
 	classFactoryBlock->SetChainRoot(&classFactory);
 	classFactory.SetNextHandler(classFactoryBlock);
 	m_SimulationRunning = false;
-	
+
+	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
+	ot::MessageType types = ot::SECURE_MESSAGE_TYPES;
+
+	disp.connect(OT_ACTION_CMD_MODEL_ExecuteAction, types, this, &Application::handleExecuteModelAction);
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, types, this, &Application::handleNewGraphicsItem);
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, types, this, &Application::handleRemoveGraphicsItem);
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, types, this, &Application::handleNewGraphicsItemConnection);
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, types, this, &Application::handleRemoveGraphicsItemConnection);
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, types, this, &Application::handleConnectionToConnection);	
 }
 
 Application::~Application() {
@@ -81,7 +91,7 @@ Application::~Application() {
 // ##################################################################################################################################################################################################################
 
 // Custom functions
-std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
 	if (action == m_buttonAddSolver.getFullPath()) {
@@ -98,8 +108,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	else {
 		//OT_LOG_W("Unknown model action");
 		assert(0);
-		}// Unhandled button action
-	return std::string();
+	}
 }
 
 // Trying to create more circuits
@@ -463,7 +472,7 @@ SubprocessHandler* Application::getSubProcessHandler() {
 	return m_subprocessHandler;
 }
 
-std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
+void Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 	//Here we get the Item Information
 	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
@@ -476,33 +485,25 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 
 	
 	m_blockEntityHandler.setPackageName(editorName);
-	auto temp = m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
-	return "";
-	
+	auto temp = m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);	
 }
 
-std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
+void Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 	ot::UIDList items;
 
 	// Add Item UIDs to the list above (Items to be removed)
 	ot::UID itemUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
 	items.push_back(itemUID);
-
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
-std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
-	
+void Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 	m_blockEntityHandler.setPackageName(pckg.name());
 	m_blockEntityHandler.addBlockConnection(pckg.connections(),pckg.name());
-	
-	return "";
-	
 }
 
-std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document) {
+ot::ReturnMessage Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -523,14 +524,14 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 
 	std::string tmp;
 	if (this->getUiComponent()->sendMessage(true, reqDoc, tmp)) {
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+		return ot::ReturnMessage::Ok;
 	}
 	else {
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed);
+		return ot::ReturnMessage::Failed;
 	}
 }
 
-std::string Application::handleConnectionToConnection(ot::JsonDocument& _document) {
+void Application::handleConnectionToConnection(ot::JsonDocument& _document) {
 
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -541,8 +542,6 @@ std::string Application::handleConnectionToConnection(ot::JsonDocument& _documen
 	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_POSITION));
 	m_blockEntityHandler.setPackageName(editorName);
 	m_blockEntityHandler.addConnectionToConnection(pckg.connections(), editorName, pos);
-	
-	return "";
 }
 
 // ############################## ####################################################################################################################################################################################

@@ -8,6 +8,7 @@
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

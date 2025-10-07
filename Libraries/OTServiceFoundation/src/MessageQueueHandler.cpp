@@ -1,3 +1,4 @@
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/MessageQueueHandler.h"
 
 void MessageQueueHandler::flushIfAppropriate(int _queueRequestIncrement, ot::ServiceBase* _serviceBase)

@@ -19,6 +19,7 @@
 #include "MeshImport.h"
 
 // Open twin header
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -51,10 +52,14 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(-1)
 {
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
+
+	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
+	disp.connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteModelAction);
+	disp.connect(OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteFunction);
 }
 
 Application::~Application()
@@ -111,17 +116,16 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 // ##################################################################################################################################
 
-std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
+void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (     action == "Mesh:Tet Mesh:Create Tet Mesh")	createMesh();
 	else if (action == "Mesh:Tet Mesh:Update Tet Mesh")	updateMesh();
 	else if (action == "Mesh:Import / Export:Import Tet Mesh") importMesh();
 	else if (action == "Mesh:Import / Export:Export Tet Mesh") exportMesh();
 	else assert(0); // Unhandled button action
-	return std::string();
 }
 
-std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
+void Application::handleExecuteFunction(ot::JsonDocument& _document) {
 
 	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 
@@ -145,8 +149,6 @@ std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 	{
 		assert(0);  // Unknown function to execute
 	}
-
-	return std::string();
 }
 
 

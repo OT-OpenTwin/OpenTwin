@@ -9,6 +9,7 @@
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/Foundation.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 

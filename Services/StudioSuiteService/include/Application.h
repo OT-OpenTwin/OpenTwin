@@ -32,7 +32,6 @@ namespace ot {
 class EntityUnits;
 
 class Application : public ot::ApplicationBase {
-	OT_DECL_ACTION_HANDLER(Application)
 public:
 	Application();
 	virtual ~Application();
@@ -51,7 +50,7 @@ public:
 
 	// ##################################################################################################################################
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	void handleExecuteModelAction(ot::JsonDocument& _document);
 
 	void importProject(void);
 	void setCSTFile(void);

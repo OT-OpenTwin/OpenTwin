@@ -4,6 +4,7 @@
 #include "ClassFactory.h"
 #include "EntityFile.h"
 #include "OTCore/ReturnValues.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCore/GenericDataStructSingle.h"
 

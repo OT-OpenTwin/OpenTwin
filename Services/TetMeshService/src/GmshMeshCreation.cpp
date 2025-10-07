@@ -60,6 +60,7 @@
 #include <thread>	
 
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 

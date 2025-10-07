@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ClassFactory.h"
 #include "OTCore/FolderNames.h"
+#include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "EntityAPI.h"
 

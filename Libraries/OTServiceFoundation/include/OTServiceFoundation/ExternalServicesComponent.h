@@ -7,12 +7,13 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/SystemInformation.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTCommunication/ServiceRunData.h"
 #include "OTCommunication/ServiceInitData.h"
-#include "OTSystem/SystemInformation.h"
+#include "OTCommunication/ActionHandleConnectorContainer.h"
 
 // std header
 #include <string> // string
@@ -28,7 +29,6 @@ namespace ot {
 		//! Use the static instance() function to get the global component that should be used in this service
 		class ExternalServicesComponent {
 			OT_DECL_NOCOPY(ExternalServicesComponent)
-			OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
 		public:
 			enum ComponentState {
 				WaitForStartup,
@@ -45,7 +45,7 @@ namespace ot {
 			// Mandatory functions
 
 			//! @brief Will initialize the component.
-			//! @param _application The application object that is using this component.
+			//! @param _application The application object that is using this component. The caller keeps ownership of this instance.
 			//! @param _ownURL The URL of this service.
 			//! @return 0 if successful, otherwise an error code.
 			int startup(ApplicationBase* _application, const std::string& _ownURL);
@@ -85,15 +85,17 @@ namespace ot {
 
 			// Private functions
 
-			OT_HANDLER(handleSetLogFlags, ExternalServicesComponent, OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleInitialize, ExternalServicesComponent, OT_ACTION_CMD_Init, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleShutdownRequestByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleServiceShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
+			ot::ActionHandleConnectorContainer m_actionHandleConnectors;
+
+			void handleSetLogFlags(JsonDocument& _document);
+			std::string handleInitialize(JsonDocument& _document);
+			void handleServiceConnected(JsonDocument& _document);
+			void handleServiceDisconnected(JsonDocument& _document);
+			void handleShutdownRequestByService();
+			void handleServiceShutdown();
+			void handleRun(JsonDocument& _document);
+			void handlePreShutdown();
+			void handleEmergencyShutdown();
 
 			// #####################################################################################################################################
 

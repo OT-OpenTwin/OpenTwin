@@ -1,5 +1,6 @@
 #include "UpdateManager.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"

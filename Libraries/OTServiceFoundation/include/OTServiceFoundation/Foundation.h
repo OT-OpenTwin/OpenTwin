@@ -51,6 +51,9 @@ namespace ot {
 		//! Afterwards ot::ExternalServicesComponent::init will be called.
 		//! 
 		//! In Release mode only ot::ExternalServicesComponent::startup will be called.
+		//! @param _ownURL The URL of this service.
+		//! @param _application Pointer to the application instance. The caller keeps ownership of this instance.
+		//! @param _explicitDebug If set to true the component will be started in debug mode even if the service is not started in debug mode.
 		OT_SERVICEFOUNDATION_API_EXPORTONLY int init(const std::string& _ownURL, ApplicationBase* _application, bool _explicitDebug);
 
 	} // namespace foundation

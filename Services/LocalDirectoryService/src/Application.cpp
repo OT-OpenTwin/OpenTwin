@@ -16,6 +16,8 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
@@ -82,19 +84,19 @@ std::list<std::string> Application::getSupportedServices(void) const {
 
 // Action handler
 
-std::string Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleStartNewService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
 	if (m_serviceManager.requestStartService(initData) != ServiceManager::RequestResult::Success) {
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, m_serviceManager.lastError());
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, m_serviceManager.lastError());
 	}
 	else {
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+		return ot::ReturnMessage::Ok;
 	}
 }
 
-std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
@@ -105,7 +107,7 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 
 	if (!supportedService.has_value()) {
 		OT_LOG_E("The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
 	}
 
 	const unsigned int maxStartupRestarts = supportedService.value().getMaxStartupRestarts();
@@ -120,7 +122,7 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 			responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 			responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-			return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
+			return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
 		}
 		else {
 			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(maxStartupRestarts));
@@ -128,30 +130,30 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 	}
 
 	OT_LOG_E("Failed to start relay service: Maximum number of start attempts reached");
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to start relay service: Maximum number of start attempts reached");
+	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start relay service: Maximum number of start attempts reached");
 }
 
-std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	m_serviceManager.sessionClosing(sessionID);
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	m_serviceManager.sessionClosed(sessionID);
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleServiceClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 
 	m_serviceManager.serviceDisconnected(sessionID, serviceID);
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocument) {
+std::string Application::handleGetDebugInformation() {
 	ot::LDSDebugInfo info;
 	info.setURL(this->getServiceURL());
 	info.setId(this->getServiceID());
@@ -164,8 +166,7 @@ std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocume
 	return info.toJson();
 }
 
-std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
-
+std::string Application::handleGetSystemInformation() {
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
 	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
 
@@ -191,11 +192,9 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	return reply.toJson();
 }
 
-std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
+void Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -203,8 +202,21 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 // Constructor/Destructor
 
 Application::Application() :
-	ot::ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService) {
+	ot::ServiceBase(OT_INFO_SERVICE_TYPE_LocalDirectoryService, OT_INFO_SERVICE_TYPE_LocalDirectoryService) 
+{
 	m_systemLoadInformation.initialize();
+
+	ot::ActionDispatcher& disp = ot::ActionDispatcher::instance();
+	ot::MessageType type = ot::SECURE_MESSAGE_TYPES;
+
+	disp.connect(OT_ACTION_CMD_StartNewService, type, this, &Application::handleStartNewService);
+	disp.connect(OT_ACTION_CMD_StartNewRelayService, type, this, &Application::handleStartNewRelayService);
+	disp.connect(OT_ACTION_CMD_ShutdownSession, type, this, &Application::handleSessionClosing);
+	disp.connect(OT_ACTION_CMD_ShutdownSessionCompleted, type, this, &Application::handleSessionClosed);
+	disp.connect(OT_ACTION_CMD_ServiceDisconnected, type, this, &Application::handleServiceClosed);
+	disp.connect(OT_ACTION_CMD_GetDebugInformation, type, this, &Application::handleGetDebugInformation);
+	disp.connect(OT_ACTION_CMD_GetSystemInformation, type, this, &Application::handleGetSystemInformation);
+	disp.connect(OT_ACTION_CMD_SetGlobalLogFlags, type, this, &Application::handleSetGlobalLogFlags);
 }
 
 Application::~Application() {}

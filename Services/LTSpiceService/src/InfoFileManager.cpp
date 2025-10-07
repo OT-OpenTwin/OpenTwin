@@ -1,6 +1,7 @@
 #include "InfoFileManager.h"
 #include "Application.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"

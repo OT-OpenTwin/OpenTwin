@@ -12,17 +12,16 @@
 // OpenTwin Gui header
 #include "OTGui/ToolBarButtonCfg.h"
 
-// OpenTwin Communication header
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionHandler.h"
-
 // OpenTwin GuiAPI header
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 // std header
+#include <functional>
 #include <unordered_map>
 
 namespace ot {
+
+	class ActionHandleConnector;
 
 	//! @brief The ButtonHandler class is used to handle button click events.
 	//! Register button click handlers via connectButtonHandler.
@@ -30,9 +29,8 @@ namespace ot {
 	class OT_GUIAPI_API_EXPORT ButtonHandler {
 		OT_DECL_NOCOPY(ButtonHandler)
 		OT_DECL_NOMOVE(ButtonHandler)
-		OT_DECL_ACTION_HANDLER(ButtonHandler)
 	public:
-		ButtonHandler() = default;
+		ButtonHandler();
 		virtual ~ButtonHandler() = default;
 		
 		//! @brief Connect a button click handler.
@@ -104,7 +102,8 @@ namespace ot {
 		// Handler
 
 	private:
-		OT_HANDLER(handleButtonClicked, ButtonHandler, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+		std::shared_ptr<ActionHandleConnector> m_actionHandleConnector;
+		void handleButtonClicked(JsonDocument& _document);
 
 		std::unordered_map<std::string, std::function<void()>> m_callbacks;
 	};

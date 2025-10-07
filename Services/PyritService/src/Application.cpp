@@ -16,6 +16,7 @@
 #include "OTCore/Variable.h"
 #include "OTCore/TypeNames.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -49,9 +50,9 @@ void Application::deleteInstance(void) {
 
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT, new UiNotifier(), new ModelNotifier()),
-	m_subprocessManager(nullptr)
+	m_subprocessManager(nullptr), visualizationModelID(-1)
 {
-	
+	ot::ActionDispatcher::instance().connect(OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES, this, &Application::handleExecuteAction);
 }
 
 Application::~Application()
@@ -160,7 +161,7 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 
 // ##################################################################################################################################################################################################################
 
-std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
+void Application::handleExecuteAction(ot::JsonDocument& _doc) {
 	std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 	OT_LOG_D("Executing action: " + action);
 	
@@ -168,8 +169,6 @@ std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
 	else if (action == "Pyrit:Solver:Run Solver")		  runSolver();
 	//	else if (action == "GetDP:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
-	
-	return std::string();
 }
 
 void Application::modelSelectionChanged()

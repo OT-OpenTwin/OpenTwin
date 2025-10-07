@@ -19,7 +19,6 @@
 #include <functional>
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
-	OT_DECL_ACTION_HANDLER(Application)
 private:
 	//! @brief Constructor
 	//! Register buttons here!
@@ -84,8 +83,7 @@ public:
 
 	// Default
 
-	static Application * instance(void);
-	static void deleteInstance(void);
+	static Application& instance();
 
 private:
 	virtual ~Application();

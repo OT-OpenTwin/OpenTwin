@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "DataBase.h"
 
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/FolderNames.h"

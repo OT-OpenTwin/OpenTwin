@@ -819,15 +819,11 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	newConfig.addToJsonObject(configObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
-	std::string response;
-	m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, response);
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E(response);
-		this->appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W(response);
-		this->appendInfoMessage(QString("[WARNING] Sending message resulted in error: ") + response.c_str() + "\n");
+	std::string responseStr;
+	m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, responseStr);
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (response != ot::ReturnMessage::Ok) {
+		OT_LOG_EAS("Sending settings change to service \"" + _owner + "\" failed: " + response.getWhat());
 	}
 }
 
