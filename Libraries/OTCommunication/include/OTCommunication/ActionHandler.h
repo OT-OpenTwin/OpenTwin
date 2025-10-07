@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionDispatcherBase.h"
 
 #include "OTCommunication/ActionDispatcher.h"

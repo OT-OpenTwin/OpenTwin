@@ -30,8 +30,7 @@ class LocalSessionService;
 //! @class GlobalSessionService
 //! @brief The GlobalSessionService is the central class of this service.
 //! It is responsible for managing all LocalSessionServices and the sessions in them.
-class GlobalSessionService : public ot::ServiceBase {
-	OT_DECL_ACTION_HANDLER(GlobalSessionService)
+class GlobalSessionService : public ot::ServiceBase, public ot::ActionHandler {
 	OT_DECL_NOCOPY(GlobalSessionService)
 	OT_DECL_NOMOVE(GlobalSessionService)
 public:
@@ -59,24 +58,22 @@ private:
 
 	// Action handler
 
-	OT_HANDLER(handleGetDBUrl, GlobalSessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetGlobalServicesURL, GlobalSessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCreateSession, GlobalSessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleConfirmSession, GlobalSessionService, OT_ACTION_CMD_ConfirmSession, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCheckProjectOpen, GlobalSessionService, OT_ACTION_CMD_IsProjectOpen, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetProjectTemplatesList, GlobalSessionService, OT_ACTION_CMD_GetListOfProjectTemplates, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetBuildInformation, GlobalSessionService, OT_ACTION_CMD_GetBuildInformation, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetFrontendInstaller, GlobalSessionService, OT_ACTION_CMD_GetFrontendInstaller, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handlePrepareFrontendInstaller, GlobalSessionService, OT_ACTION_CMD_PrepareFrontendInstaller, ot::ALL_MESSAGE_TYPES)
+	ot::ReturnMessage handleGetGlobalServicesURL();
+	ot::ReturnMessage handleCreateSession(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleConfirmSession(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleCheckProjectOpen(ot::JsonDocument& _doc);
+	std::string handleGetProjectTemplatesList(ot::JsonDocument& _doc);
+	std::string handleGetBuildInformation();
+	std::string handlePrepareFrontendInstaller();
+	std::string handleGetFrontendInstaller();
 
-	OT_HANDLER(handleGetDebugInformation, GlobalSessionService, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetSystemInformation, GlobalSessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRegisterSessionService, GlobalSessionService, OT_ACTION_CMD_RegisterNewSessionService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRegisterLibraryManagementService, GlobalSessionService, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleShutdownSession, GlobalSessionService, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleForceHealthcheck, GlobalSessionService, OT_ACTION_CMD_ForceHealthCheck, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleNewGlobalDirectoryService, GlobalSessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSetGlobalLogFlags, GlobalSessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
+	std::string handleGetDebugInformation();
+	std::string handleGetSystemInformation();
+	ot::ReturnMessage handleRegisterSessionService(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleRegisterLibraryManagementService(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleShutdownSession(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleNewGlobalDirectoryService(ot::JsonDocument& _doc);
+	void handleSetGlobalLogFlags(ot::JsonDocument& _doc);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -12,6 +12,7 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/SystemInformation.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
@@ -850,20 +851,18 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetGlobalServicesUrl, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	std::string responseStr;
+	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		return WorkerError::GSSConnectionFailed;
 	}
 
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		return WorkerError::InvalidGssResponse;
-	}
-	OT_ACTION_IF_RESPONSE_WARNING(response) {
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
 		return WorkerError::InvalidGssResponse;
 	}
 	
 	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
+	responseDoc.fromJson(response.getWhat());
 
 	if (!responseDoc.IsObject()) {
 		return WorkerError::InvalidGssResponseSyntax;

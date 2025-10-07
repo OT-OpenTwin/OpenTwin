@@ -164,15 +164,17 @@ void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessi
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(SessionService::instance().getUrl(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
-	std::string response;
+	std::string responseStr;
 	if (!this->ensureConnection()) {
 		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
 	}
-	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr)) {
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
 	}
-	else if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Unexpected GDS response: \"" + response + "\"");
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		OT_LOG_E("Failed to notify GDS about session shutdown: " + response.getWhat());
 	}
 }
 

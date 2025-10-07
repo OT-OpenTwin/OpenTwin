@@ -13,7 +13,6 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/AbstractLogNotifier.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
 // std header
@@ -22,9 +21,8 @@
 #include <string>
 #include <thread>
 
-class AppBase : public ot::ServiceBase, public ot::AbstractLogNotifier {
+class AppBase : public ot::ServiceBase, public ot::AbstractLogNotifier, public ot::ActionHandler {
 	OT_DECL_NOCOPY(AppBase)
-	OT_DECL_ACTION_HANDLER(AppBase)
 public:
 	static AppBase& instance(void);
 
@@ -35,15 +33,15 @@ public:
 
 	// Action handler
 
-	OT_HANDLER(handleLog, AppBase, OT_ACTION_CMD_Log, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRegister, AppBase, OT_ACTION_CMD_RegisterNewService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleDeregister, AppBase, OT_ACTION_CMD_RemoveService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleClear, AppBase, OT_ACTION_CMD_Reset, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetDebugInfo, AppBase, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSetGlobalLogFlags, AppBase, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSetCacheSize, AppBase, OT_ACTION_CMD_SetLogCacheSize, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetAllLogs, AppBase, OT_ACTION_CMD_GetAllLogs, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetUserLogs, AppBase, OT_ACTION_CMD_GetUserLogs, ot::ALL_MESSAGE_TYPES)
+	void handleLog(ot::JsonDocument& _jsonDocument);
+	std::string handleRegister(ot::JsonDocument& _jsonDocument);
+	void handleDeregister(ot::JsonDocument& _jsonDocument);
+	void handleClear();
+	std::string handleGetDebugInfo();
+	void handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument);
+	void handleSetCacheSize(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleGetAllLogs();
+	ot::ReturnMessage handleGetUserLogs(ot::JsonDocument& _jsonDocument);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

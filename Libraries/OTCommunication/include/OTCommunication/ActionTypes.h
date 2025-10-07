@@ -16,7 +16,6 @@
 #define OT_ACTION_CMD_ShutdownRequestedByService "Service.ShutdownRequested"
 #define OT_ACTION_CMD_ShowService "Service.Show"
 
-#define OT_ACTION_CMD_GetDatabaseUrl "Get.DatabaseURL"
 #define OT_ACTION_CMD_GetAuthorisationServerUrl "Get.AuthURL"
 #define OT_ACTION_CMD_GetGlobalServicesUrl "Get.GlobalServicesURL"
 #define OT_ACTION_CMD_GetMandatoryServices "Get.MandatoryServices"
@@ -59,7 +58,6 @@
 #define OT_ACTION_CMD_SetVisualizationModel "VisualizationModel.Set"
 #define OT_ACTION_CMD_GetVisualizationModel "VisualizationModel.Get"
 #define OT_ACTION_CMD_Log "Log"
-#define OT_ACTION_CMD_ForceHealthCheck "Healthcheck.Force"
 
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"

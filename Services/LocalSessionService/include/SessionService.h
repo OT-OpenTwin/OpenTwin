@@ -24,7 +24,7 @@
 #include <string>
 #include <unordered_set>
 
-class SessionService {
+class SessionService : public ot::ActionHandler {
 	OT_DECL_NOCOPY(SessionService)
 	OT_DECL_NOMOVE(SessionService)
 	OT_DECL_ACTION_HANDLER(SessionService)
@@ -93,32 +93,28 @@ private:
 
 	// Action handler
 
-	OT_HANDLER(handleGetDBURL, SessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetAuthURL, SessionService, OT_ACTION_CMD_GetAuthorisationServerUrl, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetGlobalServicesURL, SessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES)
+	ot::ReturnMessage handleGetAuthURL();
+	ot::ReturnMessage handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleCreateNewSession(ot::JsonDocument& _commandDoc);
 
-	OT_HANDLER(handleGetSystemInformation, SessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES)
-
-	OT_HANDLER(handleCreateNewSession, SessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleConfirmService, SessionService, OT_ACTION_CMD_ConfirmService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleShowService, SessionService, OT_ACTION_CMD_ShowService, ot::SECURE_MESSAGE_TYPES)
-
-	OT_HANDLER(handleGetSessionExists, SessionService, OT_ACTION_CMD_GetSessionExists, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceClosing, SessionService, OT_ACTION_CMD_ServiceClosing, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleShutdownSession, SessionService, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceFailure, SessionService, OT_ACTION_CMD_ServiceFailure, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceShutdownCompleted, SessionService, OT_ACTION_CMD_ServiceShutdownCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleEnableServiceDebug, SessionService, OT_ACTION_CMD_ServiceEnableDebug, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleDisableServiceDebug, SessionService, OT_ACTION_CMD_ServiceDisableDebug, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetDebugInformation, SessionService, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleCheckStartupCompleted, SessionService, OT_ACTION_CMD_CheckStartupCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMandatoryService, SessionService, OT_ACTION_CMD_AddMandatoryService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRegisterNewGlobalDirectoryService, SessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleRegisterNewLibraryManagementService, SessionService, OT_ACTION_CMD_RegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES)
-
-	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
+	std::string handleGetSystemInformation();
+	std::string handleGetMandatoryServices();
+	ot::ReturnMessage handleConfirmService(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleShowService(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleGetSessionExists(ot::JsonDocument& _commandDoc);
+	void handleServiceClosing(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleShutdownSession(ot::JsonDocument& _commandDoc);
+	void handleServiceFailure(ot::JsonDocument& _commandDoc);
+	void handleServiceShutdownCompleted(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleEnableServiceDebug(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleDisableServiceDebug(ot::JsonDocument& _commandDoc);
+	std::string handleGetDebugInformation();
+	ot::ReturnMessage handleCheckStartupCompleted(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleAddMandatoryService(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleServiceStartupFailed(ot::JsonDocument& _commandDoc);
+	void handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc);
 
 	std::mutex                                        m_mutex;
 	std::atomic_bool                                  m_workerRunning;

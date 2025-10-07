@@ -32,7 +32,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ServiceBase {
+class Application : public ot::ServiceBase, public ot::ActionHandler {
 	OT_DECL_ACTION_HANDLER(Application)
 public:
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -53,17 +53,17 @@ public:
 
 	// Action handler
 
-	OT_HANDLER(handleLocalDirectoryServiceConnected, Application, OT_ACTION_CMD_RegisterNewLocalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleStartService, Application, OT_ACTION_CMD_StartNewService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleStartServices, Application, OT_ACTION_CMD_StartNewServices, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleStartRelayService, Application, OT_ACTION_CMD_StartNewRelayService, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceStopped, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSessionClosing, Application, OT_ACTION_CMD_ShutdownSession, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateSystemLoad, Application, OT_ACTION_CMD_UpdateSystemLoad, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSetGlobalLogFlags, Application, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetDebugInformation, Application, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
+	ot::ReturnMessage handleLocalDirectoryServiceConnected(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleStartService(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleStartServices(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleStartRelayService(ot::JsonDocument& _jsonDocument);
+	void handleServiceStopped(ot::JsonDocument& _jsonDocument);
+	void handleSessionClosing(ot::JsonDocument& _jsonDocument);
+	void handleSessionClosed(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument);
+	std::string handleGetSystemInformation();
+	void handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument);
+	std::string handleGetDebugInformation();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

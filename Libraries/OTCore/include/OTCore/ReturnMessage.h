@@ -85,12 +85,14 @@ namespace ot
 		void setWhat(const std::string& _what) { m_what = _what; };
 
 		//! @brief Get the return message content
-		std::string getWhat(void) const { return m_what; }
+		std::string getWhat() const { return m_what; }
 
 		void setStatus(const ReturnMessageStatus& _status) { m_status = _status; };
 
 		//! @brief Get the return message status
-		ReturnMessageStatus getStatus(void) const { return m_status; }
+		ReturnMessageStatus getStatus() const { return m_status; };
+
+		bool isOk() const { return m_status == ReturnMessageStatus::Ok; };
 
 		void setValues(const ReturnValues& _values) { m_values = _values; };
 

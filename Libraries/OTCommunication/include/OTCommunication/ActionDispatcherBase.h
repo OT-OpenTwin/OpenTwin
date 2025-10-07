@@ -9,7 +9,6 @@
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 

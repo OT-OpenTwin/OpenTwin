@@ -57,7 +57,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	this->addSystemValues(registerDoc);
 
 	// Send request and check if the request was successful
-	std::string response;
+	std::string responseStr;
 
 	// In case of error:
 	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
@@ -66,8 +66,8 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	int ct = 1;
 	bool ok = false;
 	do {
-		response.clear();
-		if (!(ok = ot::msg::send(app.getServiceURL(), this->getServiceURL(), ot::EXECUTE, registerDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		responseStr.clear();
+		if (!(ok = ot::msg::send(app.getServiceURL(), this->getServiceURL(), ot::EXECUTE, registerDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Register at Global Directory Service (" + Application::instance().getServiceURL() + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
@@ -79,19 +79,15 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 		exit(ot::AppExitCode::GDSRegistrationFailed);
 	}
 
-	if (response.find(OT_ACTION_RETURN_INDICATOR_Error) != std::string::npos ||
-		response.find(OT_ACTION_RETURN_INDICATOR_Warning) != std::string::npos) {
-		OT_LOG_E("Register at GDS failed:" + response);
-		return;
-	}
-	if (response == OT_ACTION_RETURN_VALUE_FAILED) {
-		OT_LOG_E("Registration at global directory service failed");
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		OT_LOG_E("Register at GDS failed: " + response.getWhat());
 		return;
 	}
 
 	// Check response
 	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
+	responseDoc.fromJson(response.getWhat());
 	if (!responseDoc.IsObject()) { OT_LOG_E("Register at GDS, invalid response"); return; }
 	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_ID)) { OT_LOG_E("Register at GDS, invalid response: Missing member"); return; }
 	if (!responseDoc[OT_ACTION_PARAM_SERVICE_ID].IsUint()) { OT_LOG_E("Register at GDS, invalid response: Invalid member type"); return; }
@@ -121,17 +117,19 @@ void GlobalDirectoryService::healthCheck(void) {
 		
 		addSystemValues(systemStatusDoc);
 
-		std::string response;
-		if (!ot::msg::send(app.getServiceURL(), this->getServiceURL(), ot::EXECUTE, systemStatusDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+		std::string responseStr;
+		if (!ot::msg::send(app.getServiceURL(), this->getServiceURL(), ot::EXECUTE, systemStatusDoc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send updated system load to global directory service");
 			app.globalDirectoryServiceCrashed();
-			return;
+			break;
 		}
 
-		if (response != OT_ACTION_RETURN_VALUE_OK) {
-			OT_LOG_E("Health check for GDS: " + response);
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+
+		if (!response.isOk()) {
+			OT_LOG_E("Health check for GDS failed: " + response.getWhat());
 			app.globalDirectoryServiceCrashed();
-			return;
+			break;
 		}
 
 		int ct = 0;

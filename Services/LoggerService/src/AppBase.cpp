@@ -68,7 +68,7 @@ void AppBase::log(const ot::LogMessage& _message) {
 
 // Action handler
 
-std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
+void AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 	ot::ConstJsonObject obj = ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_LOG);
 
 	ot::LogMessage msg;
@@ -83,8 +83,6 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 	msg.setCurrentTimeAsGlobalSystemTime();
 
 	this->appendLogMessage(std::move(msg));
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 std::string AppBase::handleRegister(ot::JsonDocument& _jsonDocument) {
@@ -106,23 +104,20 @@ std::string AppBase::handleRegister(ot::JsonDocument& _jsonDocument) {
 	return doc.toJson();
 }
 
-std::string AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
+void AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string receiverUrl = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL);
-	std::string ret = OT_ACTION_RETURN_VALUE_FAILED;
 	auto it = std::find(m_receiver.begin(), m_receiver.end(), receiverUrl);
 	if (it != m_receiver.end()) {
 		m_receiver.erase(it);
-		ret = OT_ACTION_RETURN_VALUE_OK;
 #ifdef _DEBUG
 		std::cout << "Removed Receiver: " << receiverUrl << std::endl;
 #endif // _DEBUG
 	}
-	return ret;
 }
 
-std::string AppBase::handleClear(ot::JsonDocument& _jsonDocument) {
+void AppBase::handleClear() {
 	std::lock_guard<std::mutex> newMessageLock(m_newMessageMutex);
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -130,11 +125,9 @@ std::string AppBase::handleClear(ot::JsonDocument& _jsonDocument) {
 	m_count = 0;
 	m_receiver.clear();
 	m_newMessages.clear();
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string AppBase::handleGetDebugInfo(ot::JsonDocument& _jsonDocument) {
+std::string AppBase::handleGetDebugInfo() {
 	std::lock_guard<std::mutex> newMessageLock(m_newMessageMutex);
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -146,24 +139,20 @@ std::string AppBase::handleGetDebugInfo(ot::JsonDocument& _jsonDocument) {
 	return doc.toJson();
 }
 
-std::string AppBase::handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument) {
+void AppBase::handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument) {
 	ot::ConstJsonArray flags = ot::json::getArray(_jsonDocument, OT_ACTION_PARAM_Flags);
 	this->updateBufferSizeFromLogFlags(ot::logFlagsFromJsonArray(flags));
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
+void AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	size_t size = ot::json::getUInt64(_jsonDocument, OT_ACTION_PARAM_Size);
 	m_bufferSize = size;
 	this->resizeBuffer();
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string AppBase::handleGetAllLogs(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage AppBase::handleGetAllLogs() {
 	ot::ReturnMessage response;
 
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -180,10 +169,10 @@ std::string AppBase::handleGetAllLogs(ot::JsonDocument& _jsonDocument) {
 
 	response = doc.toJson();
 
-	return response.toJson();
+	return response;
 }
 
-std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
 	ot::ReturnMessage response;
 
 	std::string userName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_USER_NAME);
@@ -209,7 +198,7 @@ std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
 		response = doc.toJson();
 	}
 
-	return response.toJson();
+	return response;
 }
 
 void AppBase::updateBufferSizeFromLogFlags(const ot::LogFlags& _flags) {
@@ -329,6 +318,16 @@ AppBase::AppBase()
 
 	m_notifyThreadRunning = true;
 	m_notifyThread = new std::thread(&AppBase::workerNotify, this);
+
+	connectAction(OT_ACTION_CMD_Log, this, &AppBase::handleLog, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_RegisterNewService, this, &AppBase::handleRegister, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_RemoveService, this, &AppBase::handleDeregister, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_Reset, this, &AppBase::handleClear, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &AppBase::handleGetDebugInfo, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &AppBase::handleSetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_SetLogCacheSize, this, &AppBase::handleSetCacheSize, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_GetAllLogs, this, &AppBase::handleGetAllLogs, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_GetUserLogs, this, &AppBase::handleGetUserLogs, ot::ALL_MESSAGE_TYPES);
 }
 
 AppBase::~AppBase() {

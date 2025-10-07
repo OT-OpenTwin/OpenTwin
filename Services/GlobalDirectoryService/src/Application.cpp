@@ -23,8 +23,8 @@
 #include <chrono>
 #include <iostream>
 
-#define HANDLE_CHECK_MEMBER_TYPE(___doc, ___member, ___type)  if (!___doc[___member].Is##___type()) { OT_LOG_W("JSON member \"" ___member "\" invalid type"); return OT_ACTION_RETURN_INDICATOR_Error "JSON member \"" ___member "\" invalid type"; }
-#define HANDLE_CHECK_MEMBER_EXISTS(___doc, ___member)  if (!___doc.HasMember(___member)) { OT_LOG_W("Missing JSON member \"" ___member "\""); return OT_ACTION_RETURN_INDICATOR_Error "JSON member \"" ___member "\" is missing"; }
+#define HANDLE_CHECK_MEMBER_TYPE(___doc, ___member, ___type)  if (!___doc[___member].Is##___type()) { OT_LOG_W("JSON member \"" ___member "\" invalid type"); return ot::ReturnMessage(ot::ReturnMessage::Failed, "JSON member \"" ___member "\" invalid type"); }
+#define HANDLE_CHECK_MEMBER_EXISTS(___doc, ___member)  if (!___doc.HasMember(___member)) { OT_LOG_W("Missing JSON member \"" ___member "\""); return ot::ReturnMessage(ot::ReturnMessage::Failed, "JSON member \"" ___member "\" is missing"); }
 #define HANDLE_CHECK_MEMBER(___doc, ___member, ___type) HANDLE_CHECK_MEMBER_EXISTS(___doc, ___member) HANDLE_CHECK_MEMBER_TYPE(___doc, ___member, ___type)
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -72,7 +72,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	std::string gssURL(_globalSessionServiceURL);
 
 	// Send request to GSS
-	std::string gssResponse;
+	std::string gssResponseStr;
 
 	// In case of error:
 	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms        =   15sec
@@ -81,9 +81,9 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 	int ct = 1;
 	bool ok = false;
 	do {
-		gssResponse.clear();
+		gssResponseStr.clear();
 
-		if (!(ok = ot::msg::send(this->getServiceURL(), gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		if (!(ok = ot::msg::send(this->getServiceURL(), gssURL, ot::EXECUTE, gssDoc.toJson(), gssResponseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 			OT_LOG_E("Register at Global Session Service (" + gssURL + ") failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
@@ -95,6 +95,12 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 		exit(ot::AppExitCode::GSSRegistrationFailed);
 	}
 
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(gssResponseStr);
+	if (!response.isOk()) {
+		OT_LOG_E("Registration at Global Session Service failed due to error: " + response.getWhat());
+		exit(ot::AppExitCode::GSSRegistrationFailed);
+	}
+
 	return 0;
 }
 
@@ -102,7 +108,7 @@ int Application::initialize(const char* _siteID, const char* _ownURL, const char
 
 // Action handler
 
-std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_URL, String);
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SUPPORTED_SERVICES, Array);
 
@@ -114,14 +120,14 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	for (rapidjson::SizeType i = 0; i < supportedServiesArray.Size(); i++) {
 		if (!supportedServiesArray[i].IsString()) {
 			OT_LOG_W("LDS connected: JSON array \"" OT_ACTION_PARAM_SUPPORTED_SERVICES "\" contains a non string entry");
-			return OT_ACTION_RETURN_INDICATOR_Error ": JSON array \"" OT_ACTION_PARAM_SUPPORTED_SERVICES "\" contains a non string entry";
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "JSON array \"" OT_ACTION_PARAM_SUPPORTED_SERVICES "\" contains a non string entry");
 		}
 		supportedServices.push_back(supportedServiesArray[i].GetString());
 	}
 
 	if (supportedServices.empty()) {
 		OT_LOG_W("LDS Connected: No supported services provided");
-		return OT_ACTION_RETURN_INDICATOR_Error ": No supported services provided";
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No supported services provided");
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -130,7 +136,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
 		if (lds.getServiceURL() == ServiceURL) {
 			OT_LOG_E("LDS connected: A LocalDirectoryService under the given URL is already registered");
-			return OT_ACTION_RETURN_INDICATOR_Error "A LocalDirectoryService under the given URL is already registered";
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "A LocalDirectoryService under the given URL is already registered");
 		}
 	}
 
@@ -140,7 +146,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	newLds.setSupportedServices(supportedServices);
 
 	if (!newLds.updateSystemUsageValues(_jsonDocument)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Invalid system values provided";
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Invalid system values provided");
 	}
 
 	// Create response
@@ -154,10 +160,10 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	// Add LDS entry
 	m_localDirectoryServices.push_back(std::move(newLds));
 
-	return responseDoc.toJson();
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
-std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
@@ -166,14 +172,14 @@ std::string Application::handleStartService(ot::JsonDocument& _jsonDocument) {
 
 	if (!this->canStartService(initData)) {
 		OT_LOG_W("Service \"" + initData.getServiceName() + "\" of type \"" + initData.getServiceType() + "\" cannot be started.");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Service \"" + initData.getServiceName() + "\" of type \"" + initData.getServiceType() + "\" is not supported by any LDS");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Service \"" + initData.getServiceName() + "\" of type \"" + initData.getServiceType() + "\" is not supported by any LDS");
 	}
 	
 	m_startupDispatcher.addRequest(std::move(initData));
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
@@ -195,7 +201,7 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 		if (!this->canStartService(info)) {
 			OT_LOG_W("Service \"" + info.getServiceName() + "\" of type \"" + info.getServiceType() + "\" cannot be started.");
-			return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Service \"" + info.getServiceName() + "\" of type \"" + info.getServiceType() + "\" is not supported by any LDS");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Service \"" + info.getServiceName() + "\" of type \"" + info.getServiceType() + "\" is not supported by any LDS");
 		}
 
 		requestedServices.push_back(std::move(info));
@@ -203,16 +209,16 @@ std::string Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
 
 	if (requestedServices.empty()) {
 		OT_LOG_W("No services requested to start");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No services requested to start");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No services requested to start");
 	}
 
 	// Add the list to the dispatcher queue
 	m_startupDispatcher.addRequest(std::move(requestedServices));
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleStartRelayService(ot::JsonDocument& _jsonDocument) {
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
@@ -222,13 +228,13 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	LocalDirectoryService * lds = leastLoadedDirectoryService(initData);
 	if (lds == nullptr) {
 		OT_LOG_E("No LDS available to start relay service");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No LDS available to start relay service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start relay service");
 	}
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	if (!lds->requestToRunRelayService(initData, websocketUrl, relayServiceURL)) {
 		OT_LOG_E("Failed to start relay service");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Failed to start relay service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start relay service");
 	}
 	
 	OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
@@ -237,10 +243,10 @@ std::string Application::handleStartRelayService(ot::JsonDocument& _jsonDocument
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok, responseDoc.toJson());
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
-std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
+void Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID));
 
@@ -249,11 +255,9 @@ std::string Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		lds.serviceClosed(sessionID, serviceID);
 	}
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
+void Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -263,11 +267,9 @@ std::string Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		lds.sessionClosing(sessionID);
 	}
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
+void Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	std::string sessionID = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_SESSION_ID);
 	
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -277,11 +279,9 @@ std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		lds.sessionClosed(sessionID);
 	}
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument) {
+ot::ReturnMessage Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument) {
 	HANDLE_CHECK_MEMBER(_jsonDocument, OT_ACTION_PARAM_SERVICE_ID, Uint);
 
 	ot::serviceID_t id = _jsonDocument[OT_ACTION_PARAM_SERVICE_ID].GetUint();
@@ -291,18 +291,18 @@ std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument)
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
 		if (lds.getServiceID() == id) {
 			if (lds.updateSystemUsageValues(_jsonDocument)) {
-				return OT_ACTION_RETURN_VALUE_OK;
+				return ot::ReturnMessage::Ok;
 			}
 			else {
-				return OT_ACTION_RETURN_INDICATOR_Error "Invalid system values provided";
+				return ot::ReturnMessage(ot::ReturnMessage::Failed, "Invalid system values provided");
 			}
 		}
 	}
 
-	return OT_ACTION_RETURN_INDICATOR_Error "Unknown Local Directory Service ID";
+	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unknown Local Directory Service ID");
 }
 
-std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
+std::string Application::handleGetSystemInformation() {
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
 	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
 
@@ -329,7 +329,7 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	return reply.toJson();
 }
 
-std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
+void Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(_doc, OT_ACTION_PARAM_Flags));
 	ot::LogDispatcher::instance().setLogFlags(flags);
 
@@ -349,11 +349,9 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 			OT_LOG_EAS("Failed to send message to LSS at \"" + lds.getServiceURL() + "\"");
 		}
 	}
-
-	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string Application::handleGetDebugInformation(ot::JsonDocument& _doc) {
+std::string Application::handleGetDebugInformation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::GDSDebugInfo info;
@@ -409,8 +407,21 @@ bool Application::canStartService(const ot::ServiceInitData& _info) const {
 }
 
 Application::Application()
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService) {
+	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService)
+{
 	m_systemLoadInformation.initialize();
+
+	connectAction(OT_ACTION_CMD_RegisterNewLocalDirecotoryService, this, &Application::handleLocalDirectoryServiceConnected);
+	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartService);
+	connectAction(OT_ACTION_CMD_StartNewServices, this, &Application::handleStartServices);
+	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartRelayService);
+	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceStopped);
+	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
+	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);
+	connectAction(OT_ACTION_CMD_UpdateSystemLoad, this, &Application::handleUpdateSystemLoad);
+	connectAction(OT_ACTION_CMD_GetSystemInformation, this, &Application::handleGetSystemInformation);
+	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &Application::handleSetGlobalLogFlags);
+	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &Application::handleGetDebugInformation);
 }
 
 Application::~Application() {}

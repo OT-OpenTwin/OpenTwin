@@ -9,7 +9,16 @@ ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& se
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetAuthorisationServerUrl, doc.GetAllocator()), doc.GetAllocator());
-	ot::msg::send("", sessionServiceURL, ot::EXECUTE, doc.toJson(), _authorisationService);
+	std::string responseStr;
+	if (!ot::msg::send("", sessionServiceURL, ot::EXECUTE, doc.toJson(), responseStr)) {
+		throw std::exception("Could not get authorisation service URL from session service.");
+	}
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		throw std::exception(("Could not get authorisation service URL from session service due to error: " + response.getWhat()).c_str());
+	}
+
+	_authorisationService = response.getWhat();
 }
 
 std::string ProjectToCollectionConverter::NameCorrespondingCollection(const std::string& projectName, const std::string& userName, const std::string& userPSW)

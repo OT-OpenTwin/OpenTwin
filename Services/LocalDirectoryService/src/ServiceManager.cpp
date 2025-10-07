@@ -542,12 +542,14 @@ void ServiceManager::notifyServiceShutdownCompleted(const Service& _service) {
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _service.getInfo().getServiceID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_service.getInfo().getSessionID(), doc.GetAllocator()), doc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send("", _service.getInfo().getSessionServiceURL(), ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	std::string responseStr;
+	if (!ot::msg::send("", _service.getInfo().getSessionServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send shutdown completed message to session service { " + logInfo(_service) + " }");
 	}
-	else if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invalid shutdown completed response from session service { \"Response\": \"" + response + "\", " + logInfo(_service) + " }");
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		OT_LOG_E("Service shutdown completed failed at session service { \"Response\": \"" + response.getWhat() + "\", " + logInfo(_service) + " }");
 	}
 }
 

@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -170,13 +171,15 @@ bool LogModeSetter::sendGlobalMode(const std::string& _gss, const ot::LogFlags& 
 	ot::addLogFlagsToJsonArray(_flags, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send("", _gss, ot::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::NoRequestFlags)) {
+	std::string responseStr;
+	if (!ot::msg::send("", _gss, ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::NoRequestFlags)) {
 		OT_LOG_E("Failed to send request");
 		return false;
 	}
-	if (response != OT_ACTION_RETURN_VALUE_OK) {
-		OT_LOG_E("Invalid response: \"" + response + "\"");
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) {
+		OT_LOG_E("Error response: \"" + response.getWhat() + "\"");
 		return false;
 	}
 	else {
