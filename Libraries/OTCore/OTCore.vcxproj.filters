@@ -447,6 +447,12 @@
     <ClInclude Include="include\OTCore\ServiceDebugInformation.h">
       <Filter>include\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\PointerList.h">
+      <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\PointerList.hpp">
+      <Filter>include\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

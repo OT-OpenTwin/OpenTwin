@@ -113,6 +113,8 @@
     <ClInclude Include="include\OTCore\Matrix2.hpp" />
     <ClInclude Include="include\OTCore\Matrix2Factory.h" />
     <ClInclude Include="include\OTCore\Matrix2Factory.hpp" />
+    <ClInclude Include="include\OTCore\PointerList.h" />
+    <ClInclude Include="include\OTCore\PointerList.hpp" />
     <ClInclude Include="include\OTCore\ServiceDebugInformation.h" />
     <ClInclude Include="include\OTCore\ThisComputerInfo.h" />
     <ClInclude Include="include\OTCore\OTObject.h" />
