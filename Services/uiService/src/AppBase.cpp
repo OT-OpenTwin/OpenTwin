@@ -1951,12 +1951,13 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
-	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
-	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
-	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
 	connect(graphics, &ot::GraphicsView::copyRequested, this, &AppBase::slotCopyRequested);
 	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
+	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(graphics, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
+	connect(graphics, &ot::GraphicsView::connectionChanged, this, &AppBase::slotGraphicsConnectionChanged);
+	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
+	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
 	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
 	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");

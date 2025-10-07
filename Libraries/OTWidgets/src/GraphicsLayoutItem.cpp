@@ -136,6 +136,20 @@ double ot::GraphicsLayoutItem::getMaxAdditionalTriggerDistance(void) const {
 	return maxDist;
 }
 
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsLayoutItem::getAllConnections() const {
+	std::list<GraphicsConnectionItem*> lst = GraphicsItem::getAllConnections();
+
+	std::list<QGraphicsLayoutItem*> childs;
+	this->getAllItems(childs);
+	for (auto itm : childs) {
+		const GraphicsItem* actualItem = dynamic_cast<const GraphicsItem*>(itm);
+		if (actualItem) {
+			lst.splice(lst.end(), actualItem->getAllConnections());
+		}
+	}
+	return lst;
+}
+
 std::list<ot::GraphicsElement*> ot::GraphicsLayoutItem::getAllGraphicsElements(void)
 {
 	std::list<QGraphicsLayoutItem*> childs;

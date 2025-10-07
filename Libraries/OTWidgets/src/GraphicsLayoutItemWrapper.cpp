@@ -95,6 +95,14 @@ double ot::GraphicsLayoutItemWrapper::getMaxAdditionalTriggerDistance(void) cons
 	return maxDist;
 }
 
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsLayoutItemWrapper::getAllConnections() const {
+	std::list<GraphicsConnectionItem*> lst = GraphicsItem::getAllConnections();
+	if (m_owner) {
+		lst.splice(lst.end(), m_owner->getAllConnections());
+	}
+	return lst;
+}
+
 std::list<ot::GraphicsElement*> ot::GraphicsLayoutItemWrapper::getAllGraphicsElements(void) {
 	std::list<GraphicsElement*> result = GraphicsItem::getAllGraphicsElements();
 	if (m_owner) {

@@ -57,6 +57,8 @@ namespace ot {
 
 		virtual void finalizeGraphicsItem(void) override;
 
+		virtual std::list<GraphicsConnectionItem*> getAllConnections() const override;
+
 		virtual std::list<GraphicsElement*> getAllGraphicsElements(void) override;
 
 		virtual std::list<GraphicsElement*> getAllDirectChildElements(void) override;

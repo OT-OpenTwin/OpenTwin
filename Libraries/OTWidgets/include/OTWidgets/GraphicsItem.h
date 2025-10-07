@@ -54,11 +54,11 @@ namespace ot {
 
 		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemSelectionBorder.
 		//! The caller takes ownership of the painter.
-		static Painter2D* createSelectionBorderPainter(void);
+		static Painter2D* createSelectionBorderPainter();
 
 		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemHoverBorder.
 		//! The caller takes ownership of the painter.
-		static Painter2D* createHoverBorderPainter(void);
+		static Painter2D* createHoverBorderPainter();
 
 		// ###############################################################################################################################################
 
@@ -80,10 +80,10 @@ namespace ot {
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
 		//! \brief Returns the QGraphicsLayoutItem.
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
+		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem() = 0;
 
 		//! \brief Calls QGraphicsLayoutItem::prepareGeometryChange().
-		virtual void prepareGraphicsItemGeometryChange(void) = 0;
+		virtual void prepareGraphicsItemGeometryChange() = 0;
 
 		//! \brief Calls QGraphicsLayoutItem::sizeHint().
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const = 0;
@@ -112,16 +112,19 @@ namespace ot {
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
 		//! \brief Removes all connections to or from this item.
-		virtual void removeAllConnections(void);
+		virtual void removeAllConnections();
 
-		virtual bool graphicsItemRequiresHover(void) const;
+		virtual bool graphicsItemRequiresHover() const;
 
 		//! \brief Will be called after setupFromConfig (i.e. if the item is completely created).
 		//! Here the item structure is complete and the item may adjust settings that depend on parent items (e.g. Text reference for GraphicsTextItem).
 		//! Container items must override this method to forward the call to their child items.
-		virtual void finalizeGraphicsItem(void) {};
+		virtual void finalizeGraphicsItem() {};
 
-		virtual QMarginsF getOutlineMargins(void) const;
+		virtual QMarginsF getOutlineMargins() const;
+
+		//! @brief Returns true if this item is a connection connector item.
+		virtual bool isConnectionConnector() const { return false; };
 
 		// ###############################################################################################################################################
 
@@ -170,21 +173,21 @@ namespace ot {
 
 		// Getter / Setter
 
-		virtual GraphicsScene* getGraphicsScene(void) const override;
+		virtual GraphicsScene* getGraphicsScene() const override;
 
-		GraphicsItem* getRootItem(void);
+		GraphicsItem* getRootItem();
 
-		const GraphicsItem* getRootItem(void) const;
+		const GraphicsItem* getRootItem() const;
 
 		//! \brief Replaces the current configuration with the configuration provided.
 		//! The item takes ownership of the configuration.
 		void setConfiguration(GraphicsItemCfg* _config);
 
 		//! \brief Returns the current configuration.
-		GraphicsItemCfg* getConfiguration(void) { return m_config; };
+		GraphicsItemCfg* getConfiguration() { return m_config; };
 
 		//! \brief Returns the current configuration.
-		const GraphicsItemCfg* getConfiguration(void) const { return m_config; };
+		const GraphicsItemCfg* getConfiguration() const { return m_config; };
 
 		//! \brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
 		void setGraphicsItemPos(const QPointF& _pos);
@@ -195,10 +198,10 @@ namespace ot {
 		void setGraphicsItemPos(const Point2DD& _pos);
 
 		//! \brief Returns the current position set in the configuration.
-		const Point2DD& getGraphicsItemPos(void) const;
+		const Point2DD& getGraphicsItemPos() const;
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
-		GraphicsItem* getParentGraphicsItem(void) const { return m_parent; };
+		GraphicsItem* getParentGraphicsItem() const { return m_parent; };
 		
 		//! \brief Sets the provided flag.
 		//! \see GraphicsItem, GraphicsItemFlag
@@ -212,57 +215,57 @@ namespace ot {
 
 		//! \brief Returns the current GraphicsItemFlags set.
 		//! \see GraphicsItem, GraphicsItemFlag
-		const GraphicsItemCfg::GraphicsItemFlags& getGraphicsItemFlags(void) const;
+		const GraphicsItemCfg::GraphicsItemFlags& getGraphicsItemFlags() const;
 
 		//! \brief Sets the GraphicsItem UID.
 		//! \param _uid UID to set.
 		void setGraphicsItemUid(const ot::UID& _uid);
-		const ot::UID& getGraphicsItemUid(void) const;
+		const ot::UID& getGraphicsItemUid() const;
 
 		virtual void setGraphicsItemName(const std::string& _name);
-		const std::string& getGraphicsItemName(void) const;
+		const std::string& getGraphicsItemName() const;
 
 		void setGraphicsItemToolTip(const std::string& _toolTip);
-		const std::string& getGraphicsItemToolTip(void) const;
+		const std::string& getGraphicsItemToolTip() const;
 
 		void setAdditionalTriggerDistance(double _left, double _top, double _right, double _bottom) { this->setAdditionalTriggerDistance(MarginsD(_left, _top, _right, _bottom)); };
 		void setAdditionalTriggerDistance(double _distance) { this->setAdditionalTriggerDistance(MarginsD(_distance, _distance, _distance, _distance)); };
 		void setAdditionalTriggerDistance(const ot::MarginsD& _distance);
-		const ot::MarginsD& getAdditionalTriggerDistance(void) const;
+		const ot::MarginsD& getAdditionalTriggerDistance() const;
 		
 		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
-		virtual double getMaxAdditionalTriggerDistance(void) const;
+		virtual double getMaxAdditionalTriggerDistance() const;
 		
 		void setGraphicsItemMinimumSize(double _width, double _height) { this->setGraphicsItemMinimumSize(QSizeF(_width, _height)); };
 		void setGraphicsItemMinimumSize(const QSizeF& _size);
-		QSizeF getGraphicsItemMinimumSize(void) const;
+		QSizeF getGraphicsItemMinimumSize() const;
 	
 		void setGraphicsItemMaximumSize(double _width, double _height) { this->setGraphicsItemMaximumSize(QSizeF(_width, _height)); };
 		void setGraphicsItemMaximumSize(const QSizeF& _size);
-		QSizeF getGraphicsItemMaximumSize(void) const;
+		QSizeF getGraphicsItemMaximumSize() const;
 
 		void setGraphicsItemSizePolicy(ot::SizePolicy _policy);
-		ot::SizePolicy getGraphicsItemSizePolicy(void) const;
+		ot::SizePolicy getGraphicsItemSizePolicy() const;
 
 		void setGraphicsItemAlignment(ot::Alignment _align);
-		ot::Alignment getGraphicsItemAlignment(void) const;
+		ot::Alignment getGraphicsItemAlignment() const;
 
 		void setGraphicsItemMargins(double _left, double _top, double _right, double _bottom) { this->setGraphicsItemMargins(MarginsD(_left, _top, _right, _bottom)); };
 		void setGraphicsItemMargins(double _margins) { this->setGraphicsItemMargins(MarginsD(_margins, _margins, _margins, _margins)); };
 		void setGraphicsItemMargins(const ot::MarginsD& _margins);
-		const ot::MarginsD& getGraphicsItemMargins(void) const;
+		const ot::MarginsD& getGraphicsItemMargins() const;
 
 		void setConnectionDirection(ot::ConnectionDirection _direction);
-		ot::ConnectionDirection getConnectionDirection(void) const;
+		ot::ConnectionDirection getConnectionDirection() const;
 
 		void setStringMap(const std::map<std::string, std::string>& _map);
-		const std::map<std::string, std::string>& getStringMap(void) const;
+		const std::map<std::string, std::string>& getStringMap() const;
 
 		void setGraphicsItemTransform(const Transform& _transform);
-		const Transform& getGraphicsItemTransform(void) const;
+		const Transform& getGraphicsItemTransform() const;
 
 		void setForwardSizeChanges(bool _forward) { m_forwardSizeChanges = _forward; };
-		bool getForwardSizeChanges(void) const { return m_forwardSizeChanges; };
+		bool getForwardSizeChanges() const { return m_forwardSizeChanges; };
 
 		void storeConnection(GraphicsConnectionItem* _connection);
 
@@ -276,36 +279,38 @@ namespace ot {
 		QSizeF removeGraphicsItemMargins(const QSizeF& _size) const;
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
-		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
+		const QSizeF& graphicsItemRequestedSize() const { return m_requestedSize; };
+
+		virtual std::list<GraphicsConnectionItem*> getAllConnections() const { return m_connections; };
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
 		void setGraphicsItemSelected(bool _selected);
-		bool getGraphicsItemSelected(void) const;
+		bool getGraphicsItemSelected() const;
 
 		//! \see getBlockFlagNotifications
 		void setBlockFlagNotifications(bool _block) { m_blockFlagNotifications = _block; };
 
 		//! \brief If enabled the item will not call graphicsItemFlagsChanged() when the flags have changed.
-		bool getBlockFlagNotifications(void) const { return m_blockFlagNotifications; };
+		bool getBlockFlagNotifications() const { return m_blockFlagNotifications; };
 
 		//! \see getBlockConfigurationNotifications
 		void setBlockConfigurationNotifications(bool _block) { m_blockConfigurationNotifications = _block; };
 		
 		//! \brief If enabled the item will not call graphicsItemConfigurationChanged() when the flags have changed.
-		bool getBlockConfigurationNotifications(void) const { return m_blockConfigurationNotifications; };
+		bool getBlockConfigurationNotifications() const { return m_blockConfigurationNotifications; };
 
 		//! \brief Sets the current item position as move start point.
-		void setCurrentPosAsMoveStart(void);
+		void setCurrentPosAsMoveStart();
 
 		//! \brief Notifies the view if the items current position changed relative to the move start point.
-		void notifyMoveIfRequired(void);
+		void notifyMoveIfRequired();
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 
 		//! \brief Returns the bounding rect in scene coordinates which was expanded by the additional trigger distance according to the config.
 		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
-		QRectF getTriggerBoundingRect(void) const;
+		QRectF getTriggerBoundingRect() const;
 
 		//! @brief If enabled the item does not send any notifications to the view.
 		bool isSilencingConfigNotifications() const;
@@ -321,22 +326,22 @@ namespace ot {
 		//! The configuration may be modified.
 		//! The function will cast the current configuration to the type provided.
 		//! The method will return 0 if the cast failed.
-		template <class T> T* getItemConfiguration(void);
+		template <class T> T* getItemConfiguration();
 
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.
 		//! The function will cast the current configuration to the type provided.
 		//! The method will return 0 if the cast failed.
-		template <class T> const T* getItemConfiguration(void) const;
+		template <class T> const T* getItemConfiguration() const;
 
-		virtual void applyGraphicsItemTransform(void);
+		virtual void applyGraphicsItemTransform();
 
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) {};
 
 		//! @brief Returns the cennection direction pointing outwards relative to the parent item.
 		//! If no parent item is set returns ConnectionDirection::ConnectAny.
 		//! @callgraph
-		virtual ConnectionDirection calculateOutwardsConnectionDirection(void) const;
+		virtual ConnectionDirection calculateOutwardsConnectionDirection() const;
 
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.

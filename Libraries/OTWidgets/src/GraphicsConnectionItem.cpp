@@ -78,7 +78,7 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
-	if (m_config.getHandleState()) {
+	if (m_config.getHandlesState()) {
 		if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
 			const Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
 			linePen.setBrush(QtFactory::toQBrush(newPainter));
@@ -194,11 +194,35 @@ const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Configuration
+
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
 	m_config = _cfg;
 
 	return true;
 }
+
+void ot::GraphicsConnectionItem::setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) {
+	this->prepareGeometryChange();
+	m_config.setLineShape(_shape);
+	this->update();
+}
+
+void ot::GraphicsConnectionItem::setLineWidth(double _width) {
+	this->prepareGeometryChange();
+	m_config.setLineWidth(_width);
+	this->update();
+}
+
+void ot::GraphicsConnectionItem::setLineStyle(const PenFCfg& _style) {
+	this->prepareGeometryChange();
+	m_config.setLineStyle(_style);
+	this->update();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Item handling
 
 void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
 	OTAssertNullptr(_origin);
@@ -268,12 +292,9 @@ void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
 	this->updateConnectors();
 }
 
-void ot::GraphicsConnectionItem::setHandleState(bool _handlesState) {
-	m_config.setHandlesState(_handlesState);
-}
-
-bool ot::GraphicsConnectionItem::getHandleState() const {
-	return m_config.getHandleState();
+void ot::GraphicsConnectionItem::updatePositionsFromItems() {
+	m_config.setOriginPos(QtFactory::toPoint2D(this->calculateOriginPos()));
+	m_config.setDestPos(QtFactory::toPoint2D(this->calculateDestPos()));
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView() {
@@ -290,7 +311,6 @@ void ot::GraphicsConnectionItem::updateConnectionInformation() {
 		m_config.setOriginConnectable("");
 		m_config.setOriginUid(0);
 	}
-	m_config.setOriginPos(QtFactory::toPoint2D(this->calculateOriginPos()));
 
 	if (m_dest) {
 		m_config.setDestConnectable(m_dest->getGraphicsItemName());
@@ -300,7 +320,8 @@ void ot::GraphicsConnectionItem::updateConnectionInformation() {
 		m_config.setDestConnectable("");
 		m_config.setDestUid(0);
 	}
-	m_config.setDestPos(QtFactory::toPoint2D(this->calculateDestPos()));
+	
+	this->updatePositionsFromItems();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

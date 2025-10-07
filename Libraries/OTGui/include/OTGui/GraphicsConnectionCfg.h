@@ -101,7 +101,7 @@ namespace ot {
 		std::string createConnectionKeyReverse(void) const;
 
 		void setHandlesState(bool _handleState) { m_handlesState = _handleState; };
-		bool getHandleState(void) const { return m_handlesState; };
+		bool getHandlesState(void) const { return m_handlesState; };
 
 	private:
 		ot::UID m_originUID;

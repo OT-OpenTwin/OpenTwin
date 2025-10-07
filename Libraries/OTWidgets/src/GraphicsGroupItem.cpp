@@ -102,6 +102,19 @@ void ot::GraphicsGroupItem::finalizeGraphicsItem(void) {
 	}
 }
 
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsGroupItem::getAllConnections() const {
+	std::list<GraphicsConnectionItem*> lst = GraphicsItem::getAllConnections();
+
+	for (QGraphicsItem* child : this->childItems()) {
+		GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(child);
+		if (actualItem) {
+			lst.splice(lst.end(), actualItem->getAllConnections());
+		}
+	}
+
+	return lst;
+}
+
 std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllGraphicsElements(void) {
 	std::list<GraphicsElement*> result = GraphicsItem::getAllGraphicsElements();
 	for (QGraphicsItem* child : this->childItems()) {

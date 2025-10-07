@@ -145,8 +145,6 @@ namespace ot {
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
-		void notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection);
-
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name

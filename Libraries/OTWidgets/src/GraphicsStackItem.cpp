@@ -123,6 +123,16 @@ void ot::GraphicsStackItem::finalizeGraphicsItem(void) {
 	}
 }
 
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsStackItem::getAllConnections() const {
+	std::list<GraphicsConnectionItem*> lst = GraphicsItem::getAllConnections();
+
+	for (const GraphicsStackItemEntry& entry : m_items) {
+		lst.splice(lst.end(), entry.item->getAllConnections());
+	}
+
+	return lst;
+}
+
 std::list<ot::GraphicsElement*> ot::GraphicsStackItem::getAllGraphicsElements(void)
 {
 	std::list<GraphicsElement*> result = GraphicsItem::getAllGraphicsElements();

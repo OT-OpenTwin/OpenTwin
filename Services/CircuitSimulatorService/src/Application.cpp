@@ -82,6 +82,8 @@ Application::Application()
 	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, types, this, &Application::handleNewGraphicsItemConnection);
 	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, types, this, &Application::handleRemoveGraphicsItemConnection);
 	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, types, this, &Application::handleConnectionToConnection);	
+	disp.connect(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, types, this, &Application::handleConnectionChanged);
+
 }
 
 Application::~Application() {
@@ -542,6 +544,12 @@ void Application::handleConnectionToConnection(ot::JsonDocument& _document) {
 	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_POSITION));
 	m_blockEntityHandler.setPackageName(editorName);
 	m_blockEntityHandler.addConnectionToConnection(pckg.connections(), editorName, pos);
+}
+
+void Application::handleConnectionChanged(ot::JsonDocument& _document) {
+	ot::GraphicsConnectionCfg connection;
+	connection.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 }
 
 // ############################## ####################################################################################################################################################################################

@@ -64,6 +64,7 @@ public:
 	void handleNewGraphicsItemConnection(ot::JsonDocument& _document);
 	ot::ReturnMessage handleRemoveGraphicsItemConnection(ot::JsonDocument& _document);
 	void handleConnectionToConnection(ot::JsonDocument& _document);
+	void handleConnectionChanged(ot::JsonDocument& _document);
 
 	void createNewCircuit();
 	void createInitialCircuit();

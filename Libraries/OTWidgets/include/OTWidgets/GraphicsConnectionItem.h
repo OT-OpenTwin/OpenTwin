@@ -58,6 +58,8 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Configuration
+
 		//! @brief Will set the connection properties as provided in the configuration
 		//! The origin and destination item won't be set!
 		bool setConfiguration(const ot::GraphicsConnectionCfg& _cfg);
@@ -65,10 +67,10 @@ namespace ot {
 		//! @brief Creates a configuration object containing the items origin and destination information
 		const GraphicsConnectionCfg& getConfiguration() const { return m_config; };
 
-		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); this->update(); };
+		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape);
 		GraphicsConnectionCfg::ConnectionShape getLineShape() const { return m_config.getLineShape(); };
 
-		void setLineWidth(double _width) { m_config.setLineWidth(_width); this->update(); };
+		void setLineWidth(double _width);
 		double getLineWidth() const { return m_config.getLineWidth(); };
 
 		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
@@ -81,13 +83,15 @@ namespace ot {
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter() const { return m_config.getLinePainter(); };
 
-		void setLineStyle(const PenFCfg& _style) { m_config.setLineStyle(_style); this->update(); };
+		void setLineStyle(const PenFCfg& _style);
 		const PenFCfg& getLineStyle() const { return m_config.getLineStyle(); };
 
-		void setHandleState(bool _handlesState);
-		bool getHandleState() const;
+		void setHandleState(bool _handlesState) { m_config.setHandlesState(_handlesState); };
+		bool getHandleState() const { return m_config.getHandlesState(); };
 
-		void updateConnectionView();
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Item handling
 
 		//! \brief Sets the origin and destination items.
 		//! Will call GraphicsItem::storeConnection for every connected item.
@@ -109,8 +113,12 @@ namespace ot {
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
 		void forgetItem(const GraphicsItem* _item);
 
-		GraphicsItem* originItem() const { return m_origin; };
-		GraphicsItem* destItem() const { return m_dest; };
+		GraphicsItem* getOriginItem() const { return m_origin; };
+		GraphicsItem* getDestItem() const { return m_dest; };
+
+		void updatePositionsFromItems();
+
+		void updateConnectionView();
 
 		//! \brief Updates the configuration according to the origin and/or destination item.
 		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
@@ -146,6 +154,7 @@ namespace ot {
 
 		ot::Alignment calculateConnectionDirectionAlignment() const;
 
+		bool m_configChanged;
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;

@@ -40,11 +40,11 @@
 
 // Public Static
 
-ot::Painter2D* ot::GraphicsItem::createSelectionBorderPainter(void) {
+ot::Painter2D* ot::GraphicsItem::createSelectionBorderPainter() {
 	return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemSelectionBorder);
 }
 
-ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter(void) {
+ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter() {
 	return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemHoverBorder);
 }
 
@@ -123,7 +123,7 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 	return ret;
 }
 
-void ot::GraphicsItem::removeAllConnections(void) {
+void ot::GraphicsItem::removeAllConnections() {
 	if (m_connections.empty()) return;
 
 	GraphicsScene* scene = this->getGraphicsScene();
@@ -143,7 +143,7 @@ void ot::GraphicsItem::removeAllConnections(void) {
 	}
 }
 
-bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
+bool ot::GraphicsItem::graphicsItemRequiresHover() const {
 	OTAssertNullptr(m_config);
 	return !this->getGraphicsItemToolTip().empty();
 }
@@ -152,7 +152,7 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 
 // Event handler
 
-QMarginsF ot::GraphicsItem::getOutlineMargins(void) const {
+QMarginsF ot::GraphicsItem::getOutlineMargins() const {
 	return QMarginsF(0., 0., 0., 0.);
 }
 
@@ -300,6 +300,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		m_config->setPosition(QtFactory::toPoint2D(this->getQGraphicsItem()->pos()));
 
 		for (auto c : m_connections) {
+			c->updatePositionsFromItems();
 			c->updateConnectionView();
 		}
 		this->raiseEvent(ot::GraphicsItem::ItemMoved);
@@ -370,11 +371,11 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 
 // Getter / Setter
 
-ot::GraphicsScene* ot::GraphicsItem::getGraphicsScene(void) const {
+ot::GraphicsScene* ot::GraphicsItem::getGraphicsScene() const {
 	return (m_parent ? m_parent->getGraphicsScene() : this->GraphicsElement::getGraphicsScene());
 }
 
-ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
+ot::GraphicsItem* ot::GraphicsItem::getRootItem() {
 	if (m_parent) {
 		return m_parent->getRootItem();
 	}
@@ -383,7 +384,7 @@ ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	}
 }
 
-const ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) const {
+const ot::GraphicsItem* ot::GraphicsItem::getRootItem() const {
 	if (m_parent) {
 		return m_parent->getRootItem();
 	}
@@ -423,7 +424,7 @@ void ot::GraphicsItem::setGraphicsItemPos(const Point2DD& _pos) {
 	}
 }
 
-const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
+const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos() const {
 	OTAssertNullptr(m_config);
 	return m_config->getPosition();
 }
@@ -450,7 +451,7 @@ void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFla
 	}
 }
 
-const ot::GraphicsItemCfg::GraphicsItemFlags& ot::GraphicsItem::getGraphicsItemFlags(void) const {
+const ot::GraphicsItemCfg::GraphicsItemFlags& ot::GraphicsItem::getGraphicsItemFlags() const {
 	OTAssertNullptr(m_config);
 	return m_config->getGraphicsItemFlags();
 }
@@ -463,7 +464,7 @@ void ot::GraphicsItem::setGraphicsItemUid(const ot::UID& _uid) {
 	}
 }
 
-const ot::UID& ot::GraphicsItem::getGraphicsItemUid(void) const {
+const ot::UID& ot::GraphicsItem::getGraphicsItemUid() const {
 	OTAssertNullptr(m_config);
 	return m_config->getUid();
 }
@@ -476,7 +477,7 @@ void ot::GraphicsItem::setGraphicsItemName(const std::string& _name) {
 	}
 }
 
-const std::string& ot::GraphicsItem::getGraphicsItemName(void) const {
+const std::string& ot::GraphicsItem::getGraphicsItemName() const {
 	OTAssertNullptr(m_config);
 	return m_config->getName();
 }
@@ -489,7 +490,7 @@ void ot::GraphicsItem::setGraphicsItemToolTip(const std::string& _toolTip) {
 	}
 }
 
-const std::string& ot::GraphicsItem::getGraphicsItemToolTip(void) const {
+const std::string& ot::GraphicsItem::getGraphicsItemToolTip() const {
 	OTAssertNullptr(m_config);
 	return m_config->getToolTip();
 }
@@ -502,12 +503,12 @@ void ot::GraphicsItem::setAdditionalTriggerDistance(const ot::MarginsD& _distanc
 	}
 }
 
-const ot::MarginsD& ot::GraphicsItem::getAdditionalTriggerDistance(void) const {
+const ot::MarginsD& ot::GraphicsItem::getAdditionalTriggerDistance() const {
 	OTAssertNullptr(m_config);
 	return m_config->getAdditionalTriggerDistance();
 }
 
-double ot::GraphicsItem::getMaxAdditionalTriggerDistance(void) const {
+double ot::GraphicsItem::getMaxAdditionalTriggerDistance() const {
 	const ot::MarginsD& td = this->getAdditionalTriggerDistance();
 	return std::max({ td.left(), td.top(), td.right(), td.bottom() });
 }
@@ -520,7 +521,7 @@ void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
 	}
 }
 
-QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize(void) const {
+QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize() const {
 	OTAssertNullptr(m_config);
 	return std::move(QtFactory::toQSize(m_config->getMinimumSize()));
 }
@@ -533,7 +534,7 @@ void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
 	}
 }
 
-QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize(void) const {
+QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize() const {
 	OTAssertNullptr(m_config);
 	return std::move(QtFactory::toQSize(m_config->getMaximumSize()));
 }
@@ -546,7 +547,7 @@ void ot::GraphicsItem::setGraphicsItemSizePolicy(ot::SizePolicy _policy) {
 	}
 }
 
-ot::SizePolicy ot::GraphicsItem::getGraphicsItemSizePolicy(void) const {
+ot::SizePolicy ot::GraphicsItem::getGraphicsItemSizePolicy() const {
 	OTAssertNullptr(m_config);
 	return m_config->getSizePolicy();
 }
@@ -559,7 +560,7 @@ void ot::GraphicsItem::setGraphicsItemAlignment(ot::Alignment _align) {
 	}
 }
 
-ot::Alignment ot::GraphicsItem::getGraphicsItemAlignment(void) const {
+ot::Alignment ot::GraphicsItem::getGraphicsItemAlignment() const {
 	OTAssertNullptr(m_config);
 	return m_config->getAlignment();
 }
@@ -572,7 +573,7 @@ void ot::GraphicsItem::setGraphicsItemMargins(const ot::MarginsD& _margins) {
 	}
 }
 
-const ot::MarginsD& ot::GraphicsItem::getGraphicsItemMargins(void) const {
+const ot::MarginsD& ot::GraphicsItem::getGraphicsItemMargins() const {
 	OTAssertNullptr(m_config);
 	return m_config->getMargins();
 }
@@ -585,7 +586,7 @@ void ot::GraphicsItem::setConnectionDirection(ot::ConnectionDirection _direction
 	}
 }
 
-ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
+ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection() const {
 	OTAssertNullptr(m_config);
 	switch (m_config->getConnectionDirection()) {
 	case ot::ConnectAny: return this->calculateOutwardsConnectionDirection();
@@ -609,7 +610,7 @@ void ot::GraphicsItem::setStringMap(const std::map<std::string, std::string>& _m
 	}
 }
 
-const std::map<std::string, std::string>& ot::GraphicsItem::getStringMap(void) const {
+const std::map<std::string, std::string>& ot::GraphicsItem::getStringMap() const {
 	OTAssertNullptr(m_config);
 	return m_config->getStringMap();
 }
@@ -627,7 +628,7 @@ void ot::GraphicsItem::setGraphicsItemTransform(const Transform& _transform) {
 	}
 }
 
-const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform(void) const {
+const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform() const {
 	OTAssertNullptr(m_config);
 	return m_config->getTransform();
 }
@@ -699,16 +700,16 @@ void ot::GraphicsItem::setGraphicsItemSelected(bool _selected) {
 	this->getQGraphicsItem()->setSelected(_selected);
 }
 
-bool ot::GraphicsItem::getGraphicsItemSelected(void) const {
+bool ot::GraphicsItem::getGraphicsItemSelected() const {
 	return this->getGraphicsElementState() & GraphicsElement::SelectedState;
 }
 
-void ot::GraphicsItem::setCurrentPosAsMoveStart(void) {
+void ot::GraphicsItem::setCurrentPosAsMoveStart() {
 	OTAssertNullptr(this->getQGraphicsItem());
 	m_moveStartPt = this->getQGraphicsItem()->pos();
 }
 
-void ot::GraphicsItem::notifyMoveIfRequired(void) {
+void ot::GraphicsItem::notifyMoveIfRequired() {
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getGraphicsScene());
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
@@ -740,7 +741,7 @@ void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTrans
 	this->getQGraphicsItem()->setTransform(newTransform);
 }
 
-QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
+QRectF ot::GraphicsItem::getTriggerBoundingRect() const {
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getConfiguration());
 	QRectF rec = this->getQGraphicsItem()->mapRectToScene(this->getQGraphicsItem()->boundingRect());
@@ -761,7 +762,7 @@ void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFla
 	this->getQGraphicsItem()->update();
 }
 
-void ot::GraphicsItem::applyGraphicsItemTransform(void) {
+void ot::GraphicsItem::applyGraphicsItemTransform() {
 	OTAssertNullptr(this->getQGraphicsItem());
 
 	QTransform newTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
@@ -769,7 +770,7 @@ void ot::GraphicsItem::applyGraphicsItemTransform(void) {
 	this->notifyChildsAboutTransformChange(newTransform);
 }
 
-ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection(void) const {
+ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection() const {
 	OTAssertNullptr(this->getQGraphicsItem());
 	QPointF thisCenter = this->getQGraphicsItem()->mapToScene(this->getQGraphicsItem()->boundingRect().center());
 	QPointF rootCenter = this->getRootItem()->getQGraphicsItem()->mapToScene(this->getRootItem()->getQGraphicsItem()->boundingRect().center());

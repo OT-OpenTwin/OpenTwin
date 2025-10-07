@@ -14,6 +14,7 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
+#include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -441,15 +442,16 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	if (m_viewStateFlags & ItemMoveInProgress) {
 		return;
 	}
-	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
-}
 
-void ot::GraphicsView::notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection) {
-	if (m_viewStateFlags & ItemMoveInProgress) {
-		return;
+	// Ensure item is not a connector
+	if (!_item->isConnectionConnector()) {
+		Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 	}
-
-	Q_EMIT connectionChanged(_connection->getConfiguration());
+	
+	// Notify about connections
+	for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
+		Q_EMIT connectionChanged(connection->getConfiguration());
+	}
 }
 
 // ########################################################################################################

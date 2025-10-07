@@ -17,7 +17,8 @@ namespace ot {
 		GraphicsConnectionConnectorItem();
 		virtual ~GraphicsConnectionConnectorItem();
 
-
+		//! @brief Returns true if this item is a connection connector item.
+		virtual bool isConnectionConnector() const { return true; };
 	};
 
 }
