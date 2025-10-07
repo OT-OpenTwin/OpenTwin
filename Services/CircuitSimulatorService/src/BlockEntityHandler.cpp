@@ -271,13 +271,12 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 
 }
 
-void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos)
+void BlockEntityHandler::addConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& _connections, std::string _editorName, ot::Point2DD _pos)
 {
 	
-	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(editorName);
-	const std::string fullConnectionsFolderName = editorName + "/" + m_connectionsFolder;
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_editorName);
 
-	auto connectionEntitiesByID = findAllEntityBlockConnections(fullConnectionsFolderName);
+	auto connectionEntitiesByID = findAllEntityBlockConnections(_editorName);
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	std::list<std::string> entitiesToDelete;
 	std::list<ot::UID> topologyEntityIDList;
@@ -286,7 +285,7 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 	std::queue<std::pair<std::string,std::shared_ptr<EntityBlock>>> connectedElements;
 	std::list<ot::GraphicsConnectionCfg> connectionsNew;
 	
-	for (auto connection : connections)
+	for (auto connection : _connections)
 	{
 		//First i get the connection which i want to delete by the connection to be added
 		if (connectionEntitiesByID.find(connection.getDestinationUid()) == connectionEntitiesByID.end()) {
@@ -332,7 +331,7 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 		ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
 
 		// As next step i need to add the intersection item 
-		std::shared_ptr<EntityBlock> connector = CreateBlockEntity(editorName, "EntityBlockCircuitConnector", pos);
+		std::shared_ptr<EntityBlock> connector = CreateBlockEntity(_editorName, "EntityBlockCircuitConnector", _pos);
 
 		//Now i create a GraphicsConnectionCfg for all elements
 		while (!connectedElements.empty()) {
@@ -346,7 +345,7 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 			connectedElements.pop();
 		}
 
-		addBlockConnection(connectionsNew, editorName);	
+		addBlockConnection(connectionsNew, _editorName);
 	}
 }
 

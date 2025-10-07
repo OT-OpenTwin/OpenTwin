@@ -540,7 +540,7 @@ std::string Application::handleConnectionToConnection(ot::JsonDocument& _documen
 	ot::Point2DD pos;
 	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_POSITION));
 	m_blockEntityHandler.setPackageName(editorName);
-	m_blockEntityHandler.AddConnectionToConnection(pckg.connections(), editorName, pos);
+	m_blockEntityHandler.addConnectionToConnection(pckg.connections(), editorName, pos);
 	
 	return "";
 }
