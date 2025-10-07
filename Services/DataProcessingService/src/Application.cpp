@@ -61,7 +61,7 @@ Application::~Application()
 
 }
 
-void Application::runPipeline(ot::UIDList _selectedSolverIDs)
+void Application::runPipelineWorker(ot::UIDList _selectedSolverIDs)
 {
  	//UILockWrapper lockWrapper(Application::instance()->getUiComponent(), ot::LockModelWrite);
 	try
@@ -94,6 +94,72 @@ void Application::runPipeline(ot::UIDList _selectedSolverIDs)
 	}
 }
 
+void Application::createPipeline()
+{
+	auto modelComponent = Application::instance()->getModelComponent();
+	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+
+	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
+	newDataprocessing.setName(entityName);
+	newDataprocessing.setEditable(true);
+	newDataprocessing.StoreToDataBase();
+
+	ot::NewModelStateInformation infos;
+	infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
+	infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
+	infos.m_forceVisible.push_back(false);
+	ot::ModelServiceAPI::addEntitiesToModel(infos, "Added pipeline");
+}
+
+void Application::createSolver()
+{
+	auto modelComponent = Application::instance()->getModelComponent();
+	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+
+	if (m_dataProcessingFolderID == ot::getInvalidUID())
+	{
+		ot::EntityInformation entityInfo;
+		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::DataProcessingFolder, entityInfo);
+		m_dataProcessingFolderID = entityInfo.getEntityID();
+	}
+	newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
+
+	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::SolverFolder);
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
+	newSolver.setName(entityName);
+
+	newSolver.StoreToDataBase();
+	ot::NewModelStateInformation entityInfos;
+	entityInfos.m_topologyEntityIDs.push_back(newSolver.getEntityID());
+	entityInfos.m_topologyEntityVersions.push_back(newSolver.getEntityStorageVersion());
+	entityInfos.m_forceVisible.push_back(false);
+	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
+
+}
+
+void Application::runPipeline()
+{
+	EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+	ot::UIDList selectedSolverIDs;
+	for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
+	{
+		if (selectedEntity.getEntityType() == solver.getClassName())
+		{
+			selectedSolverIDs.push_back(selectedEntity.getEntityID());
+		}
+	}
+	if (selectedSolverIDs.size() == 0)
+	{
+		Application::instance()->getUiComponent()->displayMessage("No solver selected to run.");
+	}
+	else
+	{
+		std::thread worker(&Application::runPipelineWorker, this, selectedSolverIDs);
+		worker.detach();
+	}
+}
+
 // ##################################################################################################################################################################################################################
 
 // Custom functions
@@ -108,71 +174,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 {
 	try
 	{
-		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-		{
-			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == m_buttonRunPipeline.getFullPath())
-			{
-				EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
-				ot::UIDList selectedSolverIDs;
-				for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
-				{
-					if (selectedEntity.getEntityType() == solver.getClassName())
-					{
-						selectedSolverIDs.push_back(selectedEntity.getEntityID());
-					}
-				}
-				if (selectedSolverIDs.size() == 0)
-				{
-					Application::instance()->getUiComponent()->displayMessage("No solver selected to run.");
-				}
-				else
-				{
-					std::thread worker(&Application::runPipeline, this, selectedSolverIDs);
-					worker.detach();
-				}
-			}
-			else if (action == m_buttonCreatePipeline.getFullPath())
-			{
-				auto modelComponent = Application::instance()->getModelComponent();
-				EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
-				
-				if (m_dataProcessingFolderID == ot::getInvalidUID())
-				{
-					ot::EntityInformation entityInfo;
-					ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::DataProcessingFolder, entityInfo);
-					m_dataProcessingFolderID = entityInfo.getEntityID();
-				}				
-				newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
-
-				auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::SolverFolder);
-				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
-				newSolver.setName(entityName);
-
-				newSolver.StoreToDataBase();
-				ot::NewModelStateInformation entityInfos;
-				entityInfos.m_topologyEntityIDs.push_back(newSolver.getEntityID());
-				entityInfos.m_topologyEntityVersions.push_back(newSolver.getEntityStorageVersion());
-				entityInfos.m_forceVisible.push_back(false);
-				ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
-
-			}
-			else if (action == m_buttonGraphicsScene.getFullPath())
-			{
-				auto modelComponent = Application::instance()->getModelComponent();
-				EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
-				auto allPipelines =	ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
-				const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
-				newDataprocessing.setName(entityName);
-				newDataprocessing.StoreToDataBase();
-				ot::NewModelStateInformation infos;
-				infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
-				infos.m_topologyEntityVersions.push_back(newDataprocessing.getEntityStorageVersion());
-				infos.m_forceVisible.push_back(false);
-				ot::ModelServiceAPI::addEntitiesToModel(infos,"Added pipeline");
-			}
-		}
-		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
+		if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 		{
 			std::string itemName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 			std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
@@ -185,7 +187,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			if (dependencies.getPythonScriptFolderID() == 0)
 			{
 				ot::EntityInformation entityInfo;
-				ot::ModelServiceAPI::getEntityInformation("Scripts", entityInfo);
+				ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
 				ExternalDependencies dependencies;
 				dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
 			}
@@ -216,6 +218,10 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			//{
 			//	assert(0); //A connection should be drawn in only one graphics view.
 			//}
+		}
+		else
+		{
+			OT_LOG_E(OT_ACTION_RETURN_UnknownAction);
 		}
 	}
 	catch (const std::exception& e)
@@ -257,8 +263,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonRunPipeline = ot::ToolBarButtonCfg(pageName, groupName, "Run", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonRunPipeline.setButtonLockFlags(modelWrite));
 
-	m_buttonCreatePipeline = ot::ToolBarButtonCfg(pageName, groupName, "Add Solver", "Default/AddSolver");
-	_ui->addMenuButton(m_buttonCreatePipeline.setButtonLockFlags(modelWrite));
+	m_buttonCreateSolver = ot::ToolBarButtonCfg(pageName, groupName, "Add Solver", "Default/AddSolver");
+	_ui->addMenuButton(m_buttonCreateSolver.setButtonLockFlags(modelWrite));
 
 	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/AddSolver");
 	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
@@ -271,6 +277,10 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
 	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
+	
+	connectButton(this, &Application::createPipeline, m_buttonGraphicsScene);
+	connectButton(this, &Application::createSolver, m_buttonCreateSolver);
+	connectButton(this, &Application::runPipeline, m_buttonRunPipeline);
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)

@@ -19,7 +19,7 @@
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "GraphHandler.h"
 #include "InvalidUID.h"
-
+#include "OTGuiAPI/ButtonHandler.h"
 // Forward declaration
 namespace ot {
 	namespace components {
@@ -28,7 +28,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -67,15 +67,22 @@ private:
 	Application();
 	virtual ~Application();
 
+	
+
 	ot::ToolBarButtonCfg m_buttonRunPipeline;
-	ot::ToolBarButtonCfg m_buttonCreatePipeline;
+	ot::ToolBarButtonCfg m_buttonCreateSolver;
 	ot::ToolBarButtonCfg m_buttonGraphicsScene;
 	
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
-	void runPipeline(ot::UIDList _selectedSolverIDs);
+	
+	void runPipelineWorker(ot::UIDList _selectedSolverIDs);
 
 	ot::UID m_dataProcessingFolderID = ot::getInvalidUID();
+
+	void createPipeline();
+	void createSolver();
+	void runPipeline();
 };
