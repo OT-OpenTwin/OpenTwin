@@ -165,6 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\ConfigurationHelper.h" />
     <ClInclude Include="include\EntityBlockCircuitConnector.h" />
     <ClInclude Include="include\EntityBlockCircuitElement.h" />
     <ClInclude Include="include\EntityBlockCircuitCapacitor.h" />

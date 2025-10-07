@@ -76,6 +76,13 @@ std::string ot::EntityName::changeParentWithTopo(const std::string& _currentEnti
 	return _newParentPath + "/" + EntityName::getSubName(_currentEntityPath, -1).value();
 }
 
+std::string ot::EntityName::getParentPath(const std::string& _entityName)
+{
+	auto pos = _entityName.find_last_of('/');
+	const std::string parentPath = _entityName.substr(0, pos);
+	return parentPath;
+}
+
 std::string ot::EntityName::createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames)
 {
 	std::string fullEntityName = _nameRoot + "/" + _nameBase;

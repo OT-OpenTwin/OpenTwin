@@ -31,8 +31,9 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	blockEntity->SetGraphicsScenePackageName(editorName);
+	blockEntity->setGraphicsScenePackageChildName(m_blockFolder);
 	blockEntity->setEditable(true);
+
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->StoreToDataBase();
@@ -65,7 +66,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
-		connectionEntity.SetGraphicsScenePackageName(_baseFolderName);
+		connectionEntity.setGraphicsScenePackageChildName(m_connectionFolder);
 		connectionEntity.createProperties();
 
 		connectionEntity.StoreToDataBase();

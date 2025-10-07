@@ -14,7 +14,10 @@ public:
 
 	ot::GraphicsConnectionCfg getConnectionCfg();
 	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
-	void SetGraphicsScenePackageName(const std::string& name) { m_graphicsScenePackage = name; }
+	
+	//! @brief The name of the container below the graphics editor. This name need not be editable. 
+	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
+	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	void CreateConnections();
 
@@ -29,7 +32,7 @@ private:
 	ot::PenFCfg m_lineStyle;
 
 	ot::BasicServiceInformation m_info;
-	std::string	m_graphicsScenePackage;
+	std::string	m_graphicsScenePackageChildName = "";
 	ot::UID _blockIDOrigin;
 	ot::UID _blockIDDestination;
 	std::string _connectorNameOrigin;

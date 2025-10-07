@@ -43,6 +43,8 @@ private:
 	std::string _packageName = "Circuit Simulator";
 	const std::string m_initialCircuitName = "Circuit 1";
 
+	const std::string m_ConnectionsFolder = "Connections";
+
 	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
 };

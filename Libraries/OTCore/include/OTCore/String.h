@@ -41,6 +41,12 @@ namespace ot {
 		//! @param _occurance Occurance to find.
 		//! @return Index of the character or std::string::npos if the n-th character was not found.
 		static size_t findOccurance(const std::string& _string, char _character, int _occurance = 1);
+		
+		//! @brief Naive pattern search. Time Complexity: O(M * N),	Auxiliary Space : O(1)
+		//! Input: pattern = "OT", string = "OTCoolOT" Output : 2
+		//! Input: pattern = "OT", string = "Output" Output : 0
+		//! Input: pattern = "OO", string = "OOOOO" Output : 4
+		static size_t count(const std::string& _string, const std::string& _searchString);
 
 		//! @brief Split the provided string
 		//! @param _str String to split

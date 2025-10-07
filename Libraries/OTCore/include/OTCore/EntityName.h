@@ -56,6 +56,7 @@ namespace ot {
 		//! @param _newParentPath The new parent path of the entity.
 		static std::string changeParentWithTopo(const std::string& _currentEntityPath, const std::string& _newParentPath);
 
+		static std::string getParentPath(const std::string& _entityName);
 
 		static std::string createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames);
 	};

@@ -30,6 +30,7 @@
 #include "ResultCollectionExtender.h"
 #include "QuantityDescriptionCurve.h"
 #include "OTGui/PainterRainbowIterator.h"
+#include "OTCore/EntityName.h"
 
 // Third Party Header
 
@@ -53,11 +54,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	// Here i want to add the items to the corresponding editor
-
-	
-	blockEntity->SetGraphicsScenePackageName(_packageName);
-	
+	// Here i want to add the items to the corresponding editor	
 
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	blockCoordinates->setCoordinates(position);
@@ -200,7 +197,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	std::string blockName = "EntityBlockConnection";
 	int count = 1;
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
-	const std::string connectionFolderName = _baseFolderName + "/Connections";
+	const std::string connectionFolderName = _baseFolderName + "/" + m_ConnectionsFolder;
 	for (auto& connection : _connections) {
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
@@ -209,14 +206,8 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//Now I first create the needed parameters for entName
 		ot::UID entityID = _modelComponent->createEntityUID();
 		
-		std::string connectionName;
-		
-		do {
-			connectionName = connectionFolderName + "/Connection" + std::to_string(count);
-			count++;
-		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
-
-
+		std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
+	
 		//Here i create the connectionEntity
 		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->createProperties();
@@ -235,7 +226,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
 		connectionEntity->setName(connectionName);
-		connectionEntity->SetGraphicsScenePackageName(_baseFolderName);
+		connectionEntity->setGraphicsScenePackageChildName(m_ConnectionsFolder);
 		connectionEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->StoreToDataBase();

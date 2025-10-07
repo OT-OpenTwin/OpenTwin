@@ -5,6 +5,7 @@
 
 #include "EntityBlock.h"
 #include "EntityBlockConnection.h"
+#include "ConfigurationHelper.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner)
@@ -133,7 +134,7 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
 		bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
 		bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
-		bsoncxx::builder::basic::kvp("GraphicPackageName", m_graphicsScenePackage)
+		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -163,7 +164,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	m_coordinate2DEntityID = static_cast<ot::UID>(doc_view["CoordinatesEntityID"].get_int64());
 	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
 	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
-	m_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
+	m_graphicsScenePackageChildName = doc_view["GraphicPackageChildName"].get_utf8().value.data();
 
 	auto allConnectors = doc_view["Connectors"].get_array();
 	for (auto& element : allConnectors.value)
@@ -179,9 +180,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	{
 		auto subDocument = element.get_value().get_int64();
 		m_connectionIDs.push_back(subDocument);
-	}
-
-	
+	}	
 }
 
 void EntityBlock::CreateNavigationTreeEntry()
@@ -217,7 +216,10 @@ void EntityBlock::CreateBlockItem()
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
-	ot::GraphicsScenePackage pckg(m_graphicsScenePackage);
+
+	const std::string graphicsSceneName = ot::ConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
+
+	ot::GraphicsScenePackage pckg(graphicsSceneName);
 	pckg.addItem(blockCfg);
 
 	ot::JsonDocument reqDoc;

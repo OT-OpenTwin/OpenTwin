@@ -31,7 +31,11 @@ public:
 	ot::UID getCoordinateEntityID() const { return m_coordinate2DEntityID; }
 	EntityCoordinates2D* getCoordinateEntity() { return m_coordinateEntity; }
 	const std::string& getBlockTitle() const { return m_blockTitle; }
-	void SetGraphicsScenePackageName(const std::string& name) { m_graphicsScenePackage = name; }
+	
+	//! @brief The name of the container below the graphics editor. This name need not be editable. 
+	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
+	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
+
 	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; };
 
@@ -54,12 +58,13 @@ public:
 
 	void CreateBlockItem();
 
+
 protected:
 	std::string m_blockTitle = "";
 	ot::UID m_coordinate2DEntityID = 0;
 	EntityCoordinates2D* m_coordinateEntity = nullptr;
 	ot::BasicServiceInformation m_info;
-	std::string	m_graphicsScenePackage;
+	std::string	m_graphicsScenePackageChildName = "";
 	std::string m_navigationOldTreeIconName = "";
 	std::string m_navigationOldTreeIconNameHidden = "";
 

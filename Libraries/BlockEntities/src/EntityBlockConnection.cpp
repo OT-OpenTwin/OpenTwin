@@ -3,6 +3,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsPackage.h"
+#include "ConfigurationHelper.h"
 
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder))
@@ -61,8 +62,9 @@ void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& co
 
 void EntityBlockConnection::CreateConnections()
 {
+	const std::string graphicsSceneName = ot::ConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
 	
-	ot::GraphicsConnectionPackage connectionPckg(m_graphicsScenePackage);
+	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
 	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
 
 
@@ -151,7 +153,7 @@ void EntityBlockConnection::AddStorageData(bsoncxx::builder::basic::document& st
 	
 	storage.append(
 		
-	   bsoncxx::builder::basic::kvp("GraphicPackageName", m_graphicsScenePackage),
+	   bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
 	   bsoncxx::builder::basic::kvp("ServiceName", m_info.serviceName()),
 	   bsoncxx::builder::basic::kvp("ServiceType", m_info.serviceType()),
 
@@ -168,7 +170,7 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	//Now we read the information about the ConnectionCfg
-	m_graphicsScenePackage = std::string(doc_view["GraphicPackageName"].get_utf8().value.data());
+	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_utf8().value.data());
 	m_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
 	m_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	

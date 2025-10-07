@@ -40,6 +40,7 @@
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityGraphicsScene.h"
+#include "OTCore/EntityName.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -103,20 +104,13 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 // Trying to create more circuits
 void Application::createNewCircuit() {
-	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
-
-	int count = 1;
-	std::string circuitName;
-	do {
-		circuitName = "Circuits/Circuit " + std::to_string(count);
-		count++;
-	} while (std::find(circuits.begin(), circuits.end(), circuitName) != circuits.end());
-
-	circuitName = extractStringAfterDelimiter(circuitName, '/', 1);
+	
+	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
+	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, "Circuit", existingCircuits);
 
 	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
-	
-	entityCircuitRoot->setName(getCircuitRootName()+circuitName);
+	entityCircuitRoot->setEditable(true);
+	entityCircuitRoot->setName(circuitName);
 
 	entityCircuitRoot->StoreToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added new circuit");

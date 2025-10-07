@@ -75,6 +75,33 @@ inline size_t ot::String::findOccurance(const std::string& _string, char _charac
 	return std::string::npos;
 }
 
+size_t ot::String::count(const std::string& _string, const std::string& _searchString)
+{
+	int searchStringLength = static_cast<int32_t>(_searchString.length());
+	int stringLength = static_cast<int32_t>(_string.length());
+	int count = 0;
+
+	/* A loop to slide pat[] one by one */
+	for (int i = 0; i <= stringLength - searchStringLength; i++) {
+		/* check for match with search string*/
+		int j;
+		for (j = 0; j < searchStringLength; j++)
+		{
+			if (_string[i + j] != _searchString[j])
+			{
+				break;
+			}
+		}
+
+		if (j == searchStringLength) 
+		{
+			//search string was found
+			count++;
+		}
+	}
+	return count;
+}
+
 inline std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {
 	std::string temp = _str;
 	std::list<std::string> ret;
