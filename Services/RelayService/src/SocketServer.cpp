@@ -153,6 +153,12 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 			}
 			*/
 		}
+		else if (action == OT_ACTION_CMD_SetLogFlags) {
+			ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(doc, OT_ACTION_PARAM_Flags));
+			ot::LogDispatcher::instance().setLogFlags(flags);
+			this->sendQueueWSMessage(_senderIP, _json);
+			return QString::fromStdString(ot::ReturnMessage::toJson(ot::ReturnMessage::Ok));
+		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 
