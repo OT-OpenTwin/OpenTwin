@@ -21,9 +21,8 @@ void EntitySolverFDTD::createProperties(std::string& _meshFolderName, ot::UID& _
 	// Excitation types lists
 	std::list<std::string> excitationTypes{ "Gauss Excitation" };
 
-	EntityPropertiesInteger::createProperty("Frequency", "Start Frequency", 0, "FDTDSolver", getProperties());
-	EntityPropertiesInteger::createProperty("Frequency", "Center Frequency", 0, "FDTDSolver", getProperties());
-	EntityPropertiesInteger::createProperty("Frequency", "End Frequency", 0, "FDTDSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Frequency", "Start Frequency", 0, "FDTDSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Frequency", "End Frequency", 0, "FDTDSolver", getProperties());
 	EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "FDTDSolver", getProperties());
 	EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation type", excitationTypes, "Gauss Excitation", "FDTDSolver", getProperties());
 	EntityPropertiesSelection::createProperty("Boundary Conditions", "x-min", boundaryValues, "PEC", "FDTDSolver", getProperties());

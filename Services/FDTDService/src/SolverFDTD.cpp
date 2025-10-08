@@ -63,8 +63,7 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
 
 std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent)
 {
-    //FDTDConfig cfg;
-    //cfg.timesteps = getTimeSteps()
+    FDTDConfig cfg;
     runSolverExe("model", "FDTD_XML", "Map", tempDirPath, uiComponent);
 
     return solverOutput.str();
@@ -73,7 +72,7 @@ std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components
 tinyxml2::XMLElement* SolverFDTD::appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node) {
     tinyxml2::XMLElement* elem = doc->NewElement(node.getTag().c_str());
 
-    for (auto& [key, value] : node.getAttributes()) {
+    for (const auto& [key, value] : node.getAttributes()) {
         elem->SetAttribute(key.c_str(), value.c_str());
     }
 
@@ -106,7 +105,6 @@ std::string SolverFDTD::vecToString(const std::vector<int>& vector) {
 }
 
 XmlEntry SolverFDTD::FDTDTemplate(const FDTDConfig& config) {
-    auto vecToStr = [this](const std::vector<int>& v) {return this->vecToString(v); };
     std::array<std::string, 6> boundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
 
     XmlEntry FDTD("FDTD");
@@ -148,7 +146,6 @@ XmlEntry SolverFDTD::FDTDTemplate(const FDTDConfig& config) {
 }
 
 XmlEntry SolverFDTD::generateXML(const XmlEntry FDTD) {
-    auto vecToStr = [this](const std::vector<int>& v) {return this->vecToString(v); };
 
     XmlEntry openEMS;
     openEMS.setTag("openEMS");
