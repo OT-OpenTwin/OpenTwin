@@ -10,6 +10,8 @@
 #include "FDTDConfig.h"
 #include "XmlEntry.h"
 
+// STD INCLUDES
+#include <algorithm>
 #include <fstream>
 #include <cstdint>
 #include <map>

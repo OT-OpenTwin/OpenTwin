@@ -15,9 +15,13 @@ public:
 
 private:
 	tinyxml2::XMLElement* appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node);
-	bool wirteXML(const std::string& fileName, const XmlEntry& rootNode);
-	XmlEntry FDTDTemplate(const FDTDConfig& config);
-	std::string vecToString(const std::vector<int>& vector);
+
+	//@brief Helper function for XML double to string conversion
+	std::string doubleCleanString(double value);
+	//@brief Helper function for XML double to scientific string conversion
+	std::string doubleToScientific(double value);
+	bool writeXML(const std::string& fileName, const XmlEntry& rootNode);
+	XmlEntry writeFDTD(const FDTDConfig& config);
 	XmlEntry generateXML(const XmlEntry FDTD);
 	std::map<std::string, std::string> getBoundaryAttributes(const FDTDConfig& config) const;
 	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
