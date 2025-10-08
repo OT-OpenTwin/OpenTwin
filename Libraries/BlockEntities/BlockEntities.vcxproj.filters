@@ -90,6 +90,9 @@
     <ClInclude Include="include\ConfigurationHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ClassFactoryBlock.cpp">
@@ -154,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="src\EntityBlockCircuitTransmissionLine.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

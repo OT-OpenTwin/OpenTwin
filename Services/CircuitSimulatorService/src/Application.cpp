@@ -42,6 +42,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityGraphicsScene.h"
 #include "OTCore/EntityName.h"
+#include "Helper.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -353,10 +354,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
+	// Now we get the blockConnectionMap from helper in BlockEntities
+	std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntitiesByID);
 
 	// Here i generate my netlist
 
-	std::list<std::string> _netlist = m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
+	std::list<std::string> _netlist = m_ngSpice.ngSpice_Initialize (connectionBlockMap,solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
 	if (_netlist.empty())
 	{
 		OT_LOG_E("NGSpice Initialize function failed!");

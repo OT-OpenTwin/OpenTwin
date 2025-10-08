@@ -207,7 +207,18 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//Now I first create the needed parameters for entName
 		ot::UID entityID = _modelComponent->createEntityUID();
 		
-		std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
+		// Use a manual counter because all connections are added to the model at the end.
+		// CreateNewUniqueEntityName only considers connections already in the model,
+        // which could otherwise result in duplicate names.
+		std::string connectionName;
+		do {
+			connectionName = connectionFolderName + "/Connection" + std::to_string(count);
+			count++;
+		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
+
+
+
+		//std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
 	
 		//Here i create the connectionEntity
 		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
