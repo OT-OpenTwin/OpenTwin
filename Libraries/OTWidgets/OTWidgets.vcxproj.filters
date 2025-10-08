@@ -562,6 +562,9 @@
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsDisconnectItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1059,6 +1062,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsZValues.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

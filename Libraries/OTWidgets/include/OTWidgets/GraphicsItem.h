@@ -124,7 +124,7 @@ namespace ot {
 		virtual QMarginsF getOutlineMargins() const;
 
 		//! @brief Returns true if this item is a connection connector item.
-		virtual bool isConnectionConnector() const { return false; };
+		virtual bool isInternalItem() const { return false; };
 
 		// ###############################################################################################################################################
 

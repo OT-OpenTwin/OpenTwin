@@ -15,6 +15,8 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT CustomGraphicsItem : public QGraphicsItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
+		OT_DECL_NOCOPY(CustomGraphicsItem)
+		OT_DECL_NOMOVE(CustomGraphicsItem)
 		OT_DECL_NODEFAULT(CustomGraphicsItem)
 	public:
 		CustomGraphicsItem(GraphicsItemCfg* _configuration);

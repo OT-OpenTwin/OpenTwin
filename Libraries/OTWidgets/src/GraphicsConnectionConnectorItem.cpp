@@ -13,7 +13,7 @@ ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem() {
 	const double r = 8.;
 	GraphicsEllipseItemCfg cfg;
 	cfg.setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectionConnectable));
-	cfg.setConnectionDirection(ConnectOut);
+	cfg.setConnectionDirection(ConnectAny);
 	cfg.setFixedSize(2. * r, 2. * r);
 	PenFCfg pen;
 	pen.setStyle(LineStyle::SolidLine);

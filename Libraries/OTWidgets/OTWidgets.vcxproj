@@ -71,6 +71,7 @@
     </ClCompile>
     <ClCompile Include="src\ExpanderWidget.cpp" />
     <ClCompile Include="src\GraphicsConnectionConnectorItem.cpp" />
+    <ClCompile Include="src\GraphicsDisconnectItem.cpp" />
     <ClCompile Include="src\IndicatorWidget.cpp" />
     <ClCompile Include="src\ModelLibraryDialog.cpp" />
     <ClCompile Include="src\Painter2DEditDialogEntry.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="include\OTWidgets\CoordinateFormatConverter.h" />
     <QtMoc Include="include\OTWidgets\ExpanderWidget.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionConnectorItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsZValues.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />

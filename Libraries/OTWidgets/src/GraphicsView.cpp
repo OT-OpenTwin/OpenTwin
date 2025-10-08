@@ -431,14 +431,18 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	}
 
 	// Ensure item is not a connector
-	if (!_item->isConnectionConnector()) {
+	if (!_item->isInternalItem()) {
 		Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 	}
 	
 	// Notify about connections
 	for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
-		Q_EMIT connectionChanged(connection->getConfiguration());
+		this->notifyConnectionChanged(connection);
 	}
+}
+
+void ot::GraphicsView::notifyConnectionChanged(const ot::GraphicsConnectionItem* _connection) {
+	Q_EMIT connectionChanged(_connection->getConfiguration());
 }
 
 // ########################################################################################################

@@ -21,6 +21,7 @@
 namespace ot {
 	
 	class GraphicsItem;
+	class GraphicsDisconnectItem;
 	class GraphicsConnectionConnectorItem;
 
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsElement {
@@ -129,6 +130,8 @@ namespace ot {
 		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
 		void disconnectItem(const GraphicsItem* _item, bool _updateConfig = false);
 
+		void disconnectRequested(GraphicsDisconnectItem* _disconnector);
+
 		GraphicsItem* getOriginItem() const { return m_origin; };
 		GraphicsItem* getDestItem() const { return m_dest; };
 
@@ -152,6 +155,7 @@ namespace ot {
 		ConnectionDirection calculateDestDirection() const;
 
 		void updateConnectors();
+		void updateDisconnectVisibility();
 
 		void calculatePainterPath(QPainterPath& _path) const;
 		void calculateDirectLinePath(QPainterPath& _path) const;
@@ -173,13 +177,15 @@ namespace ot {
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;
+		GraphicsDisconnectItem* m_originDisconnect;
 		GraphicsConnectionConnectorItem* m_originConnector;
 
 		GraphicsItem* m_dest;
+		GraphicsDisconnectItem* m_destDisconnect;
 		GraphicsConnectionConnectorItem* m_destConnector;
 
 		QRectF m_lastRect;
-
+		QPointF m_disconnectOffset;
 	};
 
 }

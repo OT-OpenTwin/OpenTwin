@@ -13,9 +13,11 @@
 // OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsZValues.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/GraphicsDisconnectItem.h"
 #include "OTWidgets/GraphicsConnectionConnectorItem.h"
 
 // Qt header
@@ -23,8 +25,14 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem() :
-	m_dest(nullptr), m_origin(nullptr), m_originConnector(nullptr), m_destConnector(nullptr)
+	m_dest(nullptr), m_origin(nullptr), m_originConnector(nullptr), m_destConnector(nullptr),
+	m_disconnectOffset(-(GraphicsDisconnectItem::getSize() / 2.), -(GraphicsDisconnectItem::getSize() / 2.))
 {
+	m_originDisconnect = new GraphicsDisconnectItem(this);
+	m_originDisconnect->setVisible(false);
+	m_destDisconnect = new GraphicsDisconnectItem(this);
+	m_destDisconnect->setVisible(false);
+
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
 	this->updateConnectors();
@@ -352,12 +360,35 @@ void ot::GraphicsConnectionItem::disconnectItem(const GraphicsItem* _item, bool 
 	this->update();
 }
 
+void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _disconnector) {
+	GraphicsScene* sc = this->getGraphicsScene();
+	OTAssertNullptr(sc);
+
+	GraphicsView* view = sc->getGraphicsView();
+	OTAssertNullptr(view);
+
+	if (_disconnector == m_originDisconnect) {
+		this->disconnectItem(m_origin, true);
+		view->notifyConnectionChanged(this);
+	}
+	else if (_disconnector == m_destDisconnect) {
+		this->disconnectItem(m_dest, true);
+		view->notifyConnectionChanged(this);
+	}
+	else {
+		OT_LOG_EA("Unknown disconnector");
+	}
+}
+
 void ot::GraphicsConnectionItem::updatePositionsFromItems() {
 	m_config.setOriginPos(QtFactory::toPoint2D(this->calculateOriginPos()));
 	m_config.setDestPos(QtFactory::toPoint2D(this->calculateDestPos()));
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView() {
+	m_originDisconnect->setPos(this->calculateOriginPos() + m_disconnectOffset);
+	m_destDisconnect->setPos(this->calculateDestPos() + m_disconnectOffset);
+
 	this->prepareGeometryChange();
 	this->update();
 }
@@ -400,11 +431,17 @@ void ot::GraphicsConnectionItem::graphicsSceneSet(GraphicsScene* _scene) {
 		m_destConnector->finalizeGraphicsItem();
 	}
 
+	_scene->addItem(m_originDisconnect);
+	_scene->addItem(m_destDisconnect);
+
 	this->update();
 }
 
 void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) {
 	GraphicsElement::graphicsElementStateChanged(_flags);
+
+	updateDisconnectVisibility();
+
 	this->update();
 }
 
@@ -514,6 +551,29 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 			m_destConnector->setPos(QtFactory::toQPoint(m_config.getDestPos()) - QPointF(m_destConnector->getRadiusX(), m_destConnector->getRadiusY()));
 			m_destConnector->storeConnection(this);
 		}
+	}
+
+	this->updateDisconnectVisibility();
+}
+
+void ot::GraphicsConnectionItem::updateDisconnectVisibility() {
+	if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
+		if (m_origin) {
+			//m_originDisconnect->setVisible(true);
+		}
+		else {
+			m_originDisconnect->setVisible(false);
+		}
+		if (m_dest) {
+			//m_destDisconnect->setVisible(true);
+		}
+		else {
+			m_destDisconnect->setVisible(false);
+		}
+	}
+	else {
+		m_originDisconnect->setVisible(false);
+		m_destDisconnect->setVisible(false);
 	}
 }
 

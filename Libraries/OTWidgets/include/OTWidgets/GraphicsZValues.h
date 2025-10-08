@@ -16,5 +16,6 @@ namespace ot {
 		constexpr static int Connection = 1;
 		constexpr static int Item = 2;
 		constexpr static int Connector = 3;
+		constexpr static int Disconnect = 4;
 	};
 }
