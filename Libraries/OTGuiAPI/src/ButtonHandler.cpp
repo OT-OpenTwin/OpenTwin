@@ -12,29 +12,31 @@
 #include "OTGuiAPI/ButtonHandler.h"
 
 ot::ButtonHandler::ButtonHandler() {
-	if (!m_actionHandler.connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &ButtonHandler::handleButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
+	if (!m_actionHandler.connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &ButtonHandler::handleToolBarButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
 		OT_LOG_EA("Failed to register button click handler");
 	}
 }
 
-void ot::ButtonHandler::connectButton(void(*_callback)(), const std::string& _buttonKey) {
+void ot::ButtonHandler::connectToolBarButton(const std::string& _buttonKey, void(*_callback)()) {
     OTAssertNullptr(_callback);
+	OTAssert(m_callbacks.find(_buttonKey) == m_callbacks.end(), "A callback is already registered for the given tool bar button key");
 	m_callbacks.insert_or_assign(_buttonKey, _callback);
 }
 
-void ot::ButtonHandler::connectButton(const std::function<void()>& _callback, const std::string& _buttonKey) {
+void ot::ButtonHandler::connectToolBarButton(const std::string& _buttonKey, const std::function<void()>& _callback) {
+	OTAssert(m_callbacks.find(_buttonKey) == m_callbacks.end(), "A callback is already registered for the given tool bar button key");
 	m_callbacks.insert_or_assign(_buttonKey, _callback);
 }
 
-bool ot::ButtonHandler::disconnectButton(const std::string& _buttonKey) {
+bool ot::ButtonHandler::disconnectToolBarButton(const std::string& _buttonKey) {
     return m_callbacks.erase(_buttonKey) > 0;
 }
 
-void ot::ButtonHandler::buttonClicked(const std::string& _buttonKey) {
-	OT_LOG_W("Unhandled button click event { \"ButtonKey\": \"" + _buttonKey + "\" }");
+void ot::ButtonHandler::toolBarButtonClicked(const std::string& _buttonKey) {
+	OT_LOG_W("Unhandled tool bar button click event { \"ButtonKey\": \"" + _buttonKey + "\" }");
 }
 
-void ot::ButtonHandler::handleButtonClicked(JsonDocument& _document) {
+void ot::ButtonHandler::handleToolBarButtonClicked(JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
 	auto it = m_callbacks.find(action);
@@ -42,6 +44,6 @@ void ot::ButtonHandler::handleButtonClicked(JsonDocument& _document) {
 		it->second();
 	}
 	else {
-		this->buttonClicked(action);
+		this->toolBarButtonClicked(action);
 	}
 }

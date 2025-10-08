@@ -283,9 +283,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_pipelineHandler.setUIComponent(_ui);
 	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
 	
-	connectButton(this, &Application::createPipeline, m_buttonGraphicsScene);
-	connectButton(this, &Application::createSolver, m_buttonCreateSolver);
-	connectButton(this, &Application::runPipeline, m_buttonRunPipeline);
+	connectToolBarButton(m_buttonGraphicsScene, this, &Application::createPipeline);
+	connectToolBarButton(m_buttonCreateSolver, this, &Application::createSolver);
+	connectToolBarButton(m_buttonRunPipeline, this, &Application::runPipeline);
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)

@@ -105,11 +105,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonCreateSignal);
 
 	// Connect button handlers
-	connectButton(this, &Application::addSolver, _buttonCreateSolver);
-	connectButton(this, &Application::runSolver, _buttonRunSolver);
-	connectButton(this, &Application::addPort, _buttonAddPort);
-	connectButton(this, &Application::addMonitor, _buttonAddMonitor);
-	connectButton(this, &Application::addSignalType, _buttonCreateSignal);
+	connectToolBarButton(_buttonCreateSolver, this, &Application::addSolver);
+	connectToolBarButton(_buttonRunSolver, this, &Application::runSolver);
+	connectToolBarButton(_buttonAddPort, this, &Application::addPort);
+	connectToolBarButton(_buttonAddMonitor, this, &Application::addMonitor);
+	connectToolBarButton(_buttonCreateSignal, this, &Application::addSignalType);
 
 	modelSelectionChanged();
 

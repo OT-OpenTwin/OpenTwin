@@ -89,14 +89,9 @@ private:
 	virtual ~Application();
 
 	struct ButtonInfo {
-		ButtonInfo(const std::string& _group, const std::string& _buttonNameAndTitle, const std::string& _icon, const std::function<void(void)>& _callback) :
-			group(_group), name(_buttonNameAndTitle), title(_buttonNameAndTitle), callback(_callback), icon(_icon)
-		{}
-
-		std::string group;
-		std::string name;
-		std::string title;
-		std::string icon;
+		ButtonInfo(ot::ToolBarButtonCfg&& _cfg, std::function<void(void)>&& _callback) 
+			: cfg(std::move(_cfg)), callback(std::move(_callback)) {}
+		ot::ToolBarButtonCfg cfg;
 		std::function<void(void)> callback;
 	};
 

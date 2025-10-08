@@ -98,24 +98,24 @@ Application::Application() :
 	m_nameCounter(0)
 {
 	// Debug buttons
-	m_testButtons.push_back(ButtonInfo("Test", "Test", "BugRed", std::bind(&Application::testCode, this)));
-	m_testButtons.push_back(ButtonInfo("Test", "Frontend Info", "Information", std::bind(&Application::uiDebugInfo, this)));
-	m_testButtons.push_back(ButtonInfo("Test", "Debug Service Info", "Information", std::bind(&Application::serviceDebugInfo, this)));
-	m_testButtons.push_back(ButtonInfo("Test", "Kill", "Kill", std::bind(&Application::testKill, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Test", "Test", "Default/BugRed"), std::bind(&Application::testCode, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Test", "Frontend Info", "Default/Information"), std::bind(&Application::uiDebugInfo, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Test", "Debug Service Info", "Default/Information"), std::bind(&Application::serviceDebugInfo, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Test", "Kill", "Default/Kill"), std::bind(&Application::testKill, this)));
 	
 	// Table tests
-	m_testButtons.push_back(ButtonInfo("Table", "Small (100k)", "GreenCircle", std::bind(&Application::testTableSmall, this)));
-	m_testButtons.push_back(ButtonInfo("Table", "Medium (1M)", "YellowCircle", std::bind(&Application::testTableMedium, this)));
-	m_testButtons.push_back(ButtonInfo("Table", "Big (10M)", "RedCircle", std::bind(&Application::testTableBig, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Small (100k)", "Default/GreenCircle"), std::bind(&Application::testTableSmall, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Medium (1M)", "Default/YellowCircle"), std::bind(&Application::testTableMedium, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Big (10M)", "Default/RedCircle"), std::bind(&Application::testTableBig, this)));
 
 	// Plot tests
-	m_testButtons.push_back(ButtonInfo("Plots", "Single Curve", "Plot1DVisible", std::bind(&Application::createPlotOneCurve, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Two Curves", "Plot1DVisible", std::bind(&Application::createPlotTwoCurves, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P const", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Family of Curves 3P", "Plot1DVisible", std::bind(&Application::createFamilyOfCurves3Parameter, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Scatter Plot", "Plot1DVisible", std::bind(&Application::createPlotScatter, this)));
-	m_testButtons.push_back(ButtonInfo("Plots", "Single Value Curve", "Plot1DVisible", std::bind(&Application::createPlotSinglePoint, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P const", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3ParameterConst, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3Parameter, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Scatter Plot", "Default/Plot1DVisible"), std::bind(&Application::createPlotScatter, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Value Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotSinglePoint, this)));
 
 	// --------------------------------------------------------------------------------------------------------+
 
@@ -687,28 +687,6 @@ Application::~Application()
 
 }
 
-/*
-std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-
-	ButtonInfo* info = nullptr;
-	for (ButtonInfo& btn : m_testButtons) {
-		if (action == this->getButtonKey(btn)) {
-			btn.callback();
-			return std::string();
-		}
-	}
-	
-	OT_LOG_WAS("Unknown model action \"" + action + "\"");
-	return std::string();
-}*/
-
-// ##################################################################################################################################################################################################################
-
-std::string Application::getButtonKey(const ButtonInfo& _info) const {
-	return OT_DEBUG_SERVICE_PAGE_NAME ":" + _info.group + ":" + _info.name;
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Required functions
@@ -734,15 +712,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(OT_DEBUG_SERVICE_PAGE_NAME);
 
 	std::list<std::string> addedGroups;
+	std::list<std::string> addedSubGroups;
+
 	for (const auto& it : m_testButtons) {
 		// Add group if needed
-		if (std::find(addedGroups.begin(), addedGroups.end(), it.group) == addedGroups.end()) {
-			_ui->addMenuGroup(OT_DEBUG_SERVICE_PAGE_NAME, it.group);
-			addedGroups.push_back(it.group);
+		if (std::find(addedGroups.begin(), addedGroups.end(), it.cfg.getGroup()) == addedGroups.end()) {
+			_ui->addMenuGroup(OT_DEBUG_SERVICE_PAGE_NAME, it.cfg.getGroup());
+			addedGroups.push_back(it.cfg.getGroup());
 		}
-
-		_ui->addMenuButton(OT_DEBUG_SERVICE_PAGE_NAME, it.group, it.name, it.title, ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, it.icon);
-		this->connectButton(it.callback, OT_DEBUG_SERVICE_PAGE_NAME ":" + it.group + ":" + it.name);
+		ot::ToolBarButtonCfg cfg = it.cfg;
+		cfg.setButtonLockFlags(ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite);
+		_ui->addMenuButton(cfg);
+		this->connectToolBarButton(cfg, it.callback);
 	}
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
