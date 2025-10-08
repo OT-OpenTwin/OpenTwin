@@ -58,11 +58,7 @@ public:
 	void addPort(void);
 	void addSignalType(void);
 
-	void EnsureVisualizationModelIDKnown(void);
-
 private:
-	ot::UID					visualizationModelID = 1;
-
 	ot::ToolBarButtonCfg _buttonCreateSolver;
 	ot::ToolBarButtonCfg _buttonRunSolver;
 	ot::ToolBarButtonCfg _buttonAddPort;

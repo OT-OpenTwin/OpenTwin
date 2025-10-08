@@ -126,17 +126,6 @@ void Application::modelSelectionChanged(void)
 	getUiComponent()->setControlState(_buttonAddMonitor.getFullPath(), (this->getSelectedEntities().size() == 1));
 	getUiComponent()->setControlState(_buttonAddPort.getFullPath(), (this->getSelectedEntities().size() == 1));
 }
-	
-void Application::EnsureVisualizationModelIDKnown(void)
-{
-	if (visualizationModelID > 0) return;
-	if (this->getModelComponent() == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-
-	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
-}
 
 void Application::addMonitor(void)
 {

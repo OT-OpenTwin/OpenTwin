@@ -49,7 +49,6 @@ public:
 
 	// Add your custom functions/ members here
 
-	void EnsureVisualizationModelIDKnown(void);
 	void propertyChanged(ot::JsonDocument& _doc) override;
 private:
 	void updateEntities(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityVersions, bool itemsVisible);
@@ -57,6 +56,4 @@ private:
 	std::pair<ot::UID, ot::UID> storeBinaryData(const char *data, size_t dataLength);
 	void sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot::UID binaryDataItemID, ot::UID binaryDataItemVersion);
 	std::pair<ot::UID, ot::UID> createDataItems(EntityVis2D3D *visEntity);
-
-	ot::UID	visualizationModelID;
 };

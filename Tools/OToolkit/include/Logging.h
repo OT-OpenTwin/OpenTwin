@@ -10,6 +10,7 @@
 
 // OT header
 #include "OTCore/LogDispatcher.h"		// LogMessage
+#include "OTCommunication/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -40,7 +41,7 @@ class QTableWidgetItem;
 
 namespace ot { class ComboBox; }
 
-class Logging : public QObject, public otoolkit::Tool {
+class Logging : public QObject, public otoolkit::Tool, public ot::ActionHandler {
 	Q_OBJECT
 public:
 	// Static functions
@@ -105,6 +106,8 @@ public Q_SLOTS:
 	void slotIntervalTimeout();
 
 private:
+	void handleNewLog(ot::JsonDocument& _doc);
+
 	void iniTableItem(int _row, int _column, QTableWidgetItem* _itm);
 	void updateCountLabels();
 	void connectToLogger(bool _isAutoConnect);

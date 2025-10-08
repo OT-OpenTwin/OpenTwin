@@ -163,18 +163,6 @@ void Application::modelSelectionChanged()
 	//}
 }
 
-void Application::EnsureVisualizationModelIDKnown(void)
-{
-	if (visualizationModelID > 0) return;
-	if (this->getModelComponent() == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-
-	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
-}
-
-
 void Application::importProject(void)
 {
 	getModelComponent()->clearNewEntityList();

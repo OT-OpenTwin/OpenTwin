@@ -11,6 +11,7 @@
 
 // OpenTwin header
 #include "OTCore/AbstractLogNotifier.h"
+#include "OTCommunication/ActionHandler.h"
 
 // Qt header
 #include <QtCore/qthread.h>
@@ -31,7 +32,7 @@ class QShortcut;
 
 namespace ot { class PlainTextEditView; }
 
-class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::AbstractLogNotifier {
+class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::AbstractLogNotifier, public ot::ActionHandler {
 	Q_OBJECT
 public:
 	enum StartOption {
@@ -109,6 +110,8 @@ private Q_SLOTS:
 	void slotColorStyleChanged();
 
 private:
+	void handleDisplayData(ot::JsonDocument& _doc);
+
 	AppBase(QApplication* _app = (QApplication*)nullptr);
 
 	Qt::HANDLE				m_mainThread;

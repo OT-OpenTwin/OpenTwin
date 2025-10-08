@@ -49,7 +49,7 @@ void Application::deleteInstance(void) {
 
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT, new UiNotifier(), new ModelNotifier()),
-	m_subprocessManager(nullptr), visualizationModelID(-1)
+	m_subprocessManager(nullptr)
 {
 	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteAction);
 }

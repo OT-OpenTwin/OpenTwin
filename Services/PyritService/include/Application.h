@@ -77,5 +77,4 @@ public:
 
 private:
 	SubprocessManager*		m_subprocessManager;
-	ot::UID					visualizationModelID;
 };

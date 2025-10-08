@@ -34,7 +34,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/CheckerboardPainter2D.h"
-#include "OTCommunication/actionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PlainTextEdit.h"
 #include "OTWidgets/WidgetViewDock.h"
@@ -249,53 +249,7 @@ void AppBase::updateTransparentColorStyleValue(void) {
 // Public: Slots
 
 void AppBase::slotProcessMessage(const QString& _json) {
-	try {
-		std::string msgStd = _json.toStdString();
-		ot::JsonDocument inboundAction;
-		inboundAction.fromJson(msgStd);
-		if (inboundAction.IsObject()) {
-
-			std::string action = ot::json::getString(inboundAction, OT_ACTION_MEMBER);
-
-			if (action == OT_ACTION_CMD_Log) {
-				if (m_logger) {
-					std::list<ot::LogMessage> messages;
-					if (inboundAction.HasMember(OT_ACTION_PARAM_LOGS)) {
-						for (const ot::ConstJsonObject& logObj : ot::json::getObjectList(inboundAction, OT_ACTION_PARAM_LOGS)) {
-							ot::LogMessage msg;
-							msg.setFromJsonObject(logObj);
-							msg.setCurrentTimeAsGlobalSystemTime();
-							messages.push_back(msg);
-						}
-					}
-					else if (inboundAction.HasMember(OT_ACTION_PARAM_LOG)) {
-						ot::LogMessage msg;
-						msg.setFromJsonObject(ot::json::getObject(inboundAction, OT_ACTION_PARAM_LOG));
-						messages.push_back(msg);
-					}
-					
-					m_logger->newMessages(std::move(messages));
-				}
-			}
-			else if (action == "DisplayData") {
-				std::string data = ot::json::getString(inboundAction, OT_ACTION_PARAM_Data);
-
-				this->log("DisplayData Request", otoolkit::APIInterface::Information, QString::fromStdString(data));
-			}
-			else {
-				OT_LOG_E("Unknown action received \"" + action + "\"");
-			}
-		}
-		else {
-			this->updateStatusStringAsError("The received message is not a JSON object");
-		}
-	}
-	catch (const std::exception& _e) {
-		this->updateStatusStringAsError(_e.what());
-	}
-	catch (...) {
-		this->updateStatusStringAsError("Unknown error occured while processing message");
-	}
+	ot::ActionDispatcher::instance().dispatch(_json.toStdString(), ot::EXECUTE);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -510,7 +464,13 @@ void AppBase::slotColorStyleChanged(void) {
 	this->updateTransparentColorStyleValue();
 }
 
-AppBase::AppBase(QApplication* _app) 
+void AppBase::handleDisplayData(ot::JsonDocument& _doc) {
+	std::string data = ot::json::getString(_doc, OT_ACTION_PARAM_Data);
+
+	this->log("DisplayData Request", otoolkit::APIInterface::Information, QString::fromStdString(data));
+}
+
+AppBase::AppBase(QApplication* _app)
 	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true),
 	m_ignoreToolAutoStart(false)
 {
@@ -594,6 +554,9 @@ AppBase::AppBase(QApplication* _app)
 	this->connect(m_toolManager->getMenuManager(), &MenuManager::exitRequested , this, &AppBase::close);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
+
+	ot::ActionDispatcher::instance().setDefaultMessageTypes(ot::ALL_MESSAGE_TYPES);
+	connectAction("DisplayData", this, &AppBase::handleDisplayData);
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
 

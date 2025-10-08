@@ -59,7 +59,7 @@
 #define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_STUDIOSUITE
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(-1)
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
 	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 }
@@ -192,18 +192,6 @@ void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	else if (action == "Project:Versions:Checkout")			  getChanges();
 	else assert(0); // Unhandled button action
 }
-
-void Application::EnsureVisualizationModelIDKnown(void)
-{
-	if (visualizationModelID > 0) return;
-	if (this->getModelComponent() == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-
-	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
-}
-
 
 void Application::importProject(void)
 {

@@ -37,7 +37,7 @@
 #define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_PHREEC
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(-1)
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), m_visualizationModelID(-1)
 {
 	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 }
@@ -101,21 +101,25 @@ void Application::modelSelectionChanged()
 	}
 }
 
-void Application::EnsureVisualizationModelIDKnown(void)
+void Application::ensureVisualizationModelIDKnown(void)
 {
-	if (visualizationModelID > 0) return;
+	if (m_visualizationModelID != -1) {
+		return;
+	}
 	if (this->getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
 	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
+	m_visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
 }
 
 void Application::addTerminal(void)
 {
-	EnsureVisualizationModelIDKnown();
-	if (visualizationModelID == 0) return;
+	ensureVisualizationModelIDKnown();
+	if (m_visualizationModelID == -1) {
+		return;
+	}
 
 	std::map<std::string, std::string> options;
 	options.insert_or_assign("colorR", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("PHREEC", "Terminal color", 0, 255)));
@@ -128,7 +132,7 @@ void Application::addTerminal(void)
 
 	if (receiver != nullptr)
 	{
-		this->getUiComponent()->enterEntitySelectionMode(visualizationModelID, ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new terminal", options, receiver->getServiceID());
+		this->getUiComponent()->enterEntitySelectionMode(m_visualizationModelID, ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new terminal", options, receiver->getServiceID());
 	}
 }
 

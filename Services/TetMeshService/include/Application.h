@@ -70,8 +70,6 @@ public:
 	ot::UID getCurrentlySelectedMeshDataID(void);
 
 private:
-	ot::UID				visualizationModelID;
-
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
 

@@ -40,7 +40,7 @@
 #define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_VisualizationService
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(0) 
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
 
 }
@@ -86,17 +86,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 }
 
 // ##################################################################################################################################
-
-void Application::EnsureVisualizationModelIDKnown(void)
-{
-	if (visualizationModelID > 0) return;
-	if (this->getModelComponent() == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-	
-	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = ot::ModelServiceAPI::getCurrentVisualizationModelID();
-}
 
 void Application::propertyChanged(ot::JsonDocument& _doc)
 {

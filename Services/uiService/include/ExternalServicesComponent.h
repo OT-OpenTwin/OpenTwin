@@ -59,7 +59,7 @@ namespace ot { class WidgetView; };
 namespace ot { class ServiceBase; };
 namespace ot { class PlotDataset; };
 
-class ExternalServicesComponent : public QObject, public ak::aNotifier {
+class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
 	Q_OBJECT
 	OT_DECL_ACTION_HANDLER(ExternalServicesComponent)
 public:
@@ -73,7 +73,7 @@ public:
 
 	void shutdown(void);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Getter
 
@@ -85,7 +85,7 @@ public:
 
 	LockManager* lockManager(void) { return m_lockManager; }
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Configuration
 
@@ -95,13 +95,13 @@ public:
 
 	void setMessagingRelay(const std::string& _relayAddress);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// UI Element creation
 
 	KeyboardCommandHandler* addShortcut(ServiceDataUi* _sender, const std::string& _keySequence);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// 3D View
 
@@ -115,7 +115,7 @@ public:
 	bool isModelModified(ModelUIDtype modelID);
 	bool isCurrentModelModified(void);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Event handling
 
@@ -138,7 +138,7 @@ public:
 
 	void prefetchDataThread(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Messaging
 	void sendToModelService(const std::string& _message, std::string _response);
@@ -155,7 +155,7 @@ public:
 	void versionDeselected(void);
 	void activateVersion(const std::string& _version);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Project handling
 
@@ -165,13 +165,13 @@ public:
 	void saveProject();
 	bool projectIsOpened(const std::string& projectName, std::string& projectUser);
 
-	// ###################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// File operations
 	
 	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
-	//########################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// General purpose communication
 	void InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction);
@@ -181,167 +181,209 @@ public:
 	ServiceDataUi* getServiceFromNameType(const ot::BasicServiceInformation& _info);
 	ServiceDataUi* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
-	//########################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Action handler
+	// Action handler: General
 
-	OT_HANDLER(handleSetLogFlags, ExternalServicesComponent, OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleCompound, ExternalServicesComponent, OT_ACTION_CMD_Compound, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleConnectionLoss, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnectionLost, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleDisplayLogMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayLogMessage, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleReportInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportInformation, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handlePromptInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_PromptInformation, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRegisterForModelEvents, ExternalServicesComponent, OT_ACTION_CMD_UI_RegisterForModelEvents, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleDeregisterForModelEvents, ExternalServicesComponent, OT_ACTION_CMD_UI_DeregisterForModelEvents, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGenerateUIDs, ExternalServicesComponent, OT_ACTION_CMD_UI_GenerateUIDs, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRequestFileForReading, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestFileForReading, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSaveFileContent, ExternalServicesComponent, OT_ACTION_CMD_UI_SaveFileContent, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSelectFilesForStoring, ExternalServicesComponent, OT_ACTION_CMD_UI_SelectFileForStoring, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuPage, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuPage, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuGroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuGroup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuSubgroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuSubgroup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuButton, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuButton, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuCheckbox, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuCheckbox, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMenuLineEdit, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuLineEdit, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleActivateToolbarTab, ExternalServicesComponent, OT_ACTION_CMD_UI_ActivateToolbarTab, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddShortcut, ExternalServicesComponent, OT_ACTION_CMD_UI_AddShortcut, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetCheckboxValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetCheckboxValues, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetLineEditValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetLineEditValues, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSwitchMenuTab, ExternalServicesComponent, OT_ACTION_CMD_UI_SwitchMenuTab, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveElements, ExternalServicesComponent, OT_ACTION_CMD_UI_RemoveElements, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetControlsEnabledState, ExternalServicesComponent, OT_ACTION_CMD_UI_EnableDisableControls, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetToolTip, ExternalServicesComponent, OT_ACTION_CMD_UI_OBJ_SetToolTip, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleResetView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Reset, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRefreshView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Refresh, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleClearSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_ClearSelection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRefreshSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RefreshSelection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSelectObject, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SelectObject, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddNodeFromFacetData, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddContainerNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddContainerNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddSceneNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateMeshColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateMeshColor, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateFacetsFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateFacetsFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveShapes, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleTreeStateRecording, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TreeStateRecording, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetShapeVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleHideEntities, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleShowBranch, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowBranch, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleHideBranch, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_HideBranch, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddAnnotationNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddAnnotationNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddAnnotationNodeFromDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMeshNodeFromFacetDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshNodeFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddCartesianMeshNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCartesianMeshNodeShowLines, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_CartesianMeshNodeShowLines, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddCartesianMeshItem, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleTetMeshNodeTetEdges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddMeshItemFromFacetDatabase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
+	void handleSetLogFlags(ot::JsonDocument& _document);
+	void handleCompound(ot::JsonDocument& _document);
+	void handleRun(ot::JsonDocument& _document);
 
-	OT_HANDLER(handleEnterEntitySelectionMode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetModifiedState, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetModifiedState, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetProgressVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressVisibility, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetProgressValue, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressbarValue, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleFreeze3DView, ExternalServicesComponent, OT_ACTION_CMD_UI_Freeze3DView, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCreateModel, ExternalServicesComponent, OT_ACTION_CMD_UI_MODEL_Create, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCreateView, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_Create, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetEntityName, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetEntityName, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRenameEntity, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RenameEntityName, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCreateRubberband, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_CreateRubberband, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLock, ExternalServicesComponent, OT_ACTION_CMD_UI_Lock, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUnlock, ExternalServicesComponent, OT_ACTION_CMD_UI_Unlock, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddSettingsData, ExternalServicesComponent, OT_ACTION_CMD_UI_AddSettingsData, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddIconSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddIconSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetDebugInformation, ExternalServicesComponent, OT_ACTION_CMD_GetDebugInformation, ot::MessageType::ALL_MESSAGE_TYPES)
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Property Grid
-	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleClearModalPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_ClearModalPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleFocusPropertyGridItem, ExternalServicesComponent, OT_ACTION_CMD_UI_FocusPropertyGridItem, ot::MessageType::ALL_MESSAGE_TYPES)
-		
-	// Version Graph
-	OT_HANDLER(handleSetVersionGraph, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraph, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetVersionGraphActive, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveVersionGraphVersions, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddAndActivateVersionGraphVersion, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, ot::MessageType::ALL_MESSAGE_TYPES)
-		
-	// 1D Plot
-	OT_HANDLER(handleAddPlot1D_New, ExternalServicesComponent, OT_ACTION_CMD_VIEW1D_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleUpdateCurve, ExternalServicesComponent, OT_ACTION_CMD_UpdateCurvesOfPlot, ot::MessageType::ALL_MESSAGE_TYPES)
+	// Action handler: Shutdown handling
 
-	// Graphics Editor	
-	OT_HANDLER(handleFillGraphicsPicker, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCreateGraphicsEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddGraphicsItem, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveGraphicsItem, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddGraphicsConnection, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveGraphicsConnection, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::MessageType::ALL_MESSAGE_TYPES)
+	void handleShutdown();
+	void handlePreShutdown();
+	void handleEmergencyShutdown();
+	void handleConnectionLoss();
+	void handleShutdownRequestedByService();
 
-	// Text Editor
-	OT_HANDLER(handleSetupTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTextEditorSaved, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTextEditorModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCloseTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Close, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCloseAllTextEditors, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll, ot::MessageType::ALL_MESSAGE_TYPES)
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Table
-	OT_HANDLER(handleSetupTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTableSaved, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetSaved, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTableModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleInsertTableRowAfter, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertRowAfter, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleInsertTableRowBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertRowBefore, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveTableRow, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveRow, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleInsertTableColumnAfter, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnAfter, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleInsertTableColumnBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnBefore, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRemoveTableColumn, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveColumn, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleCloseTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Close, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetSelection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_GetSelection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetCurrentTableSelectionBackground, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, ot::MessageType::ALL_MESSAGE_TYPES)
+	// Action handler: Service management
 
-	// Studio Suite API
-	OT_HANDLER(handleStudioSuiteAction, ExternalServicesComponent, OT_ACTIONLIST(
-		OT_ACTION_CMD_UI_SS_IMPORT,
-		OT_ACTION_CMD_UI_SS_COMMIT,
-		OT_ACTION_CMD_UI_SS_GET,
-		OT_ACTION_CMD_UI_SS_UPLOAD,
-		OT_ACTION_CMD_UI_SS_DOWNLOAD,
-		OT_ACTION_CMD_UI_SS_COPY,
-		OT_ACTION_CMD_UI_SS_INFORMATION,
-		OT_ACTION_CMD_UI_SS_SETCSTFILE
-	), ot::MessageType::ALL_MESSAGE_TYPES)
+	void handleServiceConnected(ot::JsonDocument& _document);
+	void handleServiceDisconnected(ot::JsonDocument& _document);
+	void handleServiceSetupCompleted(ot::JsonDocument& _document);
+	void handleRegisterForModelEvents(ot::JsonDocument& _document);
+	void handleDeregisterForModelEvents(ot::JsonDocument& _document);
 
-	// LTSpice API
-	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, OT_ACTIONLIST(
-		OT_ACTION_CMD_UI_LTS_IMPORT,
-		OT_ACTION_CMD_UI_LTS_COMMIT,
-		OT_ACTION_CMD_UI_LTS_GET,
-		OT_ACTION_CMD_UI_LTS_UPLOAD,
-		OT_ACTION_CMD_UI_LTS_DOWNLOAD,
-		OT_ACTION_CMD_UI_LTS_COPY,
-		OT_ACTION_CMD_UI_LTS_INFORMATION,
-		OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
-	), ot::MessageType::ALL_MESSAGE_TYPES)
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Dialogs
-	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleModelLibraryDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_ModelDialog, ot::MessageType::ALL_MESSAGE_TYPES)
+	// Action handler: File handling
+
+	void handleRequestFileForReading(ot::JsonDocument& _document);
+	void handleSaveFileContent(ot::JsonDocument& _document);
+	void handleSelectFilesForStoring(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: General UI control handling
+
+	void handleAddShortcut(ot::JsonDocument& _document);
+	void handleSetCheckboxValue(ot::JsonDocument& _document);
+	void handleSetLineEditValue(ot::JsonDocument& _document);
+	void handleRemoveElements(ot::JsonDocument& _document);
+	void handleSetControlsEnabledState(ot::JsonDocument& _document);
+	void handleSetToolTip(ot::JsonDocument& _document);
+	void handleResetView(ot::JsonDocument& _document);
+	void handleRefreshView(ot::JsonDocument& _document);
+	void handleClearSelection(ot::JsonDocument& _document);
+	void handleRefreshSelection(ot::JsonDocument& _document);
+	void handleSelectObject(ot::JsonDocument& _document);
+	void handleSetModifiedState(ot::JsonDocument& _document);
+	void handleSetProgressVisibility(ot::JsonDocument& _document);
+	void handleSetProgressValue(ot::JsonDocument& _document);
+	void handleFreeze3DView(ot::JsonDocument& _document);
+	void handleCreateRubberband(ot::JsonDocument& _document);
+	void handleLock(ot::JsonDocument& _document);
+	void handleUnlock(ot::JsonDocument& _document);
+	void handleAddSettingsData(ot::JsonDocument& _document);
+	void handleAddIconSearchPath(ot::JsonDocument& _document);
+	void handleGetDebugInformation(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Message display
+
+	void handleDisplayMessage(ot::JsonDocument& _document);
+	void handleDisplayStyledMessage(ot::JsonDocument& _document);
+	void handleDisplayLogMessage(ot::JsonDocument& _document);
+	void handleReportError(ot::JsonDocument& _document);
+	void handleReportWarning(ot::JsonDocument& _document);
+	void handleReportInformation(ot::JsonDocument& _document);
+	void handlePromptInformation(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Scene node adding
+
+	void handleCreateModel(ot::JsonDocument& _document);
+	void handleCreateView(ot::JsonDocument& _document);
+	void handleAddSceneNode(ot::JsonDocument& _document);
+	void handleAddNodeFromFacetData(ot::JsonDocument& _document);
+	void handleAddNodeFromDataBase(ot::JsonDocument& _document);
+	void handleAddContainerNode(ot::JsonDocument& _document);
+	void handleAddVis2D3DNode(ot::JsonDocument& _document);
+	void handleAddAnnotationNode(ot::JsonDocument& _document);
+	void handleAddAnnotationNodeFromDataBase(ot::JsonDocument& _document);
+	void handleAddMeshNodeFromFacetDataBase(ot::JsonDocument& _document);
+	void handleAddCartesianMeshNode(ot::JsonDocument& _document);
+	void handleAddCartesianMeshItem(ot::JsonDocument& _document);
+	void handleAddMeshItemFromFacetDatabase(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Scene node updates
+
+	void handleUpdateVis2D3DNode(ot::JsonDocument& _document);
+	void handleUpdateObjectColor(ot::JsonDocument& _document);
+	void handleUpdateMeshColor(ot::JsonDocument& _document);
+	void handleUpdateFacetsFromDataBase(ot::JsonDocument& _document);
+	void handleRemoveShapes(ot::JsonDocument& _document);
+	void handleTreeStateRecording(ot::JsonDocument& _document);
+	void handleSetShapeVisibility(ot::JsonDocument& _document);
+	void handleHideEntities(ot::JsonDocument& _document);
+	void handleShowBranch(ot::JsonDocument& _document);
+	void handleHideBranch(ot::JsonDocument& _document);
+	void handleCartesianMeshNodeShowLines(ot::JsonDocument& _document);
+	void handleTetMeshNodeTetEdges(ot::JsonDocument& _document);
+	void handleEnterEntitySelectionMode(ot::JsonDocument& _document);
+	void handleSetEntityName(ot::JsonDocument& _document);
+	void handleRenameEntity(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: ToolBar
+
+	void handleAddMenuPage(ot::JsonDocument& _document);
+	void handleAddMenuGroup(ot::JsonDocument& _document);
+	void handleAddMenuSubgroup(ot::JsonDocument& _document);
+	void handleAddMenuButton(ot::JsonDocument& _document);
+	void handleAddMenuCheckbox(ot::JsonDocument& _document);
+	void handleAddMenuLineEdit(ot::JsonDocument& _document);
+	void handleActivateToolbarTab(ot::JsonDocument& _document);
+	void handleSwitchMenuTab(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Property grid
+
+	void handleFillPropertyGrid(ot::JsonDocument& _document);
+	void handleClearModalPropertyGrid(ot::JsonDocument& _document);
+	void handleFocusPropertyGridItem(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Version Graph
+
+	void handleSetVersionGraph(ot::JsonDocument& _document);
+	void handleSetVersionGraphActive(ot::JsonDocument& _document);
+	void handleRemoveVersionGraphVersions(ot::JsonDocument& _document);
+	void handleAddAndActivateVersionGraphVersion(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Graphics Editor
+
+	void handleFillGraphicsPicker(ot::JsonDocument& _document);
+	void handleCreateGraphicsEditor(ot::JsonDocument& _document);
+	void handleAddGraphicsItem(ot::JsonDocument& _document);
+	void handleRemoveGraphicsItem(ot::JsonDocument& _document);
+	void handleAddGraphicsConnection(ot::JsonDocument& _document);
+	void handleRemoveGraphicsConnection(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Plot
+
+	void handleAddPlot1D(ot::JsonDocument& _document);
+	void handleUpdatePlotCurve(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Text Editor
+
+	void handleSetupTextEditor(ot::JsonDocument& _document);
+	void handleSetTextEditorSaved(ot::JsonDocument& _document);
+	void handleSetTextEditorModified(ot::JsonDocument& _document);
+	void handleCloseTextEditor(ot::JsonDocument& _document);
+	void handleCloseAllTextEditors(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Table
+
+	void handleSetupTable(ot::JsonDocument& _document);
+	void handleSetTableSaved(ot::JsonDocument& _document);
+	void handleSetTableModified(ot::JsonDocument& _document);
+	void handleInsertTableRowAfter(ot::JsonDocument& _document);
+	void handleInsertTableRowBefore(ot::JsonDocument& _document);
+	void handleRemoveTableRow(ot::JsonDocument& _document);
+	void handleInsertTableColumnAfter(ot::JsonDocument& _document);
+	void handleInsertTableColumnBefore(ot::JsonDocument& _document);
+	void handleRemoveTableColumn(ot::JsonDocument& _document);
+	void handleCloseTable(ot::JsonDocument& _document);
+	void handleSetTableSelection(ot::JsonDocument& _document);
+	void handleGetTableSelection(ot::JsonDocument& _document);
+	void handleSetCurrentTableSelectionBackground(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: Dialogs
+
+	void handlePropertyDialog(ot::JsonDocument& _document);
+	void handleOnePropertyDialog(ot::JsonDocument& _document);
+	void handleMessageDialog(ot::JsonDocument& _document);
+	void handleModelLibraryDialog(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler: External APIs
+
+	void handleStudioSuiteAction(ot::JsonDocument& _document);
+	void handleLTSpiceAction(ot::JsonDocument& _document);
 
 public Q_SLOTS:
 	void queueAction(const std::string& _json, const std::string& _senderIP);

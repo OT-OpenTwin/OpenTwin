@@ -219,6 +219,7 @@ inline bool ot::ActionHandler::connectActionImpl(const std::list<std::string>& _
 }
 
 // Primary template implementation
+
 template<typename Function>
 inline bool ot::ActionHandler::connectAction(const std::string& _actionName, Function&& _func, const MessageTypeFlags& _messageFlags, const ActionDispatcherBase::InsertFlags& _insertFlags) {
 	auto wrapper = ot::intern::ActionHandlerFunctionWrapper<std::decay_t<Function>>::wrap(std::forward<Function>(_func));
@@ -238,6 +239,7 @@ inline bool ot::ActionHandler::connectAction(const std::list<std::string>& _acti
 }
 
 // Member function version
+
 template<typename T, typename Method>
 inline bool ot::ActionHandler::connectAction(const std::string& _actionName, T* _instance, Method&& _method, const MessageTypeFlags& _messageFlags, const ActionDispatcherBase::InsertFlags& _insertFlags) {
 	auto wrapper = ot::intern::ActionHandlerFunctionWrapper<std::decay_t<Method>>::wrap(std::forward<Method>(_method), _instance);

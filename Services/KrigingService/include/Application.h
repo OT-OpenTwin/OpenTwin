@@ -63,10 +63,7 @@ public:
 
 	KrigingParams* getParams(void);
 
-	void EnsureVisualizationModelIDKnown(void);
-
 private:
 	std::list<ot::UID>		selectedEntities;
-	ot::UID					visualizationModelID;
 	Kriging krig;
 };

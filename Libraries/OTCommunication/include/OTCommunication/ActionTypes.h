@@ -142,7 +142,6 @@
 #define OT_ACTION_CMD_UI_PromptResponse "UI.PromptResponse"
 #define OT_ACTION_CMD_UI_Lock "UI.MasterLock.Enable"
 #define OT_ACTION_CMD_UI_Unlock "UI.MasterLock.Disable"
-#define OT_ACTION_CMD_UI_GenerateUIDs "UI.UID.Generate"
 #define OT_ACTION_CMD_UI_RequestFileForReading "UI.RequestFileForReading"
 #define OT_Action_CMD_UI_StoreFileInDataBase "UI.SaveFileInDataBase"
 #define OT_ACTION_CMD_UI_SelectFileForStoring "UI.SelectFileForStoring"

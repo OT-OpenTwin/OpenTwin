@@ -76,8 +76,6 @@ public:
 	void getChanges(void);
 	void setLocalFileName(const std::string& hostName, const std::string& fileName);
 
-	void EnsureVisualizationModelIDKnown(void);
-
 	void changeUnits(const std::string &content);
 	void changeMaterials(const std::string &content);
 	void shapeInformation(const std::string &content);
@@ -106,8 +104,6 @@ private:
 	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
 	
-	ot::UID					visualizationModelID;
-
 	std::map<std::string, std::tuple<double, double, double>> materialColors;
 	std::map<std::string, std::string> shapeMaterials;
 	InfoFileManager infoFileManager;

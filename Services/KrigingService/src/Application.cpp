@@ -63,7 +63,7 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 
 		else {
 			assert(0); // Unhandled button action
-			m_uiComponent->displayMessage("Handler not Implemented.\n");
+			getUiComponent()->displayMessage("Handler not Implemented.\n");
 
 		}
 	}
@@ -86,8 +86,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Post Processing", "Kriging");
 
 
-	ot::Flags<ot::ui::lockType> modelWrite;
-	modelWrite.setFlag(ot::ui::lockType::tlModelWrite);
+	ot::Flags<ot::LockTypeFlags> modelWrite;
+	modelWrite.setFlag(ot::LockTypeFlag::LockModelWrite);
 
 	_ui->addMenuButton("Post Processing", "Data", "Import", "Import", modelWrite, "Kriging", "Default");
 	_ui->addMenuButton("Post Processing", "Data", "Export", "Export", modelWrite, "Kriging", "Default");
@@ -125,21 +125,8 @@ void Application::modelSelectionChanged(void)
 		}
 		*/
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
-}
-
-void Application::EnsureVisualizationModelIDKnown(void)
-{
-	OT_LOG_D("Called..."); // todo: remove debug code
-
-	if (visualizationModelID > 0) return;
-	if (m_modelComponent == nullptr) {
-		assert(0); throw std::exception("Model not connected");
-	}
-
-	// The visualization model isnot known yet -> get it from the model
-	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
 }
 
 KrigingParams* Application::getParams(void) 
@@ -152,7 +139,7 @@ KrigingParams* Application::getParams(void)
 
 	// Now we retrieve information about the solver items
 	std::list<ot::EntityInformation> solverInfo;
-	m_modelComponent->getEntityInformation(selectedSolvers, solverInfo);
+	getModelComponent()->getEntityInformation(selectedSolvers, solverInfo);
 
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
@@ -169,12 +156,12 @@ KrigingParams* Application::getParams(void)
 	ClassFactory classFactory;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory);
+		EntityBase *entity = getModelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory);
 		solverMap[info.getName()] = entity;
 
 		if (entity == nullptr)
 		{
-			m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+			getUiComponent()->displayMessage("ERROR: Unable to read solver information.\n");
 			return NULL;
 		}
 
@@ -200,7 +187,7 @@ KrigingParams* Application::getParams(void)
 		return new KrigingParams(params);
 	}
 
-	m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+	getUiComponent()->displayMessage("ERROR: Unable to read solver information.\n");
 	return NULL;
 
 	//KrigingParams params;

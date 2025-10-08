@@ -47,12 +47,12 @@ public:
 	void addSolver(void);
 	void runPHREEC(void);
 	void addTerminal(void);
-	void EnsureVisualizationModelIDKnown(void);
+	void ensureVisualizationModelIDKnown(void);
 
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap);
 	void runSingleSolver(ot::EntityInformation &solver, std::string &modelVersion, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity);
 
 private:
-	ot::UID					visualizationModelID;
+	ot::UID					m_visualizationModelID;
 
 };

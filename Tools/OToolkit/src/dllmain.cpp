@@ -24,6 +24,7 @@
 // Open Twin header
 #include "OTCore/JSON.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
@@ -74,7 +75,7 @@ void mainApplicationThread()
 		#else
 			ot::LogDispatcher::initialize("Toolkit", false);
 		#endif 
-		ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
+		ot::LogDispatcher::instance().setLogFlags(ot::ALL_GENERAL_LOG_FLAGS | ot::TEST_LOG);
 
 		// Set global text size
 		ot::GlobalColorStyle::instance().setApplication(&application);
@@ -197,8 +198,9 @@ extern "C"
 				}
 				else {
 					QMetaObject::invokeMethod(AppBase::instance(), "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(_json)));
-					char * r = new char[strlen(OT_ACTION_RETURN_VALUE_OK) + 1];
-					strcpy(r, OT_ACTION_RETURN_VALUE_OK);
+					std::string ret = ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+					char * r = new char[ret.length() + 1];
+					strcpy(r, ret.c_str());
 					return r;
 				}
 			}

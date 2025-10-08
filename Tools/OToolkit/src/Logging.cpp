@@ -203,6 +203,9 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	connect(m_cellWidthMode, &QComboBox::currentTextChanged, this, &Logging::slotColumnWidthModeChanged);
 	connect(m_table, &QTableWidget::itemDoubleClicked, this, &Logging::slotViewCellContent);
 
+	// Connection actions
+	connectAction(OT_ACTION_CMD_Log, this, &Logging::handleNewLog);
+
 	// Create menu bar
 	m_connectButton = _rootMenu->addAction(QIcon(":/images/Disconnected.png"), "Connect");
 	m_autoConnect = _rootMenu->addAction("Auto-Connect");
@@ -835,6 +838,31 @@ QString Logging::logMessageTypeString(const ot::LogMessage& _msg) {
 	}
 
 	return typeString;
+}
+
+void Logging::handleNewLog(ot::JsonDocument& _doc) {
+	std::list<ot::LogMessage> messages;
+	if (_doc.HasMember(OT_ACTION_PARAM_LOGS)) {
+		for (const ot::ConstJsonObject& logObj : ot::json::getObjectList(_doc, OT_ACTION_PARAM_LOGS)) {
+			ot::LogMessage msg;
+			msg.setFromJsonObject(logObj);
+			msg.setCurrentTimeAsGlobalSystemTime();
+			messages.push_back(msg);
+		}
+	}
+	else if (_doc.HasMember(OT_ACTION_PARAM_LOG)) {
+		ot::LogMessage msg;
+		msg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_LOG));
+		messages.push_back(msg);
+	}
+	else {
+		LOGVIS_LOGE("Invalid log message received");
+		return;
+	}
+	if (messages.empty()) {
+		return;
+	}
+	this->newMessages(std::move(messages));
 }
 
 void Logging::iniTableItem(int _row, int _column, QTableWidgetItem* _itm) {

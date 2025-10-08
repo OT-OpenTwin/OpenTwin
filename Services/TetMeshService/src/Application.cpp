@@ -51,7 +51,7 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), visualizationModelID(-1)
+	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
