@@ -111,9 +111,9 @@ public:
 
 	ot::ServiceBase getServiceInfo(ot::serviceID_t _serviceID);
 
-	void setServiceShutdownCompleted(ot::serviceID_t _serviceID);
+	void setServiceShutdownCompleted(ot::serviceID_t _serviceID, ot::PortManager& _debugPortManager);
 
-	void serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers);
+	void serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers, ot::PortManager& _debugPortManager);
 
 	void addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator);
 
@@ -130,7 +130,7 @@ public:
 
 	//! @brief Will prepare the session for shutdown.
 	//! The session will be flagged as shutting down and the health check will be stopped.
-	void prepareSessionForShutdown(ot::serviceID_t _requestingService);
+	void prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::PortManager& _debugPortManager);
 
 	//! @brief Will shutdown the session.
 	//! On a regular shutdown a pre shutdown broadcast message will be sent.
@@ -147,7 +147,7 @@ public:
 	//! @param _message The message to broadcast.
 	void sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message);
 
-	void removeFailedService(ot::serviceID_t _failedServiceID);
+	void removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager);
 
 private:
 

@@ -295,11 +295,17 @@ ot::ServiceBase Session::getServiceInfo(ot::serviceID_t _serviceID) {
 	return this->getServiceFromID(_serviceID);
 }
 
-void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID) {
+void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID, ot::PortManager& _debugPortManager) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		if (it->getServiceID() == _serviceID) {
+			if (it->isDebug()) {
+				// Free used debug ports
+				for (ot::port_t port : it->getPortNumbers()) {
+					_debugPortManager.freePort(port);
+				}
+			}
 			it = m_services.erase(it);
 		}
 		else {
@@ -308,7 +314,7 @@ void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID) {
 	}
 }
 
-void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers) {
+void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers, ot::PortManager& _debugPortManager) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
@@ -321,6 +327,13 @@ void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers
 
 			if (_notifyOthers) {
 				this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceDisconnected, false);
+			}
+
+			if (it->isDebug()) {
+				// Free used debug ports
+				for (ot::port_t port : it->getPortNumbers()) {
+					_debugPortManager.freePort(port);
+				}
 			}
 
 			it = m_services.erase(it);
@@ -376,7 +389,7 @@ void Session::sendRunCommand() {
 
 // Session management
 
-void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
+void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::PortManager& _debugPortManager) {
 	OT_LOG_D("Preparing session for shutdown { \"SessionID\": \"" + m_id + "\", \"RequestingServiceID\": " + std::to_string(_requestingService) + " }");
 
 	this->stopHealthCheck();
@@ -387,6 +400,13 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		// Remove requested services
 		if (it->isRequested()) {
+			if (it->isDebug()) {
+				// Free used debug ports
+				for (ot::port_t port : it->getPortNumbers()) {
+					_debugPortManager.freePort(port);
+				}
+			}
+
 			it = m_services.erase(it);
 			continue;
 		}
@@ -396,8 +416,15 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService) {
 		it->setRequested(false);
 		it->setShuttingDown();
 
+		// Remove requesting service except when it has a relay service running
 		if (it->getServiceID() == _requestingService && !it->getWebsocketUrl().empty()) {
-			// Remove requesting service except when it has a relay service running
+			if (it->isDebug()) {
+				// Free used debug ports
+				for (ot::port_t port : it->getPortNumbers()) {
+					_debugPortManager.freePort(port);
+				}
+			}
+
 			it = m_services.erase(it);
 		}
 		else {
@@ -452,13 +479,19 @@ void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string&
 	this->broadcast(_senderServiceID, _message, false, false);
 }
 
-void Session::removeFailedService(ot::serviceID_t _failedServiceID) {
+void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Perform health check
 	for (auto it = m_services.begin(); it != m_services.end(); ) {
 		if (it->getServiceID() == _failedServiceID) {
 			OT_LOG_D("Removing failed service from session { " + it->debugLogString(m_id) + " }");
+			if (it->isDebug()) {
+				// Free used debug ports
+				for (ot::port_t port : it->getPortNumbers()) {
+					_debugPortManager.freePort(port);
+				}
+			}
 			it = m_services.erase(it);
 		}
 		else {

@@ -313,8 +313,8 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 	Session& session = this->getSession(_sessionID);
 
 	// Prepare session information
-	session.removeFailedService(_serviceID);
-	session.prepareSessionForShutdown(_serviceID);
+	session.removeFailedService(_serviceID, m_debugPortManager);
+	session.prepareSessionForShutdown(_serviceID, m_debugPortManager);
 	
 	// Notify the GDS about the shutdown
 	m_gds.notifySessionShuttingDown(_sessionID);
@@ -394,7 +394,7 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	if (!stream.is_open()) {
 		// Remove service from session
 		OT_LOG_E("Failed to open file stream for writing \"" + path + "\"");
-		_session.serviceDisconnected(newDebugService.getServiceID(), false);
+		_session.serviceDisconnected(newDebugService.getServiceID(), false, m_debugPortManager);
 
 		// Free the used debug ports
 		m_debugPortManager.freePort(servicePort);
@@ -886,7 +886,7 @@ void SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) {
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	
 	Session& theSession = this->getSession(sessionID);
-	theSession.serviceDisconnected(serviceID, true);
+	theSession.serviceDisconnected(serviceID, true, m_debugPortManager);
 }
 
 ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc) {
@@ -896,7 +896,7 @@ ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _comma
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	
 	Session& session = this->getSession(sessionID);
-	session.prepareSessionForShutdown(serviceID);
+	session.prepareSessionForShutdown(serviceID, m_debugPortManager);
 
 	m_gds.notifySessionShuttingDown(sessionID);
 
@@ -923,7 +923,7 @@ void SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _commandDo
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 
 	Session& theSession = this->getSession(sessionID);
-	theSession.setServiceShutdownCompleted(serviceID);
+	theSession.setServiceShutdownCompleted(serviceID, m_debugPortManager);
 
 	if (!theSession.hasShuttingDownServices()) {
 		m_shutdownCompletedQueue.push_back(sessionID);
