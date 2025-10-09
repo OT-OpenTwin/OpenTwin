@@ -246,19 +246,61 @@ void LogVisualizationItemViewDialog::slotUpdateTimestamps() {
 }
 
 QString LogVisualizationItemViewDialog::findJsonSyntax(const QString& _inputString) {
-	//QRegularExpression regex("(.*?)(\\s*([\\{\\[])(?:[^{}\\[\\]]|(?3))*\\3\\s*)(.*$)");
-	QRegularExpression regex("(.*?)(\\s*\\{.*\\}\\s*)(.*$)");
-	QRegularExpressionMatch match = regex.match(_inputString);
+	QString result = _inputString;
+	bool foundJson = false;
 
-	if (match.hasMatch()) {
-		QString pre = match.captured(1);
-		QString doc = match.captured(2);
-		QString suf = match.captured(3);
-		return (pre + "\n\n" +
-			QJsonDocument::fromJson(QByteArray::fromStdString(doc.toStdString())).toJson(QJsonDocument::Indented) +
-			"\n\n" + suf);
+	// More sophisticated JSON finding with better boundary detection
+	int startPos = 0;
+
+	while (startPos < result.length()) {
+		// Find the start of a potential JSON object
+		int jsonStart = result.indexOf('{', startPos);
+		if (jsonStart == -1) break;
+
+		// Try to find the matching closing brace
+		int braceCount = 0;
+		int jsonEnd = -1;
+
+		for (int i = jsonStart; i < result.length(); ++i) {
+			if (result[i] == '{') {
+				braceCount++;
+			}
+			else if (result[i] == '}') {
+				braceCount--;
+				if (braceCount == 0) {
+					jsonEnd = i;
+					break;
+				}
+			}
+		}
+
+		if (jsonEnd == -1) {
+			// No matching closing brace found
+			startPos = jsonStart + 1;
+			continue;
+		}
+
+		// Extract the potential JSON
+		QString potentialJson = result.mid(jsonStart, jsonEnd - jsonStart + 1);
+
+		// Try to parse it
+		QJsonParseError parseError;
+		QJsonDocument doc = QJsonDocument::fromJson(potentialJson.toUtf8(), &parseError);
+
+		if (parseError.error == QJsonParseError::NoError && !doc.isNull()) {
+			// Valid JSON - replace with formatted version
+			QString formattedJson = doc.toJson(QJsonDocument::Indented);
+			result.replace(jsonStart, jsonEnd - jsonStart + 1, formattedJson);
+			foundJson = true;
+
+			// Update position to continue searching after the formatted JSON
+			startPos = jsonStart + formattedJson.length();
+		}
+		else {
+			// Not valid JSON, continue searching
+			startPos = jsonStart + 1;
+		}
 	}
-	else {
-		return _inputString; // Return an empty string if no match is found
-	}
+
+	return result;
 }
