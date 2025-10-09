@@ -150,6 +150,8 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->deleteLater();
 
 	m_state = bck;
+
+	updateCentralViewTitles();
 }
 
 void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
@@ -303,35 +305,12 @@ void ot::WidgetViewManager::renameView(const std::string& _oldEntityName, const 
 			WidgetViewBase data = entry.second->getViewData();
 			data.setEntityName(_newEntityName);
 
-			// Check if title should be adjusted
-			if (data.getViewFlags() & WidgetViewBase::ViewNameAsTitle) {
-				// Try to fit in short name
-				std::string shortName = EntityName::getSubName(_newEntityName).value();
-
-				if (!this->getViewTitleExists(shortName)) {
-					data.setTitle(shortName);
-				}
-				else if (!this->getViewTitleExists((shortName.append(" - " + WidgetViewBase::toString(data.getViewType()))))) {
-					data.setTitle(shortName);
-				}
-				else if (!this->getViewTitleExists(_newEntityName)) {
-					data.setTitle(_newEntityName);
-				}
-				else {
-					std::string newTitle = _newEntityName + " - " + WidgetViewBase::toString(data.getViewType());
-					if (!this->getViewTitleExists(newTitle)) {
-						data.setTitle(newTitle);
-					}
-					else {
-						OT_LOG_W("Failed to rename view title. No unique title found");
-					}
-				}
-			}
-
 			entry.second->setViewData(data);
 			entry.second->viewRenamed();
 		}
 	}
+
+	this->updateCentralViewTitles();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -805,14 +784,6 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 
 	// Check if the title already exists and try to create a unique one
-	if (this->getViewTitleExists(_view->getViewData().getTitle())) {
-		WidgetViewBase newViewData = _view->getViewData();
-		newViewData.setTitle(_view->getViewData().getTitle() + " - " + WidgetViewBase::toString(_view->getViewData().getViewType()));
-		if (!this->getViewTitleExists(newViewData.getTitle())) {
-			_view->setViewData(newViewData);
-		}
-	}
-
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Determine parent area
@@ -860,6 +831,8 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	if (_view->getViewDockWidget()->tabWidget()) {
 		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
 	}
+
+	updateCentralViewTitles();
 
 	// Update focus information or reset the current focus depending on the insert mode
 	if (_insertFlags & WidgetView::KeepCurrentFocus) {
@@ -945,5 +918,139 @@ void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view) {
 	}
 	else {
 		Q_EMIT viewCloseRequested(_view);
+	}
+}
+
+void ot::WidgetViewManager::updateCentralViewTitles() {
+	struct CheckInfo {
+		WidgetView* view;
+		std::list<std::string> options;
+	};
+
+	std::map<std::string, CheckInfo> initialViewTitleMap;
+
+	// Determine options for all central views
+	std::list<CheckInfo> viewsToCheck;
+	for (const auto& entry : m_views) {
+		WidgetViewBase& data = entry.second->getViewData();
+		if (data.getViewFlags() & WidgetViewBase::ViewIsCentral) {
+			CheckInfo info;
+			info.view = entry.second;
+
+			if (data.getViewFlags() & WidgetViewBase::ViewNameAsTitle) {
+				std::string subName = EntityName::getSubName(data.getEntityName()).value();
+				std::string typeExtension = " - " + WidgetViewBase::toString(data.getViewType());
+				if (subName != data.getEntityName()) {
+					info.options.push_back(std::move(subName));
+					info.options.push_back(info.options.back() + typeExtension);
+				}
+				info.options.push_back(data.getEntityName());
+				info.options.push_back(info.options.back() + typeExtension);
+			}
+			else {
+				info.options.push_back(data.getTitle());
+			}
+
+			viewsToCheck.push_back(std::move(info));
+		}
+		else {
+			// Non-central views remain unchanged
+			CheckInfo info;
+			info.view = entry.second;
+			info.options.push_back(data.getTitle());
+			initialViewTitleMap.insert_or_assign(data.getTitle(), std::move(info));
+		}
+	}
+
+	for (auto info = viewsToCheck.begin(); info != viewsToCheck.end(); ) {
+		bool changed = false;
+		for (CheckInfo& otherInfo : viewsToCheck) {
+			if (info->view != otherInfo.view && info->options.front() == otherInfo.options.front()) {
+				changed = true;
+				if (info->options.size() == 1 && otherInfo.options.size() == 1) {
+					OT_LOG_W("Failed to rename view title: No unique title found { \"ViewEntityName\": \"" + info->view->getViewData().getEntityName() + "\" }");
+					info = viewsToCheck.erase(info);
+					break;
+				}
+				else if (otherInfo.options.size() > 1) {
+					otherInfo.options.pop_front();
+				}
+			}
+		}
+
+		if (changed) {
+			if (info->options.size() > 1) {
+				info->options.pop_front();
+			}
+			info = viewsToCheck.begin();
+		}
+		else {
+			info++;
+		}
+	}
+		/*
+
+		// Reset map and fill with non-central views
+		std::map<std::string, CheckInfo> viewTitleMap = initialViewTitleMap;
+
+		// Check all views
+		for (auto infoIt = viewsToCheck.begin(); infoIt != viewsToCheck.end(); ) {
+			auto it = viewTitleMap.find(infoIt->options.front());
+			if (it == viewTitleMap.end()) {
+				// Title is currently not used, insert it
+				viewTitleMap.insert_or_assign(infoIt->options.front(), *infoIt);
+				infoIt++;
+			}
+			else {
+				// Conflict found
+				if (infoIt->options.size() == 1) {
+
+					// View can not be renamed anymore, check other view
+					if (it->second.options.size() == 1) {
+						// Both views can not be renamed anymore, remove current view
+						OT_LOG_W("Failed to rename view title: No unique title found { \"ViewEntityName\": \"" + infoIt->view->getViewData().getEntityName() + "\" }");
+						infoIt = viewsToCheck.erase(infoIt);
+						continue;
+					}
+					else {
+						// Other view can be renamed further
+						for (CheckInfo& updateIt : viewsToCheck) {
+							if (updateIt.view == it->second.view) {
+								updateIt.options.pop_front();
+								break;
+							}
+						}
+					}
+				}
+				else {
+
+					// Resolve conflict
+					infoIt->options.pop_front();
+
+					// If existing view can be renamed, do it
+					if (it->second.options.size() > 1) {
+						for (CheckInfo& updateIt : viewsToCheck) {
+							if (updateIt.view == it->second.view) {
+								updateIt.options.pop_front();
+								break;
+							}
+						}
+					}
+				}
+
+				changed = true;
+				break; // Restart checking
+			}
+		}
+		*/
+
+	// Rename all views
+	for (const auto& entry : viewsToCheck) {
+		WidgetViewBase data = entry.view->getViewData();
+		if (data.getTitle() != entry.options.front()) {
+			data.setTitle(entry.options.front());
+			entry.view->setViewData(data);
+			entry.view->viewRenamed();
+		}
 	}
 }

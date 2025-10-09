@@ -273,6 +273,8 @@ namespace ot {
 
 		void handleViewCloseRequest(WidgetView* _view);
 
+		void updateCentralViewTitles();
+
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
 		QTimer m_autoCloseTimer;
