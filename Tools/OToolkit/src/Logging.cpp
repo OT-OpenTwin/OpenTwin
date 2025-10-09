@@ -88,7 +88,7 @@ Logging::Logging()
 
 	m_intervalTimer = new QTimer(this);
 	m_intervalTimer->setInterval(1000);
-	m_intervalTimer->setSingleShot(false);
+	m_intervalTimer->setSingleShot(true);
 	this->connect(m_intervalTimer, &QTimer::timeout, this, &Logging::slotIntervalTimeout);
 }
 
@@ -614,6 +614,9 @@ void Logging::slotIntervalTimeout() {
 	this->resizeNewMessageBuffer();
 	this->appendLogMessages(std::move(m_newMessages));
 	m_newMessages.clear();
+	if (m_filterView->getUseInterval()) {
+		m_intervalTimer->start();
+	}
 }
 
 void Logging::appendLogMessage(ot::LogMessage&& _msg) {
