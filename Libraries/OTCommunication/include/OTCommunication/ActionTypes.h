@@ -509,7 +509,6 @@
 #define OT_ACTION_PARAM_PROJECT_NAME "Project.Name"
 #define OT_ACTION_PARAM_USER_NAME "User.Name"
 
-#define OT_ACTION_PARAM_MODEL_ActionName "Model.Event.Actions.Name"
 #define OT_ACTION_PARAM_MODEL_ID "Model.ID"
 #define OT_ACTION_PARAM_MODEL_REPLYTO "Model.ReplyTo"
 #define OT_ACTION_PARAM_MODEL_EntityID "Model.Entity.ID"
