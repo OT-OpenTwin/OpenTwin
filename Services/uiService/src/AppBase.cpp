@@ -1865,6 +1865,9 @@ void AppBase::lockPropertyGrid(bool flag)
 }
 
 void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo) {
+	if (_pckg.collections().empty()) {
+		return;
+	}
 	m_graphicsPickerManager.addCollections(_pckg.collections(), _serviceInfo);
 	if (_serviceInfo == m_graphicsPickerManager.getCurrentOwner()) {
 		// Update picker since its active
