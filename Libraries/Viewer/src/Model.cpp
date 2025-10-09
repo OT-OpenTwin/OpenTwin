@@ -533,10 +533,7 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	addSceneNodesToTree(containerNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = containerNode;
-	osgNodetoSceneNodesMap[containerNode->getShapeNode()] = containerNode;
-	treeItemToSceneNodesMap[containerNode->getTreeItemID()] = containerNode;
-	modelItemToSceneNodesMap[modelEntityID] = containerNode;
+	storeInMaps(containerNode);
 }
 
 void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
@@ -599,10 +596,7 @@ void Model::addVisualizationAnnotationNode(const std::string &treeName, unsigned
 	}
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = annotationNode;
-	osgNodetoSceneNodesMap[annotationNode->getShapeNode()] = annotationNode;
-	treeItemToSceneNodesMap[annotationNode->getTreeItemID()] = annotationNode;
-	modelItemToSceneNodesMap[modelEntityID] = annotationNode;
+	storeInMaps(annotationNode);
 }
 
 void Model::addVisualizationAnnotationNodeDataBase(const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version)
@@ -922,10 +916,7 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	addSceneNodesToTree(sceneNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[_treeName] = sceneNode;
-	osgNodetoSceneNodesMap[sceneNode->getShapeNode()] = sceneNode;
-	treeItemToSceneNodesMap[sceneNode->getTreeItemID()] = sceneNode;
-	modelItemToSceneNodesMap[_modelEntityID] = sceneNode;
+	storeInMaps(sceneNode);
 
 }
 
@@ -2416,11 +2407,8 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 		treeInfoMap[node->getName()] = (node->isSelected() ? ITEM_SELECTED : 0) | (isExpanded ? ITEM_EXPANDED : 0);
 	}
 
-	// Remove the current scene node from the maps  
-	m_nameToSceneNodesMap.erase(node->getName());
-	osgNodetoSceneNodesMap.erase(node->getShapeNode());
-	treeItemToSceneNodesMap.erase(node->getTreeItemID());
-	modelItemToSceneNodesMap.erase(node->getModelEntityID());
+	// Remove the current scene node from the maps
+	removeFromMaps(node);
 
 	// Delete the scene Node
 	// (This will also remove the node from the parents child list and delete all its children. Furthermore it will delete the corresponding osg Items if any)
@@ -3125,17 +3113,19 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 	}
 }
 
-void Model::addSceneNode(SceneNodeBase *node) 
-{ 
-	osgNodetoSceneNodesMap[node->getShapeNode()] = node; 
+void Model::storeShapeNode(SceneNodeBase *node)
+{
+	if (node->getShapeNode()) {
+		osgNodetoSceneNodesMap[node->getShapeNode()] = node; 
+	}
 }
 
-void Model::setSceneNode(osg::Node *node, SceneNodeBase *sceneNode)
+void Model::storeShapeNode(osg::Node *node, SceneNodeBase *sceneNode)
 {
 	osgNodetoSceneNodesMap[node] = sceneNode;
 }
 
-void Model::removeSceneNode(osg::Node *node)
+void Model::forgetShapeNode(osg::Node *node)
 {
 	osgNodetoSceneNodesMap.erase(node);
 }
@@ -3258,10 +3248,7 @@ void Model::addVisualizationCartesianMeshNode(const std::string &treeName, unsig
 	addSceneNodesToTree(meshNode);
 
 	// Add the node to the maps for faster access
-	m_nameToSceneNodesMap[treeName] = meshNode;
-	osgNodetoSceneNodesMap[meshNode->getShapeNode()] = meshNode;
-	treeItemToSceneNodesMap[meshNode->getTreeItemID()] = meshNode;
-	modelItemToSceneNodesMap[modelEntityID] = meshNode;
+	storeInMaps(meshNode);
 
 	meshNode->setEdgeColor(edgeColorRGB);
 	meshNode->setMeshLineColor(meshLineColorRGB);
@@ -3537,4 +3524,22 @@ void Model::remove1DPlotErrorState(void) {
 			viewer->get1DPlot()->getPlotManager()->setErrorState(false);
 		}
 	}
+}
+
+void Model::storeInMaps(SceneNodeBase* _node) {
+	m_nameToSceneNodesMap[_node->getName()] = _node;
+	if (_node->getShapeNode()) {
+		osgNodetoSceneNodesMap[_node->getShapeNode()] = _node;
+	}
+	treeItemToSceneNodesMap[_node->getTreeItemID()] = _node;
+	modelItemToSceneNodesMap[_node->getModelEntityID()] = _node;
+}
+
+void Model::removeFromMaps(const SceneNodeBase* _node) {
+	m_nameToSceneNodesMap.erase(_node->getName());
+	if (_node->getShapeNode()) {
+		osgNodetoSceneNodesMap.erase(_node->getShapeNode());
+	}
+	treeItemToSceneNodesMap.erase(_node->getTreeItemID());
+	modelItemToSceneNodesMap.erase(_node->getModelEntityID());
 }

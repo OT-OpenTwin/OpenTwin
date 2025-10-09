@@ -222,7 +222,7 @@ void SceneNodeVTK::updateVTKNode(const std::string &projName, unsigned long long
 		// Now add the current nodes osg node to the parent's osg node
 		getParent()->getShapeNode()->addChild(getShapeNode());
 
-		getModel()->addSceneNode(this);
+		getModel()->storeShapeNode(this);
 	}
 	else
 	{

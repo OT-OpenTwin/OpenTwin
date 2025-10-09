@@ -459,7 +459,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		// Now add the current nodes osg node to the parent's osg node
 		getParent()->getShapeNode()->addChild(getShapeNode());
 
-		getModel()->addSceneNode(this);
+		getModel()->storeShapeNode(this);
 	}
 	else
 	{

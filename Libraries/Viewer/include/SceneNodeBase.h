@@ -29,13 +29,13 @@ public:
 	const std::string& getName(void) const { return m_name; };
 
 	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
-	osg::Switch *getShapeNode(void) { return m_shapeNode; };
+	osg::Switch *getShapeNode(void) const { return m_shapeNode; };
 
 	void setTreeItemID(ot::UID iD) { m_treeItemID = iD; };
 	ot::UID getTreeItemID(void) const { return m_treeItemID; };
 
 	void setModelEntityID(unsigned long long id) { m_modelEntityID = id; };
-	unsigned long long getModelEntityID(void) { return m_modelEntityID; };
+	unsigned long long getModelEntityID(void) const { return m_modelEntityID; };
 
 	bool isEditable(void) const { return m_editable; };
 	virtual void setEditable(bool v) { m_editable = v; };

@@ -123,9 +123,9 @@ public:
 	void processCurrentSelectionMode(osgUtil::Intersector *intersector, double sceneRadius, bool bCtrlKeyPressed);
 	void processHoverView(osgUtil::Intersector *intersector, double sceneRadius);
 
-	void addSceneNode(SceneNodeBase *node);
-	void setSceneNode(osg::Node *node, SceneNodeBase *sceneNode);
-	void removeSceneNode(osg::Node *node);
+	void storeShapeNode(SceneNodeBase *node);
+	void storeShapeNode(osg::Node *node, SceneNodeBase *sceneNode);
+	void forgetShapeNode(osg::Node *node);
 
 	void notifySceneNodeAboutViewChange(const std::string& _sceneNodeName,const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 	std::list<Viewer *> getViewerList(void) { return viewerList; };
@@ -242,6 +242,9 @@ private:
 	void	   set1DPlotIncompatibleData(void);
 	void       remove1DPlotErrorState(void);
 		
+	void storeInMaps(SceneNodeBase* _node);
+	void removeFromMaps(const SceneNodeBase* _node);
+
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 

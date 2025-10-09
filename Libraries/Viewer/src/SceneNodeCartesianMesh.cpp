@@ -50,36 +50,15 @@ SceneNodeCartesianMesh::~SceneNodeCartesianMesh()
 		delete child;
 	}
 
-	// Remove the OSG objects 
-	// This geometry node will always have a parent group or switch node
-
-	// loop through all parent nodes
-	if (getShapeNode() != nullptr)
-	{
-		unsigned int numParents = getShapeNode()->getNumParents();
-
-		for (unsigned int i = 0; i < numParents; i++)
-		{
-			osg::Group *parent = getShapeNode()->getParent(i);
-
-			// Remove the child node from the parent (the node itself will then be deleted by reference counting automatically)
-			parent->removeChild(getShapeNode());
-		}
-
-		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		m_shapeNode = nullptr;	
-	}
-
 	// Remove all face scene nodes
-
-	for (auto face : faceTriangles)
+	for (const auto& face : faceTriangles)
 	{
-		getModel()->removeSceneNode(face.second);
+		getModel()->forgetShapeNode(face.second);
 	}
 
-	for (auto edge : faceEdges)
+	for (const auto& edge : faceEdges)
 	{
-		getModel()->removeSceneNode(edge.second);
+		getModel()->forgetShapeNode(edge.second);
 	}
 }
 
@@ -1027,13 +1006,13 @@ void SceneNodeCartesianMesh::setFaceStatus(int face, bool visible, bool forward,
 	{
 		if (owner == nullptr)
 		{
-			getModel()->removeSceneNode(faceNode);
-			getModel()->removeSceneNode(edgeNode);
+			getModel()->forgetShapeNode(faceNode);
+			getModel()->forgetShapeNode(edgeNode);
 		}
 		else
 		{
-			getModel()->setSceneNode(faceNode, owner);
-			getModel()->setSceneNode(edgeNode, owner);
+			getModel()->storeShapeNode(faceNode, owner);
+			getModel()->storeShapeNode(edgeNode, owner);
 		}
 	}
 
