@@ -23,6 +23,7 @@ namespace ot
 
 		void setAsActiveView(bool _setAsActiveView) { m_setAsActiveView = _setAsActiveView; }
 		void setVisualisingEntities(const ot::UIDList& _visualisingEntities) { m_visualisingEntities = _visualisingEntities; }
+		void addVisualisingEntity(ot::UID _visualisingEntity) { m_visualisingEntities.push_back(_visualisingEntity); }
 		void setOverrideViewerContent(bool _overrideViewerContent) { m_overrideViewerContent = _overrideViewerContent; }
 		void setSupressViewHandling(bool _supressViewHandling) { m_supressViewHandling = _supressViewHandling; }
 		void setVisualisationType(const std::string _visualisationType) { m_visualisationType = _visualisationType; }

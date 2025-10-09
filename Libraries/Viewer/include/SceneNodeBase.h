@@ -93,6 +93,9 @@ public:
 	void addVisualiser(Visualiser* _visualiser) { m_visualiser.push_back(_visualiser); }
 	const std::list<Visualiser*>& getVisualiser() const { return m_visualiser; }
 
+	//! @brief Returns a list of entities that will be visualized by the visualizers.
+	ot::UIDList getVisualisedEntities() const;
+
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 protected:

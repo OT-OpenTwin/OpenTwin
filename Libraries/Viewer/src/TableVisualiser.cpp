@@ -47,8 +47,3 @@ void TableVisualiser::showVisualisation(const VisualiserState& _state) {
 void TableVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
-
-void TableVisualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("Type", ot::JsonString("TableVisualiser", _allocator), _allocator);
-	Visualiser::getDebugInformation(_object, _allocator);
-}

@@ -178,6 +178,15 @@ void SceneNodeBase::setHighlighted(bool _highlight)
 	}
 }
 
+ot::UIDList SceneNodeBase::getVisualisedEntities() const {
+	ot::UIDList entities;
+	for (auto visualiser : m_visualiser) {
+		entities.push_back(visualiser->getVisualizationEntity());
+	}
+	entities.unique();
+	return entities;
+}
+
 void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
 

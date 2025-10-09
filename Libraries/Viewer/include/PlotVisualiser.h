@@ -9,10 +9,11 @@ public:
 	virtual void showVisualisation(const VisualiserState& _state) override;
 	virtual void hideVisualisation(const VisualiserState& _state) override;
 
-	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const override;
-
 	bool alreadyRequestedVisualisation() { return m_alreadyRequestedVisualisation; }
 	void setViewIsOpen(bool _viewIsOpen) override;
+
+protected:
+	virtual std::string getVisualiserTypeString() const override { return "Plot"; };
 
 private:
 	ot::UIDList getVisualizingUIDs(const VisualiserState& _state) const;

@@ -51,8 +51,3 @@ void TextVisualiser::showVisualisation(const VisualiserState& _state) {
 void TextVisualiser::hideVisualisation(const VisualiserState& _state) {
 
 }
-
-void TextVisualiser::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("Type", ot::JsonString("TextVisualiser", _allocator), _allocator);
-	Visualiser::getDebugInformation(_object, _allocator);
-}

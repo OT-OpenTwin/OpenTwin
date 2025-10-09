@@ -1,4 +1,5 @@
 #pragma once
+
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
@@ -12,6 +13,10 @@ class Visualiser
 public:
 	Visualiser(SceneNodeBase* _sceneNode, ot::WidgetViewBase::ViewType _viewType);
 	virtual ~Visualiser();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Visualization handling
 
 	//! @brief Request a visualization for the entity.
 	//! This is called if the entity is currently not visualized.
@@ -37,15 +42,27 @@ public:
 	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; };
 	bool getViewIsOpen(void) const { return m_viewIsOpen; };
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Information
+
 	SceneNodeBase* getSceneNode(void) const { return m_node; };
 	
+	//! @brief Set the entity that is visualized by this visualiser.
+	//! @param _entity The entity ID of the entity that is visualized by this visualiser.
+	void setVisualizationEntity(ot::UID _entity) { m_visualizationEntity = _entity; };
+	ot::UID getVisualizationEntity(void) const { return m_visualizationEntity; };
+
 	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
-	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state);
+	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state) const;
 
 protected:
+	virtual std::string getVisualiserTypeString() const = 0;
+
+	ot::UID m_visualizationEntity;
 	SceneNodeBase* m_node = nullptr;
 	bool m_mayVisualise = true;
 	bool m_viewIsOpen = false;
