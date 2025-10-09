@@ -87,9 +87,6 @@
     <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ActionAndFunctionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\CopyPasteHandler.cpp">
       <Filter>Source Files\Handler</Filter>
     </ClCompile>
@@ -168,9 +165,6 @@
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\UIControlsHandler.h">
-      <Filter>Header Files\Handler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ActionAndFunctionHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\QueuingHttpRequestsRAII.h">

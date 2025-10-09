@@ -46,25 +46,49 @@ std::string ModalCommandHealing::initializeAndCreateUI(const ot::LockTypeFlags& 
 	addMenuCheckBox("Healing", "Settings", "Column3", "SewFaces", "Sew faces", healingSewFaces, modelWrite);
 	addMenuCheckBox("Healing", "Settings", "Column3", "MakeSolid", "Make solids", healingMakeSolid, modelWrite);
 
+	connectToolBarButton("Healing:Operation:Perform", this, &ModalCommandHealing::healSelectedShapes);
+	connectToolBarButton("Healing:Operation:Close", this, &ModalCommandHealing::handleDelete);
+	connectToolBarButton("Healing:Settings:Reset", this, &ModalCommandHealing::resetSettings);
+
+	connectToolBarButton("Healing:Settings:Column2:SmallEdges", this, &ModalCommandHealing::handleToggleSmallEdges);
+	connectToolBarButton("Healing:Settings:Column2:SmallFaces", this, &ModalCommandHealing::handleToggleSmallFaces);
+	connectToolBarButton("Healing:Settings:Column3:SewFaces", this, &ModalCommandHealing::handleToggleSewFaces);
+	connectToolBarButton("Healing:Settings:Column3:MakeSolid", this, &ModalCommandHealing::handleToggleMakeSolid);
+
+	connectToolBarLineEdit("Healing:Settings:Column1:Tolerance", this, &ModalCommandHealing::processToleranceSetting);
+
 	application->modelSelectionChanged(); // Update the control states
 
 	return "Healing";  // return the name of the tab which shall be activated
 }
 
+void ModalCommandHealing::handleDelete() {
+	std::thread deleteThread([=]() {
+		delete this;
+	});
+	deleteThread.detach();
+}
+
+void ModalCommandHealing::handleToggleSmallEdges() {
+	healingSmallEdges = !healingSmallEdges;
+}
+
+void ModalCommandHealing::handleToggleSmallFaces() {
+	healingSmallFaces = !healingSmallFaces;
+}
+
+void ModalCommandHealing::handleToggleSewFaces() {
+	healingSewFaces = !healingSewFaces;
+}
+
+void ModalCommandHealing::handleToggleMakeSolid() {
+	healingMakeSolid = !healingMakeSolid;
+}
+
 bool ModalCommandHealing::executeAction(const std::string &action, rapidjson::Document &doc)
 {
-	if		(action == "Healing:Operation:Close")				delete this;
-	else if (action == "Healing:Operation:Perform")				healSelectedShapes();
-	else if (action == "Healing:Settings:Reset")				resetSettings();
-	else if (action == "Healing:Settings:Column2:SmallEdges")	healingSmallEdges = !healingSmallEdges;
-	else if (action == "Healing:Settings:Column2:SmallFaces")	healingSmallFaces = !healingSmallFaces;
-	else if (action == "Healing:Settings:Column3:SewFaces")		healingSewFaces = !healingSewFaces;
-	else if (action == "Healing:Settings:Column3:MakeSolid")	healingMakeSolid = !healingMakeSolid;
-	else if (action == "Healing:Settings:Column1:Tolerance")	processToleranceSetting(doc);
-	else return false;  // The command was not found in this list
-
-	// The command was processed successfully
-	return true;
+	OT_LOG_E("Should not happen");
+	return false;
 }
 
 void ModalCommandHealing::modelSelectionChanged(std::list< ot::UID> &selectedEntityID)
@@ -94,12 +118,10 @@ void ModalCommandHealing::resetSettings(void)
 	setMenuCheckBox("Healing", "Settings", "Column3", "MakeSolid", healingMakeSolid);
 }
 
-void ModalCommandHealing::processToleranceSetting(rapidjson::Document &doc)
+void ModalCommandHealing::processToleranceSetting(const std::string& _newText)
 {
-	std::string text = doc[OT_ACTION_PARAM_UI_CONTROL_ObjectText].GetString();
-
 	// Check field for correctness
-	std::stringstream stream(text);
+	std::stringstream stream(_newText);
 
 	double value{ 0.0 };
 	stream >> value;
@@ -119,7 +141,7 @@ void ModalCommandHealing::processToleranceSetting(rapidjson::Document &doc)
 	}
 
 	// Send the notification to either set or reset the error state
-	setMenuLineEdit("Healing", "Settings", "Column1", "Tolerance", text, error);
+	setMenuLineEdit("Healing", "Settings", "Column1", "Tolerance", std::to_string(healingTolerance), error);
 }
 
 void ModalCommandHealing::healSelectedShapes(void)

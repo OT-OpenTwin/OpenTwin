@@ -39,7 +39,7 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier()), m_visualizationModelID(-1)
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+
 }
 
 Application::~Application()
@@ -67,20 +67,16 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("PHREEC", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("PHREEC", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default", "F6");
 	
+	connectToolBarButton("PHREEC:Sources:Add Terminal", this, &Application::addTerminal);
+	connectToolBarButton("PHREEC:Solver:Create Solver", this, &Application::addSolver);
+	connectToolBarButton("PHREEC:Solver:Run Solver", this, &Application::runPHREEC);
+
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 // ##################################################################################################################################
-
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (action == "PHREEC:Solver:Create Solver")	addSolver();
-	else if (action == "PHREEC:Solver:Run Solver")		runPHREEC();
-	else if (action == "PHREEC:Sources:Add Terminal")	addTerminal();
-	else assert(0); // Unhandled button action
-}
 
 void Application::modelSelectionChanged()
 {

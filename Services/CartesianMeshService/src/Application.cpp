@@ -54,8 +54,6 @@ Application::Application()
 {
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
-
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 }
 
 Application::~Application()
@@ -79,6 +77,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton("Mesh", "Cartesian Mesh", "Create Cartesian Mesh", "Create Cartesian Mesh", modelWrite, "AddAllObjects", "Default");
 	_ui->addMenuButton("Mesh", "Cartesian Mesh", "Update Cartesian Mesh", "Update Cartesian Mesh", modelWrite, "UpdateMesh", "Default");
+
+	connectToolBarButton("Mesh:Cartesian Mesh:Create Cartesian Mesh", this, &Application::createMesh);
+	connectToolBarButton("Mesh:Cartesian Mesh:Update Cartesian Mesh", this, &Application::updateMesh);
 
 	modelSelectionChanged();
 
@@ -105,14 +106,6 @@ void Application::modelSelectionChanged()
 }
 
 // ##################################################################################################################################
-
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (     action == "Mesh:Cartesian Mesh:Create Cartesian Mesh")	createMesh();
-	else if (action == "Mesh:Cartesian Mesh:Update Cartesian Mesh")	updateMesh();
-	else assert(0); // Unhandled button action
-}
-
 
 void Application::createMesh(void)
 {

@@ -74,7 +74,6 @@ Application::Application()
 	classFactory.SetNextHandler(classFactoryBlock);
 	m_SimulationRunning = false;
 	
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &Application::handleNewGraphicsItem);
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, this, &Application::handleRemoveGraphicsItem);
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &Application::handleNewGraphicsItemConnection);
@@ -89,28 +88,8 @@ Application::~Application() {
 
 // ##################################################################################################################################################################################################################
 
-// Custom functions
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	
-	if (action == m_buttonAddSolver.getFullPath()) {
-		addSolver();
-	}
-	else if (action == m_buttonRunSimulation.getFullPath()) {
-
-		runCircuitSimulation();	
-		
-	}
-	else if (action == m_buttonAddCircuit.getFullPath()) {
-		createNewCircuit();
-	}
-	else {
-		//OT_LOG_W("Unknown model action");
-		assert(0);
-	}
-}
-
 // Trying to create more circuits
+
 void Application::createNewCircuit() {
 	
 	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
@@ -584,12 +563,15 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 	m_buttonAddSolver = ot::ToolBarButtonCfg(page, groupEdit, "Add Solver", "Default/Add");
 	_ui->addMenuButton(m_buttonAddSolver.setButtonLockFlags(flags));
+	connectToolBarButton(m_buttonAddSolver, this, &Application::addSolver);
 
 	m_buttonAddCircuit = ot::ToolBarButtonCfg(page, groupEdit, "Add Circuit", "Default/Add");
 	_ui->addMenuButton(m_buttonAddCircuit.setButtonLockFlags(flags));
+	connectToolBarButton(m_buttonAddCircuit, this, &Application::createNewCircuit);
 
 	m_buttonRunSimulation = ot::ToolBarButtonCfg(page, groupSimulate, "Run Simulation", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonRunSimulation.setButtonLockFlags(flags));
+	connectToolBarButton(m_buttonRunSimulation, this, &Application::runCircuitSimulation);
 
 	m_blockEntityHandler.setUIComponent(_ui);
 	

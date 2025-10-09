@@ -33,12 +33,8 @@ public:
 
 	static Application* instance();
 	
-	//api @security mTLS
-	//api @action OT_ACTION_CMD_MODEL_Delete
-	//api @brief Deletes a model.
-	//api @return An empty String.
-	OT_HANDLER(handleDeleteModel, Application, OT_ACTION_CMD_MODEL_Delete, ot::SECURE_MESSAGE_TYPES)
-		
+	static std::string getToolBarPageName() { return "Model"; };
+
 		//api @security mTLS
 		//api @action OT_ACTION_CMD_PROJ_Save
 		//api @brief Saves a project in the database.
@@ -51,7 +47,7 @@ public:
 		OT_HANDLER(handleGetIsModified, Application, OT_ACTION_CMD_MODEL_GetIsModified, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSetPropertiesFromJSON, Application, OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGenerateEntityIDs, Application, OT_ACTION_CMD_MODEL_GenerateEntityIDs, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleImportTableFile, Application, OT_ACTION_CMD_MODEL_ImportTableFile, ot::SECURE_MESSAGE_TYPES)
+		OT_HANDLER(handleRequestImportTableFile, Application, OT_ACTION_CMD_MODEL_RequestImportTableFile, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleQueueMessages, Application, OT_ACTION_CMD_MODEL_QueueMessages, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetListOfFolderItems, Application, OT_ACTION_CMD_MODEL_GetListOfFolderItems, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetIDsOfFolderItemsByType, Application, OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, ot::SECURE_MESSAGE_TYPES)
@@ -78,8 +74,6 @@ public:
 		OT_HANDLER(handleAddPropertiesToEntities, Application, OT_ACTION_CMD_MODEL_AddPropertiesToEntities, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleUpdatePropertiesOfEntities, Application, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleDeleteProperty, Application, OT_ACTION_CMD_MODEL_DeleteProperty, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleExecuteFunction, Application, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleEntitiesSelected, Application, OT_ACTION_CMD_MODEL_EntitiesSelected, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handlePromptResponse, Application, OT_ACTION_CMD_UI_PromptResponse, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetEntityIdentifier, Application, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, ot::SECURE_MESSAGE_TYPES)
@@ -89,7 +83,8 @@ public:
 		OT_HANDLER(handleShowTable, Application, OT_ACTION_CMD_UI_TABLE_Setup, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_MODEL_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_MODEL_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
-		
+		OT_HANDLER(handleImportTableFile, Application, OT_ACTION_CMD_ImportTableFile, ot::SECURE_MESSAGE_TYPES)
+
 	// Versions
 
 	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
@@ -138,6 +133,12 @@ public:
 	ViewVisualisationHandler& getVisualisationHandler() { return m_visualisationHandler; }
 	LibraryManagementWrapper& getLibraryManagementWrapper() { return m_libraryManagementWrapper	; }
 
+	//! @brief Stores the given content in a temporary file and returns the path to that file.
+	//! @param _content The content to store in the temporary file.
+	//! @param _uncompressedDataLength The length of the uncompressed data.
+	//! @return The path to the temporary file.
+	std::string storeTemporaryFile(const std::string& _content, uint64_t _uncompressedDataLength);
+
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 
@@ -160,7 +161,6 @@ private:
 	SelectionHandler m_selectionHandler;
 	MicroserviceNotifier* m_notifier;
 	
-	ActionAndFunctionHandler m_baseHandler;
 	FileHandler m_fileHandler;
 	PlotHandler m_plotHandler;
 	MaterialHandler m_materialHandler;

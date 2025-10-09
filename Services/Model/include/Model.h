@@ -17,7 +17,8 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
-
+#include "OTGuiAPI/ButtonHandler.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 class EntityMesh;
 class EntityMeshTet;
@@ -57,8 +58,6 @@ public:
 	void			getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
 	void			setVisualizationModel(ot::UID visModelID);
 	ot::UID				getVisualizationModel();
-	void			executeAction(const std::string &action, ot::JsonDocument &doc);
-	void			executeFunction(const std::string &function, const std::string &fileName, bool removeFile);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
 	void			keySequenceActivated(const std::string &keySequence);
 	void			updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID);
@@ -129,8 +128,7 @@ public:
 	void setModified();
 	void resetModified();
 	bool getModified() { return isModified; };
-	void setClearUiOnDelete(bool _clear) { clearUiOnDelete = _clear; }
-
+	
 	void resetToNew();
 
 	bool GetDocumentFromEntityID(ot::UID entityID, bsoncxx::builder::basic::document &doc);
@@ -154,7 +152,7 @@ public:
 
 	void modelChangeOperationCompleted(const std::string &description, bool askForCreationOfBranch = true);
 
-	void uiIsAvailable();
+	void uiIsAvailable(ot::components::UiComponent* _ui);
 
 	std::string getCurrentModelVersion();
 	void activateVersion(const std::string &version);
@@ -195,7 +193,7 @@ public:
 
 	void hideEntities(std::list<ot::UID> &hiddenEntityIDs);
 
-	void importTableFile(std::string &itemName);
+	void requestImportTableFile(const std::string& _itemName);
 
 	void setMeshingActive(ot::UID meshEntityID, bool flag);
 	bool getMeshingActive(ot::UID meshEntityID);
@@ -217,13 +215,10 @@ public:
 private:
 	// Methods
 	void clearAll();
-	void setupUIControls();
-	void removeUIControls();
+	void setupUIControls(ot::components::UiComponent* _ui);
 	void createVisualizationItems();
 	
-	void createNewParameter();
 	EntityParameter* createNewParameterItem(const std::string &parameterName);
-	void deleteSelectedShapes();
 	void addEntityNamesToList(EntityBase *entity, std::map<std::string, bool> &list);
 	void addEntityIDsToList(EntityBase *entity, std::map<std::string, ot::UID> &list);
 	void addEntityUIToList(EntityBase *entity, std::map<ot::UID, bool> &list);
@@ -239,29 +234,19 @@ private:
 	void addAllEntitiesToList(EntityBase *root, std::list<EntityBase *> &allEntities);
 	bool anyMeshItemSelected(std::list<ot::UID> &selectedEntityID);
 	bool anyMaterialItemSelected(std::list<ot::UID> &selectedEntityID);
-	void showSelectedShapeInformation();
 	void getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> &faceCurvatureRadius);
 	void createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName);
 	void updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity);
 	std::string findMostRecentModelInStorage();
-	void addMenuPage(const std::string &menu);
-	void addMenuGroup(const std::string &menu, const std::string &group);
-	void addMenuSubgroup(const std::string &menu, const std::string &group, const std::string &subgroup);
-	void addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
-	void addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder = std::string("Default"), const std::string &keySequence = std::string(""));
-	void addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags);
-	void addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags);
-	bool isUIAvailable();
 	void performSpecialUpdates(EntityBase *entity);
 	void performEntityMeshUpdate(EntityMeshTet *entity);
 	void performEntityMeshUpdate(EntityMeshCartesian *entity);
-	void undoLastOperation();
-	void redoNextOperation();
 	void removeAllNonTemplateEntities();
 	void updateUndoRedoStatus();
 	void updateModelStateForUndoRedo();
-
+public:
 	void importTableFile(const std::string &fileName, bool removeFile);
+private:
 	void loadDefaultMaterials();
 	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
 	void recursiveReplaceEntityName(EntityBase *entity, const std::string &oldName, const std::string &newName, std::list<EntityBase*> &entityList);
@@ -298,6 +283,21 @@ private:
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
 
+	// Button callbacks
+	ot::ButtonHandler m_buttonHandler;
+	ot::ToolBarButtonCfg m_undoButton;
+	ot::ToolBarButtonCfg m_redoButton;
+	ot::ToolBarButtonCfg m_deleteButton;
+	ot::ToolBarButtonCfg m_infoButton;
+	ot::ToolBarButtonCfg m_saveButton;
+	ot::ToolBarButtonCfg m_createParameterButton;
+
+	void handleUndoLastOperation();
+	void handleRedoNextOperation();
+	void handleDeleteSelectedShapes();
+	void handleShowSelectedShapeInformation();
+	void handleCreateNewParameter();
+
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer               *entityRoot;
 
@@ -310,16 +310,11 @@ private:
 	
 	// Temporary attributes
 
-	ot::UID							   visualizationModelID;
+	ot::UID							visualizationModelID;
 	bool						   isModified;
 	std::string					   projectName;
 	std::string					   projectType;
 	std::string					   collectionName;
-	std::map<std::string, bool>    uiMenuMap;
-	std::map<std::string, bool>    uiGroupMap;
-	std::map<std::string, bool>    uiSubGroupMap;
-	std::map<std::string, bool>    uiActionMap;
-	bool						   clearUiOnDelete;
 	
 	bool						   uiCreated;
 	bool						   versionGraphCreated;

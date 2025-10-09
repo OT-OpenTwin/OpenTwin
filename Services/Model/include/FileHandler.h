@@ -1,32 +1,34 @@
+//! @file FileHandler.h
+//! @authors Jan Wagner, Alexander Kuester
+//! @date November 2024
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
-#include "OTServiceFoundation/UiComponent.h"
-#include "ActionAndFunctionHandler.h"
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
-#include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/ToolBarButtonCfg.h"
-#include "OTCore/GenericDataStructMatrix.h"
+#include "OTGuiAPI/ButtonHandler.h"
+#include "OTCommunication/ActionHandler.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
-class FileHandler : public ActionAndFunctionHandler, public BusinessLogicHandler
+class FileHandler : public BusinessLogicHandler
 {
+	OT_DECL_NOCOPY(FileHandler)
+	OT_DECL_NOMOVE(FileHandler)
 public:
-	FileHandler() = default;
+	FileHandler();
 	virtual ~FileHandler() = default;
 
-	FileHandler(const FileHandler& _other) = delete;
-	FileHandler(FileHandler&& _other) = delete;
-	FileHandler& operator=(const FileHandler& _other) = delete;
-	FileHandler& operator=(FileHandler&& _other) = delete;
-
-	void addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName);
-
-protected:
-	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
+	void addButtons(ot::components::UiComponent* _uiComponent);
 
 private:
+	const std::string c_groupName = "File Imports";
 	ot::ToolBarButtonCfg m_buttonFileImport;
 	ot::ToolBarButtonCfg m_buttonPythonImport;
 
@@ -36,14 +38,34 @@ private:
 	ot::UIDList m_entityVersionsData;
 	std::list<bool> m_forceVisible;
 	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Button Handler
+
+	ot::ButtonHandler m_buttonHandler;
+	void handleImportTextFileButton();
+	void handleImportPythonScriptButton();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action Handler
+
+	ot::ActionHandler m_actionHandler;
+	void handleImportTextFile(ot::JsonDocument& _document);
+	void handleImportPythonScript(ot::JsonDocument& _document);
+	void handleTextEditorSaveRequest(ot::JsonDocument& _document);
+	void handleTableSaveRequest(ot::JsonDocument& _document);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Helper
+
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
 	//! @brief Stores the string as byte array. Content cannot be searched for but it is not necessary to guarantee UTF8 encoding
 	void storeTextFile(ot::JsonDocument&& _doc, const std::string& _folderName);
 	void addTextFilesToModel();
 	void clearBuffer();
 	
-	void handleChangedText(ot::JsonDocument& _doc);
-	void handleChangedTable(ot::JsonDocument& _doc);
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
 	void storeChangedTable(IVisualisationTable* _entity ,ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);

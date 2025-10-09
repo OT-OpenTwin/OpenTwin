@@ -15,8 +15,8 @@
 #include "ConnectionManager.h"
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
-#include "OTGui/ToolBarButtonCfg.h"
 
 // C++ header
 #include <string>
@@ -33,7 +33,7 @@ namespace ot {
 
 class QtWrapper;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -58,7 +58,6 @@ public:
 
 	// Add your custom functions/ members here
 
-	void handleExecuteModelAction(ot::JsonDocument& _document);
 	void handleNewGraphicsItem(ot::JsonDocument& _document);
 	void handleRemoveGraphicsItem(ot::JsonDocument& _document);
 	void handleNewGraphicsItemConnection(ot::JsonDocument& _document);

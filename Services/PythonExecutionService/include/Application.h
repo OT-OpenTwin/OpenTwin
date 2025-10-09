@@ -58,9 +58,8 @@ public:
 
 	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
 
-	// Handler
-	std::string handleExecuteAction(ot::JsonDocument& _doc);
-
 private:
+	std::string handleForwardToSubprocess(ot::JsonDocument& _doc);
+
 	SubprocessManager* m_subprocessManager;
 };

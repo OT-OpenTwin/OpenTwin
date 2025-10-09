@@ -43,8 +43,6 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 		return false;
 	}
 
-	std::lock_guard<std::mutex> mtxLock(m_mutex);
-
 	_item->m_actionDispatcher = this;
 
 	// Set default message type if required
@@ -79,8 +77,6 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 void ot::ActionDispatcherBase::remove(ActionHandleConnector* _item) {
 	OTAssertNullptr(_item);
 
-	std::lock_guard<std::mutex> mtxLock(m_mutex);
-	
 	for (const std::string& action : _item->actionNames()) {
 		auto it = m_data.find(action);
 		if (it == m_data.end()) {
@@ -98,6 +94,15 @@ void ot::ActionDispatcherBase::remove(ActionHandleConnector* _item) {
 
 		if (it->second.empty()) {
 			m_data.erase(it);
+		}
+	}
+
+	for (auto it = m_currentConnectors.begin(); it != m_currentConnectors.end(); ) {
+		if (*it == _item) {
+			it = m_currentConnectors.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -177,7 +182,10 @@ std::string ot::ActionDispatcherBase::dispatchImpl(const std::string& _action, J
 		auto it = m_data.find(_action);
 		_handlerFound = false;
 		if (it != m_data.end()) {
-			for (auto con : it->second) {
+			m_currentConnectors = it->second;
+			while (!m_currentConnectors.empty()) {
+				auto con = m_currentConnectors.front();
+				m_currentConnectors.pop_front();
 				if (con->mayDispatch(_messageType)) {
 					if (_handlerFound) {
 						con->forwardDispatch(_document);

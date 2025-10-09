@@ -50,7 +50,7 @@ Application::~Application()
 
 std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
 {
-	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+	/* if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
 		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 
@@ -70,6 +70,7 @@ std::string Application::processAction(const std::string & _action,  ot::JsonDoc
 	else {
 		return OT_ACTION_RETURN_UnknownAction;
 	}
+	*/
 	return "";
 }
 

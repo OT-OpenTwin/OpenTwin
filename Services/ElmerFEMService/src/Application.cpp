@@ -40,7 +40,7 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+
 }
 
 Application::~Application()
@@ -70,20 +70,16 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton("ElmerFEM", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
 
+	connectToolBarButton("ElmerFEM:Solver:Create Solver", this, &Application::addSolver);
+	connectToolBarButton("ElmerFEM:Solver:Run Solver", this, &Application::runSolver);
+	connectToolBarButton("ElmerFEM:Sources:Define Electrostatic Potential", this, &Application::definePotential);
+
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 // ##################################################################################################################################
-
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (     action == "ElmerFEM:Solver:Create Solver")	      addSolver();
-	else if (action == "ElmerFEM:Solver:Run Solver")		  runSolver();
-	else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
-	else assert(0); // Unhandled button action
-}
 
 void Application::modelSelectionChanged() 
 {

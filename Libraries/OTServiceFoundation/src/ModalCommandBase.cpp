@@ -16,10 +16,10 @@ ot::ModalCommandBase::~ModalCommandBase()
 
 	// Remove all UI elements from the modal command tab
 	std::list<std::string> objectNameList;
-	for (auto item : uiActionMap) objectNameList.push_back(item.first);
-	for (auto item : uiSubGroupMap) objectNameList.push_back(item.first);
-	for (auto item : uiGroupMap) objectNameList.push_back(item.first);
-	for (auto item : uiMenuMap) objectNameList.push_back(item.first);
+	for (const auto& item : uiActionMap) objectNameList.push_back(item.first);
+	for (const auto& item : uiSubGroupMap) objectNameList.push_back(item.first);
+	for (const auto& item : uiGroupMap) objectNameList.push_back(item.first);
+	for (const auto& item : uiMenuMap) objectNameList.push_back(item.first);
 	application->getUiComponent()->removeUIElements(objectNameList);
 
 	// Enable the action button

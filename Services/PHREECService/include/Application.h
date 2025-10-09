@@ -9,6 +9,7 @@
 #pragma once
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 
@@ -26,7 +27,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	Application();
 	virtual ~Application();
@@ -39,8 +40,6 @@ public:
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
 	
 	// ##################################################################################################################################
-
-	void handleExecuteModelAction(ot::JsonDocument& _document);
 
 	virtual void modelSelectionChanged() override;
 

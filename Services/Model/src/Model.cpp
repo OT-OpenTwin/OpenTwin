@@ -105,7 +105,6 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	projectType(_projectType),
 	collectionName(_collectionName),
 	shutdown(false),
-	clearUiOnDelete(true),
 	uiCreated(false),
 	versionGraphCreated(false),
 	stateManager(nullptr)
@@ -113,14 +112,39 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	//NOTE, debug only
 	std::cout << "Created model for project \"" << _projectName << "\"" << std::endl;
 
+	m_infoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Geometry", "Info", "Default/Information");
+	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_I));
+	m_infoButton.setButtonLockFlags(ot::LockModelRead);
+	m_buttonHandler.connectToolBarButton(m_infoButton, this, &Model::handleShowSelectedShapeInformation);
+
+	m_createParameterButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Parameters", "Create Parameter", "Default/CreateParameter");
+	m_createParameterButton.setButtonLockFlags(ot::LockModelRead);
+	m_buttonHandler.connectToolBarButton(m_createParameterButton, this, &Model::handleCreateNewParameter);
+
+	m_undoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Undo", "Default/Undo");
+	m_undoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Z));
+	m_undoButton.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonHandler.connectToolBarButton(m_undoButton, this, &Model::handleUndoLastOperation);
+
+	m_redoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Redo", "Default/Redo");
+	m_redoButton.setButtonKeySequence(ot::KeySequence(ot::Key_Control, ot::Key_Y));
+	m_redoButton.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonHandler.connectToolBarButton(m_redoButton, this, &Model::handleRedoNextOperation);
+
+	m_deleteButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Delete", "Default/Delete");
+	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::Key_Delete));
+	m_deleteButton.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
+	
 	// Create a new project structure
 	resetToNew();
 
 	// Create the UI ribbon and actions
-	if (isUIAvailable())
+	auto ui = Application::instance()->getUiComponent();
+	if (ui)
 	{
 		enableQueuingHttpRequests(true);
-		setupUIControls();
+		setupUIControls(ui);
 		enableQueuingHttpRequests(false);
 	}
 
@@ -289,7 +313,7 @@ void Model::resetToNew()
 	anyDataChangeSinceLastWrite = true;
 
 	// Now create the visualization items if needed
-	if (isUIAvailable())
+	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
 		createVisualizationItems();
@@ -300,10 +324,6 @@ void Model::resetToNew()
 Model::~Model()
 {
 	shutdown = true;
-
-	// Remove the UI controls (if required)
-	// This is NOT required if the session is shutting down, since the UI will do the cleanup automatically
-	if (clearUiOnDelete) { removeUIControls(); }
 
 	// delete all entities
 	clearAll();
@@ -319,71 +339,7 @@ void Model::detachAllViewer()
 	visualizationModelID = 0;
 }
 
-void Model::addMenuPage(const std::string &menu)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuPageVisible(menu))
-	{
-		Application::instance()->getNotifier()->addMenuPage(menu);
-		uiMenuMap[menu] = true;
-	}
-}
-
-void Model::addMenuGroup(const std::string &menu, const std::string &group)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuGroupVisible(menu, group))
-	{
-		Application::instance()->getNotifier()->addMenuGroup(menu, group);
-		uiGroupMap[menu + ":" + group] = true;
-	}
-}
-
-void Model::addMenuSubgroup(const std::string &menu, const std::string &group, const std::string &subgroup)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuGroupVisible(menu, group))
-	{
-		Application::instance()->getNotifier()->addMenuSubGroup(menu, group, subgroup);
-		uiSubGroupMap[menu + ":" + group + ":" + subgroup] = true;
-	}
-}
-
-void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
-	{
-		Application::instance()->getNotifier()->addMenuPushButton(menu, group, buttonName, text, flags, iconName, iconFolder, keySequence);
-		uiActionMap[menu + ":" + group + ":" + buttonName] = true;
-	}
-}
-
-void Model::addMenuAction(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
-	{
-		Application::instance()->getNotifier()->addMenuPushButton(menu, group, subgroup, buttonName, text, flags, iconName, iconFolder, keySequence);
-		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + buttonName] = true;
-	}
-}
-
-void Model::addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, boxName))
-	{
-		Application::instance()->getNotifier()->addMenuCheckBox(menu, group, subgroup, boxName, boxText, checked, flags);
-		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + boxName] = true;
-	}
-}
-
-void Model::addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags)
-{
-	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, editName))
-	{
-		Application::instance()->getNotifier()->addMenuLineEdit(menu, group, subgroup, editName, editText, editLabel, flags);
-		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + editName] = true;
-	}
-}
-
-
-void Model::setupUIControls()
+void Model::setupUIControls(ot::components::UiComponent* _ui)
 {	
 	assert(!uiCreated);
 
@@ -396,32 +352,23 @@ void Model::setupUIControls()
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
-	addMenuPage("Model");	
-	addMenuPage("View");
+	_ui->addMenuPage("Model");
+	_ui->addMenuPage("View");
 
-	//addMenuGroup("Model", "Database");
-	addMenuGroup("Model", "Geometry");
-	addMenuGroup("Model", "Material");
-	addMenuGroup("Model", "Parameters");
-	addMenuGroup("Model", "Edit");	
-	addMenuGroup("Model", "Plots");	
-
-
-	//addMenuAction("Model", "Database", "Save", "ProjectSave");
-
-	addMenuAction("Model", "Geometry", "Info", "Info", modelRead, "Information", "Default", ot::KeySequence(ot::Key_Control, ot::Key_I));
-
-	//addMenuAction("Model", "Material", "Create Material", "Create Material", modelWrite, "AddMaterial");
-	//addMenuAction("Model", "Material", "Show By Material", "Show By Material", modelRead, "ShowByMaterial");
-	//addMenuAction("Model", "Material", "Material Missing", "Material Missing", modelRead, "ShowMaterialMissing");
+	//_ui->addMenuGroup("Model", "Database");
+	_ui->addMenuGroup("Model", "Geometry");
+	_ui->addMenuGroup("Model", "Material");
+	_ui->addMenuGroup("Model", "Parameters");
+	_ui->addMenuGroup("Model", "Edit");
+	_ui->addMenuGroup("Model", "Plots");
 	
-	addMenuAction("Model", "Parameters", "Create Parameter", "Create Parameter", modelRead, "CreateParameter");
+	_ui->addMenuButton(m_infoButton);
+	_ui->addMenuButton(m_createParameterButton);
 
-	addMenuAction("Model", "Edit", "Undo", "Undo", modelWrite, "Undo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Z));
-	addMenuAction("Model", "Edit", "Redo", "Redo", modelWrite, "Redo", "Default", ot::KeySequence(ot::Key_Control, ot::Key_Y));
-	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::KeySequence(ot::Key_Delete));
-	
-	
+	_ui->addMenuButton(m_undoButton);
+	_ui->addMenuButton(m_redoButton);
+	_ui->addMenuButton(m_deleteButton);
+		
 	Application::instance()->addButtons();
 
 	uiCreated = true;
@@ -430,40 +377,6 @@ void Model::setupUIControls()
 	Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 
 	updateUndoRedoStatus();
-}
-
-void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
-{
-	// Now process actions for all modal commands
-
-	if (action == "Model:Edit:Undo")							
-	{
-		undoLastOperation();
-	}
-	else if (action == "Model:Edit:Redo")							
-	{
-		redoNextOperation();
-	}
-	else if (action == "Model:Edit:Delete")
-	{
-		deleteSelectedShapes();
-	}
-	else if (action == "Model:Geometry:Info")						
-	{
-		showSelectedShapeInformation();
-	}
-	else if (action == "Model:Database:Save")						
-	{
-		projectSave("", false);
-	}
-	else if (action == "Model:Parameters:Create Parameter")
-	{
-		createNewParameter();
-	}
-	else 
-	{
-		assert(0); // Unhandled button action
-	}
 }
 
 void Model::updateUndoRedoStatus()
@@ -510,41 +423,6 @@ void Model::updateUndoRedoStatus()
 
 	enableQueuingHttpRequests(false);
 }
-
-void Model::removeUIControls()
-{
-	enableQueuingHttpRequests(true);
-
-	// Remove all UI elements
-	std::list<std::string> objectNameList;
-	for (auto item : uiActionMap) objectNameList.push_back(item.first);
-	for (auto item : uiSubGroupMap) objectNameList.push_back(item.first);
-	for (auto item : uiGroupMap) objectNameList.push_back(item.first);
-	for (auto item : uiMenuMap) objectNameList.push_back(item.first);
-	Application::instance()->getNotifier()->removeUIElements("", objectNameList);
-
-	/*
-
-	std::list<std::string> uiActionList, uiSubGroupList, uiGroupList, uiMenuList;
-
-	for (auto item : uiActionMap) uiActionList.push_back(item.first);
-	for (auto item : uiSubGroupMap) uiSubGroupList.push_back(item.first);
-	for (auto item : uiGroupMap) uiGroupList.push_back(item.first);
-	for (auto item : uiMenuMap) uiMenuList.push_back(item.first);
-
-	getNotifier()->removeUIElements(OT_ACTION_VALUE_UI_ObjectType_ToolButton, uiActionList);
-	getNotifier()->removeUIElements(OT_ACTION_VALUE_UI_ObjectType_SubGroup, uiSubGroupList);
-	getNotifier()->removeUIElements(OT_ACTION_VALUE_UI_ObjectType_Group, uiGroupList);
-	getNotifier()->removeUIElements(OT_ACTION_VALUE_UI_ObjectType_Menu, uiMenuList);
-	*/
-	enableQueuingHttpRequests(false);
-
-	uiMenuMap.clear();
-	uiGroupMap.clear();
-	uiSubGroupMap.clear();
-	uiActionMap.clear();
-}
-
 
 void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityBase *root, bool addVisualizationContainers, std::list<EntityBase *> &newEntities )
 {
@@ -821,7 +699,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 {
 	visualizationModelID = visModelID;	
 		
-	if (isUIAvailable())
+	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
 
@@ -906,18 +784,12 @@ void Model::removeModalCommand(ModalCommandBase *command)
 	modalCommands.erase(std::find(modalCommands.begin(), modalCommands.end(), command));
 }
 
-void Model::executeFunction(const std::string &function, const std::string &fileName, bool removeFile)
-{
-	if (function == "importTableFile") importTableFile(fileName, removeFile);
-	else assert(0); // Unhandled function action
-}
-
-void Model::importTableFile(std::string &itemName)
+void Model::requestImportTableFile(const std::string& _itemName)
 {
 	// Get a file name for the Table file from the UI
 
-	newTableItemName = itemName;
-	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", "importTableFile", DataBase::GetDataBase()->getSiteID());
+	newTableItemName = _itemName;
+	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", OT_ACTION_CMD_ImportTableFile, DataBase::GetDataBase()->getSiteID());
 }
 
 void Model::importTableFile(const std::string &fileName, bool removeFile)
@@ -937,7 +809,7 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 	}
 }
 
-void Model::createNewParameter()
+void Model::handleCreateNewParameter()
 {
 	enableQueuingHttpRequests(true);
 
@@ -1315,7 +1187,7 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 	}
 }
 
-void Model::deleteSelectedShapes()
+void Model::handleDeleteSelectedShapes()
 {
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
@@ -2969,7 +2841,7 @@ void Model::reportInformation(const std::string &message)
 	Application::instance()->getNotifier()->reportInformation(message);
 }
 
-void Model::showSelectedShapeInformation()
+void Model::handleShowSelectedShapeInformation()
 {
 	std::list<EntityBase *> selectedEntities;
 	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
@@ -3524,11 +3396,12 @@ void Model::projectOpen()
 		//TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();  // Already included in resetToNew();
 
 		// Now setup the UI
-		if (isUIAvailable())
+		auto ui = Application::instance()->getUiComponent();
+		if (ui)
 		{
 			enableQueuingHttpRequests(true);
 
-			setupUIControls();
+			setupUIControls(ui);
 			updateVersionGraph();
 
 			enableQueuingHttpRequests(false);
@@ -3555,11 +3428,12 @@ void Model::projectOpen()
 		//TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();  // Already included in resetToNew()
 
 		// Now setup the UI
-		if (isUIAvailable())
+		auto ui = Application::instance()->getUiComponent();
+		if (ui)
 		{
 			enableQueuingHttpRequests(true);
 
-			setupUIControls();
+			setupUIControls(ui);
 			updateVersionGraph();
 
 			enableQueuingHttpRequests(false);
@@ -3581,11 +3455,12 @@ void Model::projectOpen()
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 
 	// Now setup the UI
-	if (isUIAvailable() && !uiCreated)
+	auto ui = Application::instance()->getUiComponent();
+	if (ui && !uiCreated)
 	{
 		enableQueuingHttpRequests(true);
 		
-		setupUIControls();
+		setupUIControls(ui);
 
 		enableQueuingHttpRequests(false);
 	}
@@ -3626,7 +3501,7 @@ void Model::projectOpen()
 
 void Model::updateVersionGraph()
 {
-	if (isUIAvailable() && !versionGraphCreated && visualizationModelID != 0)
+	if (Application::instance()->isUiConnected() && !versionGraphCreated && visualizationModelID != 0)
 	{
 		enableQueuingHttpRequests(true);
 
@@ -3818,15 +3693,8 @@ void Model::modelChangeOperationCompleted(const std::string &description, bool a
 	projectSave(description, !askForCreationOfBranch);
 }
 
-bool Model::isUIAvailable()
+void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 {
-	return Application::instance()->getNotifier()->isUIAvailable();
-}
-
-void Model::uiIsAvailable()
-{
-	assert(isUIAvailable());
-
 	enableQueuingHttpRequests(true);
 
 	// Create the ui ribbon controls
@@ -4752,7 +4620,7 @@ std::list<ot::UID> Model::getAllGeometryEntitiesForMeshing()
 	return meshingEntities;
 }
 
-void Model::undoLastOperation()
+void Model::handleUndoLastOperation()
 {
 	enableQueuingHttpRequests(true);
 
@@ -4778,7 +4646,7 @@ void Model::undoLastOperation()
 	enableQueuingHttpRequests(false);
 }
 
-void Model::redoNextOperation()
+void Model::handleRedoNextOperation()
 {
 	enableQueuingHttpRequests(true);
 

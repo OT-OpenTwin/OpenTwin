@@ -9,6 +9,7 @@
 #pragma once
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 #include "EntityGeometry.h"
@@ -46,7 +47,7 @@ struct LTSpiceData {
 	bool isComplex = false;
 };
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	Application();
 	virtual ~Application();
@@ -65,8 +66,6 @@ public:
 
 	// ##################################################################################################################################
 
-	void handleExecuteModelAction(ot::JsonDocument& _document);
-	
 	virtual void modelSelectionChanged() override;
 
 	void importProject(void);

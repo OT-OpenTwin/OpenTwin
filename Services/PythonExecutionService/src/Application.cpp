@@ -37,7 +37,7 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, new UiNotifier(), new ModelNotifier()),
 	m_subprocessManager(nullptr)
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteAction);
+	connectAction({ OT_ACTION_CMD_PYTHON_EXECUTE_Command, OT_ACTION_CMD_PYTHON_EXECUTE_Scripts }, this, &Application::handleForwardToSubprocess);
 }
 
 Application::~Application()
@@ -117,7 +117,7 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	OT_LOG_D("Updating log flags");
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(_flags, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());
@@ -126,18 +126,15 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	m_subprocessManager->sendRequest(doc, response);
 }
 
-
-// ##################################################################################################################################################################################################################
-
-std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
-	std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-	OT_LOG_D("Executing action: " + action);
-	
+std::string Application::handleForwardToSubprocess(ot::JsonDocument& _doc) {
 	std::string returnMessage;
-	
+
 	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) {
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
 	}
-	
+
 	return returnMessage;
 }
+
+
+// ##################################################################################################################################################################################################################

@@ -51,7 +51,13 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYRIT, OT_INFO_SERVICE_TYPE_PYRIT, new UiNotifier(), new ModelNotifier()),
 	m_subprocessManager(nullptr)
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteAction);
+	m_addSolverButton = ot::ToolBarButtonCfg("Pyrit", "Solver", "Create Solver", "Default/AddSolver");
+	m_addSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_addSolverButton, this, &Application::handleAddSolver);
+
+	m_runSolverButton = ot::ToolBarButtonCfg("Pyrit", "Solver", "Run Solver", "Default/RunSolver");
+	m_runSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_runSolverButton, this, &Application::handleRunSolver);
 }
 
 Application::~Application()
@@ -99,7 +105,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	if (m_subprocessManager) {
 		m_subprocessManager->setFrontendUrl(_ui->getServiceURL());
 	}
-
+	
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("Pyrit");
@@ -107,10 +113,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuGroup("Pyrit", "Solver");
 	//	_ui->addMenuGroup("Pyrit", "Sources");
 
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
-
-	_ui->addMenuButton("Pyrit", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("Pyrit", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
+	_ui->addMenuButton(m_addSolverButton);
+	_ui->addMenuButton(m_runSolverButton);
 
 	//	_ui->addMenuButton("Pyrit", "Sources", "Define Electrostatic Potential", "Define Electrostatic Potential", modelWrite, "DefinePotential", "Default");
 
@@ -149,7 +153,7 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 	OT_LOG_D("Updating log flags");
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_SetLogFlags, doc.GetAllocator()), doc.GetAllocator());
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(_flags, flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());
@@ -159,16 +163,6 @@ void Application::logFlagsChanged(const ot::LogFlags& _flags) {
 }
 
 // ##################################################################################################################################################################################################################
-
-void Application::handleExecuteAction(ot::JsonDocument& _doc) {
-	std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-	OT_LOG_D("Executing action: " + action);
-	
-	if (action == "Pyrit:Solver:Create Solver")	          addSolver();
-	else if (action == "Pyrit:Solver:Run Solver")		  runSolver();
-	//	else if (action == "GetDP:Sources:Define Electrostatic Potential")  definePotential();
-	else assert(0); // Unhandled button action
-}
 
 void Application::modelSelectionChanged()
 {
@@ -189,7 +183,7 @@ void Application::modelSelectionChanged()
 	}
 }
 
-void Application::addSolver(void)
+void Application::handleAddSolver()
 {
 	if (this->getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
@@ -240,7 +234,7 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
-void Application::runSolver(void)
+void Application::handleRunSolver()
 {
 	if (!m_subprocessManager)
 	{
@@ -439,8 +433,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	//						"    time.sleep(1)";
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(command, doc.GetAllocator()), doc.GetAllocator());
 
 	m_subprocessManager->startLogging();

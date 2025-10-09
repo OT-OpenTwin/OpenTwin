@@ -29,16 +29,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 extern "C" {
 
-	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
-	{
-		return ot::foundation::performAction(_json, _senderIP);
+	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
+		auto result = ot::foundation::performAction(_json, _senderIP);
+		Application::instance().actionHandlingCompleted();
+		return result;
 	};
 
-	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP)
-	{
-		//ToDo: If you want to actually queue the command implement the queueing logic here
-		// At this point we are simply forwarding the message to the perform action function to execute the action immediatly
-		return ot::foundation::performAction(_json, _senderIP);
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
+		return performAction(_json, _senderIP);
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void)
@@ -59,6 +57,6 @@ extern "C" {
 
 	// This function is called once upon startup of this service
 	_declspec(dllexport) int init(const char* _ownUrl, const char* _unused1, const char* _unused2, const char* _unused3) {
-		return ot::foundation::init(_ownUrl, new Application(), false);
+		return ot::foundation::init(_ownUrl, &Application::instance(), false);
 	}
 }

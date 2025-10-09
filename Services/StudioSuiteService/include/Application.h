@@ -9,6 +9,7 @@
 #pragma once
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 #include "EntityGeometry.h"
@@ -31,7 +32,7 @@ namespace ot {
 
 class EntityUnits;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	Application();
 	virtual ~Application();
@@ -50,13 +51,12 @@ public:
 
 	// ##################################################################################################################################
 
-	void handleExecuteModelAction(ot::JsonDocument& _document);
+	void handleImportProject(void);
+	void handleSetCSTFile(void);
+	void handleShowInformation(void);
+	void handleCommitChanges(void);
+	void handleGetChanges(void);
 
-	void importProject(void);
-	void setCSTFile(void);
-	void showInformation(void);
-	void commitChanges(void);
-	void getChanges(void);
 	void setLocalFileName(const std::string& hostName, const std::string& fileName);
 
 	void changeUnits(const std::string &content);
@@ -88,4 +88,10 @@ private:
 	std::map<std::string, std::tuple<double, double, double>> materialColors;
 	std::map<std::string, std::string> shapeMaterials;
 	InfoFileManager infoFileManager;
+
+	ot::ToolBarButtonCfg m_importProjectButton;
+	ot::ToolBarButtonCfg m_setCSTFileButton;
+	ot::ToolBarButtonCfg m_showInformationButton;
+	ot::ToolBarButtonCfg m_commitChangesButton;
+	ot::ToolBarButtonCfg m_getChangesButton;
 };

@@ -1,27 +1,30 @@
 #pragma once
+
 #include "OTServiceFoundation/UiComponent.h"
-#include "ActionAndFunctionHandler.h"
 #include "SelectionChangedObserver.h"
 #include "EntityMetadataSeries.h"
 #include "EntityResult1DPlot.h"
 #include "OTGui/Plot1DCurveCfg.h"
-#include "OTGui/ToolBarButtonCfg.h"
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTModelAPI/NewModelStateInformation.h"
 
-class PlotHandler :public ActionAndFunctionHandler, public SelectionChangedObserver
+class PlotHandler : public SelectionChangedObserver
 {
 public:
-	void addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName);
+	PlotHandler();
 
-	std::string createPlotAction(ot::JsonDocument& _document);
-	std::string addCurvesToPlot(ot::JsonDocument& _document);
+	void addButtons(ot::components::UiComponent* _uiComponent);
 
-protected:
-	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
 private:
 	ot::ToolBarButtonCfg m_btnCreatePlot;
 	ot::ToolBarButtonCfg m_btnAddCurveToPlot;
 	
+	const std::string c_groupName = "Plots";
+
+	ot::ButtonHandler m_buttonHandler;
+	void handleCreatePlot();
+	void handleAddCurveToPlot();
+
 	void updatedSelection(std::list<EntityBase*>& _selectedEntities, std::list<std::string>& _enabledButtons, std::list<std::string>& _disabledButtons) override;
 	std::list<EntityMetadataSeries*> getSelectedSeriesMetadata();
 	std::list<EntityResult1DPlot*> getSelectedPlots();

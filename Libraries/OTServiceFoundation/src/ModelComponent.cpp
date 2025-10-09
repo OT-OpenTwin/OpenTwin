@@ -96,7 +96,7 @@ DataStorageAPI::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUID
 void ot::components::ModelComponent::importTableFile(const std::string &itemName)
 {
 	JsonDocument requestDoc;
-	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ImportTableFile, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_RequestImportTableFile, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_NAME, JsonString(itemName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command

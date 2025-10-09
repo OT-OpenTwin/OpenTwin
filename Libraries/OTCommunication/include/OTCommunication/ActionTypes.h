@@ -65,6 +65,10 @@
 #define OT_ACTION_CMD_GetAllLogs "Logger.GetAllLogs"
 #define OT_ACTION_CMD_GetUserLogs "Logger.GetUserLogs"
 
+#define OT_ACTION_CMD_ImportTextFile "Import.TextFile"
+#define OT_ACTION_CMD_ImportTableFile "Import.TableFile"
+#define OT_ACTION_CMD_ImportPyhtonScript "Import.PythonScript"
+
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
 #define OT_ACTION_CMD_CheckStartupCompleted "Service.CheckStartupCompleted"
@@ -75,10 +79,12 @@
 #define OT_ACTION_CMD_ServiceEmergencyShutdown "Service.EmergencyShutdown"
 #define OT_ACTION_CMD_ServiceConnectionLost "Service.ConnectionLost"
 
+#define OT_ACTION_CMD_ButtonPressed "Button.Pressed"
+#define OT_ACTION_CMD_LineEditChanged "LineEdit.Changed"
+
 #define OT_ACTION_CMD_PROJ_Save "Project.Save"
 #define OT_ACTION_CMD_KeySequenceActivated "KeySequence.Activated"
 
-#define OT_ACTION_CMD_MODEL_Delete "Model.Delete"
 #define OT_ACTION_CMD_MODEL_SelectionChanged "Model.Event.SelectionChanged"
 #define OT_ACTION_CMD_MODEL_PropertyChanged "Model.Event.PropertyChanged"
 #define OT_ACTION_CMD_MODEL_ParentNeedsUpdate "Model.Event.ParentNeedsUpdate"
@@ -103,11 +109,9 @@
 #define OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName "Model.Entities.GetPropertiesFromName"
 #define OT_ACTION_CMD_MODEL_UpdatePropertyGrid "Model.UpdatePropertyGrid"
 #define OT_ACTION_CMD_MODEL_GetCurrentVersion "Model.Version.GetCurrent"
-#define OT_ACTION_CMD_MODEL_ExecuteAction "Model.Event.ExecuteAction"
-#define OT_ACTION_CMD_MODEL_ExecuteFunction "Model.Event.ExecuteFunction"
 #define OT_ACTION_CMD_MODEL_EntitiesSelected "Model.Event.EntitiesSelected"
 #define OT_ACTION_CMD_MODEL_GetCurrentVisModelID "Model.Visualization.GetModelID"
-#define OT_ACTION_CMD_MODEL_ImportTableFile "Model.Table.ImportFromFile"
+#define OT_ACTION_CMD_MODEL_RequestImportTableFile "Model.Table.RequestImportFromFile"
 #define OT_ACTION_CMD_MODEL_CreateGeometryFromRubberbandData "Model.CreateGeometry.FromRubberbandData"
 #define OT_ACTION_CMD_MODEL_UpdateVisualizationEntity "Model.Entities.UpdateVisEntity"
 #define OT_ACTION_CMD_MODEL_UpdateGeometryEntity "Model.Entities.UpdateGeomEntity"
@@ -336,7 +340,6 @@
 #define OT_ACTION_PARAM_Hidden "Hidden"
 #define OT_ACTION_PARAM_Ranges "Ranges"
 #define OT_ACTION_PARAM_Config "Config"
-#define OT_ACTION_PARAM_Visualisation_Config "Config.Visualisation"
 #define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Visible "Visible"
 #define OT_ACTION_PARAM_Content "Content"
@@ -359,6 +362,7 @@
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_ReceiveBroadcast "ReceiveBroadcast"
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
+#define OT_ACTION_PARAM_Visualisation_Config "Config.Visualisation"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
@@ -519,7 +523,6 @@
 #define OT_ACTION_PARAM_MODEL_Description "Model.Description"
 #define OT_ACTION_PARAM_MODEL_NewProperties "Model.Entity.NewProperties"
 #define OT_ACTION_PARAM_VIEW_ID "View.ID"
-#define OT_ACTION_PARAM_MODEL_FunctionName "Model.Event.Functions.Name"
 #define OT_ACTION_PARAM_MODEL_ITM_Description "Model.Item.Description"
 #define OT_ACTION_PARAM_MODEL_ITM_AskForBranchCreation "Model.Item.AskForBranchCreation"
 #define OT_ACTION_PARAM_MODEL_PropertyList "Model.Properties.List"

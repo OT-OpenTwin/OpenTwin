@@ -11,6 +11,11 @@
 
 #pragma warning(disable:4996)
 
+CopyPasteHandler::CopyPasteHandler() {
+	connectAction(OT_ACTION_CMD_SelectedEntitiesSerialise, this, &CopyPasteHandler::selectedEntitiesSerialiseAction);
+	connectAction(OT_ACTION_CMD_PasteEntities, this, &CopyPasteHandler::pasteEntitiesAction);
+}
+
 void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitiesByName)
 {
 	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;

@@ -12,33 +12,44 @@
 #include "OTGui/PainterRainbowIterator.h"
 #include "QueuingHttpRequestsRAII.h"
 
-void PlotHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
-{
-	const std::string groupName = "Plots";
-	_uiComponent->addMenuGroup(_pageName, groupName);
+PlotHandler::PlotHandler() {
+	const std::string pageName = Application::getToolBarPageName();
 	
-	m_btnCreatePlot = ot::ToolBarButtonCfg(_pageName, groupName, "Create Plot", "Default/Plot1DVisible");
-	_uiComponent->addMenuButton(m_btnCreatePlot.setButtonLockFlags(ot::LockModelWrite));
+	m_btnCreatePlot = ot::ToolBarButtonCfg(pageName, c_groupName, "Create Plot", "Default/Plot1DVisible");
+	m_btnCreatePlot.setButtonLockFlags(ot::LockModelWrite);
+	
+	m_btnAddCurveToPlot = ot::ToolBarButtonCfg(pageName, c_groupName, "Add Curve to Plot", "Default/Plot1DVisible");
+	m_btnAddCurveToPlot.setButtonLockFlags(ot::LockModelWrite);
 
-	m_btnAddCurveToPlot = ot::ToolBarButtonCfg(_pageName, groupName, "Add Curve to Plot", "Default/Plot1DVisible");
-	_uiComponent->addMenuButton(m_btnAddCurveToPlot.setButtonLockFlags(ot::LockModelWrite));
+	m_buttonHandler.connectToolBarButton(m_btnCreatePlot, this, &PlotHandler::handleCreatePlot);
+	m_buttonHandler.connectToolBarButton(m_btnAddCurveToPlot, this, &PlotHandler::handleAddCurveToPlot);
 }
 
-std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
+void PlotHandler::addButtons(ot::components::UiComponent* _uiComponent)
+{
+	const std::string pageName = Application::getToolBarPageName();
+
+	_uiComponent->addMenuGroup(pageName, c_groupName);
+	
+	_uiComponent->addMenuButton(m_btnCreatePlot);
+	_uiComponent->addMenuButton(m_btnAddCurveToPlot);
+}
+
+void PlotHandler::handleCreatePlot()
 {
 	QueuingHttpRequestsRAII uiQueue;
 
 	auto selectedSeriesMetadata = getSelectedSeriesMetadata();
 	if (selectedSeriesMetadata.size() == 0)
 	{
-		return "";
+		return;
 	}
 
 	//Find a free name for a plot
 	const std::string plotName = getFreePlotName();
 	if (plotName.empty())
 	{
-		return "";
+		return;
 	}
 
 	ot::NewModelStateInformation newModelStateInformation;
@@ -67,11 +78,9 @@ std::string PlotHandler::createPlotAction(ot::JsonDocument& _document)
 		newModelStateInformation.m_topologyEntityVersions, 
 		newModelStateInformation.m_forceVisible, 
 		noDataEntities, noDataEntities, noDataEntities, "Created new plot for existing series metadata", true, true);
-
-	return std::string();
 }
 
-std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
+void PlotHandler::handleAddCurveToPlot()
 {
 	QueuingHttpRequestsRAII uiQueue;
 	
@@ -79,7 +88,7 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 	auto selectedPlots = getSelectedPlots();
 	if (selectedSeriesMetadata.size() == 0 || selectedPlots.size() == 0)
 	{
-		return "";
+		return;
 	}
 	
 	ot::NewModelStateInformation newModelStateInformation, plotsForUpdate;
@@ -112,24 +121,6 @@ std::string PlotHandler::addCurvesToPlot(ot::JsonDocument& _document)
 		visualisationCfg.setOverrideViewerContent(true);
 		Application::instance()->getVisualisationHandler().handleVisualisationRequest(selectedPlot->getEntityID(),visualisationCfg);
 	}
-	return std::string();
-}
-
-bool PlotHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc)
-{
-	bool actionIsHandled = false;
-
-	if (_action == m_btnCreatePlot.getFullPath())
-	{
-		createPlotAction(_doc);
-		actionIsHandled = true;
-	}
-	else if (_action == m_btnAddCurveToPlot.getFullPath())
-	{
-		addCurvesToPlot(_doc);
-		actionIsHandled = true;
-	}
-	return actionIsHandled;
 }
 
 std::list<EntityMetadataSeries*> PlotHandler::getSelectedSeriesMetadata()

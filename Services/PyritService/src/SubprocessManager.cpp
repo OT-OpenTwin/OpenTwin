@@ -174,7 +174,7 @@ void SubprocessManager::worker(std::string _projectName) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 #ifdef _SUBSERVICEDEBUG
-			m_communicationHandler = new CommunicationHandler(this, "TestServerPython");
+			m_communicationHandler = new CommunicationHandler(this, "TestServerPyrit");
 #else
 			// Encode project name to base64 to avoid issues with special characters
 			const std::string encodedString = ot::String::toBase64Url(_projectName);

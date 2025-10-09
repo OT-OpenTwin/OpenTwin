@@ -12,6 +12,9 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 
+#include "OTGuiAPI/ButtonHandler.h"
+#include "OTCommunication/ActionHandler.h"
+
 #include "EntityCache.h"
 
 #include "ClassFactoryCAD.h"
@@ -42,22 +45,20 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
 public:
-	Application();
-	virtual ~Application();
+	static Application& instance();
 
 	// ##################################################################################################################################
 
 	// Required functions
 
-	//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation)
-	//! @param _action The action that should be processed
-	//! @param _doc The document containing all the information
-	virtual std::string processAction(const std::string & _action, ot::JsonDocument& _doc) override;
-
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
+
+	virtual void modelConnected(ot::components::ModelComponent* _model) override;
+
+	virtual void modelDisconnected(const ot::components::ModelComponent* _serviceInfo) override;
 
 	//! @brief Create settings that your application uses that are editable in the uiService
 	//! The created class will be deleted after used for sending or synchronizing with the database.
@@ -83,13 +84,13 @@ public:
 	virtual void modelSelectionChanged(void) override;
 	virtual void propertyChanged(ot::JsonDocument& _doc) override;
 
+	void actionHandlingCompleted();
+	
 	// ##################################################################################################################################
 
 private:
-	void importSTEP(void);
 	std::string CreateTmpFileFromCompressedData(const std::string &data, ot::UID uncompressedDataLength);
-	void executeFunction(const std::string &function, const std::string &fileName, bool removeFile, const std::string &originalName);
-
+	
 	PrimitiveManager    *getPrimitiveManager(void);
 	BooleanOperations   *getBooleanOperations(void);
 	UpdateManager       *getUpdateManager(void);
@@ -111,4 +112,50 @@ private:
 	STEPReader			*stepReader;
 
 	ClassFactoryCAD classFactoryCAD;
+
+	void handleImportSTEP(ot::JsonDocument& _document);
+	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);
+	void handleEntitiesSelected(ot::JsonDocument& _document);
+
+
+	ot::ToolBarButtonCfg m_buttonImportStep;
+
+	ot::ToolBarButtonCfg m_buttonCreateCuboid;
+	ot::ToolBarButtonCfg m_buttonCreateCylinder;
+	ot::ToolBarButtonCfg m_buttonCreateSphere;
+	ot::ToolBarButtonCfg m_buttonCreateTorus;
+	ot::ToolBarButtonCfg m_buttonCreateCone;
+	ot::ToolBarButtonCfg m_buttonCreatePyramid;
+
+	ot::ToolBarButtonCfg m_buttonBooleanAdd;
+	ot::ToolBarButtonCfg m_buttonBooleanSubtract;
+	ot::ToolBarButtonCfg m_buttonBooleanIntersect;
+	ot::ToolBarButtonCfg m_buttonTransform;
+	ot::ToolBarButtonCfg m_buttonChamferEdges;
+	ot::ToolBarButtonCfg m_buttonBlendEdges;
+
+	ot::ToolBarButtonCfg m_buttonRemoveFaces;
+	ot::ToolBarButtonCfg m_buttonHealing;
+
+	void handleRequestImportSTEP();
+
+	void handleCreateCuboid();
+	void handleCreateCylinder();
+	void handleCreateSphere();
+	void handleCreateTorus();
+	void handleCreateCone();
+	void handleCreatePyramid();
+
+	void handleBooleanAdd();
+	void handleBooleanSubtract();
+	void handleBooleanIntersect();
+	void handleTransform();
+	void handleChamferEdges();
+	void handleBlendEdges();
+
+	void handleRemoveFaces();
+	void handleHealing();
+
+	Application();
+	virtual ~Application();
 };

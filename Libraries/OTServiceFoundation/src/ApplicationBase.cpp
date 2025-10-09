@@ -230,7 +230,7 @@ void ot::ApplicationBase::removeModalCommand(ot::ModalCommandBase *command)
 
 std::string ot::ApplicationBase::processActionWithModalCommands(const std::string & _action, JsonDocument & _doc)
 {
-	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+	/* if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 	{
 		std::string action = json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 
@@ -246,7 +246,8 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 			}
 		}
 	}	
-	else if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
+	else */ 
+	if (_action == OT_ACTION_CMD_MODEL_SelectionChanged)
 	{
 		auto selectedEntityInfos =	json::getObjectList(_doc, OT_ACTION_PARAM_MODEL_EntityInfo);
 		m_selectedEntityInfos.clear();

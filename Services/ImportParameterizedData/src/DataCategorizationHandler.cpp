@@ -372,7 +372,7 @@ void DataCategorizationHandler::requestRangeSelection(const std::string& _tableN
 	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_RequestCallback, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject obj;
 	m_backgroundColour.addToJsonObject(obj, doc.GetAllocator());

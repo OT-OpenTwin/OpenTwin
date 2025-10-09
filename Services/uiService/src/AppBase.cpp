@@ -2329,9 +2329,8 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged,doc.GetAllocator());
-
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, doc.GetAllocator()), doc.GetAllocator());
+	
 	ot::JsonObject configObj;
 	_newConfig->addToJsonObject(configObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
@@ -2685,9 +2684,8 @@ void AppBase::slotTextEditorSaveRequested(void) {
 	{
 		ot::JsonDocument doc;
 		
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
-
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+		
 		try {
 			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(view->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
@@ -2728,8 +2726,7 @@ void AppBase::slotTableSaveRequested(void) {
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
 		ot::TableView* view = dynamic_cast<ot::TableView*>(ot::WidgetViewManager::instance().findViewFromWidget(table));

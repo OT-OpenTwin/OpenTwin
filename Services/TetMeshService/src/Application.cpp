@@ -56,8 +56,8 @@ Application::Application()
 	getClassFactory().SetNextHandler(&classFactoryCAD);
 	classFactoryCAD.SetChainRoot(&(getClassFactory()));
 
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteFunction, this, &Application::handleExecuteFunction);
+	connectAction("exportMeshFile", this, &Application::handleExportMesh);
+	connectAction("importMeshFile", this, &Application::handleImportMesh);
 }
 
 Application::~Application()
@@ -107,48 +107,17 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Mesh", "Import / Export", "Import Tet Mesh", "Import Tet Mesh", modelWrite, "Import", "Default");
 	_ui->addMenuButton("Mesh", "Import / Export", "Export Tet Mesh", "Export Tet Mesh", modelWrite, "ProjectSaveAs", "Default");
 
+	connectToolBarButton("Mesh:Tet Mesh:Create Tet Mesh", this, &Application::createMesh);
+	connectToolBarButton("Mesh:Tet Mesh:Update Tet Mesh", this, &Application::updateMesh);
+	connectToolBarButton("Mesh:Import / Export:Import Tet Mesh", this, &Application::importMesh);
+	connectToolBarButton("Mesh:Import / Export:Export Tet Mesh", this, &Application::exportMesh);
+
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 // ##################################################################################################################################
-
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (     action == "Mesh:Tet Mesh:Create Tet Mesh")	createMesh();
-	else if (action == "Mesh:Tet Mesh:Update Tet Mesh")	updateMesh();
-	else if (action == "Mesh:Import / Export:Import Tet Mesh") importMesh();
-	else if (action == "Mesh:Import / Export:Export Tet Mesh") exportMesh();
-	else assert(0); // Unhandled button action
-}
-
-void Application::handleExecuteFunction(ot::JsonDocument& _document) {
-
-	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-
-	if (function == "exportMeshFile")
-	{
-		std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
-
-		exportMeshFile(fileName);
-	}
-	else if (function == "importMeshFile")
-	{
-		std::string originalName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
-
-		std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
-		ot::UID uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-
-		// Process the file content
-		importMeshFile(originalName, content, uncompressedDataLength);
-	}
-	else
-	{
-		assert(0);  // Unknown function to execute
-	}
-}
-
 
 void Application::createMesh(void)
 {
@@ -318,7 +287,7 @@ void Application::exportMesh(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SelectFileForStoring, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Export Mesh File", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileExtensions, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("exportMeshFile", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("exportMeshFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
@@ -335,12 +304,28 @@ void Application::importMesh(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Mesh File", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileExtensions, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importMeshFile", doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("importMeshFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 
 	std::string tmp;
 	getUiComponent()->sendMessage(true, doc, tmp);
+}
+
+void Application::handleImportMesh(ot::JsonDocument& _doc) {
+	std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+
+	std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+	ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+	// Process the file content
+	importMeshFile(originalName, content, uncompressedDataLength);
+}
+
+void Application::handleExportMesh(ot::JsonDocument& _doc) {
+	std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+
+	exportMeshFile(fileName);
 }
 
 void Application::exportMeshFile(const std::string &fileName) {

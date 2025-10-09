@@ -1,3 +1,8 @@
+//! @file FileHandler.cpp
+//! @authors Jan Wagner, Alexander Kuester
+//! @date November 2024
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "stdafx.h"
 #include "Model.h"
 #include "FileHandler.h"
@@ -16,66 +21,55 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include <assert.h>
 
-void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
-{
-	const std::string groupName = "File Imports";
+FileHandler::FileHandler() {
+	const std::string pageName = Application::getToolBarPageName();
 
-	_uiComponent->addMenuGroup(_pageName,groupName);
+	m_buttonPythonImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Python Script", "Default/python");
+	m_buttonPythonImport.setButtonLockFlags(ot::LockModelWrite);
+	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Text File", "Default/TextVisible");
+	m_buttonFileImport.setButtonLockFlags(ot::LockModelWrite);
 
-	m_buttonPythonImport = ot::ToolBarButtonCfg(_pageName, groupName, "Import Python Script", "Default/python");
-	m_buttonFileImport = ot::ToolBarButtonCfg(_pageName, groupName, "Import Text File", "Default/TextVisible");
+	m_buttonHandler.connectToolBarButton(m_buttonFileImport, this, &FileHandler::handleImportTextFileButton);
+	m_buttonHandler.connectToolBarButton(m_buttonPythonImport, this, &FileHandler::handleImportPythonScriptButton);
 
-	_uiComponent->addMenuButton(m_buttonPythonImport.setButtonLockFlags(ot::LockModelWrite));
-	_uiComponent->addMenuButton(m_buttonFileImport.setButtonLockFlags(ot::LockModelWrite));
+	m_actionHandler.connectAction(OT_ACTION_CMD_ImportTextFile, this, &FileHandler::handleImportTextFile);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, this, &FileHandler::handleTextEditorSaveRequest);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TABLE_SaveRequest, this, &FileHandler::handleTableSaveRequest);
 }
 
-bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc)
+void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 {
-	bool actionIsHandled= false;
+	const std::string pageName = Application::getToolBarPageName();
 	
-	if (_action == m_buttonFileImport.getFullPath())
-	{
-		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
-		const std::string fileDialogTitle = "Import Text File";
-		const std::string subsequentFunction = "ImportTextFile";
-		importFile(fileMask,fileDialogTitle,subsequentFunction);
-		actionIsHandled = true;
-	}
-	else if (_action == m_buttonPythonImport.getFullPath())
-	{
-		const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
-		const std::string fileDialogTitle = "Import Python Script";
-		const std::string subsequentFunction = "ImportPythonScript";
-		importFile(fileMask, fileDialogTitle, subsequentFunction);
-		actionIsHandled = true;
-	}
-	else if (_action == "ImportTextFile")
-	{
-		std::thread worker(&FileHandler::storeTextFile,this, std::move(_doc), std::ref(ot::FolderNames::FilesFolder));
-		worker.detach();
-		actionIsHandled = true;
-	}
-	else if (_action == "ImportPythonScript")
-	{
-		std::thread worker(&FileHandler::storeTextFile, this, std::move(_doc), std::ref(ot::FolderNames::PythonScriptFolder));
-		worker.detach();
-		actionIsHandled = true;
-	}
-	else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
-	{
-		handleChangedText(_doc);
-		actionIsHandled = true;
-	}
-	else if (_action == OT_ACTION_CMD_UI_TABLE_SaveRequest)
-	{
-		handleChangedTable(_doc);
-		actionIsHandled = true;
-	}
-	else
-	{
-		actionIsHandled = false;
-	}
-	return actionIsHandled;
+	_uiComponent->addMenuGroup(pageName, c_groupName);
+
+	_uiComponent->addMenuButton(m_buttonPythonImport);
+	_uiComponent->addMenuButton(m_buttonFileImport);
+}
+
+void FileHandler::handleImportTextFileButton() {
+	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
+	const std::string fileDialogTitle = "Import Text File";
+	const std::string subsequentFunction = OT_ACTION_CMD_ImportTextFile;
+	importFile(fileMask, fileDialogTitle, subsequentFunction);
+}
+
+void FileHandler::handleImportPythonScriptButton() {
+	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
+	const std::string fileDialogTitle = "Import Python Script";
+	const std::string subsequentFunction = OT_ACTION_CMD_ImportPyhtonScript;
+	importFile(fileMask, fileDialogTitle, subsequentFunction);
+}
+
+void FileHandler::handleImportTextFile(ot::JsonDocument& _document) {
+	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::FilesFolder));
+	worker.detach();
+}
+
+void FileHandler::handleImportPythonScript(ot::JsonDocument& _document) {
+	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::PythonScriptFolder));
+	worker.detach();
 }
 
 void FileHandler::importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName)
@@ -86,14 +80,13 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString(_dialogTitle, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_fileMask, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_functionName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(_functionName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, ot::JsonValue(true), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadMultiple, ot::JsonValue(true), doc.GetAllocator());
 	std::string response;
 	Application::instance()->getUiComponent()->sendMessage(false, doc, response);
 }
-
 
 void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string& _folderName)
 {
@@ -142,7 +135,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	uiComponent->displayMessage(std::to_string(passedTime) + " ms\n");
 }
 
-void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
+void FileHandler::handleTableSaveRequest(ot::JsonDocument& _doc)
 {
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
@@ -181,8 +174,7 @@ void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
 				{
 					ot::JsonDocument notify;
-					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, notify.GetAllocator()), notify.GetAllocator());
-					notify.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
 					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
 					workerThread.detach();
 				}
@@ -210,7 +202,7 @@ void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& 
 	model->modelChangeOperationCompleted("Updated Table.");
 }
 
-void FileHandler::handleChangedText(ot::JsonDocument& _doc)
+void FileHandler::handleTextEditorSaveRequest(ot::JsonDocument& _doc)
 {
 	const std::string entityName = _doc[OT_ACTION_PARAM_TEXTEDITOR_Name].GetString();
 	const std::string textContent = _doc[OT_ACTION_PARAM_TEXTEDITOR_Text].GetString();
@@ -250,8 +242,7 @@ void FileHandler::handleChangedText(ot::JsonDocument& _doc)
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
 				{
 					ot::JsonDocument notify;
-					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, notify.GetAllocator()), notify.GetAllocator());
-					notify.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
 					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
 					workerThread.detach();
 				}

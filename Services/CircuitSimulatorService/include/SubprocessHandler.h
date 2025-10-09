@@ -21,18 +21,13 @@ public:
 	SubprocessHandler(const std::string& serverName, int sessionID, int serviceID);
 	~SubprocessHandler();
 
-
 	bool RunSubprocess();
 	bool startSubprocess();
 	void stopSubprocess();
 
-	
-
-private:
-	
+private:	
 	const std::string m_executableName = "CircuitExecution.exe";
 	std::string m_subprocessPath;
-	
 	
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
@@ -48,7 +43,4 @@ private:
 	const int m_heartBeat = m_timeoutSubprocessStart;
 	
 	void ProcessErrorOccured(std::string& message);
-
-
-
 };

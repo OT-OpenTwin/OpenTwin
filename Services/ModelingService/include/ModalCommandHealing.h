@@ -1,8 +1,10 @@
 #pragma once
 
+#include "OTGuiAPI/ButtonHandler.h"
+#include "OTGuiAPI/LineEditHandler.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
 
-class ModalCommandHealing : public ot::ModalCommandBase
+class ModalCommandHealing : public ot::ModalCommandBase, public ot::ButtonHandler, public ot::LineEditHandler
 {
 public:
 	ModalCommandHealing(ot::ApplicationBase *app, const std::string &actionMnuID, const std::string &actionBtnID);
@@ -15,7 +17,13 @@ protected:
 	virtual std::string initializeAndCreateUI(const ot::LockTypeFlags& modelRead, const ot::LockTypeFlags& modelWrite) override;
 
 private:
-	void processToleranceSetting(rapidjson::Document &doc);
+	void handleDelete();
+	void handleToggleSmallEdges();
+	void handleToggleSmallFaces();
+	void handleToggleSewFaces();
+	void handleToggleMakeSolid();
+
+	void processToleranceSetting(const std::string& _newText);
 	void healSelectedShapes(void);
 	void healSelectedShapesWorker(void);
 	void resetSettings(void);

@@ -61,7 +61,25 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+	m_importProjectButton = ot::ToolBarButtonCfg("Project", "Local Project", "Import", "Default/Import");
+	m_importProjectButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_importProjectButton, this, &Application::handleImportProject);
+
+	m_setCSTFileButton = ot::ToolBarButtonCfg("Project", "Local Project", "Set File", "Default/ProjectSaveAs");
+	m_setCSTFileButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_setCSTFileButton, this, &Application::handleSetCSTFile);
+
+	m_showInformationButton = ot::ToolBarButtonCfg("Project", "Versions", "Information", "Default/Information");
+	m_showInformationButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_showInformationButton, this, &Application::handleShowInformation);
+
+	m_commitChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Commit", "Default/AddSolver");
+	m_commitChangesButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_commitChangesButton, this, &Application::handleCommitChanges);
+
+	m_getChangesButton = ot::ToolBarButtonCfg("Project", "Versions", "Checkout", "Default/ArrowGreenDown");
+	m_getChangesButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_getChangesButton, this, &Application::handleGetChanges);
 }
 
 Application::~Application()
@@ -168,13 +186,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Project", "Local Project");
 	_ui->addMenuGroup("Project", "Versions");
 
-	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
-
-	_ui->addMenuButton("Project", "Local Project", "Import", "Import", modelWrite, "Import", "Default");
-	_ui->addMenuButton("Project", "Local Project", "Set File", "Set File", modelWrite, "ProjectSaveAs", "Default");
-	_ui->addMenuButton("Project", "Versions", "Information", "Information", modelWrite, "Information", "Default");
-	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
-	_ui->addMenuButton("Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
+	_ui->addMenuButton(m_importProjectButton);
+	_ui->addMenuButton(m_setCSTFileButton);
+	_ui->addMenuButton(m_showInformationButton);
+	_ui->addMenuButton(m_commitChangesButton);
+	_ui->addMenuButton(m_getChangesButton);
 
 	modelSelectionChanged();
 
@@ -183,17 +199,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 // ##################################################################################################################################
 
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if		(action == "Project:Local Project:Import")		  importProject();
-	else if (action == "Project:Local Project:Set File")	  setCSTFile();
-	else if (action == "Project:Versions:Information")		  showInformation();
-	else if (action == "Project:Versions:Commit")			  commitChanges();
-	else if (action == "Project:Versions:Checkout")			  getChanges();
-	else assert(0); // Unhandled button action
-}
-
-void Application::importProject(void)
+void Application::handleImportProject(void)
 {
 	getModelComponent()->clearNewEntityList();
 
@@ -213,7 +219,7 @@ void Application::importProject(void)
 	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::setCSTFile(void)
+void Application::handleSetCSTFile(void)
 {
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
@@ -231,7 +237,26 @@ void Application::setCSTFile(void)
 	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::commitChanges(void)
+void Application::handleShowInformation(void) {
+	// Check whether the project has already been initialized
+	if (!isProjectInitialized()) {
+		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		return;
+	}
+
+	std::string currentVersion = ot::ModelServiceAPI::getCurrentModelVersion();
+
+	// Send the information message to the UI
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string tmp;
+	getUiComponent()->sendMessage(true, doc, tmp);
+}
+
+void Application::handleCommitChanges(void)
 {
 	getModelComponent()->clearNewEntityList();
 
@@ -251,28 +276,7 @@ void Application::commitChanges(void)
 	getUiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::showInformation(void)
-{
-	// Check whether the project has already been initialized
-	if (!isProjectInitialized())
-	{
-		getUiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
-		return;
-	}
-
-	std::string currentVersion = ot::ModelServiceAPI::getCurrentModelVersion();
-
-	// Send the information message to the UI
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string tmp;
-	getUiComponent()->sendMessage(true, doc, tmp);
-}
-
-void Application::getChanges(void)
+void Application::handleGetChanges(void)
 {
 	getModelComponent()->clearNewEntityList();
 

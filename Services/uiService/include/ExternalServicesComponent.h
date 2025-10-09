@@ -108,8 +108,7 @@ public:
 	std::list<std::string> GetAllUserProjects();
 
 	ModelUIDtype createModel(const std::string& _projectName, const std::string& _collectionName);
-	bool deleteModel(ModelUIDtype modelID);
-
+	
 	void setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID);
 	ModelUIDtype getVisualizationModel(ModelUIDtype modelID);
 	bool isModelModified(ModelUIDtype modelID);
@@ -132,7 +131,7 @@ public:
 	void propertyGridValueChanged(const ot::Property* _property);
 	void propertyGridValueDeleteRequested(const ot::Property* _property);
 
-	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
+	//void notifyButtonPressed(ModelUIDtype buttonID);
 
 	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues);
 
@@ -174,8 +173,7 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// General purpose communication
-	void InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction);
-
+	
 	ServiceDataUi* getServiceFromName(const std::string& _serviceName);
 
 	ServiceDataUi* getServiceFromNameType(const ot::BasicServiceInformation& _info);

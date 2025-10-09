@@ -9,6 +9,7 @@
 #pragma once
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 
 // std header
@@ -16,7 +17,7 @@
 
 class SubprocessManager;
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
 	static Application* instance(void);
 	static void deleteInstance(void);
@@ -58,13 +59,10 @@ public:
 
 	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
 
-	// Handler
-	void handleExecuteAction(ot::JsonDocument& _doc);
-
 	virtual void modelSelectionChanged() override;
 
-	void addSolver(void);
-	void runSolver(void);
+	void handleAddSolver(void);
+	void handleRunSolver(void);
 
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity);
@@ -77,4 +75,6 @@ public:
 
 private:
 	SubprocessManager*		m_subprocessManager;
+	ot::ToolBarButtonCfg m_addSolverButton;
+	ot::ToolBarButtonCfg m_runSolverButton;
 };

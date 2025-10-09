@@ -217,9 +217,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 	try
 	{
 		std::string returnMessage = "";
-		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
+		if (_action == OT_ACTION_CMD_ButtonPressed)
 		{
-			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_NAME);
 			assert(m_buttonCreateRMDEntry.getGroup() == m_buttonCreateMSMDEntry.getGroup() && m_buttonCreateParameterEntry.getGroup() == m_buttonCreateQuantityEntry.getGroup() && m_buttonCreateMSMDEntry.getGroup() == m_buttonCreateQuantityEntry.getGroup());
 
 			if (action == m_buttonImportTouchstone.getFullPath())
@@ -228,7 +228,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(ot::FileExtension::toFilterString({ ot::FileExtension::Touchstone, ot::FileExtension::AllFiles }), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());
 
@@ -299,75 +299,57 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 			}
 		}
-		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
-		{
-			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-			if (subsequentFunction == "importTouchstoneData")
-			{
-				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
+		else if (_action == "importTouchstoneData") {
+			std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
-				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-				int32_t numberOfPorts =  _touchstoneToResultdata->getAssumptionOfPortNumber(originalName);
-				_touchstoneToResultdata->setResultdata(originalName, fileContent, uncompressedDataLength);
-				
-				ot::JsonDocument requestNumberOfPortsDoc;
-				requestNumberOfPortsDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_OnePropertyDialog, requestNumberOfPortsDoc.GetAllocator());
-				auto serviceInfo = getBasicServiceInformation();
-				serviceInfo.addToJsonObject(requestNumberOfPortsDoc, requestNumberOfPortsDoc.GetAllocator());
-				requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("SetNumberOfPorts", requestNumberOfPortsDoc.GetAllocator()), requestNumberOfPortsDoc.GetAllocator());
+			std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
+			ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+			int32_t numberOfPorts = _touchstoneToResultdata->getAssumptionOfPortNumber(originalName);
+			_touchstoneToResultdata->setResultdata(originalName, fileContent, uncompressedDataLength);
 
-				ot::OnePropertyDialogCfg dialogCfg;
-				ot::PropertyInt* portNumberProperty= new ot::PropertyInt("Number of Ports:", numberOfPorts,ot::Property::AllowCustomValues);
-				portNumberProperty->setMin(2);
-				dialogCfg.setProperty(portNumberProperty);
-				dialogCfg.setName("Select the number of ports");
-				ot::JsonObject jConfig;
-				dialogCfg.addToJsonObject(jConfig, requestNumberOfPortsDoc.GetAllocator());
-				requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_Config, jConfig, requestNumberOfPortsDoc.GetAllocator());
+			ot::JsonDocument requestNumberOfPortsDoc;
+			requestNumberOfPortsDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_OnePropertyDialog, requestNumberOfPortsDoc.GetAllocator());
+			auto serviceInfo = getBasicServiceInformation();
+			serviceInfo.addToJsonObject(requestNumberOfPortsDoc, requestNumberOfPortsDoc.GetAllocator());
+			requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString("SetNumberOfPorts", requestNumberOfPortsDoc.GetAllocator()), requestNumberOfPortsDoc.GetAllocator());
 
-				std::string tmp;
-				this->getUiComponent()->sendMessage(true, requestNumberOfPortsDoc, tmp);
-			}
-			else if (subsequentFunction == "SetNumberOfPorts")
-			{
-				auto value = ot::json::getInt( _doc,OT_ACTION_PARAM_Value);
-				_touchstoneToResultdata->createResultdata(value);
-			}
-			else if (subsequentFunction == "CreateSelectedRangeEntity")
-			{
-				this->getUiComponent()->displayMessage("Storing table range categorisations.");
-				try
-				{
-					auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
-					std::vector<ot::TableRange> ranges;
-					ranges.reserve(listOfSerializedRanges.size());
-					for (auto range : listOfSerializedRanges)
-					{
-						ot::TableRange tableRange;
-						tableRange.setFromJsonObject(range);
-						ranges.push_back(tableRange);
-					}
-					m_parametrizedDataHandler->storeSelectionRanges(ranges);
-				}
-				catch (std::exception& _e)
-				{
-					OT_LOG_E("Failed to store selection range: " + std::string(_e.what()));
-				}
+			ot::OnePropertyDialogCfg dialogCfg;
+			ot::PropertyInt* portNumberProperty = new ot::PropertyInt("Number of Ports:", numberOfPorts, ot::Property::AllowCustomValues);
+			portNumberProperty->setMin(2);
+			dialogCfg.setProperty(portNumberProperty);
+			dialogCfg.setName("Select the number of ports");
+			ot::JsonObject jConfig;
+			dialogCfg.addToJsonObject(jConfig, requestNumberOfPortsDoc.GetAllocator());
+			requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_Config, jConfig, requestNumberOfPortsDoc.GetAllocator());
 
-				if (m_twoPartsAction != nullptr)
-				{
-					delete m_twoPartsAction;
-					m_twoPartsAction = nullptr;
-				}
-			}
-			else
-			{
-				OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
-			}
+			std::string tmp;
+			this->getUiComponent()->sendMessage(true, requestNumberOfPortsDoc, tmp);
 		}
-		else {
-			OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
+		else if (_action == "SetNumberOfPorts") {
+			auto value = ot::json::getInt(_doc, OT_ACTION_PARAM_Value);
+			_touchstoneToResultdata->createResultdata(value);
+		}
+		else if (_action == "CreateSelectedRangeEntity") {
+			this->getUiComponent()->displayMessage("Storing table range categorisations.");
+			try {
+				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
+				std::vector<ot::TableRange> ranges;
+				ranges.reserve(listOfSerializedRanges.size());
+				for (auto range : listOfSerializedRanges) {
+					ot::TableRange tableRange;
+					tableRange.setFromJsonObject(range);
+					ranges.push_back(tableRange);
+				}
+				m_parametrizedDataHandler->storeSelectionRanges(ranges);
+			}
+			catch (std::exception& _e) {
+				OT_LOG_E("Failed to store selection range: " + std::string(_e.what()));
+			}
+
+			if (m_twoPartsAction != nullptr) {
+				delete m_twoPartsAction;
+				m_twoPartsAction = nullptr;
+			}
 		}
 
 		if (returnMessage != "")

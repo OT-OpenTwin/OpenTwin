@@ -9,6 +9,7 @@
 #pragma once
 
 // Open twin header
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 
@@ -30,7 +31,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
@@ -49,9 +50,6 @@ public:
 
 	// ##################################################################################################################################
 
-	void handleExecuteModelAction(ot::JsonDocument& _document);
-	void handleExecuteFunction(ot::JsonDocument& _document);
-
 	// Add your custom functions/ members here
 	virtual void modelSelectionChanged() override;
 
@@ -59,6 +57,9 @@ public:
 	void updateMesh(void);
 	void exportMesh(void);
 	void importMesh(void);
+
+	void handleImportMesh(ot::JsonDocument& _doc);
+	void handleExportMesh(ot::JsonDocument& _doc);
 
 	void mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityMeshTet *> mesherMap);
 	void runSingleMesher(ot::EntityInformation &mesher, EntityMeshTet *meshEntity);

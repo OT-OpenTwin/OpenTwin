@@ -104,7 +104,7 @@ void CommunicationHandler::processNextEvent(void) {
 bool CommunicationHandler::sendServiceInfoToClient(void) {
 	if (!m_serviceAndSessionInfoSet) {
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYRIT, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
@@ -131,7 +131,7 @@ bool CommunicationHandler::sendServiceInfoToClient(void) {
 bool CommunicationHandler::sendModelConfigToClient(void) {
 	if (!m_modelUrl.empty() && !m_modelUrlSet) {
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_modelUrl, doc.GetAllocator()), doc.GetAllocator());
 
@@ -153,7 +153,7 @@ bool CommunicationHandler::sendModelConfigToClient(void) {
 bool CommunicationHandler::sendFrontendConfigToClient(void) {
 	if (!m_frontendUrl.empty() && !m_frontendUrlSet) {
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_frontendUrl, doc.GetAllocator()), doc.GetAllocator());
 
@@ -175,7 +175,7 @@ bool CommunicationHandler::sendFrontendConfigToClient(void) {
 bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 	if (m_databaseInfo.hasInfoSet() && !m_databaseInfoSet) {
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_DataBase, doc.GetAllocator()), doc.GetAllocator());
 
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(m_databaseInfo.getDataBaseUrl(), doc.GetAllocator()), doc.GetAllocator());
@@ -350,7 +350,7 @@ void CommunicationHandler::slotNewConnection(void) {
 	this->connect(m_client, &QLocalSocket::disconnected, this, &CommunicationHandler::slotClientDisconnected);
 
 	ot::JsonDocument pingDoc;
-	pingDoc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
 	m_client->write(QByteArray::fromStdString(pingDoc.toJson()));
 	m_client->flush();
 }

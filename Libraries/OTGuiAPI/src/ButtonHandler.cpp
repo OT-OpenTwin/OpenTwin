@@ -12,7 +12,7 @@
 #include "OTGuiAPI/ButtonHandler.h"
 
 ot::ButtonHandler::ButtonHandler() {
-	if (!m_actionHandler.connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &ButtonHandler::handleToolBarButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
+	if (!m_actionHandler.connectAction(OT_ACTION_CMD_ButtonPressed, this, &ButtonHandler::handleToolBarButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
 		OT_LOG_EA("Failed to register button click handler");
 	}
 }
@@ -33,11 +33,11 @@ bool ot::ButtonHandler::disconnectToolBarButton(const std::string& _buttonKey) {
 }
 
 void ot::ButtonHandler::toolBarButtonClicked(const std::string& _buttonKey) {
-	OT_LOG_W("Unhandled tool bar button click event { \"ButtonKey\": \"" + _buttonKey + "\" }");
+	
 }
 
 void ot::ButtonHandler::handleToolBarButtonClicked(JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
+	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	
 	auto it = m_callbacks.find(action);
 	if (it != m_callbacks.end()) {

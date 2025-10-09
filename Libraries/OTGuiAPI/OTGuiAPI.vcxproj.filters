@@ -45,6 +45,12 @@
     <ClInclude Include="include\OTGuiAPI\ButtonHandler.h">
       <Filter>Header Files\CommunicationAPIs</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\LineEditHandler.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\CheckBoxHandler.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -63,6 +69,12 @@
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
     <ClCompile Include="src\ButtonHandler.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineEditHandler.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CheckBoxHandler.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
   </ItemGroup>

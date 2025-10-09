@@ -27,7 +27,7 @@ void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle,
 	inDoc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, false, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, rapidjson::Value(dialogTitle.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, rapidjson::Value(fileMask.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_CallbackAction, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_SITE_ID, siteID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;

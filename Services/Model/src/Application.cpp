@@ -38,17 +38,6 @@ Application* Application::instance() {
 
 // Action handler
 
-std::string Application::handleDeleteModel(ot::JsonDocument& _document) {
-	if (m_model)
-	{
-		delete m_model;
-		m_model = nullptr;
-		OT_LOG_D("Model deleted");
-	}
-	
-	return "";
-}
-
 std::string Application::handleProjectSave(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -160,7 +149,7 @@ std::string Application::handleGenerateEntityIDs(ot::JsonDocument& _document) {
 	return newDoc.toJson();
 }
 
-std::string Application::handleImportTableFile(ot::JsonDocument& _document) {
+std::string Application::handleRequestImportTableFile(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
 		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
@@ -168,7 +157,7 @@ std::string Application::handleImportTableFile(ot::JsonDocument& _document) {
 
 	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	m_model->importTableFile(itemName);
+	m_model->requestImportTableFile(itemName);
 
 	return "";
 }
@@ -683,82 +672,6 @@ std::string Application::handleDeleteProperty(ot::JsonDocument& _document) {
 	return "";
 }
 
-std::string Application::handleExecuteAction(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	bool alreadyHandled = m_baseHandler.tryToHandleAction(action, _document);
-	if (!alreadyHandled)
-	{
-		m_model->executeAction(action, _document);
-	}
-
-	return "";
-}
-
-std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	bool alreadyHandled = m_baseHandler.tryToHandleAction(function, _document);
-	if (!alreadyHandled)
-	{
-		std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
-
-		if (mode == OT_ACTION_VALUE_FILE_Mode_Name)
-		{
-			std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Name);
-			m_model->executeFunction(function, fileName, false);
-		}
-		else if (mode == OT_ACTION_VALUE_FILE_Mode_Content)
-		{
-			std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
-			unsigned long long uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-
-			// Create a tmp file from uncompressing the data
-			// Decode the encoded string into binary data
-			int decoded_compressed_data_length = Base64decode_len(content.c_str());
-			char* decodedCompressedString = new char[decoded_compressed_data_length];
-
-			Base64decode(decodedCompressedString, content.c_str());
-
-			// Decompress the data
-			char* decodedString = new char[uncompressedDataLength];
-			uLongf destLen = (uLongf)uncompressedDataLength;
-			uLong  sourceLen = decoded_compressed_data_length;
-			uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
-
-			delete[] decodedCompressedString;
-			decodedCompressedString = nullptr;
-
-			// Store the data in a temporary file
-			std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
-
-			std::ofstream file(tmpFileName, std::ios::binary);
-			file.write(decodedString, uncompressedDataLength);
-			file.close();
-
-			delete[] decodedString;
-			decodedString = nullptr;
-
-			// Process the file content
-			m_model->executeFunction(function, tmpFileName, true);
-		}
-		else
-		{
-			OT_LOG_E("Unknown mode");
-		}
-	}
-
-	return "";
-}
-
 std::string Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -819,11 +732,10 @@ std::string Application::handleGetEntityIdentifier(ot::JsonDocument& _document) 
 		requestedVersions.push_back(m_model->createEntityUID());
 	}
 	const std::string& requestingService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	const std::string& subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	const std::string& subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 
 	ot::JsonDocument replyDoc;
-	replyDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, replyDoc.GetAllocator()), replyDoc.GetAllocator());
-	replyDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, replyDoc.GetAllocator()), replyDoc.GetAllocator());
+	replyDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, replyDoc.GetAllocator()), replyDoc.GetAllocator());
 	replyDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(requestedUIDs, replyDoc.GetAllocator()), replyDoc.GetAllocator());
 	replyDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(requestedVersions, replyDoc.GetAllocator()), replyDoc.GetAllocator());
 
@@ -1024,6 +936,31 @@ std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) 
 	return "";
 }
 
+std::string Application::handleImportTableFile(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No model created yet");
+	}
+
+	std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
+
+	if (mode == OT_ACTION_VALUE_FILE_Mode_Name) {
+		std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Name);
+		m_model->importTableFile(fileName, false);
+	}
+	else if (mode == OT_ACTION_VALUE_FILE_Mode_Content) {
+		std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
+		unsigned long long uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+
+		const std::string tmpFileName = this->storeTemporaryFile(content, uncompressedDataLength);
+
+		// Process the file content
+		m_model->importTableFile(tmpFileName, true);
+	}
+
+	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+}
+
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -1112,7 +1049,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 		return;
 	}
 	
-	m_model->uiIsAvailable();
+	m_model->uiIsAvailable(_ui);
 }
 
 void Application::preShutdown() {
@@ -1125,9 +1062,6 @@ void Application::preShutdown() {
 
 	// Here we disconnect all viewers, but leave them alone
 	m_model->detachAllViewer();
-
-	// Disable the UI clear since the UI will clear all controls anyway
-	m_model->setClearUiOnDelete(false);
 
 	delete m_model;
 	m_model = nullptr;
@@ -1146,13 +1080,43 @@ void Application::shuttingDown() {
 void Application::addButtons()
 {
 	const std::string pageName = "Model";
-	m_fileHandler.addButtons(getUiComponent(), pageName);
+	m_fileHandler.addButtons(getUiComponent());
 	
-	m_plotHandler.addButtons(getUiComponent(), pageName);
+	m_plotHandler.addButtons(getUiComponent());
 	m_selectionHandler.subscribe(&m_plotHandler);
 
-	m_materialHandler.addButtons(getUiComponent(), pageName);
+	m_materialHandler.addButtons(getUiComponent());
 	m_selectionHandler.subscribe(&m_materialHandler);
+}
+
+std::string Application::storeTemporaryFile(const std::string& _content, uint64_t _uncompressedDataLength) {
+	// Create a tmp file from uncompressing the data
+		// Decode the encoded string into binary data
+	int decoded_compressed_data_length = Base64decode_len(_content.c_str());
+	char* decodedCompressedString = new char[decoded_compressed_data_length];
+
+	Base64decode(decodedCompressedString, _content.c_str());
+
+	// Decompress the data
+	char* decodedString = new char[_uncompressedDataLength];
+	uLongf destLen = (uLongf)_uncompressedDataLength;
+	uLong  sourceLen = decoded_compressed_data_length;
+	uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
+
+	delete[] decodedCompressedString;
+	decodedCompressedString = nullptr;
+
+	// Store the data in a temporary file
+	std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
+
+	std::ofstream file(tmpFileName, std::ios::binary);
+	file.write(decodedString, _uncompressedDataLength);
+	file.close();
+
+	delete[] decodedString;
+	decodedString = nullptr;
+
+	return tmpFileName;
 }
 
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
@@ -1260,21 +1224,6 @@ Application::Application()
 
 	std::thread asyncActionThread(&Application::asyncActionWorker, this);
 	asyncActionThread.detach();
-	m_fileHandler.setDontDeleteHandler();
-	m_baseHandler.setNextHandler(&m_fileHandler);
-
-	m_materialHandler.setDontDeleteHandler();
-	m_fileHandler.setNextHandler(&m_materialHandler);
-
-	m_plotHandler.setDontDeleteHandler();
-	m_materialHandler.setNextHandler(&m_plotHandler);
-
-	m_blockHandler.setDontDeleteHandler();
-	m_plotHandler.setNextHandler(&m_blockHandler);
-
-
-
-
 }
 
 Application::~Application() {

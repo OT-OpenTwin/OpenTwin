@@ -60,7 +60,7 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	connectAction(OT_ACTION_CMD_MODEL_ExecuteAction, this, &Application::handleExecuteModelAction);
+
 }
 
 Application::~Application()
@@ -127,22 +127,18 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Project", "Versions", "Commit", "Commit", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("Project", "Versions", "Checkout", "Checkout", modelWrite, "ArrowGreenDown", "Default");
 
+	connectToolBarButton("Project:Local Project:Import", this, &Application::importProject);
+	connectToolBarButton("Project:Local Project:Set File", this, &Application::setLTSpiceFile);
+	connectToolBarButton("Project:Versions:Information", this, &Application::showInformation);
+	connectToolBarButton("Project:Versions:Commit", this, &Application::commitChanges);
+	connectToolBarButton("Project:Versions:Checkout", this, &Application::getChanges);
+
 	modelSelectionChanged();
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 // ##################################################################################################################################
-
-void Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if		(action == "Project:Local Project:Import")		  importProject();
-	else if (action == "Project:Local Project:Set File")	  setLTSpiceFile();
-	else if (action == "Project:Versions:Information")		  showInformation();
-	else if (action == "Project:Versions:Commit")			  commitChanges();
-	else if (action == "Project:Versions:Checkout")			  getChanges();
-	else assert(0); // Unhandled button action
-}
 
 void Application::modelSelectionChanged()
 {

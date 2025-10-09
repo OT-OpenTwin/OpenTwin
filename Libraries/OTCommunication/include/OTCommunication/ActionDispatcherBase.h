@@ -115,6 +115,7 @@ namespace ot {
 		std::mutex m_mutex;
 		MessageTypeFlags m_defaultMessageType;
 		std::map<std::string, std::list<ActionHandleConnector*>> m_data;
+		std::list<ActionHandleConnector*> m_currentConnectors;
 	};
 
 }

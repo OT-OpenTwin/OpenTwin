@@ -444,7 +444,7 @@ void ot::components::UiComponent::setCheckboxValues(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetCheckboxValues, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_controlName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, _checkedState, cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _checkedState, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;

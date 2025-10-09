@@ -20,19 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGuiAPI\ButtonHandler.h" />
+    <ClInclude Include="include\OTGuiAPI\CheckBoxHandler.h" />
     <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h" />
     <ClInclude Include="include\OTGuiAPI\Frontend.h" />
     <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h" />
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h" />
+    <ClInclude Include="include\OTGuiAPI\LineEditHandler.h" />
     <ClInclude Include="include\OTGuiAPI\OTGuiAPIAPIExport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ButtonHandler.cpp" />
+    <ClCompile Include="src\CheckBoxHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FrontendActionHandler.cpp" />
     <ClCompile Include="src\Frontend.cpp" />
     <ClCompile Include="src\GraphicsFlowItem.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />
+    <ClCompile Include="src\LineEditHandler.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

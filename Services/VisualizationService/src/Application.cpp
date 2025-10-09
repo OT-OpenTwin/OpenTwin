@@ -54,21 +54,6 @@ Application::~Application()
 
 // Required functions
 
-std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
-{
-	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-	{
-		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-	
-		assert(0); // Unhandled button action
-	}
-	else {
-		return OT_ACTION_RETURN_UnknownAction;
-	}
-
-	return "";
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	//enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);

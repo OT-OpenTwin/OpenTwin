@@ -23,7 +23,7 @@ ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 	
 	ot::ReturnMessage returnMessage;
 
-	std::string action = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_ActionName);
+	std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
 	if (m_handlingFunctions.find(action) != m_handlingFunctions.end()) {
 		auto& checkParameter = m_checkParameterFunctions[action];
 		auto checkResult = checkParameter(doc);

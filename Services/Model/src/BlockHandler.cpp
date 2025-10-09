@@ -2,19 +2,25 @@
 #include <stdafx.h>
 
 // Service header
-#include "BlockHandler.h"
 #include "Model.h"
 #include "Application.h"
 #include "EntityBlock.h"
+#include "BlockHandler.h"
 
 // OpenTwin header
-#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTCore/LogDispatcher.h"
+#include "OTGui/GraphicsConnectionCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTCommunication/ActionTypes.h"
 
-void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
+BlockHandler::BlockHandler() {
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, this, &BlockHandler::handleItemChanged, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &BlockHandler::handleConnectionChanged, ot::SECURE_MESSAGE_TYPES);
+}
+
+void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_doc, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
 	if (!itemConfig) {
@@ -134,18 +140,13 @@ void BlockHandler::updateBlock(ot::JsonDocument& _doc) {
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated");
 	}
-
-	int x = 10;
 }
 
-bool BlockHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc) {
-	bool actionIsHandled = false;
+void BlockHandler::handleConnectionChanged(ot::JsonDocument& _doc) {
+	ot::GraphicsConnectionCfg connection;
+	connection.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
+	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 
-	if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged) {
-		
-		updateBlock(_doc);
-		actionIsHandled = true;
-	}
-	
-	return actionIsHandled;
+
+
 }

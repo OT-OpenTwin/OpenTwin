@@ -451,37 +451,6 @@ ModelUIDtype ExternalServicesComponent::createModel(
 	return 0;
 }
 
-bool ExternalServicesComponent::deleteModel(ModelUIDtype modelID)
-{
-	try {
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_Delete, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(modelID), inDoc.GetAllocator());
-		std::string response;
-		try {
-			for (auto reciever : m_modelViewNotifier) {
-				sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
-				// Check if response is an error or warning
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					assert(0); // ERROR
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response) {
-					assert(0); // WARNING
-				}
-			}
-			return true;
-		}
-		catch (std::out_of_range)
-		{
-			return false;
-		}
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS("Failed to delete model: " + std::string(_e.what()));
-		return false;
-	}
-}
-
 void ExternalServicesComponent::setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID)
 {
 	OT_LOG_EAS("NOT IN USE ANYMORE");
@@ -583,38 +552,40 @@ bool ExternalServicesComponent::isCurrentModelModified(void) {
 
 void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, int _info1, int _info2) {
 	try {
-
-		if (_event & (ak::etClicked | ak::etEditingFinished))
-		{
+		if (_event & (ak::etClicked | ak::etEditingFinished)) {
 			auto receiver = this->getServiceFromNameType(m_controlsManager->objectCreator(_senderId));
-			
-			if (receiver != nullptr) {
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(_senderId).toStdString(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, AppBase::instance()->getViewerComponent()->getActiveDataModel(), doc.GetAllocator());
-				std::string response;
-
-				if (_event & ak::etEditingFinished)
-				{
-					std::string editText = ak::uiAPI::niceLineEdit::text(_senderId).toStdString();
-					doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
-				}
-
-				if (!sendRelayedRequest(EXECUTE, receiver->getServiceURL(), doc.toJson(), response)) {
-					assert(0); // Failed to send HTTP request
-				}
-				// Check if response is an error or warning
-				OT_ACTION_IF_RESPONSE_ERROR(response) {
-					assert(0); // ERROR
-					AppBase::instance()->showErrorPrompt("Notification failed due to error response.", response, "Error");
-				}
-				else OT_ACTION_IF_RESPONSE_WARNING(response) {
-					assert(0); // WARNING
-					AppBase::instance()->showWarningPrompt("Notification failed due to warning response", response, "Warning");
-				}
+			if (!receiver) {
+				OT_LOG_EAS("Could not find service for object (" + std::to_string(_senderId) + ")");
+				return;
 			}
-			else { executeAction(AppBase::instance()->getViewerComponent()->getActiveDataModel(), _senderId); }
+
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(_senderId).toStdString(), doc.GetAllocator()), doc.GetAllocator());
+
+			if (_event & ak::etClicked) {				
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ButtonPressed, doc.GetAllocator()), doc.GetAllocator());	
+			}
+			else if (_event & ak::etEditingFinished) {
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LineEditChanged, doc.GetAllocator()), doc.GetAllocator());
+				
+				std::string editText = ak::uiAPI::niceLineEdit::text(_senderId).toStdString();
+				doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, doc.GetAllocator()), doc.GetAllocator());
+			}
+
+			std::string response;
+
+			if (!sendRelayedRequest(EXECUTE, receiver->getServiceURL(), doc.toJson(), response)) {
+				assert(0); // Failed to send HTTP request
+			}
+			// Check if response is an error or warning
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				assert(0); // ERROR
+				AppBase::instance()->showErrorPrompt("Notification failed due to error response.", response, "Error");
+			}
+			else OT_ACTION_IF_RESPONSE_WARNING(response) {
+				assert(0); // WARNING
+				AppBase::instance()->showWarningPrompt("Notification failed due to warning response", response, "Warning");
+			}
 		}
 	}
 	catch (const std::exception& _e) {
@@ -828,13 +799,13 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 	}
 }
 
-void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype buttonID)
+/*
+void ExternalServicesComponent::notifyButtonPressed(ModelUIDtype buttonID)
 {
 	try {
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(buttonID).toStdString(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ButtonPressed, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(ak::uiAPI::object::getObjectUniqueName(buttonID).toStdString(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
@@ -847,13 +818,12 @@ void ExternalServicesComponent::executeAction(ModelUIDtype modelID, ModelUIDtype
 				OT_LOG_EAS("Warning response: " + response);
 			}
 		}
-
-
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());
 	}
 }
+*/
 
 void ExternalServicesComponent::prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs)
 {
@@ -1608,23 +1578,6 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 // Slots
 
-void ExternalServicesComponent::InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_RETURN_VALUE_TRUE, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	sendRelayedRequest(EXECUTE, URL, doc, response);
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		assert(0); // ERROR
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) 
-	{
-		assert(0); // WARNING
-	}
-}
-
 void ExternalServicesComponent::queueAction(const std::string& _json, const std::string& _senderIP) {
 	using namespace std::chrono_literals;
 	static std::atomic_bool lock = false;
@@ -2109,7 +2062,7 @@ void ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _d
 	ImportFileWorkerData data;
 	data.fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 
-	data.subsequentFunctionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	data.subsequentFunctionName = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 	data.receiverUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 
 	data.loadContent = false;
@@ -2187,7 +2140,7 @@ void ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _documen
 void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _document) {
 	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
 	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 
 	QString fileName = QFileDialog::getSaveFileName(
@@ -2199,9 +2152,8 @@ void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _d
 	if (fileName != "")
 	{
 		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(fileName.toStdString(), inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		std::string response;
@@ -3888,7 +3840,7 @@ void ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _docum
 	// Get parameters
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 
 	// Get table
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
@@ -3919,7 +3871,7 @@ void ExternalServicesComponent::handleSetCurrentTableSelectionBackground(ot::Jso
 	}
 	if (callback) {
 		callbackUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-		callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+		callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 	}
 
 	// Optional parameters
@@ -4006,7 +3958,7 @@ void ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument& _docum
 	info.setFromJsonObject(_document.getConstObject());
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
-	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 	ot::OnePropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
@@ -4015,8 +3967,7 @@ void ExternalServicesComponent::handleOnePropertyDialog(ot::JsonDocument& _docum
 
 	if (dia.dialogResult() == ot::Dialog::Ok) {
 		ot::JsonDocument responseDoc;
-		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-		responseDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 		dia.addPropertyInputValueToJson(responseDoc, OT_ACTION_PARAM_Value, responseDoc.GetAllocator());
 
 		std::string response;
@@ -4199,8 +4150,7 @@ void ExternalServicesComponent::determineViews(const std::string& _modelServiceU
 
 void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table) {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
 	if (_table != nullptr)
 	{
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
@@ -4260,8 +4210,7 @@ void ExternalServicesComponent::actionDispatchTimeout(const std::string& _json) 
 void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, ImportFileWorkerData _info) {
 	try {
 		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		if (_info.loadContent) {
@@ -4295,8 +4244,7 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info) {
 	try {
 		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
+		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_info.subsequentFunctionName, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString(_info.fileMask, inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;

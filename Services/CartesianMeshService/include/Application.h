@@ -10,6 +10,7 @@
 
 // Open twin header
 #include "OTCore/CoreTypes.h"					// open twins rapid json layer
+#include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OldTreeIcon.h"
 #include "EntityInformation.h"
@@ -29,7 +30,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ActionHandler {
+class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 	OT_DECL_NOCOPY(Application)
 public:
 	static Application * instance(void);
@@ -50,8 +51,6 @@ public:
 	virtual void modelSelectionChanged() override;
 
 	// ##################################################################################################################################
-
-	void handleExecuteModelAction(ot::JsonDocument& _document);
 
 	// Add your custom functions/ members here
 	void createMesh(void);
