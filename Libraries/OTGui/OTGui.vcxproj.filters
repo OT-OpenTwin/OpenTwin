@@ -290,10 +290,7 @@
     <ClInclude Include="include\OTGui\BasicGraphicsIntersectionItem.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsPickerItemInformation.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\GraphicsPickerCollectionManager.h">
+    <ClInclude Include="include\OTGui\GraphicsPickerItemInfo.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\TextEditorCfg.h">
@@ -664,10 +661,7 @@
     <ClCompile Include="src\BasicGraphicsIntersectionItem.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsPickerItemInformation.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsPickerCollectionManager.cpp">
+    <ClCompile Include="src\GraphicsPickerItemInfo.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\TextEditorCfg.cpp">

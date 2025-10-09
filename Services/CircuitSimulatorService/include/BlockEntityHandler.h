@@ -46,7 +46,7 @@ private:
 	const std::string m_connectionsFolder = "Connections";
 
 	std::string InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
-	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
+	ot::GraphicsPickerCollectionPackage BuildUpBlockPicker();
 };
 
 

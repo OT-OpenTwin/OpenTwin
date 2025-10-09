@@ -987,6 +987,8 @@ void AppBase::createUi(void) {
 			//m_graphicsPicker->getGraphicsPicker()->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			//m_graphicsPicker->getGraphicsPicker()->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
+			m_graphicsPickerManager.setPicker(m_graphicsPicker->getGraphicsPicker());
+
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
 
@@ -1865,14 +1867,10 @@ void AppBase::lockPropertyGrid(bool flag)
 }
 
 void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo) {
-	if (_pckg.collections().empty()) {
+	if (_pckg.getCollections().empty()) {
 		return;
 	}
-	m_graphicsPickerManager.addCollections(_pckg.collections(), _serviceInfo);
-	if (_serviceInfo == m_graphicsPickerManager.getCurrentOwner()) {
-		// Update picker since its active
-		this->fillGraphicsPicker(_serviceInfo);
-	}
+	m_graphicsPickerManager.addCollections(_pckg.getCollections(), _serviceInfo);
 }
 
 ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
@@ -1912,9 +1910,7 @@ void AppBase::clearPropertyGrid(void) {
 // Graphics
 
 void AppBase::clearGraphicsPickerData(void) {
-	m_graphicsPicker->getGraphicsPicker()->clear();
 	m_graphicsPickerManager.clear();
-	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
 ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
@@ -2809,17 +2805,18 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 		m_navigationManager.slotViewSelected();
 
-		// Update graphics picker content
-		ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
-		if (graphicsView) {
-			ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
-			if (owner != m_graphicsPickerManager.getCurrentOwner()) {
-				this->fillGraphicsPicker(owner);
-			}
-		}
-
 		// Forward focus events of central views to the viewer component
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+			// Update graphics picker content
+			ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
+			if (graphicsView) {
+				ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
+				m_graphicsPickerManager.setCurrentOwner(owner);
+			}
+			else {
+				m_graphicsPickerManager.clearPicker();
+			}
+
 			if (m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)) {
 				// Skip entity selection if configured
 				OT_SLECTION_TEST_LOG("+ View focus changed: Skipping entity selection");
@@ -3569,20 +3566,6 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 
 	OT_SLECTION_TEST_LOG(">> Plot curve double clicked completed. Running selection handling");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
-}
-
-void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
-	this->clearGraphicsPicker();
-
-	m_graphicsPicker->getGraphicsPicker()->setOwner(_serviceInfo);
-	m_graphicsPicker->getGraphicsPicker()->add(m_graphicsPickerManager.getCollections(_serviceInfo));
-	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
-}
-
-void AppBase::clearGraphicsPicker(void) {
-	m_graphicsPicker->getGraphicsPicker()->clear();
-	m_graphicsPicker->getGraphicsPicker()->setOwner(ot::BasicServiceInformation());
-	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
 void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {

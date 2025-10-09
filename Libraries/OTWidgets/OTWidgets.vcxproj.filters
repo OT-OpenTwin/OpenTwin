@@ -565,6 +565,9 @@
     <ClCompile Include="src\GraphicsDisconnectItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsPickerManager.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1065,6 +1068,9 @@
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsDisconnectItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsPickerManager.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

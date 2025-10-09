@@ -21,45 +21,31 @@ ot::GraphicsPickerCollectionPackage::GraphicsPickerCollectionPackage() {
 
 }
 
-ot::GraphicsPickerCollectionPackage::~GraphicsPickerCollectionPackage() {
-	this->memFree();
+ot::GraphicsPickerCollectionPackage::~GraphicsPickerCollectionPackage() {}
+
+void ot::GraphicsPickerCollectionPackage::addCollection(const GraphicsPickerCollectionCfg& _collection) {
+	m_collections.push_back(_collection);
 }
 
-void ot::GraphicsPickerCollectionPackage::addCollection(GraphicsPickerCollectionCfg* _collection) {
-	m_collections.push_back(_collection);
+void ot::GraphicsPickerCollectionPackage::addCollection(GraphicsPickerCollectionCfg&& _collection) {
+	m_collections.push_back(std::move(_collection));
 }
 
 void ot::GraphicsPickerCollectionPackage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	JsonArray collectionArr;
 	for (auto c : m_collections) {
-		JsonObject collectionObj;
-		c->addToJsonObject(collectionObj, _allocator);
-		collectionArr.PushBack(collectionObj, _allocator);
+		collectionArr.PushBack(JsonObject(c, _allocator), _allocator);
 	}
 	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
 }
 
 void ot::GraphicsPickerCollectionPackage::setFromJsonObject(const ConstJsonObject& _object) {
-	this->memFree();
-
 	std::list<ConstJsonObject> collectionArr = json::getObjectList(_object, OT_JSON_Member_Collections);
-	for (auto c : collectionArr) {
-		GraphicsPickerCollectionCfg* newCollection = new GraphicsPickerCollectionCfg;
-		try {
-			newCollection->setFromJsonObject(c);
-			m_collections.push_back(newCollection);
-		}
-		catch (const std::exception& _e) {
-			OT_LOG_E(_e.what());
-			this->memFree();
-			throw _e;
-		}
+	for (const ConstJsonObject& c : collectionArr) {
+		GraphicsPickerCollectionCfg newCollection;
+		newCollection.setFromJsonObject(c);
+		m_collections.push_back(std::move(newCollection));
 	}
-}
-
-void ot::GraphicsPickerCollectionPackage::memFree(void) {
-	for (auto c : m_collections) delete c;
-	m_collections.clear();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

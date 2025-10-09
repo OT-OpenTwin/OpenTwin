@@ -7,7 +7,6 @@
 
 #include "Connector.h"
 
-#include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsFlowItemBuilder.h"
 #include "OTGui/GraphicsItemCfg.h"

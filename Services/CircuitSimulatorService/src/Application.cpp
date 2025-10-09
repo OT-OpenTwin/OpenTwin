@@ -20,7 +20,6 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionDispatcher.h"
-#include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/GraphicsFlowItemBuilder.h"

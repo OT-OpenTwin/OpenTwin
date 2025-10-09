@@ -1,4 +1,4 @@
-//! \file GraphicsPickerItemInformation.cpp
+//! \file GraphicsPickerItemInfo.cpp
 //! \author Alexander Kuester (alexk95)
 //! \date August 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,23 +6,23 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/GraphicsPickerItemInformation.h"
+#include "OTGui/GraphicsPickerItemInfo.h"
 
-ot::GraphicsPickerItemInformation::GraphicsPickerItemInformation() {
+ot::GraphicsPickerItemInfo::GraphicsPickerItemInfo() {
 
 }
 
-ot::GraphicsPickerItemInformation::GraphicsPickerItemInformation(const std::string& _name, const std::string& _title, const std::string& _previewIcon) 
+ot::GraphicsPickerItemInfo::GraphicsPickerItemInfo(const std::string& _name, const std::string& _title, const std::string& _previewIcon) 
 	: m_name(_name), m_title(_title), m_previewIcon(_previewIcon)
 {}
 
-ot::GraphicsPickerItemInformation::GraphicsPickerItemInformation(const GraphicsPickerItemInformation& _other) {
+ot::GraphicsPickerItemInfo::GraphicsPickerItemInfo(const GraphicsPickerItemInfo& _other) {
 	*this = _other;
 }
 
-ot::GraphicsPickerItemInformation::~GraphicsPickerItemInformation() {}
+ot::GraphicsPickerItemInfo::~GraphicsPickerItemInfo() {}
 
-ot::GraphicsPickerItemInformation& ot::GraphicsPickerItemInformation::operator = (const GraphicsPickerItemInformation& _other) {
+ot::GraphicsPickerItemInfo& ot::GraphicsPickerItemInfo::operator = (const GraphicsPickerItemInfo& _other) {
 	if (this == &_other) return *this;
 
 	m_name = _other.m_name;
@@ -32,13 +32,13 @@ ot::GraphicsPickerItemInformation& ot::GraphicsPickerItemInformation::operator =
 	return *this;
 }
 
-void ot::GraphicsPickerItemInformation::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+void ot::GraphicsPickerItemInfo::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("PreviewIcon", JsonString(m_previewIcon, _allocator), _allocator);
 }
 
-void ot::GraphicsPickerItemInformation::setFromJsonObject(const ConstJsonObject& _object) {
+void ot::GraphicsPickerItemInfo::setFromJsonObject(const ConstJsonObject& _object) {
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
 	m_previewIcon = json::getString(_object, "PreviewIcon");

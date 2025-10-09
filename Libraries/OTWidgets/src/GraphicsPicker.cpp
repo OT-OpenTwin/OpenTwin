@@ -3,25 +3,30 @@
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// OpenTwin header
+// OpenTwin Core header
 #include "OTCore/LogDispatcher.h"
+
+// OpenTwin Gui header
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
+
+// OpenTwin Widgets header
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/GraphicsItemPreview.h"
 
 // Qt header
-#include <QtWidgets/qsplitter.h>
-#include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlabel.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qsplitter.h>
 
 // std header
 #include <string>
@@ -58,11 +63,11 @@ ot::GraphicsPicker::~GraphicsPicker() {
 	m_splitter = nullptr;
 }
 
-QWidget* ot::GraphicsPicker::getQWidget(void) {
+QWidget* ot::GraphicsPicker::getQWidget() {
 	return m_splitter;
 }
 
-const QWidget* ot::GraphicsPicker::getQWidget(void) const {
+const QWidget* ot::GraphicsPicker::getQWidget() const {
 	return m_splitter;
 }
 
@@ -80,23 +85,23 @@ void ot::GraphicsPicker::setOrientation(Qt::Orientation _orientation) {
 	m_splitter->setOrientation(_orientation);
 }
 
-Qt::Orientation ot::GraphicsPicker::orientation(void) const {
+Qt::Orientation ot::GraphicsPicker::orientation() const {
 	return m_splitter->orientation();
 }
 
 void ot::GraphicsPicker::add(const ot::GraphicsPickerCollectionPackage& _pckg) {
-	this->addCollections(_pckg.collections(), nullptr);
+	this->addCollections(_pckg.getCollections(), nullptr);
 }
 
-void ot::GraphicsPicker::add(ot::GraphicsPickerCollectionCfg* _topLevelCollection) {
+void ot::GraphicsPicker::add(const ot::GraphicsPickerCollectionCfg& _topLevelCollection) {
 	this->addCollection(_topLevelCollection, nullptr);
 }
 
-void ot::GraphicsPicker::add(const std::list<ot::GraphicsPickerCollectionCfg*>& _topLevelCollections) {
+void ot::GraphicsPicker::add(const std::list<ot::GraphicsPickerCollectionCfg>& _topLevelCollections) {
 	this->addCollections(_topLevelCollections, nullptr);
 }
 
-void ot::GraphicsPicker::clear(void) {
+void ot::GraphicsPicker::clear() {
 	for (auto v : m_previews) {
 		m_viewLayout->removeWidget(v.layoutWidget);
 		delete v.label;
@@ -112,11 +117,32 @@ void ot::GraphicsPicker::clear(void) {
 	m_navigation->getTreeWidget()->clear();
 }
 
+ot::GraphicsPicker::PickerState ot::GraphicsPicker::getCurrentState() const {
+	PickerState state;
+	for (int i = 0; i < m_navigation->getTreeWidget()->topLevelItemCount(); i++) {
+		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(m_navigation->getTreeWidget()->topLevelItem(i));
+		OTAssertNullptr(itm);
+		this->getCurrentState(state, itm);
+	}
+	return state;
+}
+
+void ot::GraphicsPicker::applyState(const PickerState& _state) {
+	QSignalBlocker block(m_navigation->getTreeWidget());
+	for (int i = 0; i < m_navigation->getTreeWidget()->topLevelItemCount(); i++) {
+		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(m_navigation->getTreeWidget()->topLevelItem(i));
+		OTAssertNullptr(itm);
+		this->applyState(_state, itm);
+	}
+
+	this->slotSelectionChanged();
+}
+
 // ##############################################################################################################################
 
 // Private: Slots
 
-void ot::GraphicsPicker::slotSelectionChanged(void) {
+void ot::GraphicsPicker::slotSelectionChanged() {
 	for (auto v : m_previews) {
 		m_viewLayout->removeWidget(v.layoutWidget);
 		delete v.label;
@@ -127,10 +153,12 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 
 	std::list<GraphicsView *> previews;
 
-	for (auto itm : m_navigation->getTreeWidget()->selectedItems()) {
+	for (QTreeWidgetItem* selectedItem : m_navigation->getTreeWidget()->selectedItems()) {
+		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(selectedItem);
+		OTAssertNullptr(itm);
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
-			for (const GraphicsPickerItemInformation& info : *it->second) {
+			for (const GraphicsPickerItemInfo& info : *it->second) {
 				PreviewBox box;
 
 				box.view = new GraphicsItemPreview;
@@ -162,15 +190,14 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 
 // Private: Helper
 
-void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem) {
-	OTAssert(_category, "nullptr provided");
-
-	QTreeWidgetItem* categoryItem = nullptr;
+void ot::GraphicsPicker::addCollection(const ot::GraphicsPickerCollectionCfg& _category, TreeWidgetItem* _parentNavigationItem) {
+	TreeWidgetItem* categoryItem = nullptr;
 	if (_parentNavigationItem) {
 		// Check if parent has item
 		for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
-			if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->getTitle()).toLower()) {
-				categoryItem = _parentNavigationItem->child(i);
+			if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category.getTitle()).toLower()) {
+				categoryItem = dynamic_cast<TreeWidgetItem*>(_parentNavigationItem->child(i));
+				OTAssertNullptr(categoryItem);
 				break;
 			}
 		}
@@ -178,8 +205,9 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 	else {
 		// Check if parent has item
 		for (int i = 0; i < m_navigation->getTreeWidget()->topLevelItemCount(); i++) {
-			if (m_navigation->getTreeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->getTitle()).toLower()) {
-				categoryItem = m_navigation->getTreeWidget()->topLevelItem(i);
+			if (m_navigation->getTreeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category.getTitle()).toLower()) {
+				categoryItem = dynamic_cast<TreeWidgetItem*>(m_navigation->getTreeWidget()->topLevelItem(i));
+				OTAssertNullptr(categoryItem);
 				break;
 			}
 		}
@@ -187,8 +215,8 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 
 	// Item does not exist, create
 	if (categoryItem == nullptr) {
-		categoryItem = new QTreeWidgetItem;
-		categoryItem->setText(intern::ntTitle, QString::fromStdString(_category->getTitle()));
+		categoryItem = new TreeWidgetItem;
+		categoryItem->setText(intern::ntTitle, QString::fromStdString(_category.getTitle()));
 
 		if (_parentNavigationItem) {
 			// Add item as child
@@ -200,31 +228,30 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 		}
 	}
 
-	this->addCollections(_category->getChildCollections(), categoryItem);
-	this->addItems(_category->getItems(), categoryItem);
+	this->addCollections(_category.getChildCollections(), categoryItem);
+	this->addItems(_category.getItems(), categoryItem);
 }
 
-void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsPickerCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem) {
-	for (auto c : _categories)
-	{
+void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsPickerCollectionCfg>& _categories, TreeWidgetItem* _parentNavigationItem) {
+	for (const GraphicsPickerCollectionCfg& c : _categories) {
 		this->addCollection(c, _parentNavigationItem);
 	}
 }
 
-void ot::GraphicsPicker::addItem(const GraphicsPickerItemInformation& _info, QTreeWidgetItem* _parentNavigationItem) {
+void ot::GraphicsPicker::addItem(const GraphicsPickerItemInfo& _info, TreeWidgetItem* _parentNavigationItem) {
 	OTAssert(_parentNavigationItem, "nullptr provided");
-
-	QTreeWidgetItem* treeItem = nullptr;
+	TreeWidgetItem* treeItem = nullptr;
 	for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
 		if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_info.getTitle()).toLower()) {
 			OT_LOG_W("A graphics item with the name \"" + _info.getTitle() + "\" is already a child of the collection \"" + _parentNavigationItem->text(intern::ntTitle).toStdString() + "\"");
-			treeItem = _parentNavigationItem->child(i);
+			treeItem = dynamic_cast<TreeWidgetItem*>(_parentNavigationItem->child(i));
+			OTAssertNullptr(treeItem);
 			break;
 		}
 	}
 
 	if (treeItem == nullptr) {
-		treeItem = new QTreeWidgetItem;
+		treeItem = new TreeWidgetItem;
 		treeItem->setText(intern::ntTitle, QString::fromStdString(_info.getTitle()));
 
 		_parentNavigationItem->addChild(treeItem);
@@ -235,25 +262,25 @@ void ot::GraphicsPicker::addItem(const GraphicsPickerItemInformation& _info, QTr
 	}
 }
 
-void ot::GraphicsPicker::addItems(const std::list<GraphicsPickerItemInformation>& _items, QTreeWidgetItem* _parentNavigationItem) {
+void ot::GraphicsPicker::addItems(const std::list<GraphicsPickerItemInfo>& _items, TreeWidgetItem* _parentNavigationItem) {
 	for (auto b : _items) {
 		this->addItem(b, _parentNavigationItem);
 	}
 }
 
-void ot::GraphicsPicker::storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerItemInformation& _info) {
+void ot::GraphicsPicker::storePreviewData(TreeWidgetItem* _item, const GraphicsPickerItemInfo& _info) {
 	auto it = m_previewData.find(_item);
 	if (it != m_previewData.end()) {
 		it->second->push_back(_info);
 	}
 	else {
-		auto lst = new std::list<GraphicsPickerItemInformation>;
+		auto lst = new std::list<GraphicsPickerItemInfo>;
 		lst->push_back(_info);
 		m_previewData.insert_or_assign(_item, lst);
 	}
 }
 
-void ot::GraphicsPicker::rebuildPreview(void) {
+void ot::GraphicsPicker::rebuildPreview() {
 	// Remove current previews
 	for (PreviewBox& v : m_previews) {
 		v.layoutWidget->setHidden(true);
@@ -281,6 +308,42 @@ void ot::GraphicsPicker::rebuildPreview(void) {
 			col = 0;
 			row++;
 		}
+	}
+}
+
+void ot::GraphicsPicker::getCurrentState(PickerState& _state, TreeWidgetItem* _item) const {
+	if (_item->isSelected()) {
+		_state.selectedItems.push_back(_item->getTreeWidgetItemPath());
+	}
+	if (_item->isExpanded()) {
+		_state.expandedItems.push_back(_item->getTreeWidgetItemPath());
+	}
+
+	for (int i = 0; i < _item->childCount(); i++) {
+		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(_item->child(i));
+		OTAssertNullptr(itm);
+		this->getCurrentState(_state, itm);
+	}
+}
+
+void ot::GraphicsPicker::applyState(const PickerState& _state, TreeWidgetItem* _item) {
+	const QString path = _item->getTreeWidgetItemPath();
+	if (std::find(_state.selectedItems.begin(), _state.selectedItems.end(), path) != _state.selectedItems.end()) {
+		_item->setSelected(true);
+	}
+	else {
+		_item->setSelected(false);
+	}
+	if (std::find(_state.expandedItems.begin(), _state.expandedItems.end(), path) != _state.expandedItems.end()) {
+		_item->setExpanded(true);
+	}
+	else {
+		_item->setExpanded(false);
+	}
+	for (int i = 0; i < _item->childCount(); i++) {
+		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(_item->child(i));
+		OTAssertNullptr(itm);
+		this->applyState(_state, itm);
 	}
 }
 
@@ -321,7 +384,7 @@ void ot::GraphicsPickerDockWidget::resizeEvent(QResizeEvent* _event) {
 	if (o != m_widget->orientation()) m_widget->setOrientation(o);
 }
 
-void ot::GraphicsPickerDockWidget::clear(void) {
+void ot::GraphicsPickerDockWidget::clear() {
 	m_widget->clear();
 }
 

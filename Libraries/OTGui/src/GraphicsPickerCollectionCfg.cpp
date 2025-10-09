@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
@@ -20,110 +21,113 @@ ot::GraphicsPickerCollectionCfg::GraphicsPickerCollectionCfg(const std::string& 
 	: m_name(_collectionName), m_title(_collectionTitle) 
 {}
 
-ot::GraphicsPickerCollectionCfg::GraphicsPickerCollectionCfg(const GraphicsPickerCollectionCfg& _other) {
-	*this = _other;
-}
-
-ot::GraphicsPickerCollectionCfg::~GraphicsPickerCollectionCfg() {
-	this->memFree();
-}
-
-ot::GraphicsPickerCollectionCfg& ot::GraphicsPickerCollectionCfg::operator=(const GraphicsPickerCollectionCfg& _other) {
-	if (this == &_other) return *this;
-	this->memFree();
-
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	
-	m_items = _other.m_items;
-
-	for (const GraphicsPickerCollectionCfg* child : _other.m_collections) {
-		m_collections.push_back(new GraphicsPickerCollectionCfg(*child));
-	}
-
-	return *this;
-}
-
 void ot::GraphicsPickerCollectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_Member_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_Title, JsonString(m_title, _allocator), _allocator);
 
 	JsonArray collectionArr;
-	for (auto c : m_collections) {
-		JsonObject collectionObj;
-		c->addToJsonObject(collectionObj, _allocator);
-		collectionArr.PushBack(collectionObj, _allocator);
+	for (const GraphicsPickerCollectionCfg& c : m_collections) {
+		collectionArr.PushBack(JsonObject(c, _allocator), _allocator);
 	}
 	_object.AddMember(OT_JSON_Member_Collections, collectionArr, _allocator);
 
 	JsonArray itemArr;
-	for (auto i : m_items) {
-		JsonObject infoObj;
-		i.addToJsonObject(infoObj, _allocator);
-		itemArr.PushBack(infoObj, _allocator);
+	for (const GraphicsPickerItemInfo& i : m_items) {
+		itemArr.PushBack(JsonObject(i, _allocator), _allocator);
 	}
 	_object.AddMember(OT_JSON_Member_Items, itemArr, _allocator);
 }
 
 void ot::GraphicsPickerCollectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
-	this->memFree();
+	this->clear();
 
 	m_name = json::getString(_object, OT_JSON_Member_Name);
 	m_title = json::getString(_object, OT_JSON_Member_Title);
 
 	ConstJsonArray collectionArr = json::getArray(_object, OT_JSON_Member_Collections);
 	for (rapidjson::SizeType i = 0; i < collectionArr.Size(); i++) {
-		ConstJsonObject collectionObj = json::getObject(collectionArr, i);
-		
-		GraphicsPickerCollectionCfg* newChild = new GraphicsPickerCollectionCfg;
-		newChild->setFromJsonObject(collectionObj);
-		
-		m_collections.push_back(newChild);
+		GraphicsPickerCollectionCfg newChild;
+		newChild.setFromJsonObject(json::getObject(collectionArr, i));
+		m_collections.push_back(std::move(newChild));
 	}
 
 	ConstJsonArray itemArr = json::getArray(_object, OT_JSON_Member_Items);
 	for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {
-		ConstJsonObject infoObj = json::getObject(itemArr, i);
-		GraphicsPickerItemInformation info;
-		info.setFromJsonObject(infoObj);
-		m_items.push_back(info);
+		GraphicsPickerItemInfo info;
+		info.setFromJsonObject(json::getObject(itemArr, i));
+		m_items.push_back(std::move(info));
 	}
 }
 
-void ot::GraphicsPickerCollectionCfg::addChildCollection(GraphicsPickerCollectionCfg* _child) {
-	OTAssertNullptr(_child);
-	m_collections.push_back(_child);
+ot::GraphicsPickerCollectionCfg& ot::GraphicsPickerCollectionCfg::addChildCollection(const std::string& _collectionName, const std::string& _collectionTitle) {
+	GraphicsPickerCollectionCfg newCollection(_collectionName, _collectionTitle);
+	return this->addChildCollection(std::move(newCollection));
 }
 
-void ot::GraphicsPickerCollectionCfg::addItem(const std::string& _itemName, const std::string& _itemTitle, const std::string& _previewIconPath) {
-	this->addItem(GraphicsPickerItemInformation(_itemName, _itemTitle, _previewIconPath));
+ot::GraphicsPickerCollectionCfg& ot::GraphicsPickerCollectionCfg::addChildCollection(const GraphicsPickerCollectionCfg& _child) {
+	GraphicsPickerCollectionCfg newCollection(_child);
+	return this->addChildCollection(std::move(newCollection));
 }
 
-void ot::GraphicsPickerCollectionCfg::addItem(const GraphicsPickerItemInformation& _itemInfo) {
-	m_items.push_back(_itemInfo);
+ot::GraphicsPickerCollectionCfg& ot::GraphicsPickerCollectionCfg::addChildCollection(GraphicsPickerCollectionCfg&& _child) {
+	for (GraphicsPickerCollectionCfg& existingChild : m_collections) {
+		if (existingChild.getName() == _child.getName()) {
+			existingChild.mergeWith(std::move(_child));
+			return existingChild;
+		}
+	}
+	m_collections.push_back(std::move(_child));
+	return m_collections.back();
 }
 
-void ot::GraphicsPickerCollectionCfg::mergeWith(const GraphicsPickerCollectionCfg& _other) {
+ot::GraphicsPickerItemInfo& ot::GraphicsPickerCollectionCfg::addItem(const std::string& _itemName, const std::string& _itemTitle, const std::string& _previewIconPath) {
+	GraphicsPickerItemInfo newItem(_itemName, _itemTitle, _previewIconPath);
+	return this->addItem(std::move(newItem));
+}
+
+ot::GraphicsPickerItemInfo& ot::GraphicsPickerCollectionCfg::addItem(const GraphicsPickerItemInfo& _itemInfo) {
+	GraphicsPickerItemInfo info(_itemInfo);
+	return this->addItem(std::move(info));
+}
+
+ot::GraphicsPickerItemInfo& ot::GraphicsPickerCollectionCfg::addItem(GraphicsPickerItemInfo&& _itemInfo) {
+	for (GraphicsPickerItemInfo& existingItem : m_items) {
+		if (existingItem.getName() == _itemInfo.getName()) {
+			OT_LOG_W("Item already exists { \"ItemName\": \"" + existingItem.getName() + "\" }. Ignoring...");
+			return existingItem;
+		}
+	}
+	m_items.push_back(std::move(_itemInfo));
+	return m_items.back();
+}
+
+void ot::GraphicsPickerCollectionCfg::mergeWith(GraphicsPickerCollectionCfg&& _other) {
+	// Grab child collections and items from other collection
+	std::list<GraphicsPickerCollectionCfg> otherCollections = std::move(_other.m_collections);
+	std::list<GraphicsPickerItemInfo> otherItems = std::move(_other.m_items);
+	_other.m_collections.clear();
+	_other.m_items.clear();
+
 	// Merge child collections
-	for (const GraphicsPickerCollectionCfg* childCollection : _other.getChildCollections()) {
+	for (GraphicsPickerCollectionCfg& childCollection : otherCollections) {
 		bool found = false;
-		for (GraphicsPickerCollectionCfg* existingCollection : m_collections) {
-			if (existingCollection->getName() == childCollection->getName()) {
-				existingCollection->mergeWith(*childCollection);
+		for (GraphicsPickerCollectionCfg& existingCollection : m_collections) {
+			if (existingCollection.getName() == childCollection.getName()) {
+				existingCollection.mergeWith(std::move(childCollection));
 				found = true;
 				break;
 			}
 		}
 
 		if (!found) {
-			m_collections.push_back(new GraphicsPickerCollectionCfg(*childCollection));
+			m_collections.push_back(std::move(childCollection));
 		}
 	}
 
 	// Merge child items
-	for (const GraphicsPickerItemInformation& itm : _other.getItems()) {
+	for (GraphicsPickerItemInfo& itm : otherItems) {
 		bool found = false;
-		for (const GraphicsPickerItemInformation& existingItm : m_items) {
+		for (GraphicsPickerItemInfo& existingItm : m_items) {
 			if (existingItm.getName() == itm.getName()) {
 				found = true;
 				break;
@@ -131,14 +135,25 @@ void ot::GraphicsPickerCollectionCfg::mergeWith(const GraphicsPickerCollectionCf
 		}
 
 		if (!found) {
-			m_items.push_back(itm);
+			m_items.push_back(std::move(itm));
 		}
 	}
 }
 
-void ot::GraphicsPickerCollectionCfg::memFree(void) {
-	for (auto c : m_collections) delete c;
-	m_collections.clear();
+bool ot::GraphicsPickerCollectionCfg::isEmpty() const {
+	bool empty = m_items.empty();
+	if (empty) {
+		for (const GraphicsPickerCollectionCfg& c : m_collections) {
+			if (!c.isEmpty()) {
+				empty = false;
+				break;
+			}
+		}
+	}
+	return empty;
+}
 
+void ot::GraphicsPickerCollectionCfg::clear() {
+	m_collections.clear();
 	m_items.clear();
 }

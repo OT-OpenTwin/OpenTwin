@@ -23,11 +23,11 @@ class QLabel;
 class QWidget;
 class QGridLayout;
 class QVBoxLayout;
-class QTreeWidgetItem;
 
 namespace ot {
 
 	class Splitter;
+	class TreeWidgetItem;
 	class GraphicsItemCfg;
 	class TreeWidgetFilter;
 	class GraphicsItemPreview;
@@ -36,45 +36,56 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsPicker : public QObject, public WidgetBase {
 		Q_OBJECT
 	public:
+		struct PickerState {
+			QStringList expandedItems;
+			QStringList selectedItems;
+		};
+
 		GraphicsPicker(Qt::Orientation _orientation = Qt::Vertical);
 		virtual ~GraphicsPicker();
 
-		virtual QWidget* getQWidget(void) override;
-		virtual const QWidget* getQWidget(void) const override;
+		virtual QWidget* getQWidget() override;
+		virtual const QWidget* getQWidget() const override;
 
 		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
 		void setOrientation(Qt::Orientation _orientation);
-		Qt::Orientation orientation(void) const;
+		Qt::Orientation orientation() const;
 
-		void add(const ot::GraphicsPickerCollectionPackage& _pckg);
-		void add(ot::GraphicsPickerCollectionCfg* _topLevelCollection);
-		void add(const std::list<ot::GraphicsPickerCollectionCfg*>& _topLevelCollections);
+		void add(const GraphicsPickerCollectionPackage& _pckg);
+		void add(const GraphicsPickerCollectionCfg& _topLevelCollection);
+		void add(const std::list<GraphicsPickerCollectionCfg>& _topLevelCollections);
 
-		void clear(void);
+		void clear();
+
+		PickerState getCurrentState() const;
+		void applyState(const PickerState& _state);
 
 		void setPreviewBoxSize(const QSize& _size) { m_previewSize = _size; };
-		const QSize& previewBoxSize(void) const { return m_previewSize; };
+		const QSize& previewBoxSize() const { return m_previewSize; };
 
 		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
 
 		//! \brief Returns the current owner of the graphics picker.
 		//! The owner information will be added to the mime data when dragging an item.
-		const BasicServiceInformation& getOwner(void) const { return m_owner; };
+		const BasicServiceInformation& getOwner() const { return m_owner; };
 
 	private Q_SLOTS:
-		void slotSelectionChanged(void);
+		void slotSelectionChanged();
 
 	private:
-		void addCollection(ot::GraphicsPickerCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem);
-		void addCollections(const std::list<ot::GraphicsPickerCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem);
+		void addCollection(const GraphicsPickerCollectionCfg& _category, TreeWidgetItem* _parentNavigationItem);
+		void addCollections(const std::list<GraphicsPickerCollectionCfg>& _categories, TreeWidgetItem* _parentNavigationItem);
 
-		void addItem(const GraphicsPickerItemInformation& _info, QTreeWidgetItem* _parentNavigationItem);
-		void addItems(const std::list<GraphicsPickerItemInformation>& _info, QTreeWidgetItem* _parentNavigationItem);
+		void addItem(const GraphicsPickerItemInfo& _info, TreeWidgetItem* _parentNavigationItem);
+		void addItems(const std::list<GraphicsPickerItemInfo>& _info, TreeWidgetItem* _parentNavigationItem);
 
-		void storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerItemInformation& _info);
+		void storePreviewData(TreeWidgetItem* _item, const GraphicsPickerItemInfo& _info);
 
-		void rebuildPreview(void);
+		void rebuildPreview();
+
+		void getCurrentState(PickerState& _state, TreeWidgetItem* _item) const;
+		void applyState(const PickerState& _state, TreeWidgetItem* _item);
 
 		struct PreviewBox {
 			QWidget* layoutWidget;
@@ -95,7 +106,7 @@ namespace ot {
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 
-		std::map<QTreeWidgetItem*, std::list<GraphicsPickerItemInformation>*> m_previewData;
+		std::map<TreeWidgetItem*, std::list<GraphicsPickerItemInfo>*> m_previewData;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -127,12 +138,12 @@ namespace ot {
 
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
-		void clear(void);
+		void clear();
 
-		ot::GraphicsPicker* pickerWidget(void) { return m_widget; };
+		ot::GraphicsPicker* pickerWidget() { return m_widget; };
 
 	private:
-		inline Qt::Orientation calcWidgetOrientation(void) const { return (this->width() > this->height() ? Qt::Horizontal : Qt::Vertical); };
+		inline Qt::Orientation calcWidgetOrientation() const { return (this->width() > this->height() ? Qt::Horizontal : Qt::Vertical); };
 
 		GraphicsPicker* m_widget;
 	};

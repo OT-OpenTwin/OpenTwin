@@ -95,13 +95,11 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 }
 
 void BlockEntityHandler::OrderUIToCreateBlockPicker() {
-	auto graphicsEditorPackage = BuildUpBlockPicker();
 	ot::JsonDocument doc;
-	ot::JsonObject pckgObj;
-	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
-
+	
+	auto pckg = BuildUpBlockPicker();
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, ot::JsonObject(pckg, doc.GetAllocator()), doc.GetAllocator());
 	
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
@@ -382,18 +380,13 @@ std::string BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_
 
 
 
-ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
-	std::unique_ptr<ot::GraphicsPickerCollectionPackage> graphicsPicker(new ot::GraphicsPickerCollectionPackage());
-	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
-	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
-	ot::GraphicsPickerCollectionCfg* a2 = new ot::GraphicsPickerCollectionCfg("Meter Elements", "Meter Elements");
-	ot::GraphicsPickerCollectionCfg* a3 = new ot::GraphicsPickerCollectionCfg("Sources", "Sources");
-	ot::GraphicsPickerCollectionCfg* a4 = new ot::GraphicsPickerCollectionCfg("ActiveElements", "Active Elements");
-
-	a->addChildCollection(a1);
-	a->addChildCollection(a2);
-	a->addChildCollection(a3);
-	a->addChildCollection(a4);
+ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
+	ot::GraphicsPickerCollectionPackage graphicsPicker;
+	ot::GraphicsPickerCollectionCfg a("CircuitElements", "Circuit Elements");
+	ot::GraphicsPickerCollectionCfg a1("PassiveElements", "Passive Elements");
+	ot::GraphicsPickerCollectionCfg a2("Meter Elements", "Meter Elements");
+	ot::GraphicsPickerCollectionCfg a3("Sources", "Sources");
+	ot::GraphicsPickerCollectionCfg a4("ActiveElements", "Active Elements");
 
 	EntityBlockCircuitVoltageSource element(0, nullptr, nullptr, nullptr,nullptr, "");
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
@@ -405,22 +398,27 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	EntityBlockCircuitGND gndElement(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitTransmissionLine transmissionLine (0, nullptr, nullptr, nullptr, nullptr, "");
 	
+	a1.addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
+	a1.addItem(capacitor.getClassName(), capacitor.CreateBlockHeadline(), "CircuitElementImages/Capacitor.png");
+	a1.addItem(inductor.getClassName(), inductor.CreateBlockHeadline(), "CircuitElementImages/Inductor.png");
+	a1.addItem(gndElement.getClassName(), gndElement.CreateBlockHeadline(), "CircuitElementImages/GND.png");
+	a1.addItem(transmissionLine.getClassName(), transmissionLine.CreateBlockHeadline(), "CircuitElementImages/TranLine.png");
+
+	a2.addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
+	a2.addItem(currentMeter.getClassName(), currentMeter.CreateBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
+
+	a3.addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	
-	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
-	a1->addItem(capacitor.getClassName(), capacitor.CreateBlockHeadline(), "CircuitElementImages/Capacitor.png");
-	a1->addItem(inductor.getClassName(), inductor.CreateBlockHeadline(), "CircuitElementImages/Inductor.png");
-	a1->addItem(gndElement.getClassName(), gndElement.CreateBlockHeadline(), "CircuitElementImages/GND.png");
-	a1->addItem(transmissionLine.getClassName(), transmissionLine.CreateBlockHeadline(), "CircuitElementImages/TranLine.png");
 
-	a2->addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
-	a2->addItem(currentMeter.getClassName(), currentMeter.CreateBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
+	a4.addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
 
-	a3->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
-	
+	a.addChildCollection(std::move(a1));
+	a.addChildCollection(std::move(a2));
+	a.addChildCollection(std::move(a3));
+	a.addChildCollection(std::move(a4));
 
-	a4->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
-	graphicsPicker->addCollection(a);
-	return graphicsPicker.release();
+	graphicsPicker.addCollection(std::move(a));
+	return graphicsPicker;
 }
 
 

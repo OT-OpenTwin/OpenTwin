@@ -9,6 +9,7 @@
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GraphicsConnectionCfg.h"
+#include "OTGui/GraphicsPickerCollectionCfg.h"
 
 // std header
 #include <list>
@@ -16,13 +17,13 @@
 namespace ot {
 
 	class GraphicsItemCfg;
-	class GraphicsPickerCollectionCfg;
 	
 	//! @brief Package that will be used to fill the graphics picker
 	//! The name of the editor must be unique. If an editor with the given name already exists, the creation will fail.
 	//! Note that the request to the UI must be send manually by providing this object (serialized) as the package
 	class OT_GUI_API_EXPORT GraphicsPickerCollectionPackage : public ot::Serializable {
 		OT_DECL_NOCOPY(GraphicsPickerCollectionPackage)
+		OT_DECL_DEFMOVE(GraphicsPickerCollectionPackage)
 	public:
 		GraphicsPickerCollectionPackage();
 		virtual ~GraphicsPickerCollectionPackage();
@@ -37,13 +38,12 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		void addCollection(GraphicsPickerCollectionCfg* _collection);
-		const std::list<GraphicsPickerCollectionCfg*>& collections(void) const { return m_collections; };
+		void addCollection(const GraphicsPickerCollectionCfg& _collection);
+		void addCollection(GraphicsPickerCollectionCfg&& _collection);
+		const std::list<GraphicsPickerCollectionCfg>& getCollections() const { return m_collections; };
 
 	private:
-		void memFree(void);
-
-		std::list<GraphicsPickerCollectionCfg*> m_collections;
+		std::list<GraphicsPickerCollectionCfg> m_collections;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################

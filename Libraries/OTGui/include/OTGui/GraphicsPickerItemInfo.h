@@ -1,4 +1,4 @@
-//! \file GraphicsPickerItemInformation.h
+//! \file GraphicsPickerItemInfo.h
 //! \author Alexander Kuester (alexk95)
 //! \date August 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -16,14 +16,14 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT GraphicsPickerItemInformation : public Serializable {
+	class OT_GUI_API_EXPORT GraphicsPickerItemInfo : public Serializable {
 	public:
-		GraphicsPickerItemInformation();
-		GraphicsPickerItemInformation(const std::string& _name, const std::string& _title, const std::string& _previewIcon);
-		GraphicsPickerItemInformation(const GraphicsPickerItemInformation& _other);
-		virtual ~GraphicsPickerItemInformation();
+		GraphicsPickerItemInfo();
+		GraphicsPickerItemInfo(const std::string& _name, const std::string& _title, const std::string& _previewIcon);
+		GraphicsPickerItemInfo(const GraphicsPickerItemInfo& _other);
+		virtual ~GraphicsPickerItemInfo();
 
-		GraphicsPickerItemInformation& operator = (const GraphicsPickerItemInformation& _other);
+		GraphicsPickerItemInfo& operator = (const GraphicsPickerItemInfo& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

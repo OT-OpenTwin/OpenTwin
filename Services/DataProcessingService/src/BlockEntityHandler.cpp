@@ -127,11 +127,8 @@ void BlockEntityHandler::orderUIToCreateBlockPicker()
 {
 	auto graphicsEditorPackage = BuildUpBlockPicker();
 	ot::JsonDocument doc;
-	ot::JsonObject pckgObj;
-	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
-
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, ot::JsonObject(graphicsEditorPackage, doc.GetAllocator()), doc.GetAllocator());
 
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
@@ -177,40 +174,41 @@ void BlockEntityHandler::initSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 }
 
 
-ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
+ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 {
-	std::unique_ptr<ot::GraphicsPickerCollectionPackage> graphicsPicker(new ot::GraphicsPickerCollectionPackage());
+	ot::GraphicsPickerCollectionPackage graphicsPicker;
 
-	ot::GraphicsPickerCollectionCfg* controlBlockCollection = new ot::GraphicsPickerCollectionCfg("Control Blocks", "Control Blocks");
-	ot::GraphicsPickerCollectionCfg* controlBlockDatabaseCollection = new ot::GraphicsPickerCollectionCfg("Database", "Database");
-	ot::GraphicsPickerCollectionCfg* controlBlockVisualizationCollection = new ot::GraphicsPickerCollectionCfg("Visualization", "Visualization");
+	ot::GraphicsPickerCollectionCfg controlBlockCollection("Control Blocks", "Control Blocks");
+	ot::GraphicsPickerCollectionCfg controlBlockDatabaseCollection("Database", "Database");
+	ot::GraphicsPickerCollectionCfg controlBlockVisualizationCollection("Visualization", "Visualization");
 
-	//ot::GraphicsCollectionCfg* mathBlockCollection = new ot::GraphicsCollectionCfg("Mathematical Operations", "Mathematical Operations");
-	ot::GraphicsPickerCollectionCfg* customizedBlockCollection = new ot::GraphicsPickerCollectionCfg("Customized Blocks", "Customized Blocks");
+	//ot::GraphicsPickerCollectionCfg* mathBlockCollection("Mathematical Operations", "Mathematical Operations");
+	ot::GraphicsPickerCollectionCfg customizedBlockCollection("Customized Blocks", "Customized Blocks");
 	
-
-	controlBlockCollection->addChildCollection(controlBlockDatabaseCollection);
-	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
-
 	EntityBlockPython pythonBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	customizedBlockCollection->addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
+	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
 
 	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
+	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
+	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
 
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
+	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
 
 	EntityBlockFileWriter fileWriter(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
-	graphicsPicker->addCollection(controlBlockCollection);
-	graphicsPicker->addCollection(customizedBlockCollection);
-	//pckg->addCollection(mathBlockCollection);
+	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
+
+	controlBlockCollection.addChildCollection(std::move(controlBlockDatabaseCollection));
+	controlBlockCollection.addChildCollection(std::move(controlBlockVisualizationCollection));
+
+	graphicsPicker.addCollection(std::move(controlBlockCollection));
+
+	graphicsPicker.addCollection(std::move(customizedBlockCollection));
+	//graphicsPicker.addCollection(std::move(mathBlockCollection));
 	
-	return graphicsPicker.release();
+	return graphicsPicker;
 }
 
 std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName)

@@ -29,12 +29,12 @@
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
-#include "OTGui/GraphicsPickerCollectionManager.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetTypes.h"
 #include "OTWidgets/MessageBoxHandler.h"
+#include "OTWidgets/GraphicsPickerManager.h"
 
 // uiCore header
 #include <akCore/aException.h>
@@ -589,10 +589,6 @@ private:
 
 	bool checkForContinue(const std::string& _title);
 
-	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
-
-	void clearGraphicsPicker(void);
-
 	void cleanupWidgetViewInfo(ot::WidgetView* _view);
 
 	void addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UIDList& _visualizingEntities);
@@ -638,7 +634,7 @@ private:
 	ot::PropertyGridView*  m_propertyGrid;
 	ot::PlainTextEditView* m_output;
 	ot::GraphicsPickerView* m_graphicsPicker;
-	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
+	ot::GraphicsPickerManager m_graphicsPickerManager;
 	ot::UID						m_uid;							//! The UID of the wrapper
 	ot::UID						m_mainWindow;
 	ot::UID						m_viewerUid;					//! The UID of the viewer
