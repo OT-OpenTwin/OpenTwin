@@ -1803,13 +1803,13 @@ void AppBase::appendLogMessage(const ot::LogMessage& _message) {
 	this->appendHtmlInfoMessage(StyledTextConverter::toHtml(message));
 }
 
-void AppBase::autoCloseUnpinnedViews(void) {
+void AppBase::autoCloseUnpinnedViews(bool _ignoreCurrent) {
 	OT_SLECTION_TEST_LOG("Auto close unpinned views");
 
 	ot::WidgetViewManager::instance().requestCloseUnpinnedViews(
 		ot::WidgetViewBase::ViewIsCloseable | ot::WidgetViewBase::ViewIsPinnable,
 		this->getSelectedNavigationTreeItems(),
-		true
+		_ignoreCurrent
 	);
 
 	OT_SLECTION_TEST_LOG(">> Auto close unpinned views completed");
@@ -2809,7 +2809,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		m_viewerComponent->viewerTabChanged(_focusedView->getViewData());
 
 		if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling)) {
-			this->autoCloseUnpinnedViews();
+			this->autoCloseUnpinnedViews(true);
 		}
 	}
 	else {
@@ -2872,6 +2872,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 			m_projectNavigation->getTree()->setItemSelected(uid, true);
 		}
 	}
+
+	this->slotTreeItemSelectionChanged();
 
 	OT_SLECTION_TEST_LOG(">> Closing view request completed");
 
@@ -3437,6 +3439,8 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 	for (auto& graphics : m_graphicsViews) {
 		graphics.second->getGraphicsView()->setSelectedElements(selectedUids);
 	}
+
+	this->autoCloseUnpinnedViews(false);
 
 	OT_SLECTION_TEST_LOG(">> Handle selection has changed completed");
 }

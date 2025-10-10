@@ -55,7 +55,16 @@
     <ClCompile Include="src\ShortcutManager.cpp" />
     <ClCompile Include="src\ProjectManagement.cpp" />
     <ClCompile Include="src\ToolBar.cpp" />
-    <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\AppBase.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="src\UserManagement.cpp" />
     <ClCompile Include="src\UserSettings.cpp" />
     <ClCompile Include="src\ViewerComponent.cpp" />
