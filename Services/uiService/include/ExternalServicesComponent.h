@@ -144,6 +144,7 @@ public:
 
 	bool sendRelayedRequest(RequestType _operation, ot::OwnerService _service, const ot::JsonDocument& _doc, std::string& _response);
 	bool sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, ot::JsonDocument& _doc, std::string& _response);
+	bool sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, const std::string& _message, std::string& _response);
 	bool sendRelayedRequest(RequestType _operation, const std::string& _url, const ot::JsonDocument& _doc, std::string& _response);
 	bool sendRelayedRequest(RequestType _operation, const std::string& _url, const std::string& _json, std::string& _response);
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler* _sender);

@@ -8,12 +8,12 @@ ProgressUpdater::ProgressUpdater(std::string& _message, uint64_t _totalNbSteps)
 	m_app = AppBase::instance();
 	OTAssertNullptr(m_app);
 
-	QMetaObject::invokeMethod(m_app, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, QString::fromStdString(_message)), Q_ARG(bool, true), Q_ARG(bool, false));
-	QMetaObject::invokeMethod(m_app, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
+	QMetaObject::invokeMethod(m_app, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, QString::fromStdString(_message)), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(m_app, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 }
 
 ProgressUpdater::~ProgressUpdater() {
-	QMetaObject::invokeMethod(m_app, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, ""), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(m_app, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, ""), Q_ARG(bool, false), Q_ARG(bool, false));
 }
 
 void ProgressUpdater::triggerUpdate(uint64_t _currentStep) {
@@ -24,7 +24,7 @@ void ProgressUpdater::triggerUpdate(uint64_t _currentStep) {
 		uint32_t percentage = static_cast<uint32_t>((_currentStep / m_totalNbSteps) * 100 + 0.5);
 		m_priorTimestamp = currentTime;
 
-		QMetaObject::invokeMethod(m_app, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percentage));
+		QMetaObject::invokeMethod(m_app, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percentage));
 	}
 }
 

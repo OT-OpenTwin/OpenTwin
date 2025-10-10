@@ -105,6 +105,7 @@
 
 // Qt header
 #include <QtCore/qfile.h>
+#include <QtCore/qthread.h>
 #include <QtGui/qscreen.h>
 #include <QtGui/qclipboard.h>
 #include <QtWidgets/qmenu.h>
@@ -494,38 +495,6 @@ bool AppBase::createNewProjectInDatabase(const QString& _projectName, const QStr
 	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
 }
 
-void AppBase::lockSelectionAndModification(bool flag)
-{
-	ot::LockTypeFlags lockFlags;
-	lockFlags.setFlag(ot::LockModelWrite);
-	lockFlags.setFlag(ot::LockModelRead);
-	lockFlags.setFlag(ot::LockViewWrite);
-	lockFlags.setFlag(ot::LockNavigationWrite);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-	}
-
-	m_projectNavigation->getTree()->setEnabled(!flag);
-}
-
-void AppBase::lockUI(bool flag)
-{
-	ot::LockTypeFlags lockFlags(ot::LockAll);
-
-	if (flag) {
-		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, false);
-	}
-	else {
-		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
-		uiAPI::window::enableTabToolBar(m_mainWindow, true);
-	}
-}
-
 void AppBase::refreshWelcomeScreen(void)
 {
 	m_welcomeScreen->refreshProjectList();
@@ -566,14 +535,14 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
-	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.exportProject(selectedProjectName, exportFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
-	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
 	if (!error.empty())
 	{
@@ -589,7 +558,7 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 void AppBase::importProject(void)
 {
-	lockUI(true);
+	slotLockUI(true);
 
 	// Show the import file selector 
 	QString importFileName = QFileDialog::getOpenFileName(
@@ -628,19 +597,19 @@ void AppBase::importProject(void)
 	}
 	else
 	{
-		lockUI(false);
+		slotLockUI(false);
 	}
 }
 
 void AppBase::manageGroups(void)
 {
-	lockUI(true);
+	slotLockUI(true);
 
 	ManageGroups groupManager(m_loginData.getAuthorizationUrl());
 
 	groupManager.showDialog();
 
-	lockUI(false);
+	slotLockUI(false);
 }
 
 void AppBase::exportLogs(void) {
@@ -724,14 +693,14 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
-	QMetaObject::invokeMethod(this, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
 
 	std::string error = pManager.importProject(projectName, currentUser, importFileName, this);
 
-	QMetaObject::invokeMethod(this, "setProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
 
-	QMetaObject::invokeMethod(this, "lockUI", Qt::QueuedConnection, Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, false));
 
 	if (!error.empty())
 	{
@@ -1640,17 +1609,6 @@ bool AppBase::checkForContinue(const std::string& _title) {
 
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 	return true;
-}
-
-void AppBase::setProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
-	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
-}
-
-void AppBase::setProgressBarValue(int _progressPercentage) {
-	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
 }
 
 QString AppBase::availableTabText(const QString& _initialTabText) {
@@ -3330,7 +3288,7 @@ void AppBase::slotExportProject(void) {
 
 		const QString& selectedProjectName = selectedProjects.front();
 
-		this->lockUI(true);
+		this->slotLockUI(true);
 
 		// Show the export file selector 
 		QString exportFileName = QFileDialog::getSaveFileName(
@@ -3346,7 +3304,7 @@ void AppBase::slotExportProject(void) {
 			workerThread.detach();
 		}
 		else {
-			lockUI(false);
+			slotLockUI(false);
 		}
 	}
 
@@ -3361,13 +3319,13 @@ void AppBase::slotManageProjectAccess(void) {
 
 	const QString& selectedProjectName = selectedProjects.front();
 
-	this->lockUI(true);
+	this->slotLockUI(true);
 
 	// Show the ManageAccess Dialog box
 	ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName.toStdString());
 	accessManager.showDialog();
 
-	this->lockUI(false);
+	this->slotLockUI(false);
 }
 
 void AppBase::slotManageProjectOwner(void) {
@@ -3568,6 +3526,113 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected: Connector API methods
+
+void AppBase::lockUIAPI(bool _flag) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, _flag));
+	}
+	else {
+		this->slotLockUI(_flag);
+	}
+}
+
+void AppBase::lockSelectionAndModificationAPI(bool _flag) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotLockSelectionAndModification", Qt::QueuedConnection, Q_ARG(bool, _flag));
+	}
+	else {
+		this->slotLockSelectionAndModification(_flag);
+	}
+}
+
+void AppBase::setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, _progressMessage), Q_ARG(bool, _progressBaseVisible), Q_ARG(bool, _continuous));
+	}
+	else {
+		this->slotSetProgressBarVisibility(_progressMessage, _progressBaseVisible, _continuous);
+	}
+}
+
+void AppBase::setProgressBarValueAPI(int _progressPercentage) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, _progressPercentage));
+	}
+	else {
+		this->slotSetProgressBarValue(_progressPercentage);
+	}
+}
+
+bool AppBase::sendExecuteAPI(const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
+	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _receiverUrl, _message, _response);
+}
+
+bool AppBase::sendQueueAPI(const std::string& _receiverUrl, const std::string& _message) {
+	std::string tmp;
+	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, _receiverUrl, _message, tmp);
+}
+
+bool AppBase::sendExecuteToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message, std::string& _response) {
+	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _serviceInfo, _message, _response);
+}
+
+bool AppBase::sendQueueToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message) {
+	std::string tmp;
+	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, _serviceInfo, _message, tmp);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Public: Connector API slots
+
+void AppBase::slotLockUI(bool flag) {
+	ot::LockTypeFlags lockFlags(ot::LockAll);
+
+	if (flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, false);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+		uiAPI::window::enableTabToolBar(m_mainWindow, true);
+	}
+}
+
+void AppBase::slotLockSelectionAndModification(bool flag) {
+	ot::LockTypeFlags lockFlags;
+	lockFlags.setFlag(ot::LockModelWrite);
+	lockFlags.setFlag(ot::LockModelRead);
+	lockFlags.setFlag(ot::LockViewWrite);
+	lockFlags.setFlag(ot::LockNavigationWrite);
+
+	if (flag) {
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
+	}
+	else {
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
+	}
+
+	m_projectNavigation->getTree()->setEnabled(!flag);
+}
+
+void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
+	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
+	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
+	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
+}
+
+void AppBase::slotSetProgressBarValue(int _progressPercentage) {
+	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper functions
+
 void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::GraphicsViewView* graphics = dynamic_cast<ot::GraphicsViewView*>(_view);
 	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
@@ -3625,3 +3690,4 @@ void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin) {
 		OT_SLECTION_TEST_LOG(">> Selection handling completed without view change");
 	}
 }
+

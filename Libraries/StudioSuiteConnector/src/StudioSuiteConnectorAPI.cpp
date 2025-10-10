@@ -3,6 +3,7 @@
 #include "StudioSuiteConnector/CommitMessageDialog.h"
 #include "StudioSuiteConnector/ProjectInformationDialog.h"
 
+#include "OTCore/LogDispatcher.h"
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
 

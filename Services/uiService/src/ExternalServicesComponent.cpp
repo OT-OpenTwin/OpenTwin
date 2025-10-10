@@ -882,6 +882,16 @@ bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const
 	}
 }
 
+bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const ot::BasicServiceInformation& _serviceInformation, const std::string& _message, std::string& _response) {
+	auto service = this->getService(_serviceInformation);
+	if (service) {
+		return this->sendRelayedRequest(_operation, service->getServiceURL(), _message, _response);
+	}
+	else {
+		return false;
+	}
+}
+
 bool ExternalServicesComponent::sendRelayedRequest(RequestType _operation, const std::string& _url, const ot::JsonDocument& _doc, std::string& _response) {
 	return this->sendRelayedRequest(_operation, _url, _doc.toJson(), _response);
 }
@@ -1639,7 +1649,7 @@ void ExternalServicesComponent::setProgressState(bool visible, const char* messa
 {
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
-	if (app != nullptr) app->setProgressBarVisibility(message, visible, continuous);
+	if (app != nullptr) app->slotSetProgressBarVisibility(message, visible, continuous);
 
 	delete[] message;
 	message = nullptr;
@@ -1649,7 +1659,7 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 {
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
-	if (app != nullptr) app->setProgressBarValue(percentage);
+	if (app != nullptr) app->slotSetProgressBarValue(percentage);
 }
 
 void ExternalServicesComponent::lockGui(void)
@@ -2083,7 +2093,7 @@ void ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _d
 			QString::fromStdString(data.fileMask));
 
 		if (!fileNames.isEmpty()) {
-			AppBase::instance()->lockUI(true);
+			AppBase::instance()->slotLockUI(true);
 			std::thread workerThread(&ExternalServicesComponent::workerImportMultipleFiles, this, fileNames, data);
 			workerThread.detach();
 		}
@@ -2096,7 +2106,7 @@ void ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocument& _d
 			QString::fromStdString(data.fileMask));
 
 		if (fileName != "") {
-			AppBase::instance()->lockUI(true);
+			AppBase::instance()->slotLockUI(true);
 			std::thread workerThread(&ExternalServicesComponent::workerImportSingleFile, this, fileName, data);
 			workerThread.detach();
 		}
@@ -2319,7 +2329,7 @@ void ExternalServicesComponent::handleSetProgressVisibility(ot::JsonDocument& _d
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
 	if (app != nullptr) {
-		app->setProgressBarVisibility(QString::fromStdString(message), visible, continuous);
+		app->slotSetProgressBarVisibility(QString::fromStdString(message), visible, continuous);
 	}
 }
 
@@ -2328,7 +2338,7 @@ void ExternalServicesComponent::handleSetProgressValue(ot::JsonDocument& _docume
 
 	AppBase* app = AppBase::instance();
 	assert(app != nullptr);
-	if (app != nullptr) app->setProgressBarValue(percentage);
+	if (app != nullptr) app->slotSetProgressBarValue(percentage);
 }
 
 void ExternalServicesComponent::handleFreeze3DView(ot::JsonDocument& _document) {
@@ -4047,11 +4057,15 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 // Action handler: External APIs
 
 void ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
 
 void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
@@ -4344,7 +4358,7 @@ void ExternalServicesComponent::slotProcessActionBuffer() {
 }
 
 void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message) {
-	AppBase::instance()->lockUI(false);
+	AppBase::instance()->slotLockUI(false);
 
 	if (_receiverUrl.empty() || _message.empty()) {
 		return;

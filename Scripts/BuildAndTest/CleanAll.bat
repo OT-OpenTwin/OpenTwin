@@ -47,6 +47,11 @@ ECHO ===============================================================
 CALL "%OT_RANDOM_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Library: Frontend Connector API
+ECHO ===============================================================
+CALL "%OT_FRONTEND_CONNECTOR_API_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
 ECHO Clean Library: OTGui
 ECHO ===============================================================
 CALL "%OT_GUI_ROOT%\Clean.bat" 

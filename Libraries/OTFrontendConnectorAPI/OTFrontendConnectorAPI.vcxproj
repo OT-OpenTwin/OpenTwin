@@ -19,33 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
-    <ClCompile Include="src\CommitMessageDialog.cpp" />
+    <ClCompile Include="src\CommunicationAPI.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\ProgressInfo.cpp" />
-    <ClCompile Include="src\ProjectInformationDialog.cpp" />
-    <ClCompile Include="src\ProjectManager.cpp" />
-    <ClCompile Include="src\ServiceConnector.cpp" />
-    <ClCompile Include="src\InfoFileManager.cpp" />
-    <ClCompile Include="src\LTSpiceConnectorAPI.cpp" />
-    <ClCompile Include="src\VersionFile.cpp" />
+    <ClCompile Include="src\WindowAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\LTSpiceConnector\CommitMessageDialog.h" />
-    <ClInclude Include="include\LTSpiceConnector\ProgressInfo.h" />
-    <QtMoc Include="include\LTSpiceConnector\ProjectInformationDialog.h" />
-    <ClInclude Include="include\LTSpiceConnector\ProjectManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\ServiceConnector.h" />
-    <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h" />
-    <ClInclude Include="include\LTSpiceConnector\VersionFile.h" />
+    <ClInclude Include="include\OTFrontendConnectorAPI\CommunicationAPI.h" />
+    <ClInclude Include="include\OTFrontendConnectorAPI\OTFrontendConnectorAPIExport.h" />
+    <ClInclude Include="include\OTFrontendConnectorAPI\WindowAPI.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
     <Keyword>QtVS_v302</Keyword>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>LTSpiceConnector</ProjectName>
+    <ProjectName>OTFrontendConnectorAPI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -140,18 +128,19 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCD);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCD);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ZLIB_ROOT)\Debug\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCD);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(BOOST_INCD);$(ZLIB_ROOT)\Debug\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>OT_LTSPICE_CONNECTOR_EXPORTS;$(Qt_DEFINES_);_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OT_FRONTEND_CONNECTOR_API_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;DataStorage.lib;ModelEntities.lib;zlibd.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBD);$(OT_DATASTORAGE_ROOT)\$(OT_LIBD);$(OT_MODELENTITIES_ROOT)/$(OT_LIBD);$(ZLIB_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTCommunication.lib;zlibd.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(OT_WIDGETS_ROOT)\$(OT_LIBD);$(OT_COMMUNICATION_ROOT)\$(OT_LIBD);$(CURL_LIBPATHD);$(ZLIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -162,11 +151,12 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCD);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCD);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ZLIB_ROOT)\Debug\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCD);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(BOOST_INCD);$(ZLIB_ROOT)\Debug\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>OT_LTSPICE_CONNECTOR_EXPORTS;$(Qt_DEFINES_);_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OT_FRONTEND_CONNECTOR_API_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,16 +173,17 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCR);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ZLIB_ROOT)\Release\include;$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>OT_LTSPICE_CONNECTOR_EXPORTS;$(Qt_DEFINES_);NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCR);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(BOOST_INCR);$(ZLIB_ROOT)\Release\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;OT_FRONTEND_CONNECTOR_API_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTFrontendConnectorAPI.lib;DataStorage.lib;ModelEntities.lib;zlib.lib;$(MONGO_CXX_LIB);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_LIBR);$(OT_DATASTORAGE_ROOT)\$(OT_LIBR);$(OT_MODELENTITIES_ROOT)/$(OT_LIBR);$(ZLIB_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;OTWidgets.lib;OTCommunication.lib;zlib.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(OT_COMMUNICATION_ROOT)\$(OT_LIBR);$(CURL_LIBPATHR);$(ZLIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -203,9 +194,10 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCR);$(Qt_INCLUDEPATH_);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(BOOST_INCR);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);$(ZLIB_ROOT)\Release\include;$(BASE64_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>OT_LTSPICE_CONNECTOR_EXPORTS;$(Qt_DEFINES_);NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(R_JSON_INCR);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_FRONTEND_CONNECTOR_API_ROOT)\$(OT_INC);$(BOOST_INCR);$(ZLIB_ROOT)\Release\include;$(BASE64_ROOT);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;OT_FRONTEND_CONNECTOR_API_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

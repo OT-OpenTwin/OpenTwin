@@ -212,3 +212,8 @@ ECHO Test Library: Viewer
 ECHO ===============================================================
 CALL "%OT_VIEWER_ROOT%%testBat%" %1 %2
 
+ECHO ===============================================================
+ECHO Test Library: Frontend Connector API
+ECHO ===============================================================
+CALL "%OT_FRONTEND_CONNECTOR_API_ROOT%%testBat%" %1 %2
+

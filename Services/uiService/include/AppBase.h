@@ -36,6 +36,10 @@
 #include "OTWidgets/MessageBoxHandler.h"
 #include "OTWidgets/GraphicsPickerManager.h"
 
+// OpenTwin Frontend API header
+#include "OTFrontendConnectorAPI/WindowAPI.h"
+#include "OTFrontendConnectorAPI/CommunicationAPI.h"
+
 // uiCore header
 #include <akCore/aException.h>
 #include <akCore/globalDataTypes.h>
@@ -97,13 +101,15 @@ struct structModelViewInfo {
 };
 
 //! The API manager is used to manage the global objects required for this API to work
-class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, public ot::AbstractLogNotifier, public ot::MessageBoxHandler {
+class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier,
+	public ot::AbstractLogNotifier, public ot::MessageBoxHandler, public ot::WindowAPI, public ot::CommunicationAPI
+{
 	Q_OBJECT
 public:	
 	//! @brief Deconstructor
 	virtual ~AppBase();
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Base functions
 
@@ -123,7 +129,7 @@ public:
 
 	std::shared_ptr<QSettings> createSettingsInstance(void) const;
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Component functions
 
@@ -157,7 +163,7 @@ public:
 
 	LockManager * lockManager(void);
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Event handling
 
@@ -189,7 +195,7 @@ public:
 
 	void setWaitingAnimationVisible(bool flag);
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// 
 
@@ -221,7 +227,7 @@ public:
 
 	void exportLogs(void);
 
-	// ############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Information setter
 
@@ -243,7 +249,7 @@ public:
 
 	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
 
-	// ############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Information gathering
 
@@ -301,16 +307,8 @@ public:
 	const std::map<std::string, std::string>& getProjectTypeCustomIconNameMap(void) const { return m_projectTypeCustomIconNameMap; };
 
 public Q_SLOTS:
-	void lockUI(bool flag);
 	void refreshWelcomeScreen(void);
-	void lockSelectionAndModification(bool flag);
 	void downloadInstaller(QString gssUrl);
-
-	//! @brief Will turn on or off the progress bar visibility and set the progress message
-	void setProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
-
-	//! @brief Will set the percentage of the progress bar
-	void setProgressBarValue(int _progressPercentage);
 
 public:
 
@@ -321,7 +319,7 @@ public:
 	void setTabToolBarTabOrder(const QStringList& _lst);
 	void activateToolBarTab(const QString& _tab);
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Navigation
 
@@ -395,7 +393,7 @@ public:
 
 	void autoCloseUnpinnedViews(void);
 
-	// ##############################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Property grid
 
@@ -467,7 +465,7 @@ public:
 
 	void closePlot(const std::string& _name);
 
-	// ######################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Prompt
 
@@ -484,7 +482,7 @@ public Q_SLOTS:
 
 public:
 
-	// #######################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	void destroyObjects(const std::vector<ot::UID> & _objects);
 
@@ -492,7 +490,7 @@ public:
 
 	static AppBase * instance(void);
 
-	// #######################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Asynchronous callbacks
 	
@@ -566,6 +564,33 @@ private Q_SLOTS:
 
 	void slotPlotResetItemSelectionRequest();
 	void slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModifier);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Protected: Connector API methods
+
+protected:
+
+	virtual void lockUIAPI(bool _flag) override;
+	virtual void lockSelectionAndModificationAPI(bool _flag) override;
+
+	virtual void setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) override;
+	virtual void setProgressBarValueAPI(int _progressPercentage) override;
+
+	virtual bool sendExecuteAPI(const std::string& _receiverUrl, const std::string& _message, std::string& _response) override;
+	virtual bool sendQueueAPI(const std::string& _receiverUrl, const std::string& _message) override;
+	virtual bool sendExecuteToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message, std::string& _response) override;
+	virtual bool sendQueueToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Public: Connector API slots
+
+public Q_SLOTS:
+	void slotLockUI(bool _flag);
+	void slotLockSelectionAndModification(bool _flag);
+	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
+	void slotSetProgressBarValue(int _progressPercentage);
 
 private:
 	enum class AppState {

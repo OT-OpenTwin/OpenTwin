@@ -204,6 +204,11 @@ ECHO ===============================================================
 CALL "%OT_RESULT_DATA_ACCESS_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: Frontend Connector API
+ECHO ===============================================================
+CALL "%OT_FRONTEND_CONNECTOR_API_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Library: StudioSuiteConnector
 ECHO ===============================================================
 CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
