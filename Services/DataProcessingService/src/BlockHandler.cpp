@@ -27,7 +27,11 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 	bool proceed;
 	try
 	{
+		auto startTimePoint = std::chrono::high_resolution_clock::now();
 		proceed = executeSpecialized();
+		auto endTimePoint = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - startTimePoint);
+		_uiComponent->displayMessage("Block execution took: " + std::to_string(duration.count()) + " seconds\n");
 	}
 	catch (const std::exception& e)
 	{

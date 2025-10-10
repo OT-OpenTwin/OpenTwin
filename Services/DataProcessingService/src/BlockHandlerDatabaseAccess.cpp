@@ -49,7 +49,6 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 	}
 }
 
-
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
 	_uiComponent->displayMessage("Executing Database Acccess Block: " + m_blockName + "\n");
@@ -61,7 +60,6 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 	DataStorageAPI::DataStorageResponse dbResponse;
 
-	auto startTimePoint = std::chrono::high_resolution_clock::now();
 	if (m_sortByID)
 	{
 		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection,m_sort, m_documentLimit);
@@ -70,9 +68,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	{
 		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, m_documentLimit);
 	}
-	auto endTimePoint = std::chrono::high_resolution_clock::now();
-	auto duration =	std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - startTimePoint);
-	_uiComponent->displayMessage("Query took: " + std::to_string(duration.count()) + " seconds\n");
+	
 	if (dbResponse.getSuccess())
 	{
 		const std::string queryResponse = dbResponse.getResult();

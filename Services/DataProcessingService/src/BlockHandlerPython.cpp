@@ -68,11 +68,7 @@ bool BlockHandlerPython::executeSpecialized()
         }
         
         //Send the job
-        auto startTimePoint = std::chrono::high_resolution_clock::now();
         ot::ReturnMessage returnMessage = m_pythonServiceInterface->sendExecutionOrder();
-        auto endTimePoint = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(endTimePoint - startTimePoint);
-        _uiComponent->displayMessage("Python execution took: " + std::to_string(duration.count()) + " seconds\n");
 
         //Post processing
         if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
