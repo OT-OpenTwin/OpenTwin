@@ -2775,24 +2775,22 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				m_graphicsPickerManager.clearPicker();
 			}
 
-			if (m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling)) {
+			ak::aTreeWidget* tree = m_projectNavigation->getTree();
+			if (!(m_viewHandling & (ot::ViewHandlingFlag::SkipEntitySelection | ot::ViewHandlingFlag::SkipViewHandling))) {
 				// Skip entity selection if configured
-				OT_SLECTION_TEST_LOG("+ View focus changed: Skipping entity selection");
-				m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-			}
-			else {
-				ak::aTreeWidget* tree = m_projectNavigation->getTree();
 				QSignalBlocker sigBlock(tree);
-
 				// Reset current selection
 				tree->deselectAllItems(false);
+			}
+			{
+				QSignalBlocker sigBlock(tree);
 
 				OT_SLECTION_TEST_LOG("+ View focus changed: Restoring selection");
 				for (ot::UID uid : _focusedView->getVisualizingItems().getSelectedNavigationItems()) {
 					tree->setItemSelected(uid, true);
 				}
 
-				m_navigationManager.setSelectedItems(tree->selectedItems());
+				//m_navigationManager.setSelectedItems(tree->selectedItems());
 			}
 
 			// Update focus information
@@ -2801,8 +2799,10 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			if (!m_navigationManager.isSelectionHandlingRunning()) {
 				OT_SLECTION_TEST_LOG("+ View focus changed: Running selection handling");
 				// Run selection handling if currently no selection handling is running
-				this->runSelectionHandling(ot::SelectionOrigin::View);
+				//this->runSelectionHandling(ot::SelectionOrigin::View);
 			}
+
+			this->runSelectionHandling(ot::SelectionOrigin::View);
 		}
 
 		OT_SLECTION_TEST_LOG("+ View focus changed: Notify viewer component");
@@ -2873,7 +2873,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		}
 	}
 
-	this->slotTreeItemSelectionChanged();
+	this->runSelectionHandling(ot::SelectionOrigin::User);
 
 	OT_SLECTION_TEST_LOG(">> Closing view request completed");
 
