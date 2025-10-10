@@ -2864,7 +2864,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
 	// Restore selection if the view did not change during close
-	if (_view != lastStoredView && ot::WidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
+	if (lastStoredView && _view != lastStoredView && ot::WidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView) {
 		OT_SLECTION_TEST_LOG("+ Restore view selection");
 
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());
