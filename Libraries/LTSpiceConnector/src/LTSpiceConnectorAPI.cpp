@@ -5,13 +5,16 @@
 
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
+#include "OTFrontendConnectorAPI/CommunicationAPI.h"
+#include "OTFrontendConnectorAPI/CurrentProjectAPI.h"
 
 #include <QFileDialog>					// QFileDialog
 #include <QHostInfo>					
 
 #include <thread>
 
-std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName, QObject *mainObject, const QIcon &windowIcon)
+std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
 {
 	if (action == OT_ACTION_CMD_UI_LTS_IMPORT) {
 
@@ -23,18 +26,18 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 
 		if (fileName == "") return "";
 
-		CommitMessageDialog commitMessageDialog(windowIcon, "Import", "Import LTSpice project");
+		CommitMessageDialog commitMessageDialog("Import", "Import LTSpice project");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 
 		std::string message = commitMessageDialog.changeMessage().toStdString();
 		bool includeResults = commitMessageDialog.includeResults();
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
 		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL);
 		LTSpiceConnectorAPI::setLocalFileName(fileName.toStdString());
 
 		std::thread workerThread(LTSpiceConnectorAPI::importProject, fileName.toStdString(), projectName, message, includeResults);
@@ -44,30 +47,27 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 
 		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		std::string fileName = getLTSpiceFileNameForCommit(projectName, ltSpiceServiceURL, mainObject);
+		std::string fileName = getLTSpiceFileNameForCommit(projectName, ltSpiceServiceURL);
 		if (fileName.empty())
 		{
 			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
-		CommitMessageDialog commitMessageDialog(windowIcon, "Commit", "");
+		CommitMessageDialog commitMessageDialog("Commit", "");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 		std::string changeComment = commitMessageDialog.changeMessage().toStdString();
 		bool includeResults = commitMessageDialog.includeResults();
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
-		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL);
 
 		// We need to make sure that the project is at the correct version in OT
 		std::string currentVersion = LTSpiceConnectorAPI::getCurrentVersion(fileName, projectName);
 
-		char* vsn = new char[currentVersion.length() + 1];
-		strcpy(vsn, currentVersion.c_str());
-
-		QMetaObject::invokeMethod(mainObject, "activateModelVersion", Qt::DirectConnection, Q_ARG(const char*, vsn));
+		ot::CurrentProjectAPI::activateModelVersion(currentVersion);
 
 		std::thread workerThread(LTSpiceConnectorAPI::commitProject, fileName, projectName, changeComment, includeResults);
 		workerThread.detach();
@@ -82,16 +82,16 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 			return "";
 		}
 
-		std::string fileName = getLTSpiceFileNameForGet(projectName, ltSpiceServiceURL, mainObject);
+		std::string fileName = getLTSpiceFileNameForGet(projectName, ltSpiceServiceURL);
 		if (fileName.empty())
 		{
 			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
-		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL);
 
 		std::thread workerThread(LTSpiceConnectorAPI::getProject, fileName, projectName, version);
 		workerThread.detach();
@@ -133,7 +133,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		if (localFileName.empty())
 		{
 			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL, mainObject);
+			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL);
 			LTSpiceConnectorAPI::setLocalFileName(localFileName);
 		}
 
@@ -148,7 +148,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 			localVersion.clear();
 		}
 
-		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
+		ProjectInformationDialog projectInformationDialog(localFileName, serverVersion, localVersion);
 		projectInformationDialog.exec();
 	}
 	else if (action == OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE) {
@@ -160,11 +160,11 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		if (localFileName.empty())
 		{
 			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL, mainObject);
+			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL);
 			LTSpiceConnectorAPI::setLocalFileName(localFileName);
 		}
 
-		std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(ltSpiceServiceURL, mainObject);
+		std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(ltSpiceServiceURL);
 
 		std::filesystem::path filePath(localFileName);
 
@@ -198,7 +198,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 				return "";
 			}
 
-			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, ltSpiceServiceURL, mainObject);
+			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, ltSpiceServiceURL);
 
 			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "", "Set LTSpice File");
 		}
@@ -207,14 +207,14 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 	return "";
 }
 
-std::string LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL, QObject *mainObject)
+std::string LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
 {
 	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
 	if (localFileName.empty())
 	{
 		// Try to get the current file name from the server
-		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 		LTSpiceConnectorAPI::setLocalFileName(localFileName);
 	}
 
@@ -227,14 +227,14 @@ std::string LTSpiceConnectorAPI::getLTSpiceFileNameForCommit(const std::string& 
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
 {
 	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
 	if (localFileName.empty())
 	{
 		// Try to get the current file name from the server
-		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 		LTSpiceConnectorAPI::setLocalFileName(localFileName);
 	}
 
@@ -246,7 +246,7 @@ std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& pro
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject)
+std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -256,26 +256,15 @@ std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
-	std::string message = doc.toJson();
+	const std::string message = doc.toJson();
+	std::string localFileName;
 
-	char* url = new char[ltSpiceServiceURL.length() + 1];
-	strcpy(url, ltSpiceServiceURL.c_str());
-
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	char* response = nullptr;
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequestWithAnswer", Qt::DirectConnection, Q_RETURN_ARG(char*, response), Q_ARG(const char*, url), Q_ARG(const char*, msg));
-
-	std::string localFileName = response;
-
-	delete[] response;
-	response = nullptr;
+	ot::CommunicationAPI::sendExecute(ltSpiceServiceURL, message, localFileName);
 
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject)
+std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -285,25 +274,14 @@ std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string&
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string message = doc.toJson();
+	std::string simpleFileName;
 
-	char* url = new char[ltSpiceServiceURL.length() + 1];
-	strcpy(url, ltSpiceServiceURL.c_str());
-
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	char* response = nullptr;
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequestWithAnswer", Qt::DirectConnection, Q_RETURN_ARG(char*, response), Q_ARG(const char*, url), Q_ARG(const char*, msg));
-
-	std::string simpleFileName = response;
-
-	delete[] response;
-	response = nullptr;
+	ot::CommunicationAPI::sendExecute(ltSpiceServiceURL, message, simpleFileName);
 
 	return simpleFileName;
 }
 
-void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL, QObject* mainObject)
+void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL)
 {
 	// Send a message to the service and set the filename on the server to be stored in the project
 	std::string hostName = QHostInfo::localHostName().toStdString();
@@ -313,15 +291,10 @@ void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const s
 	doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 
-	std::string message = doc.toJson();
+	const std::string message = doc.toJson();
 
-	char* url = new char[ltSpiceServiceURL.length() + 1];
-	strcpy(url, ltSpiceServiceURL.c_str());
-
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequest", Qt::DirectConnection, Q_ARG(const char*, url), Q_ARG(const char*, msg));
+	std::string tmp;
+	ot::CommunicationAPI::sendExecute(ltSpiceServiceURL, message, tmp);
 
 	// Now set the file name for this instance
 	ProjectManager::getInstance().setLocalFileName(fileName);
@@ -333,9 +306,9 @@ void LTSpiceConnectorAPI::openProject()
 	ProjectManager::getInstance().openProject();
 }
 
-void LTSpiceConnectorAPI::setLTSpiceServiceData(std::string ltSpiceServiceURL, QObject* mainObject)
+void LTSpiceConnectorAPI::setLTSpiceServiceData(std::string ltSpiceServiceURL)
 {
-	ProjectManager::getInstance().setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
+	ProjectManager::getInstance().setLTSpiceServiceData(ltSpiceServiceURL);
 }
 
 void LTSpiceConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults)

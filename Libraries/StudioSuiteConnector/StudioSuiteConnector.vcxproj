@@ -22,13 +22,11 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\CommitMessageDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\ProgressInfo.cpp" />
     <ClCompile Include="src\ProjectInformationDialog.cpp" />
     <ClCompile Include="src\ProjectManager.cpp" />
     <ClCompile Include="src\Result1DFileData.cpp" />
     <ClCompile Include="src\Result1DFileManager.cpp" />
     <ClCompile Include="src\Result1DRunIDContainer.cpp" />
-    <ClCompile Include="src\ServiceConnector.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
     <ClCompile Include="src\StudioConnector.cpp" />
     <ClCompile Include="src\StudioSuiteConnectorAPI.cpp" />
@@ -36,13 +34,11 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\StudioSuiteConnector\CommitMessageDialog.h" />
-    <ClInclude Include="include\StudioSuiteConnector\ProgressInfo.h" />
     <QtMoc Include="include\StudioSuiteConnector\ProjectInformationDialog.h" />
     <ClInclude Include="include\StudioSuiteConnector\ProjectManager.h" />
     <ClInclude Include="include\StudioSuiteConnector\Result1DFileData.h" />
     <ClInclude Include="include\StudioSuiteConnector\Result1DFileManager.h" />
     <ClInclude Include="include\StudioSuiteConnector\Result1DRunIDContainer.h" />
-    <ClInclude Include="include\StudioSuiteConnector\ServiceConnector.h" />
     <ClInclude Include="include\StudioSuiteConnector\InfoFileManager.h" />
     <ClInclude Include="include\StudioSuiteConnector\StudioConnector.h" />
     <ClInclude Include="include\StudioSuiteConnector\StudioSuiteConnectorAPI.h" />

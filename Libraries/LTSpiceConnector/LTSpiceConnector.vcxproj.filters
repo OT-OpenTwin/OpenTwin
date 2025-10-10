@@ -13,12 +13,6 @@
     <ClCompile Include="src\VersionFile.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ServiceConnector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ProgressInfo.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\CommitMessageDialog.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -51,12 +45,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\LTSpiceConnector\VersionFile.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\ServiceConnector.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\ProgressInfo.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h">

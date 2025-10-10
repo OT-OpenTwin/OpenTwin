@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CommunicationAPI.cpp" />
+    <ClCompile Include="src\CurrentProjectAPI.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\WindowAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTFrontendConnectorAPI\CommunicationAPI.h" />
+    <ClInclude Include="include\OTFrontendConnectorAPI\CurrentProjectAPI.h" />
     <ClInclude Include="include\OTFrontendConnectorAPI\OTFrontendConnectorAPIExport.h" />
     <ClInclude Include="include\OTFrontendConnectorAPI\WindowAPI.h" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 #include "StudioSuiteConnector/ProjectInformationDialog.h"
-//#include "AppBase.h"
+
+#include "OTWidgets/IconManager.h"
 
 #include <qwidget.h>
 #include <qlayout.h>
@@ -14,7 +15,7 @@
 #include <qheaderview.h>
 #include <qevent.h>
 
-ProjectInformationDialog::ProjectInformationDialog(const QIcon &windowIcon, const std::string& localFileName, const std::string& serverVersion, const std::string& localVersion)
+ProjectInformationDialog::ProjectInformationDialog(const std::string& localFileName, const std::string& serverVersion, const std::string& localVersion)
 {
 	// Create controls
 	my_buttonClose = new QPushButton{ "Close" };
@@ -71,7 +72,7 @@ ProjectInformationDialog::ProjectInformationDialog(const QIcon &windowIcon, cons
 	my_fileName->setMinimumWidth(300);
 
 	setWindowTitle("Project Information");
-	setWindowIcon(windowIcon);
+	setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Hide info button
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);

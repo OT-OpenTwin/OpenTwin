@@ -6,13 +6,16 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
+#include "OTFrontendConnectorAPI/CommunicationAPI.h"
+#include "OTFrontendConnectorAPI/CurrentProjectAPI.h"
 
 #include <QFileDialog>					// QFileDialog
 #include <QHostInfo>					
 
 #include <thread>
 
-std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName, QObject *mainObject, const QIcon &windowIcon)
+std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName)
 {
 	if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
 
@@ -24,7 +27,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		if (fileName == "") return "";
 
-		CommitMessageDialog commitMessageDialog(windowIcon, "Import", "Import CST Studio Suite project");
+		CommitMessageDialog commitMessageDialog("Import", "Import CST Studio Suite project");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 
@@ -32,11 +35,11 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		bool includeResults = commitMessageDialog.includeResults();
 		bool includeParametricResults = commitMessageDialog.includeParametricResults();
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
 		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL);
 		StudioSuiteConnectorAPI::setLocalFileName(fileName.toStdString());
 
 		std::thread workerThread(StudioSuiteConnectorAPI::importProject, fileName.toStdString(), projectName, message, includeResults, includeParametricResults);
@@ -46,31 +49,28 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 
 		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		std::string fileName = getStudioSuiteFileNameForCommit(projectName, studioSuiteServiceURL, mainObject);
+		std::string fileName = getStudioSuiteFileNameForCommit(projectName, studioSuiteServiceURL);
 		if (fileName.empty())
 		{
 			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
-		CommitMessageDialog commitMessageDialog(windowIcon, "Commit", "");
+		CommitMessageDialog commitMessageDialog("Commit", "");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 		std::string changeComment = commitMessageDialog.changeMessage().toStdString();
 		bool includeResults = commitMessageDialog.includeResults();
 		bool includeParametricResults = commitMessageDialog.includeParametricResults();
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
-		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL);
 
 		// We need to make sure that the project is at the correct version in OT
 		std::string currentVersion = StudioSuiteConnectorAPI::getCurrentVersion(fileName, projectName);
 
-		char* vsn = new char[currentVersion.length() + 1];
-		strcpy(vsn, currentVersion.c_str());
-
-		QMetaObject::invokeMethod(mainObject, "activateModelVersion", Qt::DirectConnection, Q_ARG(const char*, vsn));
+		ot::CurrentProjectAPI::activateModelVersion(currentVersion);
 
 		std::thread workerThread(StudioSuiteConnectorAPI::commitProject, fileName, projectName, changeComment, includeResults, includeParametricResults);
 		workerThread.detach();
@@ -87,16 +87,16 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			return "";
 		}
 
-		std::string fileName = getStudioSuiteFileNameForGet(projectName, studioSuiteServiceURL, mainObject);
+		std::string fileName = getStudioSuiteFileNameForGet(projectName, studioSuiteServiceURL);
 		if (fileName.empty())
 		{
 			ot::MessageBoxManager::showWarningPrompt("No valid local project file has been defined. Please set the local file location.", "", "Commit");
 			return "";
 		}
 
-		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
+		ot::WindowAPI::lockUI(true);
 
-		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		StudioSuiteConnectorAPI::setStudioServiceData(studioSuiteServiceURL);
 
 		std::thread workerThread(StudioSuiteConnectorAPI::getProject, fileName, projectName, version);
 		workerThread.detach();
@@ -138,7 +138,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		if (localFileName.empty())
 		{
 			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 			StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 		}
 
@@ -153,7 +153,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			localVersion.clear();
 		}
 
-		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
+		ProjectInformationDialog projectInformationDialog(localFileName, serverVersion, localVersion);
 		projectInformationDialog.exec();
 	}
 	else if (action == OT_ACTION_CMD_UI_SS_SETCSTFILE) {
@@ -165,11 +165,11 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		if (localFileName.empty())
 		{
 			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 			StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 		}
 
-		std::string simpleFileName = StudioSuiteConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL, mainObject);
+		std::string simpleFileName = StudioSuiteConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL);
 
 		std::filesystem::path filePath(localFileName);
 
@@ -203,7 +203,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 				return "";
 			}
 
-			StudioSuiteConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
+			StudioSuiteConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL);
 
 			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "", "Set CST File");
 		}
@@ -212,14 +212,14 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 	return "";
 }
 
-std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL, QObject *mainObject)
+std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::string& projectName, const std::string &studioSuiteServiceURL)
 {
 	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
 
 	if (localFileName.empty())
 	{
 		// Try to get the current file name from the server
-		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 	}
 
@@ -232,14 +232,14 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForCommit(const std::
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::string& projectName, const std::string& studioSuiteServiceURL)
 {
 	std::string localFileName = StudioSuiteConnectorAPI::getLocalFileName();
 
 	if (localFileName.empty())
 	{
 		// Try to get the current file name from the server
-		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL);
 		StudioSuiteConnectorAPI::setLocalFileName(localFileName);
 	}
 
@@ -251,7 +251,7 @@ std::string StudioSuiteConnectorAPI::getStudioSuiteFileNameForGet(const std::str
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -263,24 +263,14 @@ std::string StudioSuiteConnectorAPI::getLocalFileNameFromProject(const std::stri
 
 	std::string message = doc.toJson();
 
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
+	std::string localFileName;
 
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	char* response = nullptr;
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequestWithAnswer", Qt::DirectConnection, Q_RETURN_ARG(char*, response), Q_ARG(const char*, url), Q_ARG(const char*, msg));
-
-	std::string localFileName = response;
-
-	delete[] response;
-	response = nullptr;
+	ot::CommunicationAPI::sendExecute(studioSuiteServiceURL, message, localFileName);
 
 	return localFileName;
 }
 
-std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and request the filename
 
@@ -290,25 +280,13 @@ std::string StudioSuiteConnectorAPI::getSimpleFileNameFromProject(const std::str
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string message = doc.toJson();
-
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
-
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	char* response = nullptr;
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequestWithAnswer", Qt::DirectConnection, Q_RETURN_ARG(char*, response), Q_ARG(const char*, url), Q_ARG(const char*, msg));
-
-	std::string simpleFileName = response;
-
-	delete[] response;
-	response = nullptr;
-
+	std::string simpleFileName;
+	ot::CommunicationAPI::sendExecute(studioSuiteServiceURL, message, simpleFileName);
+	
 	return simpleFileName;
 }
 
-void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject)
+void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL)
 {
 	// Send a message to the service and set the filename on the server to be stored in the project
 	std::string hostName = QHostInfo::localHostName().toStdString();
@@ -320,14 +298,9 @@ void StudioSuiteConnectorAPI::setAndStoreLocalFileName(std::string fileName, con
 
 	std::string message = doc.toJson();
 
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
-
-	char* msg = new char[message.length() + 1];
-	strcpy(msg, message.c_str());
-
-	QMetaObject::invokeMethod(mainObject, "sendExecuteRequest", Qt::DirectConnection, Q_ARG(const char*, url), Q_ARG(const char*, msg));
-
+	std::string tmp;
+	ot::CommunicationAPI::sendExecute(studioSuiteServiceURL, message, tmp);
+	
 	// Now set the file name for this instance
 	ProjectManager::getInstance().setLocalFileName(fileName);
 }
@@ -338,9 +311,9 @@ void StudioSuiteConnectorAPI::openProject()
 	ProjectManager::getInstance().openProject();
 }
 
-void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL, QObject* mainObject)
+void StudioSuiteConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL)
 {
-	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL, mainObject);
+	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL);
 }
 
 void StudioSuiteConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults, bool includeParametricResults)

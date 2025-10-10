@@ -105,7 +105,7 @@ void ViewerComponent::removeUIElements(std::list<ViewerUIDtype>& itemIDList) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::removeUIElements()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::removeUIElements()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to remove UI Elements.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to remove UI Elements.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::displayText(const std::string& text) {
@@ -131,7 +131,7 @@ void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls,
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::enableDisableControls()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::enableDisableControls()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to update controls enabled state.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to update controls enabled state.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::entitiesSelected(ot::serviceID_t replyTo, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues) {
@@ -143,7 +143,7 @@ void ViewerComponent::entitiesSelected(ot::serviceID_t replyTo, const std::strin
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::entitiesSelected()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::entitiesSelected()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to handle entities selected.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to handle entities selected.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::rubberbandFinished(ot::serviceID_t creatorId, const std::string& note, const std::string& pointJson, const std::vector<double>& transform) {
@@ -213,7 +213,7 @@ void ViewerComponent::clearTree(void) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::clearTree()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::clearTree()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to clear naviagtion tree.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to clear naviagtion tree.", _e.what(), "Error"); }
 }
 
 ot::UID ViewerComponent::addTreeItem(const std::string& treePath, bool editable, bool selectChildren) {
@@ -226,7 +226,7 @@ ot::UID ViewerComponent::addTreeItem(const std::string& treePath, bool editable,
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addTreeItem()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add tree item.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add tree item.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -242,7 +242,7 @@ void ViewerComponent::setTreeItemIcon(ot::UID treeItemID, int iconSize, const st
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setTreeItemIcon()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setTreeItemIcon()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set tree item icon.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set tree item icon.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setTreeItemText(ot::UID treeItemID, const std::string& text) {
@@ -254,7 +254,7 @@ void ViewerComponent::setTreeItemText(ot::UID treeItemID, const std::string& tex
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setTreeItemIcon()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setTreeItemIcon()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set tree item text.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set tree item text.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::removeTreeItems(std::list<ot::UID> treeItemIDList) {
@@ -268,7 +268,7 @@ void ViewerComponent::removeTreeItems(std::list<ot::UID> treeItemIDList) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::removeTreeItems()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::removeTreeItems()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to remove tree items.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to remove tree items.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::selectTreeItem(ot::UID treeItemID) {
@@ -281,7 +281,7 @@ void ViewerComponent::selectTreeItem(ot::UID treeItemID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::selectTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectTreeItem()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to select tree item.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to select tree item.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::selectSingleTreeItem(ot::UID treeItemID) {
@@ -294,7 +294,7 @@ void ViewerComponent::selectSingleTreeItem(ot::UID treeItemID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::selectSingleTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectSingleTreeItem()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to select single tree item.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to select single tree item.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::expandSingleTreeItem(ot::UID treeItemID) {
@@ -304,7 +304,7 @@ void ViewerComponent::expandSingleTreeItem(ot::UID treeItemID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::expandSingleTreeItem()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::expandSingleTreeItem()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to expand single tree item.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to expand single tree item.", _e.what(), "Error"); }
 }
 
 bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID) {
@@ -314,7 +314,7 @@ bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::isTreeItemExpanded()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::isTreeItemExpanded()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to check if tree item is expanded.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to check if tree item is expanded.", _e.what(), "Error"); }
 
 	return false;
 }
@@ -329,7 +329,7 @@ void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerC
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::toggleTreeItemSelection()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::toggleTreeItemSelection()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to toggle tree item selection.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to toggle tree item selection.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::clearTreeSelection(void) {
@@ -342,7 +342,7 @@ void ViewerComponent::clearTreeSelection(void) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::clearTreeSelection()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::clearTreeSelection()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to clear tree item selection.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to clear tree item selection.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::refreshSelection(void) {
@@ -581,7 +581,7 @@ ViewerUIDtype ViewerComponent::addMenuPage(const std::string& pageName) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addMenuPage()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addMenuPage()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add menu page.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add menu page.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -596,7 +596,7 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addMenuGroup()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addMenuGroup()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add menu group.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add menu group.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -624,7 +624,7 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addMenuPushButton()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addMenuPushButton()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add menu push button.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add menu push button.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -698,7 +698,7 @@ void ViewerComponent::notify(
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::notify()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::notify()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to handle internal notify.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to handle internal notify.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
@@ -743,7 +743,7 @@ ViewerUIDtype ViewerComponent::getActiveDataModel() {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::getActiveDataModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::getActiveDataModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get active data model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get active data model.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -756,7 +756,7 @@ ViewerUIDtype ViewerComponent::getActiveViewerModel() {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::getActiveViewerModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::getActiveViewerModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get active viewer model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get active viewer model.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -769,7 +769,7 @@ void ViewerComponent::resetAllViews3D(ViewerUIDtype visualizationModelID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::resetAllViews3D()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::resetAllViews3D()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to reset all 3D views.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to reset all 3D views.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::refreshAllViews(ViewerUIDtype visualizationModelID) {
@@ -781,7 +781,7 @@ void ViewerComponent::refreshAllViews(ViewerUIDtype visualizationModelID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::refreshAllViews()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::refreshAllViews()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to refresh all views.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to refresh all views.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setTreeStateRecording(ViewerUIDtype visualizationModelID, bool flag) {
@@ -793,7 +793,7 @@ void ViewerComponent::setTreeStateRecording(ViewerUIDtype visualizationModelID, 
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setTreeStateRecording()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setTreeStateRecording()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set tree state recording flag.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set tree state recording flag.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::clearSelection(ViewerUIDtype visualizationModelID) {
@@ -805,7 +805,7 @@ void ViewerComponent::clearSelection(ViewerUIDtype visualizationModelID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::clearSelection()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::clearSelection()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to clear selection.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to clear selection.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::refreshSelection(ViewerUIDtype visualizationModelID) {
@@ -817,7 +817,7 @@ void ViewerComponent::refreshSelection(ViewerUIDtype visualizationModelID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::refreshSelection()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::refreshSelection()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to refresh selection.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to refresh selection.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID entityID) {
@@ -829,7 +829,7 @@ void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID en
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::selectObject()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectObject()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to select object.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to select object.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::string& treeName, double surfaceColorRGB[3],
@@ -845,7 +845,7 @@ void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addNodeFromFacetData()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addNodeFromFacetData()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add node from facet data.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add node from facet data.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string& treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool backFaceCulling,
@@ -869,7 +869,7 @@ void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, co
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationContainerNode()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationContainerNode()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add visualization container node.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add visualization container node.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string& treeName, ModelUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool isHidden, bool editable, const std::string& projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion) {
@@ -881,7 +881,7 @@ void ViewerComponent::addVisualizationVis2D3DNode(ViewerUIDtype visModelID, cons
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationVis2D3DNode()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationVis2D3DNode()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add visualization 2D3D node.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add visualization 2D3D node.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::updateVisualizationVis2D3DNode(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, const std::string& projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion) {
@@ -893,7 +893,7 @@ void ViewerComponent::updateVisualizationVis2D3DNode(ViewerUIDtype visModelID, V
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::updateVisualizationVis2D3DNode()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::updateVisualizationVis2D3DNode()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to update visualization 2D3D node.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to update visualization 2D3D node.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string& treeName, ViewerUIDtype modelEntityID, const OldTreeIcon& treeIcons, bool isHidden,
@@ -913,7 +913,7 @@ void ViewerComponent::addVisualizationAnnotationNode(ViewerUIDtype visModelID, c
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::addVisualizationAnnotationNode()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addVisualizationAnnotationNode()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to add visualization annotation node.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to add visualization annotation node.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::updateObjectColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective) {
@@ -923,7 +923,7 @@ void ViewerComponent::updateObjectColor(ViewerUIDtype visModelID, ViewerUIDtype 
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::updateObjectColor()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::updateObjectColor()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to update object color.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to update object color.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::updateMeshColor(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, double colorRGB[3]) {
@@ -933,7 +933,7 @@ void ViewerComponent::updateMeshColor(ViewerUIDtype visModelID, ViewerUIDtype mo
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::updateMeshColor()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::updateMeshColor()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to update mesh color.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to update mesh color.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::updateObjectFacetsFromDataBase(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, unsigned long long entityID, unsigned long long entityVersion) {
@@ -943,7 +943,7 @@ void ViewerComponent::updateObjectFacetsFromDataBase(ViewerUIDtype visModelID, V
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::updateObjectFacetsFromDataBase()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::updateObjectFacetsFromDataBase()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to update objects facets from data base.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to update objects facets from data base.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::enterEntitySelectionMode(ViewerUIDtype visualizationModelID, ot::serviceID_t replyTo, const std::string& selectionType, bool allowMultipleSelection,
@@ -955,7 +955,7 @@ void ViewerComponent::enterEntitySelectionMode(ViewerUIDtype visualizationModelI
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::enterEntitySelectionMode()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::enterEntitySelectionMode()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to enter entity selection mode.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to enter entity selection mode.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::freeze3DView(ViewerUIDtype visModelID, bool flag) {
@@ -965,7 +965,7 @@ void ViewerComponent::freeze3DView(ViewerUIDtype visModelID, bool flag) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::freeze3DView()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::freeze3DView()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to freeze 3D view.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to freeze 3D view.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::isModified(ViewerUIDtype visualizationModelID, bool modifiedState) {
@@ -980,7 +980,7 @@ void ViewerComponent::isModified(ViewerUIDtype visualizationModelID, bool modifi
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::isModified()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::isModified()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get is modified flag.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get is modified flag.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::removeShapes(ViewerUIDtype visualizationModelID, std::list<ViewerUIDtype> entityID) {
@@ -990,7 +990,7 @@ void ViewerComponent::removeShapes(ViewerUIDtype visualizationModelID, std::list
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::removeShapes()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::removeShapes()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to remove shapes.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to remove shapes.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setShapeVisibility(ViewerUIDtype visualizationModelID, std::list<ModelUIDtype> visibleID, std::list<ModelUIDtype> hiddenID) {
@@ -1000,7 +1000,7 @@ void ViewerComponent::setShapeVisibility(ViewerUIDtype visualizationModelID, std
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setShapeVisibility()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setShapeVisibility()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set shape visibility.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set shape visibility.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::hideEntities(ModelUIDtype visualizationModelID, std::list<ModelUIDtype> hiddenID) {
@@ -1010,7 +1010,7 @@ void ViewerComponent::hideEntities(ModelUIDtype visualizationModelID, std::list<
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::hideAllOtherEntities()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::hideAllOtherEntities()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to hide entities.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to hide entities.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::showBranch(ModelUIDtype visualizationModelID, const std::string& branchName) {
@@ -1020,7 +1020,7 @@ void ViewerComponent::showBranch(ModelUIDtype visualizationModelID, const std::s
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::showBranch()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::showBranch()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to show branch.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to show branch.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::hideBranch(ModelUIDtype visualizationModelID, const std::string& branchName) {
@@ -1030,7 +1030,7 @@ void ViewerComponent::hideBranch(ModelUIDtype visualizationModelID, const std::s
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::hideBranch()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::hideBranch()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to hide branch.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to hide branch.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::getSelectedModelEntityIDs(std::list<ViewerUIDtype>& selected) {
@@ -1040,7 +1040,7 @@ void ViewerComponent::getSelectedModelEntityIDs(std::list<ViewerUIDtype>& select
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::getSelectedModelEntityIDs()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::getSelectedModelEntityIDs()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get selected model entity IDs.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get selected model entity IDs.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::getSelectedVisibleModelEntityIDs(std::list<ViewerUIDtype>& selected) {
@@ -1050,7 +1050,7 @@ void ViewerComponent::getSelectedVisibleModelEntityIDs(std::list<ViewerUIDtype>&
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::getSelectedVisibleModelEntityIDs()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::getSelectedVisibleModelEntityIDs()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get selected visible model entity IDs.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get selected visible model entity IDs.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setFontPath(const QString& _path) {
@@ -1060,7 +1060,7 @@ void ViewerComponent::setFontPath(const QString& _path) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setFontPath()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setFontPath()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set font path.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set font path.", _e.what(), "Error"); }
 }
 
 ViewerUIDtype ViewerComponent::createModel(void) {
@@ -1070,7 +1070,7 @@ ViewerUIDtype ViewerComponent::createModel(void) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::createModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::createModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to create model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to create model.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -1081,7 +1081,7 @@ void ViewerComponent::deleteModel(ViewerUIDtype viewerUID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::deleteModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::deleteModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to delete model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to delete model.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::prefetchDocumentsFromStorage(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>>& prefetchIDs) {
@@ -1091,7 +1091,7 @@ void ViewerComponent::prefetchDocumentsFromStorage(const std::string& projectNam
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::prefetchDocumentsFromStorage()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::prefetchDocumentsFromStorage()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to prefetch documents from storage.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to prefetch documents from storage.", _e.what(), "Error"); }
 }
 
 ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
@@ -1115,7 +1115,7 @@ ViewerUIDtype ViewerComponent::createViewer(ModelUIDtype _modelUid, double _scal
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::createViewer()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::createViewer()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to create viewer.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to create viewer.", _e.what(), "Error"); }
 	return 0;
 }
 
@@ -1126,7 +1126,7 @@ ot::WidgetView* ViewerComponent::getViewerWidget(ViewerUIDtype _viewerUID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::getViewerWidget()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::getViewerWidget()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to get viewer widget.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to get viewer widget.", _e.what(), "Error"); }
 	return nullptr;
 }
 
@@ -1137,7 +1137,7 @@ void ViewerComponent::setDataModel(ViewerUIDtype viewerUID, ModelUIDtype modelUI
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setDataModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setDataModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set data model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set data model.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::activateModel(ViewerUIDtype viewerUID) {
@@ -1147,7 +1147,7 @@ void ViewerComponent::activateModel(ViewerUIDtype viewerUID) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::activateModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::activateModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to activate model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to activate model.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::deactivateCurrentlyActiveModel(void) {
@@ -1157,7 +1157,7 @@ void ViewerComponent::deactivateCurrentlyActiveModel(void) {
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::activateModel()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::activateModel()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to deactivate currently active model.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to deactivate currently active model.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setColors(const ot::Color& _background, const ot::Color& _foreground) {
@@ -1171,7 +1171,7 @@ void ViewerComponent::setColors(const ot::Color& _background, const ot::Color& _
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setColors()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setColors()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set colors.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set colors.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setDataBaseConnectionInformation(const std::string& databaseURL, const std::string& userName, const std::string& encryptedPassword) {
@@ -1181,7 +1181,7 @@ void ViewerComponent::setDataBaseConnectionInformation(const std::string& databa
 		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::setDataBaseConnectionInformation()"); }
 		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::setDataBaseConnectionInformation()"); }
 	}
-	catch (const ak::aException& _e) { AppBase::instance()->showErrorPrompt("Failed to set data base connection.", _e.what(), "Error"); }
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Failed to set data base connection.", _e.what(), "Error"); }
 }
 
 void ViewerComponent::setTabTitles(ViewerUIDtype visualizationModelID, const std::string& _tabName3D, const std::string& _tabName1D, const std::string& _tabNameVersions) {

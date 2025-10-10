@@ -39,6 +39,7 @@
 // OpenTwin Frontend API header
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTFrontendConnectorAPI/CommunicationAPI.h"
+#include "OTFrontendConnectorAPI/CurrentProjectAPI.h"
 
 // uiCore header
 #include <akCore/aException.h>
@@ -102,7 +103,8 @@ struct structModelViewInfo {
 
 //! The API manager is used to manage the global objects required for this API to work
 class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier,
-	public ot::AbstractLogNotifier, public ot::MessageBoxHandler, public ot::WindowAPI, public ot::CommunicationAPI
+	public ot::AbstractLogNotifier, public ot::MessageBoxHandler, 
+	public ot::WindowAPI, public ot::CommunicationAPI, public ot::CurrentProjectAPI
 {
 	Q_OBJECT
 public:	
@@ -474,11 +476,11 @@ public:
 	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
 public Q_SLOTS:
-	void showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
-	void showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
+	void slotShowErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title);
 
 public:
 
@@ -571,16 +573,31 @@ private Q_SLOTS:
 
 protected:
 
+	// Window API
+
 	virtual void lockUIAPI(bool _flag) override;
 	virtual void lockSelectionAndModificationAPI(bool _flag) override;
 
 	virtual void setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) override;
 	virtual void setProgressBarValueAPI(int _progressPercentage) override;
 
+	virtual void showInfoPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) override;
+	virtual void showWarningPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) override;
+	virtual void showErrorPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) override;
+
+	virtual void appendOutputMessageAPI(const std::string& _message) override;
+	virtual void appendOutputMessageAPI(const ot::StyledTextBuilder& _message) override;
+
+	// Communication API
+
 	virtual bool sendExecuteAPI(const std::string& _receiverUrl, const std::string& _message, std::string& _response) override;
 	virtual bool sendQueueAPI(const std::string& _receiverUrl, const std::string& _message) override;
 	virtual bool sendExecuteToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message, std::string& _response) override;
 	virtual bool sendQueueToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message) override;
+
+	// Current Project API
+
+	virtual void activateModelVersionAPI(const std::string& _versionName) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

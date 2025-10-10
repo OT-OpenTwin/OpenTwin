@@ -23,7 +23,7 @@ public:
     }
 
     void openProject();
-    void setLTSpiceServiceData(const std::string& ltSpiceServiceURL, QObject* mainObject);
+    void setLTSpiceServiceData(const std::string& ltSpiceServiceURL);
 
     void importProject(const std::string& fileName, const std::string& prjName, const std::string& changeMessage, bool incResults);
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);

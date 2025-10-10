@@ -25,7 +25,7 @@ class QHBoxLayout;
 class CommitMessageDialog : public QDialog {
 	Q_OBJECT
 public:
-	CommitMessageDialog(const QIcon& windowIcon, QString type, QString message);
+	CommitMessageDialog(QString type, QString message);
 	virtual ~CommitMessageDialog();
 
 	QString changeMessage(void);

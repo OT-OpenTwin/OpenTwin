@@ -1,9 +1,9 @@
 #include "LTSpiceConnector/ProjectManager.h"
-#include "LTSpiceConnector/ServiceConnector.h"
 #include "LTSpiceConnector/VersionFile.h"
-#include "LTSpiceConnector/ProgressInfo.h"
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
+#include "OTFrontendConnectorAPI/CommunicationAPI.h"
 
 #include "EntityBinaryData.h"
 #include "EntityFile.h"
@@ -47,12 +47,9 @@ void ProjectManager::setLocalFileName(std::string fileName)
 	localProjectFileName = fileName; 
 }
 
-void ProjectManager::setLTSpiceServiceData(const std::string& ltSpiceServiceURL, QObject* mainObject)
+void ProjectManager::setLTSpiceServiceData(const std::string& ltSpiceServiceURL)
 {
-	ServiceConnector::getInstance().setServiceURL(ltSpiceServiceURL);
-	ServiceConnector::getInstance().setMainObject(mainObject);
-
-	ProgressInfo::getInstance().setMainObject(mainObject);
+	ot::CommunicationAPI::setDefaultConnectorServiceUrl(ltSpiceServiceURL);
 }
 
 void ProjectManager::importProject(const std::string& fileName, const std::string& prjName, const std::string &message, bool incResults)
@@ -73,8 +70,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		changeMessage = message;
 		includeResults = incResults;
 
-		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
-		ProgressInfo::getInstance().setProgressValue(0);
+		ot::WindowAPI::setProgressBarVisibility("Importing Project", true, false);
+		ot::WindowAPI::setProgressBarValue(0);
 
 		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
@@ -85,8 +82,8 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
 
-		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
-		ProgressInfo::getInstance().setProgressValue(15);
+		ot::WindowAPI::setProgressBarVisibility("Importing Project", true, false);
+		ot::WindowAPI::setProgressBarValue(15);
 
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
@@ -96,13 +93,14 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
-		ServiceConnector::getInstance().sendExecuteRequest(doc);
+		std::string tmp;
+		ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
 	}
 	catch (std::string &error)
 	{
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().showError(error);
-		ProgressInfo::getInstance().unlockGui();
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::showErrorPrompt("Import LT Spice Project", error);
+		ot::WindowAPI::lockUI(false);
 	}
 }
 
@@ -150,8 +148,8 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		changeMessage = changeComment;
 		includeResults = incResults;
 
-		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
-		ProgressInfo::getInstance().setProgressValue(0);
+		ot::WindowAPI::setProgressBarVisibility("Committing Project", true, false);
+		ot::WindowAPI::setProgressBarValue(0);
 
 		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
@@ -162,8 +160,8 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
 
-		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
-		ProgressInfo::getInstance().setProgressValue(15);
+		ot::WindowAPI::setProgressBarVisibility("Committing Project", true, false);
+		ot::WindowAPI::setProgressBarValue(15);
 
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
@@ -173,13 +171,14 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
-		ServiceConnector::getInstance().sendExecuteRequest(doc);
+		std::string tmp;
+		ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
 	}
 	catch (std::string& error)
 	{
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().showError(error);
-		ProgressInfo::getInstance().unlockGui();
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::showErrorPrompt("Commit LT Spice Project", error);
+		ot::WindowAPI::lockUI(false);
 	}
 }
 
@@ -199,8 +198,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 
 		projectName = prjName;
 
-		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
-		ProgressInfo::getInstance().setProgressValue(0);
+		ot::WindowAPI::setProgressBarVisibility("Getting Project", true, false);
+		ot::WindowAPI::setProgressBarValue(0);
 
 		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
@@ -208,8 +207,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		// Set the name of the cache folder
 		cacheFolderName = baseProjectName + ".cache";
 
-		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
-		ProgressInfo::getInstance().setProgressValue(10);
+		ot::WindowAPI::setProgressBarVisibility("Getting Project", true, false);
+		ot::WindowAPI::setProgressBarValue(10);
 
 		// Delete project files
 		deleteLocalProjectFiles(baseProjectName);
@@ -218,37 +217,38 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 		{
 			// The project was not found in the cache. Therefore, the files need to be retrieved from the repo
-			ProgressInfo::getInstance().setProgressValue(20);
+			ot::WindowAPI::setProgressBarValue(20);
 
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 
-			ServiceConnector::getInstance().sendExecuteRequest(doc);
+			std::string tmp;
+			ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
 		}
 		else
 		{
-			ProgressInfo::getInstance().setProgressValue(90);
+			ot::WindowAPI::setProgressBarValue(90);
 
 			// Update the version file
 			writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
 
-			ProgressInfo::getInstance().setProgressState(false, "", false);
-			ProgressInfo::getInstance().unlockGui();
+			ot::WindowAPI::setProgressBarVisibility("", false, false);
+			ot::WindowAPI::lockUI(false);
 
-			ProgressInfo::getInstance().showInformation("The LTSpice project has been restored successfully to version " + version + ".");
+			ot::WindowAPI::showInfoPrompt("Get LT Spice Project", "The LTSpice project has been restored successfully to version " + version + ".");
 		}
 	}
 	catch (std::string& error)
 	{
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().showError(error);
-		ProgressInfo::getInstance().unlockGui();
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::showErrorPrompt("Get LT Spice Project", error);
+		ot::WindowAPI::lockUI(false);
 	}
 }
 
 void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
 {
-	ProgressInfo::getInstance().setProgressValue(15);
+	ot::WindowAPI::setProgressBarValue(15);
 
 	try
 	{
@@ -265,13 +265,13 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Create the new version
 		commitNewVersion(changeMessage);
 
-		ProgressInfo::getInstance().setProgressValue(90);
+		ot::WindowAPI::setProgressBarValue(90);
 	}
 	catch (std::string& error)
 	{
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().unlockGui();
-		ProgressInfo::getInstance().showError(error);
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::showErrorPrompt("Upload LT Spice Project Files", error);
+		ot::WindowAPI::lockUI(false);
 	}
 }
 
@@ -285,15 +285,15 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 		// Store version information
 		writeVersionFile(baseProjectName, projectName, newVersion, cacheFolderName);
 
-		ProgressInfo::getInstance().setProgressValue(100);
+		ot::WindowAPI::setProgressBarValue(100);
 
 		if (currentOperation == OPERATION_IMPORT)
 		{
-			ProgressInfo::getInstance().showInformation("The LTSpice project has been imported successfully.");
+			ot::WindowAPI::showInfoPrompt("Import LT Spice Project", "The LTSpice project has been imported successfully.");
 		}
 		else if (currentOperation == OPERATION_COMMIT)
 		{
-			ProgressInfo::getInstance().showInformation("The LTSpice project has been commited successfully (version: " + newVersion + ").");
+			ot::WindowAPI::showInfoPrompt("Commit LT Spice Project", "The LTSpice project has been commited successfully (version: " + newVersion + ").");
 		}
 		else
 		{
@@ -302,11 +302,11 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 	}
 	catch (std::string& error)
 	{
-		ProgressInfo::getInstance().showError(error);
+		ot::WindowAPI::showErrorPrompt("Store LT Spice Project Files", error);
 	}
 
-	ProgressInfo::getInstance().setProgressState(false, "", false);
-	ProgressInfo::getInstance().unlockGui();
+	ot::WindowAPI::setProgressBarVisibility("", false, false);
+	ot::WindowAPI::lockUI(false);
 }
 
 std::string ProjectManager::getBaseProjectName(const std::string& ltsFileName)
@@ -625,7 +625,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		int percent = (int)(75.0 * fileCount / uploadFileList.size() + 15.0);
 		if (percent > lastPercent)
 		{
-			ProgressInfo::getInstance().setProgressValue(percent);
+			ot::WindowAPI::setProgressBarValue(percent);
 			lastPercent = percent;
 		}
 		fileCount++;
@@ -633,7 +633,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 
 	DataBase::GetDataBase()->queueWriting(false);
 
-	ProgressInfo::getInstance().setProgressValue(90);
+	ot::WindowAPI::setProgressBarValue(90);
 }
 
 void ProjectManager::commitNewVersion(const std::string &changeMessage)
@@ -669,7 +669,8 @@ void ProjectManager::commitNewVersion(const std::string &changeMessage)
 	doc.AddMember(OT_ACTION_CMD_MODEL_DeleteEntity, ot::JsonArray(deletedFiles, doc.GetAllocator()), doc.GetAllocator());
 
 	// Send the message to the service
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
+	std::string tmp;
+	ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
 }
 
 void ProjectManager::deleteLocalProjectFiles(const std::string &baseProjectName)
@@ -875,7 +876,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 		int percent = (int)(70.0 * entityCount / prefetchIDs.size() + 20.0);
 		if (percent > lastPercent)
 		{
-			ProgressInfo::getInstance().setProgressValue(percent);
+			ot::WindowAPI::setProgressBarValue(percent);
 			lastPercent = percent;
 		}
 
@@ -884,10 +885,9 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 
 	if (!success)
 	{
-		ProgressInfo::getInstance().showError("The LTSpice project could not be restored to version " + version + ".");
-
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().unlockGui();
+		ot::WindowAPI::showErrorPrompt("Get LT Spice Project", "The LTSpice project could not be restored to version " + version + ".");
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::lockUI(false);
 
 		return;
 	}
@@ -895,10 +895,10 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 	// Finally restore the project from the cache
 	if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 	{
-		ProgressInfo::getInstance().showError("The LTSpice project could not be restored to version " + version + ".");
+		ot::WindowAPI::showErrorPrompt("Get LT Spice Project", "The LTSpice project could not be restored to version " + version + ".");
 
-		ProgressInfo::getInstance().setProgressState(false, "", false);
-		ProgressInfo::getInstance().unlockGui();
+		ot::WindowAPI::setProgressBarVisibility("", false, false);
+		ot::WindowAPI::lockUI(false);
 
 		return;
 	}
@@ -906,10 +906,10 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 	// Update the version file
 	writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
 
-	ProgressInfo::getInstance().setProgressState(false, "", false);
-	ProgressInfo::getInstance().unlockGui();
+	ot::WindowAPI::setProgressBarVisibility("", false, false);
+	ot::WindowAPI::lockUI(false);
 
-	ProgressInfo::getInstance().showInformation("The LTSpice project has been restored successfully to version " + version + ".");
+	ot::WindowAPI::showInfoPrompt("Get LT Spice Project", "The LTSpice project has been restored successfully to version " + version + ".");
 }
 
 bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID entityID, ot::UID version)

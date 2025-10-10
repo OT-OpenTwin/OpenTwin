@@ -1,11 +1,11 @@
 // Project header
-#include "StudioSuiteConnector/ProgressInfo.h"
 #include "StudioSuiteConnector/StudioConnector.h"
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // Qt header
 #include <QtCore/quuid.h>
@@ -21,7 +21,7 @@
 
 std::string StudioConnector::searchProjectAndExtractData(const std::string& fileName, const std::string& projectRoot, bool includeResults, bool includeParametricResults)
 {
-	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+	ot::WindowAPI::setProgressBarVisibility("Waiting for CST Studio Suite", true, true);
 
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
@@ -60,7 +60,7 @@ std::string StudioConnector::searchProjectAndExtractData(const std::string& file
 
 std::string StudioConnector::closeProject(const std::string& fileName)
 {
-	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+	ot::WindowAPI::setProgressBarVisibility("Waiting for CST Studio Suite", true, true);
 
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();
@@ -93,7 +93,7 @@ std::string StudioConnector::closeProject(const std::string& fileName)
 
 std::string StudioConnector::openProject(const std::string& fileName)
 {
-	ProgressInfo::getInstance().setProgressState(true, "Waiting for CST Studio Suite", true);
+	ot::WindowAPI::setProgressBarVisibility("Waiting for CST Studio Suite", true, true);
 
 	// First, we need to ensure that the python subservice is running
 	startSubprocess();

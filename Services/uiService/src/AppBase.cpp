@@ -546,13 +546,13 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	if (!error.empty())
 	{
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Export Project To File")));
+		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 	else
 	{
 		std::string success = "Project exported successfully: " + exportFileName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Export Project To File")));
+		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 }
 
@@ -620,7 +620,7 @@ void AppBase::exportLogs(void) {
 
 	if (ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
 		OT_LOG_E("Logger service url empty");
-		this->showErrorPrompt("Logger service not found", "", "Export Log");
+		this->slotShowErrorPrompt("Logger service not found", "", "Export Log");
 		return;
 	}
 
@@ -631,7 +631,7 @@ void AppBase::exportLogs(void) {
 
 	std::string response;
 	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		this->showErrorPrompt("Failed to send request to Logger Service.", "", "Error");
+		this->slotShowErrorPrompt("Failed to send request to Logger Service.", "", "Error");
 		return;
 	}
 
@@ -640,14 +640,14 @@ void AppBase::exportLogs(void) {
 
 	if (responseMessage != ot::ReturnMessage::Ok) {
 		OT_LOG_E("Invalid response: " + responseMessage.getWhat());
-		this->showErrorPrompt("Invalid response from logger service", "Received response: " + response , "Export Log");
+		this->slotShowErrorPrompt("Invalid response from logger service", "Received response: " + response , "Export Log");
 		return;
 	}
 
 	ot::JsonDocument messagesDoc;
 	if (!messagesDoc.fromJson(responseMessage.getWhat())) {
 		OT_LOG_E("Invalid response syntax");
-		this->showErrorPrompt("Invalid response syntax from logger service", "Received response: " + response, "Export Log");
+		this->slotShowErrorPrompt("Invalid response syntax from logger service", "Received response: " + response, "Export Log");
 		return;
 	}
 
@@ -659,7 +659,7 @@ void AppBase::exportLogs(void) {
 	}
 
 	if (messages.empty()) {
-		this->showInfoPrompt("No log messages to export", "", "Export Log");
+		this->slotShowInfoPrompt("No log messages to export", "", "Export Log");
 		return;
 	}
 
@@ -675,7 +675,7 @@ void AppBase::exportLogs(void) {
 	QFile file(exportName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		OT_LOG_E("Failed to open file for writing");
-		this->showErrorPrompt("Failed to open log file for writing.", "File: \"" + exportName.toStdString() + "\"", "Export Log");
+		this->slotShowErrorPrompt("Failed to open log file for writing.", "File: \"" + exportName.toStdString() + "\"", "Export Log");
 		return;
 	}
 
@@ -684,7 +684,7 @@ void AppBase::exportLogs(void) {
 
 	settings->setValue("ExportLogPath", exportName);
 
-	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "", "Export Log");
+	this->slotShowInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "", "Export Log");
 }
 
 void AppBase::importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName)
@@ -706,7 +706,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	{
 		pManager.deleteProject(projectName);
 
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Import Project From File")));
+		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 	else
 	{
@@ -718,7 +718,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 		std::string success = "Project imported successfully: " + projectName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Import Project From File")));
+		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 }
 
@@ -1131,7 +1131,7 @@ void AppBase::createUi(void) {
 		}
 	}
 	catch (const std::exception & e) {
-		this->showErrorPrompt("UI setup failed", e.what(), "Critical Error");
+		this->slotShowErrorPrompt("UI setup failed", e.what(), "Critical Error");
 	}
 }
 
@@ -2174,15 +2174,15 @@ ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _messag
 	return this->showPrompt(config);
 }
 
-void AppBase::showInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+void AppBase::slotShowInfoPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
 	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+void AppBase::slotShowWarningPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
 	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
+void AppBase::slotShowErrorPrompt(const std::string& _message, const std::string& _detailedMessage, const std::string& _title) {
 	this->showPrompt(_message, _detailedMessage, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
 }
 
@@ -2966,7 +2966,7 @@ void AppBase::slotCreateProject(void) {
 			msg.append(projectUser.c_str());
 			msg.append("\".");
 
-			this->showErrorPrompt(msg, "", "Create New Project");
+			this->slotShowErrorPrompt(msg, "", "Create New Project");
 			return;
 		}
 	}
@@ -3006,7 +3006,7 @@ void AppBase::slotCreateProject(void) {
 	if (projectManager.projectExists(currentName, canBeDeleted)) {
 		if (!canBeDeleted) {
 			// Notify that the project already exists and can not be deleted
-			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "", "Create New Project");
+			this->slotShowErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "", "Create New Project");
 			return;
 		}
 
@@ -3062,14 +3062,14 @@ void AppBase::slotOpenProject(void) {
 		if (projectManager.projectExists(selectedProjectName, canBeDeleted)) {
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
-				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "", "Open Project");
+				this->slotShowInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "", "Open Project");
 				return;
 			}
 			else {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					this->showErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
+					this->slotShowErrorPrompt("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".", "", "Open Project");
 					return;
 				}
 			}
@@ -3082,7 +3082,7 @@ void AppBase::slotOpenProject(void) {
 			assert(userManager.checkConnection()); // Failed to connect
 
 			if (!projectManager.canAccessProject(projectCollection)) {
-				this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "", "Open Project");
+				this->slotShowErrorPrompt("Unable to access this project. The access permission might have been changed.", "", "Open Project");
 
 				userManager.removeRecentProject(selectedProjectName);
 				m_welcomeScreen->refreshProjectList();
@@ -3107,7 +3107,7 @@ void AppBase::slotOpenProject(void) {
 			UserManagement userManager(m_loginData);
 			assert(userManager.checkConnection()); // Failed to connect
 
-			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "", "Open Project");
+			this->slotShowErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
 			m_welcomeScreen->refreshProjectList();
@@ -3192,7 +3192,7 @@ void AppBase::slotRenameProject(void) {
 			msg.append("\" is currently opened by user: \"");
 			msg.append(projectUser);
 			msg.append("\".");
-			this->showErrorPrompt(msg, "", "Rename Project");
+			this->slotShowErrorPrompt(msg, "", "Rename Project");
 
 			return;
 		}
@@ -3259,7 +3259,7 @@ void AppBase::slotDeleteProject(void) {
 				msg.append("\" is currently opened by user: \"");
 				msg.append(projectUser);
 				msg.append("\".");
-				this->showErrorPrompt(msg, "", "Delete Project");
+				this->slotShowErrorPrompt(msg, "", "Delete Project");
 
 				continue;
 			}
@@ -3566,6 +3566,52 @@ void AppBase::setProgressBarValueAPI(int _progressPercentage) {
 	}
 }
 
+void AppBase::showInfoPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+	}
+	else {
+		this->slotShowInfoPrompt(_message, _detailedMessage, _title);
+	}
+}
+
+void AppBase::showWarningPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotShowWarningPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+	}
+	else {
+		this->slotShowWarningPrompt(_message, _detailedMessage, _title);
+	}
+}
+
+void AppBase::showErrorPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+	}
+	else {
+		this->slotShowErrorPrompt(_message, _detailedMessage, _title);
+	}
+}
+
+void AppBase::appendOutputMessageAPI(const std::string& _message) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "appendInfoMessage", Qt::QueuedConnection, Q_ARG(QString, QString::fromStdString(_message)));
+	}
+	else {
+		this->appendInfoMessage(QString::fromStdString(_message));
+	}
+}
+
+void AppBase::appendOutputMessageAPI(const ot::StyledTextBuilder& _message) {
+	QString text = ot::StyledTextConverter::toHtml(_message);
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "appendHtmlInfoMessage", Qt::QueuedConnection, Q_ARG(QString, text));
+	}
+	else {
+		this->appendHtmlInfoMessage(text);
+	}
+}
+
 bool AppBase::sendExecuteAPI(const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
 	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, _receiverUrl, _message, _response);
 }
@@ -3582,6 +3628,15 @@ bool AppBase::sendExecuteToServiceAPI(const ot::BasicServiceInformation& _servic
 bool AppBase::sendQueueToServiceAPI(const ot::BasicServiceInformation& _serviceInfo, const std::string& _message) {
 	std::string tmp;
 	return m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, _serviceInfo, _message, tmp);
+}
+
+void AppBase::activateModelVersionAPI(const std::string& _versionName) {
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, "slotRequestVersion", Qt::QueuedConnection, Q_ARG(std::string, _versionName));
+	}
+	else {
+		this->slotRequestVersion(_versionName);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

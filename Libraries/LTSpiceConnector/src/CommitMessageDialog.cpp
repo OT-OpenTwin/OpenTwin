@@ -1,5 +1,5 @@
 #include "LTSpiceConnector/CommitMessageDialog.h"
-//#include "AppBase.h"
+#include "OTWidgets/IconManager.h"
 
 #include <qwidget.h>
 #include <qlayout.h>
@@ -14,7 +14,7 @@
 #include <qheaderview.h>
 #include <qevent.h>
 
-CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, QString message)
+CommitMessageDialog::CommitMessageDialog(QString type, QString message)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
 {
@@ -50,7 +50,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 	my_layout->addWidget(my_widgetButtons);
 
 	setWindowTitle(type + " Project");
-	setWindowIcon(windowIcon);
+	setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	my_input->setMinimumWidth(300);
 

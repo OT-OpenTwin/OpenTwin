@@ -24,7 +24,7 @@ public:
     }
 
     void openProject();
-    void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
+    void setStudioServiceData(const std::string& studioSuiteServiceURL);
 
     void importProject(const std::string& fileName, const std::string& prjName, const std::string& changeMessage, bool incResults, bool incParametricResults);
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);

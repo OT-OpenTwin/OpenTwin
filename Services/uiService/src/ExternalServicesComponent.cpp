@@ -580,11 +580,11 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
 				assert(0); // ERROR
-				AppBase::instance()->showErrorPrompt("Notification failed due to error response.", response, "Error");
+				AppBase::instance()->slotShowErrorPrompt("Notification failed due to error response.", response, "Error");
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
 				assert(0); // WARNING
-				AppBase::instance()->showWarningPrompt("Notification failed due to warning response", response, "Warning");
+				AppBase::instance()->slotShowWarningPrompt("Notification failed due to warning response", response, "Warning");
 			}
 		}
 	}
@@ -940,12 +940,12 @@ bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandH
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
-		AppBase::instance()->showErrorPrompt("Callback failed due to error response", response, "Error");
+		AppBase::instance()->slotShowErrorPrompt("Callback failed due to error response", response, "Error");
 		return false;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
-		AppBase::instance()->showWarningPrompt("Callback failed due to error response", response, "Warning");
+		AppBase::instance()->slotShowWarningPrompt("Callback failed due to error response", response, "Warning");
 		return false;
 	}
 	return true;
@@ -1109,19 +1109,19 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), response)) {
 		assert(0); // Failed to send
 		OT_LOG_E("Failed to send \"" OT_ACTION_CMD_GetListOfProjectTemplates "\" request to the global session service");
-		app->showErrorPrompt("Failed to send request to the global session service", "", "Error");
+		app->slotShowErrorPrompt("Failed to send request to the global session service", "", "Error");
 		return result;
 	}
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
 		OT_LOG_E(response);
-		app->showErrorPrompt("Callback failed due to error response", response, "Error");
+		app->slotShowErrorPrompt("Callback failed due to error response", response, "Error");
 		return result;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
 		OT_LOG_W(response);
-		app->showWarningPrompt("Callback failed due to warning response", response, "Warning");
+		app->slotShowWarningPrompt("Callback failed due to warning response", response, "Warning");
 		return result;
 	}
 	
@@ -1170,13 +1170,13 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		std::string gssResponse;
 		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), gssResponse)) {
 			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
-			app->showErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
+			app->slotShowErrorPrompt("Failed to send create new session request to the global session service", "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
 		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(gssResponse);
 		if (responseMessage != ot::ReturnMessage::Ok) {
-			app->showErrorPrompt(responseMessage.getWhat(), "", "Error");
+			app->slotShowErrorPrompt(responseMessage.getWhat(), "", "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
@@ -1219,7 +1219,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		std::string lssResponse;
 		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), lssResponse)) {
 			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
-			app->showErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
+			app->slotShowErrorPrompt("Failed to send http request to Local Session Service", "", "Connection Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
@@ -1228,7 +1228,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		if (lssResult != ot::ReturnMessage::Ok) {
 			OT_LOG_EAS("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
-			app->showErrorPrompt("Failed to create session. ", lssResult.getWhat(), "Error");
+			app->slotShowErrorPrompt("Failed to create session. ", lssResult.getWhat(), "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return false;
 		}
@@ -1371,7 +1371,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 	}
 	catch (const std::exception & e) {
 		OT_LOG_EAS(e.what());
-		app->showErrorPrompt("Open project failed due to exception.", e.what(), "Error");
+		app->slotShowErrorPrompt("Open project failed due to exception.", e.what(), "Error");
 		ot::LogDispatcher::instance().setProjectName("");
 		return false;
 	}
@@ -1640,7 +1640,7 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
-	AppBase::instance()->showErrorPrompt("The Local Session Service has died unexpectedly. The application will be closed now.", "", "Error");
+	AppBase::instance()->slotShowErrorPrompt("The Local Session Service has died unexpectedly. The application will be closed now.", "", "Error");
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
 }
@@ -1952,7 +1952,7 @@ void ExternalServicesComponent::handleRun(ot::JsonDocument& _document) {
 
 void ExternalServicesComponent::handleShutdown() {
 	OT_LOG_D("Showdown received");
-	AppBase::instance()->showErrorPrompt("Shutdown requested by Local Session Service.", "", "Error");
+	AppBase::instance()->slotShowErrorPrompt("Shutdown requested by Local Session Service.", "", "Error");
 	
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::Success);
 	exitThread.detach();
@@ -1963,14 +1963,14 @@ void ExternalServicesComponent::handlePreShutdown() {
 }
 
 void ExternalServicesComponent::handleEmergencyShutdown() {
-	AppBase::instance()->showErrorPrompt("An unexpected error has occurred and the session needs to be closed.", "", "Error");
+	AppBase::instance()->slotShowErrorPrompt("An unexpected error has occurred and the session needs to be closed.", "", "Error");
 	
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::EmergencyShutdown);
 	exitThread.detach();
 }
 
 void ExternalServicesComponent::handleConnectionLoss() {
-	AppBase::instance()->showErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "", "Error");
+	AppBase::instance()->slotShowErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "", "Error");
 
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
 	exitThread.detach();
@@ -2144,7 +2144,7 @@ void ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _documen
 	decodedString = nullptr;
 
 	// Show a success message
-	AppBase::instance()->showInfoPrompt("The file has been successfully saved.\nFile: \"" + fileName + "\"", "", dialogTitle);
+	AppBase::instance()->slotShowInfoPrompt("The file has been successfully saved.\nFile: \"" + fileName + "\"", "", dialogTitle);
 }
 
 void ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocument& _document) {
@@ -2448,19 +2448,19 @@ void ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument& _docum
 void ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
-	AppBase::instance()->showErrorPrompt(message, detailedMessage, "OpenTwin");
+	AppBase::instance()->slotShowErrorPrompt(message, detailedMessage, "OpenTwin");
 }
 
 void ExternalServicesComponent::handleReportWarning(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
-	AppBase::instance()->showWarningPrompt(message, detailedMessage, "OpenTwin");
+	AppBase::instance()->slotShowWarningPrompt(message, detailedMessage, "OpenTwin");
 }
 
 void ExternalServicesComponent::handleReportInformation(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	std::string detailedMessage = ot::json::getString(_document, OT_ACTION_PARAM_Detailed);
-	AppBase::instance()->showInfoPrompt(message, detailedMessage, "OpenTwin");
+	AppBase::instance()->slotShowInfoPrompt(message, detailedMessage, "OpenTwin");
 }
 
 void ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _document) {
@@ -4060,14 +4060,14 @@ void ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _docum
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+	StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName());
 }
 
 void ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {
 	m_actionProfiler.ignoreCurrent();
 
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+	LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

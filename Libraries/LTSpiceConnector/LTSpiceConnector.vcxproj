@@ -22,20 +22,16 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\CommitMessageDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\ProgressInfo.cpp" />
     <ClCompile Include="src\ProjectInformationDialog.cpp" />
     <ClCompile Include="src\ProjectManager.cpp" />
-    <ClCompile Include="src\ServiceConnector.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
     <ClCompile Include="src\LTSpiceConnectorAPI.cpp" />
     <ClCompile Include="src\VersionFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\LTSpiceConnector\CommitMessageDialog.h" />
-    <ClInclude Include="include\LTSpiceConnector\ProgressInfo.h" />
     <QtMoc Include="include\LTSpiceConnector\ProjectInformationDialog.h" />
     <ClInclude Include="include\LTSpiceConnector\ProjectManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\ServiceConnector.h" />
     <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h" />
     <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h" />
     <ClInclude Include="include\LTSpiceConnector\VersionFile.h" />

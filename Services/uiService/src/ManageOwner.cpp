@@ -282,7 +282,7 @@ void ManageOwner::readUserList(void)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -415,7 +415,7 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
@@ -424,7 +424,7 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 		m_assetOwner = newOwner;
 	}
 	else {
-		AppBase::instance()->showErrorPrompt("The owner could not be changed.", "", "Change Owner");
+		AppBase::instance()->slotShowErrorPrompt("The owner could not be changed.", "", "Change Owner");
 	}
 
 	fillOwnerList();
@@ -468,14 +468,14 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
 
 	if (hasError(response))
 	{
-		AppBase::instance()->showErrorPrompt("The owner could not be changed.", "", "Change Owner");
+		AppBase::instance()->slotShowErrorPrompt("The owner could not be changed.", "", "Change Owner");
 	}
 	else
 	{

@@ -12,6 +12,28 @@
 
 // Public API
 
+void ot::CommunicationAPI::setDefaultConnectorServiceUrl(const std::string& _url) {
+	CommunicationAPI::instance()->m_defaultConnectorServiceUrl = _url;
+}
+
+bool ot::CommunicationAPI::sendExecute(const std::string& _message, std::string& _response) {
+	CommunicationAPI* instance = CommunicationAPI::instance();
+	if (instance->m_defaultConnectorServiceUrl.empty()) {
+		OT_LOG_EA("Default connector service URL not set");
+		throw Exception::InvalidArgument("Default connector service URL not set");
+	}
+	return instance->sendExecuteAPI(instance->m_defaultConnectorServiceUrl, _message, _response);
+}
+
+bool ot::CommunicationAPI::sendQueue(const std::string& _message) {
+	CommunicationAPI* instance = CommunicationAPI::instance();
+	if (instance->m_defaultConnectorServiceUrl.empty()) {
+		OT_LOG_EA("Default connector service URL not set");
+		throw Exception::InvalidArgument("Default connector service URL not set");
+	}
+	return instance->sendQueueAPI(instance->m_defaultConnectorServiceUrl, _message);
+}
+
 bool ot::CommunicationAPI::sendExecute(const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
 	return CommunicationAPI::instance()->sendExecuteAPI(_receiverUrl, _message, _response);
 }
@@ -50,6 +72,7 @@ ot::CommunicationAPI::~CommunicationAPI() {
 ot::CommunicationAPI* ot::CommunicationAPI::instance() {
 	ot::CommunicationAPI* instance = getInstanceReference();
 	if (!instance) {
+		OT_LOG_EA("CommunicationAPI instance not available");
 		throw Exception::ObjectNotFound("CommunicationAPI instance not available");
 	}
 	return instance;

@@ -10,6 +10,9 @@
     <ClCompile Include="src\WindowAPI.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\CurrentProjectAPI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -27,6 +30,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTFrontendConnectorAPI\CommunicationAPI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTFrontendConnectorAPI\CurrentProjectAPI.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

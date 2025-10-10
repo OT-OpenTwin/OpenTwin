@@ -26,6 +26,26 @@ void ot::WindowAPI::setProgressBarValue(int _progressPercentage) {
 	WindowAPI::instance()->setProgressBarValueAPI(_progressPercentage);
 }
 
+void ot::WindowAPI::showInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	WindowAPI::instance()->showInfoPromptAPI(_title, _message, _detailedMessage);
+}
+
+void ot::WindowAPI::showWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	WindowAPI::instance()->showWarningPromptAPI(_title, _message, _detailedMessage);
+}
+
+void ot::WindowAPI::showErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
+	WindowAPI::instance()->showErrorPromptAPI(_title, _message, _detailedMessage);
+}
+
+void ot::WindowAPI::appendOutputMessage(const std::string& _message) {
+	WindowAPI::instance()->appendOutputMessageAPI(_message);
+}
+
+void ot::WindowAPI::appendOutputMessage(const StyledTextBuilder& _message) {
+	WindowAPI::instance()->appendOutputMessageAPI(_message);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::WindowAPI::WindowAPI() {
@@ -48,6 +68,7 @@ ot::WindowAPI::~WindowAPI() {
 ot::WindowAPI* ot::WindowAPI::instance() {
 	ot::WindowAPI* instance = getInstanceReference();
 	if (!instance) {
+		OT_LOG_EA("WindowAPI instance not available");
 		throw Exception::ObjectNotFound("WindowAPI instance not available");
 	}
 	return instance;

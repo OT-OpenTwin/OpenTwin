@@ -84,7 +84,7 @@ bool UserManagement::checkConnectionAuthorizationService(void) const {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
@@ -135,7 +135,7 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
@@ -168,7 +168,7 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
@@ -205,7 +205,7 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 //	std::string response;
 //	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 //		OT_LOG_E("Failed to send request to authorization service");
-//		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
+//		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service (" + m_authServerURL + ").", "Network Error");
 //		exit(ot::AppExitCode::SendFailed);
 //		return false;
 //	}
@@ -232,7 +232,7 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
@@ -255,7 +255,7 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
@@ -455,7 +455,7 @@ std::string UserManagement::getUserSettingsCollection(void)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
+		AppBase::instance()->slotShowErrorPrompt("Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"", "Network Error");
 		exit(ot::AppExitCode::SendFailed);
 		return "ERROR: Failed to request user data from Authorization Serivce";
 	}

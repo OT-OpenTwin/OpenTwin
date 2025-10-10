@@ -22,7 +22,7 @@ class QHBoxLayout;
 class ProjectInformationDialog : public QDialog {
 	Q_OBJECT
 public:
-	ProjectInformationDialog(const QIcon& windowIcon, const std::string &localFileName, const std::string& serverVersion, const std::string& localVersion);
+	ProjectInformationDialog(const std::string &localFileName, const std::string& serverVersion, const std::string& localVersion);
 	virtual ~ProjectInformationDialog();
 
 Q_SIGNALS:
