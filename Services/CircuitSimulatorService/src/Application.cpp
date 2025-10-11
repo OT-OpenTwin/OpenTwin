@@ -333,8 +333,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 
 	// Now we get the blockConnectionMap from helper in BlockEntities
-	std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntitiesByID);
-
+	std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
+	if (connectionBlockMap.empty()) {
+		OT_LOG_E("No valid connections found in " + name);
+		finishFailedSimulation();
+		return;
+	}
 	// Here i generate my netlist
 
 	std::list<std::string> _netlist = m_ngSpice.ngSpice_Initialize (connectionBlockMap,solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);

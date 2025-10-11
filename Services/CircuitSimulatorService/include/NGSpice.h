@@ -71,9 +71,8 @@ public:
 	std::map<std::string, std::string>& getMapOfCustomToNetlistName() { return this->customNameToNetlistNameMap; }
 	std::map<std::string, int>& getMapOfElementCounters() { return this->elementCounters; }
 	std::string getNetlistNameOfMap(const std::string& customName) const;
-
-
-	
+	std::shared_ptr<EntityBlock> getEntityBlock(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const;
+	ot::UIDList getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const;
 
 private:
 	const std::string m_voltMeterConnection = "voltageMeterConnection";

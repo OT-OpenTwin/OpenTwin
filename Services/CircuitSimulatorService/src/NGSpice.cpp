@@ -124,9 +124,15 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& 
 	auto appInstance = Application::instance();
 	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
-	auto element = allEntitiesByBlockID.at(elementUID);
+	auto element = getEntityBlock(allEntitiesByBlockID, elementUID);
+	if (element == nullptr) {
+		return;
+	}
 	//auto connections = element->getAllConnections();
-	auto connections = _connectionBlockMap.at(elementUID);
+	auto connections = getConnections(_connectionBlockMap, elementUID);
+	if (connections.empty()) {
+		return;
+	}
 
 	//Check if Element already exists
 	if (checkIfElementOrConnectionVisited(visitedElements,elementUID))
@@ -225,9 +231,15 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDL
 	auto appInstance = Application::instance();
 	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
-	auto element = allEntitiesByBlockID.at(elementUID);
+	auto element = getEntityBlock(allEntitiesByBlockID, elementUID);
+	if (element == nullptr) {
+		return;
+	}
 	//auto connections = element->getAllConnections();
-	auto connections = _connectionBlockMap.at(elementUID);
+	auto connections = getConnections(_connectionBlockMap, elementUID);
+	if (connections.empty()) {
+		return;
+	}
 
 	//Check if Element already exists
 	if (checkIfElementOrConnectionVisited(visitedElements, elementUID))
@@ -321,9 +333,15 @@ void NGSpice::handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBl
 	auto appInstance = Application::instance();
 	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
-	auto element = allEntitiesByBlockID.at(elementUID);
+	auto element = getEntityBlock(allEntitiesByBlockID, elementUID);
+	if (element == nullptr) {
+		return;
+	}
 	//auto connections = element->getAllConnections();
-	auto connections = _connectionBlockMap.at(elementUID);
+	auto connections = getConnections(_connectionBlockMap, elementUID);
+	if (connections.empty()) {
+		return;
+	}
 
 	for (auto connection : connections)
 	{
@@ -459,10 +477,16 @@ bool NGSpice::checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElemen
 
 Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,ot::UID connection)
 {
-	std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
-	ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-	Connection myConn(connectionCfg);
-	return myConn;
+	auto it = allConnectionEntities.find(connection);
+	if (it != allConnectionEntities.end()) {
+		ot::GraphicsConnectionCfg connectionCfg = it->second->getConnectionCfg();
+		Connection myConn(connectionCfg);
+		return myConn;
+	}
+	else {
+		OT_LOG_E("Connection does not exist - EntityID: " + connection);
+		return Connection();
+	}
 }
 
 bool NGSpice::checkIfConnectionIsConnectedToGND(std::string pole)
@@ -508,9 +532,15 @@ void NGSpice::setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _con
 	// First get all informations that needed
 	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
-	auto element = allEntitiesByBlockID.at(elementUID);
+	auto element = getEntityBlock(allEntitiesByBlockID, elementUID);
+	if (element == nullptr) {
+		return;
+	}
 	//auto connections = element->getAllConnections();
-	auto connections = _connectionBlockMap.at(elementUID);
+	auto connections = getConnections(_connectionBlockMap, elementUID);
+	if (connections.empty()) {
+		return;
+	}
 
 	std::vector<Connection> connectionsToBeSet;
 	for (auto connection : connections)
@@ -1426,6 +1456,24 @@ std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
 		OT_LOG_E("Netlist name in customNameToNetlistNameMap not found!");
 		return "failed"; 
 	}
+}
+
+std::shared_ptr<EntityBlock> NGSpice::getEntityBlock(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const {
+	auto it = _allEntitiesByBlockID.find(_uid);
+	if (it != _allEntitiesByBlockID.end()) {
+		return it->second;
+	}
+	OT_LOG_E("Block not found - EntityID: " + std::to_string(_uid));
+	return nullptr;
+}
+
+ot::UIDList NGSpice::getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const {
+	auto it = _connectionBlockMap.find(_uid);
+	if (it != _connectionBlockMap.end()) {
+		return it->second;
+	}
+	OT_LOG_E("Connection not found - EntityID: " + std::to_string(_uid));
+	return ot::UIDList{};
 }
 
 
