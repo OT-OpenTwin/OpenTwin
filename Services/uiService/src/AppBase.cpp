@@ -810,7 +810,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	ot::WidgetViewManager::instance().renameView(_fromPath, _toPath);
 
 	// Update views in local map
-
+	
 	// Graphics
 	auto graphicsIt = m_graphicsViews.find(_fromPath);
 	if (graphicsIt != m_graphicsViews.end()) {
@@ -3439,7 +3439,7 @@ void AppBase::slotHandleSelectionHasChanged(ot::SelectionHandlingResult* _result
 		graphics.second->getGraphicsView()->setSelectedElements(selectedUids);
 	}
 
-	this->autoCloseUnpinnedViews(false);
+	this->autoCloseUnpinnedViews(!selectionInfo.getSelectedNavigationItems().empty());
 
 	OT_SLECTION_TEST_LOG(">> Handle selection has changed completed");
 }
