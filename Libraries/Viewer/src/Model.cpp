@@ -45,12 +45,7 @@
 #include "PlotManager.h"
 #include "PlotManagerView.h"
 
-#include "TextVisualiser.h"
-#include "TableVisualiser.h"
-#include "PlotVisualiser.h"
-#include "CurveVisualiser.h"
-#include "RangeVisualiser.h"
-#include "GraphicsVisualiser.h"
+#include "VisualiserHelper.h"
 
 #include "IntersectionCapCalculator.h"
 
@@ -477,40 +472,7 @@ void  Model::addVisualizationContainerNode(const std::string &treeName, unsigned
 	containerNode->setModelEntityID(modelEntityID);
 	containerNode->setOldTreeIcons(treeIcons);
 	
-	if (_visualisationTypes.visualiseAsTable())
-	{
-		auto tableVis = new TableVisualiser(containerNode);
-		containerNode->addVisualiser(tableVis);
-	}
-
-	if (_visualisationTypes.visualiseAsText())
-	{
-		auto textVis = new TextVisualiser(containerNode);
-		containerNode->addVisualiser(textVis);
-	}
-
-	if (_visualisationTypes.visualiseAsPlot1D())
-	{
-		auto plotVis = new PlotVisualiser(containerNode);
-		containerNode->addVisualiser(plotVis);
-	}
-
-	if (_visualisationTypes.visualiseAsCurve())
-	{
-		auto curveVis = new CurveVisualiser(containerNode);
-		containerNode->addVisualiser(curveVis);
-	}
-
-	if (_visualisationTypes.visualiseAsRange()) {
-		auto rangeVis = new RangeVisualiser(containerNode);
-		containerNode->addVisualiser(rangeVis);
-	}
-
-	if (_visualisationTypes.visualiseAsGraphicsView())
-	{
-		auto graphicsVis = new GraphicsVisualiser(containerNode);
-		containerNode->addVisualiser(graphicsVis);
-	}
+	VisualiserHelper::addVisualizer(containerNode, _visualisationTypes);
 
 	// Get the parent scene node
 	SceneNodeBase *parentNode = getParentNode(treeName);

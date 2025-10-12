@@ -1,92 +1,20 @@
+//! @file VisualisationTypes.cpp
+//! @author Jan Wagner, Alexander Kuester (alexk95)
+//! @date September 2025
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// OpenTwin header
 #include "OTGui/VisualisationTypes.h"
 
-
-void ot::VisualisationTypes::addTextVisualisation()
-{
-	m_visualisations.push_back(m_visualisationAsText);
+void ot::VisualisationTypes::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	_object.AddMember("VisualisationTypes", static_cast<uint64_t>(m_visualisations.data()), _allocator);
 }
 
-void ot::VisualisationTypes::addTableVisualisation()
-{
-	m_visualisations.push_back(m_visualisationAsTable);
-}
-
-void ot::VisualisationTypes::addPlot1DVisualisation()
-{
-	m_visualisations.push_back(m_visualisationAsPlot1D);
-}
-
-void ot::VisualisationTypes::addCurveVisualisation()
-{
-	m_visualisations.push_back(m_visualisationAsCurve);
-}
-
-void ot::VisualisationTypes::addRangeVisualisation() {
-	m_visualisations.push_back(m_visualisationAsRange);
-}
-
-void ot::VisualisationTypes::addGraphicsViewVisualisation()
-{
-	m_visualisations.push_back(m_visualisationAsGraphicsView);
-}
-
-bool ot::VisualisationTypes::visualiseAsText() const
-{
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsText);
-	return entryIt != m_visualisations.end();
-}
-
-bool ot::VisualisationTypes::visualiseAsTable() const
-{
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsTable);
-	return entryIt != m_visualisations.end();
-}
-
-bool ot::VisualisationTypes::visualiseAsPlot1D() const
-{
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsPlot1D);
-	return entryIt != m_visualisations.end();
-}
-
-bool ot::VisualisationTypes::visualiseAsCurve() const
-{
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsCurve);
-	return entryIt != m_visualisations.end();
-}
-
-bool ot::VisualisationTypes::visualiseAsRange() const {
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsRange);
-	return entryIt != m_visualisations.end();
-}
-
-bool ot::VisualisationTypes::visualiseAsGraphicsView() const
-{
-	const auto entryIt = std::find(m_visualisations.begin(), m_visualisations.end(), m_visualisationAsGraphicsView);
-	return entryIt != m_visualisations.end();
-}
-
-void ot::VisualisationTypes::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
-{
-	std::list<uint32_t> tempList = m_visualisations;
-	tempList.unique();
-	ot::JsonArray visualisations;
-	for (uint32_t visualisationIndx : tempList)
-	{
-		visualisations.PushBack(visualisationIndx,_allocator);
+void ot::VisualisationTypes::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	if (_object.HasMember("VisualisationTypes")) {
+		m_visualisations = static_cast<VisualisationType>(json::getUInt64(_object, "VisualisationTypes"));
 	}
-	_object.AddMember("VisualisationTypes", visualisations, _allocator);
-
-}
-
-void ot::VisualisationTypes::setFromJsonObject(const ot::ConstJsonObject& _object)
-{
-	if (_object.HasMember("VisualisationTypes"))
-	{
-		auto visualisations = _object["VisualisationTypes"].GetArray();
-		for (const auto& entry : visualisations)
-		{
-			uint32_t visualisationIndx = entry.GetUint();
-			m_visualisations.push_back(visualisationIndx);
-		}
+	else {
+		m_visualisations = None;
 	}
 }

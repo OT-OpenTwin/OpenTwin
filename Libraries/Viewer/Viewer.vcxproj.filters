@@ -166,6 +166,15 @@
     <ClCompile Include="src\GraphicsVisualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VisualiserHelper.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -343,6 +352,15 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\GraphicsVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsConnectionVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VisualiserHelper.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
   </ItemGroup>

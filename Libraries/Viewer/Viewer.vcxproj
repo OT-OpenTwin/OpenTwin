@@ -33,6 +33,8 @@
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
     <ClCompile Include="src\GlobalModel.cpp" />
+    <ClCompile Include="src\GraphicsConnectionVisualiser.cpp" />
+    <ClCompile Include="src\GraphicsItemVisualiser.cpp" />
     <ClCompile Include="src\GraphicsVisualiser.cpp" />
     <ClCompile Include="src\HandleArrow.cpp" />
     <ClCompile Include="src\HandlerBase.cpp" />
@@ -92,6 +94,7 @@
     <ClCompile Include="src\ViewerView.cpp" />
     <ClCompile Include="src\ViewManipulator.cpp" />
     <ClCompile Include="src\Visualiser.cpp" />
+    <ClCompile Include="src\VisualiserHelper.cpp" />
     <ClCompile Include="src\WorkingPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +111,8 @@
     <ClInclude Include="include\FrontendAPI.h" />
     <ClInclude Include="include\GlobalFontPath.h" />
     <ClInclude Include="include\GlobalModel.h" />
+    <ClInclude Include="include\GraphicsConnectionVisualiser.h" />
+    <ClInclude Include="include\GraphicsItemVisualiser.h" />
     <ClInclude Include="include\GraphicsVisualiser.h" />
     <ClInclude Include="include\HandleArrow.h" />
     <ClInclude Include="include\HandlerBase.h" />
@@ -149,6 +154,7 @@
     <ClInclude Include="include\TransformManipulator.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />
+    <ClInclude Include="include\VisualiserHelper.h" />
     <ClInclude Include="include\VisualiserState.h" />
     <ClInclude Include="include\WorkingPlane.h" />
     <QtMoc Include="include\Viewer.h" />
