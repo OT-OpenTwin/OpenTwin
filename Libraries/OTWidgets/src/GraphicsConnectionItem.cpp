@@ -36,7 +36,8 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
 	this->updateConnectors();
-	this->updateConnectionInformation();
+	this->updateOriginConnectionInformation();
+	this->updateDestConnectionInformation();
 	this->setZValue(GraphicsZValues::Connection);
 }
 
@@ -205,7 +206,7 @@ const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
 
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
 	m_config = _cfg;
-	this->updateConnectionInformation();
+	this->updatePositionsFromItems();
 	return true;
 }
 
@@ -245,7 +246,9 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	m_dest->storeConnection(this);
 
 	this->updateConnectors();
-	this->updateConnectionInformation();
+	this->updateOriginConnectionInformation();
+	this->updateDestConnectionInformation();
+	this->updatePositionsFromItems();
 	this->update();
 
 }
@@ -266,7 +269,8 @@ void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
 	m_origin->storeConnection(this);
 
 	this->updateConnectors();
-	this->updateConnectionInformation();
+	this->updateOriginConnectionInformation();
+	this->updatePositionsFromItems();
 	this->update();
 }
 
@@ -300,7 +304,8 @@ void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
 	m_dest->storeConnection(this);
 
 	this->updateConnectors();
-	this->updateConnectionInformation();
+	this->updateDestConnectionInformation();
+	this->updatePositionsFromItems();
 	this->update();
 }
 
@@ -333,7 +338,8 @@ void ot::GraphicsConnectionItem::disconnectItems(bool _updateConfig) {
 	this->updateConnectors();
 	
 	if (_updateConfig) {
-		this->updateConnectionInformation();
+		this->updateOriginConnectionInformation();
+		this->updateDestConnectionInformation();
 	}
 
 	this->update();
@@ -342,19 +348,29 @@ void ot::GraphicsConnectionItem::disconnectItems(bool _updateConfig) {
 void ot::GraphicsConnectionItem::disconnectItem(const GraphicsItem* _item, bool _updateConfig) {
 	this->prepareGeometryChange();
 
+	bool wasOrigin = false;
 	if (m_origin == _item) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
+		wasOrigin = true;
 	}
+
+	bool wasDest = false;
 	if (m_dest == _item) {
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
+		wasDest = true;
 	}
 	
 	this->updateConnectors();
 
 	if (_updateConfig) {
-		this->updateConnectionInformation();
+		if (wasOrigin) {
+			this->updateOriginConnectionInformation();
+		}
+		if (wasDest) {
+			this->updateDestConnectionInformation();
+		}
 	}
 
 	this->update();
@@ -393,7 +409,7 @@ void ot::GraphicsConnectionItem::updateConnectionView() {
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::updateConnectionInformation() {
+void ot::GraphicsConnectionItem::updateOriginConnectionInformation() {
 	if (m_origin) {
 		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
 		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
@@ -402,7 +418,9 @@ void ot::GraphicsConnectionItem::updateConnectionInformation() {
 		m_config.setOriginConnectable("");
 		m_config.setOriginUid(0);
 	}
+}
 
+void ot::GraphicsConnectionItem::updateDestConnectionInformation() {
 	if (m_dest) {
 		m_config.setDestConnectable(m_dest->getGraphicsItemName());
 		m_config.setDestUid(m_dest->getRootItem()->getGraphicsItemUid());
@@ -411,8 +429,6 @@ void ot::GraphicsConnectionItem::updateConnectionInformation() {
 		m_config.setDestConnectable("");
 		m_config.setDestUid(0);
 	}
-	
-	this->updatePositionsFromItems();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -502,11 +518,20 @@ ot::ConnectionDirection ot::GraphicsConnectionItem::calculateDestDirection() con
 // Private functions
 
 void ot::GraphicsConnectionItem::updateConnectors() {
+	GraphicsScene* sc = this->getGraphicsScene();
+
 	if (m_origin) {
 		// Origin set
 		if (m_originConnector) {
 			m_originConnector->setGraphicsElementDestroying();
 			m_originConnector->forgetConnection(this);
+
+			if (sc) {
+				sc->itemAboutToBeRemoved(m_originConnector);
+				sc->removeItem(m_originConnector);
+				m_originConnector->setGraphicsScene(nullptr);
+			}
+
 			delete m_originConnector;
 			m_originConnector = nullptr;
 		}
@@ -515,7 +540,6 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		// Origin not set
 		if (!m_originConnector) {
 			m_originConnector = new GraphicsConnectionConnectorItem;
-			GraphicsScene* sc = this->getGraphicsScene();
 			if (sc) {
 				sc->addItem(m_originConnector);
 				m_originConnector->setGraphicsScene(sc);
@@ -533,6 +557,13 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		if (m_destConnector) {
 			m_destConnector->setGraphicsElementDestroying();
 			m_destConnector->forgetConnection(this);
+
+			if (sc) {
+				sc->itemAboutToBeRemoved(m_destConnector);
+				sc->removeItem(m_destConnector);
+				m_destConnector->setGraphicsScene(nullptr);
+			}
+			
 			delete m_destConnector;
 			m_destConnector = nullptr;
 		}
@@ -541,7 +572,6 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 		// Destination not set
 		if (!m_destConnector) {
 			m_destConnector = new GraphicsConnectionConnectorItem;
-			GraphicsScene* sc = this->getGraphicsScene();
 			if (sc) {
 				sc->addItem(m_destConnector);
 				m_destConnector->setGraphicsScene(sc);

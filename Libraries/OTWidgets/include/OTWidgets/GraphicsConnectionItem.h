@@ -136,16 +136,19 @@ namespace ot {
 
 		void updateConnectionView();
 
-		//! @brief Updates the configuration according to the origin and/or destination item.
-		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
-		//! Same applies to the destination.
-		void updateConnectionInformation();
-
 	protected:
 		virtual void graphicsSceneSet(GraphicsScene* _scene) override;
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) override;
 
 	private:
+		//! @brief Updates the configuration according to the origin item.
+		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
+		void updateOriginConnectionInformation();
+
+		//! @brief Updates the configuration according to the destination item.
+		//! If no destination is set the destination connectable name will be an empty string and the UID 0.
+		void updateDestConnectionInformation();
+
 		QPointF calculateOriginPos() const;
 		QPointF calculateDestPos() const;
 		ConnectionDirection calculateOriginDirection() const;
