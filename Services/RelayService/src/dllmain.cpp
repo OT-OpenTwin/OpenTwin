@@ -178,14 +178,7 @@ extern "C"
 	{
 		QString retVal;
 		try {
-			QMetaObject::invokeMethod(
-				&SocketServer::instance(),
-				"performAction",
-				Qt::DirectConnection, 
-				Q_RETURN_ARG(QString, retVal), 
-				Q_ARG(const char*, _json),
-				Q_ARG(const char*, _senderIP)
-			);
+			QMetaObject::invokeMethod(&SocketServer::instance(), &SocketServer::performAction, Qt::DirectConnection, qReturnArg(retVal), std::string(_json), std::string(_senderIP));
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS(e.what());
@@ -205,16 +198,7 @@ extern "C"
 		char *retval = nullptr;
 
 		try {
-
-			char *dataCopy = new char[strlen(_json) + 1];
-			strcpy(dataCopy, _json);
-
-			char *senderIPCopy = new char[strlen(_senderIP) + 1];
-			strcpy(senderIPCopy, _senderIP);
-
-			// std::cout << "queueAction: " << dataCopy << std::endl;
-
-			QMetaObject::invokeMethod(&SocketServer::instance(), "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
+			QMetaObject::invokeMethod(&SocketServer::instance(), &SocketServer::queueAction, Qt::QueuedConnection, std::string(_json), std::string(_senderIP));
 		}
 		catch (const std::exception & e) {
 			OT_LOG_EAS(e.what());
@@ -239,7 +223,7 @@ extern "C"
 			// std::cout << "deallocateData: ";
 			if (_data != nullptr)
 			{
-				QMetaObject::invokeMethod(&SocketServer::instance(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, _data));
+				delete[] _data;
 			}
 		}
 		catch (const std::exception & e) {

@@ -330,5 +330,5 @@ void LogInGSSEditDialog::addEntry(const LogInGSSEntry& _entry) {
 }
 
 void LogInGSSEditDialog::requestDeleteEntry(int _row) {
-	QMetaObject::invokeMethod(this, "slotDeleteEntry", Qt::QueuedConnection, Q_ARG(int, _row));
+	QMetaObject::invokeMethod(this, &LogInGSSEditDialog::slotDeleteEntry, Qt::QueuedConnection, _row);
 }

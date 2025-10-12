@@ -697,7 +697,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 			if (percent > oldPercent)
 			{
 				oldPercent = percent;
-				QMetaObject::invokeMethod(parent, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+				QMetaObject::invokeMethod(parent, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, percent);
 			}
 		}
 	}
@@ -732,7 +732,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 			if (percent > oldPercent)
 			{
 				oldPercent = percent;
-				QMetaObject::invokeMethod(parent, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+				QMetaObject::invokeMethod(parent, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, percent);
 			}
 		}
 		catch (std::exception& e)
@@ -946,7 +946,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 			if (percent > oldPercent)
 			{
 				oldPercent = percent;
-				QMetaObject::invokeMethod(parent, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+				QMetaObject::invokeMethod(parent, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, percent);
 			}
 		}
 
@@ -983,7 +983,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 				if (percent > oldPercent)
 				{
 					oldPercent = percent;
-					QMetaObject::invokeMethod(parent, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+					QMetaObject::invokeMethod(parent, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, percent);
 				}
 			}
 

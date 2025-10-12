@@ -449,7 +449,7 @@ void Logging::slotFilterChanged() {
 	}
 
 	if (focusedRow >= 0) {
-		QMetaObject::invokeMethod(this, "slotScrollToItem", Qt::QueuedConnection, Q_ARG(int, focusedRow));
+		QMetaObject::invokeMethod(this, &Logging::slotScrollToItem, Qt::QueuedConnection, focusedRow);
 	}
 }
 

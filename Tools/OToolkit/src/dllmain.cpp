@@ -197,7 +197,7 @@ extern "C"
 					return r;
 				}
 				else {
-					QMetaObject::invokeMethod(AppBase::instance(), "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString(_json)));
+					QMetaObject::invokeMethod(AppBase::instance(), &AppBase::slotProcessMessage, Qt::QueuedConnection, QString(_json));
 					std::string ret = ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 					char * r = new char[ret.length() + 1];
 					strcpy(r, ret.c_str());

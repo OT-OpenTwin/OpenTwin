@@ -4242,15 +4242,15 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, ot::JsonString(_fileToImport.toStdString(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 		std::string json = inDoc.toJson();
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, _info.receiverUrl), Q_ARG(std::string, std::move(json)));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, _info.receiverUrl, std::move(json));
 	}
 	catch (const std::exception& e) {
 		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 	catch (...) {
 		OT_LOG_EAS("Unknown exception during file import.");
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 }
 
@@ -4271,7 +4271,7 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 			uint32_t counter(0);
 			std::string message = ("Import of " + std::to_string(_filesToImport.size()) + " file(s): ");
 
-			QMetaObject::invokeMethod(AppBase::instance(), "appendInfoMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromStdString(message)));
+			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 
 			auto startTime = std::chrono::system_clock::now();
 			for (const QString& fileName : _filesToImport) {
@@ -4297,7 +4297,7 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 			uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 			message = (std::to_string(millisec) + " ms\n");
 
-			QMetaObject::invokeMethod(AppBase::instance(), "appendInfoMessage", Qt::QueuedConnection, Q_ARG(const QString&, QString::fromStdString(message)));
+			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 		}
 		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
 		if (_info.loadContent) {
@@ -4307,15 +4307,15 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 		}
 
 		std::string json = inDoc.toJson();
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, _info.receiverUrl), Q_ARG(std::string, std::move(json)));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, _info.receiverUrl, std::move(json));
 	}
 	catch (const std::exception& e) {
 		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 	catch (...) {
 		OT_LOG_EAS("Unknown exception during file import.");
-		QMetaObject::invokeMethod(this, "slotImportFileWorkerCompleted", Qt::QueuedConnection, Q_ARG(std::string, ""), Q_ARG(std::string, ""));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 }
 
@@ -4409,7 +4409,7 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	}
 
 	if (sessionServiceDied) {
-		QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "shutdownAfterSessionServiceDisconnected", Qt::QueuedConnection);
+		QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), &ExternalServicesComponent::shutdownAfterSessionServiceDisconnected, Qt::QueuedConnection);
 	}
 }
 

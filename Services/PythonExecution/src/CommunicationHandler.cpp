@@ -63,7 +63,7 @@ void CommunicationHandler::slotDataReceived(void) {
 
 	std::string data = m_serverSocket->readAll().toStdString();
 
-	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(std::string, data));
+	QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, data);
 }
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {

@@ -534,24 +534,24 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, true), Q_ARG(bool, false));
-	QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarVisibility, Qt::QueuedConnection, QString("Exporting project"), true, false);
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, 0);
 
 	std::string error = pManager.exportProject(selectedProjectName, exportFileName, this);
 
-	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Exporting project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarVisibility, Qt::QueuedConnection, QString("Exporting project"), false, false);
 
-	QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, &AppBase::slotLockUI, Qt::QueuedConnection, false);
 
 	if (!error.empty())
 	{
-		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Export Project To File")));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowErrorPrompt, Qt::QueuedConnection, error, std::string(), std::string("Export Project To File"));
 	}
 	else
 	{
 		std::string success = "Project exported successfully: " + exportFileName;
 
-		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Export Project To File")));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowInfoPrompt, Qt::QueuedConnection, success, std::string(), std::string("Export Project To File"));
 	}
 }
 
@@ -692,20 +692,20 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
-	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, true), Q_ARG(bool, false));
-	QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, 0));
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarVisibility, Qt::QueuedConnection, QString("Importing project"), true, false);
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, 0);
 
 	std::string error = pManager.importProject(projectName, currentUser, importFileName, this);
 
-	QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, "Importing project"), Q_ARG(bool, false), Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarVisibility, Qt::QueuedConnection, QString("Importing project"), false, false);
 
-	QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, false));
+	QMetaObject::invokeMethod(this, &AppBase::slotLockUI, Qt::QueuedConnection, false);
 
 	if (!error.empty())
 	{
 		pManager.deleteProject(projectName);
 
-		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Import Project From File")));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowErrorPrompt, Qt::QueuedConnection, error, std::string(), std::string("Import Project From File"));
 	}
 	else
 	{
@@ -713,11 +713,11 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 		assert(manager.checkConnection()); // Failed to connect
 		manager.addRecentProject(projectName);
 
-		QMetaObject::invokeMethod(this, "refreshWelcomeScreen", Qt::QueuedConnection);
+		QMetaObject::invokeMethod(this, &AppBase::refreshWelcomeScreen, Qt::QueuedConnection);
 
 		std::string success = "Project imported successfully: " + projectName;
 
-		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Import Project From File")));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowInfoPrompt, Qt::QueuedConnection, success, std::string(), std::string("Import Project From File"));
 	}
 }
 
@@ -3535,7 +3535,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::UID _entityID, bool _hasControlModi
 
 void AppBase::lockUIAPI(bool _flag) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotLockUI", Qt::QueuedConnection, Q_ARG(bool, _flag));
+		QMetaObject::invokeMethod(this, &AppBase::slotLockUI, Qt::QueuedConnection, _flag);
 	}
 	else {
 		this->slotLockUI(_flag);
@@ -3544,7 +3544,7 @@ void AppBase::lockUIAPI(bool _flag) {
 
 void AppBase::lockSelectionAndModificationAPI(bool _flag) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotLockSelectionAndModification", Qt::QueuedConnection, Q_ARG(bool, _flag));
+		QMetaObject::invokeMethod(this, &AppBase::slotLockSelectionAndModification, Qt::QueuedConnection, _flag);
 	}
 	else {
 		this->slotLockSelectionAndModification(_flag);
@@ -3553,7 +3553,7 @@ void AppBase::lockSelectionAndModificationAPI(bool _flag) {
 
 void AppBase::setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotSetProgressBarVisibility", Qt::QueuedConnection, Q_ARG(QString, _progressMessage), Q_ARG(bool, _progressBaseVisible), Q_ARG(bool, _continuous));
+		QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarVisibility, Qt::QueuedConnection, _progressMessage, _progressBaseVisible, _continuous);
 	}
 	else {
 		this->slotSetProgressBarVisibility(_progressMessage, _progressBaseVisible, _continuous);
@@ -3562,7 +3562,7 @@ void AppBase::setProgressBarVisibilityAPI(QString _progressMessage, bool _progre
 
 void AppBase::setProgressBarValueAPI(int _progressPercentage) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotSetProgressBarValue", Qt::QueuedConnection, Q_ARG(int, _progressPercentage));
+		QMetaObject::invokeMethod(this, &AppBase::slotSetProgressBarValue, Qt::QueuedConnection, _progressPercentage);
 	}
 	else {
 		this->slotSetProgressBarValue(_progressPercentage);
@@ -3571,7 +3571,7 @@ void AppBase::setProgressBarValueAPI(int _progressPercentage) {
 
 void AppBase::showInfoPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotShowInfoPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowInfoPrompt, Qt::QueuedConnection, _message, _detailedMessage, _title);
 	}
 	else {
 		this->slotShowInfoPrompt(_message, _detailedMessage, _title);
@@ -3580,7 +3580,7 @@ void AppBase::showInfoPromptAPI(const std::string& _title, const std::string& _m
 
 void AppBase::showWarningPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotShowWarningPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowWarningPrompt, Qt::QueuedConnection, _message, _detailedMessage, _title);
 	}
 	else {
 		this->slotShowWarningPrompt(_message, _detailedMessage, _title);
@@ -3589,7 +3589,7 @@ void AppBase::showWarningPromptAPI(const std::string& _title, const std::string&
 
 void AppBase::showErrorPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotShowErrorPrompt", Qt::QueuedConnection, Q_ARG(std::string, _message), Q_ARG(std::string, _detailedMessage), Q_ARG(std::string, _title));
+		QMetaObject::invokeMethod(this, &AppBase::slotShowErrorPrompt, Qt::QueuedConnection, _message, _detailedMessage, _title);
 	}
 	else {
 		this->slotShowErrorPrompt(_message, _detailedMessage, _title);
@@ -3598,7 +3598,7 @@ void AppBase::showErrorPromptAPI(const std::string& _title, const std::string& _
 
 void AppBase::appendOutputMessageAPI(const std::string& _message) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "appendInfoMessage", Qt::QueuedConnection, Q_ARG(QString, QString::fromStdString(_message)));
+		QMetaObject::invokeMethod(this, &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(_message));
 	}
 	else {
 		this->appendInfoMessage(QString::fromStdString(_message));
@@ -3608,7 +3608,7 @@ void AppBase::appendOutputMessageAPI(const std::string& _message) {
 void AppBase::appendOutputMessageAPI(const ot::StyledTextBuilder& _message) {
 	QString text = ot::StyledTextConverter::toHtml(_message);
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "appendHtmlInfoMessage", Qt::QueuedConnection, Q_ARG(QString, text));
+		QMetaObject::invokeMethod(this, &AppBase::appendHtmlInfoMessage, Qt::QueuedConnection, text);
 	}
 	else {
 		this->appendHtmlInfoMessage(text);
@@ -3635,7 +3635,7 @@ bool AppBase::sendQueueToServiceAPI(const ot::BasicServiceInformation& _serviceI
 
 void AppBase::activateModelVersionAPI(const std::string& _versionName) {
 	if (QThread::currentThread() != this->thread()) {
-		QMetaObject::invokeMethod(this, "slotRequestVersion", Qt::QueuedConnection, Q_ARG(std::string, _versionName));
+		QMetaObject::invokeMethod(this, &AppBase::slotRequestVersion, Qt::QueuedConnection, _versionName);
 	}
 	else {
 		this->slotRequestVersion(_versionName);

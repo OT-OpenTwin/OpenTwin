@@ -108,7 +108,7 @@ ot::ServiceDebugInformation SocketServer::getServiceDebugInformation() const {
 
 // Public: Slots
 
-QString SocketServer::performAction(const char* _json, const char* _senderIP)
+QString SocketServer::performAction(const std::string& _json, const std::string& _senderIP)
 {
 	try {
 		ot::JsonDocument doc;
@@ -186,7 +186,7 @@ QString SocketServer::performAction(const char* _json, const char* _senderIP)
 	}
 }
 
-void SocketServer::queueAction(const char* _json, const char* _senderIP)
+void SocketServer::queueAction(const std::string& _json, const std::string& _senderIP)
 {
 	try {
 		ot::JsonDocument doc;
@@ -201,15 +201,6 @@ void SocketServer::queueAction(const char* _json, const char* _senderIP)
 		}
 
 		this->sendQueueWSMessage(_senderIP, _json);
-
-		if (_json) {
-			delete[] _json;
-			_json = nullptr;
-		}
-		if (_senderIP) {
-			delete[] _senderIP;
-			_senderIP = nullptr;
-		}
 	}
 	catch (const std::exception& e) {
 		OT_LOG_E(std::string(e.what()));
@@ -217,13 +208,6 @@ void SocketServer::queueAction(const char* _json, const char* _senderIP)
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error");
 	}
-}
-
-void SocketServer::deallocateData(const char* _data) {
-	if (_data != nullptr) {
-		delete[] _data;
-	}
-	_data = nullptr;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -263,7 +247,7 @@ void SocketServer::onNewConnection()
 void SocketServer::messageReceived(const QString& _message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
 	// Add message to processing queue to free the socket thread
-	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(const QString&, _message));
+	QMetaObject::invokeMethod(this, &SocketServer::slotProcessMessage, Qt::QueuedConnection, _message);
 }
 
 void SocketServer::slotProcessMessage(const QString& _message) {

@@ -753,14 +753,14 @@ void BackendInfo::loadWorker(std::string _gssUrl) {
 	}
 
 	m_gssInfos.push_back(gssInfo);
-	QMetaObject::invokeMethod(this, "slotAddGSS", Qt::QueuedConnection, Q_ARG(const ot::GSSDebugInfo&, gssInfo));
+	QMetaObject::invokeMethod(this, &BackendInfo::slotAddGSS, Qt::QueuedConnection, gssInfo);
 
 	// Get LSS info
 	for (const auto& lss : gssInfo.getLSSList()) {
 		ot::LSSDebugInfo lssInfo;
 		if (this->lssLoad(lss.url, lssInfo)) {
 			m_lssInfos.push_back(lssInfo);
-			QMetaObject::invokeMethod(this, "slotAddLSS", Qt::QueuedConnection, Q_ARG(const ot::LSSDebugInfo&, lssInfo));
+			QMetaObject::invokeMethod(this, &BackendInfo::slotAddLSS, Qt::QueuedConnection, lssInfo);
 		}
 	}
 
@@ -772,14 +772,14 @@ void BackendInfo::loadWorker(std::string _gssUrl) {
 	}
 
 	m_gdsInfos.push_back(gdsInfo);
-	QMetaObject::invokeMethod(this, "slotAddGDS", Qt::QueuedConnection, Q_ARG(const ot::GDSDebugInfo&, gdsInfo));
+	QMetaObject::invokeMethod(this, &BackendInfo::slotAddGDS, Qt::QueuedConnection, gdsInfo);
 
 	// Get LDS info
 	for (const auto& lds : gdsInfo.getLocalDirectoryServices()) {
 		ot::LDSDebugInfo ldsInfo;
 		if (this->ldsLoad(lds.url, ldsInfo)) {
 			m_ldsInfos.push_back(ldsInfo);
-			QMetaObject::invokeMethod(this, "slotAddLDS", Qt::QueuedConnection, Q_ARG(const ot::LDSDebugInfo&, ldsInfo));
+			QMetaObject::invokeMethod(this, &BackendInfo::slotAddLDS, Qt::QueuedConnection, ldsInfo);
 		}
 	}
 

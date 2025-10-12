@@ -60,9 +60,8 @@ Q_SIGNALS:
 	// Public: Slots
 
 public Q_SLOTS:
-	QString performAction(const char * _json, const char * _senderIP);
-	void queueAction(const char * _json, const char * _senderIP);
-	void deallocateData(const char * _data);
+	QString performAction(const std::string& _json, const std::string& _senderIP);
+	void queueAction(const std::string& _json, const std::string& _senderIP);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

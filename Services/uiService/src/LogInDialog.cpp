@@ -518,7 +518,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		if (msgBox.exec() == QMessageBox::Yes)
 		{
 			// We try to update the frontend installation
-			QMetaObject::invokeMethod(AppBase::instance(), "downloadInstaller", Qt::QueuedConnection, Q_ARG(QString, m_loginData.getGss().getConnectionUrl()));
+			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::downloadInstaller, Qt::QueuedConnection, m_loginData.getGss().getConnectionUrl());
 
 			m_loginData.clear();
 			this->setControlsEnabled(true);
@@ -715,7 +715,7 @@ void LogInDialog::updateGssOptions() {
 // Async worker
 
 void LogInDialog::stopWorkerWithError(WorkerError _error) {
-	QMetaObject::invokeMethod(this, "slotWorkerError", Qt::QueuedConnection, Q_ARG(WorkerError, _error));
+	QMetaObject::invokeMethod(this, &LogInDialog::slotWorkerError, Qt::QueuedConnection, _error);
 }
 
 void LogInDialog::loginWorkerStart() {

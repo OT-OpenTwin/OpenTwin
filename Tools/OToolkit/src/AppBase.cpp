@@ -120,17 +120,17 @@ void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogTy
 		switch (_type)
 		{
 		case otoolkit::APIInterface::Information:
-			QMetaObject::invokeMethod(this, "slotLogMessage", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			QMetaObject::invokeMethod(this, &AppBase::slotLogMessage, Qt::QueuedConnection, _sender, _message);
 			break;
 		case otoolkit::APIInterface::Warning:
-			QMetaObject::invokeMethod(this, "slotLogWarning", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			QMetaObject::invokeMethod(this, &AppBase::slotLogWarning, Qt::QueuedConnection, _sender, _message);
 			break;
 		case otoolkit::APIInterface::Error:
-			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, _message));
+			QMetaObject::invokeMethod(this, &AppBase::slotLogError, Qt::QueuedConnection, _sender, _message);
 			break;
 		default:
 			OTAssert(0, "Unknown log type");
-			QMetaObject::invokeMethod(this, "slotLogError", Qt::QueuedConnection, Q_ARG(QString, _sender), Q_ARG(QString, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }")));
+			QMetaObject::invokeMethod(this, &AppBase::slotLogError, Qt::QueuedConnection, _sender, QString("Unknown log type for message { \"Sender\": \"" + _sender + "\", \"Message\": \"" + _message + "\" }"));
 			break;
 		}
 	}
@@ -145,7 +145,7 @@ void AppBase::updateStatusString(const QString& _statusText) {
 		this->slotSetStatus(_statusText);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotSetStatus", Qt::QueuedConnection, Q_ARG(QString, _statusText));
+		QMetaObject::invokeMethod(this, &AppBase::slotSetStatus, Qt::QueuedConnection, _statusText);
 	}
 }
 
@@ -154,7 +154,7 @@ void AppBase::updateStatusStringAsError(const QString& _statusText) {
 		this->slotSetErrorStatus(_statusText);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotSetErrorStatus", Qt::QueuedConnection, Q_ARG(QString, _statusText));
+		QMetaObject::invokeMethod(this, &AppBase::slotSetErrorStatus, Qt::QueuedConnection, _statusText);
 	}
 }
 

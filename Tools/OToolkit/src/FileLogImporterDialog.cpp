@@ -191,7 +191,7 @@ void FileLogImporterDialog::appendOutputMessage(const QString& _msg) {
 	if (QThread::currentThread() == this->thread()) {
 		m_output->appendPlainText(_msg);
 	} else {
-		QMetaObject::invokeMethod(this, "slotAppendOutputMessage", Qt::QueuedConnection, Q_ARG(QString, _msg));
+		QMetaObject::invokeMethod(this, &FileLogImporterDialog::slotAppendOutputMessage, Qt::QueuedConnection, _msg);
 	}
 }
 
@@ -199,7 +199,7 @@ void FileLogImporterDialog::appendFilePathInfo(const QString& _path) {
 	if (QThread::currentThread() == this->thread()) {
 		m_importedFiles->appendPlainText(_path);
 	} else {
-		QMetaObject::invokeMethod(this, "slotAppendFilePathInfo", Qt::QueuedConnection, Q_ARG(QString, _path));
+		QMetaObject::invokeMethod(this, &FileLogImporterDialog::slotAppendFilePathInfo, Qt::QueuedConnection, _path);
 	}
 }
 

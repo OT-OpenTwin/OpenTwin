@@ -1238,14 +1238,12 @@ void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 void Terminal::workerSendMessage(const std::string& _receiverUrl, ot::MessageType _messageType, const QByteArray& _data) {
 	std::string response;
 	if (!ot::msg::send("", _receiverUrl, _messageType, _data.toStdString(), response, ot::msg::defaultTimeout, ot::msg::NoRequestFlags)) {
-		if (!QMetaObject::invokeMethod(this, "slotMessageSendFailed", Qt::QueuedConnection, Q_ARG(const QString&, QString(
-			"Failed to send message to \"" + QString::fromStdString(_receiverUrl) + "\""
-		)))) {
+		if (!QMetaObject::invokeMethod(this, &Terminal::slotMessageSendFailed, Qt::QueuedConnection, QString("Failed to send message to \"" + QString::fromStdString(_receiverUrl) + "\""))) {
 			OTOOLKIT_LOGE("Terminal Worker", "Failed to queue send failed call");
 		}
 	}
 	else {
-		if (!QMetaObject::invokeMethod(this, "slotMessageSendSuccessful", Qt::QueuedConnection, Q_ARG(const QByteArray&, QByteArray::fromStdString(response)))) {
+		if (!QMetaObject::invokeMethod(this, &Terminal::slotMessageSendSuccessful, Qt::QueuedConnection, QByteArray::fromStdString(response))) {
 			OTOOLKIT_LOGE("Terminal Worker", "Failed to queue send success call");
 		}
 	}

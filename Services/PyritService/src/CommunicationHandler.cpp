@@ -76,7 +76,7 @@ void CommunicationHandler::slotMessageReceived(void) {
 	std::string message;
 	message = m_client->readAll().toStdString();
 	
-	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(std::string, message));
+	QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, message);
 }
 
 void CommunicationHandler::slotClientDisconnected(void) {

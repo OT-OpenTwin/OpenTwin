@@ -22,7 +22,7 @@ void ot::SimpleLogViewer::appendLog(const ot::LogMessage& _message) {
 		slotAppendLog(_message);
 	}
 	else {
-		QMetaObject::invokeMethod(this, "slotAppendLog", Qt::QueuedConnection, Q_ARG(const ot::LogMessage&, _message));
+		QMetaObject::invokeMethod(this, &SimpleLogViewer::slotAppendLog, Qt::QueuedConnection, const ot::LogMessage&, _message);
 	}
 }
 
