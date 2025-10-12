@@ -3626,7 +3626,7 @@ void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (visualisationCfg.getSetAsActiveView()) {
+	if (!visualisationCfg.getSetAsActiveView()) {
 		insertFlags |= ot::WidgetView::KeepCurrentFocus;
 	}
 	
