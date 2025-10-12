@@ -18,9 +18,9 @@
 
 namespace ot {
 
-	//! \class StyleRefPainter2D
-	//! \brief The StyleRefPainter2D can be used to reference a ColorStyleValue in the active ColorStyle.
-	//! \note Note that the reference is only evaluated in the frontend by the QtFactory.
+	//! @class StyleRefPainter2D
+	//! @brief The StyleRefPainter2D can be used to reference a ColorStyleValue in the active ColorStyle.
+	//! @note Note that the reference is only evaluated in the frontend by the QtFactory.
 	//! *     When the active ColorStyle changes every GUI element working with Painter2D should reevaluate the Painter2D.
 	class OT_GUI_API_EXPORT StyleRefPainter2D : public ot::Painter2D {
 		OT_DECL_NOCOPY(StyleRefPainter2D)
@@ -47,15 +47,15 @@ namespace ot {
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
-		//! \brief Sets the key of the ColorStyleValue that should be referenced.
-		//! \param _referenceKey Key to set.
+		//! @brief Sets the key of the ColorStyleValue that should be referenced.
+		//! @param _referenceKey Key to set.
 		void setReferenceKey(ColorStyleValueEntry _referenceKey) { m_reference = _referenceKey; };
 
-		//! \brief Key of the ColorStyleValue that is referenced.
+		//! @brief Key of the ColorStyleValue that is referenced.
 		ColorStyleValueEntry getReferenceKey(void) const { return m_reference; };
 
 	private:
-		ColorStyleValueEntry m_reference; //! \brief ColorStyleValue key.
+		ColorStyleValueEntry m_reference; //! @brief ColorStyleValue key.
 	};
 
 }

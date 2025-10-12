@@ -6,10 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/BasicServiceInformation.h"
 
 // C++ header

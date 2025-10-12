@@ -6,14 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
-#include "OTCore/CoreTypes.h"
 #include "OTGui/Margins.h"
-#include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/GraphicsElement.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
@@ -41,8 +37,8 @@ namespace ot {
 
 		// Types
 
-		//! \enum GraphicsItemEvent
-		//! \brief The GraphicsItemEvent is used to describe the type of an event that occured.
+		//! @enum GraphicsItemEvent
+		//! @brief The GraphicsItemEvent is used to describe the type of an event that occured.
 		enum GraphicsItemEvent {
 			ItemMoved,
 			ItemResized
@@ -52,11 +48,11 @@ namespace ot {
 
 		// Public Static
 
-		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemSelectionBorder.
+		//! @brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemSelectionBorder.
 		//! The caller takes ownership of the painter.
 		static Painter2D* createSelectionBorderPainter();
 
-		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemHoverBorder.
+		//! @brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemHoverBorder.
 		//! The caller takes ownership of the painter.
 		static Painter2D* createHoverBorderPainter();
 
@@ -64,59 +60,59 @@ namespace ot {
 
 		// Constructor / Destructor
 
-		//! \brief Constructor.
-		//! \param _configuration Initial configuration
-		//! \param _stateFlags Initial state flags.
+		//! @brief Constructor.
+		//! @param _configuration Initial configuration
+		//! @param _stateFlags Initial state flags.
 		GraphicsItem(GraphicsItemCfg* _configuration);
 
-		//! \brief Destructor.
+		//! @brief Destructor.
 		virtual ~GraphicsItem();
 
 		// ###############################################################################################################################################
 
 		// Pure virtual functions
 
-		//! \brief Calls QGraphicsItem::paint().
+		//! @brief Calls QGraphicsItem::paint().
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
-		//! \brief Returns the QGraphicsLayoutItem.
+		//! @brief Returns the QGraphicsLayoutItem.
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem() = 0;
 
-		//! \brief Calls QGraphicsLayoutItem::prepareGeometryChange().
+		//! @brief Calls QGraphicsLayoutItem::prepareGeometryChange().
 		virtual void prepareGraphicsItemGeometryChange() = 0;
 
-		//! \brief Calls QGraphicsLayoutItem::sizeHint().
+		//! @brief Calls QGraphicsLayoutItem::sizeHint().
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const = 0;
 
 		// ###############################################################################################################################################
 
 		// Virtual functions
 
-		//! \brief Will setup the item from the provided configuration and store a copy.
+		//! @brief Will setup the item from the provided configuration and store a copy.
 		//! The previously stored configuration will be destroyed.
 		//! Default 0.
-		//! \param _cfg GraphicsItem configuration (Copy will be stored).
+		//! @param _cfg GraphicsItem configuration (Copy will be stored).
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg);
 
-		//! \brief Will be called when this item was registered as an event handler and the child raised an event
+		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
-		//! \brief Will be called whenever the GraphicsItem flags have changed.
+		//! @brief Will be called whenever the GraphicsItem flags have changed.
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags);
 
-		//! \brief Will be called whenever the GraphicsItem configuration has changed.
+		//! @brief Will be called whenever the GraphicsItem configuration has changed.
 		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config);
 
-		//! \brief Will return any child item that matches the _itemName.
-		//! \param _itemName The name of the item to find.
+		//! @brief Will return any child item that matches the _itemName.
+		//! @param _itemName The name of the item to find.
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
-		//! \brief Removes all connections to or from this item.
+		//! @brief Removes all connections to or from this item.
 		virtual void removeAllConnections();
 
 		virtual bool graphicsItemRequiresHover() const;
 
-		//! \brief Will be called after setupFromConfig (i.e. if the item is completely created).
+		//! @brief Will be called after setupFromConfig (i.e. if the item is completely created).
 		//! Here the item structure is complete and the item may adjust settings that depend on parent items (e.g. Text reference for GraphicsTextItem).
 		//! Container items must override this method to forward the call to their child items.
 		virtual void finalizeGraphicsItem() {};
@@ -147,7 +143,7 @@ namespace ot {
 		//! @param _rect The default item rect (the size should be the prefferred item size)
 		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect) const;
 
-		//! \brief Handles general item updates.
+		//! @brief Handles general item updates.
 		//! The selected state will be forwarded to the GraphicsHighlightItem.
 		//! Position updates will update the connections and call GraphicsItem::graphicsItemEventHandler() with GraphicsItem::ItemMoved
 		//! @callgraph
@@ -157,9 +153,9 @@ namespace ot {
 
 		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
-		//! \brief Calculates and returns the shortest distance to the given point.
+		//! @brief Calculates and returns the shortest distance to the given point.
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
-		//! \param _pt Point in scene coordinates.
+		//! @param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 		qreal calculateShortestDistanceToPoint(double _x, double _y) { return this->calculateShortestDistanceToPoint(QPointF(_x, _y)); };
 
@@ -179,46 +175,46 @@ namespace ot {
 
 		const GraphicsItem* getRootItem() const;
 
-		//! \brief Replaces the current configuration with the configuration provided.
+		//! @brief Replaces the current configuration with the configuration provided.
 		//! The item takes ownership of the configuration.
 		void setConfiguration(GraphicsItemCfg* _config);
 
-		//! \brief Returns the current configuration.
+		//! @brief Returns the current configuration.
 		GraphicsItemCfg* getConfiguration() { return m_config; };
 
-		//! \brief Returns the current configuration.
+		//! @brief Returns the current configuration.
 		const GraphicsItemCfg* getConfiguration() const { return m_config; };
 
-		//! \brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
+		//! @brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).
 		void setGraphicsItemPos(const QPointF& _pos);
 		void setGraphicsItemPos(double _x, double _y) { this->setGraphicsItemPos(QPointF(_x, _y)); };
 
-		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos(const QPointF&).
+		//! @brief This function will update the position in the configuration and call QGraphicsItem::setPos(const QPointF&).
 		//! @callgraph
 		void setGraphicsItemPos(const Point2DD& _pos);
 
-		//! \brief Returns the current position set in the configuration.
+		//! @brief Returns the current position set in the configuration.
 		const Point2DD& getGraphicsItemPos() const;
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* getParentGraphicsItem() const { return m_parent; };
 		
-		//! \brief Sets the provided flag.
-		//! \see GraphicsItem, GraphicsItemFlag
-		//! \param _flag Flag to set.
-		//! \param _active If true will set the flag, otherwise unset it.
+		//! @brief Sets the provided flag.
+		//! @see GraphicsItem, GraphicsItemFlag
+		//! @param _flag Flag to set.
+		//! @param _active If true will set the flag, otherwise unset it.
 		void setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active = true);
 
-		//! \brief Replaces the flags with the flags provided.
-		//! \param _flags Flags to set.
+		//! @brief Replaces the flags with the flags provided.
+		//! @param _flags Flags to set.
 		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags);
 
-		//! \brief Returns the current GraphicsItemFlags set.
-		//! \see GraphicsItem, GraphicsItemFlag
+		//! @brief Returns the current GraphicsItemFlags set.
+		//! @see GraphicsItem, GraphicsItemFlag
 		const GraphicsItemCfg::GraphicsItemFlags& getGraphicsItemFlags() const;
 
-		//! \brief Sets the GraphicsItem UID.
-		//! \param _uid UID to set.
+		//! @brief Sets the GraphicsItem UID.
+		//! @param _uid UID to set.
 		void setGraphicsItemUid(const ot::UID& _uid);
 		const ot::UID& getGraphicsItemUid() const;
 
@@ -233,7 +229,7 @@ namespace ot {
 		void setAdditionalTriggerDistance(const ot::MarginsD& _distance);
 		const ot::MarginsD& getAdditionalTriggerDistance() const;
 		
-		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		//! @brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance() const;
 		
 		void setGraphicsItemMinimumSize(double _width, double _height) { this->setGraphicsItemMinimumSize(QSizeF(_width, _height)); };
@@ -288,28 +284,28 @@ namespace ot {
 		void setGraphicsItemSelected(bool _selected);
 		bool getGraphicsItemSelected() const;
 
-		//! \see getBlockFlagNotifications
+		//! @see getBlockFlagNotifications
 		void setBlockFlagNotifications(bool _block) { m_blockFlagNotifications = _block; };
 
-		//! \brief If enabled the item will not call graphicsItemFlagsChanged() when the flags have changed.
+		//! @brief If enabled the item will not call graphicsItemFlagsChanged() when the flags have changed.
 		bool getBlockFlagNotifications() const { return m_blockFlagNotifications; };
 
-		//! \see getBlockConfigurationNotifications
+		//! @see getBlockConfigurationNotifications
 		void setBlockConfigurationNotifications(bool _block) { m_blockConfigurationNotifications = _block; };
 		
-		//! \brief If enabled the item will not call graphicsItemConfigurationChanged() when the flags have changed.
+		//! @brief If enabled the item will not call graphicsItemConfigurationChanged() when the flags have changed.
 		bool getBlockConfigurationNotifications() const { return m_blockConfigurationNotifications; };
 
-		//! \brief Sets the current item position as move start point.
+		//! @brief Sets the current item position as move start point.
 		void setCurrentPosAsMoveStart();
 
-		//! \brief Notifies the view if the items current position changed relative to the move start point.
+		//! @brief Notifies the view if the items current position changed relative to the move start point.
 		void notifyMoveIfRequired();
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 
-		//! \brief Returns the bounding rect in scene coordinates which was expanded by the additional trigger distance according to the config.
-		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
+		//! @brief Returns the bounding rect in scene coordinates which was expanded by the additional trigger distance according to the config.
+		//! @see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
 		QRectF getTriggerBoundingRect() const;
 
 		//! @brief If enabled the item does not send any notifications to the view.
@@ -322,13 +318,13 @@ namespace ot {
 	protected:
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
 
-		//! \brief Returns the configuration for the current item.
+		//! @brief Returns the configuration for the current item.
 		//! The configuration may be modified.
 		//! The function will cast the current configuration to the type provided.
 		//! The method will return 0 if the cast failed.
 		template <class T> T* getItemConfiguration();
 
-		//! \brief Returns the configuration for the current item.
+		//! @brief Returns the configuration for the current item.
 		//! The configuration may be modified.
 		//! The function will cast the current configuration to the type provided.
 		//! The method will return 0 if the cast failed.
@@ -344,12 +340,12 @@ namespace ot {
 		virtual ConnectionDirection calculateOutwardsConnectionDirection() const;
 
 	private:
-		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
+		GraphicsItemCfg* m_config; //! @brief Configuration used to setup this item. Default 0.
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.
 		GraphicsItem* m_parent; //! @brief Parent graphics item.
 		
-		QSizeF m_requestedSize; //! \brief Size requested by parent.
+		QSizeF m_requestedSize; //! @brief Size requested by parent.
 
 		bool m_forwardSizeChanges;
 

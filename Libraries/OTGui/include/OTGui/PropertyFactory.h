@@ -7,9 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Property.h"
-#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <map>

@@ -6,11 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Property.h"
 #include "OTGui/PropertyBase.h"
 #include "OTWidgets/TreeWidgetItem.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -45,7 +44,7 @@ namespace ot {
 		void setParentPropertyGroup(PropertyGridGroup* _group) { m_parentGroup = _group; };
 		PropertyGridGroup* getParentPropertyGroup() const { return m_parentGroup; };
 
-		//! \brief Returns the name of the parent group.
+		//! @brief Returns the name of the parent group.
 		//! A parent group must be set.
 		std::string getGroupName() const;
 

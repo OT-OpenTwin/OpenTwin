@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
 
@@ -21,8 +20,8 @@ namespace ot {
 
 	// Alignment
 
-	//! \enum Alignment
-	//! \brief Alignment.
+	//! @enum Alignment
+	//! @brief Alignment.
 	enum Alignment {
 		AlignCenter,
 		AlignTop,
@@ -42,8 +41,8 @@ namespace ot {
 
 	// Orientation
 
-	//! \enum Orientation
-	//! \brief Orientation.
+	//! @enum Orientation
+	//! @brief Orientation.
 	enum Orientation {
 		Horizontal,
 		Vertical
@@ -56,8 +55,8 @@ namespace ot {
 
 	// Font Family
 	
-	//! \enum FontFamily
-	//! \brief Generally available font families.
+	//! @enum FontFamily
+	//! @brief Generally available font families.
 	enum FontFamily {
 		Arial,
 		ComicSansMS,
@@ -79,11 +78,11 @@ namespace ot {
 
 	// Size Policy
 
-	//! \enum SizePolicy
-	//! \brief Size policy for UI elements.
+	//! @enum SizePolicy
+	//! @brief Size policy for UI elements.
 	enum SizePolicy {
-		Preferred, //! \brief The item size is the ideal size, the item wont shrink but may expand.
-		Dynamic //! \brief The item size will be ignored and the requested size will be used instead (only use for nested items).
+		Preferred, //! @brief The item size is the ideal size, the item wont shrink but may expand.
+		Dynamic //! @brief The item size will be ignored and the requested size will be used instead (only use for nested items).
 	};
 
 	OT_GUI_API_EXPORT std::string toString(SizePolicy _policy);
@@ -93,16 +92,16 @@ namespace ot {
 
 	// Connections
 
-	//! \enum ConnectionDirection
-	//! \brief Describes in which direction a connetion from an item is starting.
+	//! @enum ConnectionDirection
+	//! @brief Describes in which direction a connetion from an item is starting.
 	enum ConnectionDirection {
-		ConnectAny, //! \brief Connection may start in any direction.
-		ConnectLeft, //! \brief Connection start towards left.
-		ConnectUp, //! \brief Connection start upwards.
-		ConnectRight, //! \brief Connection start towards right.
-		ConnectDown, //! \brief Connection start downwards.
-		ConnectOut, //! \brief Connection start outwards relative to the item center.
-		ConnectIn //! \brief Connection start inwards relative to the item center.
+		ConnectAny, //! @brief Connection may start in any direction.
+		ConnectLeft, //! @brief Connection start towards left.
+		ConnectUp, //! @brief Connection start upwards.
+		ConnectRight, //! @brief Connection start towards right.
+		ConnectDown, //! @brief Connection start downwards.
+		ConnectOut, //! @brief Connection start outwards relative to the item center.
+		ConnectIn //! @brief Connection start inwards relative to the item center.
 	};
 
 	OT_GUI_API_EXPORT std::string toString(ConnectionDirection _direction);
@@ -117,7 +116,7 @@ namespace ot {
 
 	// Gradient
 
-	//! \brief Describes how the painter will behave when painting outsite the gradient area.
+	//! @brief Describes how the painter will behave when painting outsite the gradient area.
 	enum GradientSpread {
 		PadSpread, //! Pad the outside area with the color at the closest stop point.
 		RepeatSpread, //! Repeat the gradient.
@@ -131,7 +130,7 @@ namespace ot {
 
 	// Basic Key
 
-	//! \enum BasicKey
+	//! @enum BasicKey
 	enum BasicKey {
 		Key_A,
 		Key_B,
@@ -204,7 +203,7 @@ namespace ot {
 
 	// Document Syntax
 
-	//! \brief Supported document syntax.
+	//! @brief Supported document syntax.
 	//! Mainly used for syntax highlighting.
 	enum class DocumentSyntax {
 		PlainText,
@@ -221,22 +220,22 @@ namespace ot {
 
 	// Lock Type
 
-	//! \brief Describes the object type to lock in the UI.
-	//! \warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
+	//! @brief Describes the object type to lock in the UI.
+	//! @warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
 	enum LockTypeFlag {
-		NoLockFlags = 0x0000, //! \brief No lock flags are set.
-		LockViewWrite = 0x0001, //! \brief Lock view write operations.
-		LockViewRead = 0x0002, //! \brief Lock view read operations.
-		//! \brief Lock model write operations.
+		NoLockFlags = 0x0000, //! @brief No lock flags are set.
+		LockViewWrite = 0x0001, //! @brief Lock view write operations.
+		LockViewRead = 0x0002, //! @brief Lock view read operations.
+		//! @brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to modifying the model.
 		LockModelWrite = 0x0004,
-		//! \brief Lock model write operations.
+		//! @brief Lock model write operations.
 		//! Any control should be disabled and any event supressed which would lead to any model reading access.
 		LockModelRead = 0x0008,
-		LockProperties = 0x0010, //! \brief Lock properties.
-		LockNavigationWrite = 0x0020, //! \brief Lock navigation write.
-		LockNavigationAll = 0x0040, //! \brief Lock navigation.
-		LockAll = 0x1000 //! \brief Lock all.
+		LockProperties = 0x0010, //! @brief Lock properties.
+		LockNavigationWrite = 0x0020, //! @brief Lock navigation write.
+		LockNavigationAll = 0x0040, //! @brief Lock navigation.
+		LockAll = 0x1000 //! @brief Lock all.
 	};
 
 	typedef ot::Flags<LockTypeFlag> LockTypeFlags;

@@ -7,8 +7,6 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/Size2D.h"
 #include "OTGui/OTGuiAPIExport.h"
 
@@ -26,8 +24,8 @@ namespace ot {
 		enum DialogFlag {
 			NoFlags          = 0x00, //! @brief No dialog flags
 			CancelOnNoChange = 0x01, //! @brief If set the UI will silently close the dialog when pressing confim button and the initial data did not change
-			MoveGrabAnywhere = 0x02, //! \brief If set the dialog may be moved around by holding the left mouse button anywhere in the dialog and move.
-			RecenterOnF11    = 0x04  //! \brief If set the dialog will move to the center of the screen if the user presses the "F11" key.
+			MoveGrabAnywhere = 0x02, //! @brief If set the dialog may be moved around by holding the left mouse button anywhere in the dialog and move.
+			RecenterOnF11    = 0x04  //! @brief If set the dialog will move to the center of the screen if the user presses the "F11" key.
 		};
 		typedef Flags<DialogFlag> DialogFlags;
 

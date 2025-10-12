@@ -17,9 +17,9 @@ namespace ot {
 		Q_OBJECT
 	public:
 		enum VersionGraphConfig {
-			NoConfigFlags                     = 0 << 0, //! \brief No VersionGraph configuration flags.
-			IgnoreActivateRequestOnReadOnly   = 1 << 0, //! \brief Activate version requests will be suppressed if the VersionGraph is in read-only state.
-			IgnoreSelectionHandlingOnReadOnly = 1 << 1  //! \brief Version selection changed signals will be suppressed if the VersionGraph is in read-only state.
+			NoConfigFlags                     = 0 << 0, //! @brief No VersionGraph configuration flags.
+			IgnoreActivateRequestOnReadOnly   = 1 << 0, //! @brief Activate version requests will be suppressed if the VersionGraph is in read-only state.
+			IgnoreSelectionHandlingOnReadOnly = 1 << 1  //! @brief Version selection changed signals will be suppressed if the VersionGraph is in read-only state.
 		};
 		typedef Flags<VersionGraphConfig> VersionGraphConfigFlags;
 

@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/WidgetView.h"
 
 // QT ADS header

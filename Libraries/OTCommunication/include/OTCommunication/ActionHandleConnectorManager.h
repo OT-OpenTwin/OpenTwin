@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/ActionDispatcherBase.h"
 

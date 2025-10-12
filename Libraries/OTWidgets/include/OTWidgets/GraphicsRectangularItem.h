@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
@@ -49,7 +48,7 @@ namespace ot {
 		void setRectangleSize(const QSizeF& _size);
 		const Size2DD& getRectangleSize(void) const;
 
-		//! \brief Sets the background painter.
+		//! @brief Sets the background painter.
 		//! The item takes ownership of the painter.
 		void setBackgroundPainter(ot::Painter2D* _painter);
 		const ot::Painter2D* getBackgroundPainter(void) const;

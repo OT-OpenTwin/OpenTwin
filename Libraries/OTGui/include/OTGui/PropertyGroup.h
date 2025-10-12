@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyBase.h"
 
 // std header
@@ -38,7 +37,7 @@ namespace ot {
 		//! @param _title Group title
 		explicit PropertyGroup(const std::string& _name, const std::string& _title);
 
-		//! \brief Destructor.
+		//! @brief Destructor.
 		//! Destroys the parent group if set.
 		virtual ~PropertyGroup();
 
@@ -54,15 +53,15 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		//! \brief Adds the contents of the other configuration to this configuration.
+		//! @brief Adds the contents of the other configuration to this configuration.
 		//! If an improved merge is required just subclass and implement 
-		//! \param _other Other group to merge into this.
+		//! @param _other Other group to merge into this.
 		virtual void mergeWith(const PropertyGroup& _other, const PropertyBase::MergeMode& _mergeMode);
 
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
 		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
 
-		//! \brief Returns the root group.
+		//! @brief Returns the root group.
 		//! If this group has no parent returns this group.
 		PropertyGroup* getRootGroup(void);
 
@@ -82,16 +81,16 @@ namespace ot {
 		//! This group takes ownership of the property.
 		void addProperty(Property* _property);
 
-		//! \brief Removes the property with the given name.
+		//! @brief Removes the property with the given name.
 		void removeProperty(const std::string& _propertyName);
 
-		//! \brief Removes the property from the list without destroying it.
+		//! @brief Removes the property from the list without destroying it.
 		void forgetProperty(Property* _property);
 
-		//! \brief Group properties.
+		//! @brief Group properties.
 		const std::list<Property*>& getProperties(void) const { return m_properties; };
 
-		//! \brief Returns all properties of all groups and nested groups.
+		//! @brief Returns all properties of all groups and nested groups.
 		std::list<Property*> getAllProperties(void) const;
 
 		//! @brief Returns the property at the given path.
@@ -124,17 +123,17 @@ namespace ot {
 
 		PropertyGroup* findGroup(const std::string& _name) const;
 
-		//! \brief Removes the property group from the list without destroying it.
+		//! @brief Removes the property group from the list without destroying it.
 		void forgetChildGroup(PropertyGroup* _propertyGroup);
 
 		void findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const;
 
 		void clear(bool _keepGroups = false);
 
-		//! \brief Returns false if at least one property exists in this group or any of the child groups.
+		//! @brief Returns false if at least one property exists in this group or any of the child groups.
 		bool isEmpty(void) const;
 
-		//! \brief Returns the group path.
+		//! @brief Returns the group path.
 		//! The group path is a string containing all parent groups and this group name (e.g. "Root/Child/ThisGroup").
 		std::string getGroupPath(char _delimiter = '/') const;
 

@@ -6,10 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/Dialog.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -46,12 +44,12 @@ namespace ot {
 
 		void add(const std::string& _owner, const PropertyGridCfg& _config);
 
-		//! \brief Changes the merge behaviour.
-		//! \see ot::PropertyGroup::mergeWith()
+		//! @brief Changes the merge behaviour.
+		//! @see ot::PropertyGroup::mergeWith()
 		void setReplaceExistingPropertiesOnMerge(bool _replace) { m_propertyReplaceOnMerge = _replace; };
 
-		//! \brief The current property merge behaviour.
-		//! \see ot::PropertyGroup::mergeWith()
+		//! @brief The current property merge behaviour.
+		//! @see ot::PropertyGroup::mergeWith()
 		bool getReplaceExistingPropertiesOnMerge(void) const { return m_propertyReplaceOnMerge; };
 
 		const PropertyDialog* getDialog(void) const { return m_dialog; };
@@ -77,7 +75,7 @@ namespace ot {
 
 		PropertyGridCfg findData(const std::string& _owner);
 
-		//! \brief Removes the root group and sets the owner.
+		//! @brief Removes the root group and sets the owner.
 		//! The owner will be set to the root group name before the root is removed.
 		Property* createCleanedSlotProperty(const Property* _property, std::string& _owner);
 		

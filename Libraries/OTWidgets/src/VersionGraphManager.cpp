@@ -20,10 +20,10 @@ namespace ot {
 		OT_DECL_NOCOPY(VersionInfo)
 	public:
 		enum VersionInfoFlag {
-			None           = 0 << 0, //! \brief No information.
-			IsActive       = 1 << 1, //! \brief Version is active version.
+			None           = 0 << 0, //! @brief No information.
+			IsActive       = 1 << 1, //! @brief Version is active version.
 
-			//! \brief Version has branches.
+			//! @brief Version has branches.
 			//! For example only version 2 would need this flag set: <br>
 			//!  <br>
 			//! 1 ----- 2 --+-- 3 ----- ...     <br>
@@ -33,8 +33,8 @@ namespace ot {
 			//!             +-- 2.2.1 ----- ... <br>
 			//! 
 			IsBranchNode   = 1 << 2,
-			IsEndOfBranch  = 1 << 3, //! \brief Version is end of branch
-			IsDirect       = 1 << 4,  //! \brief Version is direct parent/child
+			IsEndOfBranch  = 1 << 3, //! @brief Version is end of branch
+			IsDirect       = 1 << 4,  //! @brief Version is direct parent/child
 			IsOnActivePath = 1 << 5
 		};
 		OT_ADD_FRIEND_FLAG_FUNCTIONS(VersionInfoFlag)

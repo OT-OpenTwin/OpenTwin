@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
 #include "OTCore/JSONDocument.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CoreTypes.h"
 
 // std header
 #include <string>

@@ -7,8 +7,6 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GuiTypes.h"
 
 // std header

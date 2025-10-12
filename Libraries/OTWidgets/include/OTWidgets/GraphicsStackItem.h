@@ -10,24 +10,24 @@
 
 namespace ot {
 
-	//! \class GraphicsStackItem
-	//! \brief The GraphicsStackItem is used adjust the size of child items marked as slave occording to the naster item sizes.
+	//! @class GraphicsStackItem
+	//! @brief The GraphicsStackItem is used adjust the size of child items marked as slave occording to the naster item sizes.
 	//! The graphics stack item will calculate the child item size whenever a master item chaged its size.
 	//! The GraphicsStackItemCfg is used to configure the GraphicsStackItem.
 	class OT_WIDGETS_API_EXPORT GraphicsStackItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		//! \struct GraphicsStackItemEntry
-		//! \brief The GraphicsStackItemEntry holds a GraphicsItem aswell as the information if this item is a master or a slave.
+		//! @struct GraphicsStackItemEntry
+		//! @brief The GraphicsStackItemEntry holds a GraphicsItem aswell as the information if this item is a master or a slave.
 		struct GraphicsStackItemEntry {
-			ot::GraphicsItem* item; //! \brief Item.
-			bool isMaster; //! \brief If true, the item is a master.
-			bool isSlave; //! \brief If true, the item is a slave.
+			ot::GraphicsItem* item; //! @brief Item.
+			bool isMaster; //! @brief If true, the item is a master.
+			bool isSlave; //! @brief If true, the item is a slave.
 		};
 
-		//! \brief Default constructor.
+		//! @brief Default constructor.
 		GraphicsStackItem();
 
-		//! \brief Destructor.
+		//! @brief Destructor.
 		virtual ~GraphicsStackItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -91,7 +91,7 @@ namespace ot {
 
 		void addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave);
 
-		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		//! @brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance(void) const override;
 
 		void clear(void);

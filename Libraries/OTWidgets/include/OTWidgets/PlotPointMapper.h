@@ -48,8 +48,7 @@ exceptions:
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qwt header
 #include <qwt_point_mapper.h>

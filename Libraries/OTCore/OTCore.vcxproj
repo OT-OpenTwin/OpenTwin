@@ -51,7 +51,6 @@
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
-    <ClCompile Include="src\Queue.cpp" />
     <ClCompile Include="src\Rect.cpp" />
     <ClCompile Include="src\ReturnMessage.cpp" />
     <ClCompile Include="src\ReturnValues.cpp" />
@@ -113,6 +112,7 @@
     <ClInclude Include="include\OTCore\Matrix2.hpp" />
     <ClInclude Include="include\OTCore\Matrix2Factory.h" />
     <ClInclude Include="include\OTCore\Matrix2Factory.hpp" />
+    <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\PointerList.h" />
     <ClInclude Include="include\OTCore\PointerList.hpp" />
     <ClInclude Include="include\OTCore\ServiceDebugInformation.h" />
@@ -139,13 +139,11 @@
     <ClInclude Include="include\OTCore\JSON.h" />
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
-    <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />
     <ClInclude Include="include\OTCore\OwnerServiceGlobal.h" />
     <ClInclude Include="include\OTCore\Point2D.h" />
     <ClInclude Include="include\OTCore\Point3D.h" />
-    <ClInclude Include="include\OTCore\Queue.h" />
     <ClInclude Include="include\OTCore\ReturnMessage.h" />
     <ClInclude Include="include\OTCore\ReturnValues.h" />
     <ClInclude Include="include\OTCore\Serializable.h" />

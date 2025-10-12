@@ -6,9 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/LogDispatcher.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <string>

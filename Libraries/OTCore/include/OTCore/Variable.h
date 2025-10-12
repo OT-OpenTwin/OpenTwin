@@ -8,7 +8,7 @@
 #pragma once
 #include <variant>
 #include <stdint.h>
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCore/TypeNames.h"
 #include <limits>
 #include <algorithm>

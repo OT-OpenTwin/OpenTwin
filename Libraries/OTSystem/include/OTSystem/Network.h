@@ -1,6 +1,6 @@
-//! \file Network.h
-//! \author Alexander Kuester (alexk95)
-//! \date April 2023
+//! @file Network.h
+//! @author Alexander Kuester (alexk95)
+//! @date April 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -12,7 +12,7 @@
 
 namespace ot {
 
-	//! \namespace net
+	//! @namespace net
 	namespace net {
 
 		//! @brief Will check if a TCP connection can be established

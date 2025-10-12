@@ -10,7 +10,6 @@
 #include "OTWidgets/TableItem.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableItemDelegate.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTCore/String.h"
 
 // Qt header
@@ -85,7 +84,7 @@ ot::Table::~Table() {
 void ot::Table::setupFromConfig(const TableCfg& _config) {
 	OT_TEST_TABLE_Interval("Setup from config: Total");
 
-	SignalBlockWrapper blocker(this);
+	QSignalBlocker blocker(this);
 	m_headerBuffer.clear();
 	m_headerBuffer.reserve(0);
 
@@ -160,7 +159,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Set data");
 		QAbstractItemModel* dataModel = this->model();
-		SignalBlockWrapper blocker(dataModel);
+		QSignalBlocker blocker(dataModel);
 
 		int rows = _config.getRowCount();
 		int columns = _config.getColumnCount();
@@ -246,7 +245,7 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
 	OT_TEST_TABLE_Interval("Set selected cells background");
 
-	SignalBlockWrapper blocker(this);
+	QSignalBlocker blocker(this);
 	
 	for (QTableWidgetItem* item : this->selectedItems()) {
 		item->setBackground(QBrush(_color));
@@ -339,7 +338,7 @@ void ot::Table::hideEvent(QHideEvent* _event) {
 
 void ot::Table::slotCellDataChanged(int _row, int _column) {
 	if (_row >= 0 && _row < this->rowCount()) {
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 		this->resizeRowToContents(_row);
 	}
 
@@ -361,7 +360,7 @@ void ot::Table::slotRestoreColumnSize(int _column) {
 		}
 	}
 	else { // Resize column and queue next
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 
 		OTAssert(m_columnWidthBuffer.size() == this->columnCount(), "Invalid data");
 		this->setColumnWidth(_column, m_columnWidthBuffer[_column]);
@@ -379,7 +378,7 @@ void ot::Table::slotResizeColumnToContent(int _column) {
 		this->resizeRowsToContentIfNeeded();
 	}
 	else { // Resize column and queue next
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 
 		this->resizeColumnToContents(_column++);
 		QTimer::singleShot(0, [=]() { Table::slotResizeColumnToContent(_column); });
@@ -391,7 +390,7 @@ void ot::Table::slotRestoreRowSize(int _row) {
 		return;
 	}
 	else { // Resize column and queue next
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 
 		OTAssert(m_rowHeightBuffer.size() == this->rowCount(), "Invalid data");
 		this->setRowHeight(_row, m_rowHeightBuffer[_row]);
@@ -406,7 +405,7 @@ void ot::Table::slotResizeRowToContent(int _row) {
 		return;
 	}
 	else { // Resize column and queue next
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 
 		this->resizeRowToContents(_row++);
 		QTimer::singleShot(0, [=]() { Table::slotResizeRowToContent(_row); });

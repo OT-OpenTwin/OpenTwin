@@ -24,12 +24,12 @@ namespace ot {
 	class PropertyGridGroup;
 	class TreeWidgetItem;
 
-	//! \brief The PropertyDialog is used to edit many property groups.
+	//! @brief The PropertyDialog is used to edit many property groups.
 	//! When a property is changed a copy of the property is stored and the propertyChanged signal is emitted.
 	//! All changed properties can be accessed after the dialog closed.
 	//! The dialog result is "OK" only when the user pressed Confirm and at least one property has changed.
 	//! All stored changed properties will be destroyed when the dialog is destroyed.
-	//! \see PropertyDialogCfg
+	//! @see PropertyDialogCfg
 	class OT_WIDGETS_API_EXPORT PropertyDialog : public Dialog {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyDialog)
@@ -38,7 +38,7 @@ namespace ot {
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();
 
-		//! \brief Sets up this dialog from the provided configuration.
+		//! @brief Sets up this dialog from the provided configuration.
 		//! Existing data will be removed.
 		void setupFromConfiguration(const PropertyDialogCfg& _config);
 
@@ -78,7 +78,7 @@ namespace ot {
 		void iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group);
 		bool childItemExists(QTreeWidgetItem* _item, const QString& _text);
 
-		//! \brief Creates a configuration for the root group that contains the full group structure until the provided group.
+		//! @brief Creates a configuration for the root group that contains the full group structure until the provided group.
 		//! Other groups and properties are ignored.
 		//! The resulted structure may look like this: "Root/Child/ActualGroup (the group provided)".
 		PropertyGroup* createRootGroupConfig(const PropertyGroup* _group);

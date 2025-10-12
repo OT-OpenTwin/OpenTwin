@@ -1,7 +1,6 @@
 #pragma once
 #pragma warning(disable:4251)
 
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/ReturnValues.h"
 
@@ -25,21 +24,21 @@ namespace ot
 		static std::string statusToString(ReturnMessageStatus _status);
 		static ReturnMessageStatus stringToStatus(const std::string& _status);
 
-		//! \brief Create a ReturnMessage from the provided json string.
+		//! @brief Create a ReturnMessage from the provided json string.
 		//! This function will create a new instance and and call set from json.
 		//! If the provided json string is invalid the resulting return message will have the result Failed and the what() will return the error string.
 		//! If the provided json string is empty the resulting return message will have the result Ok.
-		//! \param _json The json string.
+		//! @param _json The json string.
 		static ReturnMessage fromJson(const std::string& _json);
 
-		//! \brief Create a json string that can be used to create a ReturnMessage instance
-		//! \param _status The status
-		//! \param _what The message contents
+		//! @brief Create a json string that can be used to create a ReturnMessage instance
+		//! @param _status The status
+		//! @param _what The message contents
 		static std::string toJson(ReturnMessageStatus _status, const std::string& _what = std::string());
 
-		//! \brief Create a json string that can be used to create a ReturnMessage instance
-		//! \param _status Message status
-		//! \param _document JSON document that will be set as message
+		//! @brief Create a json string that can be used to create a ReturnMessage instance
+		//! @param _status Message status
+		//! @param _document JSON document that will be set as message
 		static std::string toJson(ReturnMessageStatus _status, const ot::JsonDocument& _document);
 
 		//! @brief Constructor

@@ -7,9 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/WidgetViewBase.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/SelectionInformation.h"
 
 // Qt header
@@ -43,7 +41,7 @@ namespace ot {
 
 		static std::string createStoredViewName(const WidgetViewBase& _view);
 
-		//! \brief Creates the name that should be used in the view management logic.
+		//! @brief Creates the name that should be used in the view management logic.
 		//! The resulted name has the following syntax: <entityName>$<viewTypeString>
 		static std::string createStoredViewName(const std::string& _entityName, WidgetViewBase::ViewType _viewType);
 

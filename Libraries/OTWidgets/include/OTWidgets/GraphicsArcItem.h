@@ -7,7 +7,6 @@
 
 // OpenTwin header
 #include "OTCore/Rect.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 

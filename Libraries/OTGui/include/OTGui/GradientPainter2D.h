@@ -6,7 +6,6 @@
 #pragma once
 
 #include "OTCore/Point2D.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/GradientPainterStop2D.h"

@@ -36,7 +36,7 @@ namespace ot {
 
 		virtual ot::Color getDefaultColor(void) const = 0;
 
-		//! \brief Returns true if this painter is equal to the other painter.
+		//! @brief Returns true if this painter is equal to the other painter.
 		virtual bool isEqualTo(const Painter2D* _other) const = 0;
 
 		//! @brief Creates a copy of this painter

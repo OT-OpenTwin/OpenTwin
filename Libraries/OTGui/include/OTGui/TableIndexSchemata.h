@@ -1,9 +1,7 @@
 #pragma once
 
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/OTGuiAPIExport.h"
 
 namespace ot {
 

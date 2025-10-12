@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTCore/LogTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <ostream>
@@ -17,7 +16,7 @@
 
 namespace ot {
 
-	//! \brief Contains information about the origin and the content of a log message.
+	//! @brief Contains information about the origin and the content of a log message.
 	class OT_CORE_API_EXPORT LogMessage : public Serializable {
 		OT_DECL_DEFCOPY(LogMessage)
 		OT_DECL_DEFMOVE(LogMessage)

@@ -8,9 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Margins.h"
-#include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsTriangleItemCfg.h"
 
@@ -59,13 +57,13 @@ namespace ot {
 		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
 		const ot::Color& textColor(void) const { return m_textColor; };
 
-		//! \brief Set custom primary painter.
+		//! @brief Set custom primary painter.
 		//! Connector takes ownership of the painter.
 		//! Existing painter will be destroyed before replacing.
 		void setCustomPrimaryPainter(ot::Painter2D* _painter);
 		const ot::Painter2D* getCustomPrimaryPainter(void) const { return m_customPrimaryPainter; };
 
-		//! \brief Set custom secondary painter.
+		//! @brief Set custom secondary painter.
 		//! Connector takes ownership of the painter.
 		//! Existing painter will be destroyed before replacing.
 		void setCustomSecondaryPainter(ot::Painter2D* _painter);

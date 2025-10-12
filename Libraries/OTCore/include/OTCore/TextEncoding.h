@@ -11,7 +11,7 @@
 #include <string>
 #include <map>
 
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CoreTypes.h"
 
 namespace ot
 {

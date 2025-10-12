@@ -7,9 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/WidgetBase.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtWidgets/qframe.h>

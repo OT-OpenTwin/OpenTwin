@@ -68,7 +68,7 @@ namespace ot {
 
 		bool findParentVersionInOtherBranches(const VersionGraphVersionCfg& _version, const std::list<std::list<VersionGraphVersionCfg>>& _branches, VersionInfo& _parentInfo);
 
-		//! \brief Returns true if the filter matches the version or the filter is empty
+		//! @brief Returns true if the filter matches the version or the filter is empty
 		bool checkFilterValid(const VersionGraphVersionCfg* _versionConfig, const QString& _filterText) const;
 
 		//! Allows all versions to be shown.

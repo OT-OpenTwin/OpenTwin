@@ -49,7 +49,7 @@ namespace ot {
 
 		void setTextColor(const Color& _color);
 
-		//! \brief Sets the text painter.
+		//! @brief Sets the text painter.
 		//! The item takes ownership of the painter.
 		void setTextPainter(Painter2D* _painter);
 

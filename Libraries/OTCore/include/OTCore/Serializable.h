@@ -7,8 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/CoreAPIExport.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 
 namespace ot {
 

@@ -88,9 +88,6 @@
     <ClCompile Include="src\OTObject.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\Queue.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\RuntimeTests.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -294,13 +291,7 @@
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\OTClassHelper.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\OTObject.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Queue.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\RuntimeTests.h">
@@ -452,6 +443,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\PointerList.hpp">
       <Filter>include\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTClassHelper.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

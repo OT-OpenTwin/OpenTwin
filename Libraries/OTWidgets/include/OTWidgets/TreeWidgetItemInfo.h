@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/NavigationTreeItem.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qstring.h>

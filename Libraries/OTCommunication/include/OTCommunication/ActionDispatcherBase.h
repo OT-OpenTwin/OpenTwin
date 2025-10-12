@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 

@@ -20,7 +20,7 @@ namespace ot {
 		CheckerboardPainter2D(ot::DefaultColor _primaryColor, ot::DefaultColor _secondaryColor, const Size2D& _cellSize = Size2D(10, 10));
 		CheckerboardPainter2D(const ot::Color& _primaryColor, const ot::Color& _secondaryColor, const Size2D& _cellSize = Size2D(10, 10));
 
-		//! \brief Assignment constructor.
+		//! @brief Assignment constructor.
 		//! The object takes ownership of the provided painter.
 		CheckerboardPainter2D(Painter2D* _primaryPainter, Painter2D* _secondaryPainter, const Size2D& _cellSize = Size2D(10, 10));
 		virtual ~CheckerboardPainter2D();
@@ -44,17 +44,17 @@ namespace ot {
 
 		virtual bool isEqualTo(const Painter2D* _other) const override;
 
-		//! \brief Sets the primary painter.
+		//! @brief Sets the primary painter.
 		//! The object takes ownership of the provided painter.
 		//! The current painter will be destroyed.
-		//! \note Note that the primary and secondary painter must be different objects.
+		//! @note Note that the primary and secondary painter must be different objects.
 		void setPrimaryPainter(Painter2D* _painter);
 		const Painter2D* getPrimaryPainter(void) const { return m_primary; };
 
-		//! \brief Sets the secondary painter.
+		//! @brief Sets the secondary painter.
 		//! The object takes ownership of the provided painter.
 		//! The current painter will be destroyed.
-		//! \note Note that the primary and secondary painter must be different objects.
+		//! @note Note that the primary and secondary painter must be different objects.
 		void setSecondaryPainter(Painter2D* _painter);
 		const Painter2D* getSecondaryPainter(void) const { return m_secondary; };
 

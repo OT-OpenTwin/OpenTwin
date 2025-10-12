@@ -6,8 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // ads header
 #include <ads/DockWidget.h>

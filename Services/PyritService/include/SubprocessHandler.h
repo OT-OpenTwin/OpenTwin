@@ -2,7 +2,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTSystem/SystemTypes.h"
+#include "OTSystem/SystemProcess.h"
 
 // std header
 #include <mutex>

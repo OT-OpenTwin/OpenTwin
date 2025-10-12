@@ -6,10 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTWidgets/AbstractPlotAxis.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtGui/qcolor.h>

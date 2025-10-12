@@ -22,7 +22,7 @@ namespace ot {
 		GraphicsInvisibleItemCfg(const ot::Size2DD& _size = ot::Size2DD());
 		virtual ~GraphicsInvisibleItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object

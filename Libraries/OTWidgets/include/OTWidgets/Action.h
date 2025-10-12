@@ -6,8 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtWidgets/qaction.h>
@@ -16,6 +15,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Action : public QAction {
 		OT_DECL_NOCOPY(Action)
+		OT_DECL_NOMOVE(Action)
 	public:
 		Action(QObject* _parent = (QObject*)nullptr);
 		Action(const QString& _text, QObject* _parent = (QObject*)nullptr);

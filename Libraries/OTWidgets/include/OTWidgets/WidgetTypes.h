@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
+#include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 namespace ot {

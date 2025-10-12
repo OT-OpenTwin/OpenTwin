@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Serializable.h"
 
 namespace ot {
@@ -14,61 +13,61 @@ namespace ot {
 	class Color;
 	class ColorF;
 
-	//! \brief Default colors.
+	//! @brief Default colors.
 	enum DefaultColor {
-		Aqua, //! \brief rgba: 0, 255, 255, 255
-		Beige, //! \brief rgba: 245, 245, 220, 255
-		Black, //! \brief rgba: 0, 0, 0, 255
-		Blue, //! \brief rgba: 0, 0, 255, 255
-		Chocolate, //! \brief rgba: 210, 105, 30, 255
-		Coral, //! \brief rgba: 255, 127, 80, 255
-		Cyan, //! \brief rgba: 0, 255, 255, 255
-		DarkGray, //! \brief rgba: 169, 169, 169, 255
-		DarkGreen, //! \brief rgba: 0, 100, 0, 255
-		DarkOrange, //! \brief rgba: 255, 140, 0, 255
-		DarkViolet, //! \brief rgba: 148, 0, 211, 255
-		DodgerBlue, //! \brief rgba: 30, 144, 255, 255
-		Fuchsia, //! \brief rgba: 255, 0, 255, 255
-		Gold, //! \brief rgba: 255, 215, 0, 255
-		Gray, //! \brief rgba: 128, 128, 128, 255
-		Green, //! \brief rgba: 0, 128, 0, 255
-		IndianRed, //! \brief rgba: 205, 92, 92, 255
-		Indigo, //! \brief rgba: 75, 0, 130, 255
-		Ivory, //! \brief rgba: 255, 255, 240, 255
-		Khaki, //! \brief rgba: 240, 230, 140, 255
-		Lavender, //! \brief rgba: 230, 230, 250, 255
-		Lime, //! \brief rgba: 0, 255, 0, 255
-		LightGray, //! \brief rgba: 211, 211, 211, 255
-		Maroon, //! \brief rgba: 128, 0, 0, 255
-		MidnightBlue, //! \brief rgba: 25, 25, 112, 255
-		Mint, //! \brief rgba: 189, 252, 201, 255
-		Navy, //! \brief rgba: 0, 0, 128, 255
-		Olive, //! \brief rgba: 128, 128, 0, 255
-		Orange, //! \brief rgba: 255, 165, 0, 255
-		Orchid, //! \brief rgba: 218, 112, 214, 255
-		Pink, //! \brief rgba: 255, 192, 203, 255
-		Plum, //! \brief rgba: 221, 160, 221, 255
-		Purple, //! \brief rgba: 128, 0, 128, 255
-		Red, //! \brief rgba: 255, 0, 0, 255
-		RoyalBlue, //! \brief rgba: 65, 105, 225, 255
-		Salmon, //! \brief rgba: 250, 128, 114, 255
-		Sienna, //! \brief rgba: 160, 82, 45, 255
-		Silver, //! \brief rgba: 192, 192, 192, 255
-		SlateGray, //! \brief rgba: 112, 128, 144, 255
-		SkyBlue, //! \brief rgba: 135, 206, 235, 255
-		SteelBlue, //! \brief rgba: 70, 130, 180, 255
-		Tan, //! \brief rgba: 210, 180, 140, 255
-		Teal, //! \brief rgba: 0, 128, 128, 255
-		Tomato, //! \brief rgba: 255, 99, 71, 255
-		Transparent, //! \brief rgba: 0, 0, 0, 0
-		Turquoise, //! \brief rgba: 64, 224, 208, 255
-		Violet, //! \brief rgba: 238, 130, 238, 255
-		White, //! \brief rgba: 255, 255, 255, 255
-		Yellow //! \brief rgba: 255, 255, 0, 255
+		Aqua, //! @brief rgba: 0, 255, 255, 255
+		Beige, //! @brief rgba: 245, 245, 220, 255
+		Black, //! @brief rgba: 0, 0, 0, 255
+		Blue, //! @brief rgba: 0, 0, 255, 255
+		Chocolate, //! @brief rgba: 210, 105, 30, 255
+		Coral, //! @brief rgba: 255, 127, 80, 255
+		Cyan, //! @brief rgba: 0, 255, 255, 255
+		DarkGray, //! @brief rgba: 169, 169, 169, 255
+		DarkGreen, //! @brief rgba: 0, 100, 0, 255
+		DarkOrange, //! @brief rgba: 255, 140, 0, 255
+		DarkViolet, //! @brief rgba: 148, 0, 211, 255
+		DodgerBlue, //! @brief rgba: 30, 144, 255, 255
+		Fuchsia, //! @brief rgba: 255, 0, 255, 255
+		Gold, //! @brief rgba: 255, 215, 0, 255
+		Gray, //! @brief rgba: 128, 128, 128, 255
+		Green, //! @brief rgba: 0, 128, 0, 255
+		IndianRed, //! @brief rgba: 205, 92, 92, 255
+		Indigo, //! @brief rgba: 75, 0, 130, 255
+		Ivory, //! @brief rgba: 255, 255, 240, 255
+		Khaki, //! @brief rgba: 240, 230, 140, 255
+		Lavender, //! @brief rgba: 230, 230, 250, 255
+		Lime, //! @brief rgba: 0, 255, 0, 255
+		LightGray, //! @brief rgba: 211, 211, 211, 255
+		Maroon, //! @brief rgba: 128, 0, 0, 255
+		MidnightBlue, //! @brief rgba: 25, 25, 112, 255
+		Mint, //! @brief rgba: 189, 252, 201, 255
+		Navy, //! @brief rgba: 0, 0, 128, 255
+		Olive, //! @brief rgba: 128, 128, 0, 255
+		Orange, //! @brief rgba: 255, 165, 0, 255
+		Orchid, //! @brief rgba: 218, 112, 214, 255
+		Pink, //! @brief rgba: 255, 192, 203, 255
+		Plum, //! @brief rgba: 221, 160, 221, 255
+		Purple, //! @brief rgba: 128, 0, 128, 255
+		Red, //! @brief rgba: 255, 0, 0, 255
+		RoyalBlue, //! @brief rgba: 65, 105, 225, 255
+		Salmon, //! @brief rgba: 250, 128, 114, 255
+		Sienna, //! @brief rgba: 160, 82, 45, 255
+		Silver, //! @brief rgba: 192, 192, 192, 255
+		SlateGray, //! @brief rgba: 112, 128, 144, 255
+		SkyBlue, //! @brief rgba: 135, 206, 235, 255
+		SteelBlue, //! @brief rgba: 70, 130, 180, 255
+		Tan, //! @brief rgba: 210, 180, 140, 255
+		Teal, //! @brief rgba: 0, 128, 128, 255
+		Tomato, //! @brief rgba: 255, 99, 71, 255
+		Transparent, //! @brief rgba: 0, 0, 0, 0
+		Turquoise, //! @brief rgba: 64, 224, 208, 255
+		Violet, //! @brief rgba: 238, 130, 238, 255
+		White, //! @brief rgba: 255, 255, 255, 255
+		Yellow //! @brief rgba: 255, 255, 0, 255
 	};
 
-	//! \class Color
-	//! \brief The Color class is used to represent RGBA colors with integer values.
+	//! @class Color
+	//! @brief The Color class is used to represent RGBA colors with integer values.
 	class OT_CORE_API_EXPORT Color : public ot::Serializable {
 	public:
 		explicit Color();
@@ -140,10 +139,10 @@ namespace ot {
 		ColorF toColorF(void) const;
 
 	private:
-		int		m_r; //! \brief Red channel.
-		int		m_g; //! \brief Green channel.
-		int		m_b; //! \brief Blue channel.
-		int		m_a; //! \brief Alpha channel.
+		int		m_r; //! @brief Red channel.
+		int		m_g; //! @brief Green channel.
+		int		m_b; //! @brief Blue channel.
+		int		m_a; //! @brief Alpha channel.
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -152,8 +151,8 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//! \class ColorF
-	//! \brief The ColorF class is used to represent RGBA colors with float values.
+	//! @class ColorF
+	//! @brief The ColorF class is used to represent RGBA colors with float values.
 	class OT_CORE_API_EXPORT ColorF : public ot::Serializable {
 	public:
 		explicit ColorF();
@@ -226,10 +225,10 @@ namespace ot {
 		Color toColor(void) const;
 
 	private:
-		float m_r; //! \brief Red channel.
-		float m_g; //! \brief Green channel.
-		float m_b; //! \brief Blue channel.
-		float m_a; //! \brief Alpha channel.
+		float m_r; //! @brief Red channel.
+		float m_g; //! @brief Green channel.
+		float m_b; //! @brief Blue channel.
+		float m_a; //! @brief Alpha channel.
 	};
 
 }

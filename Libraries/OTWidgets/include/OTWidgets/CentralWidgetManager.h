@@ -6,10 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/DelayedShowHideHandler.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtGui/qmovie.h>

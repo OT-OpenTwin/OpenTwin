@@ -19,7 +19,7 @@ namespace ot {
 		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
 		virtual ~GraphicsImageItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object

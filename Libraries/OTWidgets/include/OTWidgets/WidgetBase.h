@@ -6,9 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
 #include "OTWidgets/WidgetTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>

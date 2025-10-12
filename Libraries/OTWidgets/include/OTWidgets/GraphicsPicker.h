@@ -66,7 +66,7 @@ namespace ot {
 
 		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
 
-		//! \brief Returns the current owner of the graphics picker.
+		//! @brief Returns the current owner of the graphics picker.
 		//! The owner information will be added to the mime data when dragging an item.
 		const BasicServiceInformation& getOwner() const { return m_owner; };
 

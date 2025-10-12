@@ -24,8 +24,8 @@
 
 namespace ot {
 
-	//! \class IconManager
-	//! \brief The IconManager loads images or animations and caches them.
+	//! @class IconManager
+	//! @brief The IconManager loads images or animations and caches them.
 	//! The IconManager has a search path list.
 	//! When requestiong a file only the subPath (suffix) needs to be provided.
 	//! When checking every search path and suffix combination the first existing file (FIFO) will be imported.
@@ -51,10 +51,10 @@ namespace ot {
 		//! @brief Return or import and return the pixmap.
 		static const QByteArray& getSvgData(const QString& _subPath);
 
-		//! \brief Stores the application icon.
+		//! @brief Stores the application icon.
 		static void setApplicationIcon(const QIcon& _icon);
 
-		//! \brief Returns the main application icon.
+		//! @brief Returns the main application icon.
 		//! This icon may be used for windows and dialogs to let them all have the same icon.
 		static const QIcon& getApplicationIcon(void);
 

@@ -7,8 +7,6 @@
 
 // OT header
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/PropertyManagerNotifier.h"
 
 namespace ot {

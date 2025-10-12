@@ -20,7 +20,7 @@ namespace ot {
 		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
 		virtual ~GraphicsTextItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -44,7 +44,7 @@ namespace ot {
 
 		void setTextColor(const Color& _color) { m_textStyle.setColor(_color); };
 
-		//! \brief Sets the text painter.
+		//! @brief Sets the text painter.
 		//! The item takes ownership of the painter.
 		void setTextPainter(Painter2D* _painter) { m_textStyle.setPainter(_painter); };
 		const Painter2D* getTextPainter(void) const { return m_textStyle.getPainter(); };
@@ -54,12 +54,12 @@ namespace ot {
 		void setTextStyle(const PenFCfg& _style) { m_textStyle = _style; };
 		const PenFCfg& getTextStyle(void) const { return m_textStyle; };
 
-		//! \brief Sets the text is reference mode.
-		//! \see getTextIsReference
+		//! @brief Sets the text is reference mode.
+		//! @see getTextIsReference
 		void setTextIsReference(bool _isReference) { m_textIsReference = _isReference; };
 
-		//! \brief If enabled the set text will be used as a key for the string map.
-		//! \see GraphicsItemCfg::getStringMap
+		//! @brief If enabled the set text will be used as a key for the string map.
+		//! @see GraphicsItemCfg::getStringMap
 		bool getTextIsReference(void) const { return m_textIsReference; };
 
 	private:

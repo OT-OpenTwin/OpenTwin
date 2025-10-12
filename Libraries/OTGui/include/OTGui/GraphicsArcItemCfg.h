@@ -8,7 +8,6 @@
 
 // OpenTwin header
 #include "OTCore/Rect.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
@@ -28,7 +27,7 @@ namespace ot {
 
 		// Base class functions
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -77,7 +76,7 @@ namespace ot {
 		RectD m_rect;
 		double m_startAngle;
 		double m_spanAngle;
-		PenFCfg m_lineStyle; //! \brief Line style.
+		PenFCfg m_lineStyle; //! @brief Line style.
 	};
 
 }

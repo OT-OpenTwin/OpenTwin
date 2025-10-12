@@ -6,7 +6,6 @@
 #pragma once
 
 // OT header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyManager.h"
 
 // std header

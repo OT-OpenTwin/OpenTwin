@@ -6,18 +6,15 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
 #include "OTCore/Rect.h"
 #include "OTCore/Color.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/Point3D.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Property.h"
-#include "OTGui/OTGuiAPIExport.h"
-#include "OTGui/PropertyGridCfg.h"
 #include "OTGui/PropertyPath.h"
+#include "OTGui/PropertyGridCfg.h"
 
 // std header
 #include <map>

@@ -6,8 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCore/GlobalTestingFlags.h"
 
 // std header
@@ -21,9 +20,9 @@
 #endif
 
 #if OT_TESTING_GLOBAL_RuntimeTestingEnabled==true && OT_TEST_Interval_Enabled==true
-//! \def OT_TEST_Interval
-//! \brief Creates a new RuntimeIntervalTest in the current scope. When leaving the current scope the interval between object creation and deletion will be logged.
-//! \see ot::RuntimeIntervalTest::logOnDelete
+//! @def OT_TEST_Interval
+//! @brief Creates a new RuntimeIntervalTest in the current scope. When leaving the current scope the interval between object creation and deletion will be logged.
+//! @see ot::RuntimeIntervalTest::logOnDelete
 #define OT_TEST_Interval(___objectName, ___testCategory, ___testText) ot::RuntimeIntervalTest ___objectName; ___objectName.logOnDelete("[" ___testCategory "] " ___testText)
 #else
 #define OT_TEST_Interval(___objectName, ___testCategory, ___testText)

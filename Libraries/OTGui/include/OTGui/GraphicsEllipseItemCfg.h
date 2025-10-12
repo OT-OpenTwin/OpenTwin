@@ -21,7 +21,7 @@ namespace ot {
 		GraphicsEllipseItemCfg(double _radiusX = 5., double _radiusY = 5., ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr);
 		virtual ~GraphicsEllipseItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object

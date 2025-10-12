@@ -1,14 +1,22 @@
+//! @file CoreTypes.h
+//! @brief This file contains the core defines of OpenTwin.
+//! @author Alexander Kuester (alexk95)
+//! @date November 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
-// OpenTwin header
-#include "OTSystem/Flags.h"
-#include "OTSystem/ArchitectureInfo.h"
+// OpenTwin System header
+#include "OTSystem/SystemTypes.h"
+
+// OpenTwin Core header
+#include "OTCore/CoreAPIExport.h"
+#include "OTCore/OTClassHelper.h"
 
 // std header
 #include <list>
 #include <limits>
-
-#define OT_NOTHING 
+#include <type_traits>
 
 namespace ot {
 
@@ -23,11 +31,11 @@ namespace ot {
 
 #ifdef OT_OS_64Bit
 	//! @brief Unique identifier (64 bit unsigned integer)
-	typedef unsigned long long UID;
+	typedef uint64_t UID;
 
 #else
 	//! @brief Unique identifier (32 bit unsigned integer)
-	typedef unsigned long UID;
+	typedef uint32_t UID;
 
 #endif // DEBUG
 

@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 
 // Qt header

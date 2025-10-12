@@ -58,7 +58,7 @@ namespace ot {
 
 		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
 
-		//! \brief Deselects all items.
+		//! @brief Deselects all items.
 		//! Emits itemSelectionChanged when done.
 		void deselectAll(void);
 

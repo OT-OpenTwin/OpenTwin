@@ -43,8 +43,14 @@ bool SocketServer::startServer() {
 
 	QFile certFile(server_cert_file_path);
 	QFile keyFile(server_key_file_path);
-	certFile.open(QIODevice::ReadOnly);
-	keyFile.open(QIODevice::ReadOnly);
+	if (!certFile.open(QIODevice::ReadOnly)) {
+		OT_LOG_E("Failed to open server certificate file \"" + server_cert_file_path.toStdString() + "\"");
+		return false;
+	}
+	if (!keyFile.open(QIODevice::ReadOnly)) {
+		OT_LOG_E("Failed to open server certificate key file \"" + server_key_file_path.toStdString() + "\"");
+		return false;
+	}
 
 	QSslCertificate certificate(&certFile, QSsl::Pem);
 	QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);

@@ -16,8 +16,8 @@ namespace ot {
 
 	class PropertyGroup;
 
-	//! \class Property
-	//! \brief The Property class is used as a base class for all Properties that can be displayed and modified in the frontend.
+	//! @class Property
+	//! @brief The Property class is used as a base class for all Properties that can be displayed and modified in the frontend.
 	class OT_GUI_API_EXPORT Property : public PropertyBase {
 		OT_DECL_NOCOPY(Property)
 		OT_DECL_NOMOVE(Property)
@@ -29,19 +29,19 @@ namespace ot {
 		Property(PropertyFlags _flags = PropertyFlags(NoFlags));
 		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
 
-		//! \brief Destructor.
+		//! @brief Destructor.
 		//! Destroys the parent group if set.
 		virtual ~Property();
 
 		virtual std::string getPropertyType(void) const = 0;
 
-		//! \brief Creates a copy of this property.
+		//! @brief Creates a copy of this property.
 		virtual Property* createCopy(void) const = 0;
 
 		//! brief Creates a copy of this property and all parent groups excluding other properties and group paths.
 		//! The created property will have all the parent groups set up to the root group.
 		//!
-		//! \note Other child groups and properties are ignored.
+		//! @note Other child groups and properties are ignored.
 		//!
 		//! Assume you have the following structure:<br>
 		//! <pre>
@@ -78,11 +78,11 @@ namespace ot {
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
 		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
 
-		//! \brief Returns the root group.
+		//! @brief Returns the root group.
 		//! If this item has no parent group returns 0.
 		PropertyGroup* getRootGroup(void) const;
 
-		//! \brief Returns the property path.
+		//! @brief Returns the property path.
 		//! The property path is a string containing all parent groups and the property name (e.g. "RootGroup/ChildGroup/ThisItem").
 		std::string getPropertyPath(char _delimiter = '/') const;
 

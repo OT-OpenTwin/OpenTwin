@@ -85,7 +85,6 @@
 #include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/VersionGraphManager.h"
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/CreateProjectDialog.h"
@@ -1457,7 +1456,7 @@ void AppBase::closeAllViewerTabs(void) {
 	m_lastFocusedCentralView = nullptr;
 	ot::WidgetViewManager::instance().closeViews();
 
-	ot::SignalBlockWrapper sigBlock(&ot::WidgetViewManager::instance());
+	QSignalBlocker sigBlock(&ot::WidgetViewManager::instance());
 	ot::WidgetViewManager::instance().slotViewFocused(nullptr, m_defaultView->getViewDockWidget());
 }
 

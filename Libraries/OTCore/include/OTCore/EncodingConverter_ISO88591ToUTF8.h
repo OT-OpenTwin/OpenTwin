@@ -8,7 +8,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CoreTypes.h"
 
 namespace ot
 {

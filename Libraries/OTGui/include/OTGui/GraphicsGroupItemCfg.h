@@ -20,7 +20,7 @@ namespace ot {
 		GraphicsGroupItemCfg();
 		virtual ~GraphicsGroupItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object

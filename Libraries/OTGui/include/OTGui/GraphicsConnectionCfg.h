@@ -85,11 +85,11 @@ namespace ot {
 
 		void setLineColor(const ot::Color& _color) { m_lineStyle.setColor(_color); };
 
-		//! \brief Set the line painter.
+		//! @brief Set the line painter.
 		//! The item takes ownership of the painter.
 		void setLinePainter(ot::Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
 
-		//! \brief Returns the current painter.
+		//! @brief Returns the current painter.
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.getPainter(); };
 

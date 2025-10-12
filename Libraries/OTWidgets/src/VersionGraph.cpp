@@ -7,7 +7,6 @@
 #include "OTWidgets/VersionGraph.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/VersionGraphItem.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 ot::VersionGraph::VersionGraph() :
 	m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
@@ -100,7 +99,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 }
 
 void ot::VersionGraph::clear(void) {
-	SignalBlockWrapper signalsBlock(this);
+	QSignalBlocker signalsBlock(this);
 
 	for (const VersionsList& branchVersions : m_branches) {
 		for (VersionGraphItem* version : branchVersions) {

@@ -6,8 +6,8 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/CoreTypes.h"
 #include "OTCore/JSONTypes.h"
-#include "OTCore/OTClassHelper.h"
 
 // std header
 #include <string>
@@ -36,7 +36,7 @@ namespace ot {
 
 		const JsonDocument& constRef() const { return *this; };
 
-		ConstJsonObject getConstObject() const { return this->GetObject(); };
+		ConstJsonObject getConstObject() const { return rapidjson::Document::GetObject(); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

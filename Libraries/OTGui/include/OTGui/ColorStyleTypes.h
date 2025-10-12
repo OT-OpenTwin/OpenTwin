@@ -1,6 +1,6 @@
-//! \file ColorStyleTypes.h
-//! \author Alexander Kuester (alexk95)
-//! \date March 2024
+//! @file ColorStyleTypes.h
+//! @author Alexander Kuester (alexk95)
+//! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -14,14 +14,14 @@
 
 namespace ot {
 
-	//! \brief Contains default OpenTwin color style names.
+	//! @brief Contains default OpenTwin color style names.
 	enum class ColorStyleName {
 		BrightStyle,
 		DarkStyle,
 		BlueStyle
 	};
 
-	//! \brief Contains color style file keys.
+	//! @brief Contains color style file keys.
 	//! The keys are used to determine the beginning of a section in the color style file.
 	enum class ColorStyleFileKey {
 		NameKey,
@@ -32,7 +32,7 @@ namespace ot {
 		SheetKey
 	};
 
-	//! \brief Contains color style file macros.
+	//! @brief Contains color style file macros.
 	enum class ColorStyleFileMacro {
 		RootMacro
 	};
@@ -43,7 +43,7 @@ namespace ot {
 		ValueValue
 	};
 
-	//! \brief Contains macros used in the color style base file.
+	//! @brief Contains macros used in the color style base file.
 	enum class ColorStyleBaseFileMacro {
 		PainterMacro,
 		FileMacro,
@@ -51,7 +51,7 @@ namespace ot {
 		DoubleMacro
 	};
 
-	//! \brief Contains default file paths set in a color style.
+	//! @brief Contains default file paths set in a color style.
 	enum class ColorStyleFileEntry {
 		TransparentIcon = 0,
 
@@ -149,12 +149,12 @@ namespace ot {
 		PropertyGroupCollapsedIcon,
 		LogInBackgroundImage,
 
-		//! \brief Used to determine the last entry.
-		//! \warning This must always be the last entry in this enum.
+		//! @brief Used to determine the last entry.
+		//! @warning This must always be the last entry in this enum.
 		ColorStyleFileEntry_End
 	};
 
-	//! \brief Contains default painters set in a color style.
+	//! @brief Contains default painters set in a color style.
 	enum class ColorStyleValueEntry : uint32_t {
 		Transparent = 0,
 
@@ -245,18 +245,18 @@ namespace ot {
 		WarningForeground,
 		ErrorForeground,
 
-		//! \brief Used to determine the last entry.
-		//! \warning This must always be the last entry in this enum.
+		//! @brief Used to determine the last entry.
+		//! @warning This must always be the last entry in this enum.
 		ColorStyleValueEntry_End
 	};
 
-	//! \brief Contains default integer values set in a color style.
+	//! @brief Contains default integer values set in a color style.
 	enum class ColorStyleIntegerEntry {
 		SplitterHandleWidth,
 		SplitterBorderRadius
 	};
 
-	//! \brief Contains default double values set in a color style.
+	//! @brief Contains default double values set in a color style.
 	enum class ColorStyleDoubleEntry {
 		BorderWidth,
 		BorderRadiusBig,

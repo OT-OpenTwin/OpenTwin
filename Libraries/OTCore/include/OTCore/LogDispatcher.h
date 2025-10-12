@@ -11,9 +11,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/OTAssert.h"
 #include "OTCore/LogTypes.h"
-#include "OTCore/CoreTypes.h"
 #include "OTCore/LogMessage.h"
 
 // std header

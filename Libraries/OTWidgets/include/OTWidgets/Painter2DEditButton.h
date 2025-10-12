@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Painter2DDialogFilter.h"
 #include "OTWidgets/WidgetBase.h"
 

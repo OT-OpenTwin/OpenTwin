@@ -6,8 +6,7 @@
 #pragma once
 
 // OT header
-#include "OTSystem/OTAssert.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <string>

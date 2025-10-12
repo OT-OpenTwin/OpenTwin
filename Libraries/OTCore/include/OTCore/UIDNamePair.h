@@ -6,9 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <list>

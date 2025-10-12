@@ -26,7 +26,7 @@ namespace ot {
 		//! @param _configObject The JSON object containing the GraphicsItemCfg.
 		static ot::GraphicsItem* create(const ConstJsonObject& _configObject, bool _isRoot = false);
 
-		//! \brief Creates a graphics item from the provided configuration.
+		//! @brief Creates a graphics item from the provided configuration.
 		//! The graphics item will be created according to the graphics item cfg name.
 		//! If the created item is the root item finalizeGraphicsItem() will be called.
 		//! @param _config The graphics item configuration.

@@ -46,7 +46,7 @@ namespace ot {
 		//! @brief Setup the input from the provided configration
 		virtual bool setupFromConfiguration(const Property* _configuration);
 
-		//! \brief Sets the focus on the input widget.
+		//! @brief Sets the focus on the input widget.
 		virtual void focusPropertyInput(void) = 0;
 
 		const std::string& getPropertyType(void) const { return m_type; };

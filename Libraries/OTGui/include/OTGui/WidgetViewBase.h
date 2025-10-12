@@ -7,9 +7,8 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicEntityInformation.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <list>

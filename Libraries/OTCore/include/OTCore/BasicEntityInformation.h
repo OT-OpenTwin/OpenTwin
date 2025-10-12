@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
 
 // std header
@@ -31,14 +30,14 @@ namespace ot {
 		bool operator == (const BasicEntityInformation& _other) const;
 		bool operator != (const BasicEntityInformation& _other) const;
 
-		//! \brief Add the object contents to the provided JSON object.
-		//! \param _object Json object reference to write the data to.
-		//! \param _allocator Allocator.
+		//! @brief Add the object contents to the provided JSON object.
+		//! @param _object Json object reference to write the data to.
+		//! @param _allocator Allocator.
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
-		//! \brief Set the object contents from the provided JSON object.
-		//! \param _object The JSON object containing the information.
-		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
+		//! @brief Set the object contents from the provided JSON object.
+		//! @param _object The JSON object containing the information.
+		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setEntityName(const std::string& _entityName) { m_entityName = _entityName; };
@@ -51,9 +50,9 @@ namespace ot {
 		UID getEntityVersion(void) const { return m_entityVersion; };
 
 	private:
-		std::string m_entityName; //! \brief Name of entity that is displayed in the widget view.
-		UID m_entityId; //! \brief ID of the entity that is displayed in the widget view.
-		UID m_entityVersion; //! \brief Version of the entity that is displayed in the widget view.
+		std::string m_entityName; //! @brief Name of entity that is displayed in the widget view.
+		UID m_entityId; //! @brief ID of the entity that is displayed in the widget view.
+		UID m_entityVersion; //! @brief Version of the entity that is displayed in the widget view.
 	};
 
 }

@@ -60,7 +60,10 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QSslConfiguration sslConfiguration;
 		
 	QFile caCertFile(caStr);
-	caCertFile.open(QIODevice::ReadOnly);
+	if (!caCertFile.open(QIODevice::ReadOnly)) {
+		OT_LOG_E("Failed to open CA certificate file \"" + caStr.toStdString() + "\"");
+		return;
+	}
 	QSslCertificate caCert(&caCertFile, QSsl::Pem);
 	caCertFile.close();
 

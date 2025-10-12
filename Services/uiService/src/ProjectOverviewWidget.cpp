@@ -19,7 +19,6 @@
 #include "OTWidgets/TableItem.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/IconManager.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 // TabToolbar
 #include <TabToolbar/Page.h>
@@ -326,13 +325,13 @@ void ProjectOverviewWidget::slotTableHeaderItemClicked(int _column) {
 		for (ProjectOverviewEntry* entry : m_entries) {
 			if (!entry->getIsChecked()) {
 				allChecked = false;
-				ot::SignalBlockWrapper sigBlock(m_table);
+				QSignalBlocker sigBlock(m_table);
 				entry->setIsChecked(true);
 			}
 		}
 
 		if (allChecked) {
-			ot::SignalBlockWrapper sigBlock(m_table);
+			QSignalBlocker sigBlock(m_table);
 			for (ProjectOverviewEntry* entry : m_entries) {
 				entry->setIsChecked(false);
 			}
@@ -501,7 +500,7 @@ ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const
 }
 
 void ProjectOverviewWidget::clear() {
-	ot::SignalBlockWrapper sigBlock(m_table);
+	QSignalBlocker sigBlock(m_table);
 	int ix = m_table->horizontalHeader()->sortIndicatorSection();
 	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();
 
@@ -525,7 +524,7 @@ void ProjectOverviewWidget::clear() {
 }
 
 void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator) {
-	ot::SignalBlockWrapper sigBlock(m_table);
+	QSignalBlocker sigBlock(m_table);
 	
 	int ix = m_table->horizontalHeader()->sortIndicatorSection();
 	Qt::SortOrder order = m_table->horizontalHeader()->sortIndicatorOrder();

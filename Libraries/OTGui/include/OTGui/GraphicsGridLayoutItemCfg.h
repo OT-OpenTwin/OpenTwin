@@ -18,7 +18,7 @@ namespace ot {
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
 		virtual ~GraphicsGridLayoutItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object.

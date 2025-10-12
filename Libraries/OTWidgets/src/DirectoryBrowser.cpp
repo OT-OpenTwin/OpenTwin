@@ -8,7 +8,6 @@
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/DirectoryBrowser.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtCore/qdir.h>

@@ -15,8 +15,8 @@
 
 namespace ot {
 
-	//! \class BasicServiceInformation
-	//! \brief The BasicServiceInformation class is used to hold a service name and type.
+	//! @class BasicServiceInformation
+	//! @brief The BasicServiceInformation class is used to hold a service name and type.
 	//! The BasicServiceInformation can be used as a key in a map.
 	class OT_CORE_API_EXPORT BasicServiceInformation : public ot::Serializable {
 	public:
@@ -48,8 +48,8 @@ namespace ot {
 		const std::string& serviceType(void) const { return m_type; };
 
 	private:
-		std::string m_name; //! \brief Service name.
-		std::string m_type; //! \brief Service type.
+		std::string m_name; //! @brief Service name.
+		std::string m_type; //! @brief Service type.
 
 	};
 

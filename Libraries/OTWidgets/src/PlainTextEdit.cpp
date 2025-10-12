@@ -5,7 +5,6 @@
 
 // OpenTwin header
 #include "OTWidgets/PlainTextEdit.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtGui/qfontmetrics.h>
@@ -43,12 +42,12 @@ void ot::PlainTextEdit::scrollToBottom(void) {
 
 void ot::PlainTextEdit::keyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Return && _event->modifiers() == Qt::ControlModifier) {
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 		_event->accept();
 		this->insertPlainText("\n");
 	}
 	else if (_event->key() == Qt::Key_Tab && _event->modifiers() == Qt::ControlModifier) {
-		SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 		_event->accept();
 		this->insertPlainText("\t");
 	}

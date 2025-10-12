@@ -6,11 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <map>
@@ -79,7 +76,7 @@ namespace ot {
 		//! @param _flags Intially set flags.
 		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
 
-		//! \brief Destructor.
+		//! @brief Destructor.
 		virtual ~PropertyBase() {};
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -138,8 +135,8 @@ namespace ot {
 		std::string                        m_name;        //! @brief Property name.
 		std::string                        m_title;       //! @brief Property title.
 		std::string                        m_specialType; //! @brief Special type identifier.
-		std::map<std::string, std::string> m_data;        //! \brief Additional data.
-		PropertyFlags                      m_flags;       //! \brief Flags.
+		std::map<std::string, std::string> m_data;        //! @brief Additional data.
+		PropertyFlags                      m_flags;       //! @brief Flags.
 	};
 
 }

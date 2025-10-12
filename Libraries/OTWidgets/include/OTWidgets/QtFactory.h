@@ -10,15 +10,13 @@
 #include "OTCore/Color.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Font.h"
 #include "OTGui/PenCfg.h"
 #include "OTGui/Path2D.h"
 #include "OTGui/Margins.h"
-#include "OTGui/GuiTypes.h"
 #include "OTGui/Transform.h"
 #include "OTGui/TableRange.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qrect.h>

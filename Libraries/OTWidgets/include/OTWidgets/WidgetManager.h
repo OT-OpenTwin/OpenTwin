@@ -45,10 +45,10 @@ namespace ot {
 			std::map<LockTypeFlag, int> lockData;
 		};
 
-		//! \brief Maps ObjectName to Widget.
+		//! @brief Maps ObjectName to Widget.
 		std::map<std::string, Widget*> m_widgets;
 
-		//! \brief Maps BSI to Name to Widgets.
+		//! @brief Maps BSI to Name to Widgets.
 		std::map<BasicServiceInformation, OwnerData> m_ownerData;
 
 		//! @brief Currently set locks.

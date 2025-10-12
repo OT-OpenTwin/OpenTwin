@@ -26,20 +26,20 @@ namespace ot {
 		VersionGraphCfg& operator = (const VersionGraphCfg& _other) = delete;
 		VersionGraphCfg& operator = (VersionGraphCfg&& _other) noexcept;
 
-		//! \brief Add the object contents to the provided JSON object.
-		//! \param _object Json object reference to write the data to.
-		//! \param _allocator Allocator.
+		//! @brief Add the object contents to the provided JSON object.
+		//! @param _object Json object reference to write the data to.
+		//! @param _allocator Allocator.
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
-		//! \brief Set the object contents from the provided JSON object.
-		//! \param _object The JSON object containing the information.
-		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
+		//! @brief Set the object contents from the provided JSON object.
+		//! @param _object The JSON object containing the information.
+		//! @throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		//! \see getActiveVersionName
+		//! @see getActiveVersionName
 		void setActiveVersionName(const std::string& _version) { m_activeVersionName = _version; };
 
-		//! \brief Returns the active version name.
+		//! @brief Returns the active version name.
 		//! The active version is the currently active model version.
 		const std::string& getActiveVersionName(void) const { return m_activeVersionName; };
 
@@ -47,10 +47,10 @@ namespace ot {
 
 		static std::string incrementVersion(const std::string& _version);
 
-		//! \see getActiveBranchName
+		//! @see getActiveBranchName
 		void setActiveBranchName(const std::string& _version) { m_activeBranchName = _version; };
 
-		//! \brief Returns the active branch name.
+		//! @brief Returns the active branch name.
 		//! The active branch is the currently active branch.
 		//! All parent versions of this version are in the active branch.
 		const std::string& getActiveBranchName(void) const { return m_activeBranchName; };
@@ -63,10 +63,10 @@ namespace ot {
 
 		static VersionsList& insertBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList);
 
-		//! \brief Returns the version with the given name.
+		//! @brief Returns the version with the given name.
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
 
-		//! \brief Returns the version with the given name.
+		//! @brief Returns the version with the given name.
 		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
 
 		//! @brief Returns the last version in the active branch.
@@ -96,10 +96,10 @@ namespace ot {
 		//! Will return false if the version does not exist or is not the last of its branch.
 		bool versionIsEndOfBranch(const std::string& _version) const;
 
-		//! \brief Returns true if a version with the given name prefix exists in any of the versions (Expensive).
+		//! @brief Returns true if a version with the given name prefix exists in any of the versions (Expensive).
 		bool versionStartingWithNameExists(const std::string& _prefix);
 
-		//! \brief Removes the version and all of its childs if the version exists (Expensive).
+		//! @brief Removes the version and all of its childs if the version exists (Expensive).
 		void removeVersion(const std::string& _version);	
 
 		bool getBranchExists(const std::string& _branchName) const;
@@ -112,17 +112,17 @@ namespace ot {
 		//! @brief Returns a list of direct branches that have the specified version as a branch node.
 		std::list<std::list<VersionGraphVersionCfg>> getBranchesFromNode(const std::string& _version) const;
 
-		//! \breif Clear the version graph.
+		//! @breif Clear the version graph.
 		void clear(void);
 
 	private:
-		//! \brief Finds the next version.
+		//! @brief Finds the next version.
 		//! This method is designed to improve performance when "iterating" trough the current branch.
-		//! \param _version Version to find the next version of.
-		//! \param _versionList The list the current version is located at.
+		//! @param _version Version to find the next version of.
+		//! @param _versionList The list the current version is located at.
 		//! If the list is not set it will be searched by calling findVersionIterator.
 		//! On success the list will be set to the corresponding list of the result or null if there is no next version.
-		//! \param _currentVersionListIterator List iterator of the _versionList pointing to the current version.
+		//! @param _currentVersionListIterator List iterator of the _versionList pointing to the current version.
 		//! On success the iterator will be set to the corresponding list iterator of the result.
 		const ot::VersionGraphVersionCfg* findNextVersion(const std::string& _version, const std::string& _activeBranch, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const;
 		

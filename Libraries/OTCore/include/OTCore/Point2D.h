@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Serializable.h"
 
 namespace ot {

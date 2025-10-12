@@ -8,7 +8,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTCore/CoreTypes.h"
 
 namespace ot {
 
@@ -30,7 +30,7 @@ namespace ot {
 		//! @brief Mask used to set all incoming message log flags.
 		ALL_INCOMING_MESSAGE_LOG_FLAGS = INBOUND_MESSAGE_LOG | QUEUED_INBOUND_MESSAGE_LOG | ONEWAY_TLS_INBOUND_MESSAGE_LOG,
 
-		OUTGOING_MESSAGE_LOG = 1 << 7, //! \brief Outgoing message log.
+		OUTGOING_MESSAGE_LOG = 1 << 7, //! @brief Outgoing message log.
 
 		//! @brief Mask used to set all outgoing message log flags.
 		ALL_OUTGOING_MESSAGE_LOG_FLAGS = OUTGOING_MESSAGE_LOG,

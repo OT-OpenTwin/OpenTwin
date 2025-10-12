@@ -13,7 +13,6 @@
 // OpenTwin header
 #include "OTCore/BasicScopedBoolWrapper.h"
 #include "OTWidgets/TreeItemDelegate.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 // AK header
 #include <akCore/aException.h>
@@ -273,7 +272,7 @@ void ak::aTreeWidget::toggleItemSelection(
 void ak::aTreeWidget::deselectAllItems(bool _emitEvent) {
 	if (!m_items.empty()) {
 		{
-			ot::SignalBlockWrapper sigBlock(this);
+			QSignalBlocker sigBlock(this);
 			m_ignoreEvents = true;
 			for (auto itm = m_items.begin(); itm != m_items.end(); itm++) {
 				itm->second->setSelected(false);
@@ -607,7 +606,7 @@ void ak::aTreeWidget::selectionChangedEvent(
 ) {
 	{
 		ot::BasicScopedBoolWrapper lclIgnore(m_ignoreEvents, true);
-		ot::SignalBlockWrapper sigBlock(this);
+		QSignalBlocker sigBlock(this);
 
 		// Get selected items
 		QList<QTreeWidgetItem*> selected = m_tree->selectedItems();

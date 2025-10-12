@@ -150,7 +150,7 @@ void ot::WidgetViewManager::closeView(WidgetView* _view) {
 	_view->deleteLater();
 
 	m_state = bck;
-
+	
 	updateCentralViewTitles();
 }
 
@@ -259,6 +259,9 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 		if (lstIt != lst->end()) {
 			lst->erase(lstIt);
 		}
+
+		OTAssert(std::find(lst->begin(), lst->end(), entry) == lst->end(), "Duplicate entry");
+
 		// If the owner has no more views, erase the owner.
 		if (lst->empty()) {
 			m_viewOwnerMap.erase(owner);

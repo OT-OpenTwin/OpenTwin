@@ -10,7 +10,6 @@
 #include "OTGui/Path2D.h"
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTCore/OTClassHelper.h"
 
 #define OT_FactoryKey_GraphicsShapeItem "OT_GIShape"
 
@@ -28,7 +27,7 @@ namespace ot {
 
 		// Base class functions
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -91,11 +90,11 @@ namespace ot {
 		//! @brief Outline width.
 		double getOutlineWidth(void) const { return m_outline.getWidth(); };
 		
-		//! \brief Sets the fill shape.
-		//! \see getFillShape
+		//! @brief Sets the fill shape.
+		//! @see getFillShape
 		void setFillShape(bool _fill) { m_fillShape = _fill; };
 
-		//! \brief If fill shape is enabled the shape will be filled, otherwise only the outline will be drawn.
+		//! @brief If fill shape is enabled the shape will be filled, otherwise only the outline will be drawn.
 		bool getFillShape(void) const { return m_fillShape; };
 
 	private:

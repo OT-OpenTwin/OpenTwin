@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PenCfg.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
@@ -47,7 +46,7 @@ namespace ot {
 		void setPoints(const std::list<Point2DD>& _points);
 		const std::list<Point2DD>& getPoints(void) const;
 
-		//! \brief Sets the background painter.
+		//! @brief Sets the background painter.
 		//! The item takes ownership of the painter.
 		void setBackgroundPainter(Painter2D* _painter);
 		const Painter2D* getBackgroundPainter(void) const;

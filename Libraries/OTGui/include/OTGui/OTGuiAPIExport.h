@@ -1,7 +1,7 @@
 #pragma once
 
 // This is used to initialize the group
-//! \addtogroup OTGui
+//! @addtogroup OTGui
 
 #ifdef OTGUI_EXPORTS
 #define OT_GUI_API_EXPORT __declspec(dllexport)

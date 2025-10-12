@@ -14,8 +14,8 @@
 
 namespace ot {
 
-	//! \class SystemLoadInformation
-	//! \brief The SystemLoadInformation can be used to determine information about the system (e.g. cpu and memory load, build information).
+	//! @class SystemLoadInformation
+	//! @brief The SystemLoadInformation can be used to determine information about the system (e.g. cpu and memory load, build information).
 	class OT_SYS_API_EXPORT SystemInformation {
 	public:
 		SystemInformation();

@@ -27,44 +27,44 @@ namespace ot {
 			TimeHHMMSSZZZZ //! @brief Time in HH:MM:SS.ZZZZ format.
 		};
 
-		//! \brief Controls color style references.
+		//! @brief Controls color style references.
 		enum ColorReference {
-			Default, //! \brief Default text color.
-			Highlight, //! \brief Current styled text highlight color.
-			LightHighlight, //! \brief Current styled text light highlight color.
-			Comment, //! \brief Current styled text comment color.
-			Warning, //! \brief Current styled text warning color.
-			Error //! \brief Current styled text error color.
+			Default, //! @brief Default text color.
+			Highlight, //! @brief Current styled text highlight color.
+			LightHighlight, //! @brief Current styled text light highlight color.
+			Comment, //! @brief Current styled text comment color.
+			Warning, //! @brief Current styled text warning color.
+			Error //! @brief Current styled text error color.
 		};
 
-		//! \brief Controls text character formatting.
+		//! @brief Controls text character formatting.
 		enum TextControl {
-			//! \brief Resets all text style settings (use default style from now on).
+			//! @brief Resets all text style settings (use default style from now on).
 			//! Will also reset the current ColorReference back to Default.
 			ClearStyle,
-			Bold, //! \brief Enable bold text.
-			NotBold, //! \brief Disable bold text.
-			Italic, //! \brief Enable italic text.
-			NotItalic, //! \brief Disable italic text.
-			Underline, //! \brief Enable underline text.
-			NotUnderline, //! \brief Disable underline text.
-			LineTrough, //! \brief Enable line trough text.
-			NotLineTrough, //! \brief Disable line trough text.
+			Bold, //! @brief Enable bold text.
+			NotBold, //! @brief Disable bold text.
+			Italic, //! @brief Enable italic text.
+			NotItalic, //! @brief Disable italic text.
+			Underline, //! @brief Enable underline text.
+			NotUnderline, //! @brief Disable underline text.
+			LineTrough, //! @brief Enable line trough text.
+			NotLineTrough, //! @brief Disable line trough text.
 
-			//! \brief Big header sized text (disable Text and other header setting).
-			//! \note Note that the header text will be displayed on a separate line. <br>
+			//! @brief Big header sized text (disable Text and other header setting).
+			//! @note Note that the header text will be displayed on a separate line. <br>
 			//! If the text is "<text><header><text>" the output will be: <br>
 			//! <text> <br>
 			//! <header> <br>
 			//! <text>
 			Header1,
 
-			//! \brief Medium header sized text (disable Text and other header setting).
+			//! @brief Medium header sized text (disable Text and other header setting).
 			Header2,
 
-			//! \brief Small header sized text (disable Text and other header setting).
+			//! @brief Small header sized text (disable Text and other header setting).
 			Header3,
-			Text, //! \brief Regular text (disable Header).
+			Text, //! @brief Regular text (disable Header).
 		};
 
 		//! @brief Creates a string representation of the provided token.

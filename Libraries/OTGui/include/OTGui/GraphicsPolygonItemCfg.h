@@ -10,7 +10,6 @@
 #include "OTCore/Point2D.h"
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTCore/OTClassHelper.h"
 
 // std header
 #include <list>
@@ -27,7 +26,7 @@ namespace ot {
 		GraphicsPolygonItemCfg();
 		virtual ~GraphicsPolygonItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -94,15 +93,15 @@ namespace ot {
 		//! @brief Outline width.
 		double getOutlineWidth(void) const { return m_outline.getWidth(); };
 
-		//! \brief Set the fill property.
-		//! \see getFillPolygon
+		//! @brief Set the fill property.
+		//! @see getFillPolygon
 		void setFillPolygon(bool _fill) { m_fillPolygon = _fill; };
 
-		//! \brief If fill polygon is enabled the polygon will be filled, otherwise only the outline will be drawn.
+		//! @brief If fill polygon is enabled the polygon will be filled, otherwise only the outline will be drawn.
 		bool getFillPolygon(void) const { return m_fillPolygon; };
 
 	private:
-		bool m_fillPolygon; //! \brief Fill polygon.
+		bool m_fillPolygon; //! @brief Fill polygon.
 		std::list<Point2DD> m_points; //! @brief Outline points.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		PenFCfg m_outline; //! @brief Outline style.

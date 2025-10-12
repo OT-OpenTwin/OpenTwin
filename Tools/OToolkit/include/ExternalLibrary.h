@@ -9,7 +9,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTSystem/SystemTypes.h"
+#include "OTSystem/SystemProcess.h"
 #include "OTCore/OTClassHelper.h"
 
 // std header

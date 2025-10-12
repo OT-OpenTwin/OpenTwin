@@ -9,7 +9,6 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/TextEncoding.h"
 
 namespace ot

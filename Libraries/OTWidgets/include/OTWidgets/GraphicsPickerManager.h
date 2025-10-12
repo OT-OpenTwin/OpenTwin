@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTWidgets/GraphicsPicker.h"

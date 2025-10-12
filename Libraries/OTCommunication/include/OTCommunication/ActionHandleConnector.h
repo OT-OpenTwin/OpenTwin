@@ -7,7 +7,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 

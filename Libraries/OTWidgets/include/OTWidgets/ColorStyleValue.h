@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/ColorStyleTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qstring.h>

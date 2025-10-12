@@ -8,7 +8,7 @@
 #pragma warning (disable : 4251) // Disable warning for DLL export/import
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 
 // std header

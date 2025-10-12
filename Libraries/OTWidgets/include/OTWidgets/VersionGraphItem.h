@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 #include "OTWidgets/GraphicsStackItem.h"
 
@@ -30,7 +29,7 @@ namespace ot {
 
 		void setRowIndex(int _row) { m_row = _row; };
 		int getRowIndex(void) const { return m_row; };
-		//! \brief Returns the maximum row index of this version and all of its childs.
+		//! @brief Returns the maximum row index of this version and all of its childs.
 		int getMaxRowIndex(void) const;
 
 		//! @param _version Version to add. Caller keeps ownership of the pointer.

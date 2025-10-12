@@ -67,7 +67,6 @@
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/ModelLibraryDialog.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/StyledTextConverter.h"
@@ -1488,7 +1487,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Close all the tabs in the tab widget for the viewer
 		{
-			ot::SignalBlockWrapper sigBlock(&ot::WidgetViewManager::instance());
+			QSignalBlocker sigBlock(&ot::WidgetViewManager::instance());
 			app->closeAllViewerTabs();
 		}
 

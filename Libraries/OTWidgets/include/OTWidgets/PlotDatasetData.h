@@ -7,11 +7,9 @@
 
 // OpenTwin header
 
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/Plot1DCfg.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
-
 #include "OTCore/ComplexNumberContainer.h"
+#include "OTGui/Plot1DCfg.h"
+#include "OTWidgets/WidgetTypes.h"
 
 class QwtPlotCurve;
 

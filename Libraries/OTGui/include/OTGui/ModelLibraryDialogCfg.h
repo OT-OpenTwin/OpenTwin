@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/DialogCfg.h"
 #include "OTGui/LibraryModel.h"
 

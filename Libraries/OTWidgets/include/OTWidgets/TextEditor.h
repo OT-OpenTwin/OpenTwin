@@ -50,9 +50,9 @@ namespace ot {
 		TextEditor(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~TextEditor();
 
-		//! \brief Setup the TextEditor.
-		//! \param _config The config.
-		//! \param _replaceText If true the text will be replaced.
+		//! @brief Setup the TextEditor.
+		//! @param _config The config.
+		//! @param _replaceText If true the text will be replaced.
 		virtual void setupFromConfig(const TextEditorCfg& _config, bool _replaceText = true);
 
 		int lineNumberAreaWidth() const;
@@ -69,7 +69,7 @@ namespace ot {
 
 		QStringList code() const;
 
-		//! \brief Returns the current syntax highlighter.
+		//! @brief Returns the current syntax highlighter.
 		//! The TextEditor keeps ownership of the highlighter.
 		SyntaxHighlighter* getSyntaxHighlighter() { return m_syntaxHighlighter; };
 

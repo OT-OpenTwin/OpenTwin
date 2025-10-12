@@ -6,8 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/TreeWidgetItemInfo.h"
 
 // Qt header

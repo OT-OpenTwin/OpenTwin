@@ -7,7 +7,6 @@
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/SystemServiceConfigInfo.h"
 
 // std header

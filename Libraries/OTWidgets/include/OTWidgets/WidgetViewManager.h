@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/WidgetView.h"
@@ -47,20 +46,20 @@ namespace ot {
 		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
 
 		enum ManagerConfigFlag : uint32_t {
-			NoFlags                            = 0 << 0, //! \brief No manager flags.
-			InputFocusCentralViewOnFocusChange = 1 << 0, //! \brief Central views will get widget input focus when their view tab was focused.
-			InputFocusSideViewOnFocusChange    = 1 << 1, //! \brief Side views will get widget input focus when their view tab was focused.
-			InputFocusToolViewOnFocusChange    = 1 << 2, //! \brief Tool views will get widget input focus when their view tab was focused.
-			IgnoreInputFocusOnViewInsert       = 1 << 3, //! \brief View widgets won't get input focus when a view is added.
+			NoFlags                            = 0 << 0, //! @brief No manager flags.
+			InputFocusCentralViewOnFocusChange = 1 << 0, //! @brief Central views will get widget input focus when their view tab was focused.
+			InputFocusSideViewOnFocusChange    = 1 << 1, //! @brief Side views will get widget input focus when their view tab was focused.
+			InputFocusToolViewOnFocusChange    = 1 << 2, //! @brief Tool views will get widget input focus when their view tab was focused.
+			IgnoreInputFocusOnViewInsert       = 1 << 3, //! @brief View widgets won't get input focus when a view is added.
 
-			//! \brief Same as setting InputFocusCentralViewOnFocusChange | InputFocusSideViewOnFocusChange | InputFocusToolViewOnFocusChange
+			//! @brief Same as setting InputFocusCentralViewOnFocusChange | InputFocusSideViewOnFocusChange | InputFocusToolViewOnFocusChange
 			InputFocusOnAnyViewFocusChange     = InputFocusCentralViewOnFocusChange | InputFocusSideViewOnFocusChange | InputFocusToolViewOnFocusChange,
 
-			//! \brief Mask used to unset any input focus on focus changed.
+			//! @brief Mask used to unset any input focus on focus changed.
 			InputFocusOnFocusChangeMask        = ~InputFocusOnAnyViewFocusChange,
 
 
-			//! \brief If enabled the manager will try to determine the best parent dock when inserting a new view.
+			//! @brief If enabled the manager will try to determine the best parent dock when inserting a new view.
 			//! The last focused view of the same category will be used as the main source for the parent dock area. <br>
 			//! If no view of the same category was ever focused the "oldest" view of the same category will be used. <br>
 			//! If there does not exist any view in the same category the next higher category will be checked (Tool < Side < Central).
@@ -86,7 +85,7 @@ namespace ot {
 		//! If a central widget view is set the provided view will be added to its dock area by taking the initial dock location into account.
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
-		//! \param _insertArea The relative area to add the view.
+		//! @param _insertArea The relative area to add the view.
 		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags = WidgetView::InsertFlags(WidgetView::NoInsertFlags), WidgetView* _parentView = (WidgetView*)nullptr);
 
 		//! @brief Returns the widget view with the specified name.
@@ -94,12 +93,12 @@ namespace ot {
 		//! @param _entityName Widget view name.
 		WidgetView* findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const;
 
-		//! \brief Returns the widget view that matches the title.
+		//! @brief Returns the widget view that matches the title.
 		//! Will log and assert if more than one view with the same title were found.
 		//! Checks the view title and the current view title.
 		WidgetView* findViewFromTitle(const std::string& _viewTitle) const;
 
-		//! \brief Searches for the view and owner of the view.
+		//! @brief Searches for the view and owner of the view.
 		//! Returns true if the view was found.
 		bool findViewAndOwner(const std::string& _entityName, WidgetViewBase::ViewType _type, WidgetView*& _view, BasicServiceInformation& _owner) const;
 
@@ -151,7 +150,7 @@ namespace ot {
 		//! @param _entityName Widget view name.
 		void setCurrentView(const std::string& _entityName, WidgetViewBase::ViewType _type);
 
-		//! \brief Sets the current view title.
+		//! @brief Sets the current view title.
 		void setCurrentViewFromTitle(const std::string& _viewTitle);
 
 		//! @brief Saves the current state that can be restored later.
@@ -197,7 +196,7 @@ namespace ot {
 		//! @brief Returns all view names with the given type that belong to the given owner.
 		std::list<std::string> getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const;
 
-		//! \brief Returns true if the content of any of the views is modified.
+		//! @brief Returns true if the content of any of the views is modified.
 		bool getAnyViewContentModified();
 
 		//! @brief Return the dock toggle action
@@ -231,10 +230,10 @@ namespace ot {
 
 	private:
 		enum ManagerState {
-			DefaultState        = 0 << 0, //! \brief Default manager state.
-			InsertViewState     = 1 << 0, //! \brief View insert in progress.
-			CloseViewState      = 1 << 1, //! \brief View Remove in progress.
-			MulticloseViewState = 1 << 2 //! \brief Multiple views are closed at the same time.
+			DefaultState        = 0 << 0, //! @brief Default manager state.
+			InsertViewState     = 1 << 0, //! @brief View insert in progress.
+			CloseViewState      = 1 << 1, //! @brief View Remove in progress.
+			MulticloseViewState = 1 << 2 //! @brief Multiple views are closed at the same time.
 		};
 		typedef Flags<ManagerState> ManagerStateFlags;
 
@@ -259,10 +258,10 @@ namespace ot {
 
 		WidgetView* findView(const ViewNameTypeListEntry& _entry) const;
 
-		//! \brief Adds the view and stores the information.
+		//! @brief Adds the view and stores the information.
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
-		//! \param _parentArea The target area to add the view to.
-		//! \param _insertArea The relative area to add the view.
+		//! @param _parentArea The target area to add the view to.
+		//! @param _insertArea The relative area to add the view.
 		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView);
 
 		ads::CDockAreaWidget* getBestDockArea(const WidgetView* _view) const;

@@ -24,7 +24,7 @@ namespace ot {
 
 		// Base class functions
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -48,7 +48,7 @@ namespace ot {
 		const std::string& getFile(void) const { return m_file; };
 
 	private:
-		std::string m_file; //! \brief Starting point.
+		std::string m_file; //! @brief Starting point.
 	};
 
 }

@@ -79,17 +79,17 @@ namespace ot {
 
 		void clear(bool _clearCache);
 
-		//! \brief Returns the dataset for the given plot curve.
+		//! @brief Returns the dataset for the given plot curve.
 		//! Returns NULL if the dataset does not exist.
 		//! The Plot keeps ownership of the dataset.
 		virtual PlotDataset* findDataset(QwtPlotCurve* _curve) = 0;
 
-		//! \brief Returns the dataset for the given plot curve.
+		//! @brief Returns the dataset for the given plot curve.
 		//! Returns NULL if the dataset does not exist.
 		//! The Plot keeps ownership of the dataset.
 		virtual PlotDataset* findDataset(QwtPolarCurve* _curve) = 0;
 
-		//! \brief Returns the cached dataset for the given entity id.
+		//! @brief Returns the cached dataset for the given entity id.
 		//! Returns NULL if the dataset does not exist.
 		//! The Plot keeps ownership of the dataset.
 		virtual std::list<PlotDataset*> findDatasets(UID _entityID) = 0;

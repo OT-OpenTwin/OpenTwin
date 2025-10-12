@@ -14,7 +14,6 @@
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtGui/qevent.h>

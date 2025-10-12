@@ -6,9 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"
-#include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PropertyBase.h"
 
 // std header
@@ -97,7 +94,7 @@ namespace ot {
 		//! The last path entry must be the property name.
 		const Property* findPropertyByPath(std::list<std::string> _path) const;
 
-		//! \brief Returns false if at least one property exists in any of the groups and its child groups.
+		//! @brief Returns false if at least one property exists in any of the groups and its child groups.
 		bool isEmpty(void) const;
 
 	private:

@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
 
@@ -15,8 +14,8 @@ namespace ot {
 	class RectD;
 	class RectF;
 
-	//! \class Rect
-	//! \brief Rectangle that holds the top left and bottom right corner in int values.
+	//! @class Rect
+	//! @brief Rectangle that holds the top left and bottom right corner in int values.
 	class OT_CORE_API_EXPORT Rect : public Serializable {
 	public:
 		Rect();
@@ -81,30 +80,30 @@ namespace ot {
 
 		// Basic calculations
 
-		//! \brief Calculates and returns the union of this Rect and the provided Rect.
+		//! @brief Calculates and returns the union of this Rect and the provided Rect.
 		Rect unionWith(const Rect& _other) const;
 
-		//! \brief Calclates and returns the intersection of this Rect and the provided Rect.
+		//! @brief Calclates and returns the intersection of this Rect and the provided Rect.
 		Rect intersectsWith(const Rect& _other) const;
 
-		//! \brief Returns true if top left is (0, 0) and bottom right is (0, 0).
+		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
 		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
 
-		//! \brief Returns true if the top left and bottom right points are set correctly.
+		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
 
-		//! \see void moveTo(const Point2D& _topLeft)
+		//! @see void moveTo(const Point2D& _topLeft)
 		void moveTo(int _ax, int _ay) { this->moveTo(Point2D(_ax, _ay)); };
 
-		//! \brief Moves the rect to the specified location.
+		//! @brief Moves the rect to the specified location.
 		//! The top left and bottom right will be moved.
 		void moveTo(const Point2D& _topLeft);
 
-		//! \see void moveBy(const Point2D& _distance)
+		//! @see void moveBy(const Point2D& _distance)
 		void moveBy(int _dx, int _dy) { this->moveBy(Point2D(_dx, _dy)); };
 
-		//! \brief Moves the rect by the provided distance.
+		//! @brief Moves the rect by the provided distance.
 		//! The top left and bottom right will be moved.
 		void moveBy(const Point2D& _distance);
 
@@ -122,8 +121,8 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//! \class Rect
-	//! \brief Rectangle that holds the top left and bottom right corner in float values.
+	//! @class Rect
+	//! @brief Rectangle that holds the top left and bottom right corner in float values.
 	class OT_CORE_API_EXPORT RectF : public Serializable {
 	public:
 		RectF();
@@ -188,30 +187,30 @@ namespace ot {
 
 		// Basic calculations
 
-		//! \brief Calculates and returns the union of this Rect and the provided Rect.
+		//! @brief Calculates and returns the union of this Rect and the provided Rect.
 		RectF unionWith(const RectF& _other) const;
 
-		//! \brief Calclates and returns the intersection of this Rect and the provided Rect.
+		//! @brief Calclates and returns the intersection of this Rect and the provided Rect.
 		RectF intersectsWith(const RectF& _other) const;
 
-		//! \brief Returns true if top left is (0, 0) and bottom right is (0, 0).
+		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
 		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
 
-		//! \brief Returns true if the top left and bottom right points are set correctly.
+		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
 
-		//! \see void moveTo(const Point2DF& _topLeft)
+		//! @see void moveTo(const Point2DF& _topLeft)
 		void moveTo(float _ax, float _ay) { this->moveTo(Point2DF(_ax, _ay)); };
 
-		//! \brief Moves the rect to the specified location.
+		//! @brief Moves the rect to the specified location.
 		//! The top left and bottom right will be moved.
 		void moveTo(const Point2DF& _topLeft);
 
-		//! \see void moveBy(const Point2DF& _distance)
+		//! @see void moveBy(const Point2DF& _distance)
 		void moveBy(float _dx, float _dy) { this->moveBy(Point2DF(_dx, _dy)); };
 
-		//! \brief Moves the rect by the provided distance.
+		//! @brief Moves the rect by the provided distance.
 		//! The top left and bottom right will be moved.
 		void moveBy(const Point2DF& _distance);
 
@@ -229,8 +228,8 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	//! \class RectD
-	//! \brief Rectangle that holds the top left and bottom right corner in double values.
+	//! @class RectD
+	//! @brief Rectangle that holds the top left and bottom right corner in double values.
 	class OT_CORE_API_EXPORT RectD : public Serializable {
 	public:
 		RectD();
@@ -295,30 +294,30 @@ namespace ot {
 
 		// Basic calculations
 
-		//! \brief Calculates and returns the union of this Rect and the provided Rect.
+		//! @brief Calculates and returns the union of this Rect and the provided Rect.
 		RectD unionWith(const RectD& _other) const;
 
-		//! \brief Calclates and returns the intersection of this Rect and the provided Rect.
+		//! @brief Calclates and returns the intersection of this Rect and the provided Rect.
 		RectD intersectsWith(const RectD& _other) const;
 
-		//! \brief Returns true if top left is (0, 0) and bottom right is (0, 0).
+		//! @brief Returns true if top left is (0, 0) and bottom right is (0, 0).
 		bool isAllZero(void) const { return m_topLeft.x() == 0 && m_topLeft.y() == 0 && m_bottomRight.x() == 0 && m_bottomRight.y() == 0; };
 
-		//! \brief Returns true if the top left and bottom right points are set correctly.
+		//! @brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
 
-		//! \see void moveTo(const Point2DD& _topLeft)
+		//! @see void moveTo(const Point2DD& _topLeft)
 		void moveTo(double _ax, double _ay) { this->moveTo(Point2DD(_ax, _ay)); };
 
-		//! \brief Moves the rect to the specified location.
+		//! @brief Moves the rect to the specified location.
 		//! The top left and bottom right will be moved.
 		void moveTo(const Point2DD& _topLeft);
 
-		//! \see void moveBy(const Point2DD& _distance)
+		//! @see void moveBy(const Point2DD& _distance)
 		void moveBy(double _dx, double _dy) { this->moveBy(Point2DD(_dx, _dy)); };
 
-		//! \brief Moves the rect by the provided distance.
+		//! @brief Moves the rect by the provided distance.
 		//! The top left and bottom right will be moved.
 		void moveBy(const Point2DD& _distance);
 

@@ -6,11 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/Plot1DCurveCfg.h"
 #include "OTWidgets/PlotDatasetData.h"
-#include "CoordinateFormatConverter.h"
+#include "OTWidgets/CoordinateFormatConverter.h"
 
 // Qwt header
 #include <qwt_symbol.h>

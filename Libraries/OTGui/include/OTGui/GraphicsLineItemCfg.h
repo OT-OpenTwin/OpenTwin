@@ -8,7 +8,6 @@
 
 // OpenTwin header
 #include "OTCore/Point2D.h"
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
 
@@ -28,7 +27,7 @@ namespace ot {
 
 		// Base class functions
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object
@@ -48,29 +47,29 @@ namespace ot {
 
 		// Setter / Getter
 
-		//! \brief Set the line origin relative to the item's position.
+		//! @brief Set the line origin relative to the item's position.
 		//! The coordinates must be greater or equal 0.
 		void setFrom(double _x, double _y) { this->setFrom(Point2DD(_x, _y)); };
 
-		//! \brief Set the line origin relative to the item's position.
+		//! @brief Set the line origin relative to the item's position.
 		//! The coordinates must be greater or equal 0.
 		void setFrom(const Point2DD& _pt) { m_from = _pt; };
 
-		//! \brief Line origin relative to the item's position.
+		//! @brief Line origin relative to the item's position.
 		const Point2DD& getFrom(void) const { return m_from; };
 
-		//! \brief Set the line destination relative to the item's position.
+		//! @brief Set the line destination relative to the item's position.
 		//! The coordinates must be greater or equal 0.
 		void setTo(double _x, double _y) { this->setTo(Point2DD(_x, _y)); };
 
-		//! \brief Set the line destination relative to the item's position.
+		//! @brief Set the line destination relative to the item's position.
 		//! The coordinates must be greater or equal 0.
 		void setTo(const Point2DD& _pt) { m_to = _pt; };
 
-		//! \brief Line destination relative to the item's position.
+		//! @brief Line destination relative to the item's position.
 		const Point2DD& getTo(void) const { return m_to; };
 
-		//! \brief Set the line width.
+		//! @brief Set the line width.
 		//! The value must be greater or equal to 0.
 		void setWidth(double _width) { m_lineStyle.setWidth(_width); };
 		double getWidth(void) const { return m_lineStyle.getWidth(); };
@@ -87,9 +86,9 @@ namespace ot {
 		const PenFCfg& getLineStyle(void) const { return m_lineStyle; };
 
 	private:
-		Point2DD m_from; //! \brief Starting point.
-		Point2DD m_to; //! \brief End point.
-		PenFCfg m_lineStyle; //! \brief Line style.
+		Point2DD m_from; //! @brief Starting point.
+		Point2DD m_to; //! @brief End point.
+		PenFCfg m_lineStyle; //! @brief Line style.
 	};
 
 }

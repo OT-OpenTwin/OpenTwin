@@ -33,7 +33,7 @@ namespace ot {
 
 		void setWidgetEnabled(bool _enabled, int _counter = 1);
 
-		//! \brief Resets the disabled counter back to 0. (like no disabled was called)
+		//! @brief Resets the disabled counter back to 0. (like no disabled was called)
 		void resetWidgetDisabledCounter(void);
 
 		void lockWidget(const LockTypeFlags& _flags, int _lockCount = 1);
@@ -43,7 +43,7 @@ namespace ot {
 		void resetWidgetLockCounter(void);
 
 	protected:
-		//! \brief This method is called whenever the enabled state should be updated (e.g. setEnabled or setReadOnly).
+		//! @brief This method is called whenever the enabled state should be updated (e.g. setEnabled or setReadOnly).
 		virtual void updateWidgetEnabledState(bool _enabled, bool _locked) = 0;
 
 	private:

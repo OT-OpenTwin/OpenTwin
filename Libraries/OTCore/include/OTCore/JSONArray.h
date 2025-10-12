@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/JSONTypes.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/CoreTypes.h"
 
 // std header
 #include <list>

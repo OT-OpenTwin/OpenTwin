@@ -6,10 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTGui/GuiTypes.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // std header
 #include <map>
@@ -39,7 +37,7 @@ namespace ot {
 
 		void setGuiObjectEnabled(bool _enabled, int _counter = 1);
 
-		//! \brief Resets the disabled counter back to 0. (like no disabled was called)
+		//! @brief Resets the disabled counter back to 0. (like no disabled was called)
 		void resetGuiObjectDisabledCounter(void);
 
 		void lockGuiObject(const LockTypeFlags& _flags, int _lockCount = 1);
@@ -49,7 +47,7 @@ namespace ot {
 		void resetGuiObjectLockCounter(void);
 
 	protected:
-		//! \brief This method is called whenever the enabled state should be updated (e.g. setEnabled or setReadOnly).
+		//! @brief This method is called whenever the enabled state should be updated (e.g. setEnabled or setReadOnly).
 		virtual void updateGuiObjectEnabledState(bool _enabled) = 0;
 
 	private:

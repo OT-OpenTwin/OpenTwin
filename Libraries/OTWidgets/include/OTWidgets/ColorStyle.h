@@ -6,10 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/ColorStyleValue.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qstring.h>

@@ -6,7 +6,7 @@
 
 namespace ot {
 
-	//! \namespace url
+	//! @namespace url
 	namespace url {
 
 		//! @brief Will encode the string given as argument such that it can be used in URLs.

@@ -1,14 +1,13 @@
-//! \file ContextMenuManager.h
-//! \author Alexander Kuester (alexk95)
-//! \date November 2024
+//! @file ContextMenuManager.h
+//! @author Alexander Kuester (alexk95)
+//! @date November 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTGui/MenuCfg.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetTypes.h"
 
 // Qt header
 #include <QtCore/qobject.h>

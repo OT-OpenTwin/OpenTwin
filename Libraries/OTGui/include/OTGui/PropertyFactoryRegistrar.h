@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 
 // std header
 #include <string>

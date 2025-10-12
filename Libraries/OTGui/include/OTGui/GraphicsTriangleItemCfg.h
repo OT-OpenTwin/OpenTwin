@@ -9,7 +9,6 @@
 // OpenTwin header
 #include "OTGui/PenCfg.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTCore/OTClassHelper.h"
 
 #define OT_FactoryKey_GraphicsTriangleItem "OT_GITria"
 
@@ -42,7 +41,7 @@ namespace ot {
 		GraphicsTriangleItemCfg(TriangleDirection _direction = Right, TriangleShape _shape = Triangle);
 		virtual ~GraphicsTriangleItemCfg();
 
-		//! \brief Creates a copy of this item.
+		//! @brief Creates a copy of this item.
 		virtual GraphicsItemCfg* createCopy(void) const override;
 
 		//! @brief Add the object contents to the provided JSON object

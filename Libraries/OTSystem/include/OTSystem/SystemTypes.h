@@ -6,10 +6,13 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
+#include "OTSystem/OTAssert.h"
+#include "OTSystem/Exception.h"
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
-#include <cstdint>
+#include <stdint.h>
 
 namespace ot {
 
@@ -21,29 +24,3 @@ namespace ot {
 
 	static const port_t maxPortNumber = 49151; //! @brief Maximum port number (IANA registered ports).
 }
-
-#if defined(OT_OS_WINDOWS)
-
-#include <Windows.h>
-
-//! @def OT_PROCESS_HANDLE
-//! @brief Process handle
-#define OT_PROCESS_HANDLE HANDLE
-
-//! @def OT_INVALID_PROCESS_HANDLE
-//! @brief Invalid process handle
-#define OT_INVALID_PROCESS_HANDLE nullptr
-
-//! @def OT_INFINITE_TIMEOUT
-//! @brief Infinite timeout
-#define OT_INFINITE_TIMEOUT INFINITE
-
-namespace  ot {
-
-	//! @typedef ExternalLibraryInstance_t
-	//! @brief Instance type for a loaded external library.
-	typedef HINSTANCE ExternalLibraryInstance_t;
-}
-
-
-#endif

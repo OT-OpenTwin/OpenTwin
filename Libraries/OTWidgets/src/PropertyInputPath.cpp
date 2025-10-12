@@ -7,7 +7,6 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PathBrowseEdit.h"
-#include "OTWidgets/SignalBlockWrapper.h"
 #include "OTWidgets/PropertyInputPath.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
@@ -59,7 +58,7 @@ bool ot::PropertyInputPath::setupFromConfiguration(const Property* _configuratio
 		return false;
 	}
 
-	SignalBlockWrapper sigBlock(m_path);
+	QSignalBlocker sigBlock(m_path);
 
 	m_path->setBrowseMode(actualProperty->getBrowseMode());
 

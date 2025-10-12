@@ -6,7 +6,6 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/GraphicsItem.h"
 
 class QGraphicsLayout;
@@ -49,7 +48,7 @@ namespace ot {
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
-		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		//! @brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance(void) const override;
 
 		virtual std::list<GraphicsConnectionItem*> getAllConnections() const override;
