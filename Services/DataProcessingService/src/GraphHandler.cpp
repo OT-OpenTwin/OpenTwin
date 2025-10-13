@@ -5,21 +5,22 @@
 #include "Application.h"
 #include "EntityAPI.h"
 
-bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
+
+bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
+
 	m_rootNodes.clear();
 	m_entityByGraphNode.clear();
-	std::map<ot::UID,std::shared_ptr<EntityBlockConnection>> allConnectionsByID = loadAllConnections(_allBlockEntitiesByBlockID);
-	sortOutUnusedBlocks(_allBlockEntitiesByBlockID);
-	sortOutDanglingConnections(_allBlockEntitiesByBlockID, allConnectionsByID);
-	bool graphIsValid = allRequiredConnectionsSet(_allBlockEntitiesByBlockID, allConnectionsByID) &&
-		allConnectionsAreValid(_allBlockEntitiesByBlockID, allConnectionsByID) &&
-		hasNoCycle(_allBlockEntitiesByBlockID, allConnectionsByID);
+	sortOutUnusedBlocks(_allBlockEntitiesByBlockID, _connectionBlockMap);
+	sortOutDanglingConnections(_allBlockEntitiesByBlockID, _allConnectionsByID);
+	bool graphIsValid = allRequiredConnectionsSet(_allBlockEntitiesByBlockID, _allConnectionsByID, _connectionBlockMap) &&
+		allConnectionsAreValid(_allBlockEntitiesByBlockID, _allConnectionsByID) &&
+		hasNoCycle(_allBlockEntitiesByBlockID, _allConnectionsByID);
 	return graphIsValid;
 }
 
 
-bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID)
+bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
 	std::string uiErrorMessage = "";
 	bool allRequiredConnectionsSet = true;
@@ -28,7 +29,7 @@ bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<E
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
-		const bool entityHasAllIncommingConnectionsSet = entityHasIncommingConnectionsSet(blockEntity, _allConnectionsByID, uiErrorMessage);
+		const bool entityHasAllIncommingConnectionsSet = entityHasIncommingConnectionsSet(_connectionBlockMap,blockEntity, _allConnectionsByID, uiErrorMessage);
 		allRequiredConnectionsSet &= entityHasAllIncommingConnectionsSet;
 	}
 		
@@ -40,39 +41,7 @@ bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<E
 	return allRequiredConnectionsSet;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> GraphHandler::loadAllConnections(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
-{
-	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionsByID;
-	ot::UIDList allConnectionIDs;
-	for (auto& blockEntityByID : _allBlockEntitiesByBlockID)
-	{
-		ot::UIDList allConnectionIDsOfBlock = blockEntityByID.second->getAllConnections();
-		allConnectionIDs.insert(allConnectionIDs.end(), allConnectionIDsOfBlock.begin(),allConnectionIDsOfBlock.end());
-	}
-	allConnectionIDs.unique();
-	Application::instance()->prefetchDocumentsFromStorage(allConnectionIDs);
-	ClassFactory& classFactory = Application::instance()->getClassFactory();
-	for (ot::UID connectionID : allConnectionIDs)
-	{
-		ot::UID connectionVersion =	Application::instance()->getPrefetchedEntityVersion(connectionID);
-		EntityBase * connectionEntBase = ot::EntityAPI::readEntityFromEntityIDandVersion(connectionID, connectionID, classFactory);
-		if (connectionEntBase == nullptr)
-		{
-			OT_LOG_D("referenced connection not part of model.");
-			delete connectionEntBase;
-		}
-		else
-		{
-			auto connectionEnt = dynamic_cast<EntityBlockConnection*>(connectionEntBase);
-			assert(connectionEnt != nullptr);
-			allConnectionsByID[connectionID] = std::shared_ptr<EntityBlockConnection>(connectionEnt);
-		}
-	}
-	
-	return allConnectionsByID;
-}
-
-void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
+void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
 	std::string uiInfoMessage = "";
 	std::list<ot::UID> toBeErased;
@@ -81,8 +50,15 @@ void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityB
 	for (auto& blockEntityByBlockID : _allBlockEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
-		auto& allConnections = blockEntity->getAllConnections();
-		if (allConnections.size() == 0)
+	
+		auto it = _connectionBlockMap.find(blockEntity->getEntityID());
+		if (it == _connectionBlockMap.end()) {
+			OT_LOG_E("BlockEntity not found - EntityID: " + std::to_string(blockEntity->getEntityID()));
+			continue;
+		}
+		auto& connectionUIdList = it->second;
+
+		if (connectionUIdList.size() == 0)
 		{
 			const std::string nameWithoutRoot = getNameWithoutRoot(blockEntity.get());
 			uiInfoMessage += "Block \"" + nameWithoutRoot + "\" is not concidered furthermore, since it has no connections.\n";
@@ -196,10 +172,19 @@ const std::string GraphHandler::getNameWithoutRoot(EntityBase* _entity)
 	return nameWithoutRoot;
 }
 
-bool GraphHandler::entityHasIncommingConnectionsSet(std::shared_ptr<EntityBlock>& blockEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::string& uiMessage)
+bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDList>& _connectionBlockMap ,std::shared_ptr<EntityBlock>& blockEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::string& uiMessage)
 {
 	auto& allConnectorsByName = blockEntity->getAllConnectorsByName();
-	auto& allConnectionIDs = blockEntity->getAllConnections();
+
+	auto it = _connectionBlockMap.find(blockEntity->getEntityID());
+	if (it == _connectionBlockMap.end()) {
+		OT_LOG_E("BlockEntity not found - EntityID: " + std::to_string(blockEntity->getEntityID()));
+		uiMessage += "BlockEntity not found - EntityID: " + std::to_string(blockEntity->getEntityID());
+		return false;
+	}
+
+	auto& allConnectionIDs = it->second;
+
 	bool allIncommingConnectionsAreSet = true;
 	for (auto& connectorByName : allConnectorsByName)
 	{

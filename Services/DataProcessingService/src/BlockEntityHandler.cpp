@@ -236,6 +236,27 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	return blockEntitiesByBlockID;
 }
 
+std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections(const std::string& _folderName) {
+	const std::string fullFolderName = _folderName + "/" + m_connectionsFolder;
+	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullFolderName);
+	std::list<ot::EntityInformation> entityInfos;
+	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
+	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	ClassFactoryBlock classFactory;
+
+	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
+	for (auto& entityInfo : entityInfos) {
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
+		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
+			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
+			assert(blockEntityConnection != nullptr);
+			entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+		}
+	}
+
+	return entityBlockConnectionsByBlockID;
+}
+
 bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName)
 {
 	auto allConnectors = blockEntity->getAllConnectorsByName();

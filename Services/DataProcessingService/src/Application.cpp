@@ -25,6 +25,7 @@
 #include "TemplateDefaultManager.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
+#include "Helper.h"
 
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
@@ -76,7 +77,9 @@ void Application::runPipelineWorker(ot::UIDList _selectedSolverIDs)
 			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
 			const std::string folderName = solver->getSelectedPipeline();
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
-			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+			auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
+			std::map<ot::UID, ot::UIDList> connectionBlockMap = Helper::buildMap(allConnectionEntities, allBlockEntities);
+			const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities,allBlockEntities,connectionBlockMap);
 
 			if (isValid)
 			{
