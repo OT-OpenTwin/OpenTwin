@@ -8,6 +8,7 @@
 
 #pragma once
 
+// TINYXML2
 #include "tinyxml2.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -66,7 +67,9 @@ private:
 	double m_freqStart = 0.0;
 	double m_freqStop = 0.0;
 	uint8_t m_oversampling = 0;
-	std::array<std::string, 6> m_boundaryConditions = { "PEC", "PEC", "PEC", "PEC", "PEC", "PEC" };
+	std::array<std::string, 6> m_boundaryConditions = { "PEC", "PEC", "PEC", "PEC", "PEC", "PEC" }; // default = PEC on all sides
+	const std::array<std::string, 4> m_boundaryConditionTypes = { "PEC", "PMC", "MUR", "PML_8" };
+	const std::array<std::string, 6> m_boundaryNames = { "x-max", "x-min", "y-max", "y-min", "z-max", "z-min" };
 
 	std::map<ot::UID, EntityProperties> simulationSettingsProperties;
 	std::map<ot::UID, EntityProperties> boundaryConditionProperties;

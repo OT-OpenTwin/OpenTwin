@@ -21,7 +21,6 @@ FDTDConfig::FDTDConfig(uint32_t timeSteps, double endCriteria, double freqStart,
 	m_boundaryConditions(boundaryConditions),
 	m_excitation(excitationType)
 {
-
 }
 
 FDTDConfig::~FDTDConfig()
@@ -95,9 +94,8 @@ void FDTDConfig::setOverSampling(uint8_t overSampling) {
 }
 
 void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> values) {
-	const std::array<std::string, 4> bcNames = { "PEC", "PMC", "MUR", "PML_8" };
 	for (const auto& val : values) {
-		if (std::find(bcNames.begin(), bcNames.end(), val) == bcNames.end()) {
+		if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), val) == m_boundaryConditionTypes.end()) {
 			throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + val));
 		}
 	}
@@ -105,18 +103,16 @@ void FDTDConfig::setBoundaryCondition(std::array<std::string, 6> values) {
 }
 
 void FDTDConfig::setBoundaryCondition(size_t index, std::string value) {
-	const std::array<std::string, 4> bcNames = { "PEC", "PMC", "MUR", "PML_8" };
-	if (std::find(bcNames.begin(), bcNames.end(), value) == bcNames.end()) {
+	if (std::find(m_boundaryConditionTypes.begin(), m_boundaryConditionTypes.end(), value) == m_boundaryConditionTypes.end()) {
 		throw std::invalid_argument(std::string("[Boundary Condition] Invalid boundary condition! " + value));
 	}
-	if (index >= m_boundaryConditions.size()) {
+	if (index >= m_boundaryConditions.size() || index < 0) {
 		throw std::out_of_range(std::string("[Boundary Condition] Index out of range"));
 	}
 	m_boundaryConditions[index] = value;
 }
 
 tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLDocument& doc, EntityBase* solverEntity) {
-	std::array<std::string, 6> boundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
 	m_freqStart = readFrequencyStartInfo(solverEntity);
 	m_freqStop = readFrequencyStopInfo(solverEntity);
 	const double f0 = (m_freqStart + m_freqStop) / 2.0;
@@ -137,8 +133,8 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLDocument& doc, EntityBa
 	FDTD->InsertEndChild(excitation);
 
 	const auto& boundary = doc.NewElement("boundaryCond");
-	for (size_t i = 0; i < boundaryNames.size(); ++i) {
-		boundary->SetAttribute(boundaryNames[i].c_str(), readBoundaryConditions(solverEntity)[i].c_str());
+	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
+		boundary->SetAttribute(m_boundaryNames[i].c_str(), readBoundaryConditions(solverEntity)[i].c_str());
 	}
 	FDTD->InsertEndChild(boundary);
 
@@ -173,6 +169,18 @@ uint8_t FDTDConfig::readExcitationTypeInfo(EntityBase* solverEntity) {
 	return 0;
 }
 
+uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity)
+{
+	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
+	for (auto& item : simulationSettingsProperties) {
+		EntityProperties& props = item.second;
+		EntityPropertiesInteger* oversampling = dynamic_cast<EntityPropertiesInteger*>(props.getProperty("Oversampling"));
+		if (oversampling != nullptr) return oversampling->getValue();
+	}
+	OT_LOG_EA("Unable to read the oversampling factor, defaulting to 0.");
+	return 0;
+}
+
 double FDTDConfig::readFrequencyStartInfo(EntityBase* solverEntity) {
 	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Frequency", frequencyProperties);
 	for (auto& item : frequencyProperties) {
@@ -196,20 +204,17 @@ double FDTDConfig::readFrequencyStopInfo(EntityBase* solverEntity) {
 }
 
 std::array<std::string, 6> FDTDConfig::readBoundaryConditions(EntityBase* solverEntity) {
-	std::array<std::string, 6> boundaryConds = { "PEC", "PEC", "PEC", "PEC", "PEC", "PEC" };
-	std::array<std::string, 6> boundaryNames = { "x-min", "x-max", "y-min", "y-max", "z-min", "z-max" };
-	
 	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Boundary Conditions", boundaryConditionProperties);
 	for (auto& item : boundaryConditionProperties) {
 		EntityProperties& props = item.second;
-		for (size_t i = 0; i < boundaryNames.size(); ++i) {
-			EntityPropertiesSelection* boundaryCondition = dynamic_cast<EntityPropertiesSelection*>(props.getProperty(boundaryNames[i]));
+		for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
+			EntityPropertiesSelection* boundaryCondition = dynamic_cast<EntityPropertiesSelection*>(props.getProperty(m_boundaryNames[i]));
 			if (boundaryCondition != nullptr) {
-				boundaryConds[i] = boundaryCondition->getValue();
+				m_boundaryConditions[i] = boundaryCondition->getValue();
 			}
 		}
 	}
-	return boundaryConds;
+	return m_boundaryConditions;
 }
 
 void FDTDConfig::addToXML(EntityBase* solverEntity, std::string& tempPath) {
