@@ -178,7 +178,7 @@ EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UI
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase *entity = classFactory->CreateEntity(entityType);
+	EntityBase *entity = classFactory->createEntity(entityType);
 
 	std::map<ot::UID, EntityBase *> entityMap;
 	entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);

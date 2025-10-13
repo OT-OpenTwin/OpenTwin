@@ -53,8 +53,8 @@ Application::Application()
 {
 	ClassFactory& classFactory = getClassFactory();
 	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
-	classFactoryBlock->SetChainRoot(&classFactory);
-	classFactory.SetNextHandler(classFactoryBlock);
+	classFactoryBlock->setChainRoot(&classFactory);
+	classFactory.setNextHandler(classFactoryBlock);
 }
 
 Application::~Application()

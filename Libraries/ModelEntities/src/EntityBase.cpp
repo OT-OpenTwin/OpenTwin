@@ -26,8 +26,8 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_name(""),
 	m_isDeletable(true)
 {
-	if (_factory != nullptr && _factory->GetChainRoot() != nullptr) {
-		m_classFactory = _factory->GetChainRoot();
+	if (_factory != nullptr && _factory->getChainRoot() != nullptr) {
+		m_classFactory = _factory->getChainRoot();
 	}
 	else {
 		m_classFactory = _factory;
@@ -212,7 +212,7 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
 	assert(m_classFactory != nullptr || factory != nullptr);
-	EntityBase *entity = (m_classFactory != nullptr ? m_classFactory : factory)->CreateEntity(entityType);
+	EntityBase *entity = (m_classFactory != nullptr ? m_classFactory : factory)->createEntity(entityType);
 
 	if (entity == nullptr) {
 		return nullptr;

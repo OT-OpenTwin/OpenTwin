@@ -53,8 +53,8 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	getClassFactory().SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&(getClassFactory()));
+	getClassFactory().setNextHandler(&classFactoryCAD);
+	classFactoryCAD.setChainRoot(&(getClassFactory()));
 
 	connectAction("exportMeshFile", this, &Application::handleExportMesh);
 	connectAction("importMeshFile", this, &Application::handleImportMesh);

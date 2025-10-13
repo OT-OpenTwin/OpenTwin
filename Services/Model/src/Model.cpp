@@ -15,6 +15,7 @@
 #include "EntityFaceAnnotation.h"
 #include "EntityVis2D3D.h"
 #include "EntityUnits.h"
+#include "EntityGraphicsScene.h"
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityMetadataCampaign.h"
 #include "EntityParameterizedDataPreviewTable.h"
@@ -80,7 +81,6 @@
 
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTCore/FolderNames.h"
-#include "EntityGraphicsScene.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -302,6 +302,10 @@ void Model::resetToNew()
 		addEntityToModel(rmd->getName(), rmd, entityRoot, true, allNewEntities);
 	}
 	
+	if (typeManager.hasHierarchicalRoot()) {
+
+	}
+
 	// Now we load the default materials from the template definition
 	if (!DataBase::GetDataBase()->getProjectName().empty())
 	{
@@ -3359,7 +3363,7 @@ EntityBase *Model::readEntityFromEntityIDandVersion(EntityBase *parent, ot::UID 
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase *entity = m_classFactory.CreateEntity(entityType);
+	EntityBase *entity = m_classFactory.createEntity(entityType);
 
 	entity->restoreFromDataBase(parent, this, getStateManager(), doc_view, entityMap);
 

@@ -5,11 +5,11 @@
 class _declspec(dllexport) ClassFactoryHandler
 {
 public:
-	virtual ClassFactoryHandler* SetNextHandler(ClassFactoryHandler* nextHandler) = 0;
-	virtual EntityBase* CreateEntity(const std::string& className) = 0;
-	void SetChainRoot(ClassFactoryHandler* root) { _chainRoot = root; };
-	ClassFactoryHandler* GetChainRoot() { return _chainRoot; }
+	virtual ClassFactoryHandler* setNextHandler(ClassFactoryHandler* nextHandler) = 0;
+	virtual EntityBase* createEntity(const std::string& className) = 0;
+	void setChainRoot(ClassFactoryHandler* root) { m_chainRoot = root; };
+	ClassFactoryHandler* getChainRoot() { return m_chainRoot; }
 
 protected:
-	ClassFactoryHandler* _chainRoot = nullptr;
+	ClassFactoryHandler* m_chainRoot = nullptr;
 };

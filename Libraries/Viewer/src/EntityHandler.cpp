@@ -17,7 +17,7 @@ EntityBase* EntityHandler::readEntityFromEntityIDandVersion(ot::UID _entityID, o
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase* entity = getClassFactory().CreateEntity(entityType);
+	EntityBase* entity = getClassFactory().createEntity(entityType);
 
 	if (entity != nullptr)
 	{

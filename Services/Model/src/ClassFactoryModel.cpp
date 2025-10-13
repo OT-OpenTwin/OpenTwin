@@ -10,12 +10,12 @@ ClassFactoryModel::ClassFactoryModel()
 	_generalEntityHandler = new ClassFactory();
 	_cadEntityHandler = new ClassFactoryCAD();
 	_blockEntityHandler = new ClassFactoryBlock();
-	_cadEntityHandler->SetChainRoot(_generalEntityHandler);
-	_blockEntityHandler->SetChainRoot(_generalEntityHandler);
+	_cadEntityHandler->setChainRoot(_generalEntityHandler);
+	_blockEntityHandler->setChainRoot(_generalEntityHandler);
 
-	_generalEntityHandler->SetNextHandler(_cadEntityHandler);
-	_cadEntityHandler->SetNextHandler(_blockEntityHandler);
-	SetNextHandler(_generalEntityHandler);
+	_generalEntityHandler->setNextHandler(_cadEntityHandler);
+	_cadEntityHandler->setNextHandler(_blockEntityHandler);
+	setNextHandler(_generalEntityHandler);
 }
 
 ClassFactoryModel::~ClassFactoryModel()

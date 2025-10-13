@@ -6,6 +6,6 @@ class EntityBase;
 class _declspec(dllexport) ClassFactory : public ClassFactoryHandlerAbstract
 {
 public:
-	virtual EntityBase* CreateEntity(const std::string& className) override;
+	virtual EntityBase* createEntity(const std::string& _className) override;
 };
 

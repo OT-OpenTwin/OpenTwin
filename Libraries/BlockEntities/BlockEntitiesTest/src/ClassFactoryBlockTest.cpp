@@ -5,14 +5,14 @@
 TEST(BlockEntities, BlockEntityFound)
 {
 	ClassFactoryHandler* handler = new ClassFactoryBlock();
-	EntityBase* entity = handler->CreateEntity("EntityBlockPython");
+	EntityBase* entity = handler->createEntity("EntityBlockPython");
 	EXPECT_NE(entity, nullptr);
 }
 
 TEST(BlockEntities, ModelEntityNotFound)
 {
 	ClassFactoryHandler* handler = new ClassFactoryBlock();
-	EntityBase* entity = handler->CreateEntity("EntityAnnotation");
+	EntityBase* entity = handler->createEntity("EntityAnnotation");
 	EXPECT_EQ(entity, nullptr);
 }
 
@@ -20,7 +20,7 @@ TEST(BlockEntities, ModelEntityFound)
 {
 	ClassFactoryHandler* cadHandler = new ClassFactoryBlock();
 	ClassFactoryHandler* modelHandler = new ClassFactory();
-	cadHandler->SetNextHandler(modelHandler);
-	EntityBase* entity = cadHandler->CreateEntity("EntityAnnotation");
+	cadHandler->setNextHandler(modelHandler);
+	EntityBase* entity = cadHandler->createEntity("EntityAnnotation");
 	EXPECT_NE(entity, nullptr);
 }

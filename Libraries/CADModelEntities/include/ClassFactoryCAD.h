@@ -15,6 +15,6 @@ public:
 	//ClassFactoryCAD() {};
 	virtual ~ClassFactoryCAD() {};
 
-	virtual EntityBase *CreateEntity(const std::string &entityType) override;
+	virtual EntityBase* createEntity(const std::string &entityType) override;
 };
 

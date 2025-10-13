@@ -45,7 +45,7 @@ namespace NodeNumbers {
 
 std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position) {
 	ClassFactoryBlock factory;
-	EntityBase* baseEntity = factory.CreateEntity(blockName);
+	EntityBase* baseEntity = factory.createEntity(blockName);
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 

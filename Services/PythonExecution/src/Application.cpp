@@ -56,6 +56,6 @@ ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 }
 
 Application::Application() {
-	m_classFactory.SetNextHandler(&m_classFactoryBlock);
-	m_classFactoryBlock.SetChainRoot(&m_classFactory);
+	m_classFactory.setNextHandler(&m_classFactoryBlock);
+	m_classFactoryBlock.setChainRoot(&m_classFactory);
 }

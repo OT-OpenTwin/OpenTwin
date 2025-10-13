@@ -19,7 +19,7 @@
 #include "EntityBlockCircuitConnector.h"
 #include "EntityBlockCircuitTransmissionLine.h"
 
-EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
+EntityBase* ClassFactoryBlock::createEntity(const std::string& entityType)
 {
 
 	if (entityType == "EntityBlockDatabaseAccess")
@@ -86,5 +86,5 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 		return new EntityBlockCircuitTransmissionLine(0, nullptr, nullptr, nullptr, this, "");
 	}
 
-	return ClassFactoryHandlerAbstract::CreateEntity(entityType);
+	return ClassFactoryHandlerAbstract::createEntity(entityType);
 }

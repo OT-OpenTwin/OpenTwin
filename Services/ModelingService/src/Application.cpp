@@ -486,8 +486,8 @@ Application::Application() :
 	blendEdges(nullptr),
 	chamferEdges(nullptr) 
 {
-	getClassFactory().SetNextHandler(&classFactoryCAD);
-	classFactoryCAD.SetChainRoot(&(getClassFactory()));
+	getClassFactory().setNextHandler(&classFactoryCAD);
+	classFactoryCAD.setChainRoot(&(getClassFactory()));
 
 	entityCache.setApplication(this);
 

@@ -22,6 +22,7 @@ public:
 	bool hasRMDCategorizationPreview()	{ return m_hasRMDCategorizationPreview; }
 	bool hasDatasetRoot()				{ return m_hasDatasetRoot; }
 	bool hasDatasetRMD()				{ return m_hasDatasetRMD; }
+	bool hasHierarchicalRoot()          { return m_hasHierarchicalRoot; }
 
 	std::string getRMDCategorizationName()          { return m_RMDCategorizationName; }
 	std::string getDatasetRMD()                     { return m_datasetRMD; }
@@ -57,6 +58,8 @@ private:
 	const bool m_hasDatasetRoot				= true;
 	const bool m_hasDatasetRMD				= true;
 	
+	bool m_hasHierarchicalRoot          = false;
+
 	bool m_has3DView					= true;
 	bool m_has1DView					= true;
 	bool m_hasBlockPicker				= true;

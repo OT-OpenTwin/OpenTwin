@@ -70,6 +70,8 @@ void ProjectTypeManager::initializeProjectTypeHierarchical() {
 	//m_hasDatasetRoot = false;
 	//m_hasDatasetRMD = false;
 
+	m_hasHierarchicalRoot = true;
+
 	m_has3DView = false;
 	m_has1DView = false;
 	m_hasBlockPicker = false;

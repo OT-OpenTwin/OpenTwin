@@ -71,7 +71,7 @@
 
 #include "OTCore/TypeNames.h"
 
-EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
+EntityBase *ClassFactory::createEntity(const std::string &entityType)
 {
 	if (entityType == "EntityAnnotation")
 	{
@@ -371,6 +371,6 @@ EntityBase *ClassFactory::CreateEntity(const std::string &entityType)
 	}
 	else
 	{
-		return ClassFactoryHandlerAbstract::CreateEntity(entityType);
+		return ClassFactoryHandlerAbstract::createEntity(entityType);
 	}
 }

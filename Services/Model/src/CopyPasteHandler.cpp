@@ -119,7 +119,7 @@ std::string CopyPasteHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 			ot::JsonDocument document;
 			document.fromJson(serialisedEntities);
 			std::string entityType = ot::json::getString(document, "SchemaType");
-			std::unique_ptr<EntityBase> entity (classFactory.CreateEntity(entityType));
+			std::unique_ptr<EntityBase> entity (classFactory.createEntity(entityType));
 					
 			if (entity != nullptr)
 			{

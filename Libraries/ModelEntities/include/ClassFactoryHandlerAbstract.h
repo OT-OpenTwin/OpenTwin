@@ -4,21 +4,21 @@
 class  _declspec(dllexport) ClassFactoryHandlerAbstract : public ClassFactoryHandler
 {
 public:
-	virtual ClassFactoryHandler* SetNextHandler(ClassFactoryHandler* nextHandler) override
+	virtual ClassFactoryHandler* setNextHandler(ClassFactoryHandler* _nextHandler) override
 	{
-		_nextHandler = nextHandler;
-		return _nextHandler;
+		m_nextHandler = _nextHandler;
+		return m_nextHandler;
 	}
 
-	virtual EntityBase* CreateEntity(const std::string& className) override
+	virtual EntityBase* createEntity(const std::string& _className) override
 	{
-		if (_nextHandler != nullptr)
+		if (m_nextHandler != nullptr)
 		{
-			return _nextHandler->CreateEntity(className);
+			return m_nextHandler->createEntity(_className);
 		}
 		return nullptr;
 	}
 
 private:
-	ClassFactoryHandler* _nextHandler = nullptr;
+	ClassFactoryHandler* m_nextHandler = nullptr;
 };

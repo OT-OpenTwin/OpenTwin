@@ -18,7 +18,7 @@ EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase* entity = classFactory.CreateEntity(entityType);
+	EntityBase* entity = classFactory.createEntity(entityType);
 
 	if (entity != nullptr) {
 		std::map<UID, EntityBase*> entityMap;

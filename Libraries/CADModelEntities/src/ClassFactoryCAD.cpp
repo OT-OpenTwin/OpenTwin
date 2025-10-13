@@ -8,7 +8,7 @@
 #include "EntityResult3D.h"
 #include "EntityUnits.h"
 
-EntityBase *ClassFactoryCAD::CreateEntity(const std::string &entityType)
+EntityBase *ClassFactoryCAD::createEntity(const std::string &entityType)
 {
 	if (entityType == "EntityBrep")
 	{
@@ -31,5 +31,5 @@ EntityBase *ClassFactoryCAD::CreateEntity(const std::string &entityType)
 		return new EntityUnits(0, nullptr, nullptr, nullptr, this, "");
 	}
 
-	return ClassFactoryHandlerAbstract::CreateEntity(entityType);
+	return ClassFactoryHandlerAbstract::createEntity(entityType);
 }

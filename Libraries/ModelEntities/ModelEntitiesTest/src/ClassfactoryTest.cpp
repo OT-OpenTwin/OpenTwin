@@ -5,13 +5,13 @@
 TEST(ClassfactoryTest, EntityFound)
 {
 	ClassFactoryHandler* classFactory = new ClassFactory();
-	EntityBase* entity = classFactory->CreateEntity("EntityAnnotation");
+	EntityBase* entity = classFactory->createEntity("EntityAnnotation");
 	EXPECT_NE(entity, nullptr);
 }
 
 TEST(ClassfactoryTest, EntityNotFound)
 {
 	ClassFactoryHandler* classFactory = new ClassFactory();
-	EntityBase* entity = classFactory->CreateEntity("NotExisting");
+	EntityBase* entity = classFactory->createEntity("NotExisting");
 	EXPECT_EQ(entity, nullptr);
 }

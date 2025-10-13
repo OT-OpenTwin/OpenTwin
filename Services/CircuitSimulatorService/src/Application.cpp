@@ -69,8 +69,8 @@ Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) {
 	ClassFactory& classFactory = getClassFactory();
 	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
-	classFactoryBlock->SetChainRoot(&classFactory);
-	classFactory.SetNextHandler(classFactoryBlock);
+	classFactoryBlock->setChainRoot(&classFactory);
+	classFactory.setNextHandler(classFactoryBlock);
 	m_SimulationRunning = false;
 	
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &Application::handleNewGraphicsItem);
