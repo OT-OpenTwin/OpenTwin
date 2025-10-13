@@ -19,16 +19,16 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
     getMaterialsToObjectsMap(materialsToObjectsMap, app);
 
     // Get map of all shapes with boundary condition
-    std::map<std::string, double> boundaryCondition;
-    getBoundaryConditions(boundaryCondition);
+    //std::map<std::string, double> boundaryCondition;
+    //getBoundaryConditions(boundaryCondition);
 
     // Now we build (alias) names for each material
     std::map<std::string, std::string> materialNameToAliasMap;
     buildMaterialAliases(materialsToObjectsMap, materialNameToAliasMap);
 
-    // Now we build (alias) names for each boundary condition
-    std::map<std::string, std::string> boundaryConditionsNameToAliases;
-    buildBoundaryConditionAliases(boundaryCondition, boundaryConditionsNameToAliases);
+    //// Now we build (alias) names for each boundary condition
+    //std::map<std::string, std::string> boundaryConditionsNameToAliases;
+    //buildBoundaryConditionAliases(boundaryCondition, boundaryConditionsNameToAliases);
 
     // Write the groups defining the regions
     //writeGroups(_controlFile, materialsToObjectsMap, materialNameToAliasMap, potentialDefinitions, potentialNameToAliasMap);
@@ -37,7 +37,7 @@ void SolverFDTD::writeInputFile(std::ofstream& _controlFile, Application *app)
     writeFunctions(_controlFile, materialNameToAliasMap);
 
     // Write the constraints defining the boundary conditions and potentials
-    writeConstraints(_controlFile, boundaryCondition, boundaryConditionsNameToAliases);
+    // writeConstraints(_controlFile, boundaryCondition, boundaryConditionsNameToAliases);
 
     // Write the Jacobian
     writeJacobian(_controlFile);
@@ -67,96 +67,24 @@ std::string SolverFDTD::runSolver(const std::string& tempDirPath, ot::components
     return solverOutput.str();
 }
 
-tinyxml2::XMLElement* SolverFDTD::appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node) {
-    tinyxml2::XMLElement* elem = doc->NewElement(node.getTag().c_str());
+// @brief Get the boundary conditions from the entity properties
+// Default is PEC for all boundaries
+// Still WIP, testing if this works or not.
+// Might need to change the property type to string instead of double.
+std::array<std::string, 6> SolverFDTD::getBoundaryConditions() {
+    std::array<std::string, 6> boundaryConditions = { "PEC", "PEC", "PEC", "PEC", "PEC", "PEC" };
+	const std::array<std::string, 6> propertyNames = { "x-max", "x-min", "y-max", "y-min", "z-max", "z-min" };
 
-    for (const auto& [key, value] : node.getAttributes()) {
-        elem->SetAttribute(key.c_str(), value.c_str());
+    for (auto& item : entityProperties) {
+        for (size_t i = 0; i < propertyNames.size(); ++i) {
+            EntityPropertiesSelection* boundaryCondition = dynamic_cast<EntityPropertiesSelection*>(item.second.getProperty(propertyNames[i]));
+            if (boundaryCondition != nullptr) {
+                boundaryConditions[i] = boundaryCondition->getValue();
+            }
+        }
     }
 
-    if (!node.getText().empty()) {
-        elem->SetText(node.getText().c_str());
-    }
-
-    for (auto& _node : node.getNodes()) {
-        elem->InsertEndChild(appendNode(doc, _node));
-    }
-    return elem;
-}
-
-std::string SolverFDTD::doubleCleanString(double value) {
-    std::string s = std::to_string(value);
-    if (s.find(".") != std::string::npos) {
-        s.erase(s.find_last_not_of('0') + 1, std::string::npos);
-        if (s.back() == '.') s.pop_back();
-    }
-    return s;
-}
-
-std::string SolverFDTD::doubleToScientific(double value) {
-    std::ostringstream stringStream;
-    stringStream << std::scientific << value;
-    return stringStream.str();
-}
-
-//@brief Write the XML structure to file
-bool SolverFDTD::writeXML(const std::string& fileName, const XmlEntry& rootNode) {
-    tinyxml2::XMLDocument doc;
-
-    doc.InsertFirstChild(doc.NewDeclaration(R"(xml version="1.0" encoding="utf-8")"));
-    tinyxml2::XMLElement* root = appendNode(&doc, rootNode);
-    doc.InsertEndChild(root);
-    return doc.SaveFile(fileName.c_str()) == tinyxml2::XML_SUCCESS;
-}
-
-//@brief Write the FDTD configuration to XML
-XmlEntry SolverFDTD::writeFDTD(const FDTDConfig& config) {
-    std::array<std::string, 6> boundaryNames = { "xmax", "xmin", "ymax", "ymin", "zmax", "zmin" };
-	const double f0 = (config.getFrequencyStart() + config.getFrequencyStop()) / 2.0;
-	const double fc = (config.getFrequencyStop() - config.getFrequencyStart()) / 2.0;
-
-    XmlEntry FDTD("FDTD");
-    FDTD.setAttributes("NumberOfTimesteps", std::to_string(config.getTimeSteps()));
-    FDTD.setAttributes("OverSampling", std::to_string(config.getOversampling()));
-    FDTD.setAttributes("endCriteria", doubleToScientific(config.getEndCriteria()));
-    FDTD.setAttributes("f_max", doubleCleanString(config.getFrequencyStop()));
-    
-	// Now we add the excitation and boundary conditions nodes to the FDTD root node;
-    XmlEntry* excitation = FDTD.addNode(XmlEntry("Excitation"));
-    excitation->setAttributes("Type", std::to_string(config.getExcitationType()));
-    excitation->setAttributes("f0", doubleCleanString(f0));
-    excitation->setAttributes("fc", doubleCleanString(fc));
-
-    XmlEntry* boundary = FDTD.addNode(XmlEntry("BoundaryCond"));
-    for (size_t i = 0; i < boundaryNames.size(); ++i) {
-        boundary->setAttributes(boundaryNames[i], config.getBoundaryConditions(i));
-    }
-
-    return FDTD;
-}
-
-//@brief Generate the complete XML structure for openEMS
-XmlEntry SolverFDTD::generateXML(const XmlEntry FDTD) {
-
-    // Function signature with CSX implementation.
-	// XmlEntry SolverFDTD::generateXML(const XmlEntry FDTD, const XmlEntry CSX) 
-    XmlEntry openEMS;
-    openEMS.setTag("openEMS");
-
-    openEMS.addNode(FDTD);
-    // CSX not implemented yet
-    //openEMS.addNode(CSX);
-    return openEMS;
-}
-
-std::map<std::string, std::string> SolverFDTD::getBoundaryAttributes(const FDTDConfig& config) const {
-    const std::array<std::string, 6> boundaryConditionNames = { "xmin", "xmax", "ymin", "ymax", "zmin", "zmax" };
-    std::map<std::string, std::string> boundaryAttributes;
-
-    for (size_t i = 0; i < boundaryConditionNames.size(); ++i) {
-        boundaryAttributes[boundaryConditionNames[i]] = config.getBoundaryConditions(i);
-    }
-    return boundaryAttributes;
+	return boundaryConditions;
 }
 
 void SolverFDTD::getBoundaryConditions(std::map<std::string, double>& boundaryConditionDefinitions) {

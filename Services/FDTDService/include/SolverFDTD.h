@@ -14,18 +14,10 @@ public:
 	//virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity) override;
 
 private:
-	tinyxml2::XMLElement* appendNode(tinyxml2::XMLDocument* doc, const XmlEntry& node);
-
-	//@brief Helper function for XML double to string conversion
-	std::string doubleCleanString(double value);
-	//@brief Helper function for XML double to scientific string conversion
-	std::string doubleToScientific(double value);
-	bool writeXML(const std::string& fileName, const XmlEntry& rootNode);
-	XmlEntry writeFDTD(const FDTDConfig& config);
-	XmlEntry generateXML(const XmlEntry FDTD);
 	std::map<std::string, std::string> getBoundaryAttributes(const FDTDConfig& config) const;
-	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
 	void getBoundaryConditions(std::map<std::string, double>& boundaryConditionsDefinition);
+	std::array<std::string, 6> getBoundaryConditions();
+	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
 	void buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap);
 	void buildBoundaryConditionAliases(std::map<std::string, double>& boundaryConditionDefinitions, std::map<std::string, std::string>& boundaryConditionsNameToAliasMap);
 	std::list<int> meshVolumeGroupIdList(const std::list<std::string>& itemNames);
