@@ -12,7 +12,7 @@
 #include "tinyxml2.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 #include <string>
 #include <stdexcept>
@@ -53,7 +53,7 @@ public:
 	void setBoundaryCondition(std::array<std::string, 6> values);
 	void setBoundaryCondition(size_t index, std::string value);
 
-	bool writeXML(const std::string& filename, tinyxml2::XMLDocument& doc);
+	//bool writeXML(const std::string& filename, tinyxml2::XMLDocument& doc);
 	//void generateXML(tinyxml2::XMLDocument& openEMS, tinyxml2::XMLDocument& FDTD);
 
 	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLDocument& doc, EntityBase* solverEntity);

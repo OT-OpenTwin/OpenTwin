@@ -175,6 +175,11 @@ ECHO ===============================================================
 CALL "%OT_ELMERFEM_SERVICE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Service: FDTDService
+ECHO ===============================================================
+CALL "%OT_FDTD_SERVICE_ROOT%\Clean.bat
+
+ECHO ===============================================================
 ECHO Clean Service: FITTDService
 ECHO ===============================================================
 CALL "%OT_FITTD_SERVICE_ROOT%\Clean.bat" 

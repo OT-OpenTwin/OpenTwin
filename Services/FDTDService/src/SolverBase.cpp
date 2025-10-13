@@ -1,5 +1,6 @@
 #include "SolverBase.h"
 
+#include "OTSystem/OperatingSystem.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 #include <windows.h> // winapi
@@ -73,16 +74,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 #ifdef _DEBUG
 	exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT") + "\\Deployment";
 #else 
-#ifdef _WIN32
-	char path[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, path, MAX_PATH);
-	exePath = path;
-#else
-	char result[PATH_MAX];
-	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-	ca_cert_flile = std::string(result, (count > 0) ? count : 0);
-#endif
-	exePath = exePath.substr(0, exePath.rfind('\\'));
+	exePath = ot::OperatingSystem::getCurrentExecutableDirectory();
 #endif // _DEBUG
 
 	std::string xmlPath = workingDirectory + "\\FDTD.xml";

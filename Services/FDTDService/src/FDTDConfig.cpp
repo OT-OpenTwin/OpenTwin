@@ -169,17 +169,17 @@ uint8_t FDTDConfig::readExcitationTypeInfo(EntityBase* solverEntity) {
 	return 0;
 }
 
-uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity)
-{
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
-	for (auto& item : simulationSettingsProperties) {
-		EntityProperties& props = item.second;
-		EntityPropertiesInteger* oversampling = dynamic_cast<EntityPropertiesInteger*>(props.getProperty("Oversampling"));
-		if (oversampling != nullptr) return oversampling->getValue();
-	}
-	OT_LOG_EA("Unable to read the oversampling factor, defaulting to 0.");
-	return 0;
-}
+//uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity)
+//{
+//	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
+//	for (auto& item : simulationSettingsProperties) {
+//		EntityProperties& props = item.second;
+//		EntityPropertiesInteger* oversampling = dynamic_cast<EntityPropertiesInteger*>(props.getProperty("Oversampling"));
+//		if (oversampling != nullptr) return oversampling->getValue();
+//	}
+//	OT_LOG_EA("Unable to read the oversampling factor, defaulting to 0.");
+//	return 0;
+//}
 
 double FDTDConfig::readFrequencyStartInfo(EntityBase* solverEntity) {
 	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Frequency", frequencyProperties);

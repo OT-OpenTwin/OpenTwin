@@ -39,7 +39,12 @@
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-
+	m_runSolverButton = ot::ToolBarButtonCfg("FDTD", "Solver", "Run Solver", "Default/RunSolver");
+	m_runSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	m_createSolverButton = ot::ToolBarButtonCfg("FDTD", "Solver", "Create Solver", "Default/AddSolver");
+	m_createSolverButton.setButtonLockFlags(ot::LockModelWrite);
+	connectToolBarButton(m_createSolverButton, this, &Application::addSolver);
+	connectToolBarButton(m_runSolverButton, this, &Application::runSolver);
 }
 
 Application::~Application()
@@ -50,26 +55,6 @@ Application::~Application()
 // ##################################################################################################################################
 
 // Required functions
-
-void Application::run(void)
-{
-	// This method is called once the service can start its operation
-	if (EnsureDataBaseConnection())
-	{
-		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
-	}
-	// Add code that should be executed when the service is started and may start its work
-}
-
-std::string Application::processAction(const std::string & _action,  ot::JsonDocument& _doc)
-{
-	return OT_ACTION_RETURN_UnknownAction;
-}
-
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
-	return ""; // Return empty string if the request does not expect a return
-}
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
@@ -101,54 +86,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
-
-}
-
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
-
-}
-
-void Application::preShutdown(void) {
-
-}
-
-void Application::shuttingDown(void)
-{
-
-}
-
-bool Application::startAsRelayService(void) const
-{
-	return false;	// Do not want the service to start a relay service. Otherwise change to true
-}
-
 // ##################################################################################################################################
-
-std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	if (action == "FDTD:Solver:Create Solver")	          addSolver();
-	else if (action == "FDTD:Solver:Run Solver")		  runSolver();
-	else assert(0); // Unhandled button action
-	return std::string();
-}
 
 void Application::modelSelectionChanged()
 {
@@ -156,7 +94,7 @@ void Application::modelSelectionChanged()
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (m_selectedEntities.size() > 0)
+		if (getSelectedEntities().size() > 0)
 		{
 			enabled.push_back("FDTD:Solver:Run Solver");
 		}
@@ -165,14 +103,14 @@ void Application::modelSelectionChanged()
 			disabled.push_back("FDTD:Solver:Run Solver");
 		}
 
-		m_uiComponent->setControlsEnabledState(enabled, disabled);
+		getUiComponent()->setControlsEnabledState(enabled, disabled);
 	}
 }
 
 void Application::EnsureVisualizationModelIDKnown(void)
 {
 	if (visualizationModelID > 0) return;
-	if (m_modelComponent == nullptr) {
+	if (getModelComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -182,13 +120,7 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 void Application::addSolver(void)
 {
-	if (!EnsureDataBaseConnection())
-	{
-		assert(0);  // Data base connection failed
-		return;
-	}
-
-	if (m_uiComponent == nullptr) {
+	if (getUiComponent() == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -196,7 +128,7 @@ void Application::addSolver(void)
 	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
 	// Now get a new entity ID for creating the new item
-	ot::UID entityID = m_modelComponent->createEntityUID();
+	ot::UID entityID = getModelComponent()->createEntityUID();
 
 	// Create a unique name for the new solver item
 	int count = 1;
@@ -234,23 +166,16 @@ void Application::addSolver(void)
 
 void Application::runSolver(void)
 {
-	if (!EnsureDataBaseConnection())
+	if (getSelectedEntities().empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base.\n");
-		return;
-	}
-
-	if (m_selectedEntities.empty())
-	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
-	for (auto& entity : m_selectedEntityInfos)
+	for (auto& entity : getSelectedEntityInfos())
 	{
 		if (entity.getEntityType() == "EntitySolverFDTD")
 		{
@@ -277,8 +202,8 @@ void Application::runSolver(void)
 
 	if (solverRunList.empty())
 	{
-		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
+		if (getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
 	}
 
@@ -320,14 +245,14 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 	lock.setFlag(ot::LockViewWrite);
 	lock.setFlag(ot::LockProperties);
 
-	m_uiComponent->lockUI(lock);
+	getUiComponent()->lockUI(lock);
 
 	for (auto solver : solverInfo)
 	{
 		runSingleSolver(solver, meshInfo, solverMap[solver.getEntityName()]);
 	}
 
-	m_uiComponent->unlockUI(lock);
+	getUiComponent()->unlockUI(lock);
 }
 
 void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity) 
@@ -338,12 +263,12 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 		solverName = solverName.substr(8);
 	}
 
-	if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-	m_uiComponent->displayMessage("\nFDTD solver started: " + solverName + "\n\n");
+	if (getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+	getUiComponent()->displayMessage("\nFDTD solver started: " + solverName + "\n\n");
 
 	if (solverEntity == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read solver information.\n");
+		getUiComponent()->displayMessage("ERROR: Unable to read solver information.\n");
 		return;
 	}
 
@@ -352,7 +277,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	if (mesh == nullptr)
 	{
-		m_uiComponent->displayMessage("ERROR: Unable to read mesh information for solver.\n");
+		getUiComponent()->displayMessage("ERROR: Unable to read mesh information for solver.\n");
 		return;
 	}
 
@@ -385,29 +310,29 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	if (meshEntityID == 0)
 	{
-		m_uiComponent->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
+		getUiComponent()->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
 		return;
 	}
 
 	deleteSingleSolverResults(solverEntity);
 
 	FDTDLauncher FDTDSolver(this);
-	modelComponent()->clearNewEntityList();
+	getModelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = FDTDSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
-												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
-	m_uiComponent->displayMessage(output + "\n");
+	std::string output = FDTDSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), getUiComponent()->getServiceURL(),
+												 DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceID(), getSessionCount(), getModelComponent());
+	getUiComponent()->displayMessage(output + "\n");
 
 	// Store the output in a result item
 
-	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText + output);
+	EntityResultText *text = getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Output", logFileText + output);
 
-	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
-	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
+	getModelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
+	getModelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
 
 	// Store the newly created items in the data base
-	m_modelComponent->storeNewEntities("added solver results");
+	getModelComponent()->storeNewEntities("added solver results");
 }
 
 void Application::deleteSingleSolverResults(EntityBase* solverEntity)

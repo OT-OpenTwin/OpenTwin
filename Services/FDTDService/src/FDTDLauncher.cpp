@@ -14,7 +14,7 @@
 
 #include "OldTreeIcon.h"
 
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "EntityAPI.h"
@@ -81,7 +81,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	std::map<std::string, size_t> groupNameToIdMap;
 	readGroupsFromMesh(meshFileName, groupNameToIdMap);
 
-	application->uiComponent()->setProgressInformation("Solver running: " + problemType, true);
+	application->getUiComponent()->setProgressInformation("Solver running: " + problemType, true);
 
 	try
 	{
@@ -99,7 +99,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 		controlFile.close();
 
 		// Run the solver
-		logFileText = solver->runSolver(tempDirPath, application->uiComponent());
+		logFileText = solver->runSolver(tempDirPath, application->getUiComponent());
 
 		// Convert the results
 		//solver->convertResults(tempDirPath, application, solverEntity);
@@ -111,7 +111,7 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	catch (const std::exception& e) {
 		outputText = "ERROR: Exception occurred: " + std::string(e.what());
 	}
-	application->uiComponent()->closeProgressInformation();
+	application->getUiComponent()->closeProgressInformation();
 
 	// Delete the solver object
 	delete solver;
@@ -150,7 +150,7 @@ void FDTDLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::En
 
 void FDTDLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
 {
-	application->modelComponent()->loadMaterialInformation();
+	application->getModelComponent()->loadMaterialInformation();
 
 	std::map<ot::UID, EntityProperties> entityProperties;
 	ot::ModelServiceAPI::getEntityProperties("Materials", true, "", entityProperties);
