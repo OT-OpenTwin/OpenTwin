@@ -694,10 +694,18 @@ void ot::WidgetViewManager::slotCloseUnpinnedViews() {
 			// If the active selection is set, do not close views that are selected in the active selection
 			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
 
-			if (concider && !activeSel.empty()) {
-				// Check if the view is selected in the active selection
-				if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
-					concider = false;
+			if (concider) {
+				if (activeSel.empty()) {
+					// No active selection, ensure view is allowed to close on empty selection
+					if (!(view.second->getViewData().getViewFlags() & WidgetViewBase::ViewCloseOnEmptySelection)) {
+						concider = false;
+					}
+				}
+				else {
+					// Check if the view is selected in the active selection
+					if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
+						concider = false;
+					}
 				}
 			}
 

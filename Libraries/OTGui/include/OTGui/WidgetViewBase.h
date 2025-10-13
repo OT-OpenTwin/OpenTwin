@@ -26,14 +26,15 @@ namespace ot {
 	public:
 		//! @brief ViewFlags are used to describe the view behaviour in the frontend.
 		enum ViewFlag {
-			NoViewFlags              = 0 << 0, //! @brief Default value (no flags set)
-			ViewIsCloseable          = 1 << 0, //! @brief If set the view may be closed
-			ViewDefaultCloseHandling = 1 << 1, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour (close the view), otherwise a closeRequested signal is emitted.
-			ViewIsPinnable           = 1 << 2, //! @brief If set the view may be pinned to the auto hide areas.
-			ViewIsCentral            = 1 << 3, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsSide or ViewIsTool).
-			ViewIsSide               = 1 << 4, //! @brief If set the view is assumed to be a side view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
-			ViewIsTool               = 1 << 5, //! @brief If set the view is assumed to be a tool view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsSide).
-			ViewNameAsTitle          = 1 << 6  //! @brief If set the view name is going to be used as the view title.
+			NoViewFlags               = 0 << 0, //! @brief Default value (no flags set)
+			ViewIsCloseable           = 1 << 0, //! @brief If set the view may be closed
+			ViewDefaultCloseHandling  = 1 << 1, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour (close the view), otherwise a closeRequested signal is emitted.
+			ViewIsPinnable            = 1 << 2, //! @brief If set the view may be pinned to the auto hide areas.
+			ViewIsCentral             = 1 << 3, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsSide or ViewIsTool).
+			ViewIsSide                = 1 << 4, //! @brief If set the view is assumed to be a side view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
+			ViewIsTool                = 1 << 5, //! @brief If set the view is assumed to be a tool view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsSide).
+			ViewNameAsTitle           = 1 << 6, //! @brief If set the view name is going to be used as the view title.
+			ViewCloseOnEmptySelection = 1 << 7  //! @brief If set the view will be closed when the selection becomes empty (no selected entities).
 		};
 		typedef Flags<ViewFlag> ViewFlags; //! /ref ViewFlag "ViewFlag"
 

@@ -13,11 +13,13 @@ std::string ot::WidgetViewBase::toString(ViewFlag _flag) {
 	switch (_flag)
 	{
 	case WidgetViewBase::ViewIsCloseable: return "ViewIsCloseable";
+	case WidgetViewBase::ViewDefaultCloseHandling: return "ViewDefaultCloseHandling";
 	case WidgetViewBase::ViewIsPinnable: return "ViewIsPinnable";
 	case WidgetViewBase::ViewIsCentral: return "ViewIsCentral";
 	case WidgetViewBase::ViewIsSide: return "ViewIsSide";
 	case WidgetViewBase::ViewIsTool: return "ViewIsTool";
 	case WidgetViewBase::ViewNameAsTitle: return "NameAsTitle";
+	case WidgetViewBase::ViewCloseOnEmptySelection: return "ViewCloseOnEmptySelection";
 	default:
 		OT_LOG_EAS("Unknown view flag (" + std::to_string((int)_flag) + ")");
 		return "<null>";
@@ -26,11 +28,13 @@ std::string ot::WidgetViewBase::toString(ViewFlag _flag) {
 
 ot::WidgetViewBase::ViewFlag ot::WidgetViewBase::stringToViewFlag(const std::string& _flag) {
 	if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsCloseable)) return WidgetViewBase::ViewIsCloseable;
+	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewDefaultCloseHandling)) return WidgetViewBase::ViewDefaultCloseHandling;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsPinnable)) return WidgetViewBase::ViewIsPinnable;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsCentral)) return WidgetViewBase::ViewIsCentral;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsSide)) return WidgetViewBase::ViewIsSide;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewIsTool)) return WidgetViewBase::ViewIsTool;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewNameAsTitle)) return WidgetViewBase::ViewNameAsTitle;
+	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewCloseOnEmptySelection)) return WidgetViewBase::ViewCloseOnEmptySelection;
 	else {
 		OT_LOG_EAS("Unknown view flag \"" + _flag + "\"");
 		return NoViewFlags;
@@ -40,11 +44,13 @@ ot::WidgetViewBase::ViewFlag ot::WidgetViewBase::stringToViewFlag(const std::str
 std::list<std::string> ot::WidgetViewBase::toStringList(ViewFlags _flags) {
 	std::list<std::string> ret;
 	if (_flags & WidgetViewBase::ViewIsCloseable) ret.push_back(toString(WidgetViewBase::ViewIsCloseable));
+	if (_flags & WidgetViewBase::ViewDefaultCloseHandling) ret.push_back(toString(WidgetViewBase::ViewDefaultCloseHandling));
 	if (_flags & WidgetViewBase::ViewIsPinnable) ret.push_back(toString(WidgetViewBase::ViewIsPinnable));
 	if (_flags & WidgetViewBase::ViewIsCentral) ret.push_back(toString(WidgetViewBase::ViewIsCentral));
 	if (_flags & WidgetViewBase::ViewIsSide) ret.push_back(toString(WidgetViewBase::ViewIsSide));
 	if (_flags & WidgetViewBase::ViewIsTool) ret.push_back(toString(WidgetViewBase::ViewIsTool));
 	if (_flags & WidgetViewBase::ViewNameAsTitle) ret.push_back(toString(WidgetViewBase::ViewNameAsTitle));
+	if (_flags & WidgetViewBase::ViewCloseOnEmptySelection) ret.push_back(toString(WidgetViewBase::ViewCloseOnEmptySelection));
 	
 	return ret;
 }
