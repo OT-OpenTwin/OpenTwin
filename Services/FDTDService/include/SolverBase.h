@@ -6,9 +6,8 @@
 // TINYXML2
 #include "tinyxml2.h"
 
-// XmlEntry and FDTDConfig
+// FDTDConfig
 #include "FDTDConfig.h"
-#include "XmlEntry.h"
 
 // STD INCLUDES
 #include <algorithm>

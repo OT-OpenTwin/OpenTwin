@@ -89,9 +89,8 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 		exePath += "\\Deployment";
 	}
 
-	std::string xmlPath = " \"" + exePath + "\\openEMS\\FDTD.xml";
-
-	std::string commandLine = "\"" + exePath + "\\openEMS\\openEMS.exe\"" + xmlPath;
+	std::string xmlPath = workingDirectory + "\\FDTD.xml";
+	std::string commandLine = "\"" + exePath + "\\openEMS\\openEMS.exe\"" + " \"" + xmlPath + "\"";
 
 	if (!runExecutableAndWaitForCompletion(commandLine, workingDirectory, uiComponent))
 	{
