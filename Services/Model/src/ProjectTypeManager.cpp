@@ -6,6 +6,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/FolderNames.h"
+#include "OTCore/LogDispatcher.h"
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
@@ -42,11 +43,36 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypeCircuitSimulation();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL)
+	{
+		initializeProjectTypeHierarchical();
+	}
 	else
 	{
-		// This is an unknown project type which defaults to development
-		assert(0);
+		OT_LOG_WAS("Unknown project type \"" + projectType + "\". Defaulting to project type: \"" OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "\"...");
 	}
+}
+
+void ProjectTypeManager::initializeProjectTypeHierarchical() {
+	m_hasGeometryRoot = false;
+	m_hasCircuitsRoot = false;
+	m_hasCircuit = false;
+	m_hasMaterialRoot = false;
+	m_hasMeshRoot = false;
+	m_hasSolverRoot = false;
+	m_hasScriptsRoot = false;
+	m_hasUnitRoot = false;
+	m_hasDataCategorizationRoot = false;
+	m_hasRMDCategorization = false;
+	m_hasRMDCategorizationPreview = false;
+	m_hasDataProcessingRoot = false;
+
+	//m_hasDatasetRoot = false;
+	//m_hasDatasetRMD = false;
+
+	m_has3DView = false;
+	m_has1DView = false;
+	m_hasBlockPicker = false;
 }
 
 void ProjectTypeManager::initializeProjectType3DSimulation(void)

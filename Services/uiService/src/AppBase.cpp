@@ -231,6 +231,7 @@ bool AppBase::initialize() {
 
 		m_defaultProjectTypeIcon = ot::IconManager::getIcon("ProjectTemplates/DefaultIcon.png");
 		m_projectTypeDefaultIconNameMap = std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL, "ProjectTemplates/Hierarchical.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/3D.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/Pipeline.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
@@ -241,6 +242,7 @@ bool AppBase::initialize() {
 			});
 
 		m_projectTypeCustomIconNameMap = std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL, "ProjectTemplates/CustomHierarchical.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/Custom3D.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/CustomPipeline.png"},
 			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},

@@ -352,24 +352,29 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
+	// Add default pages, groups and buttons
 	_ui->addMenuPage("Model");
-	_ui->addMenuPage("View");
-
-	//_ui->addMenuGroup("Model", "Database");
-	_ui->addMenuGroup("Model", "Geometry");
-	_ui->addMenuGroup("Model", "Material");
-	_ui->addMenuGroup("Model", "Parameters");
 	_ui->addMenuGroup("Model", "Edit");
-	_ui->addMenuGroup("Model", "Plots");
-	
-	_ui->addMenuButton(m_infoButton);
-	_ui->addMenuButton(m_createParameterButton);
-
 	_ui->addMenuButton(m_undoButton);
 	_ui->addMenuButton(m_redoButton);
 	_ui->addMenuButton(m_deleteButton);
-		
-	Application::instance()->addButtons();
+
+	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL) {
+		// Add pages, groups and buttons for non-hierarchical projects
+
+		_ui->addMenuPage("View");
+
+		//_ui->addMenuGroup("Model", "Database");
+		_ui->addMenuGroup("Model", "Geometry");
+		_ui->addMenuGroup("Model", "Material");
+		_ui->addMenuGroup("Model", "Parameters");
+		_ui->addMenuGroup("Model", "Plots");
+
+		_ui->addMenuButton(m_infoButton);
+		_ui->addMenuButton(m_createParameterButton);
+
+		Application::instance()->addButtons();
+	}
 
 	uiCreated = true;
 

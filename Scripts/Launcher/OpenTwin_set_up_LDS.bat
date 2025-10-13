@@ -60,7 +60,8 @@ set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"CircuitSimulatorService",^
 		"StudioSuiteService",^
 		"LTSpiceService",^
-		"PyritService"^
+		"PyritService",^
+		"HierarchicalProjectService"^
 		]^
 	}
 set OT_LOCALDIRECTORYSERVICE_CONFIGURATION_DEFINED=1

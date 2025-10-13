@@ -73,6 +73,7 @@ SET	OT_CIRCUIT_EXECUTION_ROOT=%OPENTWIN_DEV_ROOT%\Services\CircuitExecution
 SET OT_PYRIT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\PyritService
 SET OT_DEBUGSERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\DebugService
 SET OT_LIBRARY_MANAGEMENT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService
+SET OT_HIERARCHICAL_PROJECT_SERVICE_ROOT=%OPENTWIN_DEV_ROOT%\Services\HierarchicalProjectService
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 REM OpenTwin library root paths

@@ -229,6 +229,24 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 	// Add default templates
 	{
 		using namespace ot;
+		ProjectTemplateInformation defaultHierarchical;
+		defaultHierarchical.setName(OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL);
+		defaultHierarchical.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL);
+		defaultHierarchical.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "Hierarchical project" << StyledText::Text <<
+			"Create a complex project structure with child projects and documents.";
+
+		defaultHierarchical.setDescription(description);
+
+		JsonObject objHierarchical;
+		defaultHierarchical.addToJsonObject(objHierarchical, result.GetAllocator());
+		result.PushBack(objHierarchical, result.GetAllocator());
+	}
+
+	{
+		using namespace ot;
 		ProjectTemplateInformation default3D;
 		default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
 		default3D.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);

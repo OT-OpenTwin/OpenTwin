@@ -8,36 +8,37 @@ public:
 	ProjectTypeManager(const std::string& projectType);
 	ProjectTypeManager() = delete;
 
-	bool hasGeometryRoot(void)				{ return m_hasGeometryRoot; }
-	bool hasCircuitsRoot(void)				{ return m_hasCircuitsRoot; }
-	bool hasCircuit(void)					{ return m_hasCircuit; }
-	bool hasMaterialRoot(void)				{ return m_hasMaterialRoot; }
-	bool hasMeshRoot(void)					{ return m_hasMeshRoot; }
-	bool hasSolverRoot(void)				{ return m_hasSolverRoot; }
-	bool hasScriptsRoot(void)				{ return m_hasScriptsRoot; }
-	bool hasDataProcessingRoot(void)		{ return m_hasDataProcessingRoot; }
-	bool hasUnitRoot(void)					{ return m_hasUnitRoot; }
-	bool hasDataCategorizationRoot(void)	{ return m_hasDataCategorizationRoot; }
-	bool hasRMDCategorization(void)			{ return m_hasRMDCategorization; }
-	bool hasRMDCategorizationPreview(void)	{ return m_hasRMDCategorizationPreview; }
-	bool hasDatasetRoot(void)				{ return m_hasDatasetRoot; }
-	bool hasDatasetRMD(void)				{ return m_hasDatasetRMD; }
+	bool hasGeometryRoot()				{ return m_hasGeometryRoot; }
+	bool hasCircuitsRoot()				{ return m_hasCircuitsRoot; }
+	bool hasCircuit()					{ return m_hasCircuit; }
+	bool hasMaterialRoot()				{ return m_hasMaterialRoot; }
+	bool hasMeshRoot()					{ return m_hasMeshRoot; }
+	bool hasSolverRoot()				{ return m_hasSolverRoot; }
+	bool hasScriptsRoot()				{ return m_hasScriptsRoot; }
+	bool hasDataProcessingRoot()		{ return m_hasDataProcessingRoot; }
+	bool hasUnitRoot()					{ return m_hasUnitRoot; }
+	bool hasDataCategorizationRoot()	{ return m_hasDataCategorizationRoot; }
+	bool hasRMDCategorization()			{ return m_hasRMDCategorization; }
+	bool hasRMDCategorizationPreview()	{ return m_hasRMDCategorizationPreview; }
+	bool hasDatasetRoot()				{ return m_hasDatasetRoot; }
+	bool hasDatasetRMD()				{ return m_hasDatasetRMD; }
 
 	std::string getRMDCategorizationName()          { return m_RMDCategorizationName; }
 	std::string getDatasetRMD()                     { return m_datasetRMD; }
 	std::string getCircuitName()						{ return m_circuitName; }
-	std::string getViews(void);
+	std::string getViews();
 
 	std::string getDatasetRootName();
 	std::string getDataCategorizationRootName();
 
 private:
-	void initializeProjectType3DSimulation(void);
-	void initializeProjectTypeDataPipeline(void);
-	void initializeProjectTypeStudioSuite(void);
-	void initializeProjectTypeLTSpice(void);
-	void initializeProjectTypePyrit(void);
-	void initializeProjectTypeCircuitSimulation(void);
+	void initializeProjectTypeHierarchical();
+	void initializeProjectType3DSimulation();
+	void initializeProjectTypeDataPipeline();
+	void initializeProjectTypeStudioSuite();
+	void initializeProjectTypeLTSpice();
+	void initializeProjectTypePyrit();
+	void initializeProjectTypeCircuitSimulation();
 
 	bool m_hasGeometryRoot				= true;
 	bool m_hasCircuitsRoot				= true;

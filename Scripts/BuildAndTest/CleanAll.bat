@@ -200,6 +200,11 @@ ECHO ===============================================================
 CALL "%OT_GLOBAL_SESSION_SERVICE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Service: HierarchicalProjectService
+ECHO ===============================================================
+CALL "%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
 ECHO Clean Service: ImportParameterizedData
 ECHO ===============================================================
 CALL "%OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT%\Clean.bat" 

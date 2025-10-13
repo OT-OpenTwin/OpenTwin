@@ -372,6 +372,11 @@ ECHO Build Service: LibraryManagementService
 ECHO ===============================================================
 CALL "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Service: HierarchicalProjectService
+ECHO ===============================================================
+CALL "%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\build.bat" %1 %2
+
 REM ====================================================================
 REM Build the executables
 REM ====================================================================

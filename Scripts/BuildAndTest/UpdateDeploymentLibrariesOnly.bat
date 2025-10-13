@@ -94,6 +94,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTSystemInformationTool.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" 2>Nul
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\LibraryManagementService.dll" 2>NUL
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\HierarchicalProjectService.dll" 2>NUL
 
 ECHO Delete color styles
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles\*.otcsf" 2>NUL
@@ -171,6 +172,7 @@ COPY "%OT_DATA_PROCESSING_SERVICE_ROOT%\%OT_DLLR%\DataProcessingService.dll" "%O
 COPY "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\%OT_DLLR%\CircuitSimulatorService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_CIRCUIT_EXECUTION_ROOT%\%OT_DLLR%\CircuitExecution.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%\%OT_DLLR%\LibraryManagementService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\%OT_DLLR%\HierarchicalProjectService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 COPY "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\open_twin.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 
