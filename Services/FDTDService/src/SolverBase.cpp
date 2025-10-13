@@ -69,25 +69,21 @@ bool SolverBase::isPMLMaterial(const std::string& materialName)
 
 void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent)
 {
-	std::string exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT");
-	if (exePath.empty())
-	{
-		// Get the path of the executable
+	std::string exePath;
+#ifdef _DEBUG
+	exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT") + "\\Deployment";
+#else 
 #ifdef _WIN32
-		char path[MAX_PATH] = { 0 };
-		GetModuleFileNameA(NULL, path, MAX_PATH);
-		exePath = path;
+	char path[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+	exePath = path;
 #else
-		char result[PATH_MAX];
-		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-		ca_cert_flile = std::string(result, (count > 0) ? count : 0);
+	char result[PATH_MAX];
+	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+	ca_cert_flile = std::string(result, (count > 0) ? count : 0);
 #endif
-		exePath = exePath.substr(0, exePath.rfind('\\'));
-	}
-	else
-	{
-		exePath += "\\Deployment";
-	}
+	exePath = exePath.substr(0, exePath.rfind('\\'));
+#endif // _DEBUG
 
 	std::string xmlPath = workingDirectory + "\\FDTD.xml";
 	std::string commandLine = "\"" + exePath + "\\openEMS\\openEMS.exe\"" + " \"" + xmlPath + "\"";
