@@ -313,6 +313,11 @@ ECHO ===============================================================
 CALL "%OT_GETDP_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Service: FDTDService
+ECHO ===============================================================
+CALL "%OT_FDTD_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Service: ElmerFEMService
 ECHO ===============================================================
 CALL "%OT_ELMERFEM_SERVICE_ROOT%\build.bat" %1 %2

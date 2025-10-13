@@ -1,0 +1,43 @@
+#pragma once
+
+#include "SolverBase.h"
+
+class Application;
+
+class SolverFDTD : public SolverBase {
+public:
+	SolverFDTD() {}
+	virtual ~SolverFDTD() {}
+
+	virtual void writeInputFile(std::ofstream& controlFile, Application*) override;
+	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) override;
+	//virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity) override;
+
+private:
+	std::map<std::string, std::string> getBoundaryAttributes(const FDTDConfig& config) const;
+	void getBoundaryConditions(std::map<std::string, double>& boundaryConditionsDefinition);
+	std::array<std::string, 6> getBoundaryConditions();
+	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application* app);
+	void buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap);
+	void buildBoundaryConditionAliases(std::map<std::string, double>& boundaryConditionDefinitions, std::map<std::string, std::string>& boundaryConditionsNameToAliasMap);
+	std::list<int> meshVolumeGroupIdList(const std::list<std::string>& itemNames);
+	std::list<int> meshSurfaceGroupIdList(const std::list<std::string>& itemNames);
+	std::string getGroupList(const std::list<int>& list);
+	std::string getGroupList(const std::list<std::string>& list);
+	void writeGroups(std::ofstream& controlFile, std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap,
+					 std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap);
+	void writeFunctions(std::ofstream& controlFile, std::map<std::string, std::string>& materialNameToAliasMap);
+	void writeConstraints(std::ofstream& controlFile, std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap);
+	void writeFunctionSpace(std::ofstream& controlFile);
+	void writeJacobian(std::ofstream& controlFile);
+	void writeIntegration(std::ofstream& controlFile);
+	void writeFormulation(std::ofstream& controlFile);
+	void writeResolution(std::ofstream& controlFile);
+	void writePostProcessing(std::ofstream& controlFile);
+	void writePostOperation(std::ofstream& controlFile);
+	size_t getOrAddNode(const std::string& node, const std::string& potential, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, std::list<std::string>& potentialList, size_t& nodeIndex, std::map<std::string, std::string>& nodeToPotentialMap);
+	size_t getOrAddCellNode(const std::string& node, std::map<std::string, size_t>& nodeToIndexMap, std::list<std::string>& nodeList, size_t& nodeIndex);
+	void storeMesh(int numberNodes, int cellType, std::list<std::string>& nodeList, std::list<std::vector<size_t>>& cellList, size_t& cellListSize, Application* app, EntityBase* solverEntity, long long& visualizationMeshID, long long& visualizationMeshVersion);
+	void storeMeshScalarData(size_t numberPoints, size_t numberCells, std::list<std::string>& potentialList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion);
+	void storeMeshVectorData(size_t numberPoints, size_t numberCells, std::list<double>& magnitudeList, std::list<std::string>& vectorList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion);
+};
