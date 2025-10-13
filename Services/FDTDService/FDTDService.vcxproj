@@ -203,7 +203,6 @@
     <ClCompile Include="src\SolverFDTD.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
-    <ClCompile Include="src\XmlEntry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -213,7 +212,6 @@
     <ClInclude Include="include\SolverBase.h" />
     <ClInclude Include="include\SolverFDTD.h" />
     <ClInclude Include="include\UiNotifier.h" />
-    <ClInclude Include="include\XmlEntry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
