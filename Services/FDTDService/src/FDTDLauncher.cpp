@@ -14,6 +14,7 @@
 
 #include "OldTreeIcon.h"
 
+#include "OTCore/Logger.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "EntityAPI.h"
@@ -84,6 +85,11 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 
 	try
 	{
+		FDTDConfig cfg;
+		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
+		cfg.addToXML(solverEntity, tempFilePath);
+		outputText = "FDTD XML file generated successfully!";
+		
 		// Build the solver input file in the temp folder
 		std::string controlFileName = tempDirPath + "\\model.pro";
 		std::ofstream controlFile(controlFileName);
@@ -102,7 +108,9 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 	{
 		outputText = "ERROR: " + error;
 	}
-
+	catch (const std::exception& e) {
+		outputText = "ERROR: Exception occurred: " + std::string(e.what());
+	}
 	application->uiComponent()->closeProgressInformation();
 
 	// Delete the solver object

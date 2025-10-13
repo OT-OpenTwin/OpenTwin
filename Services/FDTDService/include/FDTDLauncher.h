@@ -2,6 +2,7 @@
 
 #include <string>
 #include <list>
+#include <cstdint>
 #include <map>
 
 #include "OTCore/CoreTypes.h"
