@@ -6,6 +6,8 @@
 
 OT_DECL_DEPRECATED("Use Gui/NavigationTreeIcon instead") class __declspec(dllexport) OldTreeIcon
 {
+	OT_DECL_DEFCOPY(OldTreeIcon)
+	OT_DECL_DEFMOVE(OldTreeIcon)
 public:
 	OldTreeIcon() :
 		size(0)

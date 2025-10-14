@@ -13,6 +13,9 @@ EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver 
 	EntityBase(ID, parent, obs, ms, owner),
 	createVisualizationItem(true)
 {
+	m_treeIcon.size = 32;
+	m_treeIcon.visibleIcon = "ContainerVisible";
+	m_treeIcon.hiddenIcon = "ContainerHidden";
 }
 
 EntityContainer::~EntityContainer()
@@ -224,23 +227,18 @@ void EntityContainer::addVisualizationNodes(void)
 
 	if (!getName().empty())
 	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "ContainerVisible";
-		treeIcons.hiddenIcon = "ContainerHidden";
-
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(doc);
+		m_treeIcon.addToJsonDoc(doc);
 
 		getObserver()->sendMessageToViewer(doc);
 	}
 	
-	for (auto child : children)
+	for (EntityBase* child : children)
 	{
 		child->addVisualizationNodes();
 	}

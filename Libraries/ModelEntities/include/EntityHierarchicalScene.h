@@ -13,10 +13,10 @@ public:
 	EntityHierarchicalScene() : EntityHierarchicalScene(0, nullptr, nullptr, nullptr, "") {};
 	EntityHierarchicalScene(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 
-	static std::string getClassTypeName() { return "EntityHierarchicalScene"; };
-	virtual std::string getClassName(void) override { return EntityHierarchicalScene::getClassTypeName(); };
+	static std::string defaultName() { return "Project"; };
+	static std::string className() { return "EntityHierarchicalScene"; };
+	virtual std::string getClassName(void) override { return EntityHierarchicalScene::className(); };
 
 	ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() override;
 	bool visualiseGraphicsView() override { return true; };
-	void addVisualizationNodes() override;
 };

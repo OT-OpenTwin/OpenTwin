@@ -50,6 +50,9 @@ public:
 
 	virtual void detachFromHierarchy(void) override;
 
+	void setTreeIcon(const OldTreeIcon& icon) { m_treeIcon = icon; };
+	const OldTreeIcon& getTreeIcon(void) const { return m_treeIcon; };
+
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
@@ -57,6 +60,7 @@ protected:
 
 
 private:
+	OldTreeIcon m_treeIcon;
 	std::list<EntityBase *> children;
 	bool createVisualizationItem;
 };
