@@ -2,7 +2,6 @@
 #include "MetadataEntityInterface.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "MetadataEntrySingle.h"
-#include "ClassFactory.h"
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
 #include "LocaleSettingsSwitch.h"
@@ -43,7 +42,7 @@ bool DataCategorizationHandler::markSelectionForStorage(const std::list<ot::Enti
 		for (const ot::EntityInformation& entityInfo : _selectedEntities)
 		{
 			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityInfo.getEntityID());
-			EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
+			EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID);
 			selectedEntities.emplace_back(std::unique_ptr<EntityBase>(baseEnt));
 		}
 		std::string tableName("");
@@ -115,7 +114,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 	{
 		ot::EntityInformation entityInfo;
 		ot::ModelServiceAPI::getEntityInformation(m_rmdEntityName, entityInfo);
-		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+		EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		auto dataCatEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
 		assert(dataCatEntity != nullptr);
 		assert(dataCatEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
@@ -136,7 +135,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 		}
 		
 		std::list<std::unique_ptr<EntityParameterizedDataCategorization>> consideredSeries;
-		EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
+		EntityParameterizedDataCategorization temp;
 		ot::UIDList categoristationIDs;
 		if (categorisationEntities.size() != 0)
 		{
@@ -162,7 +161,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<std::
 			for (ot::UID categoristationID : categoristationIDs)
 			{
 				ot::UID version = Application::instance()->getPrefetchedEntityVersion(categoristationID);
-				EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(categoristationID, version, Application::instance()->getClassFactory());
+				EntityBase* baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(categoristationID, version);
 				std::unique_ptr<EntityParameterizedDataCategorization>categorisationEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
 				bool consider = !categorisationEnt->getIsLocked();
 				if (consider)
@@ -247,7 +246,7 @@ void DataCategorizationHandler::clearBufferedMetadata()
 
 void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::EntityInformation>& _selectedEntities, bool _lock)
 {
-	EntityParameterizedDataCategorization temp(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityParameterizedDataCategorization temp;
 
 	std::string stateChange = "";
 	if (_lock)
@@ -272,7 +271,7 @@ void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::En
 	ot::NewModelStateInformation updatedEntities;
 	for (ot::UID selectedChategorisation : selectedCategorisations)
 	{
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedChategorisation, Application::instance()->getPrefetchedEntityVersion(selectedChategorisation), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedChategorisation, Application::instance()->getPrefetchedEntityVersion(selectedChategorisation));
 		std::unique_ptr<EntityParameterizedDataCategorization> categorisation(dynamic_cast<EntityParameterizedDataCategorization*>(baseEntity));
 		assert(categorisation != nullptr);
 		if (categorisation->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata && categorisation->getIsLocked() != _lock)
@@ -353,7 +352,7 @@ void DataCategorizationHandler::addParamOrQuantityEntries(std::list<std::unique_
 void DataCategorizationHandler::addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive)
 {
 	ot::UID entID = _modelComponent->createEntityUID();
-	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 	newEntity->CreateProperties(category);
 	newEntity->setName(name);
 	newEntity->setEditable(true);
@@ -391,7 +390,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		return;
 	}
 
-	auto tableBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion, Application::instance()->getClassFactory());
+	auto tableBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion);
 	m_bufferedTableID = -1;
 	m_bufferedTableVersion = -1;
 	auto tableEntity = dynamic_cast<IVisualisationTable*>(tableBase);
@@ -429,7 +428,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		for (size_t i = 0; i < _ranges.size(); i++)
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
-			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 		
 			// We need to initialise the entityProperty with the python folder
 			ot::EntityInformation entityInfo;
@@ -642,7 +641,7 @@ void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& 
 {	
 	if (!_logMessagesByErrorType.empty())
 	{
-		EntityResultText logText(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		EntityResultText logText(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		logText.createProperties();
 	
 		std::string message("");

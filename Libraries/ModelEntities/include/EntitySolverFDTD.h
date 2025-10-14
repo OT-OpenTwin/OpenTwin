@@ -10,7 +10,8 @@
 class __declspec(dllexport) EntitySolverFDTD : public EntitySolver
 {
 public:
-	EntitySolverFDTD(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntitySolverFDTD() : EntitySolverFDTD(0, nullptr, nullptr, nullptr, "") {};
+	EntitySolverFDTD(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntitySolverFDTD();
 
 	virtual std::string getClassName(void) override { return "EntitySolverFDTD"; };

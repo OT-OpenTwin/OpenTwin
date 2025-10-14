@@ -1,7 +1,5 @@
 #include "TabledataToResultdataHandler.h"
 #include "Application.h"
-#include "ClassFactory.h"
-
 
 #include "EntityResultText.h"
 #include "KeyValuesExtractor.h"
@@ -54,7 +52,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	ResultImportLogger& logger = resultCollectionExtender.getLogger();
 	logger.clearLog();
 	resultCollectionExtender.setSaveModel(false);
@@ -218,8 +216,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 	if (newDataHasBeenAdded)
 	{
-		auto& factory = Application::instance()->getClassFactory();
-		EntityResultText importReport(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &factory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		EntityResultText importReport(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		const std::string reportName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder + "/Reports", "Import from Table");
 		importReport.setName(reportName);
 		importReport.setText(fullReport);
@@ -240,7 +237,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAllMetadataAssemblies()
 {
 	//Load all selection ranges
-	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
+	EntityTableSelectedRanges tempEntity;
 	ot::UIDList selectionRangeIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
@@ -248,7 +245,7 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAll
 
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID));
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		if (rangeEntity->getConsiderForImport())
@@ -638,7 +635,7 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 		Application::instance()->prefetchDocumentsFromStorage(tableToLoadIDs);
 		for (ot::UID tableID : tableToLoadIDs)
 		{
-			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
+			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID));
 			IVisualisationTable* visEnt = dynamic_cast<IVisualisationTable*>(baseEnt);
 			std::shared_ptr<IVisualisationTable>tableEntity(visEnt);
 			_loadedTables.insert({ baseEnt->getName(), tableEntity });

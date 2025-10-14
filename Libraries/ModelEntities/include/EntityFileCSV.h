@@ -6,8 +6,8 @@
 class __declspec(dllexport) EntityFileCSV : public EntityFileText, public IVisualisationTable
 {
 public:
-	
-	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityFileCSV() : EntityFileCSV(0, nullptr, nullptr, nullptr, "") {};
+	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	~EntityFileCSV() = default;
 	void setRowDelimiter(std::string _delimiter); 
 	void setColumnDelimiter(std::string _delimiter);

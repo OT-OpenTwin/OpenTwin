@@ -9,7 +9,8 @@
 class __declspec(dllexport) EntityContainer : public EntityBase
 {
 public:
-	EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityContainer() : EntityContainer(0, nullptr, nullptr, nullptr, "") {};
+	EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityContainer();
 
 	/**

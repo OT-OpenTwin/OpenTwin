@@ -22,7 +22,6 @@
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
 #include "Kriging.h"
-#include "ClassFactory.h"
 
 #include <thread>
 
@@ -154,10 +153,9 @@ KrigingParams* Application::getParams(void)
 
 	// Now read the solver objects for each solver
 	std::map<std::string, EntityBase *> solverMap;
-	ClassFactory classFactory;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = getModelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), classFactory);
+		EntityBase *entity = getModelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion());
 		solverMap[info.getName()] = entity;
 
 		if (entity == nullptr)

@@ -4,8 +4,6 @@
 
 #include "EntityGeometry.h"
 #include "EntityMaterial.h"
-#include "ClassFactory.h"
-#include "ClassFactoryCAD.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "EntityInformation.h"
@@ -58,7 +56,7 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 
 	for (auto mat : materialInformation)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *> (ot::EntityAPI::readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *> (ot::EntityAPI::readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion()));
 
 		if (material == nullptr)
 		{

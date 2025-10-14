@@ -10,7 +10,6 @@
 #include "PlotManagerView.h"
 #include "Rubberband.h"
 #include "EntityBase.h"
-#include "Factory.h"
 #include "ViewerToolBar.h"
 #include "GlobalFontPath.h"
 

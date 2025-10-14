@@ -20,7 +20,7 @@ TableReader::~TableReader()
 
 }
 
-std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner)
+std::string TableReader::readFromFile(const std::string fileName, const std::string &itemName, EntityObserver *obs, ModelState *ms, const std::string &owner)
 {
 	assert(model != nullptr);
 
@@ -56,7 +56,7 @@ std::string TableReader::readFromFile(const std::string fileName, const std::str
 	while (readNextLine(file, line)) dataContent.push_back(line);
 
 	// Create the new table item
-	EntityResultTable<double> *tableItem = new EntityResultTable<double>(model->createEntityUID(), nullptr, model, ms, factory, owner);
+	EntityResultTable<double> *tableItem = new EntityResultTable<double>(model->createEntityUID(), nullptr, model, ms, owner);
 
 	tableItem->setName(itemName);
 	tableItem->setEditable(false);

@@ -14,12 +14,10 @@
 #include <string>
 #include "OTServiceFoundation/ApplicationBase.h"
 
-class ClassFactory;
-
 class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionMetadataAccess
 {
 public:
-	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName);
+	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, const std::string& _ownerServiceName);
 	ResultCollectionExtender(ot::ApplicationBase* _applicationBase);
 	ResultCollectionExtender(const ResultCollectionExtender& _other) = delete;
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& _other) = delete;

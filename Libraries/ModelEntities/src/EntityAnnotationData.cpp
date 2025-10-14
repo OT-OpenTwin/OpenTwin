@@ -6,8 +6,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityAnnotationData::EntityAnnotationData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityAnnotationData> registrar("EntityAnnotationData");
+
+EntityAnnotationData::EntityAnnotationData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	edgeColorRGB { 1.0, 1.0, 1.0 }
 {
 	

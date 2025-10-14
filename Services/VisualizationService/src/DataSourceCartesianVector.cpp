@@ -40,7 +40,7 @@ DataSourceCartesianVector::~DataSourceCartesianVector()
 	}
 }
 
-bool DataSourceCartesianVector::loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory)
+bool DataSourceCartesianVector::loadData(EntityBase *resultEntity, EntityBase *meshEntity)
 {
 	assert(resultData == nullptr);
 	assert(meshData == nullptr);

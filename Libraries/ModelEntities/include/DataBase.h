@@ -20,8 +20,6 @@
 #include "Geometry.h"
 #include <mutex>
 
-class ClassFactory;
-
 using connection = mongocxx::pool::entry;
 
 class __declspec(dllexport) DataBase
@@ -48,7 +46,7 @@ public:
 		
 	//! @return Corresponse to the database success response.
 	bool GetDocumentFromEntityIDandVersion(unsigned long long entityID, unsigned long long version, bsoncxx::builder::basic::document &doc);
-	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, ClassFactory* classFactory);
+	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version);
 
 
 	bool GetAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value> &filterPairs, std::vector<std::string> &columnNames, bsoncxx::builder::basic::document &doc);

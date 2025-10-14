@@ -8,7 +8,8 @@
 class __declspec(dllexport) EntityTableSelectedRanges : public EntityBase
 {
 public:
-	EntityTableSelectedRanges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityTableSelectedRanges() : EntityTableSelectedRanges(0, nullptr, nullptr, nullptr, "") {};
+	EntityTableSelectedRanges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	~EntityTableSelectedRanges() = default;
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	virtual std::string getClassName(void) { return "EntityTableSelectedRanges"; };

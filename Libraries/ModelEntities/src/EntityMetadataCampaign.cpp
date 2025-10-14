@@ -2,8 +2,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityMetadataCampaign::EntityMetadataCampaign(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	: EntityWithDynamicFields(ID, parent, mdl, ms, factory, owner)
+static EntityFactoryRegistrar<EntityMetadataCampaign> registrar("EntityMetadataCampaign");
+
+EntityMetadataCampaign::EntityMetadataCampaign(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, const std::string& owner)
+	: EntityWithDynamicFields(ID, parent, mdl, ms, owner)
 {
 }
 

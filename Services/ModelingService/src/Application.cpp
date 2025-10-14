@@ -232,7 +232,7 @@ PrimitiveManager *Application::getPrimitiveManager(void)
 { 
 	if (primitiveManager == nullptr)
 	{
-		primitiveManager = new PrimitiveManager(this->getUiComponent(), this->getModelComponent(), getServiceName(), getServiceID(), &entityCache, &getClassFactory());
+		primitiveManager = new PrimitiveManager(this->getUiComponent(), this->getModelComponent(), getServiceName(), getServiceID(), &entityCache);
 	}
 
 	return primitiveManager; 
@@ -242,7 +242,7 @@ BooleanOperations *Application::getBooleanOperations(void)
 { 
 	if (booleanOperations == nullptr)
 	{
-		booleanOperations = new BooleanOperations(this->getUiComponent(), this->getModelComponent(), getServiceName(), &entityCache, getServiceID(), &getClassFactory());
+		booleanOperations = new BooleanOperations(this->getUiComponent(), this->getModelComponent(), getServiceName(), &entityCache, getServiceID());
 	}
 
 	return booleanOperations; 
@@ -252,7 +252,7 @@ UpdateManager *Application::getUpdateManager(void)
 { 
 	if (updateManager == nullptr)
 	{
-		updateManager = new UpdateManager(this->getUiComponent(), this->getModelComponent(), &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), getBlendEdgesManager(), &getClassFactory());
+		updateManager = new UpdateManager(this->getUiComponent(), this->getModelComponent(), &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), getBlendEdgesManager());
 	}
 
 	return updateManager; 
@@ -262,7 +262,7 @@ Transformations *Application::getTransformationManager(void)
 { 
 	if (transformationManager == nullptr)
 	{
-		transformationManager = new Transformations(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		transformationManager = new Transformations(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache);
 		transformationManager->setUpdateManager(getUpdateManager());	
 	}
 
@@ -273,7 +273,7 @@ ChamferEdges* Application::getChamferEdgesManager(void)
 {
 	if (chamferEdges == nullptr)
 	{
-		chamferEdges = new ChamferEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		chamferEdges = new ChamferEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache);
 		chamferEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -284,7 +284,7 @@ BlendEdges* Application::getBlendEdgesManager(void)
 {
 	if (blendEdges == nullptr)
 	{
-		blendEdges = new BlendEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		blendEdges = new BlendEdges(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache);
 		blendEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -295,7 +295,7 @@ SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)
 {
 	if (removeFaces == nullptr)
 	{
-		removeFaces = new SimplifyRemoveFaces(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache, &getClassFactory());
+		removeFaces = new SimplifyRemoveFaces(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName(), &entityCache);
 		removeFaces->setUpdateManager(getUpdateManager());	
 	}
 
@@ -486,9 +486,6 @@ Application::Application() :
 	blendEdges(nullptr),
 	chamferEdges(nullptr) 
 {
-	getClassFactory().setNextHandler(&classFactoryCAD);
-	classFactoryCAD.setChainRoot(&(getClassFactory()));
-
 	entityCache.setApplication(this);
 
 	// Connect actions

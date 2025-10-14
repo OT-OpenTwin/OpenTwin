@@ -58,7 +58,7 @@ void PlotHandler::handleCreatePlot()
 
 	//Finally we create the plot entity
 	Model* model = Application::instance()->getModel();
-	EntityResult1DPlot newPlot(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
+	EntityResult1DPlot newPlot(model->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 	newPlot.setName(plotName);
 
 	ot::Plot1DCfg plotCfg;
@@ -222,7 +222,7 @@ void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata
 
 		CurveFactory::addToConfig(series, curveConfig);
 
-		EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr, &model->getClassFactory(), Application::instance()->getServiceName());
+		EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 		newCurve.setName(_nameBase + "/" + shortName);
 		newCurve.createProperties();
 		newCurve.setCurve(curveConfig);

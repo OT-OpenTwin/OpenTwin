@@ -2,8 +2,6 @@
 
 #include "Application.h"
 #include "EntityCache.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -59,7 +57,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	std::list<ot::UID> requiredBreps;
 	for (auto shape : selectedGeometryEntities)
 	{
-		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion(), application->getClassFactory()));
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion()));
 
 		if (geometryEntity->getEditable())
 		{

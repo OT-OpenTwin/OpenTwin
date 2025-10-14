@@ -5,9 +5,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
+static EntityFactoryRegistrar<EntityMeshCartesianFace> registrar("EntityMeshCartesianFace");
 
-EntityMeshCartesianFace::EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+EntityMeshCartesianFace::EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	type(INDEX_BASED),
 	surfaceId(0)
 {

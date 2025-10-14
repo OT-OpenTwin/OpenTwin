@@ -1,12 +1,11 @@
 #include "MeasurementCampaignHandler.h"
 #include "Application.h"
-#include "ClassFactory.h"
 #include "OTCore/FolderNames.h"
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "EntityAPI.h"
 
-void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName, ClassFactory *classFactory)
+void MeasurementCampaignHandler::ConnectToCollection(const std::string& collectionName, const std::string& projectName)
 {
 	std::list<ot::EntityInformation> allMeasurementMetadata = getMSMDEntityInformation(collectionName, projectName);
 
@@ -22,7 +21,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 
 		for (auto& entityInfo : allMeasurementMetadata)
 		{
-			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *classFactory);
+			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 			auto metadata = dynamic_cast<EntityMetadataSeries*>(baseEnt);
 			assert(metadata != nullptr);
 			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));
@@ -40,7 +39,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 
 std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInformation(const std::string& collectionName, const std::string& projectName)
 {
-	EntityMetadataSeries temp(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityMetadataSeries temp;
 
 	ot::JsonDocument doc;
 

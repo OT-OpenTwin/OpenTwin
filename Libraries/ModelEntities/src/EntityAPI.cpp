@@ -6,8 +6,9 @@
 // OpenTwin header
 #include "DataBase.h"
 #include "EntityAPI.h"
+#include "EntityFactory.h"
 
-EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler& classFactory) {
+EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _version) {
 	auto doc = bsoncxx::builder::basic::document{};
 
 	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(_entityID, _version, doc)) {
@@ -18,7 +19,7 @@ EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase* entity = classFactory.createEntity(entityType);
+	EntityBase* entity = EntityFactory::instance().create(entityType);
 
 	if (entity != nullptr) {
 		std::map<UID, EntityBase*> entityMap;

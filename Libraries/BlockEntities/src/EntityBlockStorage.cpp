@@ -2,8 +2,10 @@
 #include "SharedResources.h"	 
 #include "PropertyHelper.h"
 
-EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBlockStorage> registrar("EntityBlockStorage");
+
+EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, owner)
 {
 	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();

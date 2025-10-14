@@ -45,7 +45,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 	const bool seriesExists = seriesAlreadyExists(seriesName);
 	if (!seriesExists)
 	{
-		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		
 		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
 		

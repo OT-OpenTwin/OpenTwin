@@ -15,14 +15,13 @@
 class __declspec(dllexport) EntityBlock : public EntityBase
 {
 public:
-	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	EntityBlock(const EntityBlock& _other) = default;
 	EntityBlock(EntityBlock&& _other) = default;
 	EntityBlock& operator=(const EntityBlock& _other) = default;
 	EntityBlock& operator=(EntityBlock&& _other) = default;
 	virtual ~EntityBlock();
 
-	virtual std::string getClassName(void) override { return "EntityBlock"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 	virtual void addVisualizationNodes(void) override;

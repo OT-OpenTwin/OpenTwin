@@ -31,12 +31,11 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD(
 
 		ensureEssentials();
 		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
-		ClassFactory& classFactory = Application::instance()->getClassFactory();
 		std::list<std::unique_ptr<EntityBatchImporter>> selectedBatchImporter;
 		for (ot::UID entityID : _selectedEntities)
 		{
 			ot::UID version = Application::instance()->getPrefetchedEntityVersion(entityID);
-			std::unique_ptr<EntityBase> baseEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, version, classFactory));
+			std::unique_ptr<EntityBase> baseEntity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, version));
 			EntityBatchImporter* batchImporter = dynamic_cast<EntityBatchImporter*>(baseEntity.get());
 			if (batchImporter != nullptr)
 			{
@@ -104,7 +103,7 @@ void BatchedCategorisationHandler::addCreator()
 	const std::string entityName = CreateNewUniqueTopologyName(nameRoot, name);
 	const std::string serviceName = Application::instance()->getServiceName();
 	
-	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, serviceName);
+	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, serviceName);
 	importer.setName(entityName);
 	importer.createProperties();
 	importer.StoreToDataBase();
@@ -188,10 +187,9 @@ void BatchedCategorisationHandler::run(bool _lastRun, std::map<std::string, ot::
 		std::list<ot::EntityInformation> entityInfos;
 		ot::ModelServiceAPI::getEntityInformation(updatedSelectionEntities, entityInfos);
 		Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-		ClassFactory& classFactory = Application::instance()->getClassFactory();
 		for (ot::EntityInformation& entityInfo : entityInfos)
 		{
-			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
+			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 			assert(baseEntity != nullptr);
 			auto updatedSelection =	std::shared_ptr<EntityTableSelectedRanges>(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 			assert(updatedSelection != nullptr);
@@ -228,14 +226,14 @@ inline void BatchedCategorisationHandler::ensureEssentials()
 
 std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandler::findAllTableSelectionsWithConsiderForBatching()
 {
-	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
+	EntityTableSelectedRanges tempEntity;
 	ot::UIDList selectionRangeIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
 	for (ot::UID selectionRangeID : selectionRangeIDs)
 	{
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID));
 		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
 		assert(rangeEntity != nullptr);
 		if (rangeEntity->getConsiderForBatchprocessing())
@@ -260,7 +258,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 	for (auto& elements : _allRelevantTableSelectionsByMSMD)
 	{
 		//First we create the new series metadata entity
-		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 		std::string nameBase = "";
 		if (m_uniqueEntityNameCreator.getNameBase().empty())
 		{
@@ -296,7 +294,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 			//Now we check if we need to create a parameter/quantity entity as well
 			if (parameter == nullptr && newSelectionName.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
 			{
-				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
 				parameter->setName(prefix + "/" + CategorisationFolderNames::getParameterFolderName());
 				parameter->StoreToDataBase();
@@ -307,7 +305,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 
 			if (quantity == nullptr && newSelectionName.find(CategorisationFolderNames::getQuantityFolderName()) != std::string::npos)
 			{
-				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				quantity->CreateProperties(EntityParameterizedDataCategorization::quantity);
 				quantity->setName(prefix + "/" + CategorisationFolderNames::getQuantityFolderName());
 				quantity->StoreToDataBase();
@@ -317,7 +315,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 			}
 
 			//Now we create a new selection range entity with new values
-			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 			newSelection->setName(newSelectionName);
 			std::string dataType = selection->getSelectedType();
 			const std::string scriptName = selection->getScriptName();
@@ -393,7 +391,7 @@ std::map<std::string, ot::UID> BatchedCategorisationHandler::getAllTableUIDsByNa
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(textEntities, entityInfos);
 	
-	EntityFileCSV tableEntity(0,nullptr, nullptr, nullptr, nullptr,"");
+	EntityFileCSV tableEntity;
 	std::map<std::string, ot::UID> tableUIDByNames;
 	for (ot::EntityInformation& entityInfo : entityInfos)
 	{

@@ -6,6 +6,7 @@
 #include "DataSourceCartesianVector.h"
 #include "DataSourceResult3D.h"
 #include "DataSourceUnstructuredMesh.h"
+#include "OTCore/LogDispatcher.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
 {
@@ -27,7 +28,7 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	}
 	else
 	{
-		assert(0); // Unknown data type
+		OT_LOG_EAS("Invalid entity type: \"" + resultEntity->getClassName() + "\"");
 	}
 
 	return nullptr;

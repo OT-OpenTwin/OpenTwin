@@ -25,7 +25,6 @@
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "DocumentAPI.h"
 #include "EntityResultText.h"
 #include "EntityUnits.h"
@@ -436,7 +435,7 @@ void Application::changeUnits(const std::string &content)
 	// Load the current units entity
 	ot::EntityInformation entityInformation;
 	ot::ModelServiceAPI::getEntityInformation("Units", entityInformation);
-	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
 	assert(units != nullptr);
 	if (units == nullptr) return;
 
@@ -558,7 +557,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	ot::EntityInformation entityInformation;
 	if (ot::ModelServiceAPI::getEntityInformation("Materials/" + materialName, entityInformation))
 	{
-		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
 	}
 
 	bool changed = false;
@@ -566,7 +565,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (material == nullptr)
 	{
 		// We have a new material to create
-		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 		material->setName("Materials/" + materialName);
 		material->createProperties();
 
@@ -661,18 +660,18 @@ void Application::changeHistory(const std::string& content)
 		if (ot::ModelServiceAPI::getEntityInformation("History", currentHistoryInfo))
 		{
 			// A history already exists
-			history = dynamic_cast<EntityFileText*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentHistoryInfo.getEntityID(), currentHistoryInfo.getEntityVersion(), getClassFactory()));
+			history = dynamic_cast<EntityFileText*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentHistoryInfo.getEntityID(), currentHistoryInfo.getEntityVersion()));
 
 			data = history->getData();
 		}
 		else
 		{
 			// A new history item needs to be created
-			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, &getClassFactory(), getServiceName());
+			history = new EntityFileText(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 			history->setFileProperties("", "history", "txt");
 			history->setName("History");
 
-			data = std::make_shared<EntityBinaryData>(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+			data = std::make_shared<EntityBinaryData>(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 		}
 
 		data->setData(content.data(), content.size());
@@ -719,13 +718,13 @@ void Application::processParameterBuffer(std::stringstream& buffer, std::map<std
 		ot::EntityInformation entityInformation;
 		if (ot::ModelServiceAPI::getEntityInformation("Parameters/" + parameterName, entityInformation))
 		{
-			parameter = dynamic_cast<EntityParameter*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+			parameter = dynamic_cast<EntityParameter*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
 		}
 
 		if (parameter == nullptr)
 		{
 			// We have a new parameter to create
-			parameter = new EntityParameter(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+			parameter = new EntityParameter(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 			parameter->setName("Parameters/" + parameterName);
 			parameter->createProperties();
 
@@ -931,7 +930,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	ot::UID entityID = getModelComponent()->createEntityUID();
 	ot::UID facetsID = getModelComponent()->createEntityUID();
 
-	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, getServiceName());
 	entityGeom->setName(otName);
 	entityGeom->setEditable(false);
 

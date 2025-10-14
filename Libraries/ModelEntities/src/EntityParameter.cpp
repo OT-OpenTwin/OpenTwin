@@ -9,8 +9,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityParameter> registrar("EntityParameter");
+
+EntityParameter::EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 	
 }

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <chrono>
 
 ProgressLogger::ProgressLogger(Application *app) : 
 	application(app) ,

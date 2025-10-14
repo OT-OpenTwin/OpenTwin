@@ -4,8 +4,6 @@
 #include "DataBase.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"

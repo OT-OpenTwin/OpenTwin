@@ -6,7 +6,6 @@ class EntityBase;
 class EntityMeshCartesian;
 class EntityMeshCartesianData;
 class EntityGeometry;
-class ClassFactory;
 class EntityMeshCartesianFace;
 class CartesianMeshTree;
 class EntityFacetData;

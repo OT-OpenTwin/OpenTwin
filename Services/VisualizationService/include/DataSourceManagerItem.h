@@ -3,7 +3,6 @@
 #include <string>
 
 class EntityBase;
-class ClassFactory;
 
 namespace ot
 {
@@ -19,7 +18,7 @@ public:
 	DataSourceManagerItem();
 	virtual ~DataSourceManagerItem();
 
-	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory *classFactory) = 0;
+	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) = 0;
 
 private:
 };

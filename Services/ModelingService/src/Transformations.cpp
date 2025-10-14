@@ -1,8 +1,6 @@
 #include "Transformations.h"
 
 #include "EntityGeometry.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
@@ -152,7 +150,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 
 	for (auto entity : geometryEntityInfo)
 	{
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entity.getEntityID(), entity.getEntityVersion(), *classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entity.getEntityID(), entity.getEntityVersion()));
 
 		if (geometryEntity != nullptr)
 		{

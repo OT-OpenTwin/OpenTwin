@@ -7,8 +7,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityVisUnstructuredScalarVolume::EntityVisUnstructuredScalarVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner) :
-	EntityVis2D3D(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityVisUnstructuredScalarVolume> registrar("EntityVisUnstructuredScalarVolume");
+
+EntityVisUnstructuredScalarVolume::EntityVisUnstructuredScalarVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) :
+	EntityVis2D3D(ID, parent, obs, ms, owner)
 {
 }
 

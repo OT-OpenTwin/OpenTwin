@@ -24,13 +24,12 @@
 std::string ShapesBase::materialsFolder;
 ot::UID ShapesBase::materialsFolderID = 0;
 
-ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory) :
+ShapesBase::ShapesBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	serviceID(_serviceID),
 	serviceName(_serviceName),
-	entityCache(_entityCache),
-	classFactory(_classFactory)
+	entityCache(_entityCache)
 {
 
 }
@@ -130,7 +129,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	ot::UID facetsID = modelComponent->createEntityUID();
 
 	// Let's create the new geometry item
-	EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
+	EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
 	geometryEntity->setName(itemName);
 	geometryEntity->setEditable(true);
 	geometryEntity->setBrep(shape);

@@ -17,7 +17,7 @@ public:
 	DataSourceUnstructuredMesh();
 	virtual ~DataSourceUnstructuredMesh();
 
-	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity, ClassFactory* classFactory) override;
+	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) override;
 
 	vtkUnstructuredGrid* GetVtkGrid() { return vtkGrid; };
 
@@ -34,11 +34,11 @@ public:
 	bool GetHasCellVector() { return hasCellVector; }
 
 private:
-	bool loadData(EntityResultUnstructuredMeshData* resultEntity, EntityBase* meshEntity, ClassFactory* classFactory);
-	bool loadData(EntityResultUnstructuredMeshVtk* resultData, ClassFactory* classFactory);
+	bool loadData(EntityResultUnstructuredMeshData* resultEntity, EntityBase* meshEntity);
+	bool loadData(EntityResultUnstructuredMeshVtk* resultData);
 
-	bool loadMeshData(EntityBase* meshEntity, ClassFactory* classFactory);
-	bool loadResultData(EntityBase* resultEntity, ClassFactory* classFactory);
+	bool loadMeshData(EntityBase* meshEntity);
+	bool loadResultData(EntityBase* resultEntity);
 	void FreeMemory();
 	void buildScalarArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray);
 	void buildVectorArray(size_t length, float* data, vtkNew<vtkDoubleArray>& dataArray);

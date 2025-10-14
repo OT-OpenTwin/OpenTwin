@@ -3,7 +3,8 @@
 class __declspec(dllexport) EntityBlockCircuitResistor : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlockCircuitResistor() : EntityBlockCircuitResistor(0, nullptr, nullptr, nullptr, "") {};
+	EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitResistor"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;

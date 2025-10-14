@@ -6,6 +6,8 @@
 #include "MaterialPolished.h"
 #include "MaterialMetal.h"
 
+#include "OTCore/LogDispatcher.h"
+
 #include <cassert>
 
 MaterialBase* SceneNodeMaterialFactory::createMaterial(const std::string& matType)
@@ -27,6 +29,6 @@ MaterialBase* SceneNodeMaterialFactory::createMaterial(const std::string& matTyp
 		return new MaterialMetal;
 	}
 
-	assert(0); // Unknown material type
+	OT_LOG_WAS("Unknown material \"" + matType + "\"");
 	return nullptr;
 }

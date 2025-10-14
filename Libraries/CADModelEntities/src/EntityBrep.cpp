@@ -13,8 +13,10 @@
 #include "TopoDS_Face.hxx"
 #include "TopoDS.hxx"
 
-EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBrep> registrar("EntityBrep");
+
+EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 	transformMatrix = gp_Trsf();
 }

@@ -9,9 +9,10 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
+static EntityFactoryRegistrar<EntityBlockCircuitTransmissionLine> registrar("EntityBlockCircuitTransmissionLine");
 
-EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
+EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
 	m_navigationOldTreeIconName = "TranLine";
 	m_navigationOldTreeIconNameHidden = "TranLine";
 	m_blockTitle = "Transmission Line";

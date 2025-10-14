@@ -2,7 +2,8 @@
 #include "EntityBlockCircuitElement.h"
 class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlockCircuitElement {
 	public:
-		EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+		EntityBlockCircuitVoltageSource() : EntityBlockCircuitVoltageSource(0, nullptr, nullptr, nullptr, "") {};
+		EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 		virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageSource"; };
 		virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 		virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;

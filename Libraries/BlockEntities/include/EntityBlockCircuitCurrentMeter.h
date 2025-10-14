@@ -3,7 +3,8 @@
 class __declspec(dllexport) EntityBlockCircuitCurrentMeter : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlockCircuitCurrentMeter() : EntityBlockCircuitCurrentMeter(0, nullptr, nullptr, nullptr, "") {};
+	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitCurrentMeter"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;

@@ -26,7 +26,6 @@
 // Application specific includes
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "EntityResultText.h"
 #include "EntityUnits.h"
 #include "EntityMaterial.h"
@@ -402,7 +401,7 @@ void Application::changeUnits(const std::string &content)
 	// Load the current units entity
 	ot::EntityInformation entityInformation;
 	ot::ModelServiceAPI::getEntityInformation("Units", entityInformation);
-	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
 	assert(units != nullptr);
 	if (units == nullptr) return;
 
@@ -524,7 +523,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	ot::EntityInformation entityInformation;
 	if (ot::ModelServiceAPI::getEntityInformation("Materials/" + materialName, entityInformation))
 	{
-		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
+		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
 	}
 
 	bool changed = false;
@@ -532,7 +531,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	if (material == nullptr)
 	{
 		// We have a new material to create
-		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 		material->setName("Materials/" + materialName);
 		material->createProperties();
 
@@ -745,7 +744,7 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	ot::UID entityID = getModelComponent()->createEntityUID();
 	ot::UID facetsID = getModelComponent()->createEntityUID();
 
-	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, getServiceName());
 	entityGeom->setName(otName);
 	entityGeom->setEditable(false);
 
@@ -1060,7 +1059,7 @@ void Application::getParametricCombinations(const std::string& logFileName, std:
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(logFileName, entityInfo);
 	
-	EntityFile *fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
+	EntityFile *fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	if (fileEntity == nullptr) return;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
@@ -1110,7 +1109,7 @@ LTSpiceData Application::getCurveData(const std::string& rawFileName)
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(rawFileName, entityInfo);
 
-	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
+	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	if (fileEntity == nullptr) return result;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();

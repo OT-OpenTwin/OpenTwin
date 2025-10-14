@@ -7,8 +7,8 @@
 #include "EntityBlockConnection.h"
 #include "ConfigurationHelper.h"
 
-EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, factory, owner)
+EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBase(ID, parent, obs, ms, owner)
 {
 	
 }
@@ -107,7 +107,7 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 		setEntityID(createEntityUID());
 
 		ot::ConstJsonObject positionObjJson = ot::json::getObject(_serialisation, "SerialisationOfPosition");
-		std::unique_ptr<EntityCoordinates2D> position(new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr, nullptr, getOwningService()));
+		std::unique_ptr<EntityCoordinates2D> position(new EntityCoordinates2D(createEntityUID(), nullptr, nullptr, nullptr, getOwningService()));
 		position->deserialiseFromJSON(positionObjJson, _copyInformation, _entityMap);
 		position->setParent(this);
 		m_coordinateEntity = position.release();

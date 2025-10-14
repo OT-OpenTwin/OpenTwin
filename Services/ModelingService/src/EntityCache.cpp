@@ -1,7 +1,5 @@
 #include "EntityCache.h"
 #include "EntityBase.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 #include "DataBase.h"
 #include "Application.h"
 #include "EntityAPI.h"
@@ -71,7 +69,7 @@ EntityBase *EntityCache::getEntity(ot::UID entityID, ot::UID entityVersion)
 
 		// We have not yet cached this item, so let's read it from the data base
 
-		entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory());
+		entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion);
 	}
 	else
 	{

@@ -23,14 +23,13 @@
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.h" />
     <ClInclude Include="include\BsonArrayTypeGetterWrapper.hpp" />
     <ClInclude Include="include\BSONToVariableConverter.h" />
-    <ClInclude Include="include\ClassFactoryHandler.h" />
-    <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\ContentChangedHandling.h" />
     <ClInclude Include="include\CSVProperties.h" />
     <ClInclude Include="include\CSVToTableTransformer.h" />
     <ClInclude Include="include\EntityAPI.h" />
     <ClInclude Include="include\EntityBatchImporter.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityFactoryRegistrar.h" />
     <ClInclude Include="include\EntityGraphicsScene.h" />
     <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityResult1DCurve.h" />
@@ -60,7 +59,7 @@
     <ClInclude Include="include\EntityVisUnstructuredScalarVolume.h" />
     <ClInclude Include="include\EntityVisUnstructuredVectorVolume.h" />
     <ClInclude Include="include\GenericBsonDocument.h" />
-    <ClInclude Include="include\ClassFactory.h" />
+    <ClInclude Include="include\EntityFactory.h" />
     <ClInclude Include="include\DataBase.h" />
     <ClInclude Include="include\EntityAnnotation.h" />
     <ClInclude Include="include\EntityAnnotationData.h" />
@@ -118,6 +117,7 @@
     <ClInclude Include="include\EntityVisCartesianFaceScalar.h" />
     <ClInclude Include="include\GenericDocument.h" />
     <ClInclude Include="include\Geometry.h" />
+    <ClInclude Include="include\ModelEntitiesAPIExport.h" />
     <ClInclude Include="include\ModelState.h" />
     <ClInclude Include="include\PlaneProperties.h" />
     <ClInclude Include="include\PropertiesVis2D3D.h" />
@@ -152,7 +152,7 @@
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
-    <ClCompile Include="src\ClassFactory.cpp" />
+    <ClCompile Include="src\EntityFactory.cpp" />
     <ClCompile Include="src\CSVToTableTransformer.cpp" />
     <ClCompile Include="src\DataBase.cpp" />
     <ClCompile Include="src\EntityAnnotation.cpp" />
@@ -170,6 +170,7 @@
     <ClCompile Include="src\EntityGraphicsScene.cpp" />
     <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
+    <ClCompile Include="src\EntityMesh.cpp" />
     <ClCompile Include="src\EntityMetadataSeries.cpp" />
     <ClCompile Include="src\EntityMeshCartesian.cpp" />
     <ClCompile Include="src\EntityMeshCartesianData.cpp" />
@@ -192,6 +193,8 @@
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
     <ClCompile Include="src\EntityResult1DCurve.cpp" />
     <ClCompile Include="src\EntityResult1DPlot.cpp" />
+    <ClCompile Include="src\EntityResultTable.cpp" />
+    <ClCompile Include="src\EntityResultTableData.cpp" />
     <ClCompile Include="src\EntityResultText.cpp" />
     <ClCompile Include="src\EntityResultTextData.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
@@ -329,7 +332,7 @@
       </SDLCheck>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OPENTWINMODELENTITIES_EXPORTS;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996;4828</DisableSpecificWarnings>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
@@ -358,7 +361,7 @@
       </SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OPENTWINMODELENTITIES_EXPORTS;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -380,7 +383,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OPENTWINMODELENTITIES_EXPORTS;_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996;4828</DisableSpecificWarnings>
     </ClCompile>
@@ -407,7 +410,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(OT_DATASTORAGE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(MONGO_CXX_INC);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OPENTWINMODELENTITIES_EXPORTS;_UNICODE;UNICODE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -3,7 +3,8 @@
 class __declspec(dllexport) EntityBlockCircuitCapacitor : public EntityBlockCircuitElement
 {
 public:
-	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlockCircuitCapacitor() : EntityBlockCircuitCapacitor(0, nullptr, nullptr, nullptr, "") {};
+	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitCapacitor"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;

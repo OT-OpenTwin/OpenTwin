@@ -19,8 +19,8 @@ class BRepTools_History;
 class BlendEdges : public EdgesOperationBase
 {
 public:
-	BlendEdges(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory) 
-		: EdgesOperationBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _classFactory) {};
+	BlendEdges(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) 
+		: EdgesOperationBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache) {};
 	virtual ~BlendEdges() {}
 
 protected:

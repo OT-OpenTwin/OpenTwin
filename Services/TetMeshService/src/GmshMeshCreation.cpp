@@ -27,8 +27,6 @@
 #include "SelfIntersectionCheck.h"
 #include "TemplateDefaultManager.h"
 #include "Application.h"
-#include "ClassFactory.h"
-#include "ClassFactoryCAD.h"
 
 #include <set>
 #include <cmath>
@@ -469,7 +467,7 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 	for (auto entityID : geometryEntitiesID)
 	{
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
-		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+		EntityGeometry *geom = dynamic_cast<EntityGeometry *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 
 		if (geom == nullptr)
 		{
@@ -501,7 +499,7 @@ std::list<EntityGeometry *> GmshMeshCreation::loadGeometryEntitiesAndBreps(std::
 		ot::UID brepID = geomEntity->getBrepStorageObjectID();
 		ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-		EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
+		EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion));
 
 		geomEntity->setBrepEntity(brep);
 	}

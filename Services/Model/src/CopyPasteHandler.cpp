@@ -108,7 +108,7 @@ std::string CopyPasteHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 	// Get class factory
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
-	ClassFactoryModel& classFactory = model->getClassFactory();
+	EntityFactory& factory = EntityFactory::instance();
 	std::map<ot::UID, EntityBase*> entityMap;
 
 	// Deserialize entities
@@ -119,7 +119,7 @@ std::string CopyPasteHandler::pasteEntitiesAction(ot::JsonDocument& _document) {
 			ot::JsonDocument document;
 			document.fromJson(serialisedEntities);
 			std::string entityType = ot::json::getString(document, "SchemaType");
-			std::unique_ptr<EntityBase> entity (classFactory.createEntity(entityType));
+			std::unique_ptr<EntityBase> entity (factory.create(entityType));
 					
 			if (entity != nullptr)
 			{

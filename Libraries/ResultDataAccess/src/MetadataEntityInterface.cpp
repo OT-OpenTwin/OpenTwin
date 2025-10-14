@@ -218,7 +218,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 
 void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign)
 {
-	EntityMetadataCampaign entityCampaign(_modelComponent.createEntityUID(), nullptr, nullptr, nullptr, nullptr, m_ownerServiceName);
+	EntityMetadataCampaign entityCampaign(_modelComponent.createEntityUID(), nullptr, nullptr, nullptr, m_ownerServiceName);
 	for (auto& metadata : _metaDataCampaign.getMetaData())
 	{
 		insertMetadata(&entityCampaign, metadata.second.get());
@@ -240,7 +240,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 	for (auto& newSeriesMetadata : _seriesMetadata)
 	{
 		const std::string name = newSeriesMetadata->getName();
-		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, nullptr, m_ownerServiceName);
+		EntityMetadataSeries entitySeries(newSeriesMetadata->getSeriesIndex(), nullptr, nullptr, nullptr, m_ownerServiceName);
 		entitySeries.setName(name);
 		entitySeries.setEditable(true);
 		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())

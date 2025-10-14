@@ -2,8 +2,10 @@
 #include "PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 
-EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
-	:EntityBase(_ID, _parent, _obs, _ms, _factory, _owner)
+static EntityFactoryRegistrar<EntityBatchImporter> registrar("EntityBatchImporter");
+
+EntityBatchImporter::EntityBatchImporter(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
+	:EntityBase(_ID, _parent, _obs, _ms, _owner)
 {
 }
 

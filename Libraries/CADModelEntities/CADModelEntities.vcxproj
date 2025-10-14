@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CheckGeometry.h" />
-    <ClInclude Include="include\ClassFactoryCAD.h" />
     <ClInclude Include="include\EntityBrep.h" />
     <ClInclude Include="include\EntityFaceAnnotation.h" />
     <ClInclude Include="include\EntityGeometry.h" />
@@ -28,7 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CheckGeometry.cpp" />
-    <ClCompile Include="src\ClassFactoryCAD.cpp" />
     <ClCompile Include="src\EntityBrep.cpp" />
     <ClCompile Include="src\EntityFaceAnnotation.cpp" />
     <ClCompile Include="src\EntityGeometry.cpp" />

@@ -178,7 +178,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisatio
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities;
 	for (const ot::UID& uid : relevantIDs)
 	{
-		EntityBase* entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(uid, *version, Application::instance()->getClassFactory());
+		EntityBase* entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(uid, *version);
 		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
 		if (selectionRange != nullptr)
 		{
@@ -213,7 +213,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 {
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(_tableName, entityInfo);
-	EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+	EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
 	if (table == nullptr)
 	{

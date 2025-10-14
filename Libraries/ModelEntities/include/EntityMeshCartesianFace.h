@@ -13,7 +13,8 @@ class __declspec(dllexport) EntityMeshCartesianFace : public EntityBase
 public:
 	enum eType {INDEX_BASED = 0, POINT_BASED = 1};
 
-	EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityMeshCartesianFace() : EntityMeshCartesianFace(0, nullptr, nullptr, nullptr, "") {};
+	EntityMeshCartesianFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityMeshCartesianFace() {};
 
 	void setType(eType t) { type = t; }

@@ -3,8 +3,10 @@
 #include "OTGui/BasicGraphicsIntersectionItem.h"
 #include "OTCore/LogDispatcher.h"
 
-EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar("EntityBlockCircuitConnector");
+
+EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, owner)
 {
 	m_navigationOldTreeIconName = "Diod2";
 	m_navigationOldTreeIconNameHidden = "Diod2";

@@ -27,7 +27,6 @@
 #include "DataBase.h"
 #include "VtkDriverFactory.h"
 #include "VtkDriver.h"
-#include "ClassFactory.h"
 
 #include <thread>
 
@@ -119,7 +118,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 	vtkDriver->setProperties(visEntity);
 
 	// Load the data item
-	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent(), &getClassFactory());
+	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent());
 
 	// Now buld the osg node and convert it to a string
 	std::string nodeString = vtkDriver->buildSceneNode(dataItem);
@@ -144,7 +143,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 
 void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bool itemsVisible)
 {
-	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, getClassFactory()));
+	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 	if (visEntity == nullptr)
 	{
 		assert(0); // Wrong entity type of entity id / version
@@ -173,7 +172,7 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 
 std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_t dataLength)
 {
-	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 
 	dataItem->setData(data, dataLength);
 	dataItem->StoreToDataBase();

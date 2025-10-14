@@ -23,7 +23,6 @@
 #include "EntitySolverFDTD.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "EntityResultText.h"
 
 #include <thread>
@@ -146,7 +145,7 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverFDTD *solverEntity = new EntitySolverFDTD(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverFDTD *solverEntity = new EntitySolverFDTD(entityID, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
@@ -226,7 +225,7 @@ void Application::runSolver(void)
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion());
 		solverMap[info.getEntityName()] = entity;
 	}
 

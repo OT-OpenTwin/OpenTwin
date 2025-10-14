@@ -10,8 +10,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityContainer(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityMeshCartesianData> registrar("EntityMeshCartesianData");
+
+EntityMeshCartesianData::EntityMeshCartesianData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityContainer(ID, parent, obs, ms, owner),
 	meshFaces(nullptr),
 	meshFacesStorageId(-1),
 	meshFacesStorageVersion(-1),
@@ -98,7 +100,7 @@ void EntityMeshCartesianData::EnsureFacesLoaded(void)
 	{
 		if (meshFacesStorageId == -1)
 		{
-			meshFaces = new EntityMeshCartesianFaceList(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshFaces = new EntityMeshCartesianFaceList(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{
@@ -139,7 +141,7 @@ void EntityMeshCartesianData::EnsureNodesLoaded(void)
 	{
 		if (meshNodesStorageId == -1)
 		{
-			meshNodes = new EntityMeshCartesianNodes(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshNodes = new EntityMeshCartesianNodes(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{
@@ -725,7 +727,7 @@ void EntityMeshCartesianData::EnsureMatrixLoaded(EntityCartesianVector *&matrix,
 	{
 		if (storageId == -1)
 		{
-			matrix = new EntityCartesianVector(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			matrix = new EntityCartesianVector(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

@@ -241,7 +241,7 @@ std::shared_ptr<EntityBase> EntityBuffer::loadEntity(const std::string& _absolut
 		{
 			throw std::exception(("Requested entity " + _absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance().getClassFactory());
+		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		m_bufferedEntities[_absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return m_bufferedEntities[_absoluteEntityName];

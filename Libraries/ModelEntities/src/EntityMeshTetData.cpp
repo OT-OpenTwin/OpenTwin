@@ -10,8 +10,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityContainer(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityMeshTetData> registrar("EntityMeshTetData");
+
+EntityMeshTetData::EntityMeshTetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityContainer(ID, parent, obs, ms, owner),
 	meshNodes(nullptr),
 	meshNodesStorageId(-1),
 	meshFaces(nullptr),
@@ -57,7 +59,7 @@ void EntityMeshTetData::EnsureFacesLoaded(void)
 	{
 		if (meshFacesStorageId == -1)
 		{
-			meshFaces = new EntityMeshTetFaceData(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshFaces = new EntityMeshTetFaceData(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{
@@ -164,7 +166,7 @@ void EntityMeshTetData::EnsureNodesLoaded(void)
 	{
 		if (meshNodesStorageId == -1)
 		{
-			meshNodes = new EntityMeshTetNodes(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshNodes = new EntityMeshTetNodes(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

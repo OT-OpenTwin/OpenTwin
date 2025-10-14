@@ -9,7 +9,7 @@
 class __declspec(dllexport) EntityMesh : public EntityContainer
 {
 public:
-	EntityMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner)
-	: EntityContainer(ID, parent, obs, ms, factory, owner){};
+	EntityMesh() : EntityMesh(0, nullptr, nullptr, nullptr, "") {};
+	EntityMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityMesh() {};
 };

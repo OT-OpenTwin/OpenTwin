@@ -2,8 +2,10 @@
 #include "../include/EntityResultUnstructuredMesh.h"
 #include "DataBase.h"
 
-EntityResultUnstructuredMesh::EntityResultUnstructuredMesh(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityResultUnstructuredMesh> registrar("EntityResultUnstructuredMesh");
+
+EntityResultUnstructuredMesh::EntityResultUnstructuredMesh(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityBase(ID,parent,obs,ms,owner)
 {}
 
 EntityResultUnstructuredMesh::~EntityResultUnstructuredMesh()
@@ -62,7 +64,7 @@ void EntityResultUnstructuredMesh::setMeshData(size_t numberPoints, size_t numbe
 	xcoord = ycoord = zcoord = cellData = nullptr;
 }
 
-void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, double *&x, double *&y, double *&z, ClassFactoryHandler* factory)
+void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, double *&x, double *&y, double *&z)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 
@@ -101,21 +103,21 @@ void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, doub
 	if (_xcoord == nullptr)
 	{
 		std::map<ot::UID, EntityBase *> entityMap;
-		_xcoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _xCoordDataID, _xCoordDataVersion, entityMap, factory));
+		_xcoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _xCoordDataID, _xCoordDataVersion, entityMap));
 		assert(_xcoord != nullptr);
 	}
 
 	if (_ycoord == nullptr)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_ycoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _yCoordDataID, _yCoordDataVersion, entityMap, factory));
+		_ycoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _yCoordDataID, _yCoordDataVersion, entityMap));
 		assert(_ycoord != nullptr);
 	}
 
 	if (_zcoord == nullptr)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_zcoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _zCoordDataID, _zCoordDataVersion, entityMap, factory));
+		_zcoord = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _zCoordDataID, _zCoordDataVersion, entityMap));
 		assert(_zcoord != nullptr);
 	}
 
@@ -141,7 +143,7 @@ void EntityResultUnstructuredMesh::GetPointCoordData(size_t & numberPoints, doub
 	}
 }
 
-void EntityResultUnstructuredMesh::GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactoryHandler* factory)
+void EntityResultUnstructuredMesh::GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells)
 {
 	if (_cellData == nullptr)
 	{
@@ -150,7 +152,7 @@ void EntityResultUnstructuredMesh::GetCellData(size_t& numberCells, size_t& size
 			throw std::invalid_argument("Binary data cellData not existing.");
 		}
 		std::map<ot::UID, EntityBase*> entityMap;
-		_cellData = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellDataID, _cellDataVersion, entityMap, factory));
+		_cellData = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellDataID, _cellDataVersion, entityMap));
 		assert(_cellData != nullptr);
 	}
 

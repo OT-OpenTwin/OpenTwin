@@ -28,9 +28,6 @@
 #include "DataBase.h"
 #include "FolderNames.h"
 
-
-#include "ClassFactory.h"
-
 #include <thread>
 
 #include <map>
@@ -141,12 +138,12 @@ void Application::addMonitor(void)
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 	
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion()));
 	assert(solverEntity != nullptr);
 	
 	//Create new monitor
 	ot::UID newMonitorID = this->getModelComponent()->createEntityUID();
-	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr, nullptr, "Model");
+	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr, "Model");
 
 	// Get a list of all items of this specific solver
 	std::string solverName = selectedSolver->getEntityName();
@@ -191,12 +188,12 @@ void Application::addPort(void) {
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion()));
 	assert(solverEntity != nullptr);
 
 	//Create new monitor
 	ot::UID newPortID = this->getModelComponent()->createEntityUID();
-	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr, nullptr, "Model");
+	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr, "Model");
 
 	// Find the next free numbered entity name
 	std::string solverName = selectedSolver->getEntityName();
@@ -253,7 +250,7 @@ void Application::addSignalType(void) {
 	auto selectedSolver = selectedEntityInfo.begin();
 	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(ot::EntityAPI::readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion()));
 	assert(solverEntity != nullptr);
 
 	// Get a list of all items of this specific solver
@@ -272,7 +269,7 @@ void Application::addSignalType(void) {
 
 	//Create new Signal Type
 	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
-	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, nullptr, "Model");
+	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, "Model");
 	
 	//Set properties
 	newSignal->setName(signalName);
@@ -320,7 +317,7 @@ void Application::addSolver(void) {
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverFITTD *solverEntity = new EntitySolverFITTD(entityID, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);	
@@ -329,7 +326,7 @@ void Application::addSolver(void) {
 
 	//Create default signal
 	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
-	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, nullptr, "Model");
+	auto newSignal = new EntitySignalType(newSignalID, nullptr, nullptr, nullptr, "Model");
 	newSignal->setName(solverName + "/" + FolderNames::GetFolderNameSignalType() + "/DefaultSignal");
 	newSignal->setInitiallyHidden(false);
 	newSignal->setEditable(false);
@@ -416,7 +413,7 @@ void Application::SolverThread(std::list<std::string> solverRunList)
 		try
 		{
 			this->getUiComponent()->displayMessage("Start solver: "+ solverName +"\n");
-			MicroServiceInterfaceFITTDSolver newSolver(solverName, static_cast<int>(getServiceID()), getSessionCount(), getClassFactory());
+			MicroServiceInterfaceFITTDSolver newSolver(solverName, static_cast<int>(getServiceID()), getSessionCount());
 			SetupSolverService(newSolver);
 			newSolver.RemoveOldResults();
 			newSolver.CreateSolver();

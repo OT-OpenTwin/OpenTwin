@@ -10,7 +10,8 @@
 class __declspec(dllexport) EntityResultUnstructuredMesh : public EntityBase
 {
 public:
-	EntityResultUnstructuredMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityResultUnstructuredMesh() : EntityResultUnstructuredMesh(0, nullptr, nullptr, nullptr, "") {};
+	EntityResultUnstructuredMesh(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityResultUnstructuredMesh();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
@@ -19,8 +20,8 @@ public:
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 
-	void GetPointCoordData(size_t& numberPoints, double *&x, double*& y, double*& z, ClassFactoryHandler* factory);
-	void GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells, ClassFactoryHandler* factory);
+	void GetPointCoordData(size_t& numberPoints, double *&x, double*& y, double*& z);
+	void GetCellData(size_t& numberCells, size_t& sizeCellData, int*& cells);
 
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setMeshData(size_t numberPoints, size_t numberCells, size_t sizeCellData, EntityBinaryData*& xcoord, EntityBinaryData*& ycoord, EntityBinaryData*& zcoord, EntityBinaryData*& cellData);

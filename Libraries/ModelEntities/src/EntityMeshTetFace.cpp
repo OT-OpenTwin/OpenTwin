@@ -6,9 +6,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
+static EntityFactoryRegistrar<EntityMeshTetFace> registrar("EntityMeshTetFace");
 
-EntityMeshTetFace::EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+EntityMeshTetFace::EntityMeshTetFace(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	surfaceId(0)
 {
 

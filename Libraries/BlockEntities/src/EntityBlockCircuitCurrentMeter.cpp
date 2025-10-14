@@ -9,8 +9,10 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
+static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar("EntityBlockCircuitCurrentMeter");
+
+EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
 	m_navigationOldTreeIconName = "CurrentMeter";
 	m_navigationOldTreeIconNameHidden = "CurrentMeter";
 	m_blockTitle = "Current Meter";

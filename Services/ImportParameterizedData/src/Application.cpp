@@ -27,7 +27,6 @@
 //Application specific includes
 #include "TemplateDefaultManager.h"
 #include <string>
-#include "ClassFactory.h"
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include "DatasetOverviewVisualiser.h"
@@ -167,8 +166,8 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 void Application::modelSelectionChanged(void)
 {	
 
-	EntityBatchImporter importer(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityParameterizedDataCategorization categorisation(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBatchImporter importer;
+	EntityParameterizedDataCategorization categorisation;
 	bool batchImporterSelected(false),categorisationSelected(false);
 	
 	for (const ot::EntityInformation& selectedEntityInfo : this->getSelectedEntityInfos())

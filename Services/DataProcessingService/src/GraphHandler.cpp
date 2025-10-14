@@ -1,7 +1,6 @@
 #include "GraphHandler.h"
 #include "GraphNode.h"
 #include "EntityBlockConnection.h"
-#include "ClassFactoryBlock.h"
 #include "Application.h"
 #include "EntityAPI.h"
 

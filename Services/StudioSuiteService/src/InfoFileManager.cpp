@@ -29,7 +29,7 @@ void InfoFileManager::readInformation()
 	if (ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The triangulation exists -> load the item
-		EntityFile* fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
+		EntityFile* fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion()));
 
 		if (fileEntity != nullptr)
 		{
@@ -158,7 +158,7 @@ void InfoFileManager::writeInformation()
 	if (!ot::ModelServiceAPI::getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The item does not exist -> create a new item
-		fileEntity = new EntityFile(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+		fileEntity = new EntityFile(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 
 		fileEntity->setName("Files/Information");
 		fileEntity->setFileProperties("", "", "Absolute");
@@ -167,11 +167,11 @@ void InfoFileManager::writeInformation()
 	else
 	{
 		// Load the existing item
-		fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
+		fileEntity = dynamic_cast<EntityFile*> (ot::EntityAPI::readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion()));
 	}
 
 	// Now create a new data item
-	EntityBinaryData* dataEntity = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	EntityBinaryData* dataEntity = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 
 	// Store the data in the item
 	std::stringstream dataContent;

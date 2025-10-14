@@ -293,14 +293,14 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")
 	{
-		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
 	}
 	else
 	{
-		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
+		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
 	}
 
-	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
+	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	fileContent.setData(_text.data(), _text.size());
 	fileContent.StoreToDataBase();
 

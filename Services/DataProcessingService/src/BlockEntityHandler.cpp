@@ -7,8 +7,6 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "Application.h"
-#include "ClassFactoryBlock.h"
-#include "ClassFactory.h"
 #include "EntityBlockPython.h"
 #include "AdvancedQueryBuilder.h"
 #include "EntityBlockStorage.h"
@@ -21,8 +19,7 @@
 
 void BlockEntityHandler::createBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
-	ClassFactory& factory = Application::instance()->getClassFactory();
-	EntityBase* baseEntity = factory.createEntity(blockName);
+	EntityBase* baseEntity = EntityFactory::instance().create(blockName);
 	assert(baseEntity != nullptr);		
 	std::shared_ptr<EntityBlock> blockEntity (dynamic_cast<EntityBlock*>(baseEntity));
 
@@ -34,7 +31,7 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 	blockEntity->setGraphicsScenePackageChildName(m_blockFolder);
 	blockEntity->setEditable(true);
 
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->StoreToDataBase();
 
@@ -55,7 +52,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionFolder;
 	for (auto& connection : connections)
 	{
-		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.createProperties();
 		ot::GraphicsConnectionCfg newConnection(connection);
 		newConnection.setUid(connectionEntity.getEntityID());
@@ -185,19 +182,19 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 	//ot::GraphicsPickerCollectionCfg* mathBlockCollection("Mathematical Operations", "Mathematical Operations");
 	ot::GraphicsPickerCollectionCfg customizedBlockCollection("Customized Blocks", "Customized Blocks");
 	
-	EntityBlockPython pythonBlock(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockPython pythonBlock;
 	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
 
-	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockDatabaseAccess dbAccessBlock;
 	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
 
-	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockDisplay displayBlock;
 	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
 
-	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockStorage storage;
 	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
 
-	EntityBlockFileWriter fileWriter(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockFileWriter fileWriter;
 	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
 
 	controlBlockCollection.addChildCollection(std::move(controlBlockDatabaseCollection));
@@ -223,7 +220,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr) //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
 		{
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
@@ -242,11 +239,10 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
 	for (auto& entityInfo : entityInfos) {
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
 			assert(blockEntityConnection != nullptr);

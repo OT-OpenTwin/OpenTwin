@@ -37,8 +37,8 @@ private:
 class EdgesOperationBase : public ShapesBase
 {
 public:
-	EdgesOperationBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache, ClassFactory *_classFactory) 
-		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _classFactory), updateManager(nullptr) {};
+	EdgesOperationBase(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName, EntityCache *_entityCache) 
+		: ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache), updateManager(nullptr) {};
 	virtual ~EdgesOperationBase() {}
 
 	void setUpdateManager(UpdateManager *_updateManager) { updateManager = _updateManager; };

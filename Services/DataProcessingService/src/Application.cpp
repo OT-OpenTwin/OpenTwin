@@ -27,9 +27,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "Helper.h"
 
-#include "ClassFactory.h"
 #include "ExternalDependencies.h"
-#include "ClassFactoryBlock.h"
 #include "EntitySolverDataProcessing.h"
 
 #include "OTServiceFoundation/UILockWrapper.h"
@@ -51,10 +49,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService, new UiNotifier(), new ModelNotifier())
 {
-	ClassFactory& classFactory = getClassFactory();
-	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
-	classFactoryBlock->setChainRoot(&classFactory);
-	classFactory.setNextHandler(classFactoryBlock);
+
 }
 
 Application::~Application()
@@ -68,12 +63,11 @@ void Application::runPipelineWorker(ot::UIDList _selectedSolverIDs)
 	try
 	{
 		Application::instance()->prefetchDocumentsFromStorage(_selectedSolverIDs);
-		ClassFactory& classFactory = Application::instance()->getClassFactory();
-		
+
 		for (ot::UID entityID : _selectedSolverIDs)
 		{
 			ot::UID entityVersion =	Application::instance()->getPrefetchedEntityVersion(entityID);
-			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, classFactory);
+			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion);
 			std::unique_ptr<EntitySolverDataProcessing> solver (dynamic_cast<EntitySolverDataProcessing*>(baseEntity));
 			const std::string folderName = solver->getSelectedPipeline();
 			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
@@ -100,7 +94,7 @@ void Application::runPipelineWorker(ot::UIDList _selectedSolverIDs)
 void Application::createPipeline()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
-	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	EntityGraphicsScene newDataprocessing(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
@@ -118,7 +112,7 @@ void Application::createPipeline()
 void Application::createSolver()
 {
 	auto modelComponent = Application::instance()->getModelComponent();
-	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, Application::instance()->getServiceName());
+	EntitySolverDataProcessing newSolver(modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 
 	if (m_dataProcessingFolderID == ot::getInvalidUID())
 	{
@@ -143,7 +137,7 @@ void Application::createSolver()
 
 void Application::runPipeline()
 {
-	EntitySolverDataProcessing solver(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntitySolverDataProcessing solver;
 	ot::UIDList selectedSolverIDs;
 	for (const ot::EntityInformation& selectedEntity : getSelectedEntityInfos())
 	{
@@ -241,10 +235,10 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 
 void Application::propertyChanged(ot::JsonDocument& _doc)
 {
-	EntityBlockDatabaseAccess dbA(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockDatabaseAccess dbA;
 	if (this->getSelectedEntities().size() == 1 && this->getSelectedEntityInfos().begin()->getEntityType() == dbA.getClassName())
 	{
-		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(this->getSelectedEntityInfos().begin()->getEntityID(), this->getSelectedEntityInfos().begin()->getEntityVersion(), getClassFactory());
+		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(this->getSelectedEntityInfos().begin()->getEntityID(), this->getSelectedEntityInfos().begin()->getEntityVersion());
 		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 		if (dbAccess != nullptr)
 		{

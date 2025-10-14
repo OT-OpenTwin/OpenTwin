@@ -38,7 +38,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
-	EntityResult1DCurve curveEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
+	EntityResult1DCurve curveEntity(uid, nullptr, nullptr, nullptr, m_extender.getOwner());
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
@@ -126,7 +126,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 {
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 
-	EntityResult1DPlot plotEntity(uid, nullptr, nullptr, nullptr, nullptr, m_extender.getOwner());
+	EntityResult1DPlot plotEntity(uid, nullptr, nullptr, nullptr, m_extender.getOwner());
 	const std::string entityName = _plotCfg.getEntityName();
 	plotEntity.setName(entityName);
 

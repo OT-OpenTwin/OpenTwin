@@ -10,7 +10,6 @@
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "EntityBlockConnection.h"
-#include "ClassFactory.h"
 #include "EntityFileText.h"
 
 // C++ header

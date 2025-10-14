@@ -9,8 +9,10 @@
 #include <OTCommunication/ActionTypes.h>
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityAnnotation> registrar("EntityAnnotation");
+
+EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	annotationData(nullptr),
 	annotationDataStorageId(-1)
 {
@@ -111,7 +113,7 @@ void EntityAnnotation::EnsureAnnotationDataIsLoaded(void)
 	{
 		if (annotationDataStorageId == -1)
 		{
-			annotationData = new EntityAnnotationData(createEntityUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			annotationData = new EntityAnnotationData(createEntityUID(), this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

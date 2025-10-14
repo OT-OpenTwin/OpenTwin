@@ -13,7 +13,8 @@
 class __declspec(dllexport) EntityFile: public EntityBase
 {
 public:
-	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityFile() : EntityFile(0, nullptr, nullptr, nullptr, "") {};
+	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityFile() = default;
 	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
@@ -25,7 +26,6 @@ public:
 	
 	//! @brief Does not reset the data entity. If a new data entity is assinged, this topology entity will still hold a reference to the old one. However, typically one would update the old data entity.
 	void setData(ot::UID _dataID, ot::UID _dataVersion);
-	//! @brief  Requires the ClassFactoryHandler to be set.
 	std::shared_ptr<EntityBinaryData> getData();
 
 	std::string getPath() const { return m_path; }

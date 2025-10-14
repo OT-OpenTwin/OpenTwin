@@ -2,8 +2,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	: EntityWithDynamicFields(ID,parent,mdl,ms,factory,owner)
+static EntityFactoryRegistrar<EntityMetadataSeries> registrar("EntityMetadataSeries");
+
+EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, const std::string& owner)
+	: EntityWithDynamicFields(ID,parent,mdl,ms,owner)
 {
 	CreatePlainDocument(_parameterDocument);
 	CreatePlainDocument(_quantityDocument);

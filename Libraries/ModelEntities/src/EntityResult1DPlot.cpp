@@ -7,8 +7,10 @@
 #include "OTCore/EntityName.h"
 #include "EntityResult1DCurve.h"
 
-EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
-	:EntityContainer(_ID,_parent,_obs,_ms,_factory,_owner)
+static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot_New");
+
+EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
+	:EntityContainer(_ID,_parent,_obs,_ms,_owner)
 {}
 
 void EntityResult1DPlot::StoreToDataBase(void)

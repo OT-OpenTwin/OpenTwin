@@ -10,7 +10,6 @@
 #include "OldTreeIcon.h"
 #include "ModelState.h"
 #include "EntityBase.h"
-#include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
 #include "OTCore/FolderNames.h"
 
@@ -209,7 +208,6 @@ public:
 	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
-	ClassFactoryModel& getClassFactory() { return m_classFactory; }
 
 	std::map<ot::UID, EntityBase*>& getAllEntitiesByUID() { return entityMap; }
 private:
@@ -330,9 +328,6 @@ private:
 
 	// Model state manager
 	ModelState *stateManager;
-
-	// Class factory
-	ClassFactoryModel m_classFactory;
 
 	// Flag indicating whether the model is currently shutting down (no more modified messages are sent)
 	bool shutdown;

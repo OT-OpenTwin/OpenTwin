@@ -30,12 +30,10 @@
 #include <string>
 #include "PlotBuilder.h"
 
-class ClassFactory;
-
 class MicroServiceInterfaceFITTDSolver : public MicroServiceSolver
 {
 public:
-	MicroServiceInterfaceFITTDSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory &classFactory) :MicroServiceSolver(solverName, serviceID, sessionCount, classFactory) {};
+	MicroServiceInterfaceFITTDSolver(std::string solverName, int serviceID, int sessionCount) :MicroServiceSolver(solverName, serviceID, sessionCount) {};
 	virtual ~MicroServiceInterfaceFITTDSolver();
 
 	void CreateSolver();

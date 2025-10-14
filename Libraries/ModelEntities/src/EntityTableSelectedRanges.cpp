@@ -5,8 +5,10 @@
 #include "OTCommunication/ActionTypes.h"
 #include "PropertyHelper.h"
 
-EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityTableSelectedRanges> registrar("EntityTableSelectedRanges");
+
+EntityTableSelectedRanges::EntityTableSelectedRanges(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityBase(ID,parent,obs,ms,owner)
 {
 }
 

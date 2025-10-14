@@ -10,8 +10,10 @@
 #include <iostream>
 #include <memory>
 
-EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner) :
-	EntityBase(_ID,_parent,_obs,_ms,_factory,_owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles))
+static EntityFactoryRegistrar<EntityFile> registrar("EntityFile");
+
+EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
+	EntityBase(_ID, _parent, _obs, _ms, _owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles))
 {
 }
 

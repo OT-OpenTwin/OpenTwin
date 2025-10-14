@@ -9,7 +9,8 @@
 class __declspec(dllexport) EntityParameter : public EntityBase
 {
 public:
-	EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityParameter() : EntityParameter(0, nullptr, nullptr, nullptr, "") {};
+	EntityParameter(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
 	virtual ~EntityParameter();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

@@ -542,10 +542,9 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 
 	const std::string collectionName = Application::instance().getCollectionName();
 	ot::components::ModelComponent* modelComponent = Application::instance().getModelComponent();
-	ClassFactory& classFactory = Application::instance().getClassFactory();
 	const std::string serviceName = Application::instance().getServiceName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, serviceName);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, serviceName);
 	PlotBuilder plotBuilder(resultCollectionExtender);
 
 	for (auto pipeLine : pipelines)

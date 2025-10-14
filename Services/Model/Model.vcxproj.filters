@@ -51,9 +51,6 @@
     <ClCompile Include="src\MicroserviceNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ClassFactoryModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProgressReport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,9 +126,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MicroserviceNotifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ClassFactoryModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ProgressReport.h">

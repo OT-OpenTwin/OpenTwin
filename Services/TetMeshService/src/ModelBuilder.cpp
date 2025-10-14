@@ -154,7 +154,7 @@ std::string ModelBuilder::addBoundingSphere(std::list<EntityGeometry *> &geometr
 	int valueB = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("Model", "Background sphere color", 2, 204);
 
 	// Build the geometry entity
-	EntityGeometry *backgroundSphere = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	EntityGeometry *backgroundSphere = new EntityGeometry(0, nullptr, nullptr, nullptr, "Model");
 
 	backgroundSphere->setName("Geometry/Background");
 	backgroundSphere->setBrep(sphere.Shape());
@@ -332,7 +332,7 @@ void ModelBuilder::createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, co
 
 EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const ot::PropertyGridCfg& shapeProperties)
 {
-	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr, application->getServiceName());
 
 	entityGeom->setName(name);
 	entityGeom->setEditable(true);

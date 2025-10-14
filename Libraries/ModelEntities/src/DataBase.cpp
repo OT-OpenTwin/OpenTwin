@@ -27,8 +27,6 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "ClassFactory.h"
-
 #include <cassert>
 
 
@@ -165,7 +163,7 @@ bool DataBase::GetDocumentFromEntityIDandVersion(unsigned long long entityID, un
 	return true;
 }
 
-EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, ClassFactory *classFactory)
+EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version)
 {
 	auto doc = bsoncxx::builder::basic::document{};
 
@@ -178,7 +176,7 @@ EntityBase * DataBase::GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UI
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	EntityBase *entity = classFactory->createEntity(entityType);
+	EntityBase *entity = EntityFactory::instance().create(entityType);
 
 	std::map<ot::UID, EntityBase *> entityMap;
 	entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);

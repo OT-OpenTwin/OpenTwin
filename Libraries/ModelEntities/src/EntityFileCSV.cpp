@@ -22,8 +22,10 @@
 #define OT_TEST_ENTITYFILECSV_Interval(___testText)
 #endif
 
-EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-: EntityFileText(ID,parent,obs,ms,factory,owner){}
+static EntityFactoryRegistrar<EntityFileCSV> registrar("EntityFileCSV");
+
+EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+: EntityFileText(ID, parent, obs, ms, owner) {}
 
 bool EntityFileCSV::updateFromProperties(void)
 {

@@ -33,7 +33,8 @@ private:
 class __declspec(dllexport) EntityFaceAnnotation : public EntityBase
 {
 public:
-	EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityFaceAnnotation() : EntityFaceAnnotation(0, nullptr, nullptr, nullptr, "") {};
+	EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityFaceAnnotation();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

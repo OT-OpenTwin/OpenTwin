@@ -9,8 +9,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityMesh(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityMeshCartesian> registrar("EntityMeshCartesian");
+
+EntityMeshCartesian::EntityMeshCartesian(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityMesh(ID, parent, obs, ms, owner),
 	meshData(nullptr),
 	meshDataStorageId(-1),
 	meshValid(false)
@@ -270,7 +272,7 @@ void EntityMeshCartesian::EnsureMeshDataLoaded(void)
 	{
 		if (meshDataStorageId == -1)
 		{
-			meshData = new EntityMeshCartesianData(0, nullptr, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshData = new EntityMeshCartesianData(0, nullptr, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

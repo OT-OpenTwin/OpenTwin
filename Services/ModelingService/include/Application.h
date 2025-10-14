@@ -17,8 +17,6 @@
 
 #include "EntityCache.h"
 
-#include "ClassFactoryCAD.h"
-
 // OC header
 #include <TopoDS_Compound.hxx>
 
@@ -110,8 +108,6 @@ private:
 	BlendEdges          *blendEdges;
 	SimplifyRemoveFaces *removeFaces;
 	STEPReader			*stepReader;
-
-	ClassFactoryCAD classFactoryCAD;
 
 	void handleImportSTEP(ot::JsonDocument& _document);
 	void handleCreateGeometryFromRubberband(ot::JsonDocument& _document);

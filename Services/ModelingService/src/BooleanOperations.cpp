@@ -3,8 +3,6 @@
 #include "EntityCache.h"
 
 #include "EntityGeometry.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 
 #include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -25,8 +23,8 @@
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepBuilderAPI_MakeSolid.hxx>
 
-BooleanOperations::BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID, ClassFactory* _classFactory) :
-	ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _classFactory)
+BooleanOperations::BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID) :
+	ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache)
 {
 
 }
@@ -197,7 +195,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 		ot::UID brepID   = modelComponent->createEntityUID();
 		ot::UID facetsID = modelComponent->createEntityUID();
 
-		EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
+		EntityGeometry *geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
 		geometryEntity->setName(baseEntity->getName());
 		geometryEntity->setEditable(true);
 		geometryEntity->setSelectChildren(false);

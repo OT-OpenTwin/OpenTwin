@@ -10,7 +10,8 @@
 class __declspec(dllexport) EntitySolverElmerFEM : public EntitySolver
 {
 public:
-	EntitySolverElmerFEM(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntitySolverElmerFEM() : EntitySolverElmerFEM(0, nullptr, nullptr, nullptr, "") {};
+	EntitySolverElmerFEM(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverElmerFEM();
 
 	virtual std::string getClassName(void) override { return "EntitySolverElmerFEM"; } ;

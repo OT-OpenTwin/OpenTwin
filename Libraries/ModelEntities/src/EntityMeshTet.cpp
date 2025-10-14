@@ -10,8 +10,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshTet::EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityMesh(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityMeshTet> registrar("EntityMeshTet");
+
+EntityMeshTet::EntityMeshTet(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityMesh(ID, parent, obs, ms, owner),
 	meshData(nullptr),
 	meshDataStorageId(-1),
 	meshValid(false)
@@ -238,7 +240,7 @@ void EntityMeshTet::EnsureMeshDataLoaded(void)
 	{
 		if (meshDataStorageId == -1)
 		{
-			meshData = new EntityMeshTetData(0, nullptr, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshData = new EntityMeshTetData(0, nullptr, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

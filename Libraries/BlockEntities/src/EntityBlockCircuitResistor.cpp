@@ -11,8 +11,10 @@
 #include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 
-EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
+static EntityFactoryRegistrar<EntityBlockCircuitResistor> registrar("EntityBlockCircuitResistor");
+
+EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
 	m_navigationOldTreeIconName = "ResistorBG";
 	m_navigationOldTreeIconNameHidden = "ResistorBG";
 	m_blockTitle = "Resistor";

@@ -46,9 +46,6 @@
     <ClInclude Include="include\CheckGeometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ClassFactoryCAD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityBrep.cpp">
@@ -64,9 +61,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CheckGeometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ClassFactoryCAD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

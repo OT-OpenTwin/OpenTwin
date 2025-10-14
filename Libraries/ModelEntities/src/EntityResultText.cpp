@@ -10,8 +10,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityResultText> registrar("EntityResultText");
+
+EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 }
 
@@ -191,7 +193,7 @@ void EntityResultText::ensureTextDataLoaded(void)
 	{
 		if (m_textDataStorageId == 0)
 		{
-			m_textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			m_textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

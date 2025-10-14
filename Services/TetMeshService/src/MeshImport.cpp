@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "TmpFileManager.h"
-#include "ClassFactory.h"
 #include "EntityMeshTet.h"
 #include "EntityMeshTetData.h"
 #include "EntityBinaryData.h"
@@ -101,7 +100,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	gmsh::model::mesh::renumberElements();
 
 	// Create a new tet mesh entity
-	EntityMeshTet* meshEntity = new EntityMeshTet(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
+	EntityMeshTet* meshEntity = new EntityMeshTet(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, application->getServiceName());
 
 	EntityPropertiesString::createProperty("General", "File name", originalName, "", meshEntity->getProperties());
 

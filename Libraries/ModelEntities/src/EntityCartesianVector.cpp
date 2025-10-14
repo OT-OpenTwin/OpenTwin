@@ -6,8 +6,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityCartesianVector::EntityCartesianVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityCompressedVector(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityCartesianVector> registrar("EntityCartesianVector");
+
+EntityCartesianVector::EntityCartesianVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityCompressedVector(ID, parent, obs, ms, owner)
 {
 }
 

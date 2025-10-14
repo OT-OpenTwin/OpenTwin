@@ -2,8 +2,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityContainer(ID, parent, obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityParameterizedDataCategorization> registrar("EntityParameterizedDataCategorization");
+
+EntityParameterizedDataCategorization::EntityParameterizedDataCategorization(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityContainer(ID, parent, obs,ms,owner)
 {
 }
 

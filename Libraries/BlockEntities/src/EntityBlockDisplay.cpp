@@ -1,8 +1,10 @@
 #include "EntityBlockDisplay.h"
 #include "SharedResources.h"
 
-EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBlockDisplay> registrar("EntityBlockDisplay");
+
+EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, owner)
 {
 	_inputConnector = { ot::ConnectorType::In, "Input", "Input"};
 	m_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;

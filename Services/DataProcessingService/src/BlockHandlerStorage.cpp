@@ -59,10 +59,9 @@ bool BlockHandlerStorage::executeSpecialized()
 		}
 		ot::NewModelStateInformation modelStateInformation;
 
-		auto& classFactory = Application::instance()->getClassFactory();
 		const auto modelComponent = Application::instance()->getModelComponent();
 		const std::string collectionName = Application::instance()->getCollectionName();
-		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
+		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, OT_INFO_SERVICE_TYPE_DataProcessingService);
 		resultCollectionExtender.setSaveModel(!m_createPlot); //If a plot shall be added as well, we create more entities later on.
 
 		ot::JSONToVariableConverter converter;
@@ -268,7 +267,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				curveConfig.setLinePenPainter(painter.release());
 				CurveFactory::addToConfig(*series, curveConfig);
 
-				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 
 				const std::string fullNameSeries = series->getName();
 				std::optional<std::string> shortNameSeries = ot::EntityName::getSubName(fullNameSeries);
@@ -287,7 +286,7 @@ bool BlockHandlerStorage::executeSpecialized()
 		
 		if (m_createPlot)
 		{
-			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
+			EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, Application::instance()->getServiceName());
 			newPlot.setName(plotName);
 
 			ot::Plot1DCfg plotCfg;

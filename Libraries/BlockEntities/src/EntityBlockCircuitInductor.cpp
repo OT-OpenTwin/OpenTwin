@@ -9,8 +9,10 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBlockCircuitInductor> registrar("EntityBlockCircuitInductor");
+
+EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
 {
 	m_navigationOldTreeIconName = "Inductor";
 	m_navigationOldTreeIconNameHidden = "Inductor";

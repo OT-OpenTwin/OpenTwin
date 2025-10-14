@@ -15,7 +15,6 @@ class PrimitiveManager;
 class BooleanOperations;
 class ChamferEdges;
 class BlendEdges;
-class ClassFactory;
 
 namespace ot
 {
@@ -29,7 +28,7 @@ namespace ot
 class UpdateManager
 {
 public:
-	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager, ClassFactory *_classFactory);
+	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager);
 	~UpdateManager() {};
 
 	void checkParentUpdates(std::list<ot::UID> modifiedEntities);
@@ -61,5 +60,4 @@ private:
 	BooleanOperations* booleanOperations;
 	ChamferEdges* chamferEdgesManager;
 	BlendEdges* blendEdgesManager;
-	ClassFactory* classFactory;
 };

@@ -13,7 +13,8 @@
 class __declspec(dllexport) EntityVisUnstructuredVectorSurface : public EntityVis2D3D
 {
 public:
-	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityVisUnstructuredVectorSurface() : EntityVisUnstructuredVectorSurface(0, nullptr, nullptr, nullptr, "") {};
+	EntityVisUnstructuredVectorSurface(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual ~EntityVisUnstructuredVectorSurface();
 
 	virtual std::string getClassName(void) override { return "EntityVisUnstructuredVectorSurface"; };

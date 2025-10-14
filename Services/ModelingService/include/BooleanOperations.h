@@ -21,12 +21,11 @@ class EntityGeometry;
 class EntityCache;
 class TopoDS_Shape;
 class BRepAlgoAPI_BuilderAlgo;
-class ClassFactory;
 
 class BooleanOperations : public ShapesBase
 {
 public:
-	BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID, ClassFactory* _classFactory);
+	BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID);
 	~BooleanOperations() {};
 
 	void enterAddMode(const std::list<ot::EntityInformation> &selectedGeometryEntities);

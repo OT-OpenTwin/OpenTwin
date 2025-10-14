@@ -2,7 +2,6 @@
 
 #include "EntityBinaryData.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 
 #include <sstream>
 #include <stdexcept>
@@ -12,8 +11,7 @@ InfoFileManager::InfoFileManager(ot::UID infoEntityID, ot::UID infoEntityVersion
 	if (infoEntityID != 0 && infoEntityVersion != 0)
 	{
 		// We need to load the binary item and read the hash information
-		ClassFactory classFactory;
-		EntityBinaryData* dataEntity = dynamic_cast<EntityBinaryData*> (DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(infoEntityID, infoEntityVersion, &classFactory));
+		EntityBinaryData* dataEntity = dynamic_cast<EntityBinaryData*>(DataBase::GetDataBase()->GetEntityFromEntityIDandVersion(infoEntityID, infoEntityVersion));
 
 		if (dataEntity != nullptr)
 		{

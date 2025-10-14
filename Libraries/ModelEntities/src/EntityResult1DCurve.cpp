@@ -8,6 +8,8 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Painter2DDialogFilterDefaults.h"
 
+static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve_New");
+
 ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _plotName, const std::string& _curveName, DefaultCurveStyle _style) {
 	ot::Plot1DCurveCfg cfg;
 
@@ -46,8 +48,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 	return cfg;
 }
 
-EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
-	: EntityBase(_ID,_parent,_mdl,_ms,_factory,_owner)
+EntityResult1DCurve::EntityResult1DCurve(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms, const std::string& _owner)
+	: EntityBase(_ID,_parent,_mdl,_ms,_owner)
 {
 }
 

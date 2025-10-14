@@ -10,7 +10,8 @@
 class __declspec(dllexport) EntitySolverPyrit : public EntitySolver
 {
 public:
-	EntitySolverPyrit(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntitySolverPyrit() : EntitySolverPyrit(0, nullptr, nullptr, nullptr, "") {};
+	EntitySolverPyrit(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverPyrit();
 
 	virtual std::string getClassName(void) override { return "EntitySolverPyrit"; } ;

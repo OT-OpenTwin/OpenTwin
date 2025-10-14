@@ -7,7 +7,6 @@
  * \date   July 2023
  *********************************************************************/
 #include "PythonAPI.h"
-#include "ClassFactory.h"
 #include "Application.h"
 #include "EntityAPI.h"
 
@@ -137,7 +136,7 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 {
 	try
 	{
-		EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion(), Application::instance().getClassFactory());
+		EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion());
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
 

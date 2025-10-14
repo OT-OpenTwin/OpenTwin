@@ -5,8 +5,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshTetItemDataFaces::EntityMeshTetItemDataFaces(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityMeshTetItemDataFaces> registrar("EntityMeshTetItemDataFaces");
+
+EntityMeshTetItemDataFaces::EntityMeshTetItemDataFaces(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 	
 }

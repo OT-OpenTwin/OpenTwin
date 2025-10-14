@@ -27,8 +27,10 @@
 #define OT_TEST_ENTITYFILETEXT_Interval(___testText)
 #endif
 
-EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
-	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
+static EntityFactoryRegistrar<EntityFileText> registrar("EntityFileText");
+
+EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
+	: EntityFile(_ID, _parent, _obs, _ms, _owner)
 {
 }
 

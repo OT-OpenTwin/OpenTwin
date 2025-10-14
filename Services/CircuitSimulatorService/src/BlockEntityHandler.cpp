@@ -11,8 +11,6 @@
 
 //#include "ExternalDependencies.h"
 #include "Application.h"
-#include "ClassFactoryBlock.h"
-#include "ClassFactory.h"
 #include "EntityBlockCircuitVoltageSource.h"
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
@@ -38,14 +36,8 @@
 #include <algorithm>
 #include <queue>
 
-namespace NodeNumbers {
-	static unsigned long long nodeNumber = 0;
-	static unsigned long long connectionNumber = 1;	
-}
-
 std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position) {
-	ClassFactoryBlock factory;
-	EntityBase* baseEntity = factory.createEntity(blockName);
+	EntityBase* baseEntity = EntityFactory::instance().create(blockName);
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 
@@ -56,7 +48,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	// Here i want to add the items to the corresponding editor	
 
-	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	blockCoordinates->setCoordinates(position);
 	blockCoordinates->StoreToDataBase();
 
@@ -113,11 +105,10 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
-
+	
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos) {
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") { //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others 
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			assert(blockEntity != nullptr);
@@ -134,11 +125,10 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	ClassFactoryBlock classFactory;
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
 	for (auto& entityInfo : entityInfos) {
-		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
 			assert(blockEntityConnection != nullptr);
@@ -152,9 +142,8 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(const std::string& _folderName,std::string _modelName) {
 	ot::EntityInformation circuitModelInfo;
 	ot::ModelServiceAPI::getEntityInformation("Circuit Models/" + _folderName + "/" + _modelName, circuitModelInfo);
-	ClassFactory classFactory;
-	
-	auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(circuitModelInfo.getEntityID(), circuitModelInfo.getEntityVersion(), Application::instance()->getClassFactory());
+
+	auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(circuitModelInfo.getEntityID(), circuitModelInfo.getEntityVersion());
 	if (baseEntity != nullptr) {
 		std::shared_ptr<EntityFileText> circuitModelEntity(dynamic_cast<EntityFileText*>(baseEntity));
 		assert(circuitModelEntity != nullptr);
@@ -219,7 +208,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
 	
 		//Here i create the connectionEntity
-		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->createProperties();
 		
 		
@@ -388,15 +377,15 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
 	ot::GraphicsPickerCollectionCfg a3("Sources", "Sources");
 	ot::GraphicsPickerCollectionCfg a4("ActiveElements", "Active Elements");
 
-	EntityBlockCircuitVoltageSource element(0, nullptr, nullptr, nullptr,nullptr, "");
-	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitDiode diode(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitVoltageMeter voltMeter(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitCurrentMeter currentMeter(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitCapacitor capacitor(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitInductor inductor(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitGND gndElement(0, nullptr, nullptr, nullptr, nullptr, "");
-	EntityBlockCircuitTransmissionLine transmissionLine (0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockCircuitVoltageSource element;
+	EntityBlockCircuitResistor resistor;
+	EntityBlockCircuitDiode diode;
+	EntityBlockCircuitVoltageMeter voltMeter;
+	EntityBlockCircuitCurrentMeter currentMeter;
+	EntityBlockCircuitCapacitor capacitor;
+	EntityBlockCircuitInductor inductor;
+	EntityBlockCircuitGND gndElement;
+	EntityBlockCircuitTransmissionLine transmissionLine;
 	
 	a1.addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
 	a1.addItem(capacitor.getClassName(), capacitor.CreateBlockHeadline(), "CircuitElementImages/Capacitor.png");

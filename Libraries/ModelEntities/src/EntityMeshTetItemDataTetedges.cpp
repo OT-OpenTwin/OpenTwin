@@ -8,8 +8,10 @@
 #include <mongocxx/client.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityMeshTetItemDataTetedges::EntityMeshTetItemDataTetedges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityMeshTetItemDataTetedges> registrar("EntityMeshTetItemDataTetedges");
+
+EntityMeshTetItemDataTetedges::EntityMeshTetItemDataTetedges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 	
 }

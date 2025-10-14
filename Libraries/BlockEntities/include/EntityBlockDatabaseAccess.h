@@ -12,7 +12,8 @@ struct __declspec(dllexport) ValueCharacteristicProperties
 class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 {
 public:
-	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityBlockDatabaseAccess() : EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, "") {};
+	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 

@@ -1,7 +1,6 @@
 #include "BlockHandlerPython.h"
 #include "EntityProperties.h"
 #include "Application.h"
-#include "ClassFactory.h"
 #include "EntityFile.h"
 #include "OTCore/ReturnValues.h"
 #include "OTCommunication/ActionTypes.h"

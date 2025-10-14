@@ -533,10 +533,10 @@ size_t SolverFDTD::getOrAddCellNode(const std::string& node, std::map<std::strin
 void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>& nodeList, std::list<std::vector<size_t>>& cellList, size_t& cellListSize, Application* app, EntityBase* solverEntity, long long& visualizationMeshID, long long& visualizationMeshVersion)
 {
     // Create the global mesh item if needed
-    EntityBinaryData* xcoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-    EntityBinaryData* ycoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-    EntityBinaryData* zcoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-    EntityBinaryData* cells = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* xcoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* ycoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* zcoord = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* cells = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 
     double* xc = new double[nodeList.size()];
     double* yc = new double[nodeList.size()];
@@ -598,7 +598,7 @@ void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>
     long long cellEntityID      = cells->getEntityID();
     long long cellEntityVersion = cells->getEntityStorageVersion();
 
-    EntityResultUnstructuredMesh* visualizationMesh = new EntityResultUnstructuredMesh(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+    EntityResultUnstructuredMesh* visualizationMesh = new EntityResultUnstructuredMesh(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMesh->setMeshData(nodeList.size(), cellList.size(), cellListSize, xcoord, ycoord, zcoord, cells);
 
@@ -621,7 +621,7 @@ void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>
 void SolverFDTD::storeMeshScalarData(size_t numberPoints, size_t numberCells, std::list<std::string>& potentialList, Application* app, EntityBase* solverEntity, long long& visualizationMeshDataID, long long& visualizationMeshDataVersion)
 {
     // Create the potential data item 
-    EntityBinaryData* pointScalar = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* pointScalar = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
     EntityBinaryData* pointVector = nullptr;
     EntityBinaryData* cellScalar = nullptr;
     EntityBinaryData* cellVector = nullptr;
@@ -645,7 +645,7 @@ void SolverFDTD::storeMeshScalarData(size_t numberPoints, size_t numberCells, st
     long long pointScalarID      = pointScalar->getEntityID();
     long long pointScalarVersion = pointScalar->getEntityStorageVersion();
 
-    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
     visualizationMeshData->StoreToDataBase();
@@ -665,8 +665,8 @@ void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, st
     // Create the potential data item 
     EntityBinaryData* pointScalar = nullptr;
     EntityBinaryData* pointVector = nullptr;
-    EntityBinaryData* cellScalar = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
-    EntityBinaryData* cellVector = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* cellScalar = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+    EntityBinaryData* cellVector = new EntityBinaryData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 
     float* m = new float[magnitudeList.size()];
 
@@ -714,7 +714,7 @@ void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, st
     long long cellVectorID      = cellVector->getEntityID();
     long long cellVectorVersion = cellVector->getEntityStorageVersion();
 
-    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
+    EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
     visualizationMeshData->StoreToDataBase();

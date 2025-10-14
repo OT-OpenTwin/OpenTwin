@@ -86,7 +86,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::GetDataBase()->getProjectName();
 
-	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->getModelComponent(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 	resultCollectionExtender.setSaveModel(false);
 
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);

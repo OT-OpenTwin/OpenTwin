@@ -85,12 +85,6 @@
     <ClCompile Include="src\ClipPlaneManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Factory.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EntityHandler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -259,12 +253,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ClipPlaneManipulator.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Factory.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EntityHandler.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeAnnotation.h">

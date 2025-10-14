@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "TmpFileManager.h"
-#include "ClassFactory.h"
 #include "EntityMeshTetData.h"
 #include "EntityBinaryData.h"
 
@@ -138,7 +137,7 @@ ot::UID MeshExport::getGmshDataStorageID(ot::UID currentMeshDataID)
 	entityList.push_back(currentMeshDataID);
 	application->prefetchDocumentsFromStorage(entityList);
 
-	EntityMeshTetData *entity = dynamic_cast<EntityMeshTetData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentMeshDataID, application->getPrefetchedEntityVersion(currentMeshDataID), application->getClassFactory()));
+	EntityMeshTetData *entity = dynamic_cast<EntityMeshTetData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(currentMeshDataID, application->getPrefetchedEntityVersion(currentMeshDataID)));
 	if (entity == nullptr) return 0;
 
 	ot::UID gmshDataStorageID = entity->getGmshDataStorageId();
@@ -155,7 +154,7 @@ void MeshExport::loadGmshData(ot::UID gmshDataStorageID, std::vector<char> &mesh
 	entityList.push_back(gmshDataStorageID);
 	application->prefetchDocumentsFromStorage(entityList);
 
-	EntityBinaryData *entityData = dynamic_cast<EntityBinaryData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
+	EntityBinaryData *entityData = dynamic_cast<EntityBinaryData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID)));
 	if (entityData == nullptr) return;
 
 	meshContent = entityData->getData();

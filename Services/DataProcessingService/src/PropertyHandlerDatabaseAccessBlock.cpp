@@ -4,7 +4,6 @@
 #include "EntityProperties.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
-#include "ClassFactory.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "Application.h"
 #include "DataBase.h"
@@ -113,7 +112,6 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 {
 	const std::string projectName = _dbAccessEntity->getSelectedProjectName();
 
-	auto& classFactory = Application::instance()->getClassFactory();
 	const std::string sessionServiceURL = Application::instance()->getSessionServiceURL();
 	auto modelComponent = Application::instance()->getModelComponent();
 
@@ -127,11 +125,11 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	ResultCollectionMetadataAccess* newResultCollectionAccess;
 	if (thisProjectsName == projectName)
 	{
-		newResultCollectionAccess =new ResultCollectionMetadataAccess(_collectionName, modelComponent, &classFactory);
+		newResultCollectionAccess =new ResultCollectionMetadataAccess(_collectionName, modelComponent);
 	}
 	else //Crosscollection access
 	{
-		newResultCollectionAccess = new ResultCollectionMetadataAccess(_collectionName, modelComponent, &classFactory, sessionServiceURL);
+		newResultCollectionAccess = new ResultCollectionMetadataAccess(_collectionName, modelComponent, sessionServiceURL);
 	}
 
 	return newResultCollectionAccess;

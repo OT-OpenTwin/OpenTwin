@@ -1,6 +1,7 @@
 #include "EntitySolverDataProcessing.h"
 #include "PropertyHelper.h"
 
+static EntityFactoryRegistrar<EntitySolverDataProcessing> registrar("EntitySolverDataProcessing");
 
 void EntitySolverDataProcessing::createProperties(const std::string& _graphicsSceneFolder, const ot::UID _graphicsSceneFolderID)
 {

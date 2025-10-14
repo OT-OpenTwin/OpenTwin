@@ -39,7 +39,7 @@ EntityMaterial* MaterialHandler::createNewMaterial(const std::string& _materialN
 	EntityContainer* entityMaterialRoot = dynamic_cast<EntityContainer*>(model->findEntityFromName(model->getMaterialRootName()));
 	if (entityMaterialRoot == nullptr)
 	{
-		entityMaterialRoot = new EntityContainer(model->createEntityUID(), nullptr, model, model->getStateManager(), &model->getClassFactory(), Application::instance()->getServiceName());
+		entityMaterialRoot = new EntityContainer(model->createEntityUID(), nullptr, model, model->getStateManager(), Application::instance()->getServiceName());
 		entityMaterialRoot->setName(model->getMaterialRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -48,7 +48,7 @@ EntityMaterial* MaterialHandler::createNewMaterial(const std::string& _materialN
 		model->addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getEditable());
 	}
 
-	EntityMaterial* materialItem = new EntityMaterial(model->createEntityUID(), entityMaterialRoot, model, model->getStateManager(), &model->getClassFactory(), Application::instance()->getServiceName());
+	EntityMaterial* materialItem = new EntityMaterial(model->createEntityUID(), entityMaterialRoot, model, model->getStateManager(), Application::instance()->getServiceName());
 
 	materialItem->setName(_materialName);
 	materialItem->setEditable(true);

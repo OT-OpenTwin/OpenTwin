@@ -26,8 +26,8 @@
 #include "OTServiceFoundation/FoundationAPIExport.h" // OT_SERVICEFOUNDATION_API_EXPORT
 
 // OpenTwin ModelEntities header
-#include "ClassFactory.h"                             // Entity class factory
 #include "EntityInformation.h"                        // Entity information
+
 // std header
 #include <map>
 #include <list>
@@ -150,9 +150,6 @@ namespace ot {
 
 		//! @brief Will return the modelNotifier attached to this application
 		AbstractModelNotifier * getModelNotifier() { return m_modelNotifier; }
-
-		//! @brief Returns a handle to the global class factory for the service
-		ClassFactory& getClassFactory() { return m_classFactory; }
 
 		const std::list<UID>& getSelectedEntities() const { return m_selectedEntities; };
 		const std::list<ot::EntityInformation>& getSelectedEntityInfos() const { return m_selectedEntityInfos; };
@@ -356,7 +353,6 @@ namespace ot {
 		std::map<UID, UID>                  m_prefetchedEntityVersions;
 
 		std::string                         m_dbUserCollection;
-		ClassFactory                        m_classFactory;
 	};
 
 }

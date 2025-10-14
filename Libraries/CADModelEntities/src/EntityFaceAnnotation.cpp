@@ -16,8 +16,10 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Shell.hxx"
 
-EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+static EntityFactoryRegistrar<EntityFaceAnnotation> registrar("EntityFaceAnnotation");
+
+EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	facetsStorageID(-1)
 {
 	EntityPropertiesColor::createProperty(  "General", "Color",           {0, 0, 0}, "", getProperties());
@@ -320,7 +322,7 @@ void EntityFaceAnnotation::renewFacets(void)
 		facets = nullptr;
 	}
 
-	facets = new EntityFacetData(createEntityUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+	facets = new EntityFacetData(createEntityUID(), this, getObserver(), getModelState(), getOwningService());
 
 	boundingBox.reset();
 }

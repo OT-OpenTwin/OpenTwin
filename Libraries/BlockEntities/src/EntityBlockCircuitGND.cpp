@@ -11,8 +11,10 @@
 #include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 
-EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
+static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar("EntityBlockCircuitGND");
+
+EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
 	m_navigationOldTreeIconName = "GND";
 	m_navigationOldTreeIconNameHidden = "GND";
 	m_blockTitle = "GND";

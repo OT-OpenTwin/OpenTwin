@@ -4,8 +4,6 @@
 #include "DataBase.h"
 #include "EntityCache.h"
 #include "UpdateManager.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/ModelComponent.h"
@@ -124,7 +122,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	ot::UID brepID   = modelComponent->createEntityUID();
 	ot::UID facetsID = modelComponent->createEntityUID();
 
-	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
+	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
 	geometryEntity->setName(baseEntity->getName());
 	geometryEntity->setEditable(true);
 	geometryEntity->setSelectChildren(false);

@@ -202,7 +202,7 @@ void Application::testTableBig(void) {
 void Application::createPlotOneCurve()
 {
 	const std::string collName = getCollectionName();
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	//Single curve
@@ -237,7 +237,7 @@ void Application::createPlotOneCurve()
 
 void Application::createPlotTwoCurves() {
 	const std::string collName = getCollectionName();
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	// First curve
@@ -300,7 +300,7 @@ void Application::createPlotTwoCurves() {
 void Application::createFamilyOfCurves()
 {
 	const std::string collName = getCollectionName();
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -364,7 +364,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 {
 	const std::string collName = getCollectionName();
 
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -437,7 +437,7 @@ void Application::createFamilyOfCurves3Parameter()
 {
 	const std::string collName = getCollectionName();
 
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	MetadataParameter parameter;
@@ -508,7 +508,7 @@ void Application::createFamilyOfCurves3Parameter()
 
 void Application::createPlotScatter() {
 	const std::string collName = getCollectionName();
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	//Single curve
@@ -542,7 +542,7 @@ void Application::createPlotScatter() {
 
 void Application::createPlotSinglePoint() {
 	const std::string collName = getCollectionName();
-	ResultCollectionExtender extender(collName, *getModelComponent(), &getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender extender(collName, *getModelComponent(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	PlotBuilder builder(extender);
 
 	// First curve

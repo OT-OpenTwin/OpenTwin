@@ -13,7 +13,6 @@
 #include "CartesianMeshCreation.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "EntityMeshCartesian.h"
 
 // Open twin header
@@ -52,8 +51,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	getClassFactory().setNextHandler(&classFactoryCAD);
-	classFactoryCAD.setChainRoot(&(getClassFactory()));
+	
 }
 
 Application::~Application()
@@ -129,7 +127,7 @@ void Application::createMesh(void)
 	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
-	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, getServiceName());
 
 	meshEntity->setName(meshName);
 	meshEntity->setEditable(true);
@@ -227,7 +225,7 @@ void Application::updateMesh(void)
 	std::map<std::string, EntityBase *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion());
 		mesherMap[info.getEntityName()] = entity;
 	}
 

@@ -10,13 +10,13 @@
 
 #include "EntityProperties.h"
 #include "ModelState.h"
+#include "EntityFactoryRegistrar.h"
 #include "OldTreeIcon.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
 
 class EntityBase;
-class ClassFactoryHandler;
 
 class  __declspec(dllexport) EntityObserver
 {
@@ -38,7 +38,7 @@ public:
 class  __declspec(dllexport) EntityBase
 {
 public:
-	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 	EntityBase(const EntityBase& _other) = default;
 	EntityBase(EntityBase&& _other) = default;
 
@@ -91,8 +91,6 @@ public:
 
 	void setObserver(EntityObserver *obs) { m_observer = obs; };
 	EntityObserver *getObserver(void) { return m_observer; };
-
-	ClassFactoryHandler *getClassFactory(void) { return m_classFactory; };
 
 	EntityProperties &getProperties(void) { return m_properties; };
 
@@ -156,7 +154,7 @@ protected:
 
 	ot::UID createEntityUID(void);
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
-	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory = nullptr);
+	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
 	void entityIsStored(void);
 	bsoncxx::builder::basic::document serialiseAsMongoDocument();
@@ -180,7 +178,5 @@ private:
 	EntityObserver*      m_observer;
 	bool			     m_isModified;
 	ModelState*          m_modelState;
-	ClassFactoryHandler* m_classFactory;
-	
 };
 

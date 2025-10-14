@@ -13,7 +13,8 @@ class __declspec(dllexport) EntityResultUnstructuredMeshVtk : public EntityBase,
 public:
 	enum eQuantityType {SCALAR, VECTOR};
 
-	EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityResultUnstructuredMeshVtk() : EntityResultUnstructuredMeshVtk(0, nullptr, nullptr, nullptr, "") {};
+	EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityResultUnstructuredMeshVtk();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
@@ -22,7 +23,7 @@ public:
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 
-	void getData(std::string& quantityName, eQuantityType &quantityType, std::vector<char>& data, ClassFactoryHandler* factory);
+	void getData(std::string& quantityName, eQuantityType &quantityType, std::vector<char>& data);
 
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData object. The object must not be deleted outside the EntityResultUnstructuredMesh.
 	void setData(const std::string &quantityName, eQuantityType quantityType, EntityBinaryData*& data);

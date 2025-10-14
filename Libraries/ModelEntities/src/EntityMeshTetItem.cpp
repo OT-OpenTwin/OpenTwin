@@ -11,8 +11,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs,  ms,  factory, owner),
+static EntityFactoryRegistrar<EntityMeshTetItem> registrar("EntityMeshTetItem");
+
+EntityMeshTetItem::EntityMeshTetItem(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs,  ms,  owner),
 	mesh(nullptr),
 	meshDataTets(nullptr),
 	meshDataTetsStorageId(0),
@@ -138,7 +140,7 @@ void EntityMeshTetItem::EnsureMeshItemDataTetsLoaded(void)
 	{
 		if (meshDataTetsStorageId == 0)
 		{
-			meshDataTets = new EntityMeshTetItemDataTets(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshDataTets = new EntityMeshTetItemDataTets(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{
@@ -180,7 +182,7 @@ void EntityMeshTetItem::EnsureMeshItemDataTetEdgesLoaded(void)
 	{
 		if (meshDataTetEdgesStorageId == 0)
 		{
-			meshDataTetEdges = new EntityMeshTetItemDataTetedges(0, this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			meshDataTetEdges = new EntityMeshTetItemDataTetedges(0, this, getObserver(), getModelState(), getOwningService());
 		}
 		else
 		{

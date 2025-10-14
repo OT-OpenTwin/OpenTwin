@@ -23,7 +23,6 @@
 class EntityBase;
 class EntityResult1D;
 class EntityPlot1D;
-class ClassFactoryHandler;
 class EntityResultText;
 class EntityGeometry;
 

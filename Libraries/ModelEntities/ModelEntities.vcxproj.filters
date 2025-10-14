@@ -44,9 +44,6 @@
     <Filter Include="Source Files\PropertyBundleDataHandle">
       <UniqueIdentifier>{99d1975b-1e86-4d98-9de8-f89fe1363ed3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ClassFactory">
-      <UniqueIdentifier>{1f88b2c5-9712-47c9-a76b-1441fd294116}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\EntityInterfaces">
       <UniqueIdentifier>{d7adf380-0920-4835-bd70-d8cdff2f0f84}</UniqueIdentifier>
     </Filter>
@@ -343,15 +340,6 @@
     <ClInclude Include="include\PropertyBundleVisUnstructuredScalarSurface.h">
       <Filter>Header Files\PropertyBundle</Filter>
     </ClInclude>
-    <ClInclude Include="include\ClassFactory.h">
-      <Filter>Header Files\ClassFactory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ClassFactoryHandler.h">
-      <Filter>Header Files\ClassFactory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ClassFactoryHandlerAbstract.h">
-      <Filter>Header Files\ClassFactory</Filter>
-    </ClInclude>
     <ClInclude Include="include\EntitySolverElmerFEM.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -439,6 +427,15 @@
     <ClInclude Include="include\EntitySolverFDTD.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityFactory.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelEntitiesAPIExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityFactoryRegistrar.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -451,9 +448,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OldTreeIcon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ClassFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityBase.cpp">
@@ -745,6 +739,18 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\EntitySolverFDTD.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityFactory.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityMesh.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResultTable.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityResultTableData.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
   </ItemGroup>

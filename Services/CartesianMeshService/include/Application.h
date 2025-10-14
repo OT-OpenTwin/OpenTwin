@@ -15,8 +15,6 @@
 #include "OldTreeIcon.h"
 #include "EntityInformation.h"
 
-#include "ClassFactoryCAD.h"
-
 // C++ header
 #include <string>
 
@@ -62,6 +60,4 @@ public:
 private:
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
-
-	ClassFactoryCAD classFactoryCAD;
 };

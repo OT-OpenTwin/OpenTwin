@@ -11,7 +11,6 @@
 #include <string>
 #include <memory>
 #include "IVisualisationTable.h"
-#include "ClassFactory.h"
 
 class EntityBuffer
 {

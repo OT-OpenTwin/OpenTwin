@@ -1,7 +1,9 @@
 #include "EntityCoordinates2D.h"
 
-EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner), m_location(0.,0.)
+static EntityFactoryRegistrar<EntityCoordinates2D> registrar("EntityCoordinates2D");
+
+EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBase(ID, parent, obs, ms, owner), m_location(0.,0.)
 {
 
 }

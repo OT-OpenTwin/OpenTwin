@@ -2,8 +2,6 @@
 
 #include "Application.h"
 
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 #include "EntityFaceAnnotation.h"
 
 #include "EntityAPI.h"
@@ -31,7 +29,7 @@ void FaceAnnotationsManager::loadAllFaceAnnotations(void)
 		ot::UID entityID = annotation;
 		ot::UID entityVersion = application->getPrefetchedEntityVersion(entityID);
 
-		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+		EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 		assert(annotationEntity != nullptr);
 
 		if (annotationEntity != nullptr)

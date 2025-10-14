@@ -10,8 +10,8 @@
 #include "OTGui/VisualisationTypes.h"
 
 template <class T>
-EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms, factory, owner),
+EntityResultTable<T>::EntityResultTable(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner),
 	tableDataStorageId(-1),
 	tableDataStorageVersion(-1)
 {

@@ -12,7 +12,6 @@
 #pragma once
 //OT Header
 #include "OTCore/Point2D.h"
-#include "ClassFactoryBlock.h"
 
 //C++ Header
 #include <string>

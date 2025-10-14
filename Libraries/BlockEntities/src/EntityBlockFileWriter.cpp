@@ -2,8 +2,10 @@
 #include "SharedResources.h"
 #include "PropertyHelper.h"
 
-EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityBlockFileWriter> registrar("EntityBlockFileWriter");
+
+EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlock(ID,parent,obs,ms,owner)
 {
 	m_inputConnector = { ot::ConnectorType::In, "Input", "Input" };
 	m_connectorsByName[m_inputConnector.getConnectorName()] = m_inputConnector;

@@ -4,7 +4,6 @@
 #include "OTServiceFoundation/UiComponent.h"
 
 #include "ModelState.h"
-#include "ClassFactory.h"
 
 #include "EntityMeshCartesianData.h"
 #include "EntityUnits.h"
@@ -15,7 +14,7 @@
 class MicroServiceSolver
 {
 public:
-	MicroServiceSolver(std::string solverName, int serviceID, int sessionCount, ClassFactory& classFactory);
+	MicroServiceSolver(std::string solverName, int serviceID, int sessionCount);
 	virtual ~MicroServiceSolver();
 
 	void setDataBaseURL(const std::string &dbURL);
@@ -71,7 +70,6 @@ private:
 	std::string projectName;
 	std::string modelStateVersion;
 	ot::UID solverEntityID;
-	ClassFactory* classFactory;
 
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;

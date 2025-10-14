@@ -2,8 +2,6 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
-#include "ClassFactoryCAD.h"
-#include "ClassFactory.h"
 #include "EntityGeometry.h"
 #include "Transformations.h"
 #include "BooleanOperations.h"
@@ -22,15 +20,14 @@
 
 #include "Application.h"
 
-UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager, ClassFactory* _classFactory) :
+UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	entityCache(_entityCache),
 	primitiveManager(_primitiveManager),
 	booleanOperations(_booleanOperations),
 	chamferEdgesManager(_chamferEdgesManager),
-	blendEdgesManager(_blendEdgesManager),
-	classFactory(_classFactory)
+	blendEdgesManager(_blendEdgesManager)
 {
 
 }
@@ -118,7 +115,7 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 {
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 
 	if (geomEntity == nullptr)
 	{
@@ -388,7 +385,7 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 {
 	// This entity will be modified later on in the process, so this one is only temporary and should not be cached.
 	// Therefore, we don't use the cache to load this entity
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, *classFactory));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 	if (geomEntity == nullptr)
 	{
 		// We cannot update this entity

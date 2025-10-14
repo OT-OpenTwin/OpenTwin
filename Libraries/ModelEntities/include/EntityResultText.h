@@ -10,7 +10,8 @@ class EntityResultTextData;
 class __declspec(dllexport) EntityResultText : public EntityBase, public IVisualisationText
 {
 public:
-	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityResultText() : EntityResultText(0, nullptr, nullptr, nullptr, "") {};
+	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
 	virtual ~EntityResultText();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

@@ -7,7 +7,8 @@
 class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualisationText
 {
 public:
-	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
+	EntityFileText() : EntityFileText(0, nullptr, nullptr, nullptr, "") {};
+	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner);
 	virtual ~EntityFileText() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };

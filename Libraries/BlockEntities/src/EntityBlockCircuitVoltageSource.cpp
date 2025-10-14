@@ -9,8 +9,10 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
+static EntityFactoryRegistrar<EntityBlockCircuitVoltageSource> registrar("EntityBlockCircuitVoltageSource");
+
+EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
 	m_navigationOldTreeIconName = "VoltageSource";
 	m_navigationOldTreeIconNameHidden = "VoltageSource";
 	m_blockTitle = "Voltage Source";

@@ -23,7 +23,6 @@
 #include "EntitySolverPHREEC.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "EntityResultText.h"
 
 #include <thread>
@@ -160,7 +159,7 @@ void Application::addSolver(void)
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 
@@ -242,7 +241,7 @@ void Application::runPHREEC(void) {
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		EntityBase *entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion());
 		solverMap[info.getEntityName()] = entity;
 	}
 

@@ -10,8 +10,6 @@
 #include "OTGui/GraphicsPackage.h"
 #include "EntityBlockConnection.h"
 
-class ClassFactory;
-
 class BlockEntityHandler : public BusinessLogicHandler
 {
 public:

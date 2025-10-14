@@ -35,8 +35,6 @@
 #include "EntitySolverCircuitSimulator.h"
 #include "EntityBlockConnection.h"
 #include "DataBase.h"
-#include "ClassFactoryBlock.h"
-#include "ClassFactory.h"
 #include "EntityAPI.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "EntityGraphicsScene.h"
@@ -66,11 +64,8 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) {
-	ClassFactory& classFactory = getClassFactory();
-	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
-	classFactoryBlock->setChainRoot(&classFactory);
-	classFactory.setNextHandler(classFactoryBlock);
+	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) 
+{
 	m_SimulationRunning = false;
 	
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &Application::handleNewGraphicsItem);
@@ -94,7 +89,7 @@ void Application::createNewCircuit() {
 	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
 	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, "Circuit", existingCircuits);
 
-	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
+	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	entityCircuitRoot->setEditable(true);
 	entityCircuitRoot->setName(circuitName);
 
@@ -123,7 +118,7 @@ void Application::createInitialCircuit() {
 	std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems("Circuits");
 	if (circuits.empty()) {
 	
-		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuitRoot->setName(getCircuitRootName() + m_blockEntityHandler.getInitialCircuitName());
 
 		entityCircuitRoot->StoreToDataBase();
@@ -172,7 +167,7 @@ void Application::addSolver() {
 	ot::UID circuitFolderID{ 0 }, circuitID{ 0 };
 
 	// Create the new solver item and store it in the data base
-	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntitySolverCircuitSimulator* solverEntity = new EntitySolverCircuitSimulator(entityID, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 
@@ -219,7 +214,7 @@ void Application::runCircuitSimulation() {
 	}
 
 	std::list<std::string> solverRunList;
-	for (auto solver : solverRunMap) {
+	for (const auto& solver : solverRunMap) {
 		solverRunList.push_back(solver.first);
 	}
 
@@ -235,15 +230,15 @@ void Application::runCircuitSimulation() {
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
 
-	for (auto info : m_solverInfo) {
+	for (const auto& info : m_solverInfo) {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
 
 	//Now read the solver objects for each solver
-	for (auto info : m_solverInfo) {
-		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+	for (const auto& info : m_solverInfo) {
+		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion());
 		m_solverMap[info.getEntityName()] = entity;
 	}
 

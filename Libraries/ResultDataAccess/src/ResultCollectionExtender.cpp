@@ -11,12 +11,12 @@
 #include "QuantityContainerSerialiser.h"
 #include "OTCore/VariableToStringConverter.h"
 
-ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName)
-	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
+ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, const std::string& _ownerServiceName)
+	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
 {}
 
 ResultCollectionExtender::ResultCollectionExtender(ot::ApplicationBase* _applicationBase)
-	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent(), &_applicationBase->getClassFactory(),_applicationBase->getServiceName())
+	:ResultCollectionExtender(_applicationBase->getCollectionName(), *_applicationBase->getModelComponent(),_applicationBase->getServiceName())
 {}
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)

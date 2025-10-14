@@ -6,7 +6,6 @@
 #include "EntityProperties.h"
 #include "EntityMaterial.h"
 #include "EntityMeshTetItemDataTets.h"
-#include "ClassFactory.h"
 
 #include "DocumentAPI.h"
 #include "Connection\ConnectionAPI.h"
@@ -330,7 +329,7 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 
 	for (auto info : materialInfo)
 	{
-		materialMap[info.getEntityName()] = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
+		materialMap[info.getEntityName()] = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	// Finally process the list of sections and create the material

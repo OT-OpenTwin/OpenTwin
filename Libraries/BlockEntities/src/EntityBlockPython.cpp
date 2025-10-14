@@ -3,8 +3,10 @@
 #include "PythonHeaderInterpreter.h"
 #include "SharedResources.h"
 
-EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+static EntityFactoryRegistrar<EntityBlockPython> registrar("EntityBlockPython");
+
+EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBlock(ID, parent, obs, ms, owner)
 {
 	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();

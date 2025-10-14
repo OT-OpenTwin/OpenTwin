@@ -8,7 +8,6 @@ class EntityMeshTetItem;
 class EntityMeshTetFace;
 class EntityFaceAnnotation;
 class EntityGeometry;
-class ClassFactory;
 class EntityPropertiesEntityList;
 class SelfIntersectionCheck;
 class EntityAnnotation;

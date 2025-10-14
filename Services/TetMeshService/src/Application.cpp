@@ -12,7 +12,6 @@
 #include "UiNotifier.h"
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
-#include "ClassFactory.h"
 #include "EntityMeshTet.h"
 #include "GmshMeshCreation.h"
 #include "MeshExport.h"
@@ -53,9 +52,6 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())
 {
-	getClassFactory().setNextHandler(&classFactoryCAD);
-	classFactoryCAD.setChainRoot(&(getClassFactory()));
-
 	connectAction("exportMeshFile", this, &Application::handleExportMesh);
 	connectAction("importMeshFile", this, &Application::handleImportMesh);
 }
@@ -141,7 +137,7 @@ void Application::createMesh(void)
 	ot::UID entityID = this->getModelComponent()->createEntityUID();
 
 	// Create the new mesh item
-	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
+	EntityMeshTet *meshEntity = new EntityMeshTet(entityID, nullptr, nullptr, nullptr, getServiceName());
 
 	meshEntity->setName(meshName);
 	meshEntity->setEditable(true);
@@ -242,7 +238,7 @@ void Application::updateMesh(void) {
 	std::map<std::string, EntityMeshTet *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory()));
+		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
 		assert(entity != nullptr);
 
 		if (entity != nullptr)

@@ -2,8 +2,10 @@
 #include "../include/EntityResultUnstructuredMeshVtk.h"
 #include "DataBase.h"
 
-EntityResultUnstructuredMeshVtk::EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityResultUnstructuredMeshVtk> registrar("EntityResultUnstructuredMeshVtk");
+
+EntityResultUnstructuredMeshVtk::EntityResultUnstructuredMeshVtk(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityBase(ID,parent,obs,ms,owner)
 {}
 
 EntityResultUnstructuredMeshVtk::~EntityResultUnstructuredMeshVtk()
@@ -40,14 +42,14 @@ void EntityResultUnstructuredMeshVtk::setData(const std::string& quantityName, e
 	data = nullptr;
 }
 
-void EntityResultUnstructuredMeshVtk::getData(std::string &quantityName, eQuantityType& quantityType, std::vector<char> &data, ClassFactoryHandler* factory)
+void EntityResultUnstructuredMeshVtk::getData(std::string &quantityName, eQuantityType& quantityType, std::vector<char> &data)
 {
 	quantityName.clear();
 
 	if (_vtkData == nullptr && _vtkDataID != -1 && _vtkDataVersion != -1)
 	{
 		std::map<ot::UID, EntityBase *> entityMap;
-		_vtkData = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _vtkDataID, _vtkDataVersion, entityMap, factory));
+		_vtkData = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _vtkDataID, _vtkDataVersion, entityMap));
 		assert(_vtkData != nullptr);
 	}
 

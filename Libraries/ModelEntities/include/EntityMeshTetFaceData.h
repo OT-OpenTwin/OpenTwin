@@ -12,7 +12,8 @@ class EntityMeshTetInfo;
 class __declspec(dllexport) EntityMeshTetFaceData : public EntityBase
 {
 public:
-	EntityMeshTetFaceData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityMeshTetFaceData() : EntityMeshTetFaceData(0, nullptr, nullptr, nullptr, "") {};
+	EntityMeshTetFaceData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityMeshTetFaceData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

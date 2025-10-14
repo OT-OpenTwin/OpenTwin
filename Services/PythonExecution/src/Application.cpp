@@ -19,10 +19,6 @@ void Application::setUIServiceURL(const std::string& url)
 	m_uiURL = url;
 }
 
-ClassFactory& Application::getClassFactory() {
-	return m_classFactory;
-}
-
 void Application::prefetchDocumentsFromStorage(const std::list<ot::UID>& entities)
 {
 	// First get the version information for all entities
@@ -56,6 +52,4 @@ ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 }
 
 Application::Application() {
-	m_classFactory.setNextHandler(&m_classFactoryBlock);
-	m_classFactoryBlock.setChainRoot(&m_classFactory);
 }

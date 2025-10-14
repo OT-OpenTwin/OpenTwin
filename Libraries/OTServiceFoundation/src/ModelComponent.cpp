@@ -15,7 +15,6 @@
 #include "EntityGeometry.h"
 
 #include <DataBase.h>
-#include <ClassFactory.h>
 
 // std header
 #include <iostream>
@@ -43,7 +42,7 @@ ot::components::ModelComponent::~ModelComponent()
 
 EntityResultText *ot::components::ModelComponent::addResultTextEntity(const std::string &name, const std::string &text)
 {
-	EntityResultText *textItem = new EntityResultText(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
+	EntityResultText *textItem = new EntityResultText(createEntityUID(), nullptr, nullptr, nullptr, "Model");
 
 	textItem->setName(name);
 	textItem->setEditable(false);

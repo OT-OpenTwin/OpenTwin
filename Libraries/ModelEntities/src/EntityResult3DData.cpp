@@ -2,8 +2,10 @@
 #include "../include/EntityResult3DData.h"
 #include "DataBase.h"
 
-EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityResult3DData> registrar("EntityResult3DData");
+
+EntityResult3DData::EntityResult3DData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityBase(ID,parent,obs,ms,owner)
 {}
 
 EntityResult3DData::~EntityResult3DData()

@@ -11,7 +11,8 @@
 class __declspec(dllexport) EntityFacetData : public EntityBase
 {
 public:
-	EntityFacetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler *factory, const std::string &owner);
+	EntityFacetData() : EntityFacetData(0, nullptr, nullptr, nullptr, "") {};
+	EntityFacetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityFacetData();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override {return false;};
@@ -23,7 +24,6 @@ public:
 	std::list<Geometry::Edge>     &getEdgeList(void)     { return edges; };
 	std::string					  &getErrorString(void)  { return errors; };
 	std::map<ot::UID, std::string> &getFaceNameMap(void) { return faceNameMap; };
-
 
 	virtual std::string getClassName(void) override { return "EntityFacetData"; };
 

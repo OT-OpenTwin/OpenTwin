@@ -2,8 +2,10 @@
 #include "../include/EntityResultUnstructuredMeshData.h"
 #include "DataBase.h"
 
-EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityBase(ID,parent,obs,ms,factory,owner)
+static EntityFactoryRegistrar<EntityResultUnstructuredMeshData> registrar("EntityResultUnstructuredMeshData");
+
+EntityResultUnstructuredMeshData::EntityResultUnstructuredMeshData(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityBase(ID,parent,obs,ms,owner)
 {}
 
 EntityResultUnstructuredMeshData::~EntityResultUnstructuredMeshData()
@@ -60,7 +62,7 @@ void EntityResultUnstructuredMeshData::setData(long long numberPoints, long long
 	pointScalar = pointVector = cellScalar = cellVector = nullptr;
 }
 
-void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector, ClassFactoryHandler* factory)
+void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& pointScalar, size_t& lenPointVector, float*& pointVector, size_t& lenCellScalar, float*& cellScalar, size_t& lenCellVector, float*& cellVector)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 
@@ -92,28 +94,28 @@ void EntityResultUnstructuredMeshData::getData(size_t& lenPointScalar, float*& p
 	if (_pointScalar == nullptr && _pointScalarID != -1 && _pointScalarVersion != -1)
 	{
 		std::map<ot::UID, EntityBase *> entityMap;
-		_pointScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointScalarID, _pointScalarVersion, entityMap, factory));
+		_pointScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointScalarID, _pointScalarVersion, entityMap));
 		assert(_pointScalar != nullptr);
 	}
 
 	if (_pointVector == nullptr && _pointVectorID != -1 && _pointVectorVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_pointVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointVectorID, _pointVectorVersion, entityMap, factory));
+		_pointVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _pointVectorID, _pointVectorVersion, entityMap));
 		assert(_pointVector != nullptr);
 	}
 
 	if (_cellScalar == nullptr && _cellScalarID != -1 && _cellScalarVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_cellScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellScalarID, _cellScalarVersion, entityMap, factory));
+		_cellScalar = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellScalarID, _cellScalarVersion, entityMap));
 		assert(_cellScalar != nullptr);
 	}
 
 	if (_cellVector == nullptr && _cellVectorID != -1 && _cellVectorVersion != -1)
 	{
 		std::map<ot::UID, EntityBase*> entityMap;
-		_cellVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellVectorID, _cellVectorVersion, entityMap, factory));
+		_cellVector = dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, _cellVectorID, _cellVectorVersion, entityMap));
 		assert(_cellVector != nullptr);
 	}
 

@@ -1,7 +1,9 @@
 #include "../include/EntityResult3D.h"
 
-EntityResult3D::EntityResult3D(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	: EntityVis2D3D(ID, parent, obs, ms, factory, owner) {}
+static EntityFactoryRegistrar<EntityResult3D> registrar("EntityResult3D");
+
+EntityResult3D::EntityResult3D(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	: EntityVis2D3D(ID, parent, obs, ms, owner) {}
 
 void EntityResult3D::createProperties(void)
 {

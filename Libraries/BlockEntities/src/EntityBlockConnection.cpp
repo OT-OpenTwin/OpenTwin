@@ -5,8 +5,11 @@
 #include "OTGui/GraphicsPackage.h"
 #include "ConfigurationHelper.h"
 
-EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, factory, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder))
+static EntityFactoryRegistrar<EntityBlockConnection> registrar("EntityBlockConnection");
+
+EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
+	:EntityBase(ID, parent, obs, ms, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
+	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
 	m_navigationOldTreeIconName = "connection";
 	m_navigationOldTreeIconNameHidden = "connection";

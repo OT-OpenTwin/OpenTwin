@@ -9,7 +9,6 @@
 #include "EntityMeshTet.h"
 #include "EntityMeshTetData.h"
 #include "EntityBinaryData.h"
-#include "ClassFactory.h"
 #include "EntityProperties.h"
 
 #include "OldTreeIcon.h"
@@ -252,7 +251,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	entityIDList.push_back(meshDataID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID), application->getClassFactory()));
+	EntityMeshTetData* entity = dynamic_cast<EntityMeshTetData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataID, application->getPrefetchedEntityVersion(meshDataID)));
 	if (entity == nullptr) return "";
 
 	ot::UID gmshDataStorageID = entity->getGmshDataStorageId();
@@ -265,7 +264,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	entityIDList.push_back(gmshDataStorageID);
 	application->prefetchDocumentsFromStorage(entityIDList);
 
-	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID), application->getClassFactory()));
+	EntityBinaryData* entityData = dynamic_cast<EntityBinaryData*> (ot::EntityAPI::readEntityFromEntityIDandVersion(gmshDataStorageID, application->getPrefetchedEntityVersion(gmshDataStorageID)));
 	if (entityData == nullptr) return "";
 
 	std::vector<char> meshContent = entityData->getData();

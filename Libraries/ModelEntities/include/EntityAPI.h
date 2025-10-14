@@ -7,7 +7,6 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
-#include "ClassFactoryHandler.h"
 
 namespace ot {
 
@@ -16,7 +15,7 @@ namespace ot {
 		OT_DECL_NOMOVE(EntityAPI)
 		OT_DECL_NODEFAULT(EntityAPI)
 	public:
-		static EntityBase* readEntityFromEntityIDandVersion(UID _entityID, UID _version, ClassFactoryHandler& classFactory);
+		static EntityBase* readEntityFromEntityIDandVersion(UID _entityID, UID _version);
 
 	private:
 

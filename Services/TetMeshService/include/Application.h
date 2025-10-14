@@ -13,8 +13,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "EntityInformation.h"
 
-#include "ClassFactoryCAD.h"
-
 #include "OldTreeIcon.h"
 
 // C++ header
@@ -73,6 +71,4 @@ public:
 private:
 	static std::string materialsFolder;
 	static ot::UID materialsFolderID;
-
-	ClassFactoryCAD classFactoryCAD;
 };

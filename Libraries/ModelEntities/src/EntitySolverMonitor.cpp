@@ -2,8 +2,10 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
-	:EntityContainer(ID,parent,obs,ms,factory,owner){}
+static EntityFactoryRegistrar<EntitySolverMonitor> registrar("EntitySolverMonitor");
+
+EntitySolverMonitor::EntitySolverMonitor(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
+	:EntityContainer(ID,parent,obs,ms,owner){}
 
 EntitySolverMonitor::~EntitySolverMonitor(){}
 

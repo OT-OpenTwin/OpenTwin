@@ -3,9 +3,7 @@
 class __declspec(dllexport) EntityBlockCircuitElement : public EntityBlock
 {
 public:
-	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitElement"; };
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
 	virtual void createProperties(const std::string& _circuitModelFolderName,const ot::UID& _circuitModelFolderID);
 	virtual std::string getTypeAbbreviation() = 0;
 	virtual std::string getFolderName() = 0;

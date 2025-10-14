@@ -485,7 +485,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					ot::UID brepID = application->getModelComponent()->createEntityUID();
 					ot::UID facetsID = application->getModelComponent()->createEntityUID();
 
-					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
+					EntityGeometry *entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, serviceName);
 					entityGeom->setName(thisName);
 					entityGeom->setEditable(true);
 					entityGeom->setBrep(itemShape);

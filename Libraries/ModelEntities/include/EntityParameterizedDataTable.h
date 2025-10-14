@@ -11,7 +11,8 @@
 class __declspec(dllexport) EntityParameterizedDataTable : public EntityResultTable<std::string>
 {
 public:
-	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityParameterizedDataTable() : EntityParameterizedDataTable(0, nullptr, nullptr, nullptr, "") {};
+	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
 	void SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns);
 	void SetSourceFile(std::string sourceFileName, std::string sourceFilePath);
 	virtual std::string getClassName(void) { return "EntityParameterizedDataTable"; };

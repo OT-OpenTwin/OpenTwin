@@ -6,8 +6,10 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-EntityBinaryData::EntityBinaryData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityBase(ID, parent, obs, ms,  factory, owner)
+static EntityFactoryRegistrar<EntityBinaryData> registrar("EntityBinaryData");
+
+EntityBinaryData::EntityBinaryData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
+	EntityBase(ID, parent, obs, ms, owner)
 {
 	
 }

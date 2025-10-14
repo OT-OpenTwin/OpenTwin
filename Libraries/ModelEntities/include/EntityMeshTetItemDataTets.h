@@ -26,7 +26,8 @@ private:
 class __declspec(dllexport) EntityMeshTetItemDataTets : public EntityBase
 {
 public:
-	EntityMeshTetItemDataTets(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
+	EntityMeshTetItemDataTets() : EntityMeshTetItemDataTets(0, nullptr, nullptr, nullptr, "") {};
+	EntityMeshTetItemDataTets(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntityMeshTetItemDataTets();
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;

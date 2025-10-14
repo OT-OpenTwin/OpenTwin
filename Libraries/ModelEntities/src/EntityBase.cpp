@@ -3,14 +3,14 @@
 #include "EntityBase.h"
 #include "DataBase.h"
 #include "OldTreeIcon.h"
-#include "ClassFactory.h"
+#include "EntityFactory.h"
 #include "OTCore/String.h"
 
 #include "OTCore/LogDispatcher.h"
 
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
-EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner) :
+EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
 	m_entityID(_ID),
 	m_entityStorageVersion(0),
 	m_initiallyHidden(false),
@@ -25,14 +25,7 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_owningService(_owner),
 	m_name(""),
 	m_isDeletable(true)
-{
-	if (_factory != nullptr && _factory->getChainRoot() != nullptr) {
-		m_classFactory = _factory->getChainRoot();
-	}
-	else {
-		m_classFactory = _factory;
-	}
-}
+{}
 
 EntityBase::~EntityBase() {
 	if (m_parentEntity != nullptr) {
@@ -200,7 +193,7 @@ ot::UID EntityBase::createEntityUID(void) {
 	return getUidGenerator()->getUID();
 }
 
-EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory) {
+EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap) {
 	auto doc = bsoncxx::builder::basic::document{};
 
 	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc)) {
@@ -211,8 +204,7 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	assert(m_classFactory != nullptr || factory != nullptr);
-	EntityBase *entity = (m_classFactory != nullptr ? m_classFactory : factory)->createEntity(entityType);
+	EntityBase* entity = EntityFactory::instance().create(entityType);
 
 	if (entity == nullptr) {
 		return nullptr;

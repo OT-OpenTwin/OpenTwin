@@ -16,8 +16,6 @@
 #include "EntityMeshCartesianNodes.h"
 #include "EntityCartesianVector.h"
 #include "CartesianMeshTree.h"
-#include "ClassFactory.h"
-#include "ClassFactoryCAD.h"
 #include "TemplateDefaultManager.h"
 #include "EntityVis2D3D.h"
 #include "EntityVisCartesianFaceScalar.h"
@@ -143,7 +141,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		for (auto entityID : geometryEntitiesID)
 		{
 			ot::UID entityVersion = getApplication()->getPrefetchedEntityVersion(entityID);
-			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion, application->getClassFactory()));
+			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 
 			if (geom == nullptr)
 			{
@@ -187,8 +185,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 				ot::UID brepID = geomEntity->getBrepStorageObjectID();
 				ot::UID brepVersion = application->getPrefetchedEntityVersion(brepID);
 
-				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetID, facetVersion, application->getClassFactory()));
-				EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion, application->getClassFactory()));
+				EntityFacetData *facet = dynamic_cast<EntityFacetData *>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetID, facetVersion));
+				EntityBrep *brep = dynamic_cast<EntityBrep *>(ot::EntityAPI::readEntityFromEntityIDandVersion(brepID, brepVersion));
 
 				geomEntity->setFacetEntity(facet);
 				geomEntity->setBrepEntity(brep);
@@ -403,11 +401,11 @@ void CartesianMeshCreation::addMatrixPlot(EntityResultBase::tResultType resultTy
 	{
 	case EntityResultBase::tResultType::CARTESIAN_EDGES_3D:
 	case EntityResultBase::tResultType::CARTESIAN_DUAL_EDGES_3D:
-		visualizationEntity = new EntityVis2D3D(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+		visualizationEntity = new EntityVis2D3D(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 		break;
 	case EntityResultBase::tResultType::CARTESIAN_FACES_3D:
 	case EntityResultBase::tResultType::CARTESIAN_DUAL_FACES_3D:
-		visualizationEntity = new EntityVisCartesianFaceScalar(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
+		visualizationEntity = new EntityVisCartesianFaceScalar(getApplication()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 		break;
 	default:
 		assert(0); // Unknown type
@@ -514,7 +512,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 
 	for (auto info : materialInfo)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *>(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
 
 		if (material == nullptr)
 		{
@@ -598,7 +596,7 @@ std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 
 EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty)
 {
-	EntityMeshCartesianData *data = new EntityMeshCartesianData(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	EntityMeshCartesianData *data = new EntityMeshCartesianData(0, nullptr, nullptr, nullptr, "Model");
 
 	// Get the bounding box
 	BoundingBox geometryBoundingBox;
@@ -747,7 +745,7 @@ EntityGeometry *CartesianMeshCreation::addBackgroundCubeTopology(void)
 		{
 			// We need to add a background cube. Its geometry will be added later
 
-			EntityGeometry *backgroundEntity = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, "Model");
+			EntityGeometry *backgroundEntity = new EntityGeometry(0, nullptr, nullptr, nullptr, "Model");
 
 			if (backgroundMaterial != nullptr)
 			{
@@ -999,7 +997,7 @@ void CartesianMeshCreation::storeBoundaryFaces(std::map<std::pair<EntityGeometry
 	{
 		CartesianMeshBoundaryFacets *face = item.second;
 
-		EntityMeshCartesianFace *entityFace = new EntityMeshCartesianFace(0 , nullptr, nullptr, nullptr, nullptr, "Model");
+		EntityMeshCartesianFace *entityFace = new EntityMeshCartesianFace(0 , nullptr, nullptr, nullptr, "Model");
 		newDataEntities.push_back(entityFace);
 
 		face->setFaceEntity(entityFace);
@@ -1497,7 +1495,7 @@ void CartesianMeshCreation::extractAndStoreMesh(std::vector<EntityGeometry *> &m
 		EntityPropertiesColor *color = dynamic_cast<EntityPropertiesColor*>(shape->getProperties().getProperty("Color"));
 		assert(color != nullptr);
 
-		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr, nullptr, "Model");
+		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr, "Model");
 		newTopologyEntities.push_back(meshEntity);
 
 		std::string shapeName = shape->getName().substr(geometryRootName.size()+1);
@@ -1734,7 +1732,7 @@ void CartesianMeshCreation::storeBoundaryFacesConformal(std::map<std::pair<Entit
 	{
 		CartesianMeshBoundaryFacetsConformal *face = item.second;
 
-		EntityMeshCartesianFace *entityFace = new EntityMeshCartesianFace(0, nullptr, nullptr, nullptr, nullptr, "Model");
+		EntityMeshCartesianFace *entityFace = new EntityMeshCartesianFace(0, nullptr, nullptr, nullptr, "Model");
 		newDataEntities.push_back(entityFace);
 
 		face->setFaceEntity(entityFace);
@@ -1925,7 +1923,7 @@ void CartesianMeshCreation::extractAndStoreMeshConformal(std::vector<EntityGeome
 		EntityPropertiesColor *color = dynamic_cast<EntityPropertiesColor*>(shape->getProperties().getProperty("Color"));
 		assert(color != nullptr);
 
-		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr, nullptr, "Model");
+		EntityMeshCartesianItem *meshEntity = new EntityMeshCartesianItem(0, nullptr, nullptr, nullptr, "Model");
 		newTopologyEntities.push_back(meshEntity);
 
 		std::string shapeName = shape->getName().substr(geometryRootName.size()+1);
@@ -2248,13 +2246,13 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 
 	// First, we create the dual ds and dual da matrices which are just containg one entries on the main diagonal
 
-	matrixDualDs = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDualDs = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDualDs->setResultType(EntityResultBase::CARTESIAN_DUAL_EDGES_3D);
 	newDataEntities.push_back(matrixDualDs);
 
 	matrixDualDs->setConstantValue(1.0, 3 * meshData->getNumberCells());
 
-	matrixDualDa = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDualDa = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDualDa->setResultType(EntityResultBase::CARTESIAN_DUAL_FACES_3D);
 	newDataEntities.push_back(matrixDualDa);
 
@@ -2289,7 +2287,7 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 	calcDsW(matrix +      0, ny, nz, nx, my, mz, mx, meshFill.data());		// x normal direction
 	setProgress(65);
 
-	matrixDs = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDs = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDs->setResultType(EntityResultBase::CARTESIAN_EDGES_3D);
 
 	newDataEntities.push_back(matrixDs);
@@ -2308,7 +2306,7 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 	setProgress(67);
 	calcDaW(matrix +      0, ny, nz, nx, my, mz, mx, meshFill.data());		// x normal direction
 
-	matrixDa = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDa = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDa->setResultType(EntityResultBase::CARTESIAN_FACES_3D);
 
 	newDataEntities.push_back(matrixDa);
@@ -2329,7 +2327,7 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 	setProgress(71);
 	calcDepsW(matrix +      0, ny, nz, nx, my, mz, mx, meshData->getMeshLinesY().data(), meshData->getMeshLinesZ().data(), meshFill.data());		// x normal direction
 
-	matrixDeps = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDeps = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDeps->setResultType(EntityResultBase::CARTESIAN_DUAL_FACES_3D);
 
 	newDataEntities.push_back(matrixDeps);
@@ -2350,7 +2348,7 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 	setProgress(75);
 	calcDsigmaW(matrix +      0, ny, nz, nx, my, mz, mx, meshData->getMeshLinesY().data(), meshData->getMeshLinesZ().data(), meshFill.data());		// x normal direction
 
-	matrixDsigma = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDsigma = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDsigma->setResultType(EntityResultBase::CARTESIAN_DUAL_FACES_3D);
 
 	newDataEntities.push_back(matrixDsigma);
@@ -2370,7 +2368,7 @@ void CartesianMeshCreation::createMatrices(std::vector<EntityGeometry *> &meshFi
 	setProgress(78);
 	calcDmuW(matrix +      0, ny, nz, nx, my, mz, mx, meshData->getMeshLinesX().data(), meshFill.data());		// x normal direction
 
-	matrixDmu = new EntityCartesianVector(0, nullptr, nullptr, nullptr, nullptr, "Model");
+	matrixDmu = new EntityCartesianVector(0, nullptr, nullptr, nullptr, "Model");
 	matrixDmu->setResultType(EntityResultBase::CARTESIAN_FACES_3D);
 
 	newDataEntities.push_back(matrixDmu);
