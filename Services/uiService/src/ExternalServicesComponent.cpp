@@ -13,6 +13,8 @@
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "WebsocketClient.h"
+#include "ProjectManagement.h"
+#include "SelectProjectDialog.h"
 #include "SelectEntitiesDialog.h"
 #include "ExternalServicesComponent.h"	// Corresponding header
 
@@ -301,6 +303,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_OnePropertyDialog, this, &ExternalServicesComponent::handleOnePropertyDialog);
 	connectAction(OT_ACTION_CMD_UI_MessageDialog, this, &ExternalServicesComponent::handleMessageDialog);
 	connectAction(OT_ACTION_CMD_UI_ModelDialog, this, &ExternalServicesComponent::handleModelLibraryDialog);
+	connectAction(OT_ACTION_CMD_UI_ProjectSelectDialog, this, &ExternalServicesComponent::handleProjectSelectDialog);
 
 
 	// External APIs
@@ -329,7 +332,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 		this, & ExternalServicesComponent::handleLTSpiceAction);
 }
 
-ExternalServicesComponent::~ExternalServicesComponent(void)
+ExternalServicesComponent::~ExternalServicesComponent()
 {
 	if (m_websocket != nullptr) { delete m_websocket; }
 	m_websocket = nullptr;
@@ -339,7 +342,7 @@ ExternalServicesComponent::~ExternalServicesComponent(void)
 	m_lockManager = nullptr;
 }
 
-void ExternalServicesComponent::shutdown(void) {
+void ExternalServicesComponent::shutdown() {
 	if (m_currentSessionID.length() == 0) { return; }
 	ot::JsonDocument commandDoc;
 	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSession, commandDoc.GetAllocator()), commandDoc.GetAllocator());
@@ -535,7 +538,7 @@ bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID) {
 	return modified;
 }
 
-bool ExternalServicesComponent::isCurrentModelModified(void) {
+bool ExternalServicesComponent::isCurrentModelModified() {
 	// Get the id of the curently active model
 	ModelUIDtype modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 	if (modelID == 0) {
@@ -1035,7 +1038,7 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 	}
 }
 
-void ExternalServicesComponent::versionDeselected(void) {
+void ExternalServicesComponent::versionDeselected() {
 	try {
 		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 		if (!model) {
@@ -1094,7 +1097,7 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 
 // Project handling
 
-std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfProjectTemplates(void) {
+std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfProjectTemplates() {
 	std::list<ot::ProjectTemplateInformation> result;
 
 	AppBase* app{ AppBase::instance() };
@@ -1638,7 +1641,7 @@ void ExternalServicesComponent::queueAction(const std::string& _json, const std:
 	}
 }
 
-void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
+void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected() {
 	ot::stopSessionServiceHealthCheck();
 	AppBase::instance()->slotShowErrorPrompt("The Local Session Service has died unexpectedly. The application will be closed now.", "", "Error");
 	std::thread exitThread(&ot::intern::exitAsync, ot::AppExitCode::LSSNotRunning);
@@ -1662,7 +1665,7 @@ void ExternalServicesComponent::setProgressValue(int percentage)
 	if (app != nullptr) app->slotSetProgressBarValue(percentage);
 }
 
-void ExternalServicesComponent::lockGui(void)
+void ExternalServicesComponent::lockGui()
 {
 	ot::LockTypeFlags lockFlags;
 	lockFlags.setFlag(ot::LockModelWrite);
@@ -1672,7 +1675,7 @@ void ExternalServicesComponent::lockGui(void)
 	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
-void ExternalServicesComponent::unlockGui(void)
+void ExternalServicesComponent::unlockGui()
 {
 	ot::LockTypeFlags lockFlags;
 	lockFlags.setFlag(ot::LockModelWrite);
@@ -4072,6 +4075,32 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	}
 }
 
+void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _document) {
+	ot::DialogCfg cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+	std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+
+	SelectProjectDialog dia(cfg);
+	if (dia.showDialog() != ot::Dialog::Ok) {
+		return;
+	}
+
+	ProjectInformation projInfo = dia.getSelectedProject();
+
+	ProjectManagement manager(AppBase::instance()->getCurrentLoginData());
+	std::string collection = manager.getProjectCollection(projInfo.getProjectName());
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projInfo.getProjectName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString(projInfo.getProjectType(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collection, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	std::string tmp;
+	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action handler: External APIs
@@ -4443,7 +4472,7 @@ void ot::startSessionServiceHealthCheck(const std::string& _sessionServiceURL) {
 	g_sessionServiceHealthCheckThread = new std::thread(sessionServiceHealthChecker, _sessionServiceURL);
 }
 
-void ot::stopSessionServiceHealthCheck(void) {
+void ot::stopSessionServiceHealthCheck() {
 	if (g_sessionServiceHealthCheckThread == nullptr) {
 		assert(0); // No health check running
 		return;

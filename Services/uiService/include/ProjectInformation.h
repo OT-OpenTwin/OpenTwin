@@ -22,7 +22,7 @@ public:
 	ProjectInformation(const ProjectInformation&) = default;
 	ProjectInformation(ProjectInformation&&) = default;
 	~ProjectInformation() {};
-
+	
 	ProjectInformation& operator = (const ProjectInformation&) = default;
 	ProjectInformation& operator = (ProjectInformation&&) = default;
 

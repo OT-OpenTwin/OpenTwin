@@ -268,7 +268,7 @@ bool AppBase::initialize() {
 	}
 }
 
-bool AppBase::logIn(void) {
+bool AppBase::logIn() {
 	LogInDialog loginDia;
 	m_loginDialog = &loginDia;
 	loginDia.showNormal();
@@ -350,9 +350,9 @@ bool AppBase::logIn(void) {
 	return true;
 }
 
-bool AppBase::isInitialized(void) const { return m_isInitialized; }
+bool AppBase::isInitialized() const { return m_isInitialized; }
 
-std::shared_ptr<QSettings> AppBase::createSettingsInstance(void) const {
+std::shared_ptr<QSettings> AppBase::createSettingsInstance() const {
 	return std::shared_ptr<QSettings>(new QSettings("OpenTwin", "UserFrontend"));
 }
 
@@ -372,23 +372,23 @@ void AppBase::setCurrentProjectIsModified(bool _isModified) {
 	m_projectStateIsModified = _isModified;
 }
 
-bool AppBase::getCurrentProjectIsModified(void) const {
+bool AppBase::getCurrentProjectIsModified() const {
 	return m_projectStateIsModified || ot::WidgetViewManager::instance().getAnyViewContentModified();
 }
 
-aWindow * AppBase::mainWindow(void) {
+aWindow * AppBase::mainWindow() {
 	if (m_mainWindow == invalidUID) {
 		OTAssert(0, "Window not created"); return nullptr;
 	}
 	return uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 }
 
-ControlsManager * AppBase::controlsManager(void) {
+ControlsManager * AppBase::controlsManager() {
 	OTAssertNullptr(m_ExternalServicesComponent);
 	return m_ExternalServicesComponent->controlsManager();
 }
 
-LockManager * AppBase::lockManager(void) {
+LockManager * AppBase::lockManager() {
 	OTAssertNullptr(m_ExternalServicesComponent);
 	return m_ExternalServicesComponent->lockManager();
 }
@@ -496,7 +496,7 @@ bool AppBase::createNewProjectInDatabase(const QString& _projectName, const QStr
 	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
 }
 
-void AppBase::refreshWelcomeScreen(void)
+void AppBase::refreshWelcomeScreen()
 {
 	m_welcomeScreen->refreshProjectList();
 }
@@ -557,7 +557,7 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 	}
 }
 
-void AppBase::importProject(void)
+void AppBase::importProject()
 {
 	slotLockUI(true);
 
@@ -602,7 +602,7 @@ void AppBase::importProject(void)
 	}
 }
 
-void AppBase::manageGroups(void)
+void AppBase::manageGroups()
 {
 	slotLockUI(true);
 
@@ -613,7 +613,7 @@ void AppBase::manageGroups(void)
 	slotLockUI(false);
 }
 
-void AppBase::exportLogs(void) {
+void AppBase::exportLogs() {
 	if (m_loginData.getUserName().empty()) {
 		OT_LOG_E("User name empty");
 		return;
@@ -723,7 +723,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	}
 }
 
-void AppBase::initializeDefaultUserSettings(void) {
+void AppBase::initializeDefaultUserSettings() {
 	ot::PropertyGridCfg frontendSettings;
 	ot::PropertyGroup* appearance = new ot::PropertyGroup("Appearance");
 	std::list<std::string> opt;
@@ -884,7 +884,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 
 // 
 
-void AppBase::createUi(void) {
+void AppBase::createUi() {
 	// From this point on exceptions can be displayed in a message box since the UI is created
 	try {
 		try {
@@ -1138,7 +1138,7 @@ void AppBase::createUi(void) {
 
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
-bool AppBase::debug(void) const { return m_isDebug; }
+bool AppBase::debug() const { return m_isDebug; }
 
 std::string AppBase::getDebugInformation() const {
 	using namespace ot;
@@ -1352,7 +1352,7 @@ void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) 
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
-std::string AppBase::getCurrentVisualizationTabTitle(void) {
+std::string AppBase::getCurrentVisualizationTabTitle() {
 	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
 	if (view) return view->getViewData().getTitle();
 	else return "";
@@ -1362,7 +1362,7 @@ std::string AppBase::getCurrentVisualizationTabTitle(void) {
 
 // Private functions
 
-void AppBase::startSessionRefreshTimer(void)
+void AppBase::startSessionRefreshTimer()
 {
 	std::thread workerThread(&AppBase::sessionRefreshTimer, this, m_loginData.getSessionUser(), m_loginData.getAuthorizationUrl());
 	workerThread.detach();
@@ -1416,9 +1416,9 @@ void AppBase::setRelayURLs(const std::string & _url) {
 	std::cout << "Relay service URL: " << _url;
 }
 
-std::string AppBase::getRelayURLs(void) const { return m_relayURLs; }
+std::string AppBase::getRelayURLs() const { return m_relayURLs; }
 
-void AppBase::switchToViewMenuTab(void) {
+void AppBase::switchToViewMenuTab() {
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
 }
 
@@ -1426,11 +1426,11 @@ void AppBase::switchToMenuTab(const std::string& _menu) {
 	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, QString::fromStdString(_menu));
 }
 
-std::string AppBase::getCurrentMenuTab(void) {
+std::string AppBase::getCurrentMenuTab() {
 	return uiAPI::window::getCurrentToolBarTabText(m_mainWindow);
 }
 
-void AppBase::closeAllViewerTabs(void) {
+void AppBase::closeAllViewerTabs() {
 	LockManager* manager = this->lockManager();
 
 	for (auto element : m_graphicsViews) {
@@ -1462,13 +1462,13 @@ void AppBase::closeAllViewerTabs(void) {
 	ot::WidgetViewManager::instance().slotViewFocused(nullptr, m_defaultView->getViewDockWidget());
 }
 
-void AppBase::clearSessionInformation(void) {
+void AppBase::clearSessionInformation() {
 	m_currentProjectName = "";
 	m_currentProjectType = "";
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 }
 
-void AppBase::restoreSessionState(void) {
+void AppBase::restoreSessionState() {
 	if (m_currentProjectType.empty()) {
 		OT_LOG_W("No project type set. Ignoring");
 		return;
@@ -1511,7 +1511,7 @@ void AppBase::restoreSessionState(void) {
 	}
 }
 
-void AppBase::storeSessionState(void) {
+void AppBase::storeSessionState() {
 	if (!m_currentStateWindow.viewShown) {
 		return;
 	}
@@ -1558,7 +1558,7 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 	
 }
 
-void AppBase::updateLogIntensityInfo(void) {
+void AppBase::updateLogIntensityInfo() {
 	ot::LogFlags flags = ot::LogDispatcher::instance().getLogFlags();
 
 	std::string info = "Currently enabled log flags:";
@@ -1645,7 +1645,7 @@ void AppBase::setNavigationTreeMultiselectionEnabled(bool _enabled) {
 	m_projectNavigation->getTree()->setMultiSelectionEnabled(_enabled);
 }
 
-void AppBase::clearNavigationTree(void) {
+void AppBase::clearNavigationTree() {
 	m_projectNavigation->getTree()->clear();
 }
 
@@ -1716,7 +1716,7 @@ QString AppBase::getNavigationTreeItemText(UID _itemID) {
 	return m_projectNavigation->getTree()->getItemText(_itemID);
 }
 
-const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems(void) {
+const ot::SelectionInformation& AppBase::getSelectedNavigationTreeItems() {
 	return m_navigationManager.getSelectionInformation();
 }
 
@@ -1860,7 +1860,7 @@ bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::s
 	return itm->getPropertyData().getPropertyFlags() & ot::PropertyBase::IsDeletable;
 }
 
-void AppBase::clearPropertyGrid(void) {
+void AppBase::clearPropertyGrid() {
 	m_propertyGrid->getPropertyGrid()->clear();
 }
 
@@ -1868,7 +1868,7 @@ void AppBase::clearPropertyGrid(void) {
 
 // Graphics
 
-void AppBase::clearGraphicsPickerData(void) {
+void AppBase::clearGraphicsPickerData() {
 	m_graphicsPickerManager.clear();
 }
 
@@ -1951,7 +1951,7 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _en
 	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags, _visualizationConfig);
 }
 
-std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
+std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors() {
 	return ot::ContainerHelper::getValues(m_graphicsViews);
 }
 
@@ -2225,7 +2225,7 @@ void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
-AppBase * AppBase::instance(void) {
+AppBase * AppBase::instance() {
 	if (g_app == nullptr) {
 		g_app = new AppBase;
 	}
@@ -2465,7 +2465,7 @@ void AppBase::slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _ne
 	}
 }
 
-void AppBase::slotGraphicsSelectionChanged(void) {
+void AppBase::slotGraphicsSelectionChanged() {
 	OT_SLECTION_TEST_LOG("Graphics selection changed");
 
 	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
@@ -2629,7 +2629,7 @@ void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 	}
 }
 
-void AppBase::slotTextEditorSaveRequested(void) {
+void AppBase::slotTextEditorSaveRequested() {
 	ot::TextEditorView* view = dynamic_cast<ot::TextEditorView*>(sender());
 	if (!view) {
 		OT_LOG_E("View not found");
@@ -2682,7 +2682,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 	}
 }
 
-void AppBase::slotTableSaveRequested(void) {
+void AppBase::slotTableSaveRequested() {
 	ot::Table* table = dynamic_cast<ot::Table*>(sender());
 	if (table == nullptr) {
 		OT_LOG_E("Table cast failed");
@@ -2743,7 +2743,7 @@ void AppBase::slotVersionSelected(const std::string& _versionName) {
 	m_ExternalServicesComponent->versionSelected(_versionName);
 }
 
-void AppBase::slotVersionDeselected(void) {
+void AppBase::slotVersionDeselected() {
 	if (m_propertyGrid) m_propertyGrid->getPropertyGrid()->clear();
 	m_ExternalServicesComponent->versionDeselected();
 }
@@ -2905,7 +2905,7 @@ void AppBase::slotViewDataModifiedChanged(ot::WidgetView* _view) {
 	}
 }
 
-void AppBase::slotColorStyleChanged(void) {
+void AppBase::slotColorStyleChanged() {
 	if (m_state & AppState::RestoringSettingsState) return;
 	if (!(m_state & AppState::LoggedInState)) return;
 
@@ -2952,7 +2952,7 @@ void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 
 // Private: Welcome Screen Slots
 
-void AppBase::slotCreateProject(void) {
+void AppBase::slotCreateProject() {
 	ProjectManagement projectManager(m_loginData);
 
 	if (!projectManager.InitializeConnection()) {
@@ -3052,7 +3052,7 @@ void AppBase::slotCreateProject(void) {
 	}
 }
 
-void AppBase::slotOpenProject(void) {
+void AppBase::slotOpenProject() {
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 		if (!checkForContinue("Open Project")) {
 			return; 
@@ -3123,7 +3123,7 @@ void AppBase::slotOpenProject(void) {
 		}
 }
 
-void AppBase::slotCopyProject(void) {
+void AppBase::slotCopyProject() {
 	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Invalid selection");
@@ -3167,7 +3167,7 @@ void AppBase::slotCopyProject(void) {
 	m_welcomeScreen->refreshProjectList();
 }
 
-void AppBase::slotRenameProject(void) {
+void AppBase::slotRenameProject() {
 	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Invalid selection");
@@ -3234,7 +3234,7 @@ void AppBase::slotRenameProject(void) {
 	m_welcomeScreen->refreshProjectList();
 }
 
-void AppBase::slotDeleteProject(void) {
+void AppBase::slotDeleteProject() {
 	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 
 	QString txt;
@@ -3287,7 +3287,7 @@ void AppBase::slotDeleteProject(void) {
 	m_welcomeScreen->refreshProjectList();
 }
 
-void AppBase::slotExportProject(void) {
+void AppBase::slotExportProject() {
 	{
 		std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 		if (selectedProjects.size() != 1) {
@@ -3319,7 +3319,7 @@ void AppBase::slotExportProject(void) {
 
 }
 
-void AppBase::slotManageProjectAccess(void) {
+void AppBase::slotManageProjectAccess() {
 	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Invalid selection");
@@ -3337,7 +3337,7 @@ void AppBase::slotManageProjectAccess(void) {
 	this->slotLockUI(false);
 }
 
-void AppBase::slotManageProjectOwner(void) {
+void AppBase::slotManageProjectOwner() {
 	std::list<QString> selectedProjects = m_welcomeScreen->getSelectedProjects();
 	if (selectedProjects.size() != 1) {
 		OT_LOG_EA("Invalid selection");
@@ -3394,7 +3394,7 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 
 // Private: Tree slots
 
-void AppBase::slotTreeItemSelectionChanged(void) {
+void AppBase::slotTreeItemSelectionChanged() {
 	OT_SLECTION_TEST_LOG("Tree item selection changed");
 	this->runSelectionHandling(ot::SelectionOrigin::User);
 	OT_SLECTION_TEST_LOG(">> Tree item selection changed completed");

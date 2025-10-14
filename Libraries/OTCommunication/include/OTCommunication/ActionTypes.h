@@ -180,6 +180,8 @@
 #define OT_ACTION_CMD_UI_PropertyDialog "UI.PropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialog "UI.OnePropertyDialog"
 #define OT_ACTION_CMD_UI_OnePropertyDialogValue "UI.OnePropertyDialogValue"
+#define OT_ACTION_CMD_UI_ProjectSelectDialog "UI.ProjectSelectDialog"
+#define OT_ACTION_CMD_UI_NewProjectDialog "UI.NewProjectDialog"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraph "UI.SetVersionGraph"
 #define OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive "UI.SetVersionGraph.Active"
 #define OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions "UI.RemoveVersionGraph.Versions"

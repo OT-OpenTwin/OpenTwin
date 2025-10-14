@@ -27,7 +27,8 @@ namespace ot {
 	//! 
 	class OT_WIDGETS_API_EXPORT Dialog : public QDialog, public ot::WidgetBase {
 		Q_OBJECT
-			OT_DECL_NOCOPY(Dialog)
+		OT_DECL_NOCOPY(Dialog)
+		OT_DECL_NOMOVE(Dialog)
 	public:
 		//! @brief Defines possible dialog results.
 		enum DialogResult {
@@ -69,8 +70,8 @@ namespace ot {
 		virtual ~Dialog();
 
 		//! @brief Returns a pointer to the root widget of this object.
-		virtual QWidget* getQWidget(void) override { return this; };
-		virtual const QWidget* getQWidget(void) const override { return this; };
+		virtual QWidget* getQWidget() override { return this; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		//! @brief Displays the dialog with the specified show flags.
 		//! @param _showFlags Flags determining how the dialog is displayed.
@@ -82,7 +83,7 @@ namespace ot {
 		// Setter / Getter
 
 		//! @brief Returns true if the result is either Ok or Confirm.
-		bool isSuccess(void) const { return m_result == Dialog::Ok || m_result == Dialog::Confirm; };
+		bool isSuccess() const { return m_result == Dialog::Ok || m_result == Dialog::Confirm; };
 
 		//! @brief Sets a dialog flag.
 		//! @param _flag The flag to set.
@@ -95,7 +96,7 @@ namespace ot {
 
 		//! @brief Retrieves the dialog flags.
 		//! @return The current dialog flags.
-		DialogCfg::DialogFlags dialogFlags(void) const { return m_flags; };
+		DialogCfg::DialogFlags dialogFlags() const { return m_flags; };
 
 		//! @brief Sets the dialog result.
 		//! @param _result The result to set.
@@ -103,7 +104,7 @@ namespace ot {
 
 		//! @brief Retrieves the dialog result.
 		//! @return The current dialog result.
-		DialogResult dialogResult(void) const { return m_result; };
+		DialogResult dialogResult() const { return m_result; };
 
 		//! @brief Sets the dialog name.
 		//! @param _name The name to set.
@@ -111,11 +112,11 @@ namespace ot {
 
 		//! @brief Retrieves the dialog name.
 		//! @return The current dialog name.
-		const std::string& dialogName(void) const { return m_dialogName; };
+		const std::string& dialogName() const { return m_dialogName; };
 
 		//! @brief Retrieves the dialog state flags.
 		//! @return The current dialog state flags.
-		const DialogStateFlags& getDialogState(void) const { return m_state; };
+		const DialogStateFlags& getDialogState() const { return m_state; };
 
 		//! @brief Generates default push buttons based on provided mappings.
 		//! @param _buttonTextToResultList List of button texts and their corresponding results.
@@ -141,12 +142,12 @@ namespace ot {
 
 	public Q_SLOTS:
 		void closeDialog(DialogResult _result);
-		void closeOk(void);
-		void closeConfirm(void);
-		void closeYes(void);
-		void closeNo(void);
-		void closeRetry(void);
-		void closeCancel(void);
+		void closeOk();
+		void closeConfirm();
+		void closeYes();
+		void closeNo();
+		void closeRetry();
+		void closeCancel();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -161,7 +162,7 @@ namespace ot {
 
 		//! @brief Determines whether the dialog may close.
 		//! @return True if the dialog may close, otherwise false.
-		virtual bool mayCloseDialogWindow(void);
+		virtual bool mayCloseDialogWindow();
 
 	private:
 		//! @brief The current dialog state flags.

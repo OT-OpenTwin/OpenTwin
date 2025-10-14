@@ -6,10 +6,17 @@
 // DebugService header
 #include "Application.h"
 
-// OpenTwin header
+// OpenTwin System header
 #include "OTSystem/DateTime.h"
+
+// OpenTwin Gui header
+#include "OTGui/DialogCfg.h"
+
+// OpenTwin Communication header
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+
+// OpenTwin ServiceFoundation header
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
@@ -24,8 +31,11 @@
 Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_HierarchicalProjectService, OT_INFO_SERVICE_TYPE_HierarchicalProjectService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier())
 {
-	// Connect action handlers
+	// Connect callback action handlers
 	connectAction(c_setProjectEntitySelectedAction, this, &Application::handleSetProjectEntitySelected);
+	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
+	connectAction(c_hierarchicalSelectedAction, this, &Application::handleHierarchicalSelected);
+	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
@@ -90,6 +100,8 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
 
+	_ui->switchMenuTab(c_pageName);
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
 	// If model and ui are connected, we can send the initial selection
@@ -132,12 +144,42 @@ void Application::handleSetProjectEntitySelected() {
 	ot::msg::send(Application::instance().getServiceURL(), this->getUiComponent()->getServiceURL(), ot::QUEUE, uiDoc.toJson(), tmp);
 }
 
+void Application::handleProjectSelected(ot::JsonDocument& _doc) {
+	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+	std::string collectionName = ot::json::getString(_doc, OT_ACTION_PARAM_COLLECTION_NAME);
+	std::string projectType = ot::json::getString(_doc, OT_ACTION_PARAM_Type);
+
+	OT_LOG_T("Project selected received: { \"Name\": \"" + projectName + "\", \"Type\": \"" + projectType + "\", \"Collection\": \"" + collectionName + "\" }");
+}
+
+void Application::handleHierarchicalSelected(ot::JsonDocument& _doc) {
+
+}
+
+void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
+
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Button callbacks
 
 void Application::handleAddProject() {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ProjectSelectDialog, doc.GetAllocator()), doc.GetAllocator());
+	
+	ot::DialogCfg cfg;
+	cfg.setFlags(ot::DialogCfg::RecenterOnF11);
+	cfg.setInitialSize(600, 400);
+	cfg.setMinSize(400, 300);
+	cfg.setName("Select Project");
+	cfg.setTitle("Select Project");
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(cfg, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(c_projectSelectedAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(this->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
+	std::string tmp;
+	this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, tmp);
 }
 
 void Application::handleAddHierarchical() {

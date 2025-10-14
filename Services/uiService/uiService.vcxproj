@@ -51,6 +51,7 @@
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\RenameProjectDialog.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
+    <ClCompile Include="src\SelectProjectDialog.cpp" />
     <ClCompile Include="src\ServiceDataUi.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
     <ClCompile Include="src\ProjectManagement.cpp" />
@@ -81,6 +82,7 @@
     <ClInclude Include="include\DownloadFile.h" />
     <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\ProjectInformation.h" />
+    <QtMoc Include="include\SelectProjectDialog.h" />
     <ClInclude Include="include\ShortParameterDescription.h" />
     <ClInclude Include="include\UITestLogs.h" />
     <ClInclude Include="include\ViewStateCfg.h" />

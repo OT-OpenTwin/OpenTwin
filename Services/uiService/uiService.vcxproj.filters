@@ -158,6 +158,9 @@
     <ClCompile Include="src\AppBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SelectProjectDialog.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -281,6 +284,9 @@
     </QtMoc>
     <QtMoc Include="include\NavigationTreeView.h">
       <Filter>Header Files\WidgetView</Filter>
+    </QtMoc>
+    <QtMoc Include="include\SelectProjectDialog.h">
+      <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -125,46 +125,46 @@ public:
 	//!		 3: Log-in failed
 	bool initialize();
 
-	bool logIn(void);
+	bool logIn();
 
 	//! @brief Returns true if the API was initialized
-	bool isInitialized(void) const;
+	bool isInitialized() const;
 
-	std::shared_ptr<QSettings> createSettingsInstance(void) const;
+	std::shared_ptr<QSettings> createSettingsInstance() const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Component functions
 
 	void setUiServiceUID(ot::UID _uid) { m_uid = _uid; };
-	ot::UID getUiServiceUID(void) const { return m_uid; }
+	ot::UID getUiServiceUID() const { return m_uid; }
 
 	void setViewerUID(ot::UID _uid) { m_viewerUid = _uid; };
-	ot::UID getViewerUID(void) const { return m_viewerUid; };
+	ot::UID getViewerUID() const { return m_viewerUid; };
 
 	void setModelUID(ot::UID _uid) { m_modelUid = _uid; };
-	ot::UID getModelUID(void) const { return m_modelUid; };
+	ot::UID getModelUID() const { return m_modelUid; };
 
-	ViewerComponent* getViewerComponent(void) const { return m_viewerComponent; };
-	ExternalServicesComponent* getExternalServicesComponent(void) const { return m_ExternalServicesComponent; };
+	ViewerComponent* getViewerComponent() const { return m_viewerComponent; };
+	ExternalServicesComponent* getExternalServicesComponent() const { return m_ExternalServicesComponent; };
 
 	//! @brief Will set the current project as modified and apply UI changes
 	void setCurrentProjectIsModified(bool _isModified = true);
 
 	//! @brief Will get the current project as modified state
-	bool getCurrentProjectIsModified(void) const;
+	bool getCurrentProjectIsModified() const;
 
 	//! @brief Will return the current username
-	const LoginData& getCurrentLoginData(void) const { return m_loginData; };
+	const LoginData& getCurrentLoginData() const { return m_loginData; };
 
 	//! @brief Will return the current username
-	std::string getCurrentUserCollection(void) const { return m_currentUserCollection; };
+	std::string getCurrentUserCollection() const { return m_currentUserCollection; };
 
-	ak::aWindow * mainWindow(void);
+	ak::aWindow * mainWindow();
 
-	ControlsManager * controlsManager(void);
+	ControlsManager * controlsManager();
 
-	LockManager * lockManager(void);
+	LockManager * lockManager();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -182,13 +182,13 @@ public:
 	//! @throw sim::Exception to forward exceptions coming from the application core class
 	virtual void notify(ot::UID _senderId, ak::eventType _eventType, int _info1, int _info2) override;
 
-	virtual bool closeEvent(void) override;
+	virtual bool closeEvent() override;
 
 	bool createNewProjectInDatabase(const QString& _projectName, const QString & _projectType);
 
 public:
 
-	void initializeDefaultUserSettings(void);
+	void initializeDefaultUserSettings();
 
 	void frontendSettingsChanged(const ot::Property* _property);
 
@@ -202,11 +202,11 @@ public:
 
 	// 
 
-	void createUi(void);
+	void createUi();
 
 	void setDebug(bool);
 
-	bool debug(void) const;
+	bool debug() const;
 
 	std::string getDebugInformation() const;
 
@@ -223,12 +223,12 @@ public:
 	//! @param _tabTitle Title of the tab to set as current.
 	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
 
-	std::string getCurrentVisualizationTabTitle(void);
+	std::string getCurrentVisualizationTabTitle();
 
-	void importProject(void);
-	void manageGroups(void);
+	void importProject();
+	void manageGroups();
 
-	void exportLogs(void);
+	void exportLogs();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -244,11 +244,11 @@ public:
 	void setSessionServiceURL(const std::string & _url);
 
 	void SetCollectionName(const std::string _collectionName);
-	void startSessionRefreshTimer(void);
+	void startSessionRefreshTimer();
 
 	void setViewHandlingFlag(ot::ViewHandlingFlag _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
 	void setViewHandlingFlags(const ot::ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
-	const ot::ViewHandlingFlags& getViewHandlingFlags(void) const { return m_viewHandling; };
+	const ot::ViewHandlingFlags& getViewHandlingFlags() const { return m_viewHandling; };
 
 	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
 
@@ -257,26 +257,26 @@ public:
 	// Information gathering
 
 	//! @brief Will return the current site ID
-	int getSiteID(void) const { return m_siteID; }
+	int getSiteID() const { return m_siteID; }
 
-	ot::UID uiUID(void) const { return m_uid; }
+	ot::UID uiUID() const { return m_uid; }
 
 	//! @brief Will set the Relay URLs
 	void setRelayURLs(const std::string &);
 
 	//! @brief Will return the current Relay URLs
-	std::string getRelayURLs(void) const;
+	std::string getRelayURLs() const;
 
 	//! @brief Will return the current Service URL
-	const std::string & getServiceURL(void) const { return m_uiServiceURL; }
+	const std::string & getServiceURL() const { return m_uiServiceURL; }
 
 	//! @brief Will return the session service URL
-	const std::string & getSessionServiceURL(void) const { return m_sessionServiceURL; }
+	const std::string & getSessionServiceURL() const { return m_sessionServiceURL; }
 
 	//! @brief Will return the current project name
-	const std::string & getCurrentProjectName(void) const { return m_currentProjectName; }
+	const std::string & getCurrentProjectName() const { return m_currentProjectName; }
 
-	const std::string& getCurrentProjectType(void) const { return m_currentProjectType; };
+	const std::string& getCurrentProjectType() const { return m_currentProjectType; };
 
 	//! @brief Will set the name of the currently active project
 	void setCurrentProjectName(const std::string & _name) { m_currentProjectName = _name; }
@@ -285,39 +285,39 @@ public:
 
 	std::string getCollectionName() const { return m_collectionName; }
 
-	void switchToViewMenuTab(void);
+	void switchToViewMenuTab();
 
 	void switchToMenuTab(const std::string& _menu);
 
-	std::string getCurrentMenuTab(void);
+	std::string getCurrentMenuTab();
 
-	void closeAllViewerTabs(void);
+	void closeAllViewerTabs();
 
 	//! @brief Will clear the session information such as the project name, collection name and user name
-	void clearSessionInformation(void);
+	void clearSessionInformation();
 
-	void restoreSessionState(void);
-	void storeSessionState(void);
+	void restoreSessionState();
+	void storeSessionState();
 
 	bool storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey);
 
 	ot::PropertyGridCfg getSettingsFromDataBase(const std::string& _subKey);
 
-	void updateLogIntensityInfo(void);
+	void updateLogIntensityInfo();
 
-	const QIcon& getDefaultProjectTypeIcon(void) const { return m_defaultProjectTypeIcon; };
-	const std::map<std::string, std::string>& getProjectTypeDefaultIconNameMap(void) const { return m_projectTypeDefaultIconNameMap; };
-	const std::map<std::string, std::string>& getProjectTypeCustomIconNameMap(void) const { return m_projectTypeCustomIconNameMap; };
+	const QIcon& getDefaultProjectTypeIcon() const { return m_defaultProjectTypeIcon; };
+	const std::map<std::string, std::string>& getProjectTypeDefaultIconNameMap() const { return m_projectTypeDefaultIconNameMap; };
+	const std::map<std::string, std::string>& getProjectTypeCustomIconNameMap() const { return m_projectTypeCustomIconNameMap; };
 
 public Q_SLOTS:
-	void refreshWelcomeScreen(void);
+	void refreshWelcomeScreen();
 	void downloadInstaller(QString gssUrl);
 
 public:
 
 	QString availableTabText(const QString& _initialTabText);
 
-	ToolBar * getToolBar(void) const { return m_ttb; }
+	ToolBar * getToolBar() const { return m_ttb; }
 
 	void setTabToolBarTabOrder(const QStringList& _lst);
 	void activateToolBarTab(const QString& _tab);
@@ -329,7 +329,7 @@ public:
 	void setNavigationTreeSortingEnabled(bool _enabled);
 	void setNavigationTreeMultiselectionEnabled(bool _enabled);
 
-	void clearNavigationTree(void);
+	void clearNavigationTree();
 
 	ot::UID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
 
@@ -363,7 +363,7 @@ public:
 
 	QString getNavigationTreeItemText(ot::UID _itemID);
 
-	const ot::SelectionInformation& getSelectedNavigationTreeItems(void);
+	const ot::SelectionInformation& getSelectedNavigationTreeItems();
 
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisible1D(bool visible1D) { m_visible1D = visible1D; }
@@ -392,7 +392,7 @@ public:
 	//! @param _message The log message to append.
 	void appendLogMessage(const ot::LogMessage& _message);
 
-	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
+	ot::VersionGraphManagerView* getVersionGraph() { return m_versionGraph; };
 
 	void autoCloseUnpinnedViews(bool _ignoreCurrent);
 
@@ -407,9 +407,9 @@ public:
 
 	bool getPropertyIsDeletable(const std::string& _groupName, const std::string& _itemName);
 
-	ShortcutManager * shortcutManager(void) { return m_shortcutManager; }
+	ShortcutManager * shortcutManager() { return m_shortcutManager; }
 
-	void clearPropertyGrid(void);
+	void clearPropertyGrid();
 
 	void lockPropertyGrid(bool flag);
 
@@ -420,7 +420,7 @@ public:
 	void addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo);
 
 	//! \brief Clears the graphics picker and stored service picker data.
-	void clearGraphicsPickerData(void);
+	void clearGraphicsPickerData();
 
 	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
@@ -428,7 +428,7 @@ public:
 
 	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
-	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
+	std::list<ot::GraphicsViewView*> getAllGraphicsEditors();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -491,7 +491,7 @@ public:
 
 	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect);
 
-	static AppBase * instance(void);
+	static AppBase * instance();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -503,14 +503,14 @@ public Q_SLOTS:
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 	void slotGraphicsConnectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
-	void slotGraphicsSelectionChanged(void);
+	void slotGraphicsSelectionChanged();
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 
 	void slotCopyRequested(const ot::CopyInformation& _info);
 	void slotPasteRequested(const ot::CopyInformation& _info);
 
-	void slotTextEditorSaveRequested(void);
-	void slotTableSaveRequested(void);
+	void slotTextEditorSaveRequested();
+	void slotTableSaveRequested();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -518,14 +518,14 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void slotVersionSelected(const std::string& _versionName);
-	void slotVersionDeselected(void);
+	void slotVersionDeselected();
 	void slotRequestVersion(const std::string& _versionName);
 
 	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
-	void slotColorStyleChanged(void);
+	void slotColorStyleChanged();
 
 	void slotShowOutputContextMenu(QPoint _pos);
 
@@ -533,14 +533,14 @@ private Q_SLOTS:
 
 	// Private: Welcome Screen Slots
 
-	void slotCreateProject(void);
-	void slotOpenProject(void);
-	void slotCopyProject(void);
-	void slotRenameProject(void);
-	void slotDeleteProject(void);
-	void slotExportProject(void);
-	void slotManageProjectAccess(void);
-	void slotManageProjectOwner(void);
+	void slotCreateProject();
+	void slotOpenProject();
+	void slotCopyProject();
+	void slotRenameProject();
+	void slotDeleteProject();
+	void slotExportProject();
+	void slotManageProjectAccess();
+	void slotManageProjectOwner();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -555,7 +555,7 @@ private Q_SLOTS:
 
 	//! @brief Navigation tree item selection has changed.
 	//! @callgraph
-	void slotTreeItemSelectionChanged(void);
+	void slotTreeItemSelectionChanged();
 	void slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column);
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 

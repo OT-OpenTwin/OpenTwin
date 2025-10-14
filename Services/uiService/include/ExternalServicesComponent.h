@@ -69,21 +69,21 @@ public:
 	};
 
 	ExternalServicesComponent(AppBase* _owner);
-	virtual ~ExternalServicesComponent(void);
+	virtual ~ExternalServicesComponent();
 
-	void shutdown(void);
+	void shutdown();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Getter
 
-	const std::string& sessionServiceURL(void) const { return m_sessionServiceURL; }
+	const std::string& sessionServiceURL() const { return m_sessionServiceURL; }
 
-	const std::string& uiServiceURL(void) const { return m_uiServiceURL; }
+	const std::string& uiServiceURL() const { return m_uiServiceURL; }
 
-	ControlsManager* controlsManager(void) { return m_controlsManager; }
+	ControlsManager* controlsManager() { return m_controlsManager; }
 
-	LockManager* lockManager(void) { return m_lockManager; }
+	LockManager* lockManager() { return m_lockManager; }
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -112,7 +112,7 @@ public:
 	void setVisualizationModel(ModelUIDtype modelID, ModelUIDtype visualizationModelID);
 	ModelUIDtype getVisualizationModel(ModelUIDtype modelID);
 	bool isModelModified(ModelUIDtype modelID);
-	bool isCurrentModelModified(void);
+	bool isCurrentModelModified();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -152,14 +152,14 @@ public:
 	void requestUpdateVTKEntity(unsigned long long modelEntityID);
 
 	void versionSelected(const std::string& _version);
-	void versionDeselected(void);
+	void versionDeselected();
 	void activateVersion(const std::string& _version);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Project handling
 
-	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates(void);
+	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates();
 	bool openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName);
 	void closeProject(bool saveChanges);
 	void saveProject();
@@ -377,6 +377,7 @@ public:
 	void handleOnePropertyDialog(ot::JsonDocument& _document);
 	void handleMessageDialog(ot::JsonDocument& _document);
 	void handleModelLibraryDialog(ot::JsonDocument& _document);
+	void handleProjectSelectDialog(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -387,11 +388,11 @@ public:
 
 public Q_SLOTS:
 	void queueAction(const std::string& _json, const std::string& _senderIP);
-	void shutdownAfterSessionServiceDisconnected(void);
+	void shutdownAfterSessionServiceDisconnected();
 	void setProgressState(bool visible, const char* message, bool continuous);
 	void setProgressValue(int percentage);
-	void lockGui(void);
-	void unlockGui(void);
+	void lockGui();
+	void unlockGui();
 	void activateModelVersion(const char* version);
 	void keepAlive();
 	void slotProcessActionBuffer();
@@ -489,6 +490,6 @@ namespace ot {
 	
 	void startSessionServiceHealthCheck(const std::string& _sessionServiceURL);
 
-	void stopSessionServiceHealthCheck(void);
+	void stopSessionServiceHealthCheck();
 }
 
