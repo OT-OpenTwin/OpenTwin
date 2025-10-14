@@ -94,6 +94,7 @@ namespace ViewerAPI {
 	
 	__declspec(dllexport) void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
 	__declspec(dllexport) std::string getEntityName(ot::UID _modelEntityID);
+	__declspec(dllexport) ot::UID getEntityID(const std::string& _entityName);
 	__declspec(dllexport) void renameEntityPath(const std::string &oldPath, const std::string &newPath);
 
 	__declspec(dllexport) void updateObjectColor(ot::UID osgModelID, unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective);

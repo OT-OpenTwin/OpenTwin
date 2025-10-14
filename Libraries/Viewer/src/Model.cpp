@@ -991,6 +991,16 @@ std::string Model::getEntityName(unsigned long long modelEntityID) const {
 	}
 }
 
+ot::UID Model::getEntityID(const std::string& _entityName) const {
+	const auto it = m_nameToSceneNodesMap.find(_entityName);
+	if (it != m_nameToSceneNodesMap.end()) {
+		return it->second->getModelEntityID();
+	}
+	else {
+		return ot::invalidUID;
+	}
+}
+
 void Model::renameEntityPath(const std::string &oldPath, const std::string &newPath)
 {
 	std::map<std::string, SceneNodeBase *> entityMap = m_nameToSceneNodesMap;
