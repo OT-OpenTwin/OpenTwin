@@ -9,6 +9,7 @@
 #include "OTSystem/Flags.h"
 #include "OTSystem/OTAssert.h"
 #include "OTSystem/Exception.h"
+#include "OTSystem/AppExitCodes.h"
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header

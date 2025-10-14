@@ -89,6 +89,7 @@ std::string ot::AppExitCode::toString(int _exitCode) {
 	case GeneralExitCode::OpenGLError: return "OpenGL error";
 	case GeneralExitCode::AssetError: return "Asset error";
 	case GeneralExitCode::ComponentError: return "Component error";
+	case GeneralExitCode::GeneralTimeout: return "General timeout";
 
 	case GeneralExitCode::LogInError: return "Log in error";
 	case GeneralExitCode::FailedToConvertPort: return "Failed to convert port";
