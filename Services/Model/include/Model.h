@@ -140,6 +140,7 @@ public:
 	void addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable);
 	void addVisualizationMeshNode(const std::string &name, ot::UID entityID);
 
+	bool isProjectOpen() const { return m_isProjectOpen; };
 	void projectOpen();
 	void projectSave(const std::string &comment, bool silentlyCreateBranch);
 
@@ -307,7 +308,7 @@ private:
 	std::map<EntityBase*, bool>	   pendingEntityUpdates;
 	
 	// Temporary attributes
-
+	bool                           m_isProjectOpen;
 	ot::UID							visualizationModelID;
 	bool						   isModified;
 	std::string					   projectName;

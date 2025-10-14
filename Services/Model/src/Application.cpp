@@ -38,39 +38,44 @@ Application* Application::instance() {
 
 // Action handler
 
-std::string Application::handleProjectSave(ot::JsonDocument& _document) {
+void Application::handleProjectSave() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	m_model->projectSave("", false);
-
-	return "";
 }
 
-std::string Application::handleSelectionChanged(ot::JsonDocument& _document) {
-	this->queueAction(ActionType::SelectionChanged, _document);
-	return "";
-}
-
-std::string Application::handleItemRenamed(ot::JsonDocument& _document) {
+ot::ReturnMessage Application::handleCheckProjectOpen() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		return ot::ReturnMessage::False;
+	}
+	else {
+		return (m_model->isProjectOpen() ? ot::ReturnMessage::True : ot::ReturnMessage::False);
+	}
+}
+
+void Application::handleSelectionChanged(ot::JsonDocument& _document) {
+	this->queueAction(ActionType::SelectionChanged, _document);
+}
+
+void Application::handleItemRenamed(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 	std::string newName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Name);
 	m_model->modelItemRenamed(entityID, newName);
-
-	return "";
 }
 
-std::string Application::handleSetVisualizationModel(ot::JsonDocument& _document) {
+void Application::handleSetVisualizationModel(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID viewerModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
@@ -80,14 +85,12 @@ std::string Application::handleSetVisualizationModel(ot::JsonDocument& _document
 	
 	m_model->projectOpen();
 	m_model->setVisualizationModel(viewerModelID);
-
-	return "";
 }
 
 std::string Application::handleGetVisualizationModel(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No model created yet");
 	}
 
 	ot::JsonDocument newDoc;
@@ -99,7 +102,7 @@ std::string Application::handleGetVisualizationModel(ot::JsonDocument& _document
 std::string Application::handleGetIsModified(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No model created yet");
 	}
 
 	ot::JsonDocument newDoc;
@@ -108,30 +111,10 @@ std::string Application::handleGetIsModified(ot::JsonDocument& _document) {
 	return newDoc.toJson();
 }
 
-std::string Application::handleSetPropertiesFromJSON(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-
-	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
-	ot::PropertyGridCfg cfg;
-	cfg.setFromJsonObject(cfgObj);
-
-	bool update = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_Update);
-	bool itemsVisible = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ItemsVisible);
-	
-	m_model->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
-
-	return "";
-}
-
 std::string Application::handleGenerateEntityIDs(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	unsigned long long count = ot::json::getUInt64(_document, OT_ACTION_PARAM_COUNT);
@@ -149,28 +132,25 @@ std::string Application::handleGenerateEntityIDs(ot::JsonDocument& _document) {
 	return newDoc.toJson();
 }
 
-std::string Application::handleRequestImportTableFile(ot::JsonDocument& _document) {
+void Application::handleRequestImportTableFile(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	m_model->requestImportTableFile(itemName);
-
-	return "";
 }
 
-std::string Application::handleQueueMessages(ot::JsonDocument& _document) {
+void Application::handleQueueMessages(ot::JsonDocument& _document) {
 	this->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, ot::json::getBool(_document, OT_ACTION_PARAM_QUEUE_FLAG));
-	return "";
 }
 
 std::string Application::handleGetListOfFolderItems(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
@@ -194,7 +174,7 @@ std::string Application::handleGetListOfFolderItems(ot::JsonDocument& _document)
 std::string Application::handleGetIDsOfFolderItemsByType(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
@@ -215,10 +195,10 @@ std::string Application::handleGetIDsOfFolderItemsByType(ot::JsonDocument& _docu
 	return newDoc.toJson();
 }
 
-std::string Application::handleUpdateVisualizationEntity(ot::JsonDocument& _document) {
+void Application::handleUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID visEntityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
@@ -227,14 +207,12 @@ std::string Application::handleUpdateVisualizationEntity(ot::JsonDocument& _docu
 	ot::UID binaryDataItemVersion = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_DataVersion);
 
 	m_model->updateVisualizationEntity(visEntityID, visEntityVersion, binaryDataItemID, binaryDataItemVersion);
-
-	return "";
 }
 
-std::string Application::handleUpdateGeometryEntity(ot::JsonDocument& _document) {
+void Application::handleUpdateGeometryEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID geomEntityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
@@ -254,40 +232,34 @@ std::string Application::handleUpdateGeometryEntity(ot::JsonDocument& _document)
 	}
 
 	m_model->updateGeometryEntity(geomEntityID, brepEntityID, brepEntityVersion, facetsEntityID, facetsEntityVersion, overrideGeometry, cfg, updateProperties);
-
-	return "";
 }
 
-std::string Application::handleModelChangeOperationCompleted(ot::JsonDocument& _document) {
+void Application::handleModelChangeOperationCompleted(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string description = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Description);
 
 	m_model->modelChangeOperationCompleted(description);
-
-	return "";
 }
 
-std::string Application::handleRequestUpdateVisualizationEntity(ot::JsonDocument& _document) {
+void Application::handleRequestUpdateVisualizationEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID visEntityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
 	m_model->requestUpdateVisualizationEntity(visEntityID);
-
-	return "";
 }
 
 std::string Application::handleCheckParentUpdates(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<ot::UID> modifiedEntities = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
@@ -295,10 +267,10 @@ std::string Application::handleCheckParentUpdates(ot::JsonDocument& _document) {
 	return m_model->checkParentUpdates(modifiedEntities);
 }
 
-std::string Application::handleAddEntities(ot::JsonDocument& _document) {
+void Application::handleAddEntities(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<ot::UID> topologyEntityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
@@ -322,14 +294,12 @@ std::string Application::handleAddEntities(ot::JsonDocument& _document) {
 	}
 
 	m_model->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, changeComment, saveModel, askForBranchCreation);
-
-	return "";
 }
 
-std::string Application::handleUpdateTopologyEntity(ot::JsonDocument& _document) {
+void Application::handleUpdateTopologyEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<ot::UID> topologyEntityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
@@ -337,14 +307,12 @@ std::string Application::handleUpdateTopologyEntity(ot::JsonDocument& _document)
 	std::string comment = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Description);
 	
 	m_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment);
-
-	return "";
 }
 
-std::string Application::handleAddGeometryOperation(ot::JsonDocument& _document) {
+void Application::handleAddGeometryOperation(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID geometryEntityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
@@ -357,41 +325,35 @@ std::string Application::handleAddGeometryOperation(ot::JsonDocument& _document)
 	std::string changeComment = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Description);
 
 	m_model->addGeometryOperation(geometryEntityID, geometryEntityVersion, geomEntityName, dataEntityIDList, dataEntityVersionList, dataEntityParentList, childrenList, changeComment);
-
-	return "";
 }
 
-std::string Application::handleDeleteEntity(ot::JsonDocument& _document) {
+void Application::handleDeleteEntity(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<std::string> entityNameList = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_EntityNameList);
 	bool saveModel = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_SaveModel);
 
 	m_model->deleteEntitiesFromModel(entityNameList, saveModel);
-
-	return "";
 }
 
-std::string Application::handleMeshingCompleted(ot::JsonDocument& _document) {
+void Application::handleMeshingCompleted(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID meshEntityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
 	m_model->setMeshingActive(meshEntityID, false);
-
-	return "";
 }
 
 std::string Application::handleGetEntityInformationByID(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
@@ -402,7 +364,7 @@ std::string Application::handleGetEntityInformationByID(ot::JsonDocument& _docum
 std::string Application::handleGetEntityInformationByName(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::list<std::string> entityNameList = ot::json::getStringList(_document, OT_ACTION_PARAM_MODEL_EntityNameList);
@@ -424,7 +386,7 @@ std::string Application::handleGetEntityInformationByName(ot::JsonDocument& _doc
 std::string Application::handleGetSelectedEntityInformation(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string typeFilter("");
@@ -447,7 +409,7 @@ std::string Application::handleGetSelectedEntityInformation(ot::JsonDocument& _d
 std::string Application::handleGetEntityChildInformationByName(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Name);
@@ -483,7 +445,7 @@ std::string Application::handleGetEntityChildInformationByName(ot::JsonDocument&
 std::string Application::handleGetEntityChildInformationByID(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
@@ -520,7 +482,7 @@ std::string Application::handleGetEntityChildInformationByID(ot::JsonDocument& _
 std::string Application::handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::JsonDocument newDoc;
@@ -529,91 +491,10 @@ std::string Application::handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument
 	return newDoc.toJson();
 }
 
-std::string Application::handleGetEntityProperties(ot::JsonDocument& _document) {
+std::string Application::handleGetCurrentVisualizationModelID() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
-	std::string propertyGroupFilter = ot::json::getString(_document, OT_ACTION_PARAM_Filter);
-
-	std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
-
-	m_model->getEntityProperties(entityID, recursive, propertyGroupFilter, entityProperties);
-
-	// Now we convert the results into JSON data
-	ot::JsonDocument newDoc;
-	std::list<ot::UID> entityIDList;
-	ot::JsonArray propertyList;
-	for (auto item : entityProperties)
-	{
-		entityIDList.push_back(item.first);
-		ot::JsonObject cfgObj;
-		item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
-		propertyList.PushBack(cfgObj, newDoc.GetAllocator());
-	}
-
-	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
-
-	return newDoc.toJson();
-}
-
-std::string Application::handleGetEntityPropertiesByName(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
-	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
-	std::string propertyGroupFilter = ot::json::getString(_document, OT_ACTION_PARAM_Filter);
-
-	EntityBase* entity = m_model->findEntityFromName(entityName);
-
-	std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
-
-	if (entity)
-	{
-		m_model->getEntityProperties(entity->getEntityID(), recursive, propertyGroupFilter, entityProperties);
-	}
-
-	// Now we convert the results into JSON data
-	ot::JsonDocument newDoc;
-	std::list<ot::UID> entityIDList;
-	ot::JsonArray propertyList;
-
-	for (auto item : entityProperties)
-	{
-		entityIDList.push_back(item.first);
-		ot::JsonObject cfgObj;
-		item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
-		propertyList.PushBack(cfgObj, newDoc.GetAllocator());
-	}
-
-	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
-
-	return newDoc.toJson();
-}
-
-std::string Application::handleUpdatePropertyGrid(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	m_model->updatePropertyGrid();
-
-	return "";
-}
-
-std::string Application::handleGetCurrentVisualizationModelID(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ot::JsonDocument newDoc;
@@ -622,60 +503,10 @@ std::string Application::handleGetCurrentVisualizationModelID(ot::JsonDocument& 
 	return newDoc.toJson();
 }
 
-std::string Application::handleAddPropertiesToEntities(ot::JsonDocument& _document) {
+void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-
-	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
-	ot::PropertyGridCfg cfg;
-	cfg.setFromJsonObject(cfgObj);
-
-	m_model->addPropertiesToEntities(entityIDList, cfg);
-
-	return "";
-}
-
-std::string Application::handleUpdatePropertiesOfEntities(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-
-	std::string json = ot::json::getString(_document, OT_ACTION_PARAM_JSON);
-
-	m_model->updatePropertiesOfEntities(entityIDList, json);
-
-	return "";
-}
-
-std::string Application::handleDeleteProperty(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-	std::string propertyName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
-	std::string groupName = "";
-	if (ot::json::exists(_document, OT_PARAM_GROUP))
-	{
-		groupName = ot::json::getString(_document, OT_PARAM_GROUP);
-	}
-	m_model->deleteProperty(entityIDList, propertyName,groupName);
-
-	return "";
-}
-
-std::string Application::handleEntitiesSelected(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string selectionAction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_SelectionAction);
@@ -693,35 +524,16 @@ std::string Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	}
 
 	m_model->entitiesSelected(selectionAction, selectionInfo, options);
-
-	return "";
-}
-
-std::string Application::handlePromptResponse(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string response = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
-	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
-	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
-
-	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
-
-	m_model->promptResponse(response, actualAnswer, parameter1);
-
-	return "";
 }
 
 std::string Application::handleGetEntityIdentifier(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 	if (!this->isUiConnected()) {
 		OT_LOG_E("Frontend is not connected");
-		return OT_ACTION_RETURN_INDICATOR_Error "Frontend is not connected";
+		throw ot::Exception::ObjectNotFound("Frontend is not connected");
 	}
 	
 	const int numberOfIdentifier = ot::json::getInt(_document, OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT);
@@ -749,7 +561,7 @@ std::string Application::handleGetEntityIdentifier(ot::JsonDocument& _document) 
 std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string	collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
@@ -797,149 +609,37 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	return newDoc.toJson();
 }
 
-std::string Application::handleViewsFromProjectType(ot::JsonDocument& _document) {
+std::string Application::handleViewsFromProjectType() {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	ProjectTypeManager typeManager(m_model->getProjectType());
 	return typeManager.getViews();
 }
 
-// Versions
+ot::ReturnMessage Application::handleVisualisationDataRequest(ot::JsonDocument& _document) {
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
 
-std::string Application::handleGetCurrentVersion(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	return m_model->getCurrentModelVersion();
-}
-
-std::string Application::handleActivateVersion(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
-
-	m_model->activateVersion(version);
-
-	return "";
-}
-
-std::string Application::handleVersionSelected(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
-
-	m_model->versionSelected(version);
-
-	return "";
-}
-
-std::string Application::handleVersionDeselected(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	m_model->versionDeselected();
-
-	return "";
-}
-
-std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
-	std::string label = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_VersionLabel);
-
-	m_model->setVersionLabel(version, label);
-
-	return "";
-}
-
-std::string Application::handleShowTable(ot::JsonDocument& _document)
-{
-	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
-	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
 
-	std::map<std::string,ot::UID> entityMap = m_model->getEntityNameToIDMap();
-	auto entityIDByName	= entityMap.find(tableName);
-	if (entityIDByName != m_model->getEntityNameToIDMap().end())
-	{
-		ot::UID tableID = entityIDByName->second;
-		m_visualisationHandler.handleVisualisationRequest(tableID, visualisationCfg);
-		return ot::ReturnMessage().toJson();
-	}
-	else
-	{
-		OT_LOG_E("Request to show table " + tableName + " could not be handled, since it is not part of the current state");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
-	}
-}
-
-std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _document)
-{
-	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
-
-	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setFromJsonObject(ot::json::getObject(_document,OT_ACTION_PARAM_Visualisation_Config));
-	
-	try
-	{
+	try {
 		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
 	}
-	catch (std::exception& e)
-	{
+	catch (std::exception& e) {
 		OT_LOG_W(e.what());
-		ot::ReturnMessage(ot::ReturnMessage::Failed, e.what()).toJson();
+		ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 
-	return ot::ReturnMessage().toJson();
+	return ot::ReturnMessage::Ok;
 }
 
-std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
-	std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
-	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
-	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
-	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-
-	// First add the model entity to the Project
-	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
-
-	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder + "/" + selectedModel);
-
-	return "";
-}
-
-std::string Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
-	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-	
-	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "");
-
-	return "";
-}
-
-std::string Application::handleImportTableFile(ot::JsonDocument& _document) {
+void Application::handleImportTableFile(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
-		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
 	std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
@@ -957,8 +657,262 @@ std::string Application::handleImportTableFile(ot::JsonDocument& _document) {
 		// Process the file content
 		m_model->importTableFile(tmpFileName, true);
 	}
+}
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+// ##################################################################################################################################################################################################################
+
+// Action handler: Properties
+
+void Application::handleSetPropertiesFromJSON(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::PropertyGridCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+	bool update = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_Update);
+	bool itemsVisible = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ItemsVisible);
+
+	m_model->setPropertiesFromJson(entityIDList, cfg, update, itemsVisible);
+}
+
+std::string Application::handleGetEntityProperties(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
+	std::string propertyGroupFilter = ot::json::getString(_document, OT_ACTION_PARAM_Filter);
+
+	std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
+
+	m_model->getEntityProperties(entityID, recursive, propertyGroupFilter, entityProperties);
+
+	// Now we convert the results into JSON data
+	ot::JsonDocument newDoc;
+	std::list<ot::UID> entityIDList;
+	ot::JsonArray propertyList;
+	for (const auto& item : entityProperties) {
+		entityIDList.push_back(item.first);
+		ot::JsonObject cfgObj;
+		item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
+		propertyList.PushBack(cfgObj, newDoc.GetAllocator());
+	}
+
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
+
+	return newDoc.toJson();
+}
+
+std::string Application::handleGetEntityPropertiesByName(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
+	std::string propertyGroupFilter = ot::json::getString(_document, OT_ACTION_PARAM_Filter);
+
+	EntityBase* entity = m_model->findEntityFromName(entityName);
+
+	std::map<ot::UID, ot::PropertyGridCfg> entityProperties;
+
+	if (entity) {
+		m_model->getEntityProperties(entity->getEntityID(), recursive, propertyGroupFilter, entityProperties);
+	}
+
+	// Now we convert the results into JSON data
+	ot::JsonDocument newDoc;
+	std::list<ot::UID> entityIDList;
+	ot::JsonArray propertyList;
+
+	for (const auto& item : entityProperties) {
+		entityIDList.push_back(item.first);
+		ot::JsonObject cfgObj;
+		item.second.addToJsonObject(cfgObj, newDoc.GetAllocator());
+		propertyList.PushBack(cfgObj, newDoc.GetAllocator());
+	}
+
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_PropertyList, propertyList, newDoc.GetAllocator());
+
+	return newDoc.toJson();
+}
+
+void Application::handleUpdatePropertyGrid(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	m_model->updatePropertyGrid();
+}
+
+void Application::handleAddPropertiesToEntities(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::PropertyGridCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+	m_model->addPropertiesToEntities(entityIDList, cfg);
+}
+
+void Application::handleUpdatePropertiesOfEntities(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+
+	std::string json = ot::json::getString(_document, OT_ACTION_PARAM_JSON);
+
+	m_model->updatePropertiesOfEntities(entityIDList, json);
+}
+
+void Application::handleDeleteProperty(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::string propertyName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	std::string groupName = "";
+	if (ot::json::exists(_document, OT_PARAM_GROUP)) {
+		groupName = ot::json::getString(_document, OT_PARAM_GROUP);
+	}
+	m_model->deleteProperty(entityIDList, propertyName, groupName);
+}
+
+// ##################################################################################################################################################################################################################
+
+// Action handler: Versions
+
+std::string Application::handleGetCurrentVersion() {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	return m_model->getCurrentModelVersion();
+}
+
+void Application::handleActivateVersion(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	m_model->activateVersion(version);
+}
+
+void Application::handleVersionSelected(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	m_model->versionSelected(version);
+}
+
+void Application::handleVersionDeselected(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	m_model->versionDeselected();
+}
+
+void Application::handleSetVersionLabel(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+	std::string label = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_VersionLabel);
+
+	m_model->setVersionLabel(version, label);
+}
+
+// ##################################################################################################################################################################################################################
+
+// Action handler: UI callbacks
+
+void Application::handlePromptResponse(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	std::string response = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
+	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
+	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
+
+	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
+
+	m_model->promptResponse(response, actualAnswer, parameter1);
+}
+
+ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
+	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+	ot::VisualisationCfg visualisationCfg;
+	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+
+	std::map<std::string, ot::UID> entityMap = m_model->getEntityNameToIDMap();
+	auto entityIDByName = entityMap.find(tableName);
+	if (entityIDByName != m_model->getEntityNameToIDMap().end()) {
+		ot::UID tableID = entityIDByName->second;
+		m_visualisationHandler.handleVisualisationRequest(tableID, visualisationCfg);
+		return ot::ReturnMessage::Ok;
+	}
+	else {
+		OT_LOG_E("Request to show table " + tableName + " could not be handled, since it is not part of the current state");
+		return ot::ReturnMessage::Failed;
+	}
+}
+
+void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
+	std::string modelInfo = ot::json::getString(_document, OT_ACTION_PARAM_ModelInfo);
+	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
+	std::string elementType = ot::json::getString(_document, OT_ACTION_PARAM_ElementType);
+	std::string selectedModel = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	// First add the model entity to the Project
+	m_libraryManagementWrapper.createModelTextEntity(modelInfo, folder, elementType, selectedModel);
+
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, true, folder + "/" + selectedModel);
+}
+
+void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	// Now update the property according to the dialog (confirm or cancel)
+	m_libraryManagementWrapper.updatePropertyOfEntity(entityID, false, "");
 }
 
 // ##################################################################################################################################################################################################################
@@ -1224,6 +1178,66 @@ Application::Application()
 
 	std::thread asyncActionThread(&Application::asyncActionWorker, this);
 	asyncActionThread.detach();
+
+
+	connectAction(OT_ACTION_CMD_PROJ_Save, this, &Application::handleProjectSave);
+	connectAction(OT_ACTION_CMD_IsProjectOpen, this, &Application::handleCheckProjectOpen);
+	connectAction(OT_ACTION_CMD_MODEL_SelectionChanged, this, &Application::handleSelectionChanged);
+	connectAction(OT_ACTION_CMD_MODEL_ItemRenamed, this, &Application::handleItemRenamed);
+	connectAction(OT_ACTION_CMD_SetVisualizationModel, this, &Application::handleSetVisualizationModel);
+	connectAction(OT_ACTION_CMD_GetVisualizationModel, this, &Application::handleGetVisualizationModel);
+	connectAction(OT_ACTION_CMD_MODEL_GetIsModified, this, &Application::handleGetIsModified);
+	connectAction(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, this, &Application::handleSetPropertiesFromJSON);
+	connectAction(OT_ACTION_CMD_MODEL_GenerateEntityIDs, this, &Application::handleGenerateEntityIDs);
+	connectAction(OT_ACTION_CMD_MODEL_RequestImportTableFile, this, &Application::handleRequestImportTableFile);
+	connectAction(OT_ACTION_CMD_MODEL_QueueMessages, this, &Application::handleQueueMessages);
+	connectAction(OT_ACTION_CMD_MODEL_GetListOfFolderItems, this, &Application::handleGetListOfFolderItems);
+	connectAction(OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, this, &Application::handleGetIDsOfFolderItemsByType);
+	connectAction(OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, this, &Application::handleUpdateVisualizationEntity);
+	connectAction(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, this, &Application::handleUpdateGeometryEntity);
+	connectAction(OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, this, &Application::handleModelChangeOperationCompleted);
+	connectAction(OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity, this, &Application::handleRequestUpdateVisualizationEntity);
+	connectAction(OT_ACTION_CMD_MODEL_CheckParentUpdates, this, &Application::handleCheckParentUpdates);
+	connectAction(OT_ACTION_CMD_MODEL_AddEntities, this, &Application::handleAddEntities);
+	connectAction(OT_ACTION_CMD_MODEL_UpdateTopologyEntity, this, &Application::handleUpdateTopologyEntity);
+	connectAction(OT_ACTION_CMD_MODEL_AddGeometryOperation, this, &Application::handleAddGeometryOperation);
+	connectAction(OT_ACTION_CMD_MODEL_DeleteEntity, this, &Application::handleDeleteEntity);
+	connectAction(OT_ACTION_CMD_MODEL_MeshingCompleted, this, &Application::handleMeshingCompleted);
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityInformationFromID, this, &Application::handleGetEntityInformationByID);
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityInformationFromName, this, &Application::handleGetEntityInformationByName);
+	connectAction(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, this, &Application::handleGetSelectedEntityInformation);
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, this, &Application::handleGetEntityChildInformationByName);
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, this, &Application::handleGetEntityChildInformationByID);
+	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, this, &Application::handleGetAllGeometryEntitiesForMeshing);
+	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
+	
+	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
+	connectAction(OT_ACTION_CMD_UI_PromptResponse, this, &Application::handlePromptResponse);
+	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, this, &Application::handleGetEntityIdentifier);
+	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, this, &Application::handleGetEntitiesFromAnotherCollection);
+	connectAction(OT_ACTION_PARAM_MODEL_ViewsForProjectType, this, &Application::handleViewsFromProjectType);
+	connectAction(OT_ACTION_CMD_MODEL_RequestVisualisationData, this, &Application::handleVisualisationDataRequest);
+	connectAction(OT_ACTION_CMD_UI_TABLE_Setup, this, &Application::handleShowTable);
+	connectAction(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, this, &Application::handleModelDialogConfirmed);
+	connectAction(OT_ACTION_CMD_MODEL_ModelDialogCanceled, this, &Application::handleModelDialogCanceled);
+	connectAction(OT_ACTION_CMD_ImportTableFile, this, &Application::handleImportTableFile);
+
+	// Properties
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityProperties, this, &Application::handleGetEntityProperties);
+	connectAction(OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, this, &Application::handleGetEntityPropertiesByName);
+	connectAction(OT_ACTION_CMD_MODEL_UpdatePropertyGrid, this, &Application::handleUpdatePropertyGrid);
+	connectAction(OT_ACTION_CMD_MODEL_AddPropertiesToEntities, this, &Application::handleAddPropertiesToEntities);
+	connectAction(OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities, this, &Application::handleUpdatePropertiesOfEntities);
+	connectAction(OT_ACTION_CMD_MODEL_DeleteProperty, this, &Application::handleDeleteProperty);
+
+
+	// Versions
+
+	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVersion, this, &Application::handleGetCurrentVersion);
+	connectAction(OT_ACTION_CMD_MODEL_ActivateVersion, this, &Application::handleActivateVersion);
+	connectAction(OT_ACTION_CMD_MODEL_VersionSelected, this, &Application::handleVersionSelected);
+	connectAction(OT_ACTION_CMD_MODEL_VersionDeselected, this, &Application::handleVersionDeselected);
+	connectAction(OT_ACTION_CMD_MODEL_SetVersionLabel, this, &Application::handleSetVersionLabel);
 }
 
 Application::~Application() {

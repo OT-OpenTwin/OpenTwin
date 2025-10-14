@@ -24,8 +24,7 @@
 class Model;
 class MicroserviceNotifier;
 
-class Application : public ot::ApplicationBase {
-	OT_DECL_ACTION_HANDLER(Application)
+class Application : public ot::ApplicationBase, public ot::ActionHandler {
 public:
 	enum class ActionType {
 		SelectionChanged
@@ -35,63 +34,128 @@ public:
 	
 	static std::string getToolBarPageName() { return "Model"; };
 
-		//api @security mTLS
-		//api @action OT_ACTION_CMD_PROJ_Save
-		//api @brief Saves a project in the database.
-		//api @return In case of success will return an empty String. In case of error will return a String with prefix "Error: ".
-		OT_HANDLER(handleProjectSave, Application, OT_ACTION_CMD_PROJ_Save, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleItemRenamed, Application, OT_ACTION_CMD_MODEL_ItemRenamed, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleSetVisualizationModel, Application, OT_ACTION_CMD_SetVisualizationModel, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetVisualizationModel, Application, OT_ACTION_CMD_GetVisualizationModel, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetIsModified, Application, OT_ACTION_CMD_MODEL_GetIsModified, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleSetPropertiesFromJSON, Application, OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGenerateEntityIDs, Application, OT_ACTION_CMD_MODEL_GenerateEntityIDs, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleRequestImportTableFile, Application, OT_ACTION_CMD_MODEL_RequestImportTableFile, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleQueueMessages, Application, OT_ACTION_CMD_MODEL_QueueMessages, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetListOfFolderItems, Application, OT_ACTION_CMD_MODEL_GetListOfFolderItems, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetIDsOfFolderItemsByType, Application, OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdateVisualizationEntity, Application, OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdateGeometryEntity, Application, OT_ACTION_CMD_MODEL_UpdateGeometryEntity, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleModelChangeOperationCompleted, Application, OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleRequestUpdateVisualizationEntity, Application, OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleCheckParentUpdates, Application, OT_ACTION_CMD_MODEL_CheckParentUpdates, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleAddEntities, Application, OT_ACTION_CMD_MODEL_AddEntities, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdateTopologyEntity, Application, OT_ACTION_CMD_MODEL_UpdateTopologyEntity, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleAddGeometryOperation, Application, OT_ACTION_CMD_MODEL_AddGeometryOperation, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleDeleteEntity, Application, OT_ACTION_CMD_MODEL_DeleteEntity, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleMeshingCompleted, Application, OT_ACTION_CMD_MODEL_MeshingCompleted, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityInformationByID, Application, OT_ACTION_CMD_MODEL_GetEntityInformationFromID, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityInformationByName, Application, OT_ACTION_CMD_MODEL_GetEntityInformationFromName, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetSelectedEntityInformation, Application, OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityChildInformationByName, Application, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityChildInformationByID, Application, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetAllGeometryEntitiesForMeshing, Application, OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityProperties, Application, OT_ACTION_CMD_MODEL_GetEntityProperties, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityPropertiesByName, Application, OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdatePropertyGrid, Application, OT_ACTION_CMD_MODEL_UpdatePropertyGrid, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetCurrentVisualizationModelID, Application, OT_ACTION_CMD_MODEL_GetCurrentVisModelID, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleAddPropertiesToEntities, Application, OT_ACTION_CMD_MODEL_AddPropertiesToEntities, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleUpdatePropertiesOfEntities, Application, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleDeleteProperty, Application, OT_ACTION_CMD_MODEL_DeleteProperty, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleEntitiesSelected, Application, OT_ACTION_CMD_MODEL_EntitiesSelected, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handlePromptResponse, Application, OT_ACTION_CMD_UI_PromptResponse, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntityIdentifier, Application, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleGetEntitiesFromAnotherCollection, Application, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleVisualisationDataRequest, Application, OT_ACTION_CMD_MODEL_RequestVisualisationData, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleShowTable, Application, OT_ACTION_CMD_UI_TABLE_Setup, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_MODEL_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_MODEL_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleImportTableFile, Application, OT_ACTION_CMD_ImportTableFile, ot::SECURE_MESSAGE_TYPES)
+	// ##################################################################################################################################################################################################################
 
-	// Versions
+	// Action handler
 
-	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleVersionSelected, Application, OT_ACTION_CMD_MODEL_VersionSelected, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleVersionDeselected, Application, OT_ACTION_CMD_MODEL_VersionDeselected, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleSetVersionLabel, Application, OT_ACTION_CMD_MODEL_SetVersionLabel, ot::SECURE_MESSAGE_TYPES)
+	//api @security mTLS
+	//api @action OT_ACTION_CMD_PROJ_Save
+	//api @brief Saves a project in the database.
+	//api @return In case of success will return an empty String. In case of error will return a String with prefix "Error: ".
+	void handleProjectSave();
+
+	//api @security mTLS
+	ot::ReturnMessage handleCheckProjectOpen();
+
+	void handleSelectionChanged(ot::JsonDocument& _document);
+
+	void handleItemRenamed(ot::JsonDocument& _document);
+
+	void handleSetVisualizationModel(ot::JsonDocument& _document);
+
+	std::string handleGetVisualizationModel(ot::JsonDocument& _document);
+
+	std::string handleGetIsModified(ot::JsonDocument& _document);
+
+	std::string handleGenerateEntityIDs(ot::JsonDocument& _document);
+
+	void handleRequestImportTableFile(ot::JsonDocument& _document);
+
+	void handleQueueMessages(ot::JsonDocument& _document);
+
+	std::string handleGetListOfFolderItems(ot::JsonDocument& _document);
+
+	std::string handleGetIDsOfFolderItemsByType(ot::JsonDocument& _document);
+
+	void handleUpdateVisualizationEntity(ot::JsonDocument& _document);
+
+	void handleUpdateGeometryEntity(ot::JsonDocument& _document);
+
+	void handleModelChangeOperationCompleted(ot::JsonDocument& _document);
+
+	void handleRequestUpdateVisualizationEntity(ot::JsonDocument& _document);
+
+	std::string handleCheckParentUpdates(ot::JsonDocument& _document);
+
+	void handleAddEntities(ot::JsonDocument& _document);
+
+	void handleUpdateTopologyEntity(ot::JsonDocument& _document);
+
+	void handleAddGeometryOperation(ot::JsonDocument& _document);
+
+	void handleDeleteEntity(ot::JsonDocument& _document);
+
+	void handleMeshingCompleted(ot::JsonDocument& _document);
+
+	std::string handleGetEntityInformationByID(ot::JsonDocument& _document);
+
+	std::string handleGetEntityInformationByName(ot::JsonDocument& _document);
+
+	std::string handleGetSelectedEntityInformation(ot::JsonDocument& _document);
+
+	std::string handleGetEntityChildInformationByName(ot::JsonDocument& _document);
+
+	std::string handleGetEntityChildInformationByID(ot::JsonDocument& _document);
+
+	std::string handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument& _document);
+
+	std::string handleGetCurrentVisualizationModelID();
+
+	void handleEntitiesSelected(ot::JsonDocument& _document);
+
+	std::string handleGetEntityIdentifier(ot::JsonDocument& _document);
+
+	std::string handleGetEntitiesFromAnotherCollection(ot::JsonDocument& _document);
+
+	std::string handleViewsFromProjectType();
+
+	ot::ReturnMessage handleVisualisationDataRequest(ot::JsonDocument& _document);
+
+	void handleImportTableFile(ot::JsonDocument& _document);
+
+	// ##################################################################################################################################################################################################################
+
+	// Action handler: Properties
+
+	void handleSetPropertiesFromJSON(ot::JsonDocument& _document);
+
+	std::string handleGetEntityProperties(ot::JsonDocument& _document);
+
+	std::string handleGetEntityPropertiesByName(ot::JsonDocument& _document);
+
+	void handleUpdatePropertyGrid(ot::JsonDocument& _document);
+
+	void handleAddPropertiesToEntities(ot::JsonDocument& _document);
+
+	void handleUpdatePropertiesOfEntities(ot::JsonDocument& _document);
+
+	void handleDeleteProperty(ot::JsonDocument& _document);
+
+	// ##################################################################################################################################################################################################################
+
+	// Action handler: Versions
+
+	std::string handleGetCurrentVersion();
+
+	void handleActivateVersion(ot::JsonDocument& _document);
+
+	void handleVersionSelected(ot::JsonDocument& _document);
+
+	void handleVersionDeselected(ot::JsonDocument& _document);
+
+	void handleSetVersionLabel(ot::JsonDocument& _document);
+
+	// ##################################################################################################################################################################################################################
+
+	// Action handler: UI callbacks
+
+	void handlePromptResponse(ot::JsonDocument& _document);
+
+	ot::ReturnMessage handleShowTable(ot::JsonDocument& _document);
+
+	void handleModelDialogConfirmed(ot::JsonDocument& _document);
+
+	void handleModelDialogCanceled(ot::JsonDocument& _document);
 
 	// ##################################################################################################################################################################################################################
 

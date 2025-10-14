@@ -107,7 +107,8 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	shutdown(false),
 	uiCreated(false),
 	versionGraphCreated(false),
-	stateManager(nullptr)
+	stateManager(nullptr),
+	m_isProjectOpen(false)
 {
 	//NOTE, debug only
 	std::cout << "Created model for project \"" << _projectName << "\"" << std::endl;
@@ -304,7 +305,6 @@ void Model::resetToNew()
 	
 	if (typeManager.hasHierarchicalRoot()) {
 		EntityHierarchicalScene* hierarchicalRoot = new EntityHierarchicalScene(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
-		hierarchicalRoot->setName("Project");
 		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);
 	}
 
@@ -3418,6 +3418,7 @@ void Model::projectOpen()
 			enableQueuingHttpRequests(false);
 		}
 
+		m_isProjectOpen = true;
 		return;
 	}
 
@@ -3431,6 +3432,7 @@ void Model::projectOpen()
 	
 	if (!GetDocumentFromEntityID(0, doc))
 	{
+		OT_LOG_E("Failed to read most recent mode from storage. Resetting project to new...");
 		displayMessage("ERROR: Unable to read most recent model from storage: " + projectName + "\n");
 		resetToNew();
 		modelChangeOperationCompleted("");
@@ -3450,6 +3452,7 @@ void Model::projectOpen()
 			enableQueuingHttpRequests(false);
 		}
 
+		m_isProjectOpen = true;
 		return;
 	}
 
@@ -3508,6 +3511,8 @@ void Model::projectOpen()
 
 	// update the undo information
 	updateUndoRedoStatus();
+
+	m_isProjectOpen = true;
 }
 
 void Model::updateVersionGraph()
