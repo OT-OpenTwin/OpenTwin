@@ -55,8 +55,8 @@ private:
 	bool m_hasDataProcessingRoot		= true;
 
 	//Became now mandatory since plot data and solver results in general are also stored in the result data base.
-	const bool m_hasDatasetRoot				= true;
-	const bool m_hasDatasetRMD				= true;
+	bool m_hasDatasetRoot				= true;
+	bool m_hasDatasetRMD				= true;
 	
 	bool m_hasHierarchicalRoot          = false;
 

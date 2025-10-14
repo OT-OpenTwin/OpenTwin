@@ -5,22 +5,23 @@
 #include "Model.h"
 #include "Application.h"
 #include "EntityBase.h"
-#include "EntityGeometry.h"
-#include "EntityAnnotation.h"
-#include "EntityMeshTet.h"
-#include "EntityMeshCartesian.h"
-#include "EntityMaterial.h"
-#include "EntityParameter.h"
-#include "EntityMeshTetItem.h"
-#include "EntityFaceAnnotation.h"
-#include "EntityVis2D3D.h"
 #include "EntityUnits.h"
+#include "EntityMeshTet.h"
+#include "EntityVis2D3D.h"
+#include "EntityMaterial.h"
+#include "EntityGeometry.h"
+#include "EntityParameter.h"
+#include "EntityAnnotation.h"
+#include "EntityMeshTetItem.h"
 #include "EntityGraphicsScene.h"
-#include "EntityParameterizedDataCategorization.h"
+#include "EntityMeshCartesian.h"
+#include "EntityFaceAnnotation.h"
 #include "EntityMetadataCampaign.h"
+#include "EntityHierarchicalScene.h"
 #include "EntityParameterizedDataPreviewTable.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
+#include "EntityParameterizedDataCategorization.h"
 #include "EntityBlockConnection.h"
+#include "OTGui/SelectEntitiesDialogCfg.h"
 
 #include "MicroserviceNotifier.h"
 #include "GeometryOperations.h"
@@ -302,7 +303,9 @@ void Model::resetToNew()
 	}
 	
 	if (typeManager.hasHierarchicalRoot()) {
-
+		EntityHierarchicalScene* hierarchicalRoot = new EntityHierarchicalScene(createEntityUID(), nullptr, this, getStateManager(), OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
+		hierarchicalRoot->setName("Project");
+		addEntityToModel(hierarchicalRoot->getName(), hierarchicalRoot, entityRoot, true, allNewEntities);
 	}
 
 	// Now we load the default materials from the template definition

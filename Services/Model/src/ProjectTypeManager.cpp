@@ -67,8 +67,8 @@ void ProjectTypeManager::initializeProjectTypeHierarchical() {
 	m_hasRMDCategorizationPreview = false;
 	m_hasDataProcessingRoot = false;
 
-	//m_hasDatasetRoot = false;
-	//m_hasDatasetRMD = false;
+	m_hasDatasetRoot = false;
+	m_hasDatasetRMD = false;
 
 	m_hasHierarchicalRoot = true;
 
