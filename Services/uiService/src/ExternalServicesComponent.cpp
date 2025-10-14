@@ -239,6 +239,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, this, &ExternalServicesComponent::handleEnterEntitySelectionMode);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntityName, this, &ExternalServicesComponent::handleSetEntityName);
 	connectAction(OT_ACTION_CMD_UI_VIEW_RenameEntityName, this, &ExternalServicesComponent::handleRenameEntity);
+	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, this, &ExternalServicesComponent::handleSetEntitySelected);
 
 	// ToolBar
 	connectAction(OT_ACTION_CMD_UI_AddMenuPage, this, &ExternalServicesComponent::handleAddMenuPage);
@@ -2883,6 +2884,29 @@ void ExternalServicesComponent::handleRenameEntity(ot::JsonDocument& _document) 
 	std::string toPath = ot::json::getString(_document, OT_ACTION_PARAM_PATH_To);
 
 	AppBase::instance()->renameEntity(fromPath, toPath);
+}
+
+void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _document) {
+	bool selected = true;
+	if (_document.HasMember(OT_ACTION_PARAM_IsSelected)) {
+		selected = ot::json::getBool(_document, OT_ACTION_PARAM_IsSelected);
+	}
+	
+	ot::UID entityID = ot::invalidUID;
+	if (_document.HasMember(OT_ACTION_PARAM_MODEL_ITM_ID)) {
+		entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
+	}
+	else {
+		if (!_document.HasMember(OT_ACTION_PARAM_NAME)) {
+			OT_LOG_E("No entity ID or name provided to set selection state");
+			return;
+		}
+		std::string name = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+		entityID = ViewerAPI::getEntityID(name);
+	}
+
+	ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(entityID);
+	AppBase::instance()->setNavigationTreeItemSelected(treeID, selected);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

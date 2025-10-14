@@ -256,6 +256,7 @@
 #define OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode "UI.VIEW.EnterEntitySelectionMode"
 #define OT_ACTION_CMD_UI_VIEW_SetModifiedState "UI.View.SetModifiedState"
 #define OT_ACTION_CMD_UI_VIEW_SetEntityName "UI.VIEW.Entity.Name.Set"
+#define OT_ACTION_CMD_UI_VIEW_SetEntitySelected "UI.VIEW.Entity.Selected.Set"
 #define OT_ACTION_CMD_UI_VIEW_RenameEntityName "UI.VIEW.Entity.Name.Rename"
 
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
@@ -353,6 +354,7 @@
 #define OT_ACTION_PARAM_Requested "Requested"
 #define OT_ACTION_PARAM_ModelType "ModelType"
 #define OT_ACTION_PARAM_ModelInfo "ModelInfo"
+#define OT_ACTION_PARAM_IsSelected "IsSelected"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"

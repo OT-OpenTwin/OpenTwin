@@ -291,6 +291,7 @@ public:
 	void handleEnterEntitySelectionMode(ot::JsonDocument& _document);
 	void handleSetEntityName(ot::JsonDocument& _document);
 	void handleRenameEntity(ot::JsonDocument& _document);
+	void handleSetEntitySelected(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
