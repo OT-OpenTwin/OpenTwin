@@ -121,7 +121,7 @@ namespace ot {
 			OpenGLError                = 7705, //! @brief OpenGL error exit code.
 			AssetError                 = 7706, //! @brief Asset error exit code.
 			ComponentError             = 7707, //! @brief Component error exit code.
-
+			GeneralTimeout		       = 7708, //! @brief General timeout exit code.
 			LogInError                 = 7800, //! @brief Log in error exit code.
 			FailedToConvertPort        = 7801, //! @brief Failed to convert port exit code.
 			KeepAliveFailed            = 7802, //! @brief Keep alive failed exit code.
