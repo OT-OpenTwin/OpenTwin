@@ -17,6 +17,8 @@ public:
 	static std::string className() { return "EntityHierarchicalScene"; };
 	virtual std::string getClassName(void) override { return EntityHierarchicalScene::className(); };
 
+	virtual void addVisualizationNodes() override;
+
 	ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() override;
 	bool visualiseGraphicsView() override { return true; };
 };

@@ -18,10 +18,37 @@ EntityHierarchicalScene::EntityHierarchicalScene(ot::UID _ID, EntityBase* _paren
 	treeIcons.hiddenIcon = "Hierarchical";
 	this->setTreeIcon(treeIcons);
 
+	this->setSelectChildren(false);
+	this->setCreateVisualizationItem(true);
+	this->setDeletable(false);
+	this->setEditable(false);
+	this->setInitiallyHidden(false);
+	this->setSelectChildren(false);
 	this->setName(EntityHierarchicalScene::defaultName());
 }
 
 ot::GraphicsNewEditorPackage* EntityHierarchicalScene::getGraphicsEditorPackage() {
 	ot::GraphicsNewEditorPackage* package = new ot::GraphicsNewEditorPackage(this->getName(), this->getName());
 	return package;
+}
+
+void EntityHierarchicalScene::addVisualizationNodes() {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+
+	ot::VisualisationTypes visTypes;
+	visTypes.addGraphicsViewVisualisation();
+	visTypes.addToJsonObject(doc, doc.GetAllocator());
+
+	this->getTreeIcon().addToJsonDoc(doc);
+
+	getObserver()->sendMessageToViewer(doc);
+
+	for (EntityBase* child : getChildrenList()) {
+		child->addVisualizationNodes();
+	}
+
 }

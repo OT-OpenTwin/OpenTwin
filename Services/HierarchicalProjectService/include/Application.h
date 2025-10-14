@@ -17,7 +17,7 @@
 #include <string>
 #include <functional>
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
 private:
 	Application();
 	virtual ~Application();
@@ -38,13 +38,40 @@ public:
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
 
+	virtual void modelConnected(ot::components::ModelComponent* _model) override;
+
 	virtual void modelSelectionChanged() override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Button callbacks
+	// Private: Action handler
 
 private:
+
+	void handleSetProjectEntitySelected();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Button callbacks
+
+	void handleAddProject();
+	void handleAddHierarchical();
+	void handleAddContainer();
+	void handleAddDocument();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
+
+	void updateButtonStates();
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Worker
+
+	void initialSelectionWorker(std::string _modelUrl);
+
+	const std::string c_setProjectEntitySelectedAction = "SetProjectEntitySelected";
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
