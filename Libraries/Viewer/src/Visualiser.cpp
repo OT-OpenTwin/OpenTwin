@@ -46,5 +46,10 @@ ot::VisualisationCfg Visualiser::createVisualiserConfig(const VisualiserState& _
 	else {
 		visualisationCfg.setSupressViewHandling(false);
 	}
+
+	if (m_customViewFlags.has_value()) {
+		visualisationCfg.setCustomViewFlags(m_customViewFlags.value());
+	}
+
 	return visualisationCfg;
 }

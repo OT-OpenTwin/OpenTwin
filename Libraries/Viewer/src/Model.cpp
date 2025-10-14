@@ -822,40 +822,7 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	sceneNode->setModelEntityID(_modelEntityID);
 	sceneNode->setOldTreeIcons(_treeIcons);
 	
-	if (_visualisationTypes.visualiseAsTable())
-	{
-		auto tableVis = new TableVisualiser(sceneNode);
-		sceneNode->addVisualiser(tableVis);
-	}
-
-	if (_visualisationTypes.visualiseAsText())
-	{
-		auto textVis = new TextVisualiser(sceneNode);
-		sceneNode->addVisualiser(textVis);
-	}
-
-	if (_visualisationTypes.visualiseAsPlot1D())
-	{
-		auto plotVis = new PlotVisualiser(sceneNode);
-		sceneNode->addVisualiser(plotVis);
-	}
-
-	if (_visualisationTypes.visualiseAsCurve())
-	{
-		auto curveVis = new CurveVisualiser(sceneNode);
-		sceneNode->addVisualiser(curveVis);
-	}
-
-	if (_visualisationTypes.visualiseAsRange()) {
-		auto rangeVis = new RangeVisualiser(sceneNode);
-		sceneNode->addVisualiser(rangeVis);
-	}
-
-	if (_visualisationTypes.visualiseAsGraphicsView())
-	{
-		auto graphicsVis = new GraphicsVisualiser(sceneNode);
-		sceneNode->addVisualiser(graphicsVis);
-	}
+	VisualiserHelper::addVisualizer(sceneNode, _visualisationTypes);
 
 	// Get the parent scene node
 	SceneNodeBase* parentNode = getParentNode(_treeName);

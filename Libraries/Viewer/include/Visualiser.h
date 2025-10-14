@@ -1,10 +1,14 @@
 #pragma once
 
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "VisualiserState.h"
 #include "OTGui/VisualisationCfg.h"
+
+// std header
+#include <optional>
 
 class SceneNodeBase;
 
@@ -53,6 +57,9 @@ public:
 	void setVisualizationEntity(ot::UID _entity) { m_visualizationEntity = _entity; };
 	ot::UID getVisualizationEntity(void) const { return m_visualizationEntity; };
 
+	void setCustomViewFlags(const ot::WidgetViewBase::ViewFlags& _flags) { m_customViewFlags = _flags; };
+	const std::optional<ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
+
 	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
@@ -67,4 +74,5 @@ protected:
 	bool m_mayVisualise = true;
 	bool m_viewIsOpen = false;
 	ot::WidgetViewBase::ViewType m_viewType;
+	std::optional<ot::WidgetViewBase::ViewFlags> m_customViewFlags = std::nullopt;
 };

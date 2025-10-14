@@ -9,10 +9,12 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/WidgetViewBase.h"
 
 // std header
+#include <map>
 #include <list>
-#include <stdint.h>
+#include <optional>
 
 #pragma warning(disable : 4251)
 
@@ -58,11 +60,22 @@ namespace ot
 		bool visualiseAsGraphicsItem() const { return m_visualisations & GraphicsItem; };
 		bool visualiseAsGraphicsConnection() const { return m_visualisations & GraphicsConnection; };
 
+		//! @brief Sets custom view flags for a specific visualisation type.
+		//! @param _visType The visualisation type for which the custom flags should be set.
+		//! @param _flags The custom view flags to be applied.
+		void setCustomViewFlags(VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags) { m_customViewFlags.insert_or_assign(_visType, _flags); };
+
+		//! @brief Retrieves custom view flags for a specific visualisation type, if they exist.
+		//! @param _visType The visualisation type for which to retrieve custom flags.
+		//! @return An optional containing the custom view flags if they exist, or std::nullopt if not.
+		std::optional<ot::WidgetViewBase::ViewFlags> getCustomViewFlags(VisualisationType _visType) const;
+
 		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 	private:
 		VisualisationTypeFlags m_visualisations;
+		std::map<VisualisationType, ot::WidgetViewBase::ViewFlags> m_customViewFlags;
 	};
 }
 
