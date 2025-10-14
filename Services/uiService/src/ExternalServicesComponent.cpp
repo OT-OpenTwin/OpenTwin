@@ -3232,7 +3232,6 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
-	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
 	
 	bool suppressViewHandling = visualisationCfg.getSupressViewHandling();
 	if (suppressViewHandling) {
@@ -3242,7 +3241,7 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualizingEntities);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags, visualisationCfg);
 
 	if (suppressViewHandling) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
@@ -3258,10 +3257,9 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
-	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
-
+	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualisationCfg);
 
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
@@ -3317,10 +3315,9 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Visualisation_Config));
-	const ot::UIDList visualizingEntities = visualisationCfg.getVisualisingEntities();
-
+	
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualizingEntities);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags, visualisationCfg);
 
 	for (const auto& connection : pckg.connections()) {
 		editor->getGraphicsView()->addConnection(connection);

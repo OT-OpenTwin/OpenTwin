@@ -1872,8 +1872,8 @@ void AppBase::clearGraphicsPickerData(void) {
 	m_graphicsPickerManager.clear();
 }
 
-ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
-	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizingEntities);
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
@@ -1885,8 +1885,14 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable));
-	this->addVisualizingEntityInfoToView(newEditor, _visualizingEntities);
+	ot::WidgetViewBase baseData(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle | ot::WidgetViewBase::ViewIsPinnable | ot::WidgetViewBase::ViewIsCloseable);
+
+	if (_visualizationConfig.getCustomViewFlags().has_value()) {
+		baseData.setViewFlags(_visualizationConfig.getCustomViewFlags().value());
+	}
+
+	newEditor->setViewData(baseData);
+	this->addVisualizingEntityInfoToView(newEditor, _visualizationConfig.getVisualisingEntities());
 
 	ot::GraphicsView* graphics = newEditor->getGraphicsView();
 
@@ -1934,15 +1940,15 @@ ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName
 	}
 }
 
-ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
-	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName, _visualizingEntities);
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (v) {
 		return v;
 	}
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _entityName + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
-	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags, _visualizingEntities);
+	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags, _visualizationConfig);
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {

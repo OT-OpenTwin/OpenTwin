@@ -630,7 +630,7 @@ ot::ReturnMessage Application::handleVisualisationDataRequest(ot::JsonDocument& 
 	}
 	catch (std::exception& e) {
 		OT_LOG_W(e.what());
-		ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 
 	return ot::ReturnMessage::Ok;

@@ -34,9 +34,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 
 	ot::JsonDocument document;
 	
-	ot::JsonObject visualisationCfgJson;
-	_visualisationCfg.addToJsonObject(visualisationCfgJson, document.GetAllocator());
-	document.AddMember( OT_ACTION_PARAM_Visualisation_Config, visualisationCfgJson, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(_visualisationCfg, document.GetAllocator()), document.GetAllocator());
 	
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	info.addToJsonObject(document, document.GetAllocator());
@@ -52,6 +50,11 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
 
 			ot::TableCfg tableCfg = tableEntity->getTableConfig(_visualisationCfg.getOverrideViewerContent());
+
+			if (_visualisationCfg.getCustomViewFlags().has_value()) {
+				tableCfg.setViewFlags(_visualisationCfg.getCustomViewFlags().value());
+			}
+
 			ot::JsonObject cfgObj;
 			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
 
@@ -69,6 +72,11 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
 
 			ot::TextEditorCfg configuration = textEntity->createConfig(_visualisationCfg.getOverrideViewerContent());
+
+			if (_visualisationCfg.getCustomViewFlags().has_value()) {
+				configuration.setViewFlags(_visualisationCfg.getCustomViewFlags().value());
+			}
+
 			ot::JsonObject cfgObj;
 			configuration.addToJsonObject(cfgObj, document.GetAllocator());
 
@@ -85,7 +93,12 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_VIEW1D_Setup, document.GetAllocator());
 			
-			const ot::Plot1DCfg plotCfg = plotEntity->getPlot();
+			ot::Plot1DCfg plotCfg = plotEntity->getPlot();
+
+			if (_visualisationCfg.getCustomViewFlags().has_value()) {
+				plotCfg.setViewFlags(_visualisationCfg.getCustomViewFlags().value());
+			}
+
 			ot::JsonObject cfgObj;
 			plotCfg.addToJsonObject(cfgObj, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());

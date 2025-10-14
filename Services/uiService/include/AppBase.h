@@ -20,15 +20,16 @@
 #include "OTCore/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
-#include "OTGui/CopyInformation.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Plot1DCfg.h"
 #include "OTGui/TextEditorCfg.h"
+#include "OTGui/CopyInformation.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/MessageDialogCfg.h"
+#include "OTGui/VisualisationCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetView.h"
@@ -421,11 +422,11 @@ public:
 	//! \brief Clears the graphics picker and stored service picker data.
 	void clearGraphicsPickerData(void);
 
-	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
 	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName, const ot::UIDList& _visualizingEntities);
 
-	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig);
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
 

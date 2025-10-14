@@ -41,6 +41,7 @@ void EntityHierarchicalScene::addVisualizationNodes() {
 
 	ot::VisualisationTypes visTypes;
 	visTypes.addGraphicsViewVisualisation();
+	visTypes.setCustomViewFlags(ot::VisualisationTypes::GraphicsView, ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewNameAsTitle);
 	visTypes.addToJsonObject(doc, doc.GetAllocator());
 
 	this->getTreeIcon().addToJsonDoc(doc);
