@@ -17,5 +17,5 @@ public:
 	std::string visibleIcon;
 	std::string hiddenIcon;
 
-	void addToJsonDoc(ot::JsonDocument& doc);
+	void addToJsonDoc(ot::JsonDocument& doc) const;
 };
