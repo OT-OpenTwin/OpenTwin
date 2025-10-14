@@ -1418,8 +1418,10 @@ void AppBase::setRelayURLs(const std::string & _url) {
 
 std::string AppBase::getRelayURLs() const { return m_relayURLs; }
 
-void AppBase::switchToViewMenuTab() {
-	uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
+void AppBase::switchToViewMenuTabIfNeeded() {
+	if (uiAPI::window::getCurrentTabToolBarTab(m_mainWindow) == 0) {
+		uiAPI::window::setCurrentTabToolBarTab(m_mainWindow, 1);
+	}
 }
 
 void AppBase::switchToMenuTab(const std::string& _menu) {

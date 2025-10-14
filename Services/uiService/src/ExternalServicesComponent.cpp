@@ -2023,7 +2023,7 @@ void ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _d
 	// Here we know that all services completed the startup -> switch to main view and restore state
 	m_servicesUiSetupCompleted = true;
 
-	AppBase::instance()->switchToViewMenuTab();
+	AppBase::instance()->switchToViewMenuTabIfNeeded();
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 
 	AppBase::instance()->restoreSessionState();

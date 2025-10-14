@@ -285,7 +285,7 @@ public:
 
 	std::string getCollectionName() const { return m_collectionName; }
 
-	void switchToViewMenuTab();
+	void switchToViewMenuTabIfNeeded();
 
 	void switchToMenuTab(const std::string& _menu);
 
