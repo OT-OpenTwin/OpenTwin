@@ -2,7 +2,7 @@
 #include "OTSystem/FileSystem.h"
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // project header
 #include "Application.h"
@@ -10,6 +10,7 @@
 
 // std header
 #include <iostream>
+#include <cstdlib>
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -25,7 +26,7 @@ int Application::run(void) {
 		exitCode = 1;
 	}
 
-	// generate documentation exitCode = 2 if error occured
+	// generate documentation, exitCode = 2 if error occured
 
 	return exitCode;
 }
@@ -34,10 +35,8 @@ bool Application::searchForServices(void) {
 	OT_LOG_D("Searching for Services.");
 
 	// search in Open Twin Services
-	const std::string path = "C:\\OT\\OpenTwin\\Services";
-	
+	const std::string path = getPathToOTServices();
 	std::list<Service> services;
-
 	bool hasError = false;
 
 	try {
@@ -84,6 +83,21 @@ bool Application::searchForServices(void) {
 		}
 	}
 	return hasError;
+}
+
+std::string Application::getPathToOTServices(void) {
+	std::string fullPath;
+	char* env_p = nullptr;
+	size_t len = 0;
+
+	if (_dupenv_s(&env_p, &len, "OPENTWIN_DEV_ROOT") == 0 && env_p != nullptr) {
+		OT_LOG_D(std::string("Your path is: ") + env_p); // C:\OT\OpenTwin
+		fullPath = std::string(env_p) + "\\Services";
+		OT_LOG_D(std::string("Full path is: ") + fullPath); // C:\OT\OpenTwin\Services
+		free(env_p);
+	}
+	
+	return fullPath;
 }
 
 bool Application::searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service) {

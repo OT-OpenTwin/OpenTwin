@@ -1,5 +1,5 @@
 // Open Twin header
-#include "OTCore/Logger.h"
+#include "OTCore/LogDispatcher.h"
 
 // project header
 #include "Endpoint.h"

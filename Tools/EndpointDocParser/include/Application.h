@@ -33,6 +33,8 @@ public:
 
 	bool searchForServices(void);
 
+	std::string getPathToOTServices(void);
+
 	bool searchIncludeAndSrcDirectoryFiles(const std::string& _file, Service& _service);
 
 	bool searchSrcDirectoryFiles(const std::string& _srcDirectory, Service& _service);
