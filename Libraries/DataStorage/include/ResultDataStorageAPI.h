@@ -27,22 +27,24 @@ namespace DataStorageAPI
 	class __declspec(dllexport)  ResultDataStorageAPI
 	{
 	public:
-		ResultDataStorageAPI(const std::string& collectionName);
-		ResultDataStorageAPI(const ResultDataStorageAPI& other) = default;
-		ResultDataStorageAPI(ResultDataStorageAPI&& other) = default;
-		ResultDataStorageAPI& operator=(const ResultDataStorageAPI& other) = default;
-		ResultDataStorageAPI& operator=(ResultDataStorageAPI&& other) = default;
+		ResultDataStorageAPI(const std::string& _collectionName);
+		ResultDataStorageAPI(const ResultDataStorageAPI& _other) = default;
+		ResultDataStorageAPI(ResultDataStorageAPI&& _other) = default;
+		ResultDataStorageAPI& operator=(const ResultDataStorageAPI& _other) = default;
+		ResultDataStorageAPI& operator=(ResultDataStorageAPI&& _other) = default;
 		~ResultDataStorageAPI() = default;
 
-		DataStorageResponse InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing);
-		DataStorageResponse SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);
-		DataStorageResponse SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort, int _limit);
-		DataStorageResponse SearchInResultCollection(const std::string& queryFilter, const std::string& projectionQuery, int limit);
-		void FlushQueuedData();
+		DataStorageResponse insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing);
+		DataStorageResponse searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery,int _limit);
+		DataStorageResponse searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options);
+		DataStorageResponse searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit);
+		void flushQueuedData();
+
+		mongocxx::collection& getCollection() { return m_docBase.getCollection(); }
 
 	private:
-		int maxDocumentLength = 16776216;
-		DocumentAccess documentAccess;
-		DocumentAccessBase docBase;
+		int m_maxDocumentLength = 16776216;
+		DocumentAccess m_documentAccess;
+		DocumentAccessBase m_docBase;
 	};
 }

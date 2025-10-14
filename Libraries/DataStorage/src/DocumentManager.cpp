@@ -30,7 +30,7 @@ namespace DataStorageAPI
 		auto jsonDataLength = jsonData.view().length();
 		DataStorageResponse response;
 		if (jsonDataLength >= MaxDocumentLength) {
-			response.UpdateDataStorageResponse("", false, "Data exceeds 16MB");
+			response.updateDataStorageResponse("", false, "Data exceeds 16MB");
 			return response;
 		}
 
@@ -55,14 +55,14 @@ namespace DataStorageAPI
 		auto jsonDataLength = fileMetaData.view().length();
 		DataStorageResponse response;
 		if (jsonDataLength >= MaxDocumentLength) {
-			response.UpdateDataStorageResponse("", false, "Data exceeds 16MB");
+			response.updateDataStorageResponse("", false, "Data exceeds 16MB");
 			return response;
 		}
 
 		UniqueFileName unique;
 		if (!unique.CheckFilePathExists(filePath))
 		{
-			response.UpdateDataStorageResponse("", false, "The file doesnot exists in the path specified.");
+			response.updateDataStorageResponse("", false, "The file doesnot exists in the path specified.");
 			return response;
 		}
 		auto entityResult = CheckDocumentEntityExists(entityId, version, collectionName);
@@ -102,7 +102,7 @@ namespace DataStorageAPI
 		auto jsonDataLength = fileMetaData.view().length();
 		DataStorageResponse response;
 		if (jsonDataLength >= MaxDocumentLength) {
-			response.UpdateDataStorageResponse("", false, "Data exceeds 16MB");
+			response.updateDataStorageResponse("", false, "Data exceeds 16MB");
 			return response;
 		}
 

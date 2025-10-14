@@ -76,7 +76,7 @@ ot::JsonDocument CurveDatasetFactory::queryCurveData(const ot::QueryInformation&
 	}
 	const std::string temp = bsoncxx::to_json(query);
 
-	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.SearchInResultCollection(query, projection, 0);
+	DataStorageAPI::DataStorageResponse dbResponse = m_dataAccess.searchInResultCollection(query, projection, 0);
 	if (dbResponse.getSuccess()) 
 	{
 		const std::string queryResponse = dbResponse.getResult();

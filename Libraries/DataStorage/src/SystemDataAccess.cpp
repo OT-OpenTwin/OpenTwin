@@ -37,18 +37,18 @@ namespace DataStorageAPI
 			if (result)
 			{
 				response.setBsonResult(result);
-				response.UpdateDataStorageResponse(bsoncxx::to_json(*result), true, "");
+				response.updateDataStorageResponse(bsoncxx::to_json(*result), true, "");
 			}
 			else
 			{
-				response.UpdateDataStorageResponse("", false, "Data not found!");
+				response.updateDataStorageResponse("", false, "Data not found!");
 			}
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}

@@ -50,6 +50,8 @@ public:
 
 	bool collectionHasMetadata() const { return m_metadataExistInProject; }
 
+
+
 protected:
 	ResultCollectionMetadataAccess() {};
 	bool m_metadataExistInProject = false;

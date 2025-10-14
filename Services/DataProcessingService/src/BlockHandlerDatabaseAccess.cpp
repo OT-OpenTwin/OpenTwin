@@ -62,11 +62,16 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 	if (m_sortByID)
 	{
-		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection,m_sort, m_documentLimit);
+		mongocxx::options::find options;
+		options.sort(m_sort);
+		options.limit(m_documentLimit);
+		options.projection(m_projection);
+
+		dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, options);
 	}
 	else
 	{
-		dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, m_documentLimit);
+		dbResponse = m_resultCollectionAccess->searchInResultCollection(m_query, m_projection, m_documentLimit);
 	}
 	
 	if (dbResponse.getSuccess())

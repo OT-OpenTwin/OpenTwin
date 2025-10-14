@@ -247,6 +247,19 @@ namespace DataStorageAPI
 		}
 	}
 
+	mongocxx::cursor DocumentAccessBase::GetAllDocument(BsonViewOrValue _queryFilter, mongocxx::options::find _options)
+	{
+		try
+		{
+			return mongoCollection.find(_queryFilter, _options);
+		}
+		catch (const mongocxx::exception& e)
+		{
+			std::cout << e.what();
+			throw e;
+		}
+	}
+
 	bsoncxx::stdx::optional<mongocxx::result::delete_result> DocumentAccessBase::DeleteMultipleDocument(String deleteQuery)
 	{
 		auto value = bsoncxx::from_json(deleteQuery);

@@ -27,18 +27,18 @@ namespace DataStorageAPI
 			auto result = docBase->InsertDocument(bsonData, allowQueueing);
 			if (!result.empty())
 			{
-				response.UpdateDataStorageResponse(result, true, "");
+				response.updateDataStorageResponse(result, true, "");
 			}
 			else
 			{
-				response.UpdateDataStorageResponse("", false, "Document not inserted!");
+				response.updateDataStorageResponse("", false, "Document not inserted!");
 			}
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -52,18 +52,18 @@ namespace DataStorageAPI
 			if (result.has_value())
 			{
 				auto count = result.value().inserted_count();
-				response.UpdateDataStorageResponse("Inserted count" + std::to_string(count), true, "");
+				response.updateDataStorageResponse("Inserted count" + std::to_string(count), true, "");
 			}
 			else
 			{
-				response.UpdateDataStorageResponse("", false, "Document(s) not inserted!");
+				response.updateDataStorageResponse("", false, "Document(s) not inserted!");
 			}
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -78,18 +78,18 @@ namespace DataStorageAPI
 			if (result)
 			{
 				response.setBsonResult(result);
-				response.UpdateDataStorageResponse(bsoncxx::to_json(*result), true, "");
+				response.updateDataStorageResponse(bsoncxx::to_json(*result), true, "");
 			}
 			else
 			{
-				response.UpdateDataStorageResponse("", false, "Data not found!");
+				response.updateDataStorageResponse("", false, "Data not found!");
 			}
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -103,18 +103,18 @@ namespace DataStorageAPI
 			if (result)
 			{
 				response.setBsonResult(result);
-				response.UpdateDataStorageResponse(bsoncxx::to_json(*result), true, "");
+				response.updateDataStorageResponse(bsoncxx::to_json(*result), true, "");
 			}
 			else
 			{
-				response.UpdateDataStorageResponse("", false, "Data not found!");
+				response.updateDataStorageResponse("", false, "Data not found!");
 			}
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -138,7 +138,7 @@ namespace DataStorageAPI
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -161,13 +161,13 @@ namespace DataStorageAPI
 				isFirst = false;
 			}
 			responseData += "]}";
-			response.UpdateDataStorageResponse(responseData, true, "");
+			response.updateDataStorageResponse(responseData, true, "");
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -190,13 +190,13 @@ namespace DataStorageAPI
 				isFirst = false;
 			}
 			responseData += "]}";
-			response.UpdateDataStorageResponse(responseData, true, "");
+			response.updateDataStorageResponse(responseData, true, "");
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}
@@ -220,13 +220,43 @@ namespace DataStorageAPI
 				isFirst = false;
 			}
 			responseData += "]}";
-			response.UpdateDataStorageResponse(responseData, true, "");
+			response.updateDataStorageResponse(responseData, true, "");
 			return response;
 		}
 		catch (std::exception& e)
 		{
 			std::cout << e.what();
-			response.UpdateDataStorageResponse("", false, e.what());
+			response.updateDataStorageResponse("", false, e.what());
+			return response;
+		}
+	}
+
+	DataStorageResponse DocumentAccess::GetAllDocuments(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
+	{
+
+		DataStorageResponse response;
+		try
+		{
+			auto results = docBase->GetAllDocument(std::move(_queryFilter), _options);
+			std::string responseData = "{ \"Documents\": [";
+			bool isFirst = true;
+			for (auto result : results)
+			{
+				if (!isFirst)
+				{
+					responseData += ",";
+				}
+				responseData += bsoncxx::to_json(result);
+				isFirst = false;
+			}
+			responseData += "]}";
+			response.updateDataStorageResponse(responseData, true, "");
+			return response;
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+			response.updateDataStorageResponse("", false, e.what());
 			return response;
 		}
 	}

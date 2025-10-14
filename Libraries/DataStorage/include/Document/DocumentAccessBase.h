@@ -41,9 +41,12 @@ namespace DataStorageAPI
 		__declspec(dllexport) mongocxx::cursor GetAllDocument(String jsonQueryFilter, String jsonProjectionQuery, int limit);
 		__declspec(dllexport) mongocxx::cursor GetAllDocument(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, int limit);
 		__declspec(dllexport) mongocxx::cursor GetAllDocument(BsonViewOrValue queryFilter, BsonViewOrValue projectionQuery, BsonViewOrValue sortQuery, int limit);
+		__declspec(dllexport) mongocxx::cursor GetAllDocument(BsonViewOrValue _queryFilter, mongocxx::options::find _options);
 
 		__declspec(dllexport) bsoncxx::stdx::optional<mongocxx::result::delete_result> DeleteMultipleDocument(String deleteQuery);
 		__declspec(dllexport) bsoncxx::stdx::optional<mongocxx::result::delete_result> DeleteMultipleDocument(BsonViewOrValue deleteQuery);
+
+		__declspec(dllexport) mongocxx::collection& getCollection() { return mongoCollection; }
 
 	protected:
 		mongocxx::collection mongoCollection;

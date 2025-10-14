@@ -4,46 +4,46 @@
 #include "bsoncxx/json.hpp"
 namespace DataStorageAPI
 {
-	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& collectionName)
-		:documentAccess("Projects", collectionName + ".results"), docBase("Projects", collectionName + ".results")
+	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& _collectionName)
+		:m_documentAccess("Projects", _collectionName + ".results"), m_docBase("Projects", _collectionName + ".results")
 	{	
 
 	}
 
-	DataStorageResponse ResultDataStorageAPI::InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing)
+	DataStorageResponse ResultDataStorageAPI::insertDocumentToResultStorage(Document& _jsonData, bool _checkForExistence, bool _allowQueueing)
 	{
-		auto jsonDataLength = jsonData.view().length();
-		if (jsonDataLength > maxDocumentLength)
+		auto jsonDataLength = _jsonData.view().length();
+		if (jsonDataLength > m_maxDocumentLength)
 		{
-			throw std::exception(("The result collection does not support documents with a size larger then " + std::to_string(maxDocumentLength)).c_str());
+			throw std::exception(("The result collection does not support documents with a size larger then " + std::to_string(m_maxDocumentLength)).c_str());
 		}
-		if (checkForExistence)
+		if (_checkForExistence)
 		{
 
 		}
-		return documentAccess.InsertDocumentToDatabase(jsonData.extract(), allowQueueing);
+		return m_documentAccess.InsertDocumentToDatabase(_jsonData.extract(), _allowQueueing);
 	}
 
-	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
+	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, int _limit)
 	{
-		return documentAccess.GetAllDocuments(_queryFilter, _projectionQuery, _limit);
+
+		
+		return m_documentAccess.GetAllDocuments(_queryFilter, _projectionQuery, _limit);
 
 	}
 
-	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(BsonViewOrValue _queryFilter, BsonViewOrValue _projectionQuery, BsonViewOrValue _sort, int _limit)
+	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(BsonViewOrValue _queryFilter, mongocxx::options::find& _options)
 	{
-		return documentAccess.GetAllDocuments(_queryFilter, _projectionQuery, _sort, _limit);
+		return m_documentAccess.GetAllDocuments(_queryFilter, _options);
 	}
-
 	
-
-	DataStorageResponse ResultDataStorageAPI::SearchInResultCollection(const std::string& queryFilter, const std::string& projectionQuery, int limit)
+	DataStorageResponse ResultDataStorageAPI::searchInResultCollection(const std::string& _queryFilter, const std::string& _projectionQuery, int _limit)
 	{
-		return SearchInResultCollection(bsoncxx::from_json(queryFilter), bsoncxx::from_json(projectionQuery), limit);
+		return searchInResultCollection(bsoncxx::from_json(_queryFilter), bsoncxx::from_json(_projectionQuery), _limit);
 	}
 
-	void ResultDataStorageAPI::FlushQueuedData()
+	void ResultDataStorageAPI::flushQueuedData()
 	{
-		docBase.FlushQueuedDocuments();
+		m_docBase.FlushQueuedDocuments();
 	}
 }
