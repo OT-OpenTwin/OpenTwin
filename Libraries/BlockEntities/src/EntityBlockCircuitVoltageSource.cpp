@@ -12,22 +12,24 @@
 static EntityFactoryRegistrar<EntityBlockCircuitVoltageSource> registrar(EntityBlockCircuitVoltageSource::className());
 
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
-	m_navigationOldTreeIconName = "VoltageSource";
-	m_navigationOldTreeIconNameHidden = "VoltageSource";
-	m_blockTitle = "Voltage Source";
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) 
+{
+	OldTreeIcon icon;
+	icon.visibleIcon = "VoltageSource";
+	icon.hiddenIcon = "VoltageSource";
+	setNavigationTreeIcon(icon);
 
-	
+	setBlockTitle("Voltage Source");
 
 	const std::string connectorPositive = "positivePole";
 	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
-	m_connectorsByName[connectorPositive] = m_positiveConnector;
+	addConnector(m_positiveConnector);
 
 	const std::string connectorNegative = "negativePole";
 	m_negativeConnector = { ot::ConnectorType::Out,connectorNegative,connectorNegative };
-	m_connectorsByName[connectorNegative] = m_negativeConnector;
-	
+	addConnector(m_negativeConnector);
 
+	resetModified();
 }
 
 void EntityBlockCircuitVoltageSource::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {

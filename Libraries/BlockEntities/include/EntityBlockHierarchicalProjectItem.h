@@ -6,6 +6,7 @@
 #pragma once
 
 #include "EntityBlock.h"
+#include "OTCore/ProjectInformation.h"
 
 class __declspec(dllexport) EntityBlockHierarchicalProjectItem : public EntityBlock {
 public:
@@ -19,6 +20,12 @@ public:
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	virtual bool updateFromProperties() override;
 
+	virtual void createProperties();
+
+	void setProjectInformation(const ot::ProjectInformation& info);
+	ot::ProjectInformation getProjectInformation() const;
+
 private:
+
 };
 

@@ -21,3 +21,14 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 bool EntityBlockHierarchicalProjectItem::updateFromProperties() {
 	return false;
 }
+
+void EntityBlockHierarchicalProjectItem::createProperties() {
+	
+}
+
+void EntityBlockHierarchicalProjectItem::setProjectInformation(const ot::ProjectInformation& info) {
+}
+
+ot::ProjectInformation EntityBlockHierarchicalProjectItem::getProjectInformation() const {
+	return ot::ProjectInformation();
+}

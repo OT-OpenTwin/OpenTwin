@@ -45,13 +45,13 @@ public:
 
 	bool getReproducableOrder() ;
 
-	static const std::string getIconName() {return "Database_access.svg";}
+	static const std::string getIconName() {return "Database_access.svg"; }
+
 protected:
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-
 	const uint32_t m_maxNbOfQueries = 40;
 
 	const std::string m_propertyNameProjectName = "Projectname";

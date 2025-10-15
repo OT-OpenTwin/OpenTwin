@@ -14,15 +14,20 @@
 static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar(EntityBlockCircuitGND::className());
 
 EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
-	m_navigationOldTreeIconName = "GND";
-	m_navigationOldTreeIconNameHidden = "GND";
-	m_blockTitle = "GND";
+	: EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+{
+	OldTreeIcon icon;
+	icon.visibleIcon = "GND";
+	icon.hiddenIcon = "GND";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("GND");
 
 	const std::string connectorNameLeft = "GND";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
+	resetModified();
 }
 
 void EntityBlockCircuitGND::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {

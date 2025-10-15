@@ -14,17 +14,22 @@ static EntityFactoryRegistrar<EntityBlockCircuitInductor> registrar(EntityBlockC
 EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = "Inductor";
-	m_navigationOldTreeIconNameHidden = "Inductor";
-	m_blockTitle = "Inductor";
+	OldTreeIcon icon;
+	icon.visibleIcon = "Inductor";
+	icon.hiddenIcon = "Inductor";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Inductor");
 
 	const std::string connectorNameLeft = "Left8";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
 	const std::string connectorNameRight = "Right8";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	m_connectorsByName[connectorNameRight] = m_RightConnector;
+	addConnector(m_RightConnector);
+
+	resetModified();
 }
 
 void EntityBlockCircuitInductor::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)

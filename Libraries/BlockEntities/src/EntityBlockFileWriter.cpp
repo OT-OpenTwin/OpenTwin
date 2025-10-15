@@ -7,11 +7,17 @@ static EntityFactoryRegistrar<EntityBlockFileWriter> registrar(EntityBlockFileWr
 EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID,parent,obs,ms,owner)
 {
+	OldTreeIcon icon;
+	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("File Writer");
+
 	m_inputConnector = { ot::ConnectorType::In, "Input", "Input" };
-	m_connectorsByName[m_inputConnector.getConnectorName()] = m_inputConnector;
-	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_blockTitle = "File Writer";
+	addConnector(m_inputConnector);
+
+	resetModified();
 }
 
 void EntityBlockFileWriter::createProperties()

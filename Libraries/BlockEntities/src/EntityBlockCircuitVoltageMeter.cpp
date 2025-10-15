@@ -14,17 +14,22 @@ static EntityFactoryRegistrar<EntityBlockCircuitVoltageMeter> registrar(EntityBl
 EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = "VoltMeter";
-	m_navigationOldTreeIconNameHidden = "VoltMeter";
-	m_blockTitle = "Voltage Meter";
+	OldTreeIcon icon;
+	icon.visibleIcon = "VoltMeter";
+	icon.hiddenIcon = "VoltMeter";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Voltage Meter");
 
 	const std::string connectorNameLeft = "Left4";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
 	const std::string connectorNameRight = "Right4";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	m_connectorsByName[connectorNameRight] = m_RightConnector;
+	addConnector(m_RightConnector);
+
+	resetModified();
 }
 
 void EntityBlockCircuitVoltageMeter::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {

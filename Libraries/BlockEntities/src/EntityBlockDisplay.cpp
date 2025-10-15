@@ -6,11 +6,17 @@ static EntityFactoryRegistrar<EntityBlockDisplay> registrar(EntityBlockDisplay::
 EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
 {
+	OldTreeIcon icon;
+	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Display");
+
 	_inputConnector = { ot::ConnectorType::In, "Input", "Input"};
-	m_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;
-	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_blockTitle = "Display";
+	addConnector(_inputConnector);
+
+	resetModified();
 }
 
 void EntityBlockDisplay::createProperties()

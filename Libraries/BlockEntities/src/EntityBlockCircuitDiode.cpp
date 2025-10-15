@@ -14,17 +14,22 @@ static EntityFactoryRegistrar<EntityBlockCircuitDiode> registrar(EntityBlockCirc
 EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner) 
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
 {
+	OldTreeIcon icon;
+	icon.visibleIcon = "Diod2";
+	icon.hiddenIcon = "Diod2";
+	setNavigationTreeIcon(icon);
 
-	m_navigationOldTreeIconName = "Diod2";
-	m_navigationOldTreeIconNameHidden = "Diod2";
-	m_blockTitle = "Diode";
+	setBlockTitle("Diode");
+
 	const std::string connectorNameLeft = "Left2";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
 	const std::string connectorNameRight = "Right2";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	m_connectorsByName[connectorNameRight] = m_RightConnector;
+	addConnector(m_RightConnector);
+
+	resetModified();
 }
 
 void EntityBlockCircuitDiode::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)

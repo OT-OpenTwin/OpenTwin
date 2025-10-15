@@ -9,9 +9,14 @@ static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::cl
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_blockTitle = "Python";
+	OldTreeIcon icon;
+	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Python");
+
+	resetModified();
 }
 
 void EntityBlockPython::createProperties(const std::string& scriptFolder, ot::UID scriptFolderID)
@@ -85,7 +90,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 
 		for (auto& connector : allConnectors) 
 		{
-			m_connectorsByName[connector.getConnectorName()] = std::move(connector);
+			addConnector(std::move(connector));
 		}
 
 		for (auto& property : allProperties)
@@ -107,7 +112,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 
 void EntityBlockPython::resetBlockRelatedAttributes()
 {
-	m_connectorsByName.clear();
+	clearConnectors();
 	
 	auto allProperties = getProperties().getListOfAllProperties();
 	for (auto& property : allProperties)

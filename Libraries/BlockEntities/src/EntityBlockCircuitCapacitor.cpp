@@ -14,17 +14,22 @@ static EntityFactoryRegistrar<EntityBlockCircuitCapacitor> registrar(EntityBlock
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = "Capacitor";
-	m_navigationOldTreeIconNameHidden = "Capacitor";
-	m_blockTitle = "Capacitor";
+	OldTreeIcon icon;
+	icon.visibleIcon = "Capacitor";
+	icon.hiddenIcon = "Capacitor";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Capacitor");
 
 	const std::string connectorNameLeft = "Left7";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
 	const std::string connectorNameRight = "Right7";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	m_connectorsByName[connectorNameRight] = m_RightConnector;
+	addConnector(m_RightConnector);
+
+	resetModified();
 }
 
 void EntityBlockCircuitCapacitor::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID)

@@ -8,12 +8,15 @@ static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlock
 EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = "Diod2";
-	m_navigationOldTreeIconNameHidden = "Diod2";
-	m_blockTitle = "Connector";
+	OldTreeIcon icon;
+	icon.visibleIcon = "Diod2";
+	icon.hiddenIcon = "Diod2";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Connector");
+
+	resetModified();
 }
-
-
 
 #define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitConnector::createBlockCfg() {

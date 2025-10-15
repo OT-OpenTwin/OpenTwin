@@ -11,8 +11,8 @@ EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, Ent
 	:EntityBase(ID, parent, obs, ms, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
 	_blockIDOrigin(-1), _blockIDDestination(-1)
 {
-	m_navigationOldTreeIconName = "connection";
-	m_navigationOldTreeIconNameHidden = "connection";
+	m_navigationIcon.visibleIcon = "connection";
+	m_navigationIcon.hiddenIcon = "connection";
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -122,23 +122,14 @@ void EntityBlockConnection::addVisualizationNodes(void)
 
 void EntityBlockConnection::CreateNavigationTreeEntry()
 {
-	if (m_navigationOldTreeIconName != "" && m_navigationOldTreeIconNameHidden != "")
-	{
-		OldTreeIcon treeIcons;
-		treeIcons.size = 32;
-
-		treeIcons.visibleIcon = m_navigationOldTreeIconName;
-		treeIcons.hiddenIcon = m_navigationOldTreeIconNameHidden;
-
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		treeIcons.addToJsonDoc(doc);
+		m_navigationIcon.addToJsonDoc(doc);
 		getObserver()->sendMessageToViewer(doc);
-	}
 }
 
 void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& storage)

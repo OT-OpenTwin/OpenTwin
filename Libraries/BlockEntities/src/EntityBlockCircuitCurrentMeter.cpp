@@ -12,18 +12,24 @@
 static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar(EntityBlockCircuitCurrentMeter::className());
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
-	m_navigationOldTreeIconName = "CurrentMeter";
-	m_navigationOldTreeIconNameHidden = "CurrentMeter";
-	m_blockTitle = "Current Meter";
+	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
+{
+	OldTreeIcon icon;
+	icon.visibleIcon = "CurrentMeter";
+	icon.hiddenIcon = "CurrentMeter";
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Current Meter");
 
 	const std::string connectorNameLeft = "Left6";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
-	m_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	addConnector(m_LeftConnector);
 
 	const std::string connectorNameRight = "Right6";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
-	m_connectorsByName[connectorNameRight] = m_RightConnector;
+	addConnector(m_RightConnector);
+
+	resetModified();
 }
 
 void EntityBlockCircuitCurrentMeter::createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) {

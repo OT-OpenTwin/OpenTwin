@@ -7,9 +7,14 @@ static EntityFactoryRegistrar<EntityBlockStorage> registrar(EntityBlockStorage::
 EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_blockTitle = "Store in Database";
+	OldTreeIcon icon;
+	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	setNavigationTreeIcon(icon);
+
+	setBlockTitle("Store in Database");
+
+	resetModified();
 }
 
 ot::GraphicsItemCfg* EntityBlockStorage::createBlockCfg()
@@ -40,8 +45,8 @@ void EntityBlockStorage::createProperties()
 
 bool EntityBlockStorage::updateFromProperties()
 {
-	//First we need to check if the number of connectors needs a refreshing
-	bool requiresConnectorUpdate = getNumberOfInputs() != m_connectorsByName.size();
+	// First we need to check if the number of connectors needs a refreshing
+	bool requiresConnectorUpdate = getNumberOfInputs() != getConnectorCount();
 
 	if (requiresConnectorUpdate)
 	{
@@ -72,7 +77,7 @@ std::string EntityBlockStorage::getPlotName()
 const std::list<std::string> EntityBlockStorage::getInputNames()
 {
 	std::list<std::string> inputNames;
-	for (auto& connectorByName : m_connectorsByName)
+	for (auto& connectorByName : getAllConnectors())
 	{
 		if (connectorByName.first != getSeriesConnectorName())
 		{
@@ -105,12 +110,7 @@ void EntityBlockStorage::createConnectors()
 			name += std::to_string(i -1);
 		}
 		ot::Connector newConnector(type, name, title);
-		m_connectorsByName[name] = newConnector;
+		addConnector(newConnector);
 	}
 	
-}
-
-void EntityBlockStorage::clearConnectors()
-{
-	m_connectorsByName.clear();
 }

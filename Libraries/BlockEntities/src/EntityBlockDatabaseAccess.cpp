@@ -10,14 +10,18 @@ static EntityFactoryRegistrar<EntityBlockDatabaseAccess> registrar(EntityBlockDa
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
 {
-	m_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	m_blockTitle = "Database Access";
+	OldTreeIcon icon;
+	icon.visibleIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	icon.hiddenIcon = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	setNavigationTreeIcon(icon);
 
+	setBlockTitle("Database Access");
 
 	const std::string connectorNameOutput= "Output";
 	m_connectorOutput = { ot::ConnectorType::Out, connectorNameOutput, connectorNameOutput };
-	m_connectorsByName[connectorNameOutput] = m_connectorOutput;
+	addConnector(m_connectorOutput);
+
+	resetModified();
 }
 
 void EntityBlockDatabaseAccess::createProperties()

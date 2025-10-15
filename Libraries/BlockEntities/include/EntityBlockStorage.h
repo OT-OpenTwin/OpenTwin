@@ -42,5 +42,4 @@ private:
 	void createParameterProperties(const std::string& _groupName);
 
 	void createConnectors();
-	void clearConnectors();
 };

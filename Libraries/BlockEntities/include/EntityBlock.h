@@ -4,6 +4,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "EntityCoordinates2D.h"
+#include "OldTreeIcon.h"
 
 #include "Connector.h"
 
@@ -40,9 +41,6 @@ public:
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
 
-	void addConnector(const ot::Connector& connector);
-	void removeConnector(const ot::Connector& connector);
-
 	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
 
 	std::string createBlockHeadline();
@@ -53,19 +51,33 @@ public:
 	void createBlockItem();
 
 protected:
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+
+	void addConnector(const ot::Connector& connector);
+	void addConnector(ot::Connector&& connector);
+	void removeConnector(const ot::Connector& connector);
+	void clearConnectors();
+	const std::map<std::string, ot::Connector>& getAllConnectors() const { return m_connectorsByName; }
+	ot::Connector getConnectorByName(const std::string& _connectorName) const;
+	size_t getConnectorCount() const { return m_connectorsByName.size(); }
+
+	void createNavigationTreeEntry();
+	void addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
+
+	void setNavigationTreeIcon(const OldTreeIcon& icon) { m_navigationTreeIcon = icon; setModified(); };
+	const OldTreeIcon& getNavigationTreeIcon() const { return m_navigationTreeIcon; };
+
+	void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
+
+private:
 	std::string m_blockTitle = "";
 	ot::UID m_coordinate2DEntityID = 0;
 	EntityCoordinates2D* m_coordinateEntity = nullptr;
 	ot::BasicServiceInformation m_info;
 	std::string	m_graphicsScenePackageChildName = "";
-	std::string m_navigationOldTreeIconName = "";
-	std::string m_navigationOldTreeIconNameHidden = "";
 
-	std::map<std::string,ot::Connector> m_connectorsByName;
+	OldTreeIcon m_navigationTreeIcon;
 
-	void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
-
-	void createNavigationTreeEntry();
-	void addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
+	std::map<std::string, ot::Connector> m_connectorsByName;
 };
