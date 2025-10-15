@@ -84,10 +84,11 @@ std::string FDTDLauncher::startSolver(std::string &logFileText, const std::strin
 
 	try
 	{
+		// Create the FDTD configuration and write the XML file
 		FDTDConfig cfg;
 		std::string tempFilePath = tempDirPath + "\\FDTD.xml";
 		cfg.addToXML(solverEntity, tempFilePath);
-		outputText = "FDTD XML file generated successfully!";
+		outputText = "\nFDTD XML file generated successfully!";
 		
 		// Build the solver input file in the temp folder
 		std::string controlFileName = tempDirPath + "\\model.pro";
