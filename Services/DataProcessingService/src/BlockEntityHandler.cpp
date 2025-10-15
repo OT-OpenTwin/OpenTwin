@@ -60,7 +60,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		const std::string connectionName = CreateNewUniqueTopologyName(connectionFolderName, "Connection", 1, false);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setConnectionCfg(newConnection);
-		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionFolder);
 		connectionEntity.createProperties();
@@ -104,7 +104,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	{
 		for (auto& entityForUpdate : entitiesForUpdate)
 		{
-			entityForUpdate.StoreToDataBase();
+			entityForUpdate.storeToDataBase();
 			topoEntIDs.push_back(entityForUpdate.getEntityID());
 			topoEntVers.push_back(entityForUpdate.getEntityStorageVersion());
 		}

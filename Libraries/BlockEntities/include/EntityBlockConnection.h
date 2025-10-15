@@ -20,7 +20,7 @@ public:
 	//! @brief The name of the container below the graphics editor. This name need not be editable. 
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
-	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
+	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	void CreateConnections();
 
 	void createProperties();
