@@ -100,10 +100,8 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 
 		std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 		std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		ot::UID infoEntityID = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityID);
-		ot::UID infoEntityVersion = ot::json::getUInt64(doc, OT_ACTION_PARAM_MODEL_EntityVersion);
 
-		std::thread workerThread(LTSpiceConnectorAPI::uploadFiles, entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
+		std::thread workerThread(LTSpiceConnectorAPI::uploadFiles, entityIDList, entityVersionList);
 		workerThread.detach();
 	}
 	else if (action == OT_ACTION_CMD_UI_LTS_DOWNLOAD) {
@@ -331,9 +329,9 @@ void LTSpiceConnectorAPI::getProject(std::string fileName, std::string projectNa
 	ProjectManager::getInstance().getProject(fileName, projectName, version);
 }
 
-void LTSpiceConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
+void LTSpiceConnectorAPI::uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList)
 {
-	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
+	ProjectManager::getInstance().uploadFiles(entityIDList, entityVersionList);
 }
 
 void LTSpiceConnectorAPI::downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version)

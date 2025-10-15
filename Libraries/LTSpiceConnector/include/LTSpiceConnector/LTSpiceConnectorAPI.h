@@ -17,7 +17,7 @@ namespace LTSpiceConnectorAPI
 	__declspec(dllexport) void commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults);
 	__declspec(dllexport) void getProject(std::string fileName, std::string projectName, std::string version);
 	__declspec(dllexport) std::string getCurrentVersion(std::string fileName, std::string projectName);
-	__declspec(dllexport) void uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion);
+	__declspec(dllexport) void uploadFiles(std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList);
 	__declspec(dllexport) void downloadFiles(std::string fileName, std::string projectName, std::list<ot::UID> entityIDList, std::list<ot::UID> entityVersionList, std::string version);
 	__declspec(dllexport) void copyFiles(std::string newVersion);
 	__declspec(dllexport) std::string getLocalFileName();

@@ -245,7 +245,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 	}
 }
 
-void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion)
+void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot::UID> &entityVersionList)
 {
 	ot::WindowAPI::setProgressBarValue(15);
 
@@ -254,9 +254,6 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Determine the project root folder
 		std::filesystem::path projectPath(baseProjectName);
 		std::string projectRoot = projectPath.parent_path().string();
-
-		// Load the hash information for the entities 
-		InfoFileManager infoFileManager(infoEntityID, infoEntityVersion);
 
 		// Upload files (progress range 15-90)
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);

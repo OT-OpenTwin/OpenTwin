@@ -38,6 +38,7 @@
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"
 #include "ParametricCombination.h"
+#include "LTSpiceRawReader.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -293,16 +294,10 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 		versionID.push_back(this->getModelComponent()->createEntityUID());
 	}
 
-	// Read the information
-	infoFileManager.setData(this);
-	infoFileManager.readInformation();
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, infoFileManager.getInfoEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, infoFileManager.getInfoEntityVersion(), doc.GetAllocator());
 
 	std::string tmp;
 	getUiComponent()->sendMessage(true, doc, tmp);
@@ -352,9 +347,6 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	std::list<std::string> deletedNameList = ot::json::getStringList(_doc, OT_ACTION_CMD_MODEL_DeleteEntity);
 
-	// We need to finalize the shape triangle information
-	infoFileManager.writeInformation();
-	infoFileManager.addDeletedShapesToList(deletedNameList);
 
 	// Now we need to send the model change to the model service 
 	for (auto item : modifiedNameList)
@@ -394,460 +386,6 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	doc2.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc2.GetAllocator()), doc2.GetAllocator());
 
 	getUiComponent()->sendMessage(true, doc2, tmp);
-}
-
-void Application::changeUnits(const std::string &content)
-{
-	// Load the current units entity
-	ot::EntityInformation entityInformation;
-	ot::ModelServiceAPI::getEntityInformation("Units", entityInformation);
-	EntityUnits* units = dynamic_cast<EntityUnits*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
-	assert(units != nullptr);
-	if (units == nullptr) return;
-
-	// Loop through the various units and check whether an update is necessary
-	std::stringstream buffer(content);
-	bool changed = false;
-
-	processSingleUnit("Dimension", buffer, units, changed);
-	processSingleUnit("Temperature", buffer, units, changed);
-	processSingleUnit("Voltage", buffer, units, changed);
-	processSingleUnit("Current", buffer, units, changed);
-	processSingleUnit("Resistance", buffer, units, changed);
-	processSingleUnit("Conductance", buffer, units, changed);
-	processSingleUnit("Capacitance", buffer, units, changed);
-	processSingleUnit("Inductance", buffer, units, changed);
-	processSingleUnit("Frequency", buffer, units, changed);
-	processSingleUnit("Time", buffer, units, changed);
-
-	// If a change is necessary, store the new entity
-	if (changed)
-	{
-		units->getProperties().setAllPropertiesReadOnly();
-		units->storeToDataBase();
-		getModelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
-	}
-
-	delete units; units = nullptr;
-}
-
-void Application::processSingleUnit(const std::string& unitName, std::stringstream& buffer, EntityUnits* units, bool& changed)
-{
-	std::string currentValue;
-	std::getline(buffer, currentValue);
-
-	EntityPropertiesSelection* scale = dynamic_cast<EntityPropertiesSelection*>(units->getProperties().getProperty(unitName));
-	assert(scale != nullptr);
-	if (scale == nullptr) return;
-
-	if (scale->getValue() != currentValue)
-	{
-		changed = true;
-		scale->setValue(currentValue);
-	}
-}
-
-void Application::changeMaterials(const std::string &content)
-{
-	std::stringstream buffer(content);
-
-	ot::UIDList currentMaterials = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
-	std::list<ot::EntityInformation> currentMaterialInfo;
-	ot::ModelServiceAPI::getEntityInformation(currentMaterials, currentMaterialInfo);
-	std::map<std::string, bool> materialProcessed;
-
-	while (processSingleMaterial(buffer, materialProcessed));
-
-	// Now we need to check if an existing material was not processed, which means that it no longer exists.
-	// In this case, we need to delete the material
-
-	std::list<std::string> obsoleteMaterials;
-
-	for (auto material : currentMaterialInfo)
-	{
-		if (materialProcessed.count(material.getEntityName()) == 0)
-		{
-			obsoleteMaterials.push_back(material.getEntityName());
-		}
-	}
-
-	if (!obsoleteMaterials.empty())
-	{
-		ot::ModelServiceAPI::deleteEntitiesFromModel(obsoleteMaterials, false);
-	}
-}
-
-bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std::string, bool> &materialProcessed)
-{
-	std::string materialName, materialColor, materialType, materialEps, materialMu, materialSigma;
-	double materialEpsValue(1.0), materialMuValue(1.0), materialSigmaValue(0.0);
-
-	std::getline(buffer, materialName);
-	if (materialName.empty()) return false;
-
-	std::getline(buffer, materialColor);
-	double r(0.0), g(0.0), b(0.0);
-	readDoubleTriple(materialColor, r, g, b);
-
-	materialColors[materialName] = std::tuple<double, double, double>(r, g, b);
-
-	std::getline(buffer, materialType);
-
-	if (materialType == "Normal")
-	{
-		std::getline(buffer, materialEps);
-		double epsx(0.0), epsy(0.0), epsz(0.0);
-		readDoubleTriple(materialEps, epsx, epsy, epsz);
-		materialEpsValue = sqrt((epsx * epsx + epsy * epsy + epsz * epsz)/3.0);
-
-		std::getline(buffer, materialMu);
-		double mux(0.0), muy(0.0), muz(0.0);
-		readDoubleTriple(materialMu, mux, muy, muz);
-		materialMuValue = sqrt((mux * mux + muy * muy + muz * muz) / 3.0);
-
-		std::getline(buffer, materialSigma);
-		double sigmax(0.0), sigmay(0.0), sigmaz(0.0);
-		readDoubleTriple(materialSigma, sigmax, sigmay, sigmaz);
-		materialSigmaValue = sqrt((sigmax * sigmax + sigmay * sigmay + sigmaz * sigmaz) / 3.0);
-	}
-
-	if (materialName[0] == '$')
-	{
-		// This is an internal material which we should not consider
-		return true;
-	}
-
-	// Try loading the material
-	EntityMaterial* material = nullptr;
-
-	ot::EntityInformation entityInformation;
-	if (ot::ModelServiceAPI::getEntityInformation("Materials/" + materialName, entityInformation))
-	{
-		material = dynamic_cast<EntityMaterial*> (ot::EntityAPI::readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion()));
-	}
-
-	bool changed = false;
-
-	if (material == nullptr)
-	{
-		// We have a new material to create
-		material = new EntityMaterial(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
-		material->setName("Materials/" + materialName);
-		material->createProperties();
-
-		EntityPropertiesSelection* type = dynamic_cast<EntityPropertiesSelection*>(material->getProperties().getProperty("Material type"));
-		EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permittivity (relative)"));
-		EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permeability (relative)"));
-		EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Conductivity"));
-
-		type->setValue(materialType == "Normal" ? "Volumetric" : "PEC");
-		type->setNeedsUpdate();
-
-		permittivity->setValue(materialEpsValue);
-		permeability->setValue(materialMuValue);
-		conductivity->setValue(materialSigmaValue);
-
-		changed = true;
-	}
-	else
-	{
-		// We need to modify an existing material
-		EntityPropertiesSelection* type = dynamic_cast<EntityPropertiesSelection*>(material->getProperties().getProperty("Material type"));
-		EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permittivity (relative)"));
-		EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Permeability (relative)"));
-		EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Conductivity"));
-
-		type->setValue(materialType == "Normal" ? "Volumetric" : "PEC");
-
-		permittivity->setValue(materialEpsValue);
-		permeability->setValue(materialMuValue);
-		conductivity->setValue(materialSigmaValue);
-
-		if (material->getProperties().anyPropertyNeedsUpdate())
-		{
-			changed = true;
-		}
-
-		materialProcessed[material->getName()] = true;
-	}
-
-	// If a change is necessary, store the new entity
-	if (changed)
-	{
-		material->updateFromProperties();
-		material->getProperties().setAllPropertiesReadOnly();
-		material->storeToDataBase();
-		getModelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
-	}
-
-	delete material; material = nullptr;
-
-	return true;
-}
-
-void Application::readDoubleTriple(const std::string& line, double& a, double& b, double& c)
-{
-	std::stringstream buffer(line);
-
-	std::string sA, sB, sC;
-	buffer >> sA;
-	buffer >> sB;
-	buffer >> sC;
-
-	std::replace(sA.begin(), sA.end(), ',', '.');
-	std::replace(sB.begin(), sB.end(), ',', '.');
-	std::replace(sC.begin(), sC.end(), ',', '.');
-
-	a = std::atof(sA.c_str());
-	b = std::atof(sB.c_str());
-	c = std::atof(sC.c_str());
-}
-
-void Application::shapeInformation(const std::string &content)
-{
-	std::map<std::string, bool> previousShape;
-	infoFileManager.getShapes(previousShape);
-
-	std::stringstream data(content);
-
-	while (!data.eof())
-	{
-		std::string name, material;
-
-		std::getline(data, name);
-		std::getline(data, material);
-
-		if (!name.empty() && !material.empty())
-		{
-			shapeMaterials[name] = material;
-			previousShape[name] = true;
-		}
-	}
-
-	for (auto shape : previousShape)
-	{
-		if (!shape.second)
-		{
-			// This shape existed before, but was not processed this time anyore -> the shape has been deleted
-			infoFileManager.deleteShape(shape.first);
-		}
-	}
-}
-
-void Application::result1D(bool appendData, std::string& data, size_t uncompressedDataLength)
-{
-	ParametricResult1DManager parametricResultManager(this);
-
-	if (!appendData)
-	{
-		// We need to clear the result1D information in the info file manager in case that we do not want to append
-		infoFileManager.clearResult1D();
-		parametricResultManager.clear();
-	}
-
-	if (data.empty())
-	{
-		return;
-	}
-
-	// First, we need to decode the data back into a byte buffer
-	int decoded_compressed_data_length = Base64decode_len(data.c_str());
-	char* decodedCompressedString = new char[decoded_compressed_data_length];
-
-	Base64decode(decodedCompressedString, data.c_str());
-
-	data.clear();
-
-	// Decompress the data
-	char* dataBuffer = new char[uncompressedDataLength];
-	uLongf destLen = (uLongf)uncompressedDataLength;
-	uLong  sourceLen = decoded_compressed_data_length;
-	uncompress((Bytef*)dataBuffer, &destLen, (Bytef*)decodedCompressedString, sourceLen);
-
-	delete[] decodedCompressedString;
-	decodedCompressedString = nullptr;
-
-	try
-	{
-		{
-			// Now the data is in the dataBuffer with length uncompressedDataLength
-			// We need to process the buffer and read the data from it
-			Result1DManager resultManager(dataBuffer, uncompressedDataLength);
-
-			// We can now delete the buffer
-			delete[] dataBuffer;
-			dataBuffer = nullptr;
-
-			// Now we need to store the new hash information in the infoFileManager
-			resultManager.addResult1DInformation(infoFileManager);
-
-			// And finally store (add) the parametric data. In case that the data is not appended, the storage was already cleared above
-			parametricResultManager.extractData(resultManager);
-		}
-		parametricResultManager.storeDataInResultCollection();
-	}
-	catch (std::exception &e)
-	{
-		std::string error = e.what();
-		assert(0);
-
-		// We have an problem processing the data.
-		if (dataBuffer != nullptr)
-		{
-			delete[] dataBuffer;
-			dataBuffer = nullptr;
-		}
-	}
-}
-
-
-void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
-{
-	std::string materialsFolder = "Materials";
-
-	std::list<std::string> entityList{ materialsFolder };
-	std::list<ot::EntityInformation> entityInfo;
-
-	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
-
-	assert(entityInfo.size() == 1);
-	assert(entityInfo.front().getEntityName() == materialsFolder);
-
-	ot::UID materialsFolderID = entityInfo.front().getEntityID();
-
-	auto triangles = shapeTriangles.begin();
-	auto hash      = shapeHash.begin();
-
-	for (auto name : shapeNames)
-	{
-		storeShape(name, *triangles, materialsFolder, materialsFolderID);
-		infoFileManager.setShapeHash(name, *hash);
-
-		triangles++;
-		hash++;
-	}
-}
-
-void Application::storeShape(const std::string& name, const std::string& triangles, 
-							 const std::string &materialsFolder, ot::UID materialsFolderID)
-{
-	std::string otName = "Geometry\\" + name;
-	std::replace(otName.begin(), otName.end(), '\\', '/');
-
-	std::string material = shapeMaterials[name];
-	std::tuple<double, double, double> rgb = materialColors[material];
-
-	int colorR = (int) (255 * std::get<0>(rgb));
-	int colorG = (int) (255 * std::get<1>(rgb));
-	int colorB = (int) (255 * std::get<2>(rgb));
-
-	ot::UID entityID = getModelComponent()->createEntityUID();
-	ot::UID facetsID = getModelComponent()->createEntityUID();
-
-	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr, getServiceName());
-	entityGeom->setName(otName);
-	entityGeom->setEditable(false);
-
-	entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
-
-	EntityPropertiesEntityList* materialProp = dynamic_cast<EntityPropertiesEntityList*> (entityGeom->getProperties().getProperty("Material"));
-	assert(materialProp != nullptr);
-	if (materialProp != nullptr)
-	{
-		materialProp->setValueName(material);
-	}
-
-	entityGeom->getFacets()->setEntityID(facetsID);
-
-	createFacets(triangles, entityGeom->getFacets()->getNodeVector(), entityGeom->getFacets()->getTriangleList(), entityGeom->getFacets()->getEdgeList());
-
-	entityGeom->getProperties().setAllPropertiesReadOnly();
-	entityGeom->getFacets()->storeToDataBase();
-	entityGeom->storeToDataBase();
-
-	getModelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
-	getModelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
-	getModelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
-
-	delete entityGeom;
-	entityGeom = nullptr;
-}
-
-void Application::createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges)
-{
-	// Process the STL data
-	std::stringstream stlData(data);
-
-	ot::UID vertex[3];
-	Geometry::Node node[3];
-	int vertexID = 0;
-	size_t vertexCount = 0;
-
-	std::list<Geometry::Node> nodesList;
-
-	while (!stlData.eof())
-	{
-		std::string line;
-		std::getline(stlData, line);
-
-		boost::trim_left(line);
-		boost::to_lower(line);
-
-		std::stringstream lineBuffer(line);
-
-		std::string keyword;
-		lineBuffer >> keyword;
-
-		if (keyword == "vertex")
-		{
-			double pX(0.0), pY(0.0), pZ(0.0);
-
-			lineBuffer >> pX >> pY >> pZ;
-
-			node[vertexID].setCoords(pX, pY, pZ);
-
-			vertex[vertexID] = vertexCount;
-			vertexCount++;
-			vertexID++;
-
-			if (vertexID == 3)
-			{
-				// We need to calculate the facet normal, since this information can be incorrect in Studio Suite generated STL files
-
-				double vector1[] = { node[1].getCoord(0) - node[0].getCoord(0), node[1].getCoord(1) - node[0].getCoord(1), node[1].getCoord(2) - node[0].getCoord(2) };
-				double vector2[] = { node[2].getCoord(0) - node[0].getCoord(0), node[2].getCoord(1) - node[0].getCoord(1), node[2].getCoord(2) - node[0].getCoord(2) };
-
-				double normalX = vector1[1] * vector2[2] - vector1[2] * vector2[1];
-				double normalY = vector1[2] * vector2[0] - vector1[0] * vector2[2];
-				double normalZ = vector1[0] * vector2[1] - vector1[1] * vector2[0];
-
-				double abs = sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
-
-				normalX /= abs;
-				normalY /= abs;
-				normalZ /= abs;
-
-				node[0].setNormals(normalX, normalY, normalZ);
-				node[1].setNormals(normalX, normalY, normalZ);
-				node[2].setNormals(normalX, normalY, normalZ);
-
-				nodesList.push_back(node[0]);
-				nodesList.push_back(node[1]);
-				nodesList.push_back(node[2]);
-
-				// Three vertices were added, so we have a new facet
-				triangles.push_back(Geometry::Triangle(vertex[0], vertex[1], vertex[2], 0));
-				vertexID = 0;
-			}
-		}
-	}
-
-	// Finally we need to store the list of nodes in the nodes array
-	nodes.reserve(nodesList.size());
-	for (auto n : nodesList)
-	{
-		nodes.push_back(n);
-	}
 }
 
 void Application::writeProjectInformation(const std::string &simpleFileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames)
@@ -1037,16 +575,30 @@ void Application::extractResults()
 	if (projectFileName.empty()) return;
 
 	// First, we get a list of all parametric runs and their parameter combinations from the .log file
-	std::list<ParametricCombination> parameterRuns; 
+	std::list<ParametricCombination> parameterRuns;
 	getParametricCombinations(projectFileName + ".log", parameterRuns);
 
 	// Now we read the curves from the .raw file
-	LTSpiceData spiceData = getCurveData(projectFileName + ".raw");
+	std::string rawFileName = projectFileName + ".raw";
+	ot::EntityInformation entityInfo;
+	ot::ModelServiceAPI::getEntityInformation(rawFileName, entityInfo);
 
-	// Split the curves into the individual parametric runs (if necessary)
+	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
+	if (fileEntity == nullptr) return;
 
+	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
+	if (data == nullptr) return;
+
+	std::vector<char> rawFileData = data->getData();
+
+	std::stringstream dataStream(std::ios::in | std::ios::out | std::ios::binary);
+	dataStream.write(rawFileData.data(), rawFileData.size());
+
+	ltspice::AutoRawReader reader;
+	ltspice::RawData resultData = reader.read(dataStream);
 
 	// Finally, we store the parametric data of the curves
+	// TODO
 
 
 }
@@ -1083,7 +635,7 @@ void Application::getParametricCombinations(const std::string& logFileName, std:
 
 	// Finally, we need to process each line and extract its parameter combinations
 	std::vector<std::pair<std::string, double>> params;
-	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex für Parameter=Wert
+	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex fï¿½r Parameter=Wert
 	std::smatch match;
 
 	for (auto line : stepLines)
@@ -1101,150 +653,3 @@ void Application::getParametricCombinations(const std::string& logFileName, std:
 		parameterRuns.push_back(parameterCombination);
 	}
 }
-
-LTSpiceData Application::getCurveData(const std::string& rawFileName)
-{
-	LTSpiceData result;
-
-	ot::EntityInformation entityInfo;
-	ot::ModelServiceAPI::getEntityInformation(rawFileName, entityInfo);
-
-	EntityFile* fileEntity = dynamic_cast<EntityFile*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
-	if (fileEntity == nullptr) return result;
-
-	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
-	if (data == nullptr) return result;
-
-	std::vector<char> rawFileData = data->getData();
-
-	std::stringstream dataStream(std::ios::in | std::ios::out | std::ios::binary);
-	dataStream.write(rawFileData.data(), rawFileData.size());
-
-	result = readLTSpiceRaw(dataStream);
-
-	return result;
-}
-
-bool Application::getLine(std::stringstream& data, std::string &line)
-{
-	line.clear();
-	while (!data.eof())
-	{
-		char c = 0;
-		data.get(c);
-
-		if (c == '\n')
-		{
-			data.get(c); // Skip the following 0
-			return true;
-		}
-		if (c != 0 && c != '\r') line.push_back(c);
-	}
-
-	return !(line.empty());
-}
-
-double bytesToDouble(const uint8_t* bytes) {
-	// 8-Byte-Wert für die Interpretation
-	uint64_t intRepresentation = 0;
-
-	// Big-Endian zu uint64_t umwandeln
-	for (int i = 0; i < 8; ++i) {
-		intRepresentation = (intRepresentation << 8) | bytes[i];
-	}
-
-	// In double umwandeln
-	double result;
-	std::memcpy(&result, &intRepresentation, sizeof(double)); // Typ-Punning
-	return result;
-}
-
-LTSpiceData Application::readLTSpiceRaw(std::stringstream& data) 
-{
-	LTSpiceData result;
-
-	bool binaryData = false;
-
-	std::string line;
-	while (getLine(data, line)) {
-		if (line.find("Flags:") != std::string::npos) {
-			if (line.find("complex") != std::string::npos) {
-				result.isComplex = true;
-			}
-		}
-		else if (line.find("No. Variables:") != std::string::npos) {
-			int numVariables = std::stoi(line.substr(15));
-			result.variables.reserve(numVariables);
-		}
-		else if (line.find("Variables:") != std::string::npos) {
-			for (int i = 0; i < result.variables.capacity(); i++) {
-				std::string varline;
-				if (getLine(data, varline))
-				{
-					std::stringstream varStream(varline);
-					LTSpiceVariable var;
-					varStream >> var.index >> var.name >> var.unit;
-					result.variables.push_back(var);
-				}
-			}
-		}
-		else if (line.find("Binary:") != std::string::npos) {
-			binaryData = true;
-			break;  // Start of the binary data block
-		}
-		else if (line.find("Values:") != std::string::npos) {
-			break;  // Start of the ascii data block
-		}
-	}
-
-	if (binaryData)
-	{
-		// Read the binary data (distinguish between real and complex data)
-		while (!data.eof()) {
-			std::vector<std::complex<double>> dataRow;
-			for (size_t i = 0; i < result.variables.size(); i++) {
-				if (i == 0)
-				{
-					// This variable is stored in double-precision
-					if (result.isComplex) {
-						double realPart, imagPart;
-						data.read(reinterpret_cast<char*>(&realPart), sizeof(double));
-						data.read(reinterpret_cast<char*>(&imagPart), sizeof(double));
-						dataRow.emplace_back(realPart, imagPart);
-					}
-					else {
-						double realValue;
-						data.read(reinterpret_cast<char*>(&realValue), sizeof(double));
-						dataRow.emplace_back(realValue, 0.0f);
-					}
-				}
-				else
-				{
-					// This variable is stored in single-precision
-					if (result.isComplex) {
-						double realPart, imagPart;
-						data.read(reinterpret_cast<char*>(&realPart), sizeof(double));
-						data.read(reinterpret_cast<char*>(&imagPart), sizeof(double));
-						dataRow.emplace_back(realPart, imagPart);
-					}
-					else {
-						float realValue;
-						data.read(reinterpret_cast<char*>(&realValue), sizeof(float));
-						dataRow.emplace_back(realValue, 0.0f);
-					}
-				}
-			}
-			if (data) result.data.push_back(dataRow);
-		}
-	}
-	else
-	{
-		// Read the ascii data (distinguish between real and complex data)
-		assert(0); // Not yet implemented
-
-
-	}
-
-	return result;
-}
-

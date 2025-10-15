@@ -29,7 +29,7 @@ public:
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);
     void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults);
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
-    void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion);
+    void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
     void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);
     void copyFiles(const std::string& newVersion);
     std::string getLocalFileName() { return localProjectFileName; }

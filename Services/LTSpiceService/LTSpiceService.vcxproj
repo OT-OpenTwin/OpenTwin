@@ -197,6 +197,7 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\LTSpiceRawReader.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
     <ClCompile Include="src\ParametricResult1DManager.cpp" />
@@ -207,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\LTSpiceRawReader.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\InfoFileManager.h" />
     <ClInclude Include="include\ParametricCombination.h" />

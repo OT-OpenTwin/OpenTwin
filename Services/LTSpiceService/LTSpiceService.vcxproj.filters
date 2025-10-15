@@ -48,6 +48,9 @@
     <ClCompile Include="src\ParametricResult1DManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LTSpiceRawReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ParametricCombination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LTSpiceRawReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
