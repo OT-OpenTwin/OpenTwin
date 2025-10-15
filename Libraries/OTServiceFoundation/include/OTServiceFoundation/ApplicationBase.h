@@ -123,32 +123,32 @@ namespace ot {
 		//! @brief The current collection name.
 		const std::string& getCollectionName() const { return m_collectionName; };
 
-		//! @brief Will return true if a UI is running in the session
+		//! @brief Will return true if a UI is running in the session.
 		bool isUiConnected() const { return m_uiComponent != nullptr; }
 
-		//! @brief Will return true if a model service is running in the session
+		//! @brief Will return true if a model service is running in the session.
 		bool isModelConnected() const { return m_modelComponent != nullptr; }
 
-		//! @brief Will return the model component used in this application
-		//! The model component only exists when a model service is running in the session
+		//! @brief Will return the model component used in this application.
+		//! The model component only exists when a model service is running in the session.
 		components::ModelComponent * getModelComponent() const { return m_modelComponent; }
 
-		//! @brief Will return the ui component used in this application
-		//! The UI component only exists when a ui service is running in the session
+		//! @brief Will return the ui component used in this application.
+		//! The UI component only exists when a ui service is running in the session.
 		components::UiComponent * getUiComponent() const { return m_uiComponent; }
 
-		//! @brief Will return the service with the specified ID
-		//! @param _id The ID of the requested service
+		//! @brief Will return the service with the specified ID.
+		//! @param _id The ID of the requested service.
 		ServiceBase * getConnectedServiceByID(serviceID_t _id);
 
-		//! @brief Will return the service with the specified name
-		//! @param _name The name of the requested service
+		//! @brief Will return the service with the specified name.
+		//! @param _name The name of the requested service.
 		ServiceBase * getConnectedServiceByName(const std::string & _name);
 
-		//! @brief Will return the uiNotifier attached to this application
+		//! @brief Will return the uiNotifier attached to this application.
 		AbstractUiNotifier * getUiNotifier() { return m_uiNotifier; }
 
-		//! @brief Will return the modelNotifier attached to this application
+		//! @brief Will return the modelNotifier attached to this application.
 		AbstractModelNotifier * getModelNotifier() { return m_modelNotifier; }
 
 		const std::list<UID>& getSelectedEntities() const { return m_selectedEntities; };
@@ -177,30 +177,55 @@ namespace ot {
 
 		// Messaging
 
-		//! @brief Set the message queuing flag
-		//! If the flag counter reaches 0 the currently queued message will be flushed
-		//! @param _serviceName The name of the service
-		//! @param _flag The flag
+		//! @brief Set the message queuing flag.
+		//! If the flag counter reaches 0 the currently queued message will be flushed.
+		//! @param _serviceName The name of the service.
+		//! @param _flag The flag.
 		void enableMessageQueuing(const std::string & _serviceName, bool _flag);
 
-		//! @brief Will flush the currently queued messages for the service with the provided name
-		//! @param _serviceName The name of the service
+		//! @brief Will flush the currently queued messages for the service with the provided name.
+		//! @param _serviceName The name of the service.
 		void flushQueuedHttpRequests(const std::string & _serviceName);
 
-		//! @brief Will send the message to the service with the specified name
-		//! @param _queue If true, the message will be queued
-		//! @param _serviceName The name of the service
-		//! @param _doc The document containing the message
-		//! @param _response The reponse will be written here
+		//! @brief Will send the message to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _response The reponse will be written here.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessage(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
+		//! @brief Will send the message to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _response The reponse will be written here.
+		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
-		//! @brief Will send the message to the service with the specified name
-		//! @param _queue If true, the message will be queued
-		//! @param _serviceName The name of the service
-		//! @param _doc The document containing the message
-		//! @param _prefetchIds A list containing the prefetched IDs
-		//! @param _response The reponse will be written here
+		//! @brief Will send the message to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _prefetchIds A list containing the prefetched IDs.
+		//! @param _response The reponse will be written here.
+		//! @param _requestFlags Flags to control the request behavior.
 		bool sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
+		//! @brief Will send the message asynchronously to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
+
+		//! @brief Will send the message asynchronously to the service with the specified name.
+		//! @param _queue If true, the message will be queued.
+		//! @param _serviceName The name of the service.
+		//! @param _doc The document containing the message.
+		//! @param _prefetchIds A list containing the prefetched IDs.
+		//! @param _requestFlags Flags to control the request behavior.
+		bool sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags = ot::msg::DefaultFlags);
 
 		//! @brief Will be called whenever the selection in the UI has changed.
 		virtual void modelSelectionChanged() {};

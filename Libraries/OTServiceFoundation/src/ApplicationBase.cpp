@@ -187,9 +187,15 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 	MessageQueueHandler::instance().flushServiceBuffer(destinationServiceInfo);
 }
 
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	std::list<std::pair<UID, UID>> prefetchIds;
+	std::string tmp;
+	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, tmp, _requestFlags);
+}
+
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
-	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
+	std::list<std::pair<UID, UID>> prefetchIds;
 	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, _response, _requestFlags);
 }
 
@@ -212,6 +218,23 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 	{
 		return true;
 	}
+}
+
+bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, const ot::msg::RequestFlags& _requestFlags) {
+	std::list<std::pair<UID, UID>> prefetchIds;
+	return this->sendMessageAsync(_queue, _serviceName, _doc, prefetchIds, _requestFlags);
+}
+
+bool ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags) {
+	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
+	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
+		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
+		return false;
+	}
+
+	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
+	ot::msg::sendAsync(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), 0, _requestFlags);
+	return true;
 }
 
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
