@@ -25,12 +25,12 @@
 // Forward declaration
 class EntityBase;
 
- //@brief Template function to read entity properties of different types
- //@param T The type of the property to read (double, int, string, etc.)
- //@param solverEntity Pointer to the solver entity
- //@param groupFilter The group filter to apply when reading properties
- //@param properties Map to store the read properties
- //@param propertyName The name of the property to read
+//@brief Template function to read entity properties of different types
+//@param T The type of the property to read (double, int, string, etc.)
+//@param solverEntity Pointer to the solver entity
+//@param groupFilter The group filter to apply when reading properties
+//@param properties Map to store the read properties
+//@param propertyName The name of the property to read
 template<typename T>
 T readEntityPropertiesInfo(EntityBase* solverEntity, const std::string& groupFilter, std::map<ot::UID, EntityProperties>& properties, const std::string& propertyName) {
 	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, groupFilter, properties);
