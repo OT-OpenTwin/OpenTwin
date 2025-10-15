@@ -717,7 +717,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		if (entityRoot != nullptr)
 		{
 			// Ensure that the root nodes have a visualization item
-			//createVisualizationItems();
+			createVisualizationItems();
 
 			entityRoot->addVisualizationNodes();
 		}
@@ -747,7 +747,7 @@ void Model::createVisualizationItems()
 	for (auto entity : entityList)
 	{
 		auto temp = dynamic_cast<EntityContainer*>(entity);
-		if (temp != nullptr && false)
+		if (temp != nullptr)
 		{
 			addVisualizationContainerNode(entity->getName(), entity->getEntityID(), entity->getEditable());
 		}
