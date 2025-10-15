@@ -6,23 +6,16 @@
 // Frontend header
 #include "LoginData.h"
 
-LoginData::LoginData(const LoginData& _other) {
-	*this = _other;
+void LoginData::addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
+	_jsonObject.AddMember("UserName", ot::JsonString(m_username, _allocator), _allocator);
+	_jsonObject.AddMember("UserPassword", ot::JsonString(m_encryptedUserPassword, _allocator), _allocator);
+	_jsonObject.AddMember("GSS", ot::JsonString(m_gss.getUrl().toStdString(), _allocator), _allocator);
 }
 
-LoginData& LoginData::operator = (const LoginData& _other) {
-	if (this == &_other) return *this;
-
-	m_gss = _other.m_gss;
-	m_databaseUrl = _other.m_databaseUrl;
-	m_authorizationUrl = _other.m_authorizationUrl;
-	m_username = _other.m_username;
-	m_userPassword = _other.m_userPassword;
-	m_encryptedUserPassword = _other.m_encryptedUserPassword;
-	m_sessionUser = _other.m_sessionUser;
-	m_sessionPassword = _other.m_sessionPassword;
-
-	return *this;
+void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) {
+	m_username = ot::json::getString(_jsonObject, "UserName");
+	m_encryptedUserPassword = ot::json::getString(_jsonObject, "UserPassword");
+	m_gss.setUrl(QString::fromStdString(ot::json::getString(_jsonObject, "GSS")));
 }
 
 void LoginData::clear(void) {

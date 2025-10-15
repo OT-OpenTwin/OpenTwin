@@ -158,6 +158,9 @@
     <ClCompile Include="src\SelectProjectDialog.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\StartArgumentParser.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -224,6 +227,9 @@
       <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
     <ClInclude Include="include\ProgressUpdater.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StartArgumentParser.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>

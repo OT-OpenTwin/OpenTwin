@@ -6,8 +6,9 @@
 // Frontend header
 #include "AppBase.h"
 #include "LogInDialog.h"
-#include "LogInGSSEditDialog.h"
 #include "DownloadFile.h"
+#include "LogInGSSEditDialog.h"
+#include "StartArgumentParser.h"
 
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
@@ -195,6 +196,37 @@ LogInDialog::~LogInDialog() {
 	
 }
 
+void LogInDialog::initialize() {
+	// Check if we have to restore a login
+	if (!m_startArgs.importConfig()) {
+		return;
+	}
+
+	if (m_startArgs.getLogInSet()) {
+		{
+			QSignalBlocker textBlock(m_password);
+			m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
+		}
+		m_state |= LogInStateFlag::RestoredPassword;
+
+		// Apply password and username
+		m_restoredPassword = QString::fromStdString(m_startArgs.getLogInData().getEncryptedUserPassword());
+		m_username->setText(QString::fromStdString(m_startArgs.getLogInData().getUserName()));
+
+		// Apply GSS
+		QString gss = m_startArgs.getLogInData().getGss().getName();
+
+		int ix = 0;
+		for (const LogInGSSEntry& entry : m_gssData) {
+			if (entry.getName() == gss) {
+				m_gss->setCurrentIndex(ix);
+				break;
+			}
+			ix++;
+		}
+	}
+}
+
 void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_gss->setEnabled(_enabled);
 	m_username->setEnabled(_enabled);
@@ -212,6 +244,14 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 
 bool LogInDialog::mayCloseDialogWindow() {
 	return !(m_state & LogInStateFlag::WorkerRunning);
+}
+
+void LogInDialog::showEvent(QShowEvent* _event) {
+	ot::Dialog::showEvent(_event);
+
+	if (m_startArgs.getLogInSet()) {
+		this->slotLogIn();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

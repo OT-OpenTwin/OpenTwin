@@ -4075,6 +4075,8 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 }
 
 void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
 	ot::DialogCfg cfg;
 	cfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
@@ -4099,19 +4101,16 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);
 }
 
-void ExternalServicesComponent::handleOpenNewProject(ot::JsonDocument& _document) {
-	m_actionProfiler.ignoreCurrent();
+// ###########################################################################################################################################################################################################################################################################################################################
 
+// Action handler: Specialized
+
+void ExternalServicesComponent::handleOpenNewProject(ot::JsonDocument& _document) {
 	ot::ProjectInformation projInfo(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	AppBase::instance()->appendInfoMessage("Opening project \"" + QString::fromStdString(projInfo.getProjectName()) + "\" in new instance...\n");
-
-	const LoginData& userData = AppBase::instance()->getCurrentLoginData();
-
-	// Prepare command line
-
-
-
+	if (!AppBase::instance()->openNewInstance(projInfo)) {
+		OT_LOG_E("Failed to open new project instance for project \"" + projInfo.getProjectName() + "\"");
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

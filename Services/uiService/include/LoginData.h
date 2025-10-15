@@ -8,16 +8,21 @@
 // Frontend header
 #include "LogInGSSEntry.h"
 
+// OpenTwin header
+#include "OTCore/Serializable.h"
+
 // std header
 #include <string>
 
 class LoginData {
+	OT_DECL_DEFCOPY(LoginData)
+	OT_DECL_DEFMOVE(LoginData)
 public:
 	LoginData() {};
-	LoginData(const LoginData& _other);
 	~LoginData() {};
 
-	LoginData& operator = (const LoginData& _other);
+	void addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
+	void setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject);
 
 	void setGss(const LogInGSSEntry& _gss) { m_gss = _gss; };
 	const LogInGSSEntry& getGss(void) const { return m_gss; };

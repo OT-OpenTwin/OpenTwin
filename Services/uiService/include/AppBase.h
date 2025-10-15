@@ -17,6 +17,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/ProjectInformation.h"
 #include "OTCore/AbstractLogNotifier.h"
 
 // OpenTwin Gui header
@@ -493,6 +494,8 @@ public:
 
 	static AppBase * instance();
 
+	bool openNewInstance(const ot::ProjectInformation& _projectInfo);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Asynchronous callbacks
@@ -536,6 +539,7 @@ private Q_SLOTS:
 
 	void slotCreateProject();
 	void slotOpenProject();
+	void slotOpenSpecificProject(QString _projectName);
 	void slotCopyProject();
 	void slotRenameProject();
 	void slotDeleteProject();

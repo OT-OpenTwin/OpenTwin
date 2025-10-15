@@ -5,16 +5,18 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+
 // Qt header
 #include <QtCore/qstring.h>
 
 class LogInGSSEntry {
+	OT_DECL_DEFCOPY(LogInGSSEntry)
+	OT_DECL_DEFMOVE(LogInGSSEntry)
 public:
-	LogInGSSEntry();
+	LogInGSSEntry() = default;
 	LogInGSSEntry(const QString& _name, const QString& _url, const QString& _port);
-	LogInGSSEntry(const LogInGSSEntry& _other);
-
-	LogInGSSEntry& operator = (const LogInGSSEntry& _other);
 
 	void setName(const QString& _name) { m_name = _name; };
 	const QString& getName(void) const { return m_name; };
