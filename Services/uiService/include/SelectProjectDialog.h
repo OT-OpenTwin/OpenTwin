@@ -5,10 +5,8 @@
 
 #pragma once
 
-// Frontend header
-#include "ProjectInformation.h"
-
 // OpenTwin header
+#include "OTCore/ProjectInformation.h"
 #include "OTWidgets/Dialog.h"
 
 // Qt header
@@ -32,12 +30,12 @@ class SelectProjectDialogEntry : public QListWidgetItem {
 	OT_DECL_NOMOVE(SelectProjectDialogEntry)
 	OT_DECL_NODEFAULT(SelectProjectDialogEntry)
 public:
-	SelectProjectDialogEntry(const ProjectInformation& _info);
+	SelectProjectDialogEntry(const ot::ProjectInformation& _info);
 
-	const ProjectInformation& getProjectInformation() const { return m_info; };
+	const ot::ProjectInformation& getProjectInformation() const { return m_info; };
 
 private:
-	ProjectInformation m_info;
+	ot::ProjectInformation m_info;
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -55,7 +53,7 @@ public:
 	SelectProjectDialog(const ot::DialogCfg& _config);
 	virtual ~SelectProjectDialog();
 
-	ProjectInformation getSelectedProject() const;
+	ot::ProjectInformation getSelectedProject() const;
 
 private Q_SLOTS:
 	void slotConfirm();

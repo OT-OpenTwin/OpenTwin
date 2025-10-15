@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "ControlsManager.h"
-#include "ProjectInformation.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/ProjectInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/WidgetBase.h"
 
@@ -37,7 +37,7 @@ class ProjectOverviewEntry : public QObject {
 	Q_OBJECT
 	OT_DECL_NODEFAULT(ProjectOverviewEntry)
 public:
-	ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
+	ProjectOverviewEntry(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
 
 	void setIsChecked(bool _checked);
 	bool getIsChecked() const;
@@ -131,7 +131,7 @@ private Q_SLOTS:
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
 	void clear();
-	void addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator);
+	void addProject(const ot::ProjectInformation& _projectInfo, bool _ownerIsCreator);
 	void updateCountLabel(bool _hasMore);
 	void updateToggleViewModeButton();
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);

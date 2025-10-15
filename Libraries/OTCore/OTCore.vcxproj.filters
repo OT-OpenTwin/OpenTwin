@@ -154,6 +154,9 @@
     <ClCompile Include="src\Serializable.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectInformation.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -445,6 +448,9 @@
       <Filter>include\Container</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\OTClassHelper.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ProjectInformation.h">
       <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -64,8 +64,6 @@ namespace MongoProjectFunctions
 
 	bool checkForCollectionExistence(const std::string& collectionName, mongocxx::client& loggedInUser);
 
-	std::string projectToJson(Project& project);
-
 	std::string projectsToJson(std::vector<Project>& projects);
 
 }

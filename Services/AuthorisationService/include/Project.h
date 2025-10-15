@@ -11,6 +11,8 @@
 #include "MongoUserFunctions.h"
 #include "MongoGroupFunctions.h"
 
+#include "OTCore/ProjectInformation.h"
+
 class Project
 {
 
@@ -55,6 +57,8 @@ public:
 
 	void setLastAccessedOn(bsoncxx::types::b_date _msSinceEpoch) { m_lastAccessedOn = _msSinceEpoch; };
 	bsoncxx::types::b_date getLastAccessedOn(void) const { return m_lastAccessedOn; };
+
+	ot::ProjectInformation toProjectInformation() const;
 
 private:
 	void importData(const bsoncxx::v_noabi::document::view& _view);

@@ -91,20 +91,16 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 		return false;
 	}
 
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::string collectionName;
-
-	try
-	{
-		collectionName = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
-	}
-	catch (std::exception)
-	{
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+	if (!responseMessage.isOk()) {
+		return false;
 	}
 
-	return createNewCollection(collectionName, defaultSettingTemplate);
+	ot::JsonDocument projDoc;
+	projDoc.fromJson(responseMessage.getWhat());
+
+	ot::ProjectInformation info(projDoc.getConstObject());
+	return createNewCollection(info.getCollectionName(), defaultSettingTemplate);
 }
 
 bool ProjectManagement::deleteProject(const std::string &projectName)
@@ -151,13 +147,15 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 		return false;
 	}
 
-	return !hasError(response);
+	ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
+	return ret.isOk();
 }
 
 bool ProjectManagement::projectExists(const std::string &projectName, bool &canBeDeleted)
 {
-	assert(!m_authServerURL.empty());
+	canBeDeleted = false;
 
+	assert(!m_authServerURL.empty());
 	AppBase * app{ AppBase::instance() };
 
 	ot::JsonDocument doc;
@@ -175,20 +173,18 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	}
 		
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if(responseMessage == ot::ReturnMessage::Failed)
-	{
+	if (!responseMessage.isOk()) {
 		return false;
 	}
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(responseMessage.getWhat());
 
-	canBeDeleted = false;
 	try
 	{
-		std::string owner = ot::json::getString(responseDoc, OT_PARAM_AUTH_OWNER);
+		ot::ProjectInformation info(responseDoc.getConstObject());
 
-		if (owner == app->getCurrentLoginData().getUserName())
+		if (info.getUserName() == app->getCurrentLoginData().getUserName())
 		{
 			canBeDeleted = true;
 		}
@@ -246,25 +242,15 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	}
 
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (responseMessage == ot::ReturnMessage::Failed)
-	{
+	if (!responseMessage.isOk()) {
 		return "";
 	}
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(responseMessage.getWhat());
 
-	std::string collectionName;
-
-	try
-	{
-		collectionName = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
-	}
-	catch (std::exception)
-	{
-	}
-
-	return collectionName;
+	ot::ProjectInformation info(responseDoc.getConstObject());
+	return info.getCollectionName();
 }
 
 std::string ProjectManagement::getProjectType(const std::string& projectName)
@@ -288,7 +274,7 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	}
 
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (responseMessage == ot::ReturnMessage::Failed)
+	if (!responseMessage.isOk())
 	{
 		OT_LOG_E(responseMessage.getWhat());
 		return "";
@@ -297,21 +283,11 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(responseMessage.getWhat());
 
-	std::string projectType;
-
-	try
-	{
-		projectType = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_TYPE);
-	}
-	catch (const std::exception& _e)
-	{
-		OT_LOG_E(_e.what());
-	}
-
-	return projectType;
+	ot::ProjectInformation info(responseDoc.getConstObject());
+	return info.getProjectType();
 }
 
-bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
+bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
 {
 	assert(!m_authServerURL.empty());
 
@@ -338,25 +314,18 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	const rapidjson::Value& projectArray = responseDoc["projects"];
-	assert(projectArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = projectArray.Begin(); itr != projectArray.End(); ++itr)
+	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
 	{
-		const rapidjson::Value& project = *itr;
-		std::string projectData = project.GetString();
-
-		ot::JsonDocument projectDoc;
-		projectDoc.fromJson(projectData);
-
-		ProjectInformation newInfo(projectDoc.getConstObject());
+		ot::ProjectInformation newInfo(projObj);
 		_projectsFound.push_back(newInfo);
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
-	while (_projectsFound.size() > _maxNumberOfResults) {
+	size_t size = _projectsFound.size();
+	while (size > _maxNumberOfResults) {
 		_maxLengthExceeded = true;
 		_projectsFound.pop_back();
+		size--;
 	}
 
 	return (!_projectsFound.empty());
@@ -410,10 +379,10 @@ bool ProjectManagement::InitializeConnection(void)
 	}
 }
 
-ProjectInformation ProjectManagement::getProjectInformation(const std::string& _projectName) {
+ot::ProjectInformation ProjectManagement::getProjectInformation(const std::string& _projectName) {
 	auto it = m_projectInfoMap.find(_projectName);
 	if (it == m_projectInfoMap.end()) {
-		return ProjectInformation();
+		return ot::ProjectInformation();
 	}
 	else {
 		return it->second;
@@ -446,18 +415,9 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	const rapidjson::Value& projectArray = responseDoc[ "projects" ];
-	assert(projectArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = projectArray.Begin(); itr != projectArray.End(); ++itr)
+	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
 	{
-		const rapidjson::Value& project = *itr;
-		std::string projectData = project.GetString();
-
-		ot::JsonDocument projectDoc;
-		projectDoc.fromJson(projectData);
-
-		ProjectInformation newInfo(projectDoc.getConstObject());
+		ot::ProjectInformation newInfo(projObj);
 		validProjects.push_back(newInfo.getProjectName());
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
@@ -468,7 +428,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	bool uManagerInitialized = false;
 
 	for (const std::string& projectName : _projects) {
-		if (m_projectInfoMap.count(projectName) == 0) {
+		if (m_projectInfoMap.find(projectName) == m_projectInfoMap.end()) {
 			// Remove the project from the recent projects list
 			if (!uManagerInitialized) {
 				uManager.setAuthServerURL(m_authServerURL);

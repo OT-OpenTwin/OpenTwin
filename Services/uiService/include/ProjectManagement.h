@@ -9,7 +9,9 @@
 
 // Frontend header
 #include "LoginData.h"
-#include "ProjectInformation.h"
+
+// OpenTwin Core header
+#include "OTCore/ProjectInformation.h"
 
 // std header
 #include <map>
@@ -42,8 +44,8 @@ public:
 	bool renameProject(const std::string &oldProjectName, const std::string &newProjectName);
 	bool projectExists(const std::string &projectName, bool &canBeDeleted);
 	std::string getProjectCollection(const std::string &projectName);
-	bool findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
-	ProjectInformation getProjectInformation(const std::string& _projectName);
+	bool findProjects(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
+	ot::ProjectInformation getProjectInformation(const std::string& _projectName);
 	bool readProjectsInfo(std::list<std::string>& _projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
 	std::vector<std::string> getDefaultTemplateList(void);
@@ -63,5 +65,5 @@ private:
 	std::string m_authServerURL;
 	const std::string m_dataBaseName;
 	const std::string m_projectCatalogCollectionName;
-	std::map<std::string, ProjectInformation> m_projectInfoMap;
+	std::map<std::string, ot::ProjectInformation> m_projectInfoMap;
 };

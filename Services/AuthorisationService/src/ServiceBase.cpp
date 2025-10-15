@@ -773,7 +773,7 @@ std::string ServiceBase::handleCreateProject(const ot::ConstJsonObject& _actionD
 
 	Project createdProject = MongoProjectFunctions::createProject(projectName, projectType, _loggedInUser, adminClient);
 
-	return MongoProjectFunctions::projectToJson(createdProject);
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, createdProject.toProjectInformation().toJson()).toJson();
 }
 
 std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _actionDocument) {
@@ -782,7 +782,7 @@ std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _action
 	try
 	{
 		Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
-		ot::ReturnMessage rMsg(ot::ReturnMessage::Ok, MongoProjectFunctions::projectToJson(proj));
+		ot::ReturnMessage rMsg(ot::ReturnMessage::Ok, proj.toProjectInformation().toJson());
 		return rMsg.toJson();
 	}
 	catch (std::runtime_error& error)
@@ -850,7 +850,7 @@ std::string ServiceBase::handleChangeProjectName(const ot::ConstJsonObject& _act
 		throw std::runtime_error("The logged in user is not the owner of this group! He cannot make the requested changes!");
 	}
 
-	return MongoProjectFunctions::projectToJson(proj);
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, proj.toProjectInformation().toJson()).toJson();
 }
 
 std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
@@ -869,7 +869,7 @@ std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _ac
 		throw std::runtime_error("The logged in user is not the owner of this Project! He cannot make the requested changes!");
 	}
 
-	return MongoProjectFunctions::projectToJson(proj);
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, proj.toProjectInformation().toJson()).toJson();
 }
 
 std::string ServiceBase::handleAddGroupToProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {

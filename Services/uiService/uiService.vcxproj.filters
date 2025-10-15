@@ -134,9 +134,6 @@
     <ClCompile Include="src\RenameProjectDialog.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectInformation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\NavigationSelectionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,7 +156,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SelectProjectDialog.cpp">
-      <Filter>Source Files\Components</Filter>
+      <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,9 +197,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ProjectInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DownloadFile.h">

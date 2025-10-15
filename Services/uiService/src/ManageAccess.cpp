@@ -6,6 +6,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ProjectInformation.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTWidgets/Label.h"
@@ -326,29 +327,22 @@ void ManageAccess::fillGroupsList(void)
 		return;
 	}
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (responseMessage == ot::ReturnMessage::Failed)
-	{
+	if (!responseMessage.isOk()) {
 		return;
 	}
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(responseMessage.getWhat());
 
+	ot::ProjectInformation info(responseDoc.getConstObject());
+
 	// Reset in group flag for all members
-	for (auto user : m_groupList)
+	for (const std::string& user : m_groupList)
 	{
 		m_groupHasAccess[user] = false;
 	}
 
-	// Now update the group flag according to the group membership
-	const rapidjson::Value& groupArray = responseDoc[ "groups" ];
-	assert(groupArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
-	{
-		const rapidjson::Value& group = *itr;
-		std::string groupName = group.GetString();
-
+	for (const std::string& groupName : info.getGroups()) {
 		m_groupHasAccess[groupName] = true;
 	}
 

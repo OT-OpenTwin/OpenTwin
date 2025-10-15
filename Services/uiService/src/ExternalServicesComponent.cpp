@@ -410,7 +410,7 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 
 // 3D View
 
-std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
+std::list<ot::ProjectInformation> ExternalServicesComponent::GetAllUserProjects()
 {
 	std::string authorizationURL = AppBase::instance()->getCurrentLoginData().getAuthorizationUrl();
 	ot::JsonDocument doc;
@@ -428,16 +428,13 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	const rapidjson::Value& projectArray = responseDoc["projects"];
-	assert(projectArray.IsArray());
-	std::list<std::string> projectList;
-	for (auto& element : projectArray.GetArray())
-	{
-		std::string projectDescription = element.GetString();
-		ot::JsonDocument projectDescriptionDoc;
-		projectDescriptionDoc.fromJson(projectDescription);
-		projectList.push_back(projectDescriptionDoc[OT_PARAM_AUTH_NAME].GetString());
+	std::list<ot::ProjectInformation> projectList;
+	
+	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List)) {
+		ot::ProjectInformation newInfo(projObj);
+		projectList.push_back(std::move(newInfo));
 	}
+
 	return projectList;
 }
 
@@ -4086,7 +4083,7 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 		return;
 	}
 
-	ProjectInformation projInfo = dia.getSelectedProject();
+	ot::ProjectInformation projInfo = dia.getSelectedProject();
 
 	ProjectManagement manager(AppBase::instance()->getCurrentLoginData());
 	std::string collection = manager.getProjectCollection(projInfo.getProjectName());

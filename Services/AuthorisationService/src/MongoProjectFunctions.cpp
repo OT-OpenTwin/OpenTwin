@@ -569,31 +569,20 @@ namespace MongoProjectFunctions
 		return secondaryDb.has_collection(collectionName);
 	}
 
-	std::string projectToJson(Project& project)
-	{
-		ot::JsonDocument json;
-		json.AddMember("id", ot::JsonString(project.getId().to_string(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_NAME, ot::JsonString(project.getName(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(project.getType(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_PROJECT_COLLECTION, ot::JsonString(project.getCollectionName(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_OWNER, ot::JsonString(project.getUser().username, json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_PROJECT_LASTACCESS, project.getLastAccessedOn().value.count(), json.GetAllocator());
-		
-		std::list<std::string> groups;
-
-		for (auto group : project.getGroups()) {
-			groups.push_back(group.name);
-		}
-		json.AddMember("groups", ot::JsonArray(groups, json.GetAllocator()), json.GetAllocator());
-
-		return json.toJson();
-	}
-
 	std::string projectsToJson(std::vector<Project>& projects)
 	{
+		ot::JsonDocument doc;
+		ot::JsonArray projectsArr;
+		for (const Project& project : projects) {
+			projectsArr.PushBack(ot::JsonObject(project.toProjectInformation(), doc.GetAllocator()), doc.GetAllocator());
+		}
+		doc.AddMember(OT_ACTION_PARAM_List, projectsArr, doc.GetAllocator());
+		return doc.toJson();
+		
+		/*
 		std::list<std::string> jsonProjects{};
 
-		for (auto project : projects)
+		for (const Project& project : projects)
 		{
 			jsonProjects.push_back(MongoProjectFunctions::projectToJson(project));
 		}
@@ -602,5 +591,7 @@ namespace MongoProjectFunctions
 		ot::JsonDocument json;
 		json.AddMember("projects", ot::JsonArray(jsonProjects, json.GetAllocator()), json.GetAllocator());
 		return json.toJson();
+
+		*/
 	}
 }

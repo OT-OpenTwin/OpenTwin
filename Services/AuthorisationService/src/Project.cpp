@@ -29,6 +29,24 @@ void Project::addGroup(const Group& _group) {
 	m_groups.push_back(_group);
 }
 
+ot::ProjectInformation Project::toProjectInformation() const {
+	ot::ProjectInformation info;
+	
+	info.setVersion(m_version);
+	info.setProjectName(m_name);
+	info.setProjectType(m_type);
+	info.setCollectionName(m_collectionName);
+	info.setUserName(m_creatingUser.username);
+	info.setCreationTime(m_createdOn);
+	info.setLastAccessTime(m_lastAccessedOn);
+
+	for (const Group& group : m_groups) {
+		info.addGroup(group.name);
+	}
+
+	return info;
+}
+
 void Project::importData(const bsoncxx::v_noabi::document::view& _view) {
 	m_id = _view["_id"].get_oid().value;
 	m_name = std::string(_view["project_name"].get_utf8().value.data());

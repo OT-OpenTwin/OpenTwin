@@ -3,6 +3,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ProjectInformation.h"
 
 
 ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& sessionServiceURL)
@@ -34,11 +35,13 @@ std::string ProjectToCollectionConverter::NameCorrespondingCollection(const std:
 	ot::msg::send("", _authorisationService, ot::EXECUTE, doc.toJson(), response);
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 
-	if (responseMessage.getStatus() == ot::ReturnMessage::Failed)
-	{
+	if (!responseMessage.isOk()) {
 		throw std::exception(std::string("Could not get information about project \"" + projectName + "\".").c_str());
 	}
+
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(responseMessage.getWhat());
-	return ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_COLLECTION);
+
+	ot::ProjectInformation info(responseDoc.getConstObject());
+	return info.getCollectionName();
 }

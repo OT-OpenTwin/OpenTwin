@@ -18,7 +18,7 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlistwidget.h>
 
-SelectProjectDialogEntry::SelectProjectDialogEntry(const ProjectInformation& _info) :
+SelectProjectDialogEntry::SelectProjectDialogEntry(const ot::ProjectInformation& _info) :
 	m_info(_info)
 {
 	this->setText(QString::fromStdString(m_info.getProjectName()));
@@ -84,16 +84,16 @@ SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config)
 SelectProjectDialog::~SelectProjectDialog() {
 }
 
-ProjectInformation SelectProjectDialog::getSelectedProject() const {
+ot::ProjectInformation SelectProjectDialog::getSelectedProject() const {
 	auto sel = m_list->selectedItems();
 	if (sel.size() != 1) {
-		return ProjectInformation();
+		return ot::ProjectInformation();
 	}
 	else {
 		SelectProjectDialogEntry* entry = dynamic_cast<SelectProjectDialogEntry*>(sel.front());
 		if (!entry) {
 			OT_LOG_E("Unexpected item type");
-			return ProjectInformation();
+			return ot::ProjectInformation();
 		}
 		return entry->getProjectInformation();
 	}
@@ -143,12 +143,12 @@ void SelectProjectDialog::slotRefillList() {
 
 	const int maxNumberOfResults = 1000;
 
-	std::list<ProjectInformation> projects;
+	std::list<ot::ProjectInformation> projects;
 	bool maxLengthExceeded = false;
-	manager.findProjectNames(m_filter->text().toStdString(), maxNumberOfResults, projects, maxLengthExceeded);
+	manager.findProjects(m_filter->text().toStdString(), maxNumberOfResults, projects, maxLengthExceeded);
 
 	// Refill list
-	for (const ProjectInformation& proj : projects) {
+	for (const ot::ProjectInformation& proj : projects) {
 		SelectProjectDialogEntry* entry = new SelectProjectDialogEntry(proj);
 		auto icoIt = m_projectTypeToIconMap.find(proj.getProjectType());
 		if (icoIt != m_projectTypeToIconMap.end()) {

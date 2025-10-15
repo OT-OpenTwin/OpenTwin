@@ -14,6 +14,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
+#include "OTCore/ProjectInformation.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -105,7 +106,7 @@ public:
 
 	// 3D View
 
-	std::list<std::string> GetAllUserProjects();
+	std::list<ot::ProjectInformation> GetAllUserProjects();
 
 	ModelUIDtype createModel(const std::string& _projectName, const std::string& _collectionName);
 	

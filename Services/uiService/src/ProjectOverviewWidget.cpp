@@ -39,7 +39,7 @@ enum TableColumn {
 	ColumnCount
 };
 
-ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
+ProjectOverviewEntry::ProjectOverviewEntry(const ot::ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
 	int row = _table->rowCount();
@@ -84,10 +84,12 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 		m_groupsItem->setSortHint(QString::fromStdString(newGroupsSortHint));
 	}
 
+	QDateTime lastAccess = QDateTime::fromMSecsSinceEpoch(_projectInfo.getLastAccessTime());
+
 	m_lastAccessTimeItem = new ot::TableItem;
 	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
-	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString());
-	m_lastAccessTimeItem->setSortHint(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
+	m_lastAccessTimeItem->setText(lastAccess.toString());
+	m_lastAccessTimeItem->setSortHint(lastAccess.toString("yyyy.MM.dd hh:mm:ss"));
 
 	_table->setCellWidget(row, TableColumn::ColumnCheck, m_checkBox);
 	_table->setItem(row, TableColumn::ColumnType, m_typeItem);
@@ -379,7 +381,7 @@ void ProjectOverviewWidget::slotRefreshRecentProjects() {
 	
 	for (const std::string& proj : recent) {
 		std::string editorName("< Unknown >");
-		ProjectInformation newInfo = projectManager.getProjectInformation(proj);
+		ot::ProjectInformation newInfo = projectManager.getProjectInformation(proj);
 
 		if (newInfo.getProjectName().empty()) {
 			OT_LOG_E("Project information for project \"" + proj + "\" not found");
@@ -403,12 +405,12 @@ void ProjectOverviewWidget::slotRefreshAllProjects() {
 	AppBase* app = AppBase::instance();
 	std::string currentUser = app->getCurrentLoginData().getUserName();
 
-	std::list<ProjectInformation> projects;
+	std::list<ot::ProjectInformation> projects;
 	bool resultExceeded = false;
 	ProjectManagement projectManager(app->getCurrentLoginData());
-	projectManager.findProjectNames(m_filter->text().toStdString(), 100, projects, resultExceeded);
+	projectManager.findProjects(m_filter->text().toStdString(), 100, projects, resultExceeded);
 
-	for (const ProjectInformation& proj : projects) {
+	for (const ot::ProjectInformation& proj : projects) {
 		std::string editorName("< Unknown >");
 		//projectManager.getProjectAuthor(proj.getProjectName(), editorName);
 
@@ -523,7 +525,7 @@ void ProjectOverviewWidget::clear() {
 	}
 }
 
-void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator) {
+void ProjectOverviewWidget::addProject(const ot::ProjectInformation& _projectInfo, bool _ownerIsCreator) {
 	QSignalBlocker sigBlock(m_table);
 	
 	int ix = m_table->horizontalHeader()->sortIndicatorSection();

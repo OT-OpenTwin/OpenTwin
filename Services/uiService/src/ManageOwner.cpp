@@ -5,6 +5,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
@@ -473,7 +474,9 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 		return;
 	}
 
-	if (hasError(response))
+	ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
+
+	if (!ret.isOk())
 	{
 		AppBase::instance()->slotShowErrorPrompt("The owner could not be changed.", "", "Change Owner");
 	}

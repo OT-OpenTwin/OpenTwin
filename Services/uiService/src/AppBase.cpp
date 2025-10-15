@@ -1742,8 +1742,12 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 			continue;
 		}
 
-		std::list<std::string> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
-		actualProp->setList(userProjects);
+		std::list<ot::ProjectInformation> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
+		std::list<std::string> userProjectNames;
+		for (const ot::ProjectInformation& pi : userProjects) {
+			userProjectNames.push_back(pi.getProjectName());
+		}
+		actualProp->setList(userProjectNames);
 	}
 
 	m_propertyGrid->getPropertyGrid()->setupGridFromConfig(_configuration);
