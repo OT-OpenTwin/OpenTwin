@@ -39,6 +39,10 @@ namespace ot {
 
 		static const QStringList& searchPaths(void);
 
+		//! @brief Check if a file exists in any of the search paths.
+		//! @param _subPath The sub path of the file to check.
+		static bool fileExists(const QString& _subPath);
+
 		//! @brief Return or import and return the icon.
 		static const QIcon& getIcon(const QString& _subPath);
 

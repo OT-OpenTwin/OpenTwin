@@ -3,11 +3,14 @@
 //! @date October 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// DebugService header
+// Service header
 #include "Application.h"
 
 // OpenTwin System header
 #include "OTSystem/DateTime.h"
+
+// OpenTwin Core header
+#include "OTCore/ProjectInformation.h"
 
 // OpenTwin Gui header
 #include "OTGui/DialogCfg.h"
@@ -90,6 +93,8 @@ void Application::run() {
 }
 
 void Application::uiConnected(ot::components::UiComponent* _ui) {
+	m_entityHandler.setUIComponent(_ui);
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 
 	_ui->addMenuPage(c_pageName);
@@ -112,6 +117,8 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 }
 
 void Application::modelConnected(ot::components::ModelComponent* _model) {
+	m_entityHandler.setModelComponent(_model);
+
 	// If model and ui are connected, we can send the initial selection
 	if (this->isUiConnected()) {
 		std::thread worker(&Application::initialSelectionWorker, this, _model->getServiceURL());
@@ -145,16 +152,33 @@ void Application::handleSetProjectEntitySelected() {
 }
 
 void Application::handleProjectSelected(ot::JsonDocument& _doc) {
-	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-	std::string collectionName = ot::json::getString(_doc, OT_ACTION_PARAM_COLLECTION_NAME);
-	std::string projectType = ot::json::getString(_doc, OT_ACTION_PARAM_Type);
+	ot::ProjectInformation info(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
 
-	if (collectionName == this->getCollectionName()) {
+	if (info.getCollectionName() == this->getCollectionName()) {
 		OT_LOG_E("Can not add the current project as a child project");
 		return;
 	}
 
-	OT_LOG_T("Project selected received: { \"Name\": \"" + projectName + "\", \"Type\": \"" + projectType + "\", \"Collection\": \"" + collectionName + "\" }");
+	OT_LOG_T("Project selected received: " + info.toJson());
+
+	std::string parentEntity = EntityHierarchicalScene::defaultName();
+
+	// Check if we have a selection
+	const auto& infos = this->getSelectedEntityInfos();
+	if (infos.size() == 1) {
+		// Ensure validity of parent entity
+		const std::list<std::string> validParentTypes = {
+			EntityHierarchicalScene::className()
+		};
+		if (std::find(validParentTypes.begin(), validParentTypes.end(), infos.front().getEntityType()) == validParentTypes.end()) {
+			OT_LOG_E("Invalid parent selection");
+			return;
+		}
+
+		parentEntity = infos.front().getEntityName();
+	}
+
+	m_entityHandler.createProjectItemBlockEntity(info, parentEntity);
 }
 
 void Application::handleHierarchicalSelected(ot::JsonDocument& _doc) {

@@ -8,6 +8,8 @@
 #include "EntityProperties.h"
 #include "EntityBlockHierarchicalProjectItem.h"
 
+#include "OTGui/GraphicsHierarchicalProjectItemBuilder.h"
+
 static EntityFactoryRegistrar<EntityBlockHierarchicalProjectItem> registrar(EntityBlockHierarchicalProjectItem::className());
 
 EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
@@ -24,7 +26,16 @@ EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _
 }
 
 ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
-	return nullptr;
+	ot::ProjectInformation project = this->getProjectInformation();
+
+	ot::GraphicsHierarchicalProjectItemBuilder builder;
+	
+	builder.setName(this->getClassName());
+	builder.setTitle(this->createBlockHeadline());
+	builder.setLeftTitleCornerImagePath("ProjectTemplates/" + project.getProjectType());
+	builder.setTitleBackgroundGradientColor(ot::Green);
+
+	return builder.createGraphicsItem();
 }
 
 bool EntityBlockHierarchicalProjectItem::updateFromProperties() {

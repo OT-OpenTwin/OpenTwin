@@ -6,8 +6,8 @@
 
 // OpenTwin header
 #include "OTCore/LogDispatcher.h"
-
 #include "OTGui/GraphicsFlowItemBuilder.h"
+
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"

@@ -46,23 +46,63 @@ void ot::ImagePainterManager::addImagePainter(const std::string& _key, ImagePain
 }
 
 void ot::ImagePainterManager::importFromFile(const std::string& _fileSubPath) {
+	if (_fileSubPath.empty()) {
+		OT_LOG_E("Empty file path");
+		return;
+	}
+
 	if (this->contains(_fileSubPath)) {
 		return;
 	}
 
+	std::string actualPath = _fileSubPath;
 	std::list<std::string> filePath = ot::String::split(_fileSubPath, '.', true);
-	ImagePainter* newPainter = nullptr;
+	std::string actualExtension;
 
-	if (filePath.empty()) newPainter = this->importPng(_fileSubPath);
-	else if (filePath.back() == "png") newPainter = this->importPng(_fileSubPath);
-	else if (filePath.back() == "svg") newPainter = this->importSvg(_fileSubPath);
+	if (filePath.size() > 1) {
+		// File extension provided
+		actualExtension = filePath.back();
+	}
+	else if (filePath.size() == 1) {
+		// No file extension find best
+		std::list<std::string> testExtensions = { "png", "svg" };
+		while (!testExtensions.empty()) {
+			std::string extension = testExtensions.back();
+			testExtensions.pop_back();
+			std::string testPath = _fileSubPath + "." + extension;
+			if (IconManager::fileExists(QString::fromStdString(testPath))) {
+				actualPath = std::move(testPath);
+				actualExtension = std::move(extension);
+				break;
+			}
+		}
+	}
 	else {
-		OT_LOG_E("Unknown file type. Defaulting to pixmap..");
-		newPainter = this->importPng(_fileSubPath);
+		OT_LOG_E("Invalid file path \"" + _fileSubPath + "\"");
+		return;
+	}
+
+
+	ImagePainter* newPainter = nullptr;
+	
+	if (actualExtension.empty()) {
+		OT_LOG_E("Failed to determine file extension. Ignoring import request for \"" + _fileSubPath + "\"");
+		return;
+	}
+
+	if (actualExtension == "png") {
+		newPainter = this->importPng(actualPath);
+	}
+	else if (actualExtension == "svg") {
+		newPainter = this->importSvg(actualPath);
+	}
+	else {
+		OT_LOG_W("Unknown file type \"" + actualExtension + "\". Defaulting to pixmap..");
+		newPainter = this->importPng(actualPath);
 	}
 
 	if (newPainter) {
-		m_painter.insert_or_assign(_fileSubPath, newPainter);
+		m_painter.insert_or_assign(actualPath, newPainter);
 	}
 }
 

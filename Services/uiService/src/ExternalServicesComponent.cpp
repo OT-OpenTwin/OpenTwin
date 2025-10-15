@@ -4087,13 +4087,12 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 
 	ProjectManagement manager(AppBase::instance()->getCurrentLoginData());
 	std::string collection = manager.getProjectCollection(projInfo.getProjectName());
+	projInfo.setCollectionName(collection);
 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projInfo.getProjectName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString(projInfo.getProjectType(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collection, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	
 	std::string tmp;
 	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);
 }

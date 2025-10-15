@@ -6,6 +6,7 @@
 #pragma once
 
 // Service header
+#include "EntityHandler.h"
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
@@ -73,6 +74,8 @@ private:
 	// Private: Worker
 
 	void initialSelectionWorker(std::string _modelUrl);
+
+	EntityHandler m_entityHandler;
 
 	const std::string c_setProjectEntitySelectedAction = "SetProjectEntitySelected";
 	const std::string c_projectSelectedAction = "ProjectSelected";

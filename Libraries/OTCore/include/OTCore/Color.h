@@ -70,8 +70,8 @@ namespace ot {
 	//! @brief The Color class is used to represent RGBA colors with integer values.
 	class OT_CORE_API_EXPORT Color : public ot::Serializable {
 	public:
-		explicit Color();
-		explicit Color(DefaultColor _color);
+		Color();
+		Color(DefaultColor _color);
 		explicit Color(int r, int g, int b, int a = 255);
 		Color(const Color& _other);
 		virtual ~Color();
@@ -155,8 +155,8 @@ namespace ot {
 	//! @brief The ColorF class is used to represent RGBA colors with float values.
 	class OT_CORE_API_EXPORT ColorF : public ot::Serializable {
 	public:
-		explicit ColorF();
-		explicit ColorF(DefaultColor _color);
+		ColorF();
+		ColorF(DefaultColor _color);
 		explicit ColorF(float _r, float _g, float _b, float _a = 1.f);
 		ColorF(const ColorF& _other);
 		virtual ~ColorF();

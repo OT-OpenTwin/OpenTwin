@@ -50,6 +50,15 @@ const QStringList& ot::IconManager::searchPaths(void) {
 	return IconManager::instance().m_searchPaths;
 }
 
+bool ot::IconManager::fileExists(const QString& _subPath) {
+	IconManager& manager = IconManager::instance();
+
+	std::lock_guard<std::mutex> lock(manager.m_mutex);
+
+	QString path = manager.findFullPath(_subPath);
+	return !path.isEmpty();
+}
+
 const QIcon& ot::IconManager::getIcon(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
 	return *manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
