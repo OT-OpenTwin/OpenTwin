@@ -41,7 +41,8 @@ public:
 	void resetBrep(void);
 	void resetFacets(void);
 
-	virtual std::string getClassName(void) override  { return "EntityGeometry"; };
+	static std::string className() { return "EntityGeometry"; };
+	virtual std::string getClassName(void) override  { return EntityGeometry::className(); };
 
 	void addPrefetchingRequirementsForBrep(std::list<ot::UID> &prefetchIds);
 	void addPrefetchingRequirementsForFacets(std::list<ot::UID> &prefetchIds);

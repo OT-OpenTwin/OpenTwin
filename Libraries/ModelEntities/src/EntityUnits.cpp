@@ -8,7 +8,7 @@ static EntityFactoryRegistrar<EntityUnits> registrar("EntityUnits");
 EntityUnits::EntityUnits(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
 	: EntityBase(ID,parent,obs,ms,owner)
 {
-	SetUnitLists();
+	setUnitLists();
 }
 
 bool EntityUnits::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
@@ -18,17 +18,17 @@ bool EntityUnits::getEntityBox(double & xmin, double & xmax, double & ymin, doub
 
 void EntityUnits::createProperties(void)
 {
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameDimension, GetUnitList(dimensionsList), "m", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTemperature, GetUnitList(temperatureList), "degC", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameFrequency, GetUnitList(frequencyList), "Hz", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTime, GetUnitList(timeList), "s", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameVoltage, GetUnitList(voltageList), "V", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameCurrent, GetUnitList(currentList), "A", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameConductance, GetUnitList(conductanceList), "S", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameResistance, GetUnitList(resistanceList), "Ohm", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameInductance, GetUnitList(inductanceList), "H", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameCapacitance, GetUnitList(capacitanceList), "F", unitGroupname, getProperties());
-	EntityPropertiesSelection::createProperty(unitGroupname, unitNameConductivity, GetUnitList(conductivityList), "S/m", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameDimension, getUnitList(dimensionsList), "m", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTemperature, getUnitList(temperatureList), "degC", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameFrequency, getUnitList(frequencyList), "Hz", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameTime, getUnitList(timeList), "s", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameVoltage, getUnitList(voltageList), "V", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameCurrent, getUnitList(currentList), "A", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameConductance, getUnitList(conductanceList), "S", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameResistance, getUnitList(resistanceList), "Ohm", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameInductance, getUnitList(inductanceList), "H", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameCapacitance, getUnitList(capacitanceList), "F", unitGroupname, getProperties());
+	EntityPropertiesSelection::createProperty(unitGroupname, unitNameConductivity, getUnitList(conductivityList), "S/m", unitGroupname, getProperties());
 }
 
 void EntityUnits::TurnToSIDimension(double & value, std::string& formerUnit)
@@ -167,7 +167,7 @@ void EntityUnits::addVisualizationNodes(void)
 		EntityBase::addVisualizationNodes();
 }
 
-void EntityUnits::SetUnitLists()
+void EntityUnits::setUnitLists()
 {
 	dimensionsList = { {"nm", pow(10,-6)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.1}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
 	temperatureList = { {"degC",1.}, {"K",1.}, {"degF",1.} };
@@ -181,20 +181,20 @@ void EntityUnits::SetUnitLists()
 	capacitanceList = { {"fF", pow(10,-15)}, {"pF", pow(10,-12)}, {"nF", pow(10,-9)}, {"uF", pow(10,-6)}, {"mF", pow(10,-3)}, {"F",1.} };
 	conductivityList = { {"S/m",1.} };
 
-	BuildMap(dimensionsList, dimensions);
-	BuildMap(temperatureList, temperature);
-	BuildMap(frequencyList, frequency);
-	BuildMap(timeList, time);
-	BuildMap(voltageList, voltage);
-	BuildMap(currentList, current);
-	BuildMap(conductanceList, conductance);
-	BuildMap(resistanceList, resistance);
-	BuildMap(inductanceList, inductance);
-	BuildMap(capacitanceList, capacitance);
-	BuildMap(conductivityList, conductivity);
+	buildMap(dimensionsList, dimensions);
+	buildMap(temperatureList, temperature);
+	buildMap(frequencyList, frequency);
+	buildMap(timeList, time);
+	buildMap(voltageList, voltage);
+	buildMap(currentList, current);
+	buildMap(conductanceList, conductance);
+	buildMap(resistanceList, resistance);
+	buildMap(inductanceList, inductance);
+	buildMap(capacitanceList, capacitance);
+	buildMap(conductivityList, conductivity);
 }
 
-void EntityUnits::BuildMap(const std::list<std::pair<std::string, double>>& list, std::map<std::string, double> &map)
+void EntityUnits::buildMap(const std::list<std::pair<std::string, double>>& list, std::map<std::string, double> &map)
 {
 	for (auto it = list.begin(); it != list.end(); it++)
 	{
@@ -202,7 +202,7 @@ void EntityUnits::BuildMap(const std::list<std::pair<std::string, double>>& list
 	}
 }
 
-std::list<std::string> EntityUnits::GetUnitList(std::list<std::pair<std::string, double>> &quantity)
+std::list<std::string> EntityUnits::getUnitList(std::list<std::pair<std::string, double>> &quantity)
 {
 	std::list<std::string> units;
 	for (auto it = quantity.begin(); it != quantity.end(); it++)

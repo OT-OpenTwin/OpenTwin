@@ -53,7 +53,7 @@ public:
 	virtual void addVisualizationNodes(void) override;
 
 	static std::string className() { return "EntityFaceAnnotation"; };
-	virtual std::string getClassName(void) { return EntityFaceAnnotation::className(); };
+	virtual std::string getClassName(void) override { return EntityFaceAnnotation::className(); };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;

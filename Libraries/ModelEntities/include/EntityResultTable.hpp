@@ -152,12 +152,12 @@ bool EntityResultTable<T>::updateFromProperties()
 template <class T>
 std::shared_ptr<EntityResultTableData<T>> EntityResultTable<T>::getTableData()
 {
-	EnsureTableDataLoaded();
+	ensureTableDataLoaded();
 	return tableData;
 }
 
 template <class T>
-void EntityResultTable<T>::EnsureTableDataLoaded()
+void EntityResultTable<T>::ensureTableDataLoaded()
 {
 	if (tableData == nullptr)
 	{

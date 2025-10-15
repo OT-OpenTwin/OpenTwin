@@ -38,7 +38,7 @@ public:
 	BoundingBox &getBoundingBox(void) { return boundingBox; };
 	void setBoundingBox(const BoundingBox &box) { boundingBox = box; setModified(); };
 
-	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
+	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
 	void setSurfaceId(int id) { surfaceId = id; setModified(); };
 	int  getSurfaceId(void) { return surfaceId; };

@@ -71,7 +71,7 @@ private:
 	std::map<std::string, double> capacitance;
 	std::map<std::string, double> conductivity;
 
-	void SetUnitLists();
-	std::list<std::string> GetUnitList(std::list<std::pair<std::string, double>>& quantity);
-	void BuildMap(const std::list<std::pair<std::string, double>>& list, std::map<std::string, double>& map);
+	void setUnitLists();
+	std::list<std::string> getUnitList(std::list<std::pair<std::string, double>>& quantity);
+	void buildMap(const std::list<std::pair<std::string, double>>& list, std::map<std::string, double>& map);
 };

@@ -20,12 +20,12 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
-	virtual void createProperties(void);
-	virtual bool updatePropertyVisibilities(void);
+	virtual void createProperties(void) override;
+	virtual bool updatePropertyVisibilities(void) override;
 
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
-	virtual void addStorageData(bsoncxx::builder::basic::document& storage);
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:

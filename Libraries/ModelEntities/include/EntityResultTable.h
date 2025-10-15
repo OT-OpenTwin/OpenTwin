@@ -53,7 +53,7 @@ private:
 	int _maxCol = 50;
 	int _maxRow = 50;
 	virtual int getSchemaVersion(void) override { return 1; };
-	void EnsureTableDataLoaded(void);
+	void ensureTableDataLoaded(void);
 	std::string className; 
 	std::shared_ptr<EntityResultTableData<T>> tableData = nullptr;
 	long long tableDataStorageId;
