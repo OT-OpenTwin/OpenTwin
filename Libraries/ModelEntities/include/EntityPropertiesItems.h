@@ -1,3 +1,8 @@
+//! @file EntityPropertiesItems.h
+//! @author Peter Thoma, Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 #pragma warning(disable : 4251)
 
@@ -25,7 +30,7 @@ public:
 
 	EntityPropertiesBase(const EntityPropertiesBase &other);
 
-	virtual EntityPropertiesBase *createCopy(void) = 0;
+	virtual EntityPropertiesBase *createCopy(void) const = 0;
 
 	void setContainer(EntityProperties *c) { m_container = c; };
 
@@ -46,8 +51,8 @@ public:
 	void setHasMultipleValues(bool b) { m_multipleValues = b; };
 	bool hasMultipleValues(void) const { return m_multipleValues; };
 
-	virtual bool isCompatible(EntityPropertiesBase *other) { return true; };
-	virtual bool hasSameValue(EntityPropertiesBase *other) = 0;
+	virtual bool isCompatible(EntityPropertiesBase *other) const { return true; };
+	virtual bool hasSameValue(EntityPropertiesBase *other) const = 0;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) = 0;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root);
@@ -75,7 +80,7 @@ public:
 	EntityPropertiesBase& operator=(const EntityPropertiesBase &other);
 
 protected:
-	void setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property);
+	void setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property) const;
 
 private:
 	void setMultipleValues(void) { m_multipleValues = true; }
@@ -106,7 +111,7 @@ public:
 
 	EntityPropertiesDouble(const EntityPropertiesDouble& _other);
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesDouble(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesDouble(*this); };
 
 	EntityPropertiesDouble& operator=(const EntityPropertiesDouble& _other);
 
@@ -125,7 +130,7 @@ public:
 	void setAllowCustomValues(bool _allowCustomValues);
 	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -133,7 +138,7 @@ public:
 	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
-	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
+	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root) override;
 
 	static EntityPropertiesDouble* createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
 	static EntityPropertiesDouble* createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
@@ -159,7 +164,7 @@ public:
 
 	EntityPropertiesInteger(const EntityPropertiesInteger& _other);
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesInteger(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesInteger(*this); };
 
 	EntityPropertiesInteger& operator=(const EntityPropertiesInteger& _other);
 
@@ -178,7 +183,7 @@ public:
 	void setAllowCustomValues(bool _allowCustomValues);
 	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -186,7 +191,7 @@ public:
 	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
-	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
+	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root) override;
 
 	static EntityPropertiesInteger* createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
 	static EntityPropertiesInteger* createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
@@ -212,7 +217,7 @@ public:
 
 	EntityPropertiesBoolean(const EntityPropertiesBoolean &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesBoolean(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesBoolean(*this); };
 
 	EntityPropertiesBoolean& operator=(const EntityPropertiesBoolean &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
@@ -222,7 +227,7 @@ public:
 	void setValue(bool b) { if (m_value != b) setNeedsUpdate(); m_value = b; };
 	bool getValue(void) const { return m_value; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -252,7 +257,7 @@ public:
 
 	EntityPropertiesString(const EntityPropertiesString &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesString(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesString(*this); };
 
 	EntityPropertiesString& operator=(const EntityPropertiesString &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value =other.getValue(); }; return *this; };
 
@@ -262,7 +267,7 @@ public:
 	void setValue(const std::string &s) { if (m_value != s) setNeedsUpdate(); m_value = s; };
 	const std::string& getValue(void) const { return m_value; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -290,14 +295,14 @@ public:
 
 	EntityPropertiesSelection(const EntityPropertiesSelection &other) : EntityPropertiesBase(other) { m_options = other.m_options; m_value = other.m_value; };
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesSelection(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesSelection(*this); };
 
 	EntityPropertiesSelection& operator=(const EntityPropertiesSelection &other) { if (&other != this) { assert(checkCompatibilityOfSettings(other)); EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
 	virtual eType getType(void) const override { return SELECTION; };
 	virtual std::string getTypeString(void) const override { return EntityPropertiesSelection::typeString(); };
 
-	virtual bool isCompatible(EntityPropertiesBase *other) override;
+	virtual bool isCompatible(EntityPropertiesBase *other) const override;
 
 	bool setValue(const std::string &s);
 	const std::string& getValue(void)const { return m_value; };
@@ -307,7 +312,7 @@ public:
 	void resetOptions(const std::list<std::string>& _options);
 	const std::vector<std::string> &getOptions(void) { return m_options; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -321,7 +326,7 @@ public:
 	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other);
+	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other) const;
 
 	std::vector<std::string> m_options;
 	std::string m_value;
@@ -341,7 +346,7 @@ public:
 	EntityPropertiesColor(const std::string &n, double r, double g, double b) : m_color{ r, g, b } { setName(n); };
 	virtual ~EntityPropertiesColor() {};
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesColor(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesColor(*this); };
 
 	EntityPropertiesColor& operator=(const EntityPropertiesColor &other);
 
@@ -358,7 +363,7 @@ public:
 	double getColorG(void) const { return m_color[1]; };
 	double getColorB(void) const { return m_color[2]; };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -388,14 +393,14 @@ public:
 
 	virtual ~EntityPropertiesEntityList() {};
 
-	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesEntityList(*this); };
+	virtual EntityPropertiesBase *createCopy(void) const override { return new EntityPropertiesEntityList(*this); };
 
 	EntityPropertiesEntityList& operator=(const EntityPropertiesEntityList &other);
 
 	virtual eType getType(void) const override { return ENTITYLIST; };
 	virtual std::string getTypeString(void) const override { return EntityPropertiesEntityList::typeString(); };
 
-	virtual bool hasSameValue(EntityPropertiesBase *other) override;
+	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -447,13 +452,13 @@ public:
 
 	EntityPropertiesProjectList() {};
 	EntityPropertiesProjectList(const std::string& name) { setName(name); }
-	virtual EntityPropertiesBase* createCopy(void) override { return new EntityPropertiesProjectList(*this); };
+	virtual EntityPropertiesBase* createCopy(void) const override { return new EntityPropertiesProjectList(*this); };
 	virtual eType getType(void) const override { return PROJECTLIST; };
 	virtual std::string getTypeString(void) const override { return EntityPropertiesProjectList::typeString(); };
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
-	virtual bool hasSameValue(EntityPropertiesBase* other) override { return true; };
+	virtual bool hasSameValue(EntityPropertiesBase* other) const override { return true; };
 	
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;
@@ -483,7 +488,7 @@ public:
 
 	EntityPropertiesGuiPainter(const EntityPropertiesGuiPainter& other);
 
-	virtual EntityPropertiesBase* createCopy(void) override { return new EntityPropertiesGuiPainter(*this); };
+	virtual EntityPropertiesBase* createCopy(void) const override { return new EntityPropertiesGuiPainter(*this); };
 
 	EntityPropertiesGuiPainter& operator=(const EntityPropertiesGuiPainter& other);
 
@@ -499,7 +504,7 @@ public:
 	void setFilter(const ot::Painter2DDialogFilter& _filter) { m_filter = _filter; };
 	const ot::Painter2DDialogFilter& getFilter() const { return m_filter; };
 
-	virtual bool hasSameValue(EntityPropertiesBase* other) override;
+	virtual bool hasSameValue(EntityPropertiesBase* other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root) override;
 	virtual void setFromConfiguration(const ot::Property* _property, EntityBase* root) override;

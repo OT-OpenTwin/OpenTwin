@@ -92,7 +92,8 @@ public:
 	void setObserver(EntityObserver *obs) { m_observer = obs; };
 	EntityObserver *getObserver() { return m_observer; };
 
-	EntityProperties &getProperties() { return m_properties; };
+	EntityProperties& getProperties() { return m_properties; };
+	const EntityProperties& getProperties() const { return m_properties; };
 
 	virtual EntityBase *getEntityFromName(const std::string &n) { if (m_name == n) return this; return nullptr; };
 

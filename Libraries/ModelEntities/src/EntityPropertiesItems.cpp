@@ -1,3 +1,8 @@
+//! @file EntityPropertiesItems.cpp
+//! @author Peter Thoma, Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include <cassert>
 
 #include "EntityPropertiesItems.h"
@@ -120,7 +125,7 @@ EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase
 	return *this; 
 }
 
-void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property)
+void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property) const
 {
 	if (this->hasMultipleValues()) _property->setPropertyFlag(ot::Property::HasMultipleValues);
 	if (this->getReadOnly()) _property->setPropertyFlag(ot::Property::IsReadOnly);
@@ -275,7 +280,7 @@ void EntityPropertiesDouble::setAllowCustomValues(bool _allowCustomValues) {
 	}
 }
 
-bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) {
+bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) const {
 	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
 
 	if (entity == nullptr) return false;
@@ -419,7 +424,7 @@ void EntityPropertiesInteger::setAllowCustomValues(bool _allowCustomValues) {
 	}
 }
 
-bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesInteger* entity = dynamic_cast<EntityPropertiesInteger*>(other);
 
@@ -528,7 +533,7 @@ void EntityPropertiesBoolean::copySettings(EntityPropertiesBase *other, EntityBa
 	}
 }
 
-bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesBoolean* entity = dynamic_cast<EntityPropertiesBoolean*>(other);
 
@@ -596,7 +601,7 @@ void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBas
 	}
 }
 
-bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesString* entity = dynamic_cast<EntityPropertiesString*>(other);
 
@@ -733,7 +738,7 @@ void EntityPropertiesSelection::resetOptions(const std::list<std::string>& _opti
 	}
 }
 
-bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesSelection* entity = dynamic_cast<EntityPropertiesSelection*>(other);
 
@@ -752,7 +757,7 @@ bool EntityPropertiesSelection::setValue(const std::string& s)
 	return true;
 }
 
-bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other)
+bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other) const
 {
 	if (m_options.size() != other.m_options.size()) return false;
 
@@ -764,7 +769,7 @@ bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropert
 	return true;
 }
 
-bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other)
+bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other) const
 {
 	EntityPropertiesSelection* otherItem = dynamic_cast<EntityPropertiesSelection*>(other);
 	if (otherItem == nullptr) return false;
@@ -860,7 +865,7 @@ void EntityPropertiesColor::copySettings(EntityPropertiesBase *other, EntityBase
 	}
 }
 
-bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesColor* entity = dynamic_cast<EntityPropertiesColor*>(other);
 
@@ -871,7 +876,7 @@ bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase* other)
 
 // ################################################################################################################################################################
 
-bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other)
+bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other) const
 {
 	EntityPropertiesEntityList *entity = dynamic_cast<EntityPropertiesEntityList *>(other);
 
@@ -1339,7 +1344,7 @@ void EntityPropertiesGuiPainter::copySettings(EntityPropertiesBase* other, Entit
 	}
 }
 
-bool EntityPropertiesGuiPainter::hasSameValue(EntityPropertiesBase* other)
+bool EntityPropertiesGuiPainter::hasSameValue(EntityPropertiesBase* other) const
 {
 	EntityPropertiesGuiPainter* entity = dynamic_cast<EntityPropertiesGuiPainter*>(other);
 

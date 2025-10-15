@@ -2,7 +2,6 @@
 #include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"
 #include "SharedResources.h"
-#include "EntityBlockHierarchicalProjectItem.h"
 
 static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 

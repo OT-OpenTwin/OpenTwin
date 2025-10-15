@@ -1,3 +1,7 @@
+//! @file EntityProperties.cpp
+//! @author Peter Thoma, Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #include "EntityProperties.h"
 
@@ -113,52 +117,6 @@ bool EntityProperties::deleteProperty(const std::string &_name, const std::strin
 	return true;
 }
 
-EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, const std::string& _groupName)
-{
-	if (_groupName == "")
-	{
-		const bool accesserIsAKey = isKey(_name);
-		if(accesserIsAKey)
-		{
-			auto property = m_properties.find(_name);
-			if (property == m_properties.end())
-			{
-				return nullptr;
-			}
-			else
-			{
-				return property->second;
-			}
-		}
-		else
-		{
-			// Find first of name
-			for (auto& property : m_properties)
-			{
-				const std::string& keyOfCurrentProperty = property.first;
-				const std::string name = extractNameFromKey(keyOfCurrentProperty);
-				if (name == _name)
-				{
-					return property.second;
-				}
-			}
-		}
-		
-		return nullptr;
-	}
-	else
-	{
-		const std::string key =	createKey(_name, _groupName);
-		auto it = m_properties.find(key);
-		if (it == m_properties.end()) {
-			return nullptr;
-		}
-		else {
-			return it->second;
-		}
-	}
-}
-
 bool EntityProperties::propertyExists(const std::string &_name, const std::string& _groupName)
 {
 	EntityPropertiesBase* base = getProperty(_name, _groupName);
@@ -215,7 +173,7 @@ EntityProperties& EntityProperties::operator=(const EntityProperties &other)
 	return *this;
 }
 
-void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _configuration)
+void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _configuration) const
 {
 	// Here we convert the entire container with all its entities into a JSON document
 		
@@ -278,7 +236,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	}
 }
 
-std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly)
+std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly) const
 {
 	// Here we convert the entire container with all its entities into a JSON document
 
@@ -546,3 +504,39 @@ std::string EntityProperties::extractNameFromKey(const std::string& _key) const 
 	return nameOfKey;
 }
 
+EntityPropertiesBase* EntityProperties::getPropertyImpl(const std::string& _name, const std::string& _groupName) const {
+	if (_groupName == "") {
+		const bool accesserIsAKey = isKey(_name);
+		if (accesserIsAKey) {
+			auto property = m_properties.find(_name);
+			if (property == m_properties.end()) {
+				return nullptr;
+			}
+			else {
+				return property->second;
+			}
+		}
+		else {
+			// Find first of name
+			for (auto& property : m_properties) {
+				const std::string& keyOfCurrentProperty = property.first;
+				const std::string name = extractNameFromKey(keyOfCurrentProperty);
+				if (name == _name) {
+					return property.second;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+	else {
+		const std::string key = createKey(_name, _groupName);
+		auto it = m_properties.find(key);
+		if (it == m_properties.end()) {
+			return nullptr;
+		}
+		else {
+			return it->second;
+		}
+	}
+}

@@ -1,34 +1,73 @@
+//! @file PropertyHelper.cpp
+//! @author Peter Thoma, Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
+
 #include "EntityBase.h"
 #include "OTCore/Color.h"
+#include "ModelEntitiesAPIExport.h"
 
-namespace PropertyHelper
+class OT_MODELENTITIES_API_EXPORT PropertyHelper
 {
-	__declspec(dllexport) bool hasProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	OT_DECL_STATICONLY(PropertyHelper)
+public:
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-	__declspec(dllexport) double getDoublePropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) std::string getStringPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) std::string getSelectionPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) bool getBoolPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) ot::Color getColourPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) const ot::Painter2D* getPainterPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) int32_t getIntegerPropertyValue(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	 
-	__declspec(dllexport) EntityPropertiesDouble* getDoubleProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName ="");
-	__declspec(dllexport) EntityPropertiesString* getStringProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesSelection* getSelectionProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesBoolean* getBoolProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesColor* getColourProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesInteger* getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesGuiPainter* getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) EntityPropertiesEntityList* getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	// General
 
-	__declspec(dllexport) void setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setStringPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setSelectionPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setSelectionPropertyValue(const std::list<std::string>& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setColourPropertyValue(ot::Color _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
-	__declspec(dllexport) void setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static bool hasProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Value getter
+
+	static double getDoublePropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static std::string getStringPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static std::string getSelectionPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static bool getBoolPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static ot::Color getColourPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const ot::Painter2D* getPainterPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static int32_t getIntegerPropertyValue(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Value setter
+
+	static void setDoublePropertyValue(double _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setStringPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setSelectionPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setSelectionPropertyValue(const std::list<std::string>& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setColourPropertyValue(ot::Color _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static void setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Writable property access
+
+	static EntityPropertiesDouble* getDoubleProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName ="");
+	static EntityPropertiesString* getStringProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesSelection* getSelectionProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesBoolean* getBoolProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesColor* getColourProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesInteger* getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesGuiPainter* getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static EntityPropertiesEntityList* getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Read-only property access
+
+	static const EntityPropertiesDouble* getDoubleProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesString* getStringProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesSelection* getSelectionProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesBoolean* getBoolProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesColor* getColourProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesInteger* getIntegerProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesGuiPainter* getPainterProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	static const EntityPropertiesEntityList* getEntityListProperty(const EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+
 };
 

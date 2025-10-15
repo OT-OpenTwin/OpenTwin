@@ -1,3 +1,8 @@
+//! @file EntityProperties.h
+//! @author Peter Thoma, Alexander Kuester (alexk95)
+//! @date February 2020
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 #pragma warning(disable : 4251)
 
@@ -27,18 +32,19 @@ public:
 	bool deleteProperty(const std::string &_name, const std::string& _groupName = "");
 	bool propertyExists(const std::string &_name, const std::string& _groupName = "");
 
-	EntityPropertiesBase *getProperty(const std::string &_name, const std::string& _groupName = "");
+	EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") { return getPropertyImpl(_name, _groupName); };
+	const EntityPropertiesBase* getProperty(const std::string& _name, const std::string& _groupName = "") const { return getPropertyImpl(_name, _groupName); };
 
 	void setNeedsUpdate(void) { m_needsUpdate = true; };
 	bool anyPropertyNeedsUpdate(void) const { return m_needsUpdate; };
 	void checkWhetherUpdateNecessary(void);
 	void forceResetUpdateForAllProperties();
 
-	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config);
+	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config) const;
 	void buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root);
 	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root);
 
-	std::string createJSON(EntityBase* root, bool visibleOnly);
+	std::string createJSON(EntityBase* root, bool visibleOnly) const;
 	void buildFromJSON(const std::string& prop, EntityBase* root);
 
 	void checkMatchingProperties(EntityProperties &other);
@@ -62,6 +68,7 @@ public:
 
 private:
 	void deleteAllProperties(void);
+	EntityPropertiesBase* getPropertyImpl(const std::string& _name, const std::string& _groupName = "") const;
 
 	bool m_needsUpdate;
 	std::map<std::string, EntityPropertiesBase *> m_properties;
