@@ -102,7 +102,7 @@ void ot::ImagePainterManager::importFromFile(const std::string& _fileSubPath) {
 	}
 
 	if (newPainter) {
-		m_painter.insert_or_assign(actualPath, newPainter);
+		m_painter.insert_or_assign(_fileSubPath, newPainter);
 	}
 }
 
