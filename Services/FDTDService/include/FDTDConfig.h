@@ -31,7 +31,6 @@ public:
 		RAMP = 2
 	};
 	FDTDConfig();
-	FDTDConfig(uint32_t timeSteps, double endCriteria, double freqStart, double freqStop, uint8_t oversampling, std::array<std::string, 6>boundaryConditions, ExcitationType excitationType);
 	virtual ~FDTDConfig();
 
 	uint32_t getTimeSteps() const;
@@ -53,9 +52,6 @@ public:
 	void setBoundaryCondition(std::array<std::string, 6> values);
 	void setBoundaryCondition(size_t index, std::string value);
 
-	//bool writeXML(const std::string& filename, tinyxml2::XMLDocument& doc);
-	//void generateXML(tinyxml2::XMLDocument& openEMS, tinyxml2::XMLDocument& FDTD);
-
 	tinyxml2::XMLElement* writeFDTD(tinyxml2::XMLDocument& doc, EntityBase* solverEntity);
 
 	void addToXML(EntityBase* solverEntity, std::string& tempPath);
@@ -75,7 +71,6 @@ private:
 	std::map<ot::UID, EntityProperties> boundaryConditionProperties;
 	std::map<ot::UID, EntityProperties> frequencyProperties;
 
-	// Maybe unify these functions into one that reads a property based on name and type?
 	// Helper functions to read the configuration from the entity properties
 	uint32_t readTimestepInfo(EntityBase* solverEntity);
 	uint8_t readExcitationTypeInfo(EntityBase* solverEntity);

@@ -12,17 +12,6 @@ FDTDConfig::FDTDConfig()
 {
 }
 
-FDTDConfig::FDTDConfig(uint32_t timeSteps, double endCriteria, double freqStart, double freqStop, uint8_t oversampling, std::array<std::string, 6>boundaryConditions, ExcitationType excitationType)
-	: m_timeSteps(timeSteps),
-	m_endCriteria(endCriteria),
-	m_freqStart(freqStart),
-	m_freqStop(freqStop),
-	m_oversampling(oversampling),
-	m_boundaryConditions(boundaryConditions),
-	m_excitation(excitationType)
-{
-}
-
 FDTDConfig::~FDTDConfig()
 {
 }
