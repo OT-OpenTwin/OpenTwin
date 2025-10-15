@@ -25,7 +25,6 @@ public:
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections(const std::string& _folderName);
 	std::shared_ptr<EntityFileText> getCircuitModel(const std::string& _folderName, std::string _modelName);
 
-	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string _baseFolderName);
 	void addConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& _connections, std::string _editorName, ot::Point2DD _pos);
 	//Function for resultCurves of Simulation

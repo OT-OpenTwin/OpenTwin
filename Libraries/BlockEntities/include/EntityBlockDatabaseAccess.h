@@ -76,7 +76,4 @@ private:
 
 	bool setVisibleParameter(const std::string& _groupName,bool _visible);
 	void updateBlockConfig();
-	void updateConnections(std::list<std::string>& connectorsForRemoval);
-	void removeConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval);
-
 };

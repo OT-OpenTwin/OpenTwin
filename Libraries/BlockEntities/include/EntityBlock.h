@@ -39,13 +39,9 @@ public:
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
-	const std::list<ot::UID>& getAllConnections() const { return m_connectionIDs; }
 
 	void AddConnector(const ot::Connector& connector);
 	void RemoveConnector(const ot::Connector& connector);
-
-	void AddConnection(const ot::UID id);
-	void RemoveConnection(const ot::UID idForRemoval);
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
@@ -67,8 +63,6 @@ protected:
 	std::string m_navigationOldTreeIconNameHidden = "";
 
 	std::map<std::string,ot::Connector> m_connectorsByName;
-	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;
-	std::list<ot::UID> m_connectionIDs;
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;

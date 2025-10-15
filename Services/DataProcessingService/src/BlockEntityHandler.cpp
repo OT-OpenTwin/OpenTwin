@@ -46,8 +46,7 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& _baseFolderName)
 {
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
-
-	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	std::list<EntityBlockConnection> entitiesForUpdate;
 	ot::UIDList topoEntIDs, topoEntVers;
 	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionFolder;
 	for (auto& connection : connections)
@@ -66,9 +65,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionFolder);
 		connectionEntity.createProperties();
 
-		connectionEntity.StoreToDataBase();
-		topoEntIDs.push_back(connectionEntity.getEntityID());
-		topoEntVers.push_back(connectionEntity.getEntityStorageVersion());
+
 		
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
@@ -95,26 +92,21 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 			continue;
 		}
 
-		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
-		{
-			blockEntitiesByBlockID[newConnection.getOriginUid()]->AddConnection(newConnection.getUid());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getOriginUid()]);
-			blockEntitiesByBlockID[newConnection.getDestinationUid()]->AddConnection(newConnection.getUid());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[newConnection.getDestinationUid()]);
+		if (originConnectorIsTypeOut != destConnectorIsTypeOut) {
+			entitiesForUpdate.push_back(connectionEntity);
 		}
-		else
-		{
+		else {
 			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
 		}
 	}
 
 	if (entitiesForUpdate.size() != 0)
 	{
-		for (auto entityForUpdate : entitiesForUpdate)
+		for (auto& entityForUpdate : entitiesForUpdate)
 		{
-			entityForUpdate->StoreToDataBase();
-			topoEntIDs.push_back(entityForUpdate->getEntityID());
-			topoEntVers.push_back(entityForUpdate->getEntityStorageVersion());
+			entityForUpdate.StoreToDataBase();
+			topoEntIDs.push_back(entityForUpdate.getEntityID());
+			topoEntVers.push_back(entityForUpdate.getEntityStorageVersion());
 		}
 		ot::ModelServiceAPI::updateTopologyEntities(topoEntIDs, topoEntVers, "Added new connection to BlockEntities.");
 	}

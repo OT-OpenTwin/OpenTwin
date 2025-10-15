@@ -56,18 +56,6 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 	}
 }
 
-void EntityBlock::AddConnection(const ot::UID id)
-{
-	m_connectionIDs.push_back(id);
-	setModified();
-}
-
-void EntityBlock::RemoveConnection(const ot::UID idForRemoval)
-{
-	m_connectionIDs.remove(idForRemoval);
-	setModified();
-}
-
 std::string EntityBlock::CreateBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
@@ -112,7 +100,6 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 		position->setParent(this);
 		m_coordinateEntity = position.release();
 		m_coordinate2DEntityID = m_coordinateEntity->getEntityID();
-		m_connectionIDs.clear();
 
 		_entityMap[getEntityID()] = this;
 		_entityMap[m_coordinateEntity->getEntityID()] = m_coordinateEntity;
@@ -144,17 +131,6 @@ void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
 		connectorsArray.append(subDocument);
 	}
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
-
-	auto connectionIDArray = bsoncxx::builder::basic::array();
-	std::map<ot::UID, EntityBase*> entityMap;
-
-	for (auto& connection : m_connectionIDs)
-	{
-		//Here i add the ConnectionIDs
-		auto subDocument = connection;
-		connectionIDArray.append(static_cast<int64_t>(subDocument));
-	}
-	storage.append(bsoncxx::builder::basic::kvp("ConnectionIDs", connectionIDArray));
 }
 
 void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
@@ -174,13 +150,6 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 		connector.DeserializeBSON(subDocument);
 		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
-
-	auto connections = doc_view["ConnectionIDs"].get_array();
-	for (auto& element : connections.value)
-	{
-		auto subDocument = element.get_value().get_int64();
-		m_connectionIDs.push_back(subDocument);
-	}	
 }
 
 void EntityBlock::CreateNavigationTreeEntry()

@@ -121,7 +121,8 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 	}
 	else {
 		coordinateEntity->StoreToDataBase();
-		
+		//blockEnt->StoreToDataBase();
+
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
 

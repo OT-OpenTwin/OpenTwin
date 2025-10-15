@@ -111,8 +111,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") { //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others 
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
-			assert(blockEntity != nullptr);
-			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
+			if (blockEntity != nullptr) {
+				blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
+			}
 		}
 
 	}
@@ -131,8 +132,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
-			assert(blockEntityConnection != nullptr);
-			entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+			if (blockEntityConnection != nullptr) {
+				entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
+			}
 		}
 	}
 
@@ -156,24 +158,8 @@ std::shared_ptr<EntityFileText> BlockEntityHandler::getCircuitModel(const std::s
 
 }
 
-bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName) {
-	auto allConnectors = blockEntity->getAllConnectorsByName();
-	const ot::ConnectorType connectorType = allConnectors[connectorName].getConnectorType();
-	if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS("Unset connectortype of connector: " + allConnectors[connectorName].getConnectorName()); }
-	if (connectorType == ot::ConnectorType::In || connectorType == ot::ConnectorType::InOptional) {
-		return false;
-	}
-	else {
-		return true;
-	}
-}
-
-
-
 void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnectionCfg>& _connections,std::string _baseFolderName) {
-	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_baseFolderName);
-	//auto entityBlockConnectionsByBlockID = findAllEntityBlockConnections();
 
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
@@ -184,10 +170,9 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 
 	std::string blockName = "EntityBlockConnection";
 	int count = 1;
-	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	std::list< EntityBlockConnection> entitiesForUpdate;
 	const std::string connectionFolderName = _baseFolderName + "/" + m_connectionsFolder;
 	for (auto& connection : _connections) {
-		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
 		std::list<std::string> connectionItems = ot::ModelServiceAPI::getListOfFolderItems(connectionFolderName);
 
@@ -208,64 +193,52 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		//std::string connectionName = ot::EntityName::createUniqueEntityName(connectionFolderName, "Connection", connectionItems);
 	
 		//Here i create the connectionEntity
-		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-		connectionEntity->createProperties();
+		EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+		connectionEntity.createProperties();
 		
 		
 		//Now i create the GraphicsConnectionCfg and set it with the information
-
-		ot::GraphicsConnectionCfg connectionCfg;
-		connectionCfg.setOriginUid(connection.getOriginUid());
-		connectionCfg.setDestUid(connection.getDestinationUid());
-		connectionCfg.setOriginConnectable(connection.getOriginConnectable());
-		connectionCfg.setDestConnectable(connection.getDestConnectable());
-		connectionCfg.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
-		connectionCfg.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+		ot::GraphicsConnectionCfg newConnection(connection);
+		newConnection.setUid(connectionEntity.getEntityID());
+		newConnection.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
+		newConnection.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
 
 		//Now i set the attirbutes of connectionEntity
-		connectionEntity->setConnectionCfg(connectionCfg);
-		connectionEntity->setName(connectionName);
-		connectionEntity->setGraphicsScenePackageChildName(m_connectionsFolder);
-		connectionEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
-		connectionEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-		connectionEntity->StoreToDataBase();
+		connectionEntity.setConnectionCfg(newConnection);
+		connectionEntity.setName(connectionName);
+		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
+		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 
-		topologyEntityIDList.push_back(connectionEntity->getEntityID());
-		topologyEntityVersionList.push_back(connectionEntity->getEntityStorageVersion());
-
-
-		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end()) {
-			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
+		
+		if (blockEntitiesByBlockID.find(newConnection.getOriginUid()) != blockEntitiesByBlockID.end()) {
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
 		}
 		else {
-			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getOriginUid()) + " was not found");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getOriginUid()) + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(connection.getDestinationUid()) != blockEntitiesByBlockID.end()) {
-			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getDestinationUid()]);
+		if (blockEntitiesByBlockID.find(newConnection.getDestinationUid()) != blockEntitiesByBlockID.end()) {
+			auto& blockEntity = blockEntitiesByBlockID[newConnection.getDestinationUid()];
 		}
 		else {
-			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getDestinationUid()) + " was not found.");
+			OT_LOG_EAS("Could not create connection since block " + std::to_string(newConnection.getDestinationUid()) + " was not found.");
 			continue;
 		}
-
-
+		
+		entitiesForUpdate.push_back(connectionEntity);
 	}
 
-	if (entitiesForUpdate.size() != 0) {
-
-		for (auto entityForUpdate : entitiesForUpdate) {
-			entityForUpdate->StoreToDataBase();
-			topologyEntityIDList.push_back(entityForUpdate->getEntityID());
-			topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
-		}
-		
-		ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Added new connection to BlockEntities");
-		
+	for (auto& entityForUpdate : entitiesForUpdate) {
+		entityForUpdate.StoreToDataBase();
+		topologyEntityIDList.push_back(entityForUpdate.getEntityID());
+		topologyEntityVersionList.push_back(entityForUpdate.getEntityStorageVersion());
 	}
+		
+	ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Added new connection to BlockEntities");
+		
+	
 
 }
 
@@ -275,7 +248,6 @@ void BlockEntityHandler::addConnectionToConnection(const std::list<ot::GraphicsC
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID(_editorName);
 
 	auto connectionEntitiesByID = findAllEntityBlockConnections(_editorName);
-	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	std::list<std::string> entitiesToDelete;
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
@@ -306,27 +278,12 @@ void BlockEntityHandler::addConnectionToConnection(const std::list<ot::GraphicsC
 
 		//Saving  connected Elements and connectors
 		connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(),blockEntitiesByBlockID[connectionCfg.getDestinationUid()]));
-		
 		connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(),blockEntitiesByBlockID[connectionCfg.getOriginUid()]));
-	
-		//Now I delete the connection at the blocks
-		blockEntitiesByBlockID[(connectionCfg.getDestinationUid())]->RemoveConnection(connectionToDelete->getEntityID());
-		blockEntitiesByBlockID[(connectionCfg.getOriginUid())]->RemoveConnection(connectionToDelete->getEntityID());
-
-		entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionCfg.getDestinationUid())]);
-		entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionCfg.getOriginUid())]);
 
 		entitiesToDelete.push_back(connectionToDelete->getName());
 
-		for (auto entityForUpdate : entitiesForUpdate) {
-			entityForUpdate->StoreToDataBase();
-			topologyEntityIDList.push_back(entityForUpdate->getEntityID());
-			topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
-		}
-
 		// Now i remove the connections from model
 		ot::ModelServiceAPI::deleteEntitiesFromModel(entitiesToDelete);
-		ot::ModelServiceAPI::updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
 
 		// As next step i need to add the intersection item 
 		std::shared_ptr<EntityBlock> connector = CreateBlockEntity(_editorName, "EntityBlockCircuitConnector", _pos);
@@ -338,7 +295,6 @@ void BlockEntityHandler::addConnectionToConnection(const std::list<ot::GraphicsC
 			temp.setDestConnectable(connector->getName());
 			temp.setOriginUid(connectedElements.front().second->getEntityID());
 			temp.setOriginConnectable(connectedElements.front().first);
-			/*	ot::GraphicsConnectionCfg(connectedElements.front()->getEntityID(), connectors.front(), connector->getEntityID(), connector->getAllConnectorsByName().begin()->first);*/
 			connectionsNew.push_back(temp);
 			connectedElements.pop();
 		}
