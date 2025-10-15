@@ -1926,6 +1926,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(graphics, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(graphics, &ot::GraphicsView::connectionChanged, this, &AppBase::slotGraphicsConnectionChanged);
+	connect(graphics, &ot::GraphicsView::itemDoubleClicked, this, &AppBase::slotGraphicsItemDoubleClicked);
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
 	connect(graphics->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
@@ -2320,6 +2321,49 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 			return;
 		}
 
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig) {
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::WidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view) {
+		OT_LOG_E("View not found");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject configObj;
+	_itemConfig->addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsView()->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_E(_e.what());

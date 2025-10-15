@@ -57,8 +57,9 @@
 #define OT_ACTION_CMD_GetDebugInformation "Debug.Info.Get"
 #define OT_ACTION_CMD_SetVisualizationModel "VisualizationModel.Set"
 #define OT_ACTION_CMD_GetVisualizationModel "VisualizationModel.Get"
-#define OT_ACTION_CMD_Log "Log"
+#define OT_ACTION_CMD_OpenNewProject "Project.OpenNew"
 
+#define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"
 #define OT_ACTION_CMD_SetLogCacheSize "Logger.SetCacheSize"
@@ -288,6 +289,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection "UI.GraphicsEditor.Connection.AddToConnection"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked "UI.GraphicsEditor.ItemDoubleClicked"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged "UI.GraphicsEditor.ConnectionChanged"
 #define OT_ACTION_CMD_SelectedEntitiesSerialise "SerialiseSelectedEntities"
 #define OT_ACTION_CMD_PasteEntities "PasteEntities"

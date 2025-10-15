@@ -14,6 +14,7 @@
 
 // OpenTwin Gui header
 #include "OTGui/DialogCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 
 // OpenTwin Communication header
 #include "OTCommunication/Msg.h"
@@ -25,7 +26,11 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 
+// OpenTwin ModelAPI header
+#include "OTModelAPI/ModelServiceAPI.h"
+
 // Entities
+#include "EntityAPI.h"
 #include "EntityHierarchicalScene.h"
 
 // std header
@@ -39,6 +44,8 @@ Application::Application() :
 	connectAction(c_projectSelectedAction, this, &Application::handleProjectSelected);
 	connectAction(c_hierarchicalSelectedAction, this, &Application::handleHierarchicalSelected);
 	connectAction(c_documentSelectedAction, this, &Application::handleDocumentSelected);
+
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &Application::handleBlockDoubleClicked);
 
 	// Initialize toolbar buttons
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
@@ -225,6 +232,48 @@ void Application::handleAddDocument() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Private: Graphics Callbacks
+
+ot::ReturnMessage Application::handleBlockDoubleClicked(ot::JsonDocument& _doc) {
+	// Create configuration from provided JSON object
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_doc, OT_ACTION_PARAM_Config);
+	std::unique_ptr<ot::GraphicsItemCfg> cfg(ot::GraphicsItemCfgFactory::instance().create(cfgObj));
+	if (!cfg.get()) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not create graphics item configuration from provided JSON object");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Get entity name from configuration
+	std::string entityName = cfg->getName();
+	if (entityName.empty()) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity name from graphics item configuration");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Get entity information
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(entityName, info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + entityName);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	// Check entity type
+	if (info.getEntityType() == EntityBlockHierarchicalProjectItem::className()) {
+		// Request to open the project
+		return this->requestToOpenProject(info);
+	}
+	else {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Unsupported entity type { \"Name\": " + entityName + "\", \"Type\": \"" + info.getEntityType() + "\"");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 // Private: Helper
 
 void Application::updateButtonStates() {
@@ -254,6 +303,39 @@ void Application::updateButtonStates() {
 			ui->setControlsEnabledState(std::list<std::string>(), controls); // Disable all
 		}
 	}
+}
+
+ot::ReturnMessage Application::requestToOpenProject(const ot::EntityInformation& _entity) {
+	EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entity.getEntityID(), _entity.getEntityVersion());
+	if (!entity) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not read entity from database "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) + 
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) + " }"
+		);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	std::unique_ptr<EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<EntityBlockHierarchicalProjectItem*>(entity));
+	if (!projectEntity.get()) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Invalid entity type "
+			"{ \"Name\": \"" + _entity.getEntityName() + "\", \"UID\": " + std::to_string(_entity.getEntityID()) +
+			", \"Version\": " + std::to_string(_entity.getEntityVersion()) +
+			", \"Type\": \"" + _entity.getEntityType() + "\", \"ExpectedType\": \"" + EntityBlockHierarchicalProjectItem::className() + "\" }"
+		);
+		OT_LOG_E(ret.getWhat());
+		delete entity;
+		return ret;
+	}
+
+	// Request to open the project
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_OpenNewProject, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projectEntity->getProjectInformation(), doc.GetAllocator()), doc.GetAllocator());
+
+	sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
+
+	return ot::ReturnMessage::Ok;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

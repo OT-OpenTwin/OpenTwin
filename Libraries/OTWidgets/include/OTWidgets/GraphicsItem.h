@@ -180,9 +180,11 @@ namespace ot {
 		void setConfiguration(GraphicsItemCfg* _config);
 
 		//! @brief Returns the current configuration.
+		//! The item keeps ownership of the configuration.
 		GraphicsItemCfg* getConfiguration() { return m_config; };
 
 		//! @brief Returns the current configuration.
+		//! The item keeps ownership of the configuration.
 		const GraphicsItemCfg* getConfiguration() const { return m_config; };
 
 		//! @brief Calls GraphicsItem::setGraphicsItemPos(const Point2DD&).

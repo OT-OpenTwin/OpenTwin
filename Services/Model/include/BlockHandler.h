@@ -12,5 +12,6 @@ public:
 private:
 	ot::ActionHandler m_actionHandler;
 	void handleItemChanged(ot::JsonDocument& _doc);
+	ot::ReturnMessage handleItemDoubleClicked(ot::JsonDocument& _doc);
 	void handleConnectionChanged(ot::JsonDocument& _doc);
 };

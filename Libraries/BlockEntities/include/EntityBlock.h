@@ -35,7 +35,9 @@ public:
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 
-	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
+	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; };
+	ot::BasicServiceInformation getServiceInformation() const { return m_info; };
+
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; };
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }

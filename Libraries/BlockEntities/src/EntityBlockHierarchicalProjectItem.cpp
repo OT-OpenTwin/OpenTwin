@@ -30,7 +30,7 @@ ot::GraphicsItemCfg* EntityBlockHierarchicalProjectItem::createBlockCfg() {
 
 	ot::GraphicsHierarchicalProjectItemBuilder builder;
 	
-	builder.setName(this->getClassName());
+	builder.setName(this->getName());
 	builder.setTitle(this->createBlockHeadline());
 	builder.setLeftTitleCornerImagePath("ProjectTemplates/" + project.getProjectType());
 	builder.setTitleBackgroundGradientColor(ot::Green);

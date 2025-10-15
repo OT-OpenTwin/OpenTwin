@@ -17,6 +17,7 @@
 
 BlockHandler::BlockHandler() {
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, this, &BlockHandler::handleItemChanged, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &BlockHandler::handleItemDoubleClicked, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &BlockHandler::handleConnectionChanged, ot::SECURE_MESSAGE_TYPES);
 }
 
@@ -141,6 +142,41 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		_model->updateTopologyEntities(topoEntID, topoEntVers, "BlockPositionUpdated");
 	}
+}
+
+ot::ReturnMessage BlockHandler::handleItemDoubleClicked(ot::JsonDocument& _doc) {
+	std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+
+	// Restore item configuration
+	std::unique_ptr<ot::GraphicsItemCfg> itemConfig(ot::GraphicsItemCfgFactory::instance().create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config)));
+	if (!itemConfig) {
+		OT_LOG_E("ItemConfig is null");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create item configuration from JSON");
+	}
+
+	// Get entity
+	Model* model = Application::instance()->getModel();
+	EntityBase* baseEntity = model->getEntityByID(itemConfig->getUid());
+	if (!baseEntity) {
+		OT_LOG_E("Entity not found from block config { \"Name\": \"" + itemConfig->getName() + "\", \"UID\": " + std::to_string(itemConfig->getUid()) + " }");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to find entity from UID");
+	}
+
+	// Cast to block entity
+	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(baseEntity);
+	if (!blockEntity) {
+		OT_LOG_E("Block entity cast failed { \"Name\": \"" + itemConfig->getName() + "\", \"UID\": " + std::to_string(itemConfig->getUid()) + ", \"EntityType\": \"" + baseEntity->getClassName() + "\" }");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Block entity cast failed");
+	}
+
+	// Notify owner service if required
+	ot::BasicServiceInformation ownerService = blockEntity->getServiceInformation();
+	Application* app = Application::instance();
+	if (!ownerService.serviceName().empty() && ownerService.serviceType() != app->getServiceType()) {
+		app->sendMessageAsync(false, ownerService.serviceName(), _doc);
+	}
+
+	return ot::ReturnMessage::Ok;
 }
 
 void BlockHandler::handleConnectionChanged(ot::JsonDocument& _doc) {

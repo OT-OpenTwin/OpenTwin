@@ -43,6 +43,8 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene) :
 
 	this->setUpdatesEnabled(true);
 
+	this->connect(m_scene, &GraphicsScene::graphicsItemDoubleClicked, this, &GraphicsView::slotGraphicsItemDoubleClicked);
+
 	QShortcut* copyShortcut = new QShortcut(this);
 	copyShortcut->setKey(QKeySequence("Ctrl+C"));
 	copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
@@ -751,6 +753,10 @@ void ot::GraphicsView::slotPaste() {
 	}
 
 	Q_EMIT pasteRequested(info);
+}
+
+void ot::GraphicsView::slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item) {
+	Q_EMIT itemDoubleClicked(_item->getConfiguration());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

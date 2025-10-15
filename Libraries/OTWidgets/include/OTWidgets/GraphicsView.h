@@ -200,6 +200,8 @@ namespace ot {
 
 		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);
 
+		void itemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
+
 		void connectionChanged(const ot::GraphicsConnectionCfg& _newConfig);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
@@ -230,8 +232,9 @@ namespace ot {
 		// Private: Slots
 
 	private Q_SLOTS:
-		void slotCopy(void);
-		void slotPaste(void);
+		void slotCopy();
+		void slotPaste();
+		void slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

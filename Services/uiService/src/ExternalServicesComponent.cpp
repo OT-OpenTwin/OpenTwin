@@ -305,6 +305,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	connectAction(OT_ACTION_CMD_UI_ModelDialog, this, &ExternalServicesComponent::handleModelLibraryDialog);
 	connectAction(OT_ACTION_CMD_UI_ProjectSelectDialog, this, &ExternalServicesComponent::handleProjectSelectDialog);
 
+	// Specialized
+	connectAction(OT_ACTION_CMD_OpenNewProject, this, &ExternalServicesComponent::handleOpenNewProject);
 
 	// External APIs
 	connectAction({
@@ -4095,6 +4097,21 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 	
 	std::string tmp;
 	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);
+}
+
+void ExternalServicesComponent::handleOpenNewProject(ot::JsonDocument& _document) {
+	m_actionProfiler.ignoreCurrent();
+
+	ot::ProjectInformation projInfo(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	AppBase::instance()->appendInfoMessage("Opening project \"" + QString::fromStdString(projInfo.getProjectName()) + "\" in new instance...\n");
+
+	const LoginData& userData = AppBase::instance()->getCurrentLoginData();
+
+	// Prepare command line
+
+
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
