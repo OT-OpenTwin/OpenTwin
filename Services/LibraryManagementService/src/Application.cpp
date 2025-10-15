@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTCore/DebugHelper.h"
 #include "OTCore/LogDispatcher.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -46,12 +47,12 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			exit(ot::AppExitCode::GSSUrlMissing);
 		}
 
-		std::string ownUrl(_ownURL);
+		ot::DebugHelper::serviceSetupCompleted(*this);
 
 		// Register at GSS
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-		gssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(ownUrl, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+		gssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(getServiceURL(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
 		// Send request to GSS
 			std::string gssResponse;
@@ -65,7 +66,7 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	
 		do {
 			gssResponse.clear();
-			if (!(ok = ot::msg::send(ownUrl, _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
 				OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(500ms);
