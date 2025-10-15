@@ -149,6 +149,11 @@ void Application::handleProjectSelected(ot::JsonDocument& _doc) {
 	std::string collectionName = ot::json::getString(_doc, OT_ACTION_PARAM_COLLECTION_NAME);
 	std::string projectType = ot::json::getString(_doc, OT_ACTION_PARAM_Type);
 
+	if (collectionName == this->getCollectionName()) {
+		OT_LOG_E("Can not add the current project as a child project");
+		return;
+	}
+
 	OT_LOG_T("Project selected received: { \"Name\": \"" + projectName + "\", \"Type\": \"" + projectType + "\", \"Collection\": \"" + collectionName + "\" }");
 }
 
