@@ -7,6 +7,7 @@
  */
 
 #include "FDTDConfig.h"
+#include "FDTDPropertyReader.hpp"
 
 FDTDConfig::FDTDConfig()
 {
@@ -109,19 +110,19 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLDocument& doc, EntityBa
 
 	const auto& FDTD = doc.NewElement("FDTD");
 	FDTD->SetAttribute("NumberOfTimesteps", readTimestepInfo(solverEntity));
-	FDTD->SetAttribute("OverSampling", m_oversampling);
-	FDTD->SetAttribute("endCriteria", m_endCriteria);
+	FDTD->SetAttribute("OverSampling", readOversamplingInfo(solverEntity));
+	FDTD->SetAttribute("endCriteria", readEndCriteriaInfo(solverEntity));
 	FDTD->SetAttribute("f_max", m_freqStop);
 	doc.InsertFirstChild(FDTD);
 
 	// Now we add the excitation and boundary conditions nodes to the FDTD root node;
-	const auto& excitation = doc.NewElement("excitation");
-	excitation->SetAttribute("Type", static_cast<int>(m_excitation));
+	const auto& excitation = doc.NewElement("Excitation");
+	excitation->SetAttribute("Type", static_cast<int>(readExcitationTypeInfo(solverEntity)));
 	excitation->SetAttribute("f0", f0);
 	excitation->SetAttribute("fc", fc);
 	FDTD->InsertEndChild(excitation);
 
-	const auto& boundary = doc.NewElement("boundaryCond");
+	const auto& boundary = doc.NewElement("BoundaryCond");
 	for (size_t i = 0; i < m_boundaryNames.size(); ++i) {
 		boundary->SetAttribute(m_boundaryNames[i].c_str(), readBoundaryConditions(solverEntity)[i].c_str());
 	}
@@ -131,65 +132,37 @@ tinyxml2::XMLElement* FDTDConfig::writeFDTD(tinyxml2::XMLDocument& doc, EntityBa
 }
 
 uint32_t FDTDConfig::readTimestepInfo(EntityBase* solverEntity) {
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
-	for (auto& item : simulationSettingsProperties) {
-		EntityProperties& props = item.second;
-		EntityPropertiesInteger* timeSteps = dynamic_cast<EntityPropertiesInteger*>(props.getProperty("Timesteps"));
-		if (timeSteps != nullptr) {
-			return timeSteps->getValue();
-		}
-	}
-	OT_LOG_EA("Unable to read the number of timesteps, defaulting to 0.");
-	return 0;
+	return readEntityPropertiesInfo<uint32_t>(solverEntity, "Simulation Settings", simulationSettingsProperties, "Timesteps");
 }
 
 uint8_t FDTDConfig::readExcitationTypeInfo(EntityBase* solverEntity) {
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
-	std::list<uint8_t> excitationTypes = { 0, 1, 2 }; // 0: Gaussian, 1: Sine, 2: Ricker
-	for (auto& item : simulationSettingsProperties) {
-		EntityProperties& props = item.second;
-		EntityPropertiesSelection* excitationType = dynamic_cast<EntityPropertiesSelection*>(props.getProperty("Excitation type"));
-		if (excitationType != nullptr) {
-			std::string value = excitationType->getValue();
-			if (value == "Gauss Excitation") return 0;
-		}
+	std::string excitation = readEntityPropertiesInfo<std::string> (solverEntity, "Simulation Settings", simulationSettingsProperties, "Excitation type");
+	if (excitation == "Gauss Excitation") {
+		m_excitation = ExcitationType::GAUSSIAN;
 	}
-	OT_LOG_EA("Unable to read the excitation type, defaulting to 0 (Gauss Excitation).");
-	return 0;
+	else if (excitation == "Sinus Excitation") {
+		m_excitation = ExcitationType::SINUSOIDAL;
+	}
+	else {
+		throw std::invalid_argument("[Excitation Type] Invalid excitation type! Must be 'Gaussian', 'Sinusoidal', or 'Ramp'");
+	}
+	return static_cast<uint8_t>(m_excitation);
 }
 
-//uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity)
-//{
-//	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Simulation Settings", simulationSettingsProperties);
-//	for (auto& item : simulationSettingsProperties) {
-//		EntityProperties& props = item.second;
-//		EntityPropertiesInteger* oversampling = dynamic_cast<EntityPropertiesInteger*>(props.getProperty("Oversampling"));
-//		if (oversampling != nullptr) return oversampling->getValue();
-//	}
-//	OT_LOG_EA("Unable to read the oversampling factor, defaulting to 0.");
-//	return 0;
-//}
+uint16_t FDTDConfig::readOversamplingInfo(EntityBase* solverEntity) {
+	return readEntityPropertiesInfo<uint16_t>(solverEntity, "Simulation Settings", simulationSettingsProperties, "Oversampling");;
+}
+
+double FDTDConfig::readEndCriteriaInfo(EntityBase* solverEntity) {
+	return readEntityPropertiesInfo<double>(solverEntity, "Simulation Settings", simulationSettingsProperties, "End Criteria");
+}
 
 double FDTDConfig::readFrequencyStartInfo(EntityBase* solverEntity) {
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Frequency", frequencyProperties);
-	for (auto& item : frequencyProperties) {
-		EntityProperties& props = item.second;
-		EntityPropertiesDouble* freqStart = dynamic_cast<EntityPropertiesDouble*>(props.getProperty("Start Frequency"));
-		if (freqStart != nullptr) return freqStart->getValue();
-	}
-	OT_LOG_EA("Unable to read the start frequency, defaulting to 0.");
-	return 0;
+	return readEntityPropertiesInfo<double>(solverEntity, "Frequency", frequencyProperties, "Start Frequency");
 }
 
 double FDTDConfig::readFrequencyStopInfo(EntityBase* solverEntity) {
-	ot::ModelServiceAPI::getEntityProperties(solverEntity->getName(), true, "Frequency", frequencyProperties);
-	for (auto& item : frequencyProperties) {
-		EntityProperties& props = item.second;
-		EntityPropertiesDouble* freqStop = dynamic_cast<EntityPropertiesDouble*>(props.getProperty("End Frequency"));
-		if (freqStop != nullptr) return freqStop->getValue();
-	}
-	OT_LOG_EA("Unable to read the end frequency, defaulting to 0.");
-	return 0;
+	return readEntityPropertiesInfo<double>(solverEntity, "Frequency", frequencyProperties, "End Frequency");
 }
 
 std::array<std::string, 6> FDTDConfig::readBoundaryConditions(EntityBase* solverEntity) {
@@ -207,9 +180,10 @@ std::array<std::string, 6> FDTDConfig::readBoundaryConditions(EntityBase* solver
 }
 
 void FDTDConfig::addToXML(EntityBase* solverEntity, std::string& tempPath) {
-	// Implementation for adding configuration to an existing XML document
 	tinyxml2::XMLDocument doc;	
-	auto root = doc.NewElement("OpenEMS");
+	auto declaration = doc.NewDeclaration("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+	doc.InsertFirstChild(declaration);
+	auto root = doc.NewElement("openEMS");
 	doc.InsertFirstChild(root);
 	auto FDTD = writeFDTD(doc, solverEntity);
 	root->InsertEndChild(FDTD);
