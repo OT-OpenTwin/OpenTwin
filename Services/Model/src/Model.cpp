@@ -717,7 +717,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		if (entityRoot != nullptr)
 		{
 			// Ensure that the root nodes have a visualization item
-			createVisualizationItems();
+			//createVisualizationItems();
 
 			entityRoot->addVisualizationNodes();
 		}
@@ -747,7 +747,7 @@ void Model::createVisualizationItems()
 	for (auto entity : entityList)
 	{
 		auto temp = dynamic_cast<EntityContainer*>(entity);
-		if (temp != nullptr)
+		if (temp != nullptr && false)
 		{
 			addVisualizationContainerNode(entity->getName(), entity->getEntityID(), entity->getEditable());
 		}
@@ -3569,7 +3569,7 @@ void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 	// setupUIControls();
 
 	// Create the root visualization items 
-	createVisualizationItems();
+	//createVisualizationItems();
 
 	// The visualization items themselves will be created when the message setVisualizationModel is received, In case that the message
 	// was already sent, we will create the visualization items now.
@@ -4593,7 +4593,7 @@ void Model::updateModelStateForUndoRedo()
 		// We need to reload the entire project
 		projectOpen();
 
-		createVisualizationItems();
+		//createVisualizationItems();
 
 		entityRoot->addVisualizationNodes();
 	}
