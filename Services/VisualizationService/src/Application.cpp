@@ -175,7 +175,7 @@ std::pair<ot::UID, ot::UID> Application::storeBinaryData(const char *data, size_
 	EntityBinaryData *dataItem = new EntityBinaryData(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, getServiceName());
 
 	dataItem->setData(data, dataLength);
-	dataItem->StoreToDataBase();
+	dataItem->storeToDataBase();
 
 	return std::pair<ot::UID, ot::UID>(dataItem->getEntityID(), dataItem->getEntityStorageVersion());
 }

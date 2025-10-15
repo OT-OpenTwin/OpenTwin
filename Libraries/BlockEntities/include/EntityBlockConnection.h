@@ -10,7 +10,8 @@ public:
 
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
-	virtual std::string getClassName(void) override { return "EntityBlockConnection"; };
+	static std::string className() { return "EntityBlockConnection"; }
+	virtual std::string getClassName(void) override { return EntityBlockConnection::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
 	ot::GraphicsConnectionCfg getConnectionCfg();
@@ -41,7 +42,7 @@ private:
 	
 	
 	void CreateNavigationTreeEntry();
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };
 

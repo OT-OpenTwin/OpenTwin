@@ -31,19 +31,19 @@ bool EntityResultText::getEntityBox(double &xmin, double &xmax, double &ymin, do
 	return false;
 }
 
-void EntityResultText::StoreToDataBase(void)
+void EntityResultText::storeToDataBase(void)
 {
 	if (m_textData != nullptr)
 	{
 		storeTextData();
 	}
 
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityResultText::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResultText::addStorageData(bsoncxx::builder::basic::document &storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 	// Now we store the particular information about the current object
 	storage.append(
 		bsoncxx::builder::basic::kvp("TextDataID", static_cast<int64_t>(m_textDataStorageId)),
@@ -166,7 +166,7 @@ void EntityResultText::storeTextData(void)
 	if (m_textData == nullptr) return;
 	assert(m_textData != nullptr);
 
-	m_textData->StoreToDataBase();
+	m_textData->storeToDataBase();
 
 	if (m_textDataStorageId != m_textData->getEntityID() || m_textDataStorageVersion != m_textData->getEntityStorageVersion())
 	{

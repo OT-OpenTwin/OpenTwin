@@ -11,7 +11,7 @@
 #include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar("EntityBlockCircuitGND");
+static EntityFactoryRegistrar<EntityBlockCircuitGND> registrar(EntityBlockCircuitGND::className());
 
 EntityBlockCircuitGND::EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
@@ -59,7 +59,7 @@ std::string EntityBlockCircuitGND::getFlip() {
 
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitGND::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitGND::createBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitGND");
@@ -105,9 +105,9 @@ bool EntityBlockCircuitGND::updateFromProperties(void)
 	return refresh;
 }
 
-void EntityBlockCircuitGND::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitGND::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitGND::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

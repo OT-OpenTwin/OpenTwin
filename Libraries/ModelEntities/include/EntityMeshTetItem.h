@@ -51,7 +51,7 @@ public:
 	void setTetEdgeNodes(size_t nE, size_t n[2]);
 	void getTetEdgeNodes(size_t nE, size_t n[2]);
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 
 	virtual void addVisualizationNodes(void) override;
 
@@ -80,7 +80,7 @@ private:
 	void storeMeshData(void);
 	void releaseMeshData(void);
 	virtual int getSchemaVersion(void) override { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	EntityMeshTet *mesh;

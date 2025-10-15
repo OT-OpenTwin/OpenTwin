@@ -1,7 +1,7 @@
 #include "EntityBlockDisplay.h"
 #include "SharedResources.h"
 
-static EntityFactoryRegistrar<EntityBlockDisplay> registrar("EntityBlockDisplay");
+static EntityFactoryRegistrar<EntityBlockDisplay> registrar(EntityBlockDisplay::className());
 
 EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
@@ -25,17 +25,17 @@ const std::string& EntityBlockDisplay::getDescription()
 	return stringProperty->getValue();
 }
 
-ot::GraphicsItemCfg* EntityBlockDisplay::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockDisplay::createBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
-	block.setTitle(this->CreateBlockHeadline());
+	block.setTitle(this->createBlockHeadline());
 	
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameVis());
 	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
-	AddConnectors(block);
+	addConnectors(block);
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;

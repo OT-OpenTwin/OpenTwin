@@ -42,7 +42,7 @@ private:
 
 	DataCategorie _selectedCategory = UNKNOWN;
 	
-	virtual void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	virtual int getSchemaVersion() { return 1; };
 

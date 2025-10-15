@@ -220,7 +220,7 @@ void Application::handleAddSolver()
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID, scriptFolderName, scriptFolderID, scriptName, scriptID);
 
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };
@@ -507,14 +507,14 @@ void Application::addScalarResult(const std::string &resultName, char* fileData,
 {
 	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	vtkData->setData(fileData, data_length + 1);
-	vtkData->StoreToDataBase();
+	vtkData->storeToDataBase();
 
 	ot::UID vtkDataEntityID = vtkData->getEntityID();
 	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
 
 	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
-	vtkResult->StoreToDataBase();
+	vtkResult->storeToDataBase();
 
 	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
@@ -526,7 +526,7 @@ void Application::addScalarResult(const std::string &resultName, char* fileData,
 
 	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
 
-	visualizationEntity->StoreToDataBase();
+	visualizationEntity->storeToDataBase();
 
 	getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 	getModelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());
@@ -543,14 +543,14 @@ void Application::addVectorResult(const std::string& resultName, char* fileData,
 {
 	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	vtkData->setData(fileData, data_length + 1);
-	vtkData->StoreToDataBase();
+	vtkData->storeToDataBase();
 
 	ot::UID vtkDataEntityID = vtkData->getEntityID();
 	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
 
 	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::VECTOR, vtkData);
-	vtkResult->StoreToDataBase();
+	vtkResult->storeToDataBase();
 
 	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
@@ -562,7 +562,7 @@ void Application::addVectorResult(const std::string& resultName, char* fileData,
 
 	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
 
-	visualizationEntity->StoreToDataBase();
+	visualizationEntity->storeToDataBase();
 
 	getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 	getModelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());

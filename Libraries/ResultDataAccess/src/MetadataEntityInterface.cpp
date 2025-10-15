@@ -223,7 +223,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 	{
 		insertMetadata(&entityCampaign, metadata.second.get());
 	}
-	entityCampaign.StoreToDataBase();
+	entityCampaign.storeToDataBase();
 	m_newEntityIDs.push_back(entityCampaign.getEntityID());
 	m_newEntityVersions.push_back(entityCampaign.getEntityStorageVersion());
 }
@@ -300,7 +300,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		{
 			insertMetadata(&entitySeries, metadata.second.get());
 		}
-		entitySeries.StoreToDataBase();
+		entitySeries.storeToDataBase();
 		m_newEntityIDs.push_back(entitySeries.getEntityID());
 		m_newEntityVersions.push_back(entitySeries.getEntityStorageVersion());
 	}

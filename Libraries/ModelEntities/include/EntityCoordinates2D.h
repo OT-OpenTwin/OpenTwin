@@ -11,7 +11,8 @@ public:
 	virtual entityType getEntityType(void) const override { return DATA; };
 	void setCoordinates(const ot::Point2DD& position) { m_location = position; setModified(); };
 	const ot::Point2DD& getCoordinates() { return m_location; };
-	virtual std::string getClassName(void) { return "EntityCoordinates2D"; };
+	static std::string className() { return "EntityCoordinates2D"; };
+	virtual std::string getClassName(void) override { return EntityCoordinates2D::className(); };
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
@@ -21,6 +22,6 @@ private:
 	
 	ot::Point2DD m_location;
 
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

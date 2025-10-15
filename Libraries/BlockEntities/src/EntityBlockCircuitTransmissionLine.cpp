@@ -9,7 +9,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitTransmissionLine> registrar("EntityBlockCircuitTransmissionLine");
+static EntityFactoryRegistrar<EntityBlockCircuitTransmissionLine> registrar(EntityBlockCircuitTransmissionLine::className());
 
 EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
@@ -66,7 +66,7 @@ std::string EntityBlockCircuitTransmissionLine::getFolderName() {
 	return "Transmission Line";
 }
 
-ot::GraphicsItemCfg* EntityBlockCircuitTransmissionLine::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitTransmissionLine::createBlockCfg() {
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitTransmissionLine");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
@@ -128,8 +128,8 @@ bool EntityBlockCircuitTransmissionLine::updateFromProperties(void) {
 
 
 
-void EntityBlockCircuitTransmissionLine::AddStorageData(bsoncxx::builder::basic::document& storage) {
-	EntityBlock::AddStorageData(storage);
+void EntityBlockCircuitTransmissionLine::addStorageData(bsoncxx::builder::basic::document& storage) {
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitTransmissionLine::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {

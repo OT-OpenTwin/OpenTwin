@@ -38,13 +38,13 @@ public:
 	void setSurfaceId(int id) { surfaceId = id; setModified(); };
 	int  getSurfaceId(void) { return surfaceId; };
 	
-	virtual std::string getClassName(void) { return "EntityMeshCartesianFace"; };
+	virtual std::string getClassName(void) override { return "EntityMeshCartesianFace"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void readCellFaces(bsoncxx::document::view &doc_view, int direction, const std::string &itemName);
 	void readPoints(bsoncxx::document::view &doc_view, int index, const std::string &itemName);

@@ -152,7 +152,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	application->getModelComponent()->addNewTopologyEntity(meshEntity->getMeshData()->getEntityID(), meshEntity->getMeshData()->getEntityStorageVersion(), false);
 	
 	// Store the mesh entity itself
-	meshEntity->StoreToDataBase();
+	meshEntity->storeToDataBase();
 	application->getModelComponent()->addNewTopologyEntity(meshEntity->getEntityID(), meshEntity->getEntityStorageVersion(), false);
 
 	// Finalize the operation and send all newly created entities to the modeler

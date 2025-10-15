@@ -66,10 +66,10 @@ bool EntityMeshCartesianFace::getEntityBox(double &xmin, double &xmax, double &y
 	return true;
 }
 
-void EntityMeshCartesianFace::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesianFace::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object 
 	storage.append(

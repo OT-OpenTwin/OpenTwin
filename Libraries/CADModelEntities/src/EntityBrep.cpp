@@ -13,7 +13,7 @@
 #include "TopoDS_Face.hxx"
 #include "TopoDS.hxx"
 
-static EntityFactoryRegistrar<EntityBrep> registrar("EntityBrep");
+static EntityFactoryRegistrar<EntityBrep> registrar(EntityBrep::className());
 
 EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
@@ -38,10 +38,10 @@ bool EntityBrep::getEntityBox(double &xmin, double &xmax, double &ymin, double &
 	return true;
 }
 
-void EntityBrep::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityBrep::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now check whether the geometry is modified and we need to create a new entry
 

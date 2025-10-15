@@ -15,7 +15,7 @@
 #include "BRepBuilderAPI_Transform.hxx"
 #include "gp_Ax1.hxx"
 
-static EntityFactoryRegistrar<EntityGeometry> registrar("EntityGeometry");
+static EntityFactoryRegistrar<EntityGeometry> registrar(EntityGeometry::className());
 
 EntityGeometry::EntityGeometry(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityContainer(ID, parent, obs, ms, owner),
@@ -73,7 +73,7 @@ void EntityGeometry::resetFacets(void)
 
 bool EntityGeometry::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
 {
-	EnsureBrepIsLoaded();
+	ensureBrepIsLoaded();
 
 	assert(brep != nullptr);
 	if (brep == nullptr) return false;
@@ -292,7 +292,7 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	return updatePropertiesGrid;
 }
 
-void EntityGeometry::StoreToDataBase(void)
+void EntityGeometry::storeToDataBase(void)
 {
 	// If the pointers to brep or facets are 0, then the objects are stored in the data storage and the storage IDs are up to date
 
@@ -307,13 +307,13 @@ void EntityGeometry::StoreToDataBase(void)
 	}
 
 	// Afterward, we store the container itself
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
-void EntityGeometry::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityGeometry::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 
@@ -374,7 +374,7 @@ void EntityGeometry::readSpecificDataFromDataBase(bsoncxx::document::view &doc_v
 	resetModified();
 }
 
-void EntityGeometry::EnsureBrepIsLoaded(void)
+void EntityGeometry::ensureBrepIsLoaded(void)
 {
 	if (brep != nullptr) return;
 
@@ -385,7 +385,7 @@ void EntityGeometry::EnsureBrepIsLoaded(void)
 	brep = dynamic_cast<EntityBrep *>(readEntityFromEntityID(this, brepStorageID, entityMap));
 }
 
-void EntityGeometry::EnsureFacetsAreLoaded(void)
+void EntityGeometry::ensureFacetsAreLoaded(void)
 {
 	if (facets != nullptr) return;
 
@@ -489,7 +489,7 @@ void EntityGeometry::addVisualizationNodes(void)
 
 void EntityGeometry::setBrep(TopoDS_Shape shape)
 {
-	EnsureBrepIsLoaded();
+	ensureBrepIsLoaded();
 
 	assert(brep != nullptr); 
 	brep->setBrep(shape); 
@@ -498,7 +498,7 @@ void EntityGeometry::setBrep(TopoDS_Shape shape)
 
 TopoDS_Shape &EntityGeometry::getBrep(void) 
 { 
-	EnsureBrepIsLoaded();
+	ensureBrepIsLoaded();
 
 	assert(brep != nullptr); 
 	return brep->getBrep(); 
@@ -506,7 +506,7 @@ TopoDS_Shape &EntityGeometry::getBrep(void)
 
 EntityFacetData* EntityGeometry::getFacets(void) 
 { 
-	EnsureFacetsAreLoaded();
+	ensureFacetsAreLoaded();
 
 	assert(facets != nullptr);
 	return facets; 
@@ -514,7 +514,7 @@ EntityFacetData* EntityGeometry::getFacets(void)
 
 EntityBrep* EntityGeometry::getBrepEntity(void)
 {
-	EnsureBrepIsLoaded();
+	ensureBrepIsLoaded();
 
 	assert(brep != nullptr); 
 	return brep; 
@@ -530,7 +530,7 @@ void EntityGeometry::storeBrep(void)
 		if (brep->getEntityID() == 0) brep->setEntityID(createEntityUID());
 
 		// First, we need to store the brep object
-		brep->StoreToDataBase();
+		brep->storeToDataBase();
 		brepStorageID = brep->getEntityID();
 	}
 }
@@ -549,7 +549,7 @@ void EntityGeometry::storeFacets(void)
 	if (facets->getEntityID() == 0) facets->setEntityID(createEntityUID());
 
 	// Now we need to store the facets object
-	facets->StoreToDataBase();
+	facets->storeToDataBase();
 	facetsStorageID = facets->getEntityID();
 }
 
@@ -919,7 +919,7 @@ void EntityGeometry::facetEntity(bool isHidden)
 	// If we don't have a model state, are are creating the facets temporarily. Otherwise we save them to the data base.
 	if (getModelState() != nullptr)
 	{
-		StoreToDataBase();
+		storeToDataBase();
 
 		// We do not need to keep the facets in memory. Allow the object to clear memory data
 		releaseFacets();

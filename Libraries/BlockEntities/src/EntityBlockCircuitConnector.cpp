@@ -3,7 +3,7 @@
 #include "OTGui/BasicGraphicsIntersectionItem.h"
 #include "OTCore/LogDispatcher.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar("EntityBlockCircuitConnector");
+static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlockCircuitConnector::className());
 
 EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
@@ -16,7 +16,7 @@ EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase*
 
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitConnector::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitConnector::createBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::BasicGraphicsIntersectionItem* newConfig = new ot::BasicGraphicsIntersectionItem;
 	newConfig->setUid(this->getEntityID());
@@ -26,9 +26,9 @@ ot::GraphicsItemCfg* EntityBlockCircuitConnector::CreateBlockCfg() {
 #endif
 }
 
-void EntityBlockCircuitConnector::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitConnector::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitConnector::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

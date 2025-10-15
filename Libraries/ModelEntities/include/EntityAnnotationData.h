@@ -28,13 +28,14 @@ public:
 
 	const double* getEdgeColorRGB() { return edgeColorRGB; };
 
-	virtual std::string getClassName(void) { return "EntityAnnotationData"; };
+	static std::string className() { return "EntityAnnotationData"; };
+	virtual std::string getClassName(void) override { return EntityAnnotationData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	double edgeColorRGB[3];

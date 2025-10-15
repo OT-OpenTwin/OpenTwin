@@ -18,7 +18,8 @@ public:
 	virtual ~EntityFile() = default;
 	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual std::string getClassName(void) override { return "EntityFile"; };
+	static std::string className() { return "EntityFile"; };
+	virtual std::string getClassName(void) override { return EntityFile::className(); };
 	virtual bool updateFromProperties(void) override;
 	virtual void addVisualizationNodes() override;
 
@@ -37,7 +38,7 @@ public:
 
 protected:
 	virtual void setSpecializedProperties() {};
-	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
 
 
@@ -51,7 +52,7 @@ private:
 
 	std::shared_ptr<EntityBinaryData> m_data = nullptr;
 
-	void EnsureDataIsLoaded();
+	void ensureDataIsLoaded();
 	void setProperties();
 	virtual int getSchemaVersion() { return 1; }
 };

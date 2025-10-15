@@ -6,7 +6,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityBinaryData> registrar("EntityBinaryData");
+static EntityFactoryRegistrar<EntityBinaryData> registrar(EntityBinaryData::className());
 
 EntityBinaryData::EntityBinaryData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
@@ -25,10 +25,10 @@ bool EntityBinaryData::getEntityBox(double &xmin, double &xmax, double &ymin, do
 }
 
 
-void EntityBinaryData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityBinaryData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now add the actual data array
 

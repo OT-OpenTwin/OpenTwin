@@ -15,7 +15,7 @@ public:
 	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, const std::string &owner);
 	void SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns);
 	void SetSourceFile(std::string sourceFileName, std::string sourceFilePath);
-	virtual std::string getClassName(void) { return "EntityParameterizedDataTable"; };
+	virtual std::string getClassName(void) override { return "EntityParameterizedDataTable"; };
 	std::string getFileName() const { return _sourceFileName; }
 	std::string getFilePath() const { return _sourceFilePath; }
 
@@ -32,7 +32,7 @@ private:
 	std::string _sourceFilePath;
 	const std::string _defaulCategory = "tableInformation";
 
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 

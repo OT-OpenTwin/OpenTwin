@@ -164,7 +164,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 	// Now we facet the entity and store it to the data base afterward.
 	geometryEntity->facetEntity(false);
-	geometryEntity->StoreToDataBase();
+	geometryEntity->storeToDataBase();
 
 	ot::UID entityVersion = geometryEntity->getEntityStorageVersion();
 	ot::UID brepVersion   = geometryEntity->getBrepEntity()->getEntityStorageVersion();

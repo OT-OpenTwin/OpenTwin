@@ -63,9 +63,9 @@ void EntityResultUnstructuredMeshVtk::getData(std::string &quantityName, eQuanti
 	data         = _vtkData->getData();
 }
 
-void EntityResultUnstructuredMeshVtk::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityResultUnstructuredMeshVtk::addStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	if (_vtkData != nullptr)
 	{

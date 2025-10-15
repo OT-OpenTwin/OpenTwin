@@ -41,7 +41,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	auto tp3 = std::chrono::system_clock::now();
 
 
-	tableData->StoreToDataBase();
+	tableData->storeToDataBase();
 
 	auto tp4 = std::chrono::system_clock::now();
 	//_uiComponent->displayMessage("Total duration: " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(tp4 - tp1).count()) + " mys\n");
@@ -54,7 +54,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	topoEnt->SetTableDimensions(static_cast<unsigned int> (tableData->getNumberOfRows()), static_cast<unsigned int> (tableData->getNumberOfColumns()));
 	topoEnt->SetSourceFile(sourceFile->getFileName() + "." + sourceFile->getFileType(), sourceFile->getPath());
 	topoEnt->createProperties(ot::TableCfg::TableHeaderMode::Horizontal);
-	topoEnt->StoreToDataBase();
+	topoEnt->storeToDataBase();
 
 	std::list<ot::UID> topologyEntityIDList = { topoEnt->getEntityID() };
 	std::list<ot::UID> topologyEntityVersionList = { topoEnt->getEntityStorageVersion() };

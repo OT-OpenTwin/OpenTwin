@@ -198,9 +198,9 @@ void EntityResultUnstructuredMesh::updateIDFromObjects(void)
 	}
 }
 
-void EntityResultUnstructuredMesh::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityResultUnstructuredMesh::addStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	updateIDFromObjects();
 

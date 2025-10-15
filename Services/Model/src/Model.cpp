@@ -262,7 +262,7 @@ void Model::resetToNew()
 		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), Application::instance()->getServiceName());
 		entityUnits->setName(getUnitRootName());
 		entityUnits->createProperties();
-		//entityUnits->StoreToDataBase();
+		//entityUnits->storeToDataBase();
 		addEntityToModel(entityUnits->getName(), entityUnits, entityRoot, true, allNewEntities);
 	}
 
@@ -717,7 +717,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		if (entityRoot != nullptr)
 		{
 			// Ensure that the root nodes have a visualization item
-			createVisualizationItems();
+			//createVisualizationItems();
 
 			entityRoot->addVisualizationNodes();
 		}
@@ -747,7 +747,7 @@ void Model::createVisualizationItems()
 	for (auto entity : entityList)
 	{
 		auto temp = dynamic_cast<EntityContainer*>(entity);
-		if (temp != nullptr)
+		if (temp != nullptr && false)
 		{
 			addVisualizationContainerNode(entity->getName(), entity->getEntityID(), entity->getEditable());
 		}
@@ -1004,7 +1004,7 @@ void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden
 									entity->getFacets()->getNodeVector(), entity->getFacets()->getTriangleList(), entity->getFacets()->getEdgeList(), entity->getFacets()->getFaceNameMap(), entity->getFacets()->getErrorString());
 	entity->getFacets()->setModified();
 
-	entity->StoreToDataBase();
+	entity->storeToDataBase();
 
 	if (notifyViewer)
 	{
@@ -1413,7 +1413,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity);
 	if (blockEntity != nullptr)
 	{
-		blockEntity->CreateBlockItem();
+		blockEntity->createBlockItem();
 	}
 
 	Application::instance()->getVisualisationHandler().handleRenaming(entityID);
@@ -2089,7 +2089,7 @@ void Model::updateEntities(bool itemsVisible)
 		if (entity->getOwningService() != "Model")
 		{
 			// We need to notify the owner. We also need to store entity to the database, since the other service may need to access its properties.
-			entity->StoreToDataBase();
+			entity->storeToDataBase();
 			otherServicesUpdate[entity->getOwningService()].push_back(std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()));
 			needsWritingQueueFlush = true;
 		}
@@ -3400,7 +3400,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	// First recursively store the entities
 	if (entityRoot != nullptr)
 	{
-		entityRoot->StoreToDataBase();
+		entityRoot->storeToDataBase();
 	}
 
 	// Now we store the specific information about the model itself
@@ -4190,7 +4190,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(visEntity->getEntityID(), visEntityVersion));
 
-	visEntity->StoreToDataBase();
+	visEntity->storeToDataBase();
 
 	// Now send the update view message to the viewer
 	ot::JsonDocument notify;
@@ -4248,7 +4248,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	geomEntity->getProperties().forceResetUpdateForAllProperties();
 
 	// Finally save the new geom entity state
-	geomEntity->StoreToDataBase();
+	geomEntity->storeToDataBase();
 
 	// Update the display
 	geomEntity->addVisualizationNodes();

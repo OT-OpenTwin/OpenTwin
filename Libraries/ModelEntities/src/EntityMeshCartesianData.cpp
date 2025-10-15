@@ -120,7 +120,7 @@ void EntityMeshCartesianData::storeMeshFaces(void)
 		meshFaces->setEntityID(createEntityUID());
 	}
 
-	meshFaces->StoreToDataBase();
+	meshFaces->storeToDataBase();
 	meshFacesStorageId = meshFaces->getEntityID();
 	meshFacesStorageVersion = meshFaces->getEntityStorageVersion();
 }
@@ -161,7 +161,7 @@ void EntityMeshCartesianData::storeMeshNodes(void)
 		meshNodes->setEntityID(createEntityUID());
 	}
 
-	meshNodes->StoreToDataBase();
+	meshNodes->storeToDataBase();
 	meshNodesStorageId = meshNodes->getEntityID();
 	meshNodesStorageVersion = meshNodes->getEntityStorageVersion();
 }
@@ -176,7 +176,7 @@ void EntityMeshCartesianData::releaseMeshNodes(void)
 	meshNodes = nullptr;
 }
 
-void EntityMeshCartesianData::StoreToDataBase(void)
+void EntityMeshCartesianData::storeToDataBase(void)
 {
 	if (meshFaces != nullptr)
 	{
@@ -189,13 +189,13 @@ void EntityMeshCartesianData::StoreToDataBase(void)
 	}
 
 	// Afterward, we store the container itself
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
-void EntityMeshCartesianData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesianData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	auto coordX = bsoncxx::builder::basic::array();
 	auto coordY = bsoncxx::builder::basic::array();
@@ -573,7 +573,7 @@ void EntityMeshCartesianData::setDsMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 	
 	matrixDs = matrix;
 	matrixDsStorageId = matrix->getEntityID();
@@ -588,7 +588,7 @@ void EntityMeshCartesianData::setDualDsMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDualDs = matrix;
 	matrixDualDsStorageId = matrix->getEntityID();
@@ -603,7 +603,7 @@ void EntityMeshCartesianData::setDaMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDa = matrix;
 	matrixDaStorageId = matrix->getEntityID();
@@ -618,7 +618,7 @@ void EntityMeshCartesianData::setDualDaMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDualDs = matrix;
 	matrixDualDaStorageId = matrix->getEntityID();
@@ -633,7 +633,7 @@ void EntityMeshCartesianData::setDepsMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDeps = matrix;
 	matrixDepsStorageId = matrix->getEntityID();
@@ -648,7 +648,7 @@ void EntityMeshCartesianData::setDmuMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDmu = matrix;
 	matrixDmuStorageId = matrix->getEntityID();
@@ -663,7 +663,7 @@ void EntityMeshCartesianData::setDsigmaMatrix(EntityCartesianVector *matrix)
 
 	if (matrix == nullptr) return;
 
-	matrix->StoreToDataBase();
+	matrix->storeToDataBase();
 
 	matrixDsigma = matrix;
 	matrixDsigmaStorageId = matrix->getEntityID();

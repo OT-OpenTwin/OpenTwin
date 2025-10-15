@@ -15,7 +15,7 @@ std::shared_ptr<EntityParameterizedDataPreviewTable> PreviewAssembler::AssembleT
 	AddFieldsToTable(newPreviewTableData);
 
 
-	newPreviewTableData->StoreToDataBase();
+	newPreviewTableData->storeToDataBase();
 	newPreviewTable->setTableData(newPreviewTableData);
 
 	return newPreviewTable;

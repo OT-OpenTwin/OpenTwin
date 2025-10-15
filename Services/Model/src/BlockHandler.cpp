@@ -92,7 +92,7 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
 
-		blockEnt->StoreToDataBase();
+		blockEnt->storeToDataBase();
 
 		dataEntID.push_back(coordinateEntity->getEntityID());
 		dataEntVers.push_back(coordinateEntity->getEntityStorageVersion());
@@ -103,7 +103,7 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 
 		_model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Update BlockItem position and rotation", false, false);
 
-		coordinateEntity->StoreToDataBase();
+		coordinateEntity->storeToDataBase();
 		topoEntID.push_back(blockEnt->getEntityID());
 		topoEntVers.push_back(blockEnt->getEntityStorageVersion());
 		forceVis.push_back(false);
@@ -112,7 +112,7 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 
 	}
 	else if (_rotationChanged || _flipChanged) {
-		blockEnt->StoreToDataBase();
+		blockEnt->storeToDataBase();
 		const std::string comment = "Rotation and Flip updated";
 		std::list<ot::UID>  topologyEntityIDList{ blockEnt->getEntityID() };
 		std::list<ot::UID>  topologyEntityVersionList { blockEnt->getEntityStorageVersion() };
@@ -120,8 +120,8 @@ void BlockHandler::handleItemChanged(ot::JsonDocument& _doc) {
 		_model->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, comment);
 	}
 	else {
-		coordinateEntity->StoreToDataBase();
-		//blockEnt->StoreToDataBase();
+		coordinateEntity->storeToDataBase();
+		//blockEnt->storeToDataBase();
 
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;

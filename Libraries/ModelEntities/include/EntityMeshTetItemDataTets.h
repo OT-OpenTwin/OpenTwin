@@ -39,13 +39,13 @@ public:
 	void setTetNode(size_t nT, int nodeIndex, size_t node) { assert(nT < tets.size()); tets[nT].setNode(nodeIndex, node); setModified(); };
 	size_t getTetNode(size_t nT, int nodeIndex) { assert(nT < tets.size()); return tets[nT].getNode(nodeIndex); };
 
-	virtual std::string getClassName(void) { return "EntityMeshTetItemDataTets"; };
+	virtual std::string getClassName(void) override { return "EntityMeshTetItemDataTets"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::vector<EntityMeshTetItemTet> tets;

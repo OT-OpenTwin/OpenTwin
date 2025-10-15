@@ -559,9 +559,9 @@ void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>
     ycoord->setData((char*)yc, sizeof(double) * nodeList.size());
     zcoord->setData((char*)zc, sizeof(double) * nodeList.size());
 
-    xcoord->StoreToDataBase();
-    ycoord->StoreToDataBase();
-    zcoord->StoreToDataBase();
+    xcoord->storeToDataBase();
+    ycoord->storeToDataBase();
+    zcoord->storeToDataBase();
 
     delete[] xc; xc = nullptr;
     delete[] yc; yc = nullptr;
@@ -585,7 +585,7 @@ void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>
     }
 
     cells->setData((char*)c, sizeof(int) * cellListSize);
-    cells->StoreToDataBase();
+    cells->storeToDataBase();
 
     delete[] c; c = nullptr;
 
@@ -602,7 +602,7 @@ void SolverFDTD::storeMesh(int numberNodes, int cellType, std::list<std::string>
 
     visualizationMesh->setMeshData(nodeList.size(), cellList.size(), cellListSize, xcoord, ycoord, zcoord, cells);
 
-    visualizationMesh->StoreToDataBase();
+    visualizationMesh->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(xcEntityID, xcEntityVersion, visualizationMesh->getEntityID());
     app->getModelComponent()->addNewDataEntity(ycEntityID, ycEntityVersion, visualizationMesh->getEntityID());
@@ -638,7 +638,7 @@ void SolverFDTD::storeMeshScalarData(size_t numberPoints, size_t numberCells, st
     }
 
     pointScalar->setData((char*)p, sizeof(float) * potentialList.size());
-    pointScalar->StoreToDataBase();
+    pointScalar->storeToDataBase();
 
     delete[] p; p = nullptr;
 
@@ -648,7 +648,7 @@ void SolverFDTD::storeMeshScalarData(size_t numberPoints, size_t numberCells, st
     EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
-    visualizationMeshData->StoreToDataBase();
+    visualizationMeshData->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(pointScalarID, pointScalarVersion, visualizationMeshData->getEntityID());
     app->getModelComponent()->addNewDataEntity(visualizationMeshData->getEntityID(), visualizationMeshData->getEntityStorageVersion(), solverEntity->getEntityID());
@@ -680,7 +680,7 @@ void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, st
     }
 
     cellScalar->setData((char*)m, sizeof(float) * magnitudeList.size());
-    cellScalar->StoreToDataBase();
+    cellScalar->storeToDataBase();
 
     delete[] m; m = nullptr;
 
@@ -705,7 +705,7 @@ void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, st
     }
 
     cellVector->setData((char*)v, sizeof(float) * 3 * vectorList.size());
-    cellVector->StoreToDataBase();
+    cellVector->storeToDataBase();
 
     delete[] v; v = nullptr;
 
@@ -717,7 +717,7 @@ void SolverFDTD::storeMeshVectorData(size_t numberPoints, size_t numberCells, st
     EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
-    visualizationMeshData->StoreToDataBase();
+    visualizationMeshData->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(cellScalarID, cellScalarVersion, visualizationMeshData->getEntityID());
     app->getModelComponent()->addNewDataEntity(cellVectorID, cellVectorVersion, visualizationMeshData->getEntityID());

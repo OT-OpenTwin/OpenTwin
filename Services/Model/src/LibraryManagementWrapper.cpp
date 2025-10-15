@@ -199,7 +199,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 	//Create the data entity
 	EntityBinaryData fileContent(entIDData, circuitModel.get(), nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	fileContent.setData(modelText.data(), modelText.size());
-	fileContent.StoreToDataBase();
+	fileContent.storeToDataBase();
 
 	//ot::EncodingGuesser guesser;
 
@@ -226,7 +226,7 @@ void LibraryManagementWrapper::createModelTextEntity(const std::string& _modelIn
 
 	circuitModel->setName(entityName);
 
-	circuitModel->StoreToDataBase();
+	circuitModel->storeToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
 	m_entityVersionsTopo.push_back(circuitModel->getEntityStorageVersion());
 	m_entityIDsData.push_back(entIDData);
@@ -250,7 +250,7 @@ void LibraryManagementWrapper::updatePropertyOfEntity(ot::UID _entityID, bool _d
 	else {
 		modelProperty->setValue("");
 	}
-	entBase->StoreToDataBase();
+	entBase->storeToDataBase();
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
 	ot::UIDList versionList{entBase->getEntityStorageVersion()};

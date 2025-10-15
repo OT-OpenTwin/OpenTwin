@@ -2,7 +2,7 @@
 #include "SharedResources.h"
 #include "PropertyHelper.h"
 
-static EntityFactoryRegistrar<EntityBlockFileWriter> registrar("EntityBlockFileWriter");
+static EntityFactoryRegistrar<EntityBlockFileWriter> registrar(EntityBlockFileWriter::className());
 
 EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID,parent,obs,ms,owner)
@@ -44,18 +44,18 @@ const std::string& EntityBlockFileWriter::getFileName()
 }
 
 
-ot::GraphicsItemCfg* EntityBlockFileWriter::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockFileWriter::createBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
-	block.setTitle(this->CreateBlockHeadline());
+	block.setTitle(this->createBlockHeadline());
 
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
 	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 	
-	AddConnectors(block);
+	addConnectors(block);
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;

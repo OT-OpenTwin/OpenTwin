@@ -35,16 +35,16 @@ bool EntityMeshCartesianItem::getEntityBox(double &xmin, double &xmax, double &y
 	return true;
 }
 
-void EntityMeshCartesianItem::StoreToDataBase(void)
+void EntityMeshCartesianItem::storeToDataBase(void)
 {
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityMeshCartesianItem::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesianItem::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Add the specific entity data now
 	storage.append(bsoncxx::builder::basic::kvp("BoundingBox", boundingBox.getBSON()));

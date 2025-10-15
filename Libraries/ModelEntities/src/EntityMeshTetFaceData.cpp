@@ -72,7 +72,7 @@ void EntityMeshTetFaceData::storeMeshFaces(void)
 	{
 		if (fp.second != nullptr)
 		{
-			fp.second->StoreToDataBase();
+			fp.second->storeToDataBase();
 			meshFaceStorageIds[fp.first] = std::pair<ot::UID, ot::UID>(fp.second->getEntityID(), fp.second->getEntityStorageVersion());
 		}
 	}
@@ -94,19 +94,19 @@ void EntityMeshTetFaceData::releaseMeshFaces(void)
 	meshFaces.clear();
 }
 
-void EntityMeshTetFaceData::StoreToDataBase(void)
+void EntityMeshTetFaceData::storeToDataBase(void)
 {
 	// If the pointers to faces, then the objects are stored in the data storage and the storage IDs are up to date
 	storeMeshFaces();
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityMeshTetFaceData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetFaceData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now check whether the geometry is modified and we need to create a new entry
 

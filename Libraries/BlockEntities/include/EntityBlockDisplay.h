@@ -6,12 +6,14 @@ class __declspec(dllexport) EntityBlockDisplay : public EntityBlock
 public:
 	EntityBlockDisplay() : EntityBlockDisplay(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockDisplay"; };
+
+	static std::string className() { return "EntityBlockDisplay"; }
+	virtual std::string getClassName(void) override { return EntityBlockDisplay::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 		
 	void createProperties();
 	const std::string& getDescription();
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	const ot::Connector& getConnectorInput() const { return _inputConnector; }
 
 	static const std::string getIconName() { return "Monitor.svg"; }

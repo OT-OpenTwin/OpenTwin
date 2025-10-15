@@ -2,7 +2,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-static EntityFactoryRegistrar<EntitySolverPort> registrar("EntitySolverPort");
+static EntityFactoryRegistrar<EntitySolverPort> registrar(EntitySolverPort::className());
 
 EntitySolverPort::EntitySolverPort(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
 	: EntityContainer(ID,parent,obs,ms,owner){}

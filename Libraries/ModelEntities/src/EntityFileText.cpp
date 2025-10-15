@@ -27,7 +27,7 @@
 #define OT_TEST_ENTITYFILETEXT_Interval(___testText)
 #endif
 
-static EntityFactoryRegistrar<EntityFileText> registrar("EntityFileText");
+static EntityFactoryRegistrar<EntityFileText> registrar(EntityFileText::className());
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner)
 	: EntityFile(_ID, _parent, _obs, _ms, _owner)
@@ -108,10 +108,10 @@ void EntityFileText::setText(const std::string& _text)
 		
 		if (getModelState() != nullptr)
 		{
-			dataEntity->StoreToDataBase();
+			dataEntity->storeToDataBase();
 			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
 			getModelState()->modifyEntityVersion(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-			this->StoreToDataBase();
+			this->storeToDataBase();
 			getModelState()->modifyEntityVersion(this->getEntityID(), this->getEntityStorageVersion());
 		}
 		else
@@ -215,9 +215,9 @@ bool EntityFileText::requiresDataUpdate()
 	return temp;
 }
 
-void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& _storage)
+void EntityFileText::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
-	EntityFile::AddStorageData(_storage);
+	EntityFile::addStorageData(_storage);
 	ot::TextEncoding encoding;
 	std::string encodingStr = encoding.getString(m_encoding);
 	_storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));

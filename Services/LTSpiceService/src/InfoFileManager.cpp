@@ -192,10 +192,10 @@ void InfoFileManager::writeInformation()
 	dataEntity->setData(dataContent.str().c_str(), dataContent.str().length()+1);
 
 	// Store the entities
-	dataEntity->StoreToDataBase();
+	dataEntity->storeToDataBase();
 
 	fileEntity->setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-	fileEntity->StoreToDataBase();
+	fileEntity->storeToDataBase();
 
 	// And add them to the model
 	application->getModelComponent()->addNewTopologyEntity(fileEntity->getEntityID(), fileEntity->getEntityStorageVersion(), false);

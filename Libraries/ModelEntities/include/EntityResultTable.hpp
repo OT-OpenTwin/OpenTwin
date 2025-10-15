@@ -30,16 +30,16 @@ bool EntityResultTable<T>::getEntityBox(double &xmin, double &xmax, double &ymin
 }
 
 template <class T>
-void EntityResultTable<T>::StoreToDataBase(void)
+void EntityResultTable<T>::storeToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
 template <class T>
-void EntityResultTable<T>::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResultTable<T>::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 	storage.append(

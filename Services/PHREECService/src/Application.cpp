@@ -167,7 +167,7 @@ void Application::addSolver(void)
 	EntityPropertiesDouble::createProperty("Solver", "Frequency [MHz]", 0.0, "PHREEC", solverEntity->getProperties());
 	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "PHREEC", solverEntity->getProperties());
 
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };

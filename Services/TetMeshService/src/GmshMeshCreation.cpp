@@ -388,7 +388,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 														false);
 
 	// Finally, store the mesh entity itself
-	getEntityMesh()->StoreToDataBase();
+	getEntityMesh()->storeToDataBase();
 	application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getEntityID(), 
 														getEntityMesh()->getEntityStorageVersion(), 
 														false);

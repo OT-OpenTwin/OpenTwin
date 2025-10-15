@@ -16,7 +16,7 @@ public:
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	
-	virtual std::string getClassName(void) { return "EntityResultUnstructuredMesh"; };
+	virtual std::string getClassName(void) override { return "EntityResultUnstructuredMesh"; };
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 
@@ -51,6 +51,6 @@ private:
 	void clearAllBinaryData(void);
 	void updateIDFromObjects(void);
 
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 };

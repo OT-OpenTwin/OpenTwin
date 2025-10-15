@@ -6,13 +6,15 @@ class __declspec(dllexport) EntityBlockFileWriter : public EntityBlock
 public:
 	EntityBlockFileWriter() : EntityBlockFileWriter(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockFileWriter"; };
+
+	static std::string className() { return "EntityBlockFileWriter"; }
+	virtual std::string getClassName(void) override { return EntityBlockFileWriter::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	void createProperties();
 	const std::string& getHeadline();
 	const std::string& getFileName();
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 	const ot::Connector& getConnectorInput() const { return m_inputConnector; }
 	const std::string& getFileModeAppend() const { return m_fileModeAppend; }
 	const std::string& getFileModeOverride() const { return m_fileModeOverride; }

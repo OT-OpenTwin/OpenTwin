@@ -33,7 +33,7 @@ public:
 
 protected:
 	void CreatePlainDocument(std::string documentName);
-	virtual void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:

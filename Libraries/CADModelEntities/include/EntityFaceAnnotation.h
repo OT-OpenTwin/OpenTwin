@@ -46,13 +46,14 @@ public:
 
 	std::list<TopoDS_Shape> findFacesFromShape(EntityBrep* brep);
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 
 	void releaseFacets(void);
 
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) { return "EntityFaceAnnotation"; };
+	static std::string className() { return "EntityFaceAnnotation"; };
+	virtual std::string getClassName(void) { return EntityFaceAnnotation::className(); };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
@@ -65,11 +66,11 @@ public:
 	BoundingBox &getBoundingBox(void) { return boundingBox; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void updateVisualization(bool isHidden);
-	void EnsureFacetsAreLoaded(void);
+	void ensureFacetsAreLoaded(void);
 	void storeFacets(void);
 	void findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
 

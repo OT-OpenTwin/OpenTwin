@@ -338,19 +338,19 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 		std::unique_ptr<EntityCompressedVector> xComponentDataEnt (new EntityCompressedVector(xUID, dataEntity, nullptr, nullptr, "Model"));
 		xComponentDataEnt->setName("DFTVectorResultXComponent");
 		xComponentDataEnt->setValues(xComponent, size);
-		xComponentDataEnt->StoreToDataBase();
+		xComponentDataEnt->storeToDataBase();
 		ot::UID xVersion = xComponentDataEnt->getEntityStorageVersion();
 
 		std::unique_ptr<EntityCompressedVector> yComponentDataEnt (new EntityCompressedVector(yUID, dataEntity, nullptr, nullptr, "Model"));
 		yComponentDataEnt->setName("DFTVectorResultYComponent");
 		yComponentDataEnt->setValues(yComponent, size);
-		yComponentDataEnt->StoreToDataBase();
+		yComponentDataEnt->storeToDataBase();
 		ot::UID yVersion = yComponentDataEnt->getEntityStorageVersion();
 
 		std::unique_ptr<EntityCompressedVector> zComponentDataEnt (new EntityCompressedVector(zUID, dataEntity, nullptr, nullptr, "Model"));
 		zComponentDataEnt->setName("DFTVectorResultZComponent");
 		zComponentDataEnt->setValues(zComponent, size);
-		zComponentDataEnt->StoreToDataBase();
+		zComponentDataEnt->storeToDataBase();
 		ot::UID zVersion = zComponentDataEnt->getEntityStorageVersion();
 
 		dataEntity->SetVectorDataUIDs(xComponentDataEnt->getEntityID(), xComponentDataEnt->getEntityStorageVersion(), 
@@ -359,7 +359,7 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 		dataEntity->setMeshData(meshDataEntityID, meshDataVersion);
 		dataEntity->setEditable(true);
 		dataEntity->setResultType(EntityResultBase::CARTESIAN_NODE_VECTORS);
-		dataEntity->StoreToDataBase();
+		dataEntity->storeToDataBase();
 
 		topoEntity->setName(name + "/Plot");
 		topoEntity->setEditable(true);
@@ -367,7 +367,7 @@ void MicroServiceSolver::addResultFD(std::string name, std::string title, double
 		topoEntity->setResultType(EntityResultBase::CARTESIAN_NODE_VECTORS);
 		topoEntity->createProperties();
 		topoEntity->setSource(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
-		topoEntity->StoreToDataBase();
+		topoEntity->storeToDataBase();
 
 		topologyEntityIDList.push_back(topoEntity->getEntityID());
 		topologyEntityVersionList.push_back(topoEntity->getEntityStorageVersion());

@@ -35,11 +35,12 @@ public:
 	virtual bool considerForPropertyFilter(void) override { return false; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return true; };
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 
 	virtual void addVisualizationNodes(void) override;
 
-	virtual std::string getClassName(void) override { return "EntityContainer"; } ;
+	static std::string className() { return "EntityContainer"; };
+	virtual std::string getClassName(void) override { return EntityContainer::className(); } ;
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) override;
 
@@ -55,7 +56,7 @@ public:
 
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 

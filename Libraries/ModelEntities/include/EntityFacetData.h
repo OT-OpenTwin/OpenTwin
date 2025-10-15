@@ -25,13 +25,14 @@ public:
 	std::string					  &getErrorString(void)  { return errors; };
 	std::map<ot::UID, std::string> &getFaceNameMap(void) { return faceNameMap; };
 
-	virtual std::string getClassName(void) override { return "EntityFacetData"; };
+	static std::string className() { return "EntityFacetData"; };
+	virtual std::string getClassName(void) override { return EntityFacetData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::vector<Geometry::Node> nodes;

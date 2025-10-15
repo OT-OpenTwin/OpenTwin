@@ -106,7 +106,7 @@ void BatchedCategorisationHandler::addCreator()
 	EntityBatchImporter importer(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, serviceName);
 	importer.setName(entityName);
 	importer.createProperties();
-	importer.StoreToDataBase();
+	importer.storeToDataBase();
 	
 	ot::NewModelStateInformation newEntities;
 	newEntities.m_topologyEntityIDs.push_back(importer.getEntityID());
@@ -270,7 +270,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 		newMSMD->setName(newSMDName);
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
-		newMSMD->StoreToDataBase();
+		newMSMD->storeToDataBase();
 		topoVers.push_back(newMSMD->getEntityStorageVersion());
 		topoIDs.push_back(newMSMD->getEntityID());
 		forceVis.push_back(false);
@@ -297,7 +297,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
 				parameter->setName(prefix + "/" + CategorisationFolderNames::getParameterFolderName());
-				parameter->StoreToDataBase();
+				parameter->storeToDataBase();
 				topoVers.push_back(parameter->getEntityStorageVersion());
 				topoIDs.push_back(parameter->getEntityID());
 				forceVis.push_back(false);
@@ -308,7 +308,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 				quantity->CreateProperties(EntityParameterizedDataCategorization::quantity);
 				quantity->setName(prefix + "/" + CategorisationFolderNames::getQuantityFolderName());
-				quantity->StoreToDataBase();
+				quantity->storeToDataBase();
 				topoVers.push_back(quantity->getEntityStorageVersion());
 				topoIDs.push_back(quantity->getEntityID());
 				forceVis.push_back(false);
@@ -360,13 +360,13 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 			newSelection->setPassOnScript(passOnScript);
 
 			selection->setConsiderForBatchprocessing(!passOnScript);
-			selection->StoreToDataBase();
+			selection->storeToDataBase();
 			topoIDs.push_back(selection->getEntityID());
 			topoVers.push_back(selection->getEntityStorageVersion());
 			forceVis.push_back(false);
 
 			//Storing the new selection range
-			newSelection->StoreToDataBase();
+			newSelection->storeToDataBase();
 			topoIDs.push_back(newSelection->getEntityID());
 			topoVers.push_back(newSelection->getEntityStorageVersion());
 			forceVis.push_back(false);

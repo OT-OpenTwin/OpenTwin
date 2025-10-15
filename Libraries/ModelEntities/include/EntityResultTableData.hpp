@@ -15,7 +15,7 @@ template <class T>
 EntityResultTableData<T>::EntityResultTableData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
 {
-	className = className + "_" + ot::TemplateTypeName<T>::getTypeName();
+	className = EntityResultTableData::classNameBase() + "_" + ot::TemplateTypeName<T>::getTypeName();
 }
 
 template <class T>
@@ -30,16 +30,16 @@ bool EntityResultTableData<T>::getEntityBox(double &xmin, double &xmax, double &
 }
 
 template <class T>
-void EntityResultTableData<T>::StoreToDataBase(void)
+void EntityResultTableData<T>::storeToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
 template <class T>
-void EntityResultTableData<T>::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResultTableData<T>::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	auto headerArray = bsoncxx::builder::basic::array();
 

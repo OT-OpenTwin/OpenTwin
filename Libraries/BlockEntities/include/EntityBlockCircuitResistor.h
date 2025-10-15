@@ -5,14 +5,16 @@ class __declspec(dllexport) EntityBlockCircuitResistor : public EntityBlockCircu
 public:
 	EntityBlockCircuitResistor() : EntityBlockCircuitResistor(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitResistor"; };
+
+	static std::string className() { return "EntityBlockCircuitResistor"; }
+	virtual std::string getClassName(void) override { return EntityBlockCircuitResistor::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	std::string getResistance();
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 
 	double getRotation();
@@ -26,7 +28,7 @@ private:
 	ot::Connector m_RightConnector;
 	//std::list<Connection> listOfConnections
 
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 

@@ -41,7 +41,7 @@ bool PropertyBundleDataHandleScaling::UpdateMinMaxProperties(double minValue, do
 	{
 		minScale->setValue(minValue);
 		maxScale->setValue(maxValue);
-		thisObject->StoreToDataBase();
+		thisObject->storeToDataBase();
 		return true;
 	}
 	else

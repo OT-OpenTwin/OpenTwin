@@ -19,11 +19,11 @@ public:
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(bool isHidden);
 	
-	virtual std::string getClassName(void) { return "EntityResultText"; };
+	virtual std::string getClassName(void) override { return "EntityResultText"; };
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	
@@ -48,8 +48,8 @@ public:
 
 private:
 	void ensureTextDataLoaded(void);
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	EntityResultTextData *getTextData(void);
 

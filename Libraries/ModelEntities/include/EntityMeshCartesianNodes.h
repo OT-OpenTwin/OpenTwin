@@ -25,13 +25,13 @@ public:
 	void setNumberOfNodes(size_t n);
 	size_t getNumberOfNodes(void) { return nodeCoordsX.size(); }
 
-	virtual std::string getClassName(void) { return "EntityMeshCartesianNodes"; };
+	virtual std::string getClassName(void) override { return "EntityMeshCartesianNodes"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::vector<double> nodeCoordsX;

@@ -150,7 +150,7 @@ void Application::addSolver(void)
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
 
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };

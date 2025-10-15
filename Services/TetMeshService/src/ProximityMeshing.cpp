@@ -351,7 +351,7 @@ void ProximityMeshing::storeErrorAnnotations(void)
 {
 	for (auto annotation : errorAnnotations)
 	{
-		annotation->StoreToDataBase();
+		annotation->storeToDataBase();
 		application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
 		application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
 														annotation->getAnnotationData()->getEntityStorageVersion(), 

@@ -18,10 +18,10 @@ public:
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	void addVisualizationItem(bool isHidden);
-	virtual std::string getClassName(void) { return className; };
+	virtual std::string getClassName(void) override { return className; };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(void);
 	virtual bool updateFromProperties(void) override;
@@ -44,7 +44,7 @@ public:
 	void setMaxRow(int maxRow);
 
 protected:
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	int _minCol = 0;
 	int _minRow = 1;
@@ -52,7 +52,7 @@ protected:
 private:
 	int _maxCol = 50;
 	int _maxRow = 50;
-	virtual int getSchemaVersion(void) { return 1; };
+	virtual int getSchemaVersion(void) override { return 1; };
 	void EnsureTableDataLoaded(void);
 	std::string className; 
 	std::shared_ptr<EntityResultTableData<T>> tableData = nullptr;

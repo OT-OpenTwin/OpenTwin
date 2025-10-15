@@ -23,10 +23,10 @@ bool EntityMeshTetInfo::getEntityBox(double &xmin, double &xmax, double &ymin, d
 	return false;
 }
 
-void EntityMeshTetInfo::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetInfo::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the specific data of this item (list of general, faces and volumes data)
 	auto generalID = bsoncxx::builder::basic::array();

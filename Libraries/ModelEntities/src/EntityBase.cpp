@@ -74,7 +74,7 @@ bool EntityBase::updateFromProperties(void) {
 	return false; // No property grid update necessary
 }
 
-void EntityBase::StoreToDataBase(void) {
+void EntityBase::storeToDataBase(void) {
 	if (!getModified()) {
 		return;
 	}
@@ -86,10 +86,10 @@ void EntityBase::StoreToDataBase(void) {
 
 	ot::UID entityVersion = globalUidGenerator->getUID();
 
-	StoreToDataBase(entityVersion);
+	storeToDataBase(entityVersion);
 }
 
-void EntityBase::StoreToDataBase(ot::UID givenEntityVersion) {
+void EntityBase::storeToDataBase(ot::UID givenEntityVersion) {
 	if (!getModified()) return;
 
 	m_entityStorageVersion = givenEntityVersion;
@@ -281,7 +281,7 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		bsoncxx::builder::basic::kvp("Properties", bsonObj)
 	);
 
-	AddStorageData(doc);
+	addStorageData(doc);
 
 	return doc;
 }

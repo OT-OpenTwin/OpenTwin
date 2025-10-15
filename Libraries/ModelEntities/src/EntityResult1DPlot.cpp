@@ -13,9 +13,9 @@ EntityResult1DPlot::EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityO
 	:EntityContainer(_ID,_parent,_obs,_ms,_owner)
 {}
 
-void EntityResult1DPlot::StoreToDataBase(void)
+void EntityResult1DPlot::storeToDataBase(void)
 {
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
 void EntityResult1DPlot::addVisualizationNodes(void)
@@ -320,9 +320,9 @@ void EntityResult1DPlot::setQuerySelections()
 	m_querySettings.updateQuerySettings(this, filterOptions);
 }
 
-void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityResult1DPlot::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 }
 
 void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

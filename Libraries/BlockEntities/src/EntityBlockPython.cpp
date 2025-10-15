@@ -2,8 +2,9 @@
 #include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"
 #include "SharedResources.h"
+#include "EntityBlockHierarchicalProjectItem.h"
 
-static EntityFactoryRegistrar<EntityBlockPython> registrar("EntityBlockPython");
+static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
@@ -27,11 +28,11 @@ std::string EntityBlockPython::getSelectedScript()
 	return scriptSelection->getValueName();
 }
 
-ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockPython::createBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
-	block.setTitle(this->CreateBlockHeadline());
+	block.setTitle(this->createBlockHeadline());
 
 	const ot::Color colourTitle(ot::Cyan);
 	const ot::Color colourBackground(ot::White);
@@ -41,8 +42,8 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	//block.setBackgroundImageInsertMode(ot::GraphicsFlowItemBuilder::OnStack);
 
 	const std::string blockName = getClassName();
-	const std::string blockTitel = CreateBlockHeadline();
-	AddConnectors(block);
+	const std::string blockTitel = createBlockHeadline();
+	addConnectors(block);
 	
 	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
@@ -54,7 +55,7 @@ bool EntityBlockPython::updateFromProperties()
 	if (scriptSelectionProperty->needsUpdate())
 	{
 		updateBlockAccordingToScriptHeader();
-		CreateBlockItem();
+		createBlockItem();
 	}
 	getProperties().forceResetUpdateForAllProperties();
 	return true;

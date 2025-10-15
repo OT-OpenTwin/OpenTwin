@@ -29,10 +29,10 @@ bool EntityMeshTetFace::getEntityBox(double &xmin, double &xmax, double &ymin, d
 	return true;
 }
 
-void EntityMeshTetFace::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetFace::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object 
 	storage.append(

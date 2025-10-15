@@ -9,7 +9,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar("EntityBlockCircuitCurrentMeter");
+static EntityFactoryRegistrar<EntityBlockCircuitCurrentMeter> registrar(EntityBlockCircuitCurrentMeter::className());
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
@@ -57,7 +57,7 @@ const double EntityBlockCircuitCurrentMeter::getRotation() {
 }
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::createBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitInductor");
@@ -151,8 +151,8 @@ bool EntityBlockCircuitCurrentMeter::updateFromProperties(void) {
 	return refresh;
 }
 
-void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage) {
-	EntityBlock::AddStorageData(storage);
+void EntityBlockCircuitCurrentMeter::addStorageData(bsoncxx::builder::basic::document& storage) {
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {

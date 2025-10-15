@@ -13,7 +13,8 @@ public:
 	void setColumnDelimiter(std::string _delimiter);
 	std::string getRowDelimiter() ;
 	std::string getColumnDelimiter();
-	virtual std::string getClassName(void) override { return "EntityFileCSV"; };
+	static std::string className() { return "EntityFileCSV"; };
+	virtual std::string getClassName(void) override { return EntityFileCSV::className(); };
 
 	// Inherited via IVisualisationTable
 	const ot::GenericDataStructMatrix getTable() override;
@@ -30,7 +31,7 @@ public:
 
 private:
 	void setSpecializedProperties() override;
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::string m_rowDelimiterDefault = "\\n";

@@ -4,7 +4,9 @@ class __declspec(dllexport) EntityBlockCircuitTransmissionLine : public EntityBl
 public:
 	EntityBlockCircuitTransmissionLine() : EntityBlockCircuitTransmissionLine(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockCircuitTransmissionLine(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitTransmissionLine"; };
+
+	static std::string className() { return "EntityBlockCircuitTransmissionLine"; }
+	virtual std::string getClassName(void) override { return EntityBlockCircuitTransmissionLine::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	std::string getImpedance();
@@ -12,7 +14,7 @@ public:
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 
 	double getRotation();
@@ -32,7 +34,7 @@ private:
 	ot::Connector m_RightConnectorNeg2;
 	
 
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 

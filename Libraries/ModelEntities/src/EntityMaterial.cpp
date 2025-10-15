@@ -9,7 +9,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityMaterial> registrar("EntityMaterial");
+static EntityFactoryRegistrar<EntityMaterial> registrar(EntityMaterial::className());
 
 EntityMaterial::EntityMaterial(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
@@ -26,15 +26,15 @@ bool EntityMaterial::getEntityBox(double &xmin, double &xmax, double &ymin, doub
 	return false;
 }
 
-void EntityMaterial::StoreToDataBase(void)
+void EntityMaterial::storeToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityMaterial::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMaterial::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 }

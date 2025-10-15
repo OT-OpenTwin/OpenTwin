@@ -29,23 +29,24 @@ public:
 
 	const double* getEdgeColorRGB();
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	
-	virtual std::string getClassName(void) { return "EntityAnnotation"; };
+	static std::string className() { return "EntityAnnotation"; };
+	virtual std::string getClassName(void) override { return EntityAnnotation::className(); };
 
 	void addVisualizationItem(bool isHidden);
 
 	virtual entityType getEntityType(void)const  override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
-	EntityAnnotationData *getAnnotationData(void) { EnsureAnnotationDataIsLoaded(); return annotationData; }
+	EntityAnnotationData *getAnnotationData(void) { ensureAnnotationDataIsLoaded(); return annotationData; }
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
-	void EnsureAnnotationDataIsLoaded(void);
+	void ensureAnnotationDataIsLoaded(void);
 	void storeAnnotationData(void);
 	void releaseAnnotationData(void);
 

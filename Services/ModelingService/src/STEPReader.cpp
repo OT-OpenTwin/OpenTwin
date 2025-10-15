@@ -512,7 +512,7 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					entityGeom->getFacets()->setEntityID(facetsID);
 
 					entityGeom->facetEntity(false);
-					entityGeom->StoreToDataBase();
+					entityGeom->storeToDataBase();
 
 					entityList.push_back(entityGeom);
 					existingEntityNames[thisName] = true;

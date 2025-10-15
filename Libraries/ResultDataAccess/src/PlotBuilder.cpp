@@ -142,7 +142,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	plotEntity.createProperties();
 	plotEntity.setPlot(_plotCfg);
 	plotEntity.setEditable(true);
-	plotEntity.StoreToDataBase();
+	plotEntity.storeToDataBase();
 
 	for (EntityResult1DCurve& curve : m_curves)
 	{
@@ -153,7 +153,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 			curve.setName(curveEntityName);
 		}
 
-		curve.StoreToDataBase();
+		curve.storeToDataBase();
 		ModelStateInformationHelper::addTopologyEntity(m_newModelStateInformation, curve);
 	}
 	

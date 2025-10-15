@@ -6,13 +6,15 @@ class __declspec(dllexport) EntityBlockCircuitGND : public EntityBlockCircuitEle
 public:
 	EntityBlockCircuitGND() : EntityBlockCircuitGND(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockCircuitGND(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockCircuitGND"; };
+
+	static std::string className() { return "EntityBlockCircuitGND"; }
+	virtual std::string getClassName(void) override { return EntityBlockCircuitGND::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void createProperties(const std::string& _circuitModelFolderName, const ot::UID& _circuitModelFolderID) override;
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 
 	double getRotation();
@@ -25,7 +27,7 @@ private:
 
 
 
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 

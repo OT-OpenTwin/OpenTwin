@@ -287,7 +287,7 @@ void EntityMeshCartesian::storeMeshData(void)
 	if (meshData == nullptr) return;
 	assert(meshData != nullptr);
 
-	meshData->StoreToDataBase();
+	meshData->storeToDataBase();
 	meshDataStorageId = meshData->getEntityID();
 }
 
@@ -299,15 +299,15 @@ void EntityMeshCartesian::releaseMeshData(void)
 	storeMeshData();
 }
 
-void EntityMeshCartesian::StoreToDataBase(void)
+void EntityMeshCartesian::storeToDataBase(void)
 {
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
-void EntityMeshCartesian::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesian::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 

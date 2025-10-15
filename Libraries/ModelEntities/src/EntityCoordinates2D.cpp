@@ -1,6 +1,6 @@
 #include "EntityCoordinates2D.h"
 
-static EntityFactoryRegistrar<EntityCoordinates2D> registrar("EntityCoordinates2D");
+static EntityFactoryRegistrar<EntityCoordinates2D> registrar(EntityCoordinates2D::className());
 
 EntityCoordinates2D::EntityCoordinates2D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, owner), m_location(0.,0.)
@@ -12,7 +12,6 @@ bool EntityCoordinates2D::getEntityBox(double& xmin, double& xmax, double& ymin,
 {
 	return false;
 }
-
 
 std::string EntityCoordinates2D::serialiseAsJSON()
 {
@@ -44,10 +43,9 @@ bool EntityCoordinates2D::deserialiseFromJSON(const ot::ConstJsonObject& _serial
 	}
 }
 
-
-void EntityCoordinates2D::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityCoordinates2D::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 	storage.append(
 		bsoncxx::builder::basic::kvp("LocationX", m_location.x()),
 		bsoncxx::builder::basic::kvp("LocationY", m_location.y())

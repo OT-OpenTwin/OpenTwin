@@ -221,7 +221,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		importReport.setName(reportName);
 		importReport.setText(fullReport);
 		importReport.createProperties();
-		importReport.StoreToDataBase();
+		importReport.storeToDataBase();
 
 		ot::ModelServiceAPI::addEntitiesToModel({ importReport.getEntityID() },
 			{ importReport.getEntityStorageVersion() }, 
@@ -398,7 +398,7 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 	for (auto range : _metadataAssemblyData.m_allSelectionRanges)
 	{
 		range->setConsiderForImport(false);
-		range->StoreToDataBase();
+		range->storeToDataBase();
 		newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
 		newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
 		newModelEntities.m_forceVisible.push_back(false);
@@ -411,7 +411,7 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 		for (auto range : quantity->m_allSelectionRanges)
 		{
 			range->setConsiderForImport(false);
-			range->StoreToDataBase();
+			range->storeToDataBase();
 			newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
 			newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
 			newModelEntities.m_forceVisible.push_back(false);
@@ -423,7 +423,7 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 			for (auto range : parameter->m_allSelectionRanges)
 			{
 				range->setConsiderForImport(false);
-				range->StoreToDataBase();
+				range->storeToDataBase();
 				newModelEntities.m_topologyEntityIDs.push_back(range->getEntityID());
 				newModelEntities.m_topologyEntityVersions.push_back(range->getEntityStorageVersion());
 				newModelEntities.m_forceVisible.push_back(false);

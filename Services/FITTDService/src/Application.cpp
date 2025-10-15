@@ -161,7 +161,7 @@ void Application::addMonitor(void)
 	newMonitor->setName(monitorName);
 	newMonitor->setInitiallyHidden(false);
 	newMonitor->createProperties();
-	newMonitor->StoreToDataBase();
+	newMonitor->storeToDataBase();
 
 	// Register the new solver item in the model
 
@@ -223,7 +223,7 @@ void Application::addPort(void) {
 
 
 	newPort->createProperties(signalTypeFolderName, entityInfos.getEntityVersion(), firstSignalName, firstSignalID);
-	newPort->StoreToDataBase();
+	newPort->storeToDataBase();
 
 	// Register the new solver item in the model
 
@@ -275,7 +275,7 @@ void Application::addSignalType(void) {
 	newSignal->setName(signalName);
 	newSignal->setInitiallyHidden(false);
 	newSignal->createProperties();
-	newSignal->StoreToDataBase();
+	newSignal->storeToDataBase();
 
 	//Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { newSignal->getEntityID()};
@@ -322,7 +322,7 @@ void Application::addSolver(void) {
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);	
 
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	//Create default signal
 	ot::UID newSignalID = this->getModelComponent()->createEntityUID();
@@ -332,7 +332,7 @@ void Application::addSolver(void) {
 	newSignal->setEditable(false);
 	newSignal->createProperties();
 
-	newSignal->StoreToDataBase();
+	newSignal->storeToDataBase();
 
 	// Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), newSignal->getEntityID() };

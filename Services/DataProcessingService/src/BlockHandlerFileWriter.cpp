@@ -79,10 +79,10 @@ void BlockHandlerFileWriter::createFile()
 	const std::string fileContent = m_fileStream.str();
 
 	data.setData(fileContent.c_str(), fileContent.size());
-	data.StoreToDataBase();
+	data.storeToDataBase();
 
 	textFile.setData(data.getEntityID(),data.getEntityStorageVersion());
-	textFile.StoreToDataBase();
+	textFile.storeToDataBase();
 
 	ot::ModelServiceAPI::addEntitiesToModel({ textFile.getEntityID() }, { textFile.getEntityStorageVersion() }, { false }, { data.getEntityID() }, { data.getEntityStorageVersion() }, { textFile.getEntityID() }, "Created text file.");
 }

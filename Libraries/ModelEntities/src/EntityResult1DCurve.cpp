@@ -355,9 +355,9 @@ bool EntityResult1DCurve::updatePropertyVisibilities() {
 	return visibilityChanged;
 }
 
-void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	ot::QuantityContainerEntryDescription quantityDescription = m_queryInformation.m_quantityDescription;
 	bsoncxx::builder::basic::document quantityDescriptionSerialised = serialise(quantityDescription);

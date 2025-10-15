@@ -45,34 +45,34 @@ public:
 	virtual ~EntityBase();
 
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
-	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator(void);
+	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator();
 
 	void setName(std::string n) { m_name = n; setModified(); };
-	std::string getName(void)  const { return m_name; };
+	std::string getName() const { return m_name; };
 
 	//! \brief Returns the name of the entity without the parent entity names.
 	//! If the name is "root/entity" then the function will return "entity".
 	std::string getNameOnly() const;
 
 	void setEntityID(ot::UID id) { m_entityID = id; setModified(); };
-	ot::UID getEntityID(void) const { return m_entityID; };
+	ot::UID getEntityID() const { return m_entityID; };
 
-	ot::UID getEntityStorageVersion(void) const { return m_entityStorageVersion; };
+	ot::UID getEntityStorageVersion() const { return m_entityStorageVersion; };
 
 	void setInitiallyHidden(bool flag) { m_initiallyHidden = flag; };
-	bool getInitiallyHidden(void) { return m_initiallyHidden; };
+	bool getInitiallyHidden() { return m_initiallyHidden; };
 
 	void setEditable(bool flag) { m_isEditable = flag; }
-	bool getEditable(void) { return m_isEditable; }
+	bool getEditable() { return m_isEditable; }
 
 	void setSelectChildren(bool flag) { m_selectChildren = flag; }
-	bool getSelectChildren(void) { return m_selectChildren; }
+	bool getSelectChildren() { return m_selectChildren; }
 
 	void setManageParentVisibility(bool flag) { m_manageParentVisibility = flag; }
-	bool getManageParentVisibility(void) { return m_manageParentVisibility; }
+	bool getManageParentVisibility() { return m_manageParentVisibility; }
 
 	void setManageChildVisibility(bool flag) { m_manageChildVisibility = flag; }
-	bool getManageChildVisibility(void) { return m_manageChildVisibility; }
+	bool getManageChildVisibility() { return m_manageChildVisibility; }
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) = 0;
 
@@ -84,43 +84,43 @@ public:
 	virtual bool updateFromProperties();
 
 	void setModelState(ModelState *ms) { m_modelState = ms; };
-	ModelState *getModelState(void) { return m_modelState; };
+	ModelState *getModelState() { return m_modelState; };
 
-	EntityBase *getParent(void) { return m_parentEntity; };
+	EntityBase *getParent() { return m_parentEntity; };
 	void setParent(EntityBase *parent) { m_parentEntity = parent; };  // The parent information is not persistent. Changing it therefore does not set the modified flag for the entity.
 
 	void setObserver(EntityObserver *obs) { m_observer = obs; };
-	EntityObserver *getObserver(void) { return m_observer; };
+	EntityObserver *getObserver() { return m_observer; };
 
-	EntityProperties &getProperties(void) { return m_properties; };
+	EntityProperties &getProperties() { return m_properties; };
 
 	virtual EntityBase *getEntityFromName(const std::string &n) { if (m_name == n) return this; return nullptr; };
 
-	virtual bool considerForPropertyFilter(void) { return true; };
-	virtual bool considerChildrenForPropertyFilter(void) { return true; };
+	virtual bool considerForPropertyFilter() { return true; };
+	virtual bool considerChildrenForPropertyFilter() { return true; };
 
-	virtual void StoreToDataBase(void);
-	virtual void StoreToDataBase(ot::UID givenEntityVersion);
+	virtual void storeToDataBase();
+	virtual void storeToDataBase(ot::UID givenEntityVersion);
 
-	void setModified(void);
-	void resetModified(void) { m_isModified = false; };
-	bool getModified(void) { return (m_isModified || m_properties.anyPropertyNeedsUpdate()); };
+	void setModified();
+	void resetModified() { m_isModified = false; };
+	bool getModified() { return (m_isModified || m_properties.anyPropertyNeedsUpdate()); };
 
 	void restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
-	virtual void addVisualizationNodes(void) {};
+	virtual void addVisualizationNodes() {};
 
-	virtual std::string getClassName(void) { return "EntityBase"; };
+	virtual std::string getClassName() { return "EntityBase"; };
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds);
 
 	enum entityType {TOPOLOGY, DATA};
-	virtual entityType getEntityType(void) const = 0;
+	virtual entityType getEntityType() const = 0;
 
 	void setOwningService(const std::string &owner) { m_owningService = owner; };
-	const std::string &getOwningService(void) { return m_owningService; };
+	const std::string &getOwningService() { return m_owningService; };
 
-	virtual void detachFromHierarchy(void);
+	virtual void detachFromHierarchy();
 
 	void setDeletable(bool deletable) { m_isDeletable = deletable; };
 	const bool deletable() const { return m_isDeletable; }
@@ -128,14 +128,11 @@ public:
 	//! @brief Creates a copy of the entity. The override from instantiable classes need to set the observer=nullptr and the parent=nullptr. 
 	//! Otherwise the originals are deleted from the modelstate, if the clone happens in the model service
 	//! @return 
-	virtual EntityBase* clone() { return nullptr; }
+	virtual EntityBase* clone() { return nullptr; };
 
 	//! @brief 
 	//! @return Empty string if entity does not support copy. 
-	virtual std::string serialiseAsJSON() 
-	{ 
-		return "";	
-	}
+	virtual std::string serialiseAsJSON() { return ""; };
 
 	//! @brief Entity specific (optional) implementation of a deserialisation fro a string (copy/paste functionality). 
 	//! In this function, it is necessary to create new IDs. Don't store the entity. Storing and unique name creation are taken care of by the model service.
@@ -148,15 +145,15 @@ public:
 	}
 
 protected:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) {};
+	virtual int getSchemaVersion() { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) {};
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
-	ot::UID createEntityUID(void);
+	ot::UID createEntityUID();
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
 	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
-	void entityIsStored(void);
+	void entityIsStored();
 	bsoncxx::builder::basic::document serialiseAsMongoDocument();
 
 private:

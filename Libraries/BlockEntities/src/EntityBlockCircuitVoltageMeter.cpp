@@ -9,7 +9,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitVoltageMeter> registrar("EntityBlockCircuitVoltageMeter");
+static EntityFactoryRegistrar<EntityBlockCircuitVoltageMeter> registrar(EntityBlockCircuitVoltageMeter::className());
 
 EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
@@ -58,7 +58,7 @@ std::string EntityBlockCircuitVoltageMeter::getFlip() {
 }
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::createBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitVoltageMeter");
@@ -154,9 +154,9 @@ bool EntityBlockCircuitVoltageMeter::updateFromProperties(void)
 	return refresh;
 }
 
-void EntityBlockCircuitVoltageMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitVoltageMeter::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitVoltageMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

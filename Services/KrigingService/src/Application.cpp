@@ -301,7 +301,7 @@ void Application::addParameters(void)
 	regressionFunctionType.push_back("quadratic");
 	EntityPropertiesSelection::createProperty("Parameters", "Poly", regressionFunctionType, "constant", "Kriging", solverEntity->getProperties());
 
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model
 

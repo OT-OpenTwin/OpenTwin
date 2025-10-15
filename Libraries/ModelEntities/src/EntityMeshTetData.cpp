@@ -79,7 +79,7 @@ void EntityMeshTetData::storeMeshFaces(void)
 		meshFaces->setEntityID(createEntityUID());
 	}
 
-	meshFaces->StoreToDataBase();
+	meshFaces->storeToDataBase();
 	meshFacesStorageId = meshFaces->getEntityID();
 }
 
@@ -186,7 +186,7 @@ void EntityMeshTetData::storeMeshNodes(void)
 		meshNodes->setEntityID(createEntityUID());
 	}
 
-	meshNodes->StoreToDataBase();
+	meshNodes->storeToDataBase();
 	meshNodesStorageId = meshNodes->getEntityID();
 }
 
@@ -200,7 +200,7 @@ void EntityMeshTetData::releaseMeshNodes(void)
 	meshNodes = nullptr;
 }
 
-void EntityMeshTetData::StoreToDataBase(void)
+void EntityMeshTetData::storeToDataBase(void)
 {
 	// If the pointers to faces or nodes are 0, then the objects are stored in the data storage and the storage IDs are up to date
 	if (meshFaces != nullptr)
@@ -214,13 +214,13 @@ void EntityMeshTetData::StoreToDataBase(void)
 	}
 
 	// Afterward, we store the container itself
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
-void EntityMeshTetData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	// Now check whether the geometry is modified and we need to create a new entry
 

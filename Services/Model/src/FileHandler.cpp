@@ -302,7 +302,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 
 	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	fileContent.setData(_text.data(), _text.size());
-	fileContent.StoreToDataBase();
+	fileContent.storeToDataBase();
 
 	textFile->setData(fileContent.getEntityID(),fileContent.getEntityStorageVersion());
 
@@ -316,7 +316,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	_folderContent.push_back(entityName);
 
 	textFile->setTextEncoding(guesser(_text.data(), _text.size()));
-	textFile->StoreToDataBase();
+	textFile->storeToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
 	m_entityVersionsTopo.push_back(textFile->getEntityStorageVersion());
 	m_entityIDsData.push_back(entIDData);

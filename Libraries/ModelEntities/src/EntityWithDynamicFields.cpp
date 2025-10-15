@@ -96,7 +96,7 @@ void EntityWithDynamicFields::CreatePlainDocument(std::string documentName)
 	}
 }
 
-void EntityWithDynamicFields::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityWithDynamicFields::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	OrderGenericDocumentsHierarchical();
 	auto rootDocument = _bsonDocumentsByName["/"];

@@ -278,7 +278,7 @@ void DataCategorizationHandler::handleChategorisationLock(const std::list<ot::En
 		{
 			
 			categorisation->setLock(_lock);
-			categorisation->StoreToDataBase();
+			categorisation->storeToDataBase();
 			updatedEntities.m_topologyEntityIDs.push_back(categorisation->getEntityID());
 			updatedEntities.m_topologyEntityVersions.push_back(categorisation->getEntityStorageVersion());
 			updatedEntities.m_forceVisible.push_back(false);
@@ -512,7 +512,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			name =	CreateNewUniqueTopologyNamePlainPossible(bufferedCategorisationName, name, takenNames);
 			tableRange->setName(name);
 
-			tableRange->StoreToDataBase();
+			tableRange->storeToDataBase();
 			entityInfos.m_topologyEntityIDs.push_back(tableRange->getEntityID());
 			entityInfos.m_topologyEntityVersions.push_back(tableRange->getEntityStorageVersion());
 			entityInfos.m_forceVisible.push_back(false);
@@ -522,7 +522,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	//Lastly we store all entities marked for storage.
 	for (auto categoryEntity : m_markedForStorringEntities)
 	{
-		categoryEntity->StoreToDataBase();
+		categoryEntity->storeToDataBase();
 		entityInfos.m_topologyEntityIDs.push_back(categoryEntity->getEntityID());
 		entityInfos.m_topologyEntityVersions.push_back(categoryEntity->getEntityStorageVersion());
 		entityInfos.m_forceVisible.push_back(false);
@@ -653,7 +653,7 @@ void DataCategorizationHandler::logWarnings(std::map<std::string, std::string>& 
 
 		const std::string logFileName = ot::FolderNames::DataCategorisationFolder + "/Table cells analysation log";
 		logText.setName(logFileName);
-		logText.StoreToDataBase();
+		logText.storeToDataBase();
 		_entityInfos.m_dataEntityIDs.push_back(logText.getTextDataStorageId());
 		_entityInfos.m_dataEntityVersions.push_back(logText.getTextDataStorageVersion());
 		_entityInfos.m_dataEntityParentIDs.push_back(logText.getEntityID());

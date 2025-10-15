@@ -26,11 +26,11 @@ EntityBlock::~EntityBlock()
 
 void EntityBlock::addVisualizationNodes(void)
 {
-	CreateNavigationTreeEntry();
-	CreateBlockItem();
+	createNavigationTreeEntry();
+	createBlockItem();
 }
 
-void EntityBlock::AddConnector(const ot::Connector& connector)
+void EntityBlock::addConnector(const ot::Connector& connector)
 {
 	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
 	{
@@ -43,7 +43,7 @@ void EntityBlock::AddConnector(const ot::Connector& connector)
 	}
 }
 
-void EntityBlock::RemoveConnector(const ot::Connector& connector)
+void EntityBlock::removeConnector(const ot::Connector& connector)
 {
 	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
 	{
@@ -56,7 +56,7 @@ void EntityBlock::RemoveConnector(const ot::Connector& connector)
 	}
 }
 
-std::string EntityBlock::CreateBlockHeadline()
+std::string EntityBlock::createBlockHeadline()
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
 	//const std::string blockTitel = m_blockTitle + ": " + nameWithoutRootDirectory;
@@ -113,9 +113,9 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 }
 
 
-void EntityBlock::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 	
 	storage.append(
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
@@ -152,7 +152,7 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 	}
 }
 
-void EntityBlock::CreateNavigationTreeEntry()
+void EntityBlock::createNavigationTreeEntry()
 {
 	if (m_navigationOldTreeIconName != "" && m_navigationOldTreeIconNameHidden != "")
 	{
@@ -173,7 +173,7 @@ void EntityBlock::CreateNavigationTreeEntry()
 	}
 }
 
-void EntityBlock::CreateBlockItem()
+void EntityBlock::createBlockItem()
 {
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
@@ -182,7 +182,7 @@ void EntityBlock::CreateBlockItem()
 	std::unique_ptr<EntityCoordinates2D> entCoordinate(dynamic_cast<EntityCoordinates2D*>(entBase));
 	assert(entCoordinate != nullptr);
 
-	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
+	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
 	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
 
@@ -209,7 +209,7 @@ void EntityBlock::CreateBlockItem()
 }
 
 
-void EntityBlock::AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
+void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder)
 {
 	for (auto connectorByName : m_connectorsByName)
 	{

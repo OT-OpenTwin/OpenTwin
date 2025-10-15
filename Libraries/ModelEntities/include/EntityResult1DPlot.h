@@ -14,7 +14,7 @@ public:
 	entityType getEntityType(void) const override { return entityType::TOPOLOGY; };
 	virtual bool considerForPropertyFilter(void) override { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) override { return false; };
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 	virtual void addVisualizationNodes(void) override;
 	virtual std::string getClassName(void) override { return "EntityResult1DPlot_New"; };
 	virtual bool updateFromProperties(void) override;
@@ -36,7 +36,7 @@ private:
 
 	void setQuerySelections();
 
-	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 };

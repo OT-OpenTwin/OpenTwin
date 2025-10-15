@@ -55,7 +55,7 @@ void EntityParameterizedDataCategorization::CreateProperties(DataCategorie categ
 	}
 }
 
-void EntityParameterizedDataCategorization::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityParameterizedDataCategorization::addStorageData(bsoncxx::builder::basic::document & storage)
 {
 	if (_selectedCategory == DataCategorie::UNKNOWN)
 	{
@@ -65,7 +65,7 @@ void EntityParameterizedDataCategorization::AddStorageData(bsoncxx::builder::bas
 	_dataCategorieStringMapping.find(_selectedCategory) == _dataCategorieStringMapping.end() ? returnVal = "" : returnVal = _dataCategorieStringMapping.at(_selectedCategory);
 	if (returnVal != "")
 	{
-		EntityContainer::AddStorageData(storage);
+		EntityContainer::addStorageData(storage);
 		storage.append(
 			bsoncxx::builder::basic::kvp("Category", returnVal)
 		);

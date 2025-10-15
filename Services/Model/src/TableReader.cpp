@@ -99,7 +99,7 @@ std::string TableReader::readFromFile(const std::string fileName, const std::str
 	// Finally write everything to the data base and add the item to the model
 
 
-	tableItem->StoreToDataBase();
+	tableItem->storeToDataBase();
 
 	//UIDList newEntitiesID{ tableItem->getEntityID(), dataItem->getEntityID() };
 	//UIDList newEntitiesVersion{ tableItem->getEntityStorageVersion(), dataItem->getEntityStorageVersion() };

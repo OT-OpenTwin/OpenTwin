@@ -24,13 +24,13 @@ public:
 
 	void setNumberOfNodes(size_t n);
 
-	virtual std::string getClassName(void) { return "EntityMeshTetNodes"; };
+	virtual std::string getClassName(void) override { return "EntityMeshTetNodes"; };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	std::vector<double> nodeCoordsX;

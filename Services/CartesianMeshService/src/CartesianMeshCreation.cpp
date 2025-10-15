@@ -270,13 +270,13 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		if (getDsMatrix() != nullptr)
 		{
 			// Store the matrices such that we can use their storage versions later on
-			getDsMatrix()->StoreToDataBase();
-			getDualDsMatrix()->StoreToDataBase();
-			getDaMatrix()->StoreToDataBase();
-			getDualDaMatrix()->StoreToDataBase();
-			getDepsMatrix()->StoreToDataBase();
-			getDmuMatrix()->StoreToDataBase();
-			getDsigmaMatrix()->StoreToDataBase();
+			getDsMatrix()->storeToDataBase();
+			getDualDsMatrix()->storeToDataBase();
+			getDaMatrix()->storeToDataBase();
+			getDualDaMatrix()->storeToDataBase();
+			getDepsMatrix()->storeToDataBase();
+			getDmuMatrix()->storeToDataBase();
+			getDsigmaMatrix()->storeToDataBase();
 
 			// Now set the mesh matrices as child of the meshData entity
 			meshData->setDsMatrix(getDsMatrix());
@@ -291,9 +291,9 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		// Set the new mesh data object as data entity for the cartesian mesh
 		getEntityMesh()->setMeshDataID(meshData->getEntityID());
 
-		getEntityMesh()->StoreToDataBase();
+		getEntityMesh()->storeToDataBase();
 
-		meshData->StoreToDataBase();
+		meshData->storeToDataBase();
 
 		// Now add the visualization for all matrices, if this debug option is turned on
 		if (visualizeMatrices && getDsMatrix() != nullptr)
@@ -309,7 +309,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		for (auto entity : entityList)
 		{
-			entity->StoreToDataBase();
+			entity->storeToDataBase();
 		}
 		DataBase::GetDataBase()->queueWriting(false);
 

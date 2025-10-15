@@ -5,7 +5,7 @@
 #include "PropertyHelper.h"
 #include "OTCore/ComparisionSymbols.h"
 
-static EntityFactoryRegistrar<EntityBlockDatabaseAccess> registrar("EntityBlockDatabaseAccess");
+static EntityFactoryRegistrar<EntityBlockDatabaseAccess> registrar(EntityBlockDatabaseAccess::className());
 
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
@@ -128,11 +128,11 @@ void EntityBlockDatabaseAccess::updateBlockConfig()
 
 }
 
-ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockDatabaseAccess::createBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
-	block.setTitle(this->CreateBlockHeadline());
+	block.setTitle(this->createBlockHeadline());
 
 	const ot::Color colourTitle(ot::Lime);
 	const ot::Color colourBackground(ot::White);
@@ -140,7 +140,7 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
 	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 
-	AddConnectors(block);
+	addConnectors(block);
 
 	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
@@ -177,9 +177,9 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 	return requiresUpdate;
 }
 
-void EntityBlockDatabaseAccess::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockDatabaseAccess::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

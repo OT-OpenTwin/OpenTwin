@@ -160,7 +160,7 @@ void Application::createMesh(void)
 
 	meshEntity->createProperties(materialsFolder, materialsFolderID);
 
-	meshEntity->StoreToDataBase();
+	meshEntity->storeToDataBase();
 
 	// Register the new mesh item in the model
 	std::list<ot::UID> topologyEntityIDList = { meshEntity->getEntityID() };

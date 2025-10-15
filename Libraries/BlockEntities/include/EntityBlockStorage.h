@@ -20,8 +20,10 @@ class __declspec(dllexport) EntityBlockStorage : public EntityBlock
 public:
 	EntityBlockStorage() : EntityBlockStorage(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
-	virtual std::string getClassName(void) override { return "EntityBlockStorage"; };
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
+
+	static std::string className() { return "EntityBlockStorage"; }
+	virtual std::string getClassName(void) override { return EntityBlockStorage::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 	void createProperties();
 	virtual bool updateFromProperties() override;

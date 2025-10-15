@@ -10,7 +10,7 @@
 #include <iostream>
 #include <memory>
 
-static EntityFactoryRegistrar<EntityFile> registrar("EntityFile");
+static EntityFactoryRegistrar<EntityFile> registrar(EntityFile::className());
 
 EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, const std::string& _owner) :
 	EntityBase(_ID, _parent, _obs, _ms, _owner), m_fileFilter(ot::FileExtension::toFilterString(ot::FileExtension::AllFiles))
@@ -66,11 +66,11 @@ void EntityFile::setFileProperties(const std::string& _path, const std::string& 
 
 std::shared_ptr<EntityBinaryData> EntityFile::getData()
 {
-	EnsureDataIsLoaded();
+	ensureDataIsLoaded();
 	return m_data;
 }
 
-void EntityFile::EnsureDataIsLoaded()
+void EntityFile::ensureDataIsLoaded()
 {
 	if (m_data == nullptr)
 	{
@@ -108,10 +108,10 @@ void EntityFile::setData(ot::UID _dataID, ot::UID _dataVersion)
 	setModified();
 }
 
-void EntityFile::AddStorageData(bsoncxx::builder::basic::document& _storage)
+void EntityFile::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(_storage);
+	EntityBase::addStorageData(_storage);
 
 	_storage.append(
 		bsoncxx::builder::basic::kvp("FilePath", m_path),

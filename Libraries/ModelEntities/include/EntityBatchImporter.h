@@ -10,7 +10,9 @@ public:
 	bool getEntityBox(double& _xmin, double& _xmax, double& _ymin, double& _ymax, double& _zmin, double& _zmax) override { return false; };
 	entityType getEntityType(void) const override { return entityType::TOPOLOGY; };
 	virtual void addVisualizationNodes(void) override;
-	virtual std::string getClassName(void) override { return "EntityBatchImporter"; };
+
+	static std::string className() { return "EntityBatchImporter"; };
+	virtual std::string getClassName(void) override { return EntityBatchImporter::className(); };
 
 	uint32_t getNumberOfRuns();
 	std::string getNameBase();

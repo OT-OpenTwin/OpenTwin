@@ -458,7 +458,7 @@ void Application::changeUnits(const std::string &content)
 	if (changed)
 	{
 		units->getProperties().setAllPropertiesReadOnly();
-		units->StoreToDataBase();
+		units->storeToDataBase();
 		getModelComponent()->addNewTopologyEntity(units->getEntityID(), units->getEntityStorageVersion(), false);
 	}
 
@@ -610,7 +610,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	{
 		material->updateFromProperties();
 		material->getProperties().setAllPropertiesReadOnly();
-		material->StoreToDataBase();
+		material->storeToDataBase();
 		getModelComponent()->addNewTopologyEntity(material->getEntityID(), material->getEntityStorageVersion(), false);
 	}
 
@@ -675,7 +675,7 @@ void Application::changeHistory(const std::string& content)
 		}
 
 		data->setData(content.data(), content.size());
-		data->StoreToDataBase();
+		data->storeToDataBase();
 
 		ot::EncodingGuesser guesser;
 
@@ -683,7 +683,7 @@ void Application::changeHistory(const std::string& content)
 		history->setTextEncoding(guesser(content.data(), content.size()));
 		history->getProperties().setAllPropertiesReadOnly();
 		history->setEditable(false);
-		history->StoreToDataBase();
+		history->storeToDataBase();
 
 		getModelComponent()->addNewDataEntity(data->getEntityID(), data->getEntityStorageVersion(), history->getEntityID());
 		getModelComponent()->addNewTopologyEntity(history->getEntityID(), history->getEntityStorageVersion(), false);
@@ -767,7 +767,7 @@ void Application::processParameterBuffer(std::stringstream& buffer, std::map<std
 		if (changed)
 		{
 			parameter->getProperties().setAllPropertiesReadOnly();
-			parameter->StoreToDataBase();
+			parameter->storeToDataBase();
 			getModelComponent()->addNewTopologyEntity(parameter->getEntityID(), parameter->getEntityStorageVersion(), false);
 		}
 
@@ -948,8 +948,8 @@ void Application::storeShape(const std::string& name, const std::string& triangl
 	createFacets(triangles, entityGeom->getFacets()->getNodeVector(), entityGeom->getFacets()->getTriangleList(), entityGeom->getFacets()->getEdgeList());
 
 	entityGeom->getProperties().setAllPropertiesReadOnly();
-	entityGeom->getFacets()->StoreToDataBase();
-	entityGeom->StoreToDataBase();
+	entityGeom->getFacets()->storeToDataBase();
+	entityGeom->storeToDataBase();
 
 	getModelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
 	getModelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());

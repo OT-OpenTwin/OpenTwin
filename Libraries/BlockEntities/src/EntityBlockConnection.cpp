@@ -5,7 +5,7 @@
 #include "OTGui/GraphicsPackage.h"
 #include "ConfigurationHelper.h"
 
-static EntityFactoryRegistrar<EntityBlockConnection> registrar("EntityBlockConnection");
+static EntityFactoryRegistrar<EntityBlockConnection> registrar(EntityBlockConnection::className());
 
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)),
@@ -141,15 +141,9 @@ void EntityBlockConnection::CreateNavigationTreeEntry()
 	}
 }
 
-//
-//void EntityBlockConnection::StoreToDataBase(void)
-//{
-//	EntityBase::StoreToDataBase();
-//}
-
-void EntityBlockConnection::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Store the ConnectionCfg
 

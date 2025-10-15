@@ -10,9 +10,10 @@ public:
 	EntitySolverPort(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolverPort();
 
-	virtual void addVisualizationNodes(void) override;
+	static std::string className() { return "EntitySolverPort"; }
+	virtual std::string getClassName(void) override { return EntitySolverPort::className(); }
 
-	virtual std::string getClassName(void) override { return "EntitySolverPort"; };
+	virtual void addVisualizationNodes(void) override;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

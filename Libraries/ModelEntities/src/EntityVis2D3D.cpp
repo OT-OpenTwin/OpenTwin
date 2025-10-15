@@ -31,10 +31,10 @@ EntityVis2D3D::~EntityVis2D3D()
 	//}
 }
 
-void EntityVis2D3D::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityVis2D3D::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("visualizationDataID", (long long) visualizationDataID),

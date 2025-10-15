@@ -22,15 +22,15 @@ bool EntityResultTextData::getEntityBox(double &xmin, double &xmax, double &ymin
 	return false;
 }
 
-void EntityResultTextData::StoreToDataBase(void)
+void EntityResultTextData::storeToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityResultTextData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityResultTextData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now add the actual text data
 

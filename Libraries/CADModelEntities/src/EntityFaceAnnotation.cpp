@@ -16,7 +16,7 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Shell.hxx"
 
-static EntityFactoryRegistrar<EntityFaceAnnotation> registrar("EntityFaceAnnotation");
+static EntityFactoryRegistrar<EntityFaceAnnotation> registrar(EntityFaceAnnotation::className());
 
 EntityFaceAnnotation::EntityFaceAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner),
@@ -120,7 +120,7 @@ bool EntityFaceAnnotation::getEntityBox(double &xmin, double &xmax, double &ymin
 	return true;
 }
 
-void EntityFaceAnnotation::EnsureFacetsAreLoaded(void)
+void EntityFaceAnnotation::ensureFacetsAreLoaded(void)
 {
 	if (facets != nullptr) return;
 
@@ -236,10 +236,10 @@ bool EntityFaceAnnotation::updateFromProperties(void)
 	return false; // No property grid update necessary
 }
 
-void EntityFaceAnnotation::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityFaceAnnotation::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 
@@ -249,7 +249,7 @@ void EntityFaceAnnotation::AddStorageData(bsoncxx::builder::basic::document &sto
 	);
 }
 
-void EntityFaceAnnotation::StoreToDataBase(void)
+void EntityFaceAnnotation::storeToDataBase(void)
 {
 	// If the pointers to brep or facets are 0, then the objects are stored in the data storage and the storage IDs are up to date
 
@@ -259,7 +259,7 @@ void EntityFaceAnnotation::StoreToDataBase(void)
 	}
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
 void EntityFaceAnnotation::storeFacets(void)
@@ -271,7 +271,7 @@ void EntityFaceAnnotation::storeFacets(void)
 	if (facets->getEntityID() == 0) facets->setEntityID(createEntityUID());
 
 	// Now we need to store the facets object
-	facets->StoreToDataBase();
+	facets->storeToDataBase();
 	facetsStorageID = facets->getEntityID();
 }
 

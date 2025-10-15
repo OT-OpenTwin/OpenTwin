@@ -12,7 +12,8 @@ public:
 	virtual ~EntityFileText() = default;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual std::string getClassName(void) override { return "EntityFileText"; };
+	static std::string className() { return "EntityFileText"; };
+	virtual std::string getClassName(void) override { return EntityFileText::className(); };
 
 	void setTextEncoding(ot::TextEncoding::EncodingStandard _encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();
@@ -34,7 +35,7 @@ protected:
 	//! @brief Must be called after updateFromProperties
 	bool requiresDataUpdate();
 	
-	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:

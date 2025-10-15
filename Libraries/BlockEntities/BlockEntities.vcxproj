@@ -185,6 +185,7 @@
     <ClInclude Include="include\EntityBlockPython.h" />
     <ClInclude Include="include\EntityBlockStorage.h" />
     <ClInclude Include="include\EntityBlockCircuitVoltageMeter.h" />
+    <ClInclude Include="include\EntityBlockHierarchicalProjectItem.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\PythonHeaderInterpreter.h" />
     <ClInclude Include="include\SharedResources.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="src\EntityBlockDatabaseAccess.cpp" />
     <ClCompile Include="src\EntityBlockDisplay.cpp" />
     <ClCompile Include="src\EntityBlockFileWriter.cpp" />
+    <ClCompile Include="src\EntityBlockHierarchicalProjectItem.cpp" />
     <ClCompile Include="src\EntityBlockPython.cpp" />
     <ClCompile Include="src\EntityBlockStorage.cpp" />
     <ClCompile Include="src\EntityBlockCircuitVoltageMeter.cpp" />

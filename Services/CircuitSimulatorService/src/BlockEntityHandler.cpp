@@ -43,14 +43,14 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 
 	
 	blockEntity->setEditable(true);
-	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
+	blockEntity->setServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	// Here i want to add the items to the corresponding editor	
 
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService));
 	blockCoordinates->setCoordinates(position);
-	blockCoordinates->StoreToDataBase();
+	blockCoordinates->storeToDataBase();
 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 	
@@ -80,7 +80,7 @@ std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::st
 
 
 
-	blockEntity->StoreToDataBase();
+	blockEntity->storeToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 
 	return blockEntity;
@@ -207,7 +207,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.setConnectionCfg(newConnection);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setGraphicsScenePackageChildName(m_connectionsFolder);
-		connectionEntity.SetServiceInformation(Application::instance()->getBasicServiceInformation());
+		connectionEntity.setServiceInformation(Application::instance()->getBasicServiceInformation());
 		connectionEntity.setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 
 		
@@ -231,7 +231,7 @@ void BlockEntityHandler::addBlockConnection(const std::list<ot::GraphicsConnecti
 	}
 
 	for (auto& entityForUpdate : entitiesForUpdate) {
-		entityForUpdate.StoreToDataBase();
+		entityForUpdate.storeToDataBase();
 		topologyEntityIDList.push_back(entityForUpdate.getEntityID());
 		topologyEntityVersionList.push_back(entityForUpdate.getEntityStorageVersion());
 	}
@@ -343,19 +343,19 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker() {
 	EntityBlockCircuitGND gndElement;
 	EntityBlockCircuitTransmissionLine transmissionLine;
 	
-	a1.addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
-	a1.addItem(capacitor.getClassName(), capacitor.CreateBlockHeadline(), "CircuitElementImages/Capacitor.png");
-	a1.addItem(inductor.getClassName(), inductor.CreateBlockHeadline(), "CircuitElementImages/Inductor.png");
-	a1.addItem(gndElement.getClassName(), gndElement.CreateBlockHeadline(), "CircuitElementImages/GND.png");
-	a1.addItem(transmissionLine.getClassName(), transmissionLine.CreateBlockHeadline(), "CircuitElementImages/TranLine.png");
+	a1.addItem(resistor.getClassName(), resistor.createBlockHeadline(), "CircuitElementImages/ResistorBG.png");
+	a1.addItem(capacitor.getClassName(), capacitor.createBlockHeadline(), "CircuitElementImages/Capacitor.png");
+	a1.addItem(inductor.getClassName(), inductor.createBlockHeadline(), "CircuitElementImages/Inductor.png");
+	a1.addItem(gndElement.getClassName(), gndElement.createBlockHeadline(), "CircuitElementImages/GND.png");
+	a1.addItem(transmissionLine.getClassName(), transmissionLine.createBlockHeadline(), "CircuitElementImages/TranLine.png");
 
-	a2.addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
-	a2.addItem(currentMeter.getClassName(), currentMeter.CreateBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
+	a2.addItem(voltMeter.getClassName(), voltMeter.createBlockHeadline(), "CircuitElementImages/VoltMeter.png");
+	a2.addItem(currentMeter.getClassName(), currentMeter.createBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
 
-	a3.addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
+	a3.addItem(element.getClassName(), element.createBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	
 
-	a4.addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
+	a4.addItem(diode.getClassName(), diode.createBlockHeadline(), "CircuitElementImages/Diod2.png");
 
 	a.addChildCollection(std::move(a1));
 	a.addChildCollection(std::move(a2));

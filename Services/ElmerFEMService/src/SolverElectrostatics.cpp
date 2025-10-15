@@ -566,7 +566,7 @@ void SolverElectrostatics::convertGlobalPotential(const std::string& tempDirPath
     visualizationEntity->setSource(scalarDataID, scalarDataVersion);
     visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
 
-    visualizationEntity->StoreToDataBase();
+    visualizationEntity->storeToDataBase();
 
     app->getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 
@@ -699,7 +699,7 @@ void SolverElectrostatics::convertSurfacePotentials(const std::string& tempDirPa
             visualizationEntity->setSource(scalarDataID, scalarDataVersion);
             visualizationEntity->setMesh(visualizationMeshID, visualizationMeshVersion);
 
-            visualizationEntity->StoreToDataBase();
+            visualizationEntity->storeToDataBase();
 
             app->getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 
@@ -880,7 +880,7 @@ void SolverElectrostatics::convertEfield(const std::string& tempDirPath, Applica
     visualizationEntity->setSource(vectorDataID, vectorDataVersion);
     visualizationEntity->setMesh(globalVisualizationMeshID, globalVisualizationMeshVersion);
 
-    visualizationEntity->StoreToDataBase();
+    visualizationEntity->storeToDataBase();
 
     app->getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
 
@@ -983,9 +983,9 @@ void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<st
     ycoord->setData((char*)yc, sizeof(double) * nodeList.size());
     zcoord->setData((char*)zc, sizeof(double) * nodeList.size());
 
-    xcoord->StoreToDataBase();
-    ycoord->StoreToDataBase();
-    zcoord->StoreToDataBase();
+    xcoord->storeToDataBase();
+    ycoord->storeToDataBase();
+    zcoord->storeToDataBase();
 
     delete[] xc; xc = nullptr;
     delete[] yc; yc = nullptr;
@@ -1009,7 +1009,7 @@ void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<st
     }
 
     cells->setData((char*)c, sizeof(int) * cellListSize);
-    cells->StoreToDataBase();
+    cells->storeToDataBase();
 
     delete[] c; c = nullptr;
 
@@ -1026,7 +1026,7 @@ void SolverElectrostatics::storeMesh(int numberNodes, int cellType, std::list<st
 
     visualizationMesh->setMeshData(nodeList.size(), cellList.size(), cellListSize, xcoord, ycoord, zcoord, cells);
 
-    visualizationMesh->StoreToDataBase();
+    visualizationMesh->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(xcEntityID, xcEntityVersion, visualizationMesh->getEntityID());
     app->getModelComponent()->addNewDataEntity(ycEntityID, ycEntityVersion, visualizationMesh->getEntityID());
@@ -1062,7 +1062,7 @@ void SolverElectrostatics::storeMeshScalarData(size_t numberPoints, size_t numbe
     }
 
     pointScalar->setData((char*)p, sizeof(float) * potentialList.size());
-    pointScalar->StoreToDataBase();
+    pointScalar->storeToDataBase();
 
     delete[] p; p = nullptr;
 
@@ -1072,7 +1072,7 @@ void SolverElectrostatics::storeMeshScalarData(size_t numberPoints, size_t numbe
     EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
-    visualizationMeshData->StoreToDataBase();
+    visualizationMeshData->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(pointScalarID, pointScalarVersion, visualizationMeshData->getEntityID());
     app->getModelComponent()->addNewDataEntity(visualizationMeshData->getEntityID(), visualizationMeshData->getEntityStorageVersion(), solverEntity->getEntityID());
@@ -1104,7 +1104,7 @@ void SolverElectrostatics::storeMeshVectorData(size_t numberPoints, size_t numbe
     }
 
     cellScalar->setData((char*)m, sizeof(float) * magnitudeList.size());
-    cellScalar->StoreToDataBase();
+    cellScalar->storeToDataBase();
 
     delete[] m; m = nullptr;
 
@@ -1129,7 +1129,7 @@ void SolverElectrostatics::storeMeshVectorData(size_t numberPoints, size_t numbe
     }
 
     cellVector->setData((char*)v, sizeof(float) * 3 * vectorList.size());
-    cellVector->StoreToDataBase();
+    cellVector->storeToDataBase();
 
     delete[] v; v = nullptr;
 
@@ -1141,7 +1141,7 @@ void SolverElectrostatics::storeMeshVectorData(size_t numberPoints, size_t numbe
     EntityResultUnstructuredMeshData* visualizationMeshData = new EntityResultUnstructuredMeshData(app->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_VisualizationService);;
 
     visualizationMeshData->setData(numberPoints, numberCells, pointScalar, pointVector, cellScalar, cellVector);
-    visualizationMeshData->StoreToDataBase();
+    visualizationMeshData->storeToDataBase();
 
     app->getModelComponent()->addNewDataEntity(cellScalarID, cellScalarVersion, visualizationMeshData->getEntityID());
     app->getModelComponent()->addNewDataEntity(cellVectorID, cellVectorVersion, visualizationMeshData->getEntityID());

@@ -6,7 +6,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityCartesianVector> registrar("EntityCartesianVector");
+static EntityFactoryRegistrar<EntityCartesianVector> registrar(EntityCartesianVector::className());
 
 EntityCartesianVector::EntityCartesianVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityCompressedVector(ID, parent, obs, ms, owner)
@@ -22,15 +22,15 @@ bool EntityCartesianVector::getEntityBox(double &xmin, double &xmax, double &ymi
 	return false;
 }
 
-void EntityCartesianVector::StoreToDataBase(void)
+void EntityCartesianVector::storeToDataBase(void)
 {
-	EntityCompressedVector::StoreToDataBase();
+	EntityCompressedVector::storeToDataBase();
 }
 
-void EntityCartesianVector::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityCartesianVector::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityCompressedVector::AddStorageData(storage);
+	EntityCompressedVector::addStorageData(storage);
 
 	// Now add the actual cartesian vector data
 

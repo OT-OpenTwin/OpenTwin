@@ -255,7 +255,7 @@ void ViewVisualisationHandler::setupGraphicsScene(EntityBase* _container)
 			EntityBlock* childBlock = dynamic_cast<EntityBlock*>(child);
 			if (childBlock != nullptr)
 			{
-				childBlock->CreateBlockItem();
+				childBlock->createBlockItem();
 			}
 			else
 			{

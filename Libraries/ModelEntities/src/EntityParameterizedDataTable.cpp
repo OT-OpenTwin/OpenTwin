@@ -63,9 +63,9 @@ ot::TableCfg::TableHeaderMode EntityParameterizedDataTable::getSelectedHeaderMod
 	return mode;
 }
 
-void EntityParameterizedDataTable::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityParameterizedDataTable::addStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityResultTable::AddStorageData(storage);
+	EntityResultTable::addStorageData(storage);
 
 	auto dataArray = bsoncxx::builder::basic::array();
 

@@ -2,7 +2,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 
-static EntityFactoryRegistrar<EntityGraphicsScene> registrar("EntityGraphicsScene");
+static EntityFactoryRegistrar<EntityGraphicsScene> registrar(EntityGraphicsScene::className());
 
 EntityGraphicsScene::EntityGraphicsScene(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityContainer(ID,parent,obs,ms,owner)

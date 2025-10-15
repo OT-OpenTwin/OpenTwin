@@ -9,7 +9,7 @@
 #include <OTCommunication/ActionTypes.h>
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityAnnotation> registrar("EntityAnnotation");
+static EntityFactoryRegistrar<EntityAnnotation> registrar(EntityAnnotation::className());
 
 EntityAnnotation::EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner),
@@ -35,7 +35,7 @@ bool EntityAnnotation::getEntityBox(double &xmin, double &xmax, double &ymin, do
 
 void EntityAnnotation::addPoint(double x, double y, double z, double r, double g, double b)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	annotationData->addPoint(x, y, z, r, g, b);
@@ -44,7 +44,7 @@ void EntityAnnotation::addPoint(double x, double y, double z, double r, double g
 
 void EntityAnnotation::addTriangle(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3, double r, double g, double b)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	annotationData->addTriangle(x1, y1, z1, x2, y2, z2, x3, y3, z3, r, g, b);
@@ -53,7 +53,7 @@ void EntityAnnotation::addTriangle(double x1, double y1, double z1, double x2, d
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getPoints(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getPoints();
@@ -61,7 +61,7 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getPoints(void)
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getPointsRGB(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getPointsRGB();
@@ -69,7 +69,7 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getPointsRGB(void)
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP1(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getTriangleP1();
@@ -77,7 +77,7 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP1(void)
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP2(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getTriangleP2();
@@ -85,7 +85,7 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP2(void)
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP3(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getTriangleP3();
@@ -93,7 +93,7 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleP3(void)
 
 const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleRGB(void)
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getTriangleRGB();
@@ -101,13 +101,13 @@ const std::vector<std::array<double, 3>> &EntityAnnotation::getTriangleRGB(void)
 
 const double* EntityAnnotation::getEdgeColorRGB()
 {
-	EnsureAnnotationDataIsLoaded();
+	ensureAnnotationDataIsLoaded();
 	assert(annotationData != nullptr);
 
 	return annotationData->getEdgeColorRGB();
 }
 
-void EntityAnnotation::EnsureAnnotationDataIsLoaded(void)
+void EntityAnnotation::ensureAnnotationDataIsLoaded(void)
 {
 	if (annotationData == nullptr)
 	{
@@ -127,7 +127,7 @@ void EntityAnnotation::storeAnnotationData(void)
 {
 	assert(annotationData != nullptr);
 
-	annotationData->StoreToDataBase();
+	annotationData->storeToDataBase();
 	annotationDataStorageId = annotationData->getEntityID();
 }
 
@@ -141,7 +141,7 @@ void EntityAnnotation::releaseAnnotationData(void)
 	annotationData = nullptr;
 }
 
-void EntityAnnotation::StoreToDataBase(void)
+void EntityAnnotation::storeToDataBase(void)
 {
 	// If the pointers to brep or facets are 0, then the objects are stored in the data storage and the storage IDs are up to date
 
@@ -151,13 +151,13 @@ void EntityAnnotation::StoreToDataBase(void)
 	}
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityAnnotation::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityAnnotation::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 
@@ -196,7 +196,7 @@ void EntityAnnotation::addVisualizationItem(bool isHidden)
 {
 	if (annotationDataStorageId == -1)
 	{
-		StoreToDataBase();
+		storeToDataBase();
 		assert(annotationDataStorageId != -1);
 	}
 

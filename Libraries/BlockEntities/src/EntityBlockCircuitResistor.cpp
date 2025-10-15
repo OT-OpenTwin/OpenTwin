@@ -11,7 +11,7 @@
 #include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitResistor> registrar("EntityBlockCircuitResistor");
+static EntityFactoryRegistrar<EntityBlockCircuitResistor> registrar(EntityBlockCircuitResistor::className());
 
 EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner) {
@@ -64,7 +64,7 @@ std::string EntityBlockCircuitResistor::getFolderName() {
 	return "Resistor";
 }
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg() {
+ot::GraphicsItemCfg* EntityBlockCircuitResistor::createBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitResistor");
@@ -198,9 +198,9 @@ bool EntityBlockCircuitResistor::updateFromProperties(void)
 	return refresh;
 }
 
-void EntityBlockCircuitResistor::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitResistor::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitResistor::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

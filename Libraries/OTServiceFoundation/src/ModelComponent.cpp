@@ -54,7 +54,7 @@ EntityResultText *ot::components::ModelComponent::addResultTextEntity(const std:
 	textItem->releaseTextData();
 
 	// Store the entity in the data base as well.
-	textItem->StoreToDataBase();
+	textItem->storeToDataBase();
 
 	// Return the entity ID of the newly created entity
 	return textItem;
@@ -73,7 +73,7 @@ void ot::components::ModelComponent::facetAndStoreGeometryEntity(EntityGeometry 
 	entityGeom->getFacets()->setEntityID(facetsID);
 	entityGeom->facetEntity(false);
 
-	entityGeom->StoreToDataBase();
+	entityGeom->storeToDataBase();
 
 	addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), forceVisible);
 	addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());

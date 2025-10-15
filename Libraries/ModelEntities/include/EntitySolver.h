@@ -13,9 +13,10 @@ public:
 	EntitySolver(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner);
 	virtual ~EntitySolver();
 
-	virtual void addVisualizationNodes(void) override;
+	static std::string className() { return "EntitySolver"; }
+	virtual std::string getClassName(void) override { return EntitySolver::className(); }
 
-	virtual std::string getClassName(void) override { return "EntitySolver"; } ;
+	virtual void addVisualizationNodes(void) override;
 
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 

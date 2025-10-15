@@ -14,7 +14,9 @@ class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 public:
 	EntityBlockDatabaseAccess() : EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr, "") {};
 	EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner);
-	virtual std::string getClassName(void) override { return "EntityBlockDatabaseAccess"; };
+
+	static std::string className() { return "EntityBlockDatabaseAccess"; }
+	virtual std::string getClassName(void) override { return EntityBlockDatabaseAccess::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	void createProperties();
@@ -39,13 +41,13 @@ public:
 
 	virtual bool updateFromProperties() override;
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 	bool getReproducableOrder() ;
 
 	static const std::string getIconName() {return "Database_access.svg";}
 protected:
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:

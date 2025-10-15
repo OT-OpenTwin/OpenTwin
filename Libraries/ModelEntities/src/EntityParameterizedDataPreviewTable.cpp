@@ -7,10 +7,10 @@ EntityParameterizedDataPreviewTable::EntityParameterizedDataPreviewTable(ot::UID
 {
 }
 
-void EntityParameterizedDataPreviewTable::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityParameterizedDataPreviewTable::addStorageData(bsoncxx::builder::basic::document & storage)
 {
 	// We store the parent class information first 
-	EntityResultTable::AddStorageData(storage);
+	EntityResultTable::addStorageData(storage);
 
 	auto selectionRangesIDs = bsoncxx::builder::basic::array();
 	auto selectionRangesVersions = bsoncxx::builder::basic::array();

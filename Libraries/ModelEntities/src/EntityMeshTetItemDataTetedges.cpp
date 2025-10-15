@@ -26,10 +26,10 @@ bool EntityMeshTetItemDataTetedges::getEntityBox(double &xmin, double &xmax, dou
 	return false;
 }
 
-void EntityMeshTetItemDataTetedges::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetItemDataTetedges::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Add the specific data of the mesh item (tets)
 

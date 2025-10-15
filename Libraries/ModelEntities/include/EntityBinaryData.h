@@ -16,7 +16,8 @@ public:
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
-	virtual std::string getClassName(void) { return "EntityBinaryData"; };
+	static std::string className() { return "EntityBinaryData"; };
+	virtual std::string getClassName(void) override { return EntityBinaryData::className(); };
 
 	virtual entityType getEntityType(void) const override { return DATA; };
 	virtual void removeChild(EntityBase *child) override;
@@ -28,8 +29,8 @@ public:
 	const std::vector<char>& getData(void) const;
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	
 	std::vector<char> data;

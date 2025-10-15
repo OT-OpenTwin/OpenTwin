@@ -5,7 +5,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityFacetData> registrar("EntityFacetData");
+static EntityFactoryRegistrar<EntityFacetData> registrar(EntityFacetData::className());
 
 EntityFacetData::EntityFacetData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
@@ -18,10 +18,10 @@ EntityFacetData::~EntityFacetData()
 
 }
 
-void EntityFacetData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityFacetData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Store the facet information
 	storage.append(

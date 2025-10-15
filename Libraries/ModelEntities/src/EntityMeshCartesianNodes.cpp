@@ -32,10 +32,10 @@ void EntityMeshCartesianNodes::setNumberOfNodes(size_t n)
 	setModified();
 }
 
-void EntityMeshCartesianNodes::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesianNodes::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now check whether the geometry is modified and we need to create a new entry
 

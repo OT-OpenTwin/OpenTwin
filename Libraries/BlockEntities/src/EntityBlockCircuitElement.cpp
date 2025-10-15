@@ -19,7 +19,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	auto flipProperty = getProperties().getProperty("Flip");
 
 	if (rotationProperty->needsUpdate() || flipProperty->needsUpdate()) {
-		CreateBlockItem();
+		createBlockItem();
 	}
 
 	// Check if LoadFromLibrary was selected
@@ -47,9 +47,9 @@ std::string EntityBlockCircuitElement::getCircuitModel() {
 	return value;
 }
 
-void EntityBlockCircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitElement::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitElement::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

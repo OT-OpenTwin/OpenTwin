@@ -201,7 +201,7 @@ void EntityMeshTetItem::storeMeshData(void)
 		{
 			meshDataTets->setEntityID(createEntityUID());
 		}
-		meshDataTets->StoreToDataBase();
+		meshDataTets->storeToDataBase();
 		meshDataTetsStorageId = meshDataTets->getEntityID();
 	}
 
@@ -211,7 +211,7 @@ void EntityMeshTetItem::storeMeshData(void)
 		{
 			meshDataTetEdges->setEntityID(createEntityUID());
 		}
-		meshDataTetEdges->StoreToDataBase();
+		meshDataTetEdges->storeToDataBase();
 		meshDataTetEdgesStorageId = meshDataTetEdges->getEntityID();
 	}
 }
@@ -233,19 +233,19 @@ void EntityMeshTetItem::releaseMeshData(void)
 	}
 }
 
-void EntityMeshTetItem::StoreToDataBase(void)
+void EntityMeshTetItem::storeToDataBase(void)
 {
 	// If the pointers to brep or facets are 0, then the objects are stored in the data storage and the storage IDs are up to date
 	storeMeshData();
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityMeshTetItem::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetItem::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	long long meshDataTetsStorageVersion     = 0;
 	long long meshDataTetEdgesStorageVersion = 0;

@@ -9,7 +9,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 #include "OTGui/GraphicsItemFileCfg.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitCapacitor> registrar("EntityBlockCircuitCapacitor");
+static EntityFactoryRegistrar<EntityBlockCircuitCapacitor> registrar(EntityBlockCircuitCapacitor::className());
 
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, owner)
@@ -80,7 +80,7 @@ std::string EntityBlockCircuitCapacitor::getFolderName() {
 }
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::createBlockCfg()
 {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
@@ -163,9 +163,9 @@ ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::CreateBlockCfg()
 	return myStack;
 }
 
-void EntityBlockCircuitCapacitor::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitCapacitor::addStorageData(bsoncxx::builder::basic::document& storage)
 {
-	EntityBlock::AddStorageData(storage);
+	EntityBlock::addStorageData(storage);
 }
 
 void EntityBlockCircuitCapacitor::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)

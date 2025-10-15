@@ -6,7 +6,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityCompressedVector> registrar("EntityCompressedVector");
+static EntityFactoryRegistrar<EntityCompressedVector> registrar(EntityCompressedVector::className());
 
 EntityCompressedVector::EntityCompressedVector(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner),
@@ -29,15 +29,15 @@ bool EntityCompressedVector::getEntityBox(double &xmin, double &xmax, double &ym
 	return false;
 }
 
-void EntityCompressedVector::StoreToDataBase(void)
+void EntityCompressedVector::storeToDataBase(void)
 {
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityCompressedVector::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityCompressedVector::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now add the actual compressed vector data
 

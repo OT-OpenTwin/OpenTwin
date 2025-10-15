@@ -766,7 +766,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		dataSize = size;
 
 		dataEntity->setData(memBlock, size);
-		dataEntity->StoreToDataBase(dataVersion);
+		dataEntity->storeToDataBase(dataVersion);
 
 		delete dataEntity;
 		dataEntity = nullptr;
@@ -785,7 +785,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		fileEntity->setData(dataEntityID, dataVersion);
 		fileEntity->setEditable(false);
 
-		fileEntity->StoreToDataBase(fileVersion);
+		fileEntity->storeToDataBase(fileVersion);
 
 		delete fileEntity;
 		fileEntity = nullptr;

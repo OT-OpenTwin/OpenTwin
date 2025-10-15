@@ -165,7 +165,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 
 	// Now we facet the entity and store it to the data base afterward.
 	geometryEntity->facetEntity(false);
-	geometryEntity->StoreToDataBase();
+	geometryEntity->storeToDataBase();
 
 	ot::UID entityVersion = geometryEntity->getEntityStorageVersion();
 	ot::UID brepVersion   = geometryEntity->getBrepEntity()->getEntityStorageVersion();

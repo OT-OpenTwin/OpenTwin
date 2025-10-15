@@ -62,7 +62,7 @@ void EntityBuffer::saveChangedEntities()
 		auto entity = bufferedEntity.second;
 		if (entity->getModified())
 		{
-			entity->StoreToDataBase();
+			entity->storeToDataBase();
 			topoEntID.push_back(entity->getEntityID());
 			topoEntVersion.push_back(entity->getEntityStorageVersion());
 			forceVis.push_back(false);
@@ -82,7 +82,7 @@ bool EntityBuffer::saveChangedEntities(const std::string& _absoluteEntityName)
 	if (m_bufferedEntities.find(_absoluteEntityName) != m_bufferedEntities.end())
 	{
 		std::shared_ptr<EntityBase> entity = m_bufferedEntities[_absoluteEntityName];
-		entity->StoreToDataBase();
+		entity->storeToDataBase();
 		ot::UIDList topoEntID, topoEntVersion, dataEnt;
 		std::list<bool> forceVis;
 		topoEntID.push_back(entity->getEntityID());

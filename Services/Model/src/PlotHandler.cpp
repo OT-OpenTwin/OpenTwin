@@ -66,7 +66,7 @@ void PlotHandler::handleCreatePlot()
 	plotCfg.setTitle(shortName);
 	newPlot.createProperties();
 	newPlot.setPlot(plotCfg);
-	newPlot.StoreToDataBase();
+	newPlot.storeToDataBase();
 	newModelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
 	newModelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
 	newModelStateInformation.m_forceVisible.push_back(false);
@@ -226,7 +226,7 @@ void PlotHandler::createCurves(std::list<EntityMetadataSeries*>& _seriesMetadata
 		newCurve.setName(_nameBase + "/" + shortName);
 		newCurve.createProperties();
 		newCurve.setCurve(curveConfig);
-		newCurve.StoreToDataBase();
+		newCurve.storeToDataBase();
 
 		_modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
 		_modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());

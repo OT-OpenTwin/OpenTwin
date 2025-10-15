@@ -40,7 +40,7 @@ bool EntityResult3DData::getEntityBox(double & xmin, double & xmax, double & ymi
 	return false;
 }
 
-void EntityResult3DData::StoreToDataBase(void)
+void EntityResult3DData::storeToDataBase(void)
 {
 	if (  _xComponentDataID == -1 || _yComponentDataID == -1 || _zComponentDataID == -1 
 		|| _xComponentDataVersion == -1 || _yComponentDataVersion == -1 || _zComponentDataVersion == -1
@@ -49,7 +49,7 @@ void EntityResult3DData::StoreToDataBase(void)
 		throw std::invalid_argument("Not all component UIDs are set.");
 	};
 	
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
 /**
@@ -90,9 +90,9 @@ void EntityResult3DData::SetVectorData(EntityCompressedVector * xComponent, Enti
 {
 	DeleteAllCompressedVectors();
 
-	_xComponentData->StoreToDataBase();
-	_yComponentData->StoreToDataBase();
-	_zComponentData->StoreToDataBase();
+	_xComponentData->storeToDataBase();
+	_yComponentData->storeToDataBase();
+	_zComponentData->storeToDataBase();
 
 	_xComponentData = xComponent;
 	_xComponentDataID = xComponent->getEntityID();
@@ -259,9 +259,9 @@ void EntityResult3DData::clearZComponentData(void)
 
 
 
-void EntityResult3DData::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityResult3DData::addStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("_xComponentDataID",      _xComponentDataID),

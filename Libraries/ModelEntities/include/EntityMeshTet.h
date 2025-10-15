@@ -38,7 +38,7 @@ public:
 
 	EntityMeshTetData *getMeshData(void);
 
-	virtual void StoreToDataBase(void) override;
+	virtual void storeToDataBase(void) override;
 
 	virtual std::string getClassName(void) override { return "EntityMeshTet"; };
 	virtual void addVisualizationNodes(void) override;
@@ -61,7 +61,7 @@ public:
 private:
 	void EnsureMeshDataLoaded(void);
 	virtual int getSchemaVersion(void) override { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void recursivelySetMesh(const std::list<EntityBase *> &childList);
 

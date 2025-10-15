@@ -22,7 +22,7 @@
 #define OT_TEST_ENTITYFILECSV_Interval(___testText)
 #endif
 
-static EntityFactoryRegistrar<EntityFileCSV> registrar("EntityFileCSV");
+static EntityFactoryRegistrar<EntityFileCSV> registrar(EntityFileCSV::className());
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, const std::string & owner)
 : EntityFileText(ID, parent, obs, ms, owner) {}
@@ -169,9 +169,9 @@ void EntityFileCSV::setSpecializedProperties() {
 		"default", getProperties());
 }
 
-void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityFileCSV::addStorageData(bsoncxx::builder::basic::document & storage)
 {
-	EntityFile::AddStorageData(storage);
+	EntityFile::addStorageData(storage);
 }
 
 void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)

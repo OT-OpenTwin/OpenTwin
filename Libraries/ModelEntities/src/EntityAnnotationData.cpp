@@ -6,7 +6,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityAnnotationData> registrar("EntityAnnotationData");
+static EntityFactoryRegistrar<EntityAnnotationData> registrar(EntityAnnotationData::className());
 
 EntityAnnotationData::EntityAnnotationData(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner),
@@ -51,10 +51,10 @@ void EntityAnnotationData::addTriangle(double x1, double y1, double z1, double x
 	setModified();
 }
 
-void EntityAnnotationData::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityAnnotationData::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object (points and triangles)
 

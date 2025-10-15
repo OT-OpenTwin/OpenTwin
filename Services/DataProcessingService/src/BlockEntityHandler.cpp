@@ -25,7 +25,7 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 
 	std::string entName = CreateNewUniqueTopologyName(editorName + "/" + m_blockFolder, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
-	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
+	blockEntity->setServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_DataProcessingService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	blockEntity->setGraphicsScenePackageChildName(m_blockFolder);
@@ -33,13 +33,13 @@ void BlockEntityHandler::createBlockEntity(const std::string& editorName, const 
 
 	std::unique_ptr<EntityCoordinates2D> blockCoordinates(new EntityCoordinates2D(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_DataProcessingService));
 	blockCoordinates->setCoordinates(position);
-	blockCoordinates->StoreToDataBase();
+	blockCoordinates->storeToDataBase();
 
 	blockEntity->setCoordinateEntityID(blockCoordinates->getEntityID());
 	
 	initSpecialisedBlockEntity(blockEntity);
 
-	blockEntity->StoreToDataBase();
+	blockEntity->storeToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
@@ -175,19 +175,19 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsPickerCollectionCfg customizedBlockCollection("Customized Blocks", "Customized Blocks");
 	
 	EntityBlockPython pythonBlock;
-	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
+	customizedBlockCollection.addItem(pythonBlock.getClassName(), pythonBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
 
 	EntityBlockDatabaseAccess dbAccessBlock;
-	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
+	controlBlockDatabaseCollection.addItem(dbAccessBlock.getClassName(), dbAccessBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
 
 	EntityBlockDisplay displayBlock;
-	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
+	controlBlockVisualizationCollection.addItem(displayBlock.getClassName(), displayBlock.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
 
 	EntityBlockStorage storage;
-	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
+	controlBlockDatabaseCollection.addItem(storage.getClassName(), storage.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
 
 	EntityBlockFileWriter fileWriter;
-	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
+	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.createBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
 
 	controlBlockCollection.addChildCollection(std::move(controlBlockDatabaseCollection));
 	controlBlockCollection.addChildCollection(std::move(controlBlockVisualizationCollection));

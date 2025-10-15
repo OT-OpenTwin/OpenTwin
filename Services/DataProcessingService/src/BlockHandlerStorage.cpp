@@ -276,7 +276,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				newCurve.setName(plotName + "/"+ shortNameSeries.value());
 				newCurve.createProperties();
 				newCurve.setCurve(curveConfig);
-				newCurve.StoreToDataBase();
+				newCurve.storeToDataBase();
 
 				modelStateInformation.m_topologyEntityIDs.push_back(newCurve.getEntityID());
 				modelStateInformation.m_topologyEntityVersions.push_back(newCurve.getEntityStorageVersion());
@@ -294,7 +294,7 @@ bool BlockHandlerStorage::executeSpecialized()
 			plotCfg.setTitle(shortName);
 			newPlot.createProperties();
 			newPlot.setPlot(plotCfg);
-			newPlot.StoreToDataBase();
+			newPlot.storeToDataBase();
 			modelStateInformation.m_topologyEntityIDs.push_back(newPlot.getEntityID());
 			modelStateInformation.m_topologyEntityVersions.push_back(newPlot.getEntityStorageVersion());
 			modelStateInformation.m_forceVisible.push_back(false);

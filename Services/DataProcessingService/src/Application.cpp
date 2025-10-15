@@ -100,7 +100,7 @@ void Application::createPipeline()
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
 	newDataprocessing.setName(entityName);
 	newDataprocessing.setEditable(true);
-	newDataprocessing.StoreToDataBase();
+	newDataprocessing.storeToDataBase();
 
 	ot::NewModelStateInformation infos;
 	infos.m_topologyEntityIDs.push_back(newDataprocessing.getEntityID());
@@ -126,7 +126,7 @@ void Application::createSolver()
 	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
 	newSolver.setName(entityName);
 
-	newSolver.StoreToDataBase();
+	newSolver.storeToDataBase();
 	ot::NewModelStateInformation entityInfos;
 	entityInfos.m_topologyEntityIDs.push_back(newSolver.getEntityID());
 	entityInfos.m_topologyEntityVersions.push_back(newSolver.getEntityStorageVersion());

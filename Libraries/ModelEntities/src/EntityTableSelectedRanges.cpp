@@ -317,7 +317,7 @@ bool EntityTableSelectedRanges::UpdateVisibility()
 	}
 }
 
-void EntityTableSelectedRanges::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityTableSelectedRanges::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	storage.append(
 		bsoncxx::builder::basic::kvp("TableID", static_cast<int64_t>(_tableID))

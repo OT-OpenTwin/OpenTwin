@@ -23,8 +23,8 @@ public:
 	void		 setBrep(TopoDS_Shape &shape) { brep = shape; setModified(); }
 	TopoDS_Shape &getBrep(void) { return brep; };
 
-	virtual std::string getClassName(void) { return "EntityBrep"; };
-
+	static std::string className() { return "EntityBrep"; };
+	virtual std::string getClassName(void) { return EntityBrep::className(); };
 	virtual entityType getEntityType(void) const override { return DATA; };
 
 	gp_Trsf getTransform(void);
@@ -38,8 +38,8 @@ public:
 	std::map< const opencascade::handle<TopoDS_TShape>, std::string> getFaceNameMap();
 
 private:
-	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual int getSchemaVersion(void) override { return 1; };
+	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 	TopoDS_Shape brep;

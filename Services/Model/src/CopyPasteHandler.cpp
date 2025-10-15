@@ -45,7 +45,7 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 			entityNames[newName] = true;
 			newEntity->setName(newName);
 		
-			newEntity->StoreToDataBase();
+			newEntity->storeToDataBase();
 
 			if (newEntity->getEntityType() == EntityBase::entityType::TOPOLOGY)
 			{

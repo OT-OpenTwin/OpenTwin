@@ -2,7 +2,7 @@
 #include "SharedResources.h"	 
 #include "PropertyHelper.h"
 
-static EntityFactoryRegistrar<EntityBlockStorage> registrar("EntityBlockStorage");
+static EntityFactoryRegistrar<EntityBlockStorage> registrar(EntityBlockStorage::className());
 
 EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, owner)
@@ -12,11 +12,11 @@ EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObs
 	m_blockTitle = "Store in Database";
 }
 
-ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockStorage::createBlockCfg()
 {
 	ot::GraphicsFlowItemBuilder block;
 	block.setName(this->getClassName());
-	block.setTitle(this->CreateBlockHeadline());
+	block.setTitle(this->createBlockHeadline());
 
 	const ot::Color colourTitle(ot::Lime);
 	const ot::Color colourBackground(ot::White);
@@ -24,7 +24,7 @@ ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
 	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
 	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 
-	AddConnectors(block);
+	addConnectors(block);
 
 	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
@@ -47,7 +47,7 @@ bool EntityBlockStorage::updateFromProperties()
 	{
 		clearConnectors();
 		createConnectors();
-		CreateBlockItem();
+		createBlockItem();
 	}
 
 	return true;

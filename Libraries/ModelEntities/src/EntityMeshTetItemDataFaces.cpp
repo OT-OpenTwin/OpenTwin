@@ -23,10 +23,10 @@ bool EntityMeshTetItemDataFaces::getEntityBox(double &xmin, double &xmax, double
 	return false;
 }
 
-void EntityMeshTetItemDataFaces::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTetItemDataFaces::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Add the specific data of the mesh item (face list)
 

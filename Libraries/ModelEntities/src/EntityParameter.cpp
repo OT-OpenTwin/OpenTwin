@@ -26,10 +26,10 @@ bool EntityParameter::getEntityBox(double &xmin, double &xmax, double &ymin, dou
 	return false;
 }
 
-void EntityParameter::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityParameter::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Add the dependency information to the storage
 

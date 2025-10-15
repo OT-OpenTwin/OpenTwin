@@ -34,24 +34,23 @@ public:
 	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
 	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 
-	void SetServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
+	void setServiceInformation(const ot::BasicServiceInformation& info) { m_info = info; }
 	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; };
 
 	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
 	const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
 
-	void AddConnector(const ot::Connector& connector);
-	void RemoveConnector(const ot::Connector& connector);
+	void addConnector(const ot::Connector& connector);
+	void removeConnector(const ot::Connector& connector);
 
-	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
+	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
 
-	std::string CreateBlockHeadline();
+	std::string createBlockHeadline();
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
-	void CreateBlockItem();
-
+	void createBlockItem();
 
 protected:
 	std::string m_blockTitle = "";
@@ -64,9 +63,9 @@ protected:
 
 	std::map<std::string,ot::Connector> m_connectorsByName;
 
-	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
-	void CreateNavigationTreeEntry();
-	void AddConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
+	void createNavigationTreeEntry();
+	void addConnectors(ot::GraphicsFlowItemBuilder& flowBlockBuilder);
 };

@@ -19,10 +19,10 @@ EntityVisUnstructuredScalarSurface::~EntityVisUnstructuredScalarSurface()
 
 }
 
-void EntityVisUnstructuredScalarSurface::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityVisUnstructuredScalarSurface::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	// We store the parent class information first 
-	EntityVis2D3D::AddStorageData(storage);
+	EntityVis2D3D::addStorageData(storage);
 
 }
 

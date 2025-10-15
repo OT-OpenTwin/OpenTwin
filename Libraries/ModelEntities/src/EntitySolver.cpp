@@ -1,4 +1,3 @@
-
 #include "EntitySolver.h"
 #include "OldTreeIcon.h"
 

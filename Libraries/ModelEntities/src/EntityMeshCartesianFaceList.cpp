@@ -1,4 +1,3 @@
-
 #include "EntityMeshCartesianFaceList.h"
 #include "EntityMeshCartesianFace.h"
 #include "DataBase.h"
@@ -6,7 +5,7 @@
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityMeshCartesianFaceList> registrar("EntityMeshCartesianFaceList");
+static EntityFactoryRegistrar<EntityMeshCartesianFaceList> registrar(EntityMeshCartesianFaceList::className());
 
 EntityMeshCartesianFaceList::EntityMeshCartesianFaceList(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner)
@@ -71,7 +70,7 @@ void EntityMeshCartesianFaceList::storeMeshFaces(void)
 	{
 		if (fp.second != nullptr)
 		{
-			fp.second->StoreToDataBase();
+			fp.second->storeToDataBase();
 			meshFaceStorageIds[fp.first] = std::pair<ot::UID, ot::UID>(fp.second->getEntityID(), fp.second->getEntityStorageVersion());
 		}
 	}
@@ -93,19 +92,19 @@ void EntityMeshCartesianFaceList::releaseMeshFaces(void)
 	meshFaces.clear();
 }
 
-void EntityMeshCartesianFaceList::StoreToDataBase(void)
+void EntityMeshCartesianFaceList::storeToDataBase(void)
 {
 	// If the pointers to faces, then the objects are stored in the data storage and the storage IDs are up to date
 	storeMeshFaces();
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityMeshCartesianFaceList::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshCartesianFaceList::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now check whether the geometry is modified and we need to create a new entry
 

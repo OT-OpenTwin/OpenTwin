@@ -7,7 +7,7 @@
 // MongoDB header
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityContainer> registrar("EntityContainer");
+static EntityFactoryRegistrar<EntityContainer> registrar(EntityContainer::className());
 
 EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, owner),
@@ -147,22 +147,22 @@ EntityBase *EntityContainer::getEntityFromName(const std::string &n)
 	return nullptr;
 }
 
-void EntityContainer::StoreToDataBase(void)
+void EntityContainer::storeToDataBase(void)
 {
 	// First, we need to store all the child items
 	for (auto child : children)
 	{
-		child->StoreToDataBase();
+		child->storeToDataBase();
 	}
 
 	// Afterward, we store the container itself
-	EntityBase::StoreToDataBase();
+	EntityBase::storeToDataBase();
 }
 
-void EntityContainer::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityContainer::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::addStorageData(storage);
 
 	// Now we store the particular information about the current object (the children)
 

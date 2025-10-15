@@ -255,7 +255,7 @@ void EntityMeshTet::storeMeshData(void)
 	if (meshData == nullptr) return;
 	assert(meshData != nullptr);
 
-	meshData->StoreToDataBase();
+	meshData->storeToDataBase();
 	meshDataStorageId = meshData->getEntityID();
 }
 
@@ -269,15 +269,15 @@ void EntityMeshTet::releaseMeshData(void)
 	meshData->releaseMeshData();
 }
 
-void EntityMeshTet::StoreToDataBase(void)
+void EntityMeshTet::storeToDataBase(void)
 {
-	EntityContainer::StoreToDataBase();
+	EntityContainer::storeToDataBase();
 }
 
-void EntityMeshTet::AddStorageData(bsoncxx::builder::basic::document &storage)
+void EntityMeshTet::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
+	EntityContainer::addStorageData(storage);
 
 	// Now we store the particular information about the current object
 

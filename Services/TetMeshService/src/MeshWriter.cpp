@@ -366,7 +366,7 @@ void MeshWriter::storeMeshEntity(const std::string &entityName, EntityBase *enti
 	}
 
 	// Store the new object and its childs
-	meshItem->StoreToDataBase();
+	meshItem->storeToDataBase();
 
 	// and finally add the new entities to the lists
 	application->getModelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), !isBackgroundMeshEntity);
@@ -700,7 +700,7 @@ void MeshWriter::checkForInvalidFaceMeshes(const std::string &entityName, gmsh::
 
 				annotation->setName(entityMesh->getName() + "/Mesh Errors" + plainName + "/Error surface " + std::to_string(faceTag));
 				annotation->setInitiallyHidden(true);
-				annotation->StoreToDataBase();
+				annotation->storeToDataBase();
 
 				application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
 				application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), 
@@ -845,7 +845,7 @@ bool MeshWriter::storeMeshFile(void)
 	readMeshFile(meshFileName, fileData);
 
 	// Store the data and add it to the data model
-	fileData->StoreToDataBase();
+	fileData->storeToDataBase();
 
 	application->getModelComponent()->addNewDataEntity(fileData->getEntityID(),
 													fileData->getEntityStorageVersion(),
@@ -1059,7 +1059,7 @@ void MeshWriter::storeMeshEntityFromPhysicalGroup(const std::string& entityName,
 	}
 
 	// Store the new object and its childs
-	meshItem->StoreToDataBase();
+	meshItem->storeToDataBase();
 
 	// and finally add the new entities to the lists
 	application->getModelComponent()->addNewTopologyEntity(meshItem->getEntityID(), meshItem->getEntityStorageVersion(), true);

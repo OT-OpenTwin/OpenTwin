@@ -93,7 +93,7 @@ void Application::createNewCircuit() {
 	entityCircuitRoot->setEditable(true);
 	entityCircuitRoot->setName(circuitName);
 
-	entityCircuitRoot->StoreToDataBase();
+	entityCircuitRoot->storeToDataBase();
 	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added new circuit");
 	
 	Circuit circuit;
@@ -121,7 +121,7 @@ void Application::createInitialCircuit() {
 		EntityContainer* entityCircuitRoot = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		entityCircuitRoot->setName(getCircuitRootName() + m_blockEntityHandler.getInitialCircuitName());
 
-		entityCircuitRoot->StoreToDataBase();
+		entityCircuitRoot->storeToDataBase();
 		ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
 	}
 	
@@ -175,7 +175,7 @@ void Application::addSolver() {
 	ot::ModelServiceAPI::getEntityInformation("Circuits", entityInfo);
 
 	solverEntity->createProperties("Circuits", entityInfo.getEntityID(), circuitName, circuitID);
-	solverEntity->StoreToDataBase();
+	solverEntity->storeToDataBase();
 
 	// Register the new solver item in the model
 	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };
