@@ -261,19 +261,26 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 }
 
 QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) const {
+	QSizeF newSize;
+
+	// Minimum size
 	if (this->getGraphicsItemSizePolicy() == ot::Dynamic) {
-		return QRectF(
-			_rect.topLeft(),
-			this->applyGraphicsItemMargins(this->getGraphicsItemMinimumSize().expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
-		).marginsAdded(this->getOutlineMargins());
+		newSize = this->getGraphicsItemMinimumSize();
 	}
 	else {
-		return QRectF(
-			_rect.topLeft(),
-			this->applyGraphicsItemMargins(_rect.size().expandedTo(this->getGraphicsItemMinimumSize()).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
-		).marginsAdded(this->getOutlineMargins());
+		newSize = _rect.size().expandedTo(this->getGraphicsItemMinimumSize());
 	}
+
+	// Adjust size to requested size
+		newSize = newSize.expandedTo(this->removeGraphicsItemMargins(m_requestedSize));
 	
+	// Bound to maximum size
+	newSize = newSize.boundedTo(this->getGraphicsItemMaximumSize());
+
+	// Apply margins
+	newSize = this->applyGraphicsItemMargins(newSize);
+
+	return QRectF(_rect.topLeft(), newSize).marginsAdded(this->getOutlineMargins());
 }
 
 void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

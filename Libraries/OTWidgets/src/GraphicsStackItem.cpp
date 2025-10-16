@@ -175,7 +175,7 @@ QVariant ot::GraphicsStackItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 QRectF ot::GraphicsStackItem::boundingRect(void) const {
 	QRectF rec;
 
-	for (auto itm : m_items) {
+	for (const auto& itm : m_items) {
 		if (rec.isValid()) {
 			rec = itm.item->getQGraphicsItem()->boundingRect().united(rec);
 		}

@@ -121,5 +121,7 @@ std::list<ot::GraphicsElement*> ot::GraphicsLayoutItemWrapper::getAllDirectChild
 
 void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	this->setMinimumSize(_size);
+	this->setMaximumSize(_size);
 	this->setPreferredSize(_size);
 }
