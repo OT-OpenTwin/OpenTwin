@@ -40,56 +40,74 @@ namespace ot {
 	public:
 
 		//! @brief Connect a button click handler.
-		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _buttonKey The key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
         void connectToolBarButton(const std::string& _buttonKey, void(*_callback)());
 
 		//! @brief Connect a button click handler.
-		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
 		void connectToolBarButton(const ToolBarButtonCfg& _button, void(*_callback)()) { this->connectToolBarButton(_button.getFullPath(), _callback); };
 
 		//! @brief Connect a button click handler.
-		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _buttonKey The key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
         void connectToolBarButton(const std::string& _buttonKey, const std::function<void()>& _callback);
 
 		//! @brief Connect a button click handler.
-		//! @param _callback The callback function to be called when the button is clicked.
 		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
 		void connectToolBarButton(const ToolBarButtonCfg& _button, const std::function<void()>& _callback) { this->connectToolBarButton(_button.getFullPath(), _callback); };
 
 		//! @brief Connect a button click handler.
+		//! This template version will accept any callable type that is not std::function<void()>.
+		//! @tparam Callable The type of the callable to be connected.
+		//! @tparam Enabled SFINAE helper to disable this overload for std::function<void()>.
+		//! @param _buttonKey The key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
+		template<typename Callable, typename Enabled  = std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, std::function<void()>>>>
+		void connectToolBarButton(const std::string& _buttonKey, Callable&& _callback);
+
+		//! @brief Connect a button click handler.
+		//! This template version will accept any callable type that is not std::function<void()>.
+		//! @tparam Callable The type of the callable to be connected.
+		//! @tparam Enabled SFINAE helper to disable this overload for std::function<void()>.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
+		//! @param _callback The callback function to be called when the button is clicked.
+		template<typename Callable, typename Enabled = std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, std::function<void()>>>>
+		void connectToolBarButton(const ToolBarButtonCfg& _button, Callable&& _callback) { this->connectToolBarButton(_button.getFullPath(), _callback); };
+
+		//! @brief Connect a button click handler.
 		//! @tparam T The class type of the object.
+		//! @param _buttonKey The key of the button to connect the handler to.
 		//! @param _object The object to connect the handler to.
 		//! @param _method The member function to be called when the button is clicked.
-		//! @param _buttonKey The key of the button to connect the handler to.
         template<typename T>
         void connectToolBarButton(const std::string& _buttonKey, T* _object, void(T::* _method)());
 
 		//! @brief Connect a button click handler.
 		//! @tparam T The class type of the object.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
 		//! @param _object The object to connect the handler to.
 		//! @param _method The member function to be called when the button is clicked.
-		//! @param _button The configuration used to determine the key of the button to connect the handler to.
 		template<typename T>
 		void connectToolBarButton(const ToolBarButtonCfg& _button, T* _object, void(T::* _method)()) { this->connectToolBarButton(_button.getFullPath(), _object, _method); };
 
 		//! @brief Connect a button click handler.
 		//! @tparam T The class type of the object.
+		//! @param _buttonKey The key of the button to connect the handler to.
 		//! @param _object The object to connect the handler to.
 		//! @param _method The member function to be called when the button is clicked.
-		//! @param _buttonKey The key of the button to connect the handler to.
         template<typename T>
         void connectToolBarButton(const std::string& _buttonKey, T* _object, void(T::* _method)() const);
 
 		//! @brief Connect a button click handler.
 		//! @tparam T The class type of the object.
+		//! @param _button The configuration used to determine the key of the button to connect the handler to.
 		//! @param _object The object to connect the handler to.
 		//! @param _method The member function to be called when the button is clicked.
-		//! @param _button The configuration used to determine the key of the button to connect the handler to.
 		template<typename T>
-		void connectToolBarButton(const ToolBarButtonCfg& _button, T* _object, void(T::* _method)() const) { this->connectToolBarButton(_object, _method, _button.getFullPath()); };
+		void connectToolBarButton(const ToolBarButtonCfg& _button, T* _object, void(T::* _method)() const) { this->connectToolBarButton(_button.getFullPath(), _object, _method); };
 
 		//! @brief Disconnect a button click handler.
 		//! @param _buttonKey The key of the button to disconnect the handler from.
@@ -106,6 +124,11 @@ namespace ot {
 
 		std::unordered_map<std::string, std::function<void()>> m_callbacks;
 	};
+}
+
+template<typename Callable, typename Enabled>
+inline void ot::ButtonHandler::connectToolBarButton(const std::string& _buttonKey, Callable&& _callback) {
+	this->connectToolBarButton(_buttonKey, std::function<void()>(std::forward<Callable>(_callback)));
 }
 
 template<typename T>
