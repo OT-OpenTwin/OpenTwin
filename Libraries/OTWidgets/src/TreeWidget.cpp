@@ -163,8 +163,8 @@ void ot::TreeWidget::slotColorStyleChanged(void) {
 
 QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item) {
 	for (int i = 0; i < _parent->childCount(); i++) {
-		if (_parent->child(i)->text(0) == _item.text()) {
-			for (const TreeWidgetItemInfo& child : _item.childItems()) {
+		if (_parent->child(i)->text(0) == _item.getText()) {
+			for (const TreeWidgetItemInfo& child : _item.getChildItems()) {
 				this->addItem(_parent->child(i), child);
 			}
 			return _parent->child(i);

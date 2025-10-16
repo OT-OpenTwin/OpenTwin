@@ -72,7 +72,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	
 	if (!m_rootItem->isExpanded()) m_rootItem->setExpanded(true);
 
-	QTreeWidgetItem* newNavigationItem = this->findItem(m_rootItem, { infoNew.text() });
+	QTreeWidgetItem* newNavigationItem = this->findItem(m_rootItem, { infoNew.getText() });
 	OTAssertNullptr(newNavigationItem);
 
 	_item->setNavigationItem(newNavigationItem);

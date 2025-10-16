@@ -60,7 +60,7 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	for (const ot::NavigationTreeItem& itm : _config.rootItems()) {
 		this->addItem(m_available->getTreeWidget(), nullptr, itm);
 		ot::NavigationTreeItem cop(itm);
-		if (cop.filter(ot::ItemIsSelected)) {
+		if (cop.filter(ot::NavigationTreeItem::ItemIsSelected)) {
 			this->addItem(m_selected->getTreeWidget(), nullptr, itm);
 		}
 	}
@@ -129,7 +129,7 @@ void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 		return;
 	}
 
-	if (!(itm->navigationItemFlags() & ot::ItemMayBeAdded)) {
+	if (!(itm->getNavigationItemFlags() & ot::NavigationTreeItem::ItemMayBeAdded)) {
 		return;
 	}
 	if (m_selected->getTreeWidget()->itemExists(m_available->getTreeWidget()->getItemPath(_item))) {
@@ -151,7 +151,7 @@ void SelectEntitiesDialog::slotRemove(QTreeWidgetItem* _item, int _col) {
 	ot::TreeWidgetItem* parent = dynamic_cast<ot::TreeWidgetItem*>(_item->parent());
 	if (parent) {
 		parent->removeChild(_item);
-		if (parent->childCount() == 0 && (parent->navigationItemFlags() & ot::RemoveItemWhenEmpty)) {
+		if (parent->childCount() == 0 && (parent->getNavigationItemFlags() & ot::NavigationTreeItem::RemoveItemWhenEmpty)) {
 			this->slotRemove(parent, 0);
 		}
 	}

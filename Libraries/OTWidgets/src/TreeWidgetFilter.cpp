@@ -96,7 +96,7 @@ void ot::TreeWidgetFilter::setAllVisible(QTreeWidgetItem* _item) {
 	OTAssertNullptr(_item);
 	TreeWidgetItem* treeItem = dynamic_cast<TreeWidgetItem*>(_item);
 	if (treeItem) {
-		if (treeItem->flags() & NavigationTreeItemFlag::ItemIsInvisible) return;
+		if (treeItem->flags() & NavigationTreeItem::ItemIsInvisible) return;
 	}
 	for (int i = 0; i < _item->childCount(); i++) {
 		this->setAllVisible(_item->child(i));
@@ -108,7 +108,7 @@ bool ot::TreeWidgetFilter::filterChilds(QTreeWidgetItem* _item, const QString& _
 	OTAssertNullptr(_item);
 	TreeWidgetItem* treeItem = dynamic_cast<TreeWidgetItem*>(_item);
 	if (treeItem) {
-		if (treeItem->flags() & NavigationTreeItemFlag::ItemIsInvisible) return false;
+		if (treeItem->flags() & NavigationTreeItem::ItemIsInvisible) return false;
 	}
 
 	bool vis = false;

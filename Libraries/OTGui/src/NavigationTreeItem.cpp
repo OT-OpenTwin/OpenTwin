@@ -7,129 +7,69 @@
 #include "OTCore/LogDispatcher.h"
 #include "OTGui/NavigationTreeItem.h"
 
-#define JSON_MEMBER_Text       "Text"
-#define JSON_MEMBER_Flags      "Flags"
-#define JSON_MEMBER_IconPath   "IconPath"
-#define JSON_MEMBER_ChildItems "Childs"
+ot::NavigationTreeItem::NavigationTreeItem() : m_flags(NoItemFlags), m_parent(nullptr) {}
 
-std::string ot::toString(NavigationTreeItemFlag _flag) {
-	switch (_flag)
-	{
-	case ot::NavigationTreeItemFlag::NoNavigationTreeItemFlags: return "<null>";
-	case ot::NavigationTreeItemFlag::RemoveItemWhenEmpty: return "RemoveItemWhenEmpty";
-	case ot::NavigationTreeItemFlag::ItemMayBeAdded: return "ItemMayBeAdded";
-	case ot::NavigationTreeItemFlag::ItemIsSelected: return "ItemIsSelected";
-	case ot::NavigationTreeItemFlag::ItemIsInvisible: return "ItemIsInvisible";
-	default:
-		OT_LOG_EA("Unknown navigation tree item flag");
-		return "<null>";
-	}
-}
-
-std::list<std::string> ot::toStringList(NavigationTreeItemFlags _flags) {
-	std::list<std::string> ret;
-	if (_flags & ot::RemoveItemWhenEmpty) ret.push_back(toString(ot::RemoveItemWhenEmpty));
-	if (_flags & ot::ItemMayBeAdded) ret.push_back(toString(ot::ItemMayBeAdded));
-	if (_flags & ot::ItemIsSelected) ret.push_back(toString(ot::ItemIsSelected));
-	if (_flags & ot::ItemIsInvisible) ret.push_back(toString(ot::ItemIsInvisible));
-
-	return ret;
-}
-
-ot::NavigationTreeItemFlag ot::stringToNavigationItemFlag(const std::string& _flag) {
-	if (_flag == ot::toString(NavigationTreeItemFlag::RemoveItemWhenEmpty)) return NavigationTreeItemFlag::RemoveItemWhenEmpty;
-	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemMayBeAdded)) return NavigationTreeItemFlag::ItemMayBeAdded;
-	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemIsSelected)) return NavigationTreeItemFlag::ItemIsSelected;
-	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemIsInvisible)) return NavigationTreeItemFlag::ItemIsInvisible;
-	else {
-		OT_LOG_EA("Unknown navigation tree item flag");
-		return NoNavigationTreeItemFlags;
-	}
-}
-
-ot::NavigationTreeItemFlags ot::stringListToNavigationItemFlags(const std::list<std::string>& _flags) {
-	NavigationTreeItemFlags ret = ot::NoNavigationTreeItemFlags;
-	for (const std::string& flag : _flags) {
-		ret |= stringToNavigationItemFlag(flag);
-	}
-	return ret;
-}
-
-ot::NavigationTreeItem::NavigationTreeItem() : m_flags(ot::NoNavigationTreeItemFlags), m_parent(nullptr) {}
-
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, ot::NavigationTreeItemFlags _flags)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const ItemFlags& _flags)
 	: m_text(_text), m_flags(_flags), m_parent(nullptr)
 {}
 
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationTreeItemFlags _flags)
-	: m_text(_text), m_iconPath(_iconPath), m_flags(_flags), m_parent(nullptr)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const ItemFlags& _flags)
+	: m_text(_text), m_icon(_iconPath, _iconPath), m_flags(_flags), m_parent(nullptr)
 {}
 
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationTreeItemFlags _flags)
-	: m_text(_text), m_iconPath(_iconPath), m_childs(_childItems), m_flags(_flags), m_parent(nullptr)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, const ItemFlags& _flags)
+	: m_text(_text), m_icon(_iconPath, _iconPath), m_childs(_childItems), m_flags(_flags), m_parent(nullptr)
 {
 	for (NavigationTreeItem& c : m_childs) c.setParentNavigationTreeItem(this);
 }
 
 ot::NavigationTreeItem::NavigationTreeItem(const NavigationTreeItem& _other)
-	: m_text(_other.m_text), m_iconPath(_other.m_iconPath), m_childs(_other.m_childs), m_flags(_other.m_flags), m_parent(nullptr)
+	: m_text(_other.m_text), m_icon(_other.m_icon), m_childs(_other.m_childs), m_flags(_other.m_flags), m_parent(nullptr)
 {
-	for (NavigationTreeItem& c : m_childs) c.setParentNavigationTreeItem(this);
+	for (NavigationTreeItem& c : m_childs) {
+		c.setParentNavigationTreeItem(this);
+	}
 }
 
 ot::NavigationTreeItem::~NavigationTreeItem() {}
 
 ot::NavigationTreeItem& ot::NavigationTreeItem::operator = (const NavigationTreeItem& _other) {
 	m_text = _other.m_text;
-	m_iconPath = _other.m_iconPath;
+	m_icon = _other.m_icon;
 	m_childs = _other.m_childs;
 	m_flags = _other.m_flags;
 
-	for (NavigationTreeItem& c : m_childs) c.setParentNavigationTreeItem(this);
+	for (NavigationTreeItem& c : m_childs) {
+		c.setParentNavigationTreeItem(this);
+	}
 
 	return *this;
 }
 
 void ot::NavigationTreeItem::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember(JSON_MEMBER_Text, JsonString(m_text, _allocator), _allocator);
-	_object.AddMember(JSON_MEMBER_IconPath, JsonString(m_iconPath, _allocator), _allocator);
+	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
+	_object.AddMember("Icon", JsonObject(m_icon, _allocator), _allocator);
 
 	JsonArray childArr;
 	for (const NavigationTreeItem& c : m_childs) {
-		JsonObject childObj;
-		c.addToJsonObject(childObj, _allocator);
-		childArr.PushBack(childObj, _allocator);
+		childArr.PushBack(JsonObject(c, _allocator), _allocator);
 	}
-	_object.AddMember(JSON_MEMBER_ChildItems, childArr, _allocator);
-
-	std::list<std::string> flagList = ot::toStringList(m_flags);
-
-	JsonArray flagArr;
-	for (const std::string& f : flagList) {
-		flagArr.PushBack(JsonString(f, _allocator), _allocator);
-	}
-	_object.AddMember(JSON_MEMBER_Flags, flagArr, _allocator);
+	_object.AddMember("Childs", childArr, _allocator);
+	_object.AddMember("Flags", static_cast<uint64_t>(m_flags.data()), _allocator);
 }
 
 void ot::NavigationTreeItem::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	m_text = json::getString(_object, JSON_MEMBER_Text);
-	m_iconPath = json::getString(_object, JSON_MEMBER_IconPath);
+	m_text = json::getString(_object, "Text");
+	m_icon.setFromJsonObject(json::getObject(_object, "Icon"));
 
 	m_childs.clear();
-	ConstJsonArray childArr = json::getArray(_object, JSON_MEMBER_ChildItems);
-	for (rapidjson::SizeType c = 0; c < childArr.Size(); c++) {
-		ConstJsonObject childObj = json::getObject(childArr, c);
+	for (const ConstJsonObject& childObj : json::getObjectList(_object, "Childs")) {
 		NavigationTreeItem newItem;
 		newItem.setFromJsonObject(childObj);
 		m_childs.push_back(newItem);
 	}
 
-	std::list<std::string> flagList;
-	ConstJsonArray flagArr = json::getArray(_object, JSON_MEMBER_Flags);
-	for (rapidjson::SizeType c = 0; c < flagArr.Size(); c++) {
-		flagList.push_back(json::getString(flagArr, c));
-	}
-	m_flags = stringListToNavigationItemFlags(flagList);
+	m_flags = static_cast<ItemFlag>(json::getUInt64(_object, "Flags"));
 }
 
 void ot::NavigationTreeItem::addChildItem(const NavigationTreeItem& _item) {
@@ -149,7 +89,7 @@ void ot::NavigationTreeItem::merge(const NavigationTreeItem& _other) {
 	for (const NavigationTreeItem& item : bck) {
 		bool exists = false;
 		for (NavigationTreeItem& eItem : m_childs) {
-			if (eItem.text() == item.text()) {
+			if (eItem.m_text == item.m_text) {
 				eItem.merge(item);
 				exists = true;
 				break;
@@ -161,16 +101,16 @@ void ot::NavigationTreeItem::merge(const NavigationTreeItem& _other) {
 		}
 	}
 
-	if (this->text() != _other.text()) return;
-	if (this->iconPath() != _other.iconPath()) {
+	if (m_text != _other.m_text) return;
+	if (m_icon != _other.m_icon) {
 		OT_LOG_WA("Icon path differs on merge. Ignoring");
 	}
 
 	// Merge with other
-	for (const NavigationTreeItem& item : _other.childItems()) {
+	for (const NavigationTreeItem& item : _other.m_childs) {
 		bool exists = false;
 		for (NavigationTreeItem& eItem : m_childs) {
-			if (eItem.text() == item.text()) {
+			if (eItem.m_text == item.m_text) {
 				eItem.merge(item);
 				exists = true;
 				break;
@@ -192,7 +132,7 @@ std::string ot::NavigationTreeItem::itemPath(char _delimiter, const std::string&
 	}
 }
 
-bool ot::NavigationTreeItem::filter(NavigationTreeItemFlags _flags) {
+bool ot::NavigationTreeItem::filter(const ItemFlags& _flags) {
 	std::list<NavigationTreeItem> bck = m_childs;
 	m_childs.clear();
 	for (NavigationTreeItem& itm : bck) {

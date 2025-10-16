@@ -74,7 +74,7 @@ void ot::NavigationTreePackage::mergeItems(bool _mergeAllChilds) {
 	for (const NavigationTreeItem& item : bck) {
 		exists = false;
 		for (NavigationTreeItem& eItem : m_rootItems) {
-			if (eItem.text() == item.text()) {
+			if (eItem.getText() == item.getText()) {
 				eItem.merge(item);
 				exists = true;
 				break;

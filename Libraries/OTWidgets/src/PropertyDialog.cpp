@@ -258,7 +258,7 @@ void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const Proper
 			TreeWidgetItem* propItem = new TreeWidgetItem;
 			propItem->setText(0, propText);
 			newEntry.getTreeItem()->addChild(propItem);
-			propItem->setNavigationItemFlag(NavigationTreeItemFlag::ItemIsInvisible);
+			propItem->setNavigationItemFlag(NavigationTreeItem::ItemIsInvisible);
 			propItem->setHidden(true);
 		}	
 	}

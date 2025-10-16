@@ -8,18 +8,18 @@
 
 
 ot::TreeWidgetItem::TreeWidgetItem(int _type)
-	: QTreeWidgetItem(_type), m_flags(ot::NoNavigationTreeItemFlags)
+	: QTreeWidgetItem(_type), m_flags(NavigationTreeItem::NoItemFlags)
 {
 	
 }
 
 ot::TreeWidgetItem::TreeWidgetItem(const TreeWidgetItemInfo& _item, int _type)
-	: QTreeWidgetItem(_type), m_flags(_item.flags())
+	: QTreeWidgetItem(_type), m_flags(_item.getFlags())
 {
-	this->setText(0, _item.text());
-	this->setIcon(0, _item.icon());
+	this->setText(0, _item.getText());
+	this->setIcon(0, _item.getIcon());
 
-	for (const TreeWidgetItemInfo& c : _item.childItems()) {
+	for (const TreeWidgetItemInfo& c : _item.getChildItems()) {
 		this->addChild(new TreeWidgetItem(c));
 	}
 }
@@ -30,7 +30,7 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 	ot::TreeWidgetItemInfo info;
 	info.setText(this->text(0));
 	info.setIcon(this->icon(0));
-	info.setFlags(this->navigationItemFlags());
+	info.setFlags(this->getNavigationItemFlags());
 
 	const QTreeWidgetItem* itm = this->parent();
 
@@ -44,10 +44,10 @@ ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
 		info.setIcon(itm->icon(0));
 		const ot::TreeWidgetItem* castItem = dynamic_cast<const ot::TreeWidgetItem*>(itm);
 		if (castItem) {
-			info.setFlags(castItem->navigationItemFlags());
+			info.setFlags(castItem->getNavigationItemFlags());
 		}
 		else {
-			info.setFlags(ot::NoNavigationTreeItemFlags);
+			info.setFlags(NavigationTreeItem::NoItemFlags);
 		}
 
 		info.addChildItem(child);

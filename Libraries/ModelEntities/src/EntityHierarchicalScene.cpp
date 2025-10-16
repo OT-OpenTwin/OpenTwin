@@ -23,7 +23,6 @@ EntityHierarchicalScene::EntityHierarchicalScene(ot::UID _ID, EntityBase* _paren
 	this->setDeletable(false);
 	this->setEditable(false);
 	this->setInitiallyHidden(false);
-	this->setSelectChildren(false);
 	this->setName(EntityHierarchicalScene::defaultName());
 }
 

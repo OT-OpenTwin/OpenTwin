@@ -18,19 +18,19 @@ namespace ot {
 		TreeWidgetItem(const TreeWidgetItemInfo& _itemInfo, int _type = 0);
 		virtual ~TreeWidgetItem();
 
-		void setNavigationItemFlag(NavigationTreeItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
-		void setNavigationItemFlags(NavigationTreeItemFlags _flags) { m_flags = _flags; };
-		NavigationTreeItemFlags navigationItemFlags(void) const { return m_flags; };
+		void setNavigationItemFlag(NavigationTreeItem::ItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setNavigationItemFlags(const NavigationTreeItem::ItemFlags& _flags) { m_flags = _flags; };
+		const NavigationTreeItem::ItemFlags getNavigationItemFlags() const { return m_flags; };
 
 		//! @brief Returns the item info
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
-		TreeWidgetItemInfo getFullInfo(void) const;
+		TreeWidgetItemInfo getFullInfo() const;
 
 		QString getTreeWidgetItemPath(char _delimiter = '/', int _nameColumn = 0) const;
 
 		void expandAllParents(bool _expandThis = false);
 
 	private:
-		NavigationTreeItemFlags m_flags;
+		NavigationTreeItem::ItemFlags m_flags;
 	};
 }
