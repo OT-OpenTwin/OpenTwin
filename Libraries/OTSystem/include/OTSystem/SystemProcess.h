@@ -53,10 +53,11 @@ namespace ot {
 			UseUnicode          = 1 << 0, //! @brief Use unicode for command line and application path.
 			CreateNewConsole    = 1 << 1, //! @brief Create a new console for the application.
 			DetachedProcess     = 1 << 2, //! @brief Detach the process from the parent process.
-			AboveNormalPriority = 1 << 3,  //! @brief Start the process with above normal priority.
+			AboveNormalPriority = 1 << 3, //! @brief Start the process with above normal priority.
+			HideWindow          = 1 << 4, //! @brief Start the process with hidden window (if supported by application).
 
 			//! @brief Default flags.
-			DefaultFlags = UseUnicode | CreateNewConsole | AboveNormalPriority
+			DefaultFlags = UseUnicode | CreateNewConsole | AboveNormalPriority | HideWindow
 		};
 		typedef ot::Flags<ProcessFlag> ProcessFlags;
 

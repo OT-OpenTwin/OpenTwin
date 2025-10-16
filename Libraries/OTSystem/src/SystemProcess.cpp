@@ -74,11 +74,13 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	info.cb = sizeof(info);
 	info.lpTitle = commandline;
 	info.dwFlags = STARTF_USESHOWWINDOW;
-	#ifdef OT_RELEASE_DEBUG
-		info.wShowWindow = SW_SHOW;
-	#else
+
+	if (_flags & ProcessFlag::HideWindow) {
 		info.wShowWindow = SW_HIDE;
-	#endif
+	}
+	else {
+		info.wShowWindow = SW_SHOW;
+	}
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
 	DWORD creationFlags = 0;
