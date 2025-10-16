@@ -28,7 +28,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ApplicationBase, public ot::ButtonHandler {
+class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

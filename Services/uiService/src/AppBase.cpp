@@ -361,7 +361,6 @@ bool AppBase::logIn() {
 			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, projName);
 		}
 	}
-	OT_LOG_T("1");
 	return true;
 }
 
@@ -3156,12 +3155,10 @@ void AppBase::slotOpenProject() {
 }
 
 void AppBase::slotOpenSpecificProject(QString _projectName) {
-	OT_LOG_T("2");
 	// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	if (!checkForContinue("Open Project")) {
 		return;
 	}
-	OT_LOG_T("3");
 	const std::string& selectedProjectName = _projectName.toStdString();
 	bool canBeDeleted = false;
 	ProjectManagement projectManager(m_loginData);

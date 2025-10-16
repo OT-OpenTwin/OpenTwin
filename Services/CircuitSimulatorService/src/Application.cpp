@@ -74,6 +74,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, this, &Application::handleRemoveGraphicsItemConnection);
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection, this, &Application::handleConnectionToConnection);
 	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ConnectionChanged, this, &Application::handleConnectionChanged);
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, [](){});
 }
 
 Application::~Application() {

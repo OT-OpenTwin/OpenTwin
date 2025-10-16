@@ -49,7 +49,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DataProcessingService, OT_INFO_SERVICE_TYPE_DataProcessingService, new UiNotifier(), new ModelNotifier())
 {
-
+	connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, []() {});
 }
 
 Application::~Application()
