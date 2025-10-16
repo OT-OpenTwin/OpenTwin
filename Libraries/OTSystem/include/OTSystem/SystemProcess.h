@@ -6,9 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/SystemAPIExport.h"
-#include "OTSystem/SystemTypes.h"
+#include "OTSystem/Flags.h"
 #include "OTSystem/RunResult.h"
+#include "OTSystem/SystemTypes.h"
+#include "OTSystem/SystemAPIExport.h"
 
 // std header
 #include <string>
@@ -45,36 +46,48 @@ namespace ot {
 
 	//! @namespace app
 	//! @brief The app namespace contains several functions that may be used to start processes.
-	class OT_SYS_API_EXPORT SystemProcess
-	{
+	class OT_SYS_API_EXPORT SystemProcess {
 	public:
-	
-	//! @brief Will start the application under the given application path.
-	//! @param _applicationPath The path the application is located at.
-	//! @param _waitForResponse If true, the function will wait until the process was successfully started.
-	static RunResult runApplication(const std::string& _applicationPath);
+		enum ProcessFlag {
+			NoProcessFlags      = 0 << 0, //! @brief No flags are set.
+			UseUnicode          = 1 << 0, //! @brief Use unicode for command line and application path.
+			CreateNewConsole    = 1 << 1, //! @brief Create a new console for the application.
+			DetachedProcess     = 1 << 2, //! @brief Detach the process from the parent process.
+			AboveNormalPriority = 1 << 3,  //! @brief Start the process with above normal priority.
 
-	//! @brief Will start the application under the given application path.
-	//! @param _applicationPath The path the application is located at.
-	//! @param _waitForResponse If true, the function will wait until the process was successfully started.
-	static RunResult runApplication(const std::wstring& _applicationPath);
+			//! @brief Default flags.
+			DefaultFlags = UseUnicode | CreateNewConsole | AboveNormalPriority
+		};
+		typedef ot::Flags<ProcessFlag> ProcessFlags;
 
-	//! @brief Will start the application under the given application path with the given command line.
-	//! @param _applicationPath The path the application is located at.
-	//! @param _commandLine The command line that should be used to start the application.
-	//! @param _hProcess The process handle will be written here.
-	//! @param _waitForResponse If true, the function will wait until the process was successfully started.
-	static RunResult runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle);
+		//! @brief Will start the application under the given application path.
+		//! @param _applicationPath The path the application is located at.
+		//! @param _waitForResponse If true, the function will wait until the process was successfully started.
+		static RunResult runApplication(const std::string& _applicationPath, const ProcessFlags& _flags = ProcessFlag::DefaultFlags);
 
-	//! @brief Will start the application under the given application path with the given command line.
-	//! @param _applicationPath The path the application is located at.
-	//! @param _commandLine The command line that should be used to start the application.
-	//! @param _hProcess The process handle will be written here.
-	//! @param _waitForResponse If true, the function will wait until the process was successfully started.
-	static RunResult runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle);
+		//! @brief Will start the application under the given application path.
+		//! @param _applicationPath The path the application is located at.
+		//! @param _waitForResponse If true, the function will wait until the process was successfully started.
+		static RunResult runApplication(const std::wstring& _applicationPath, const ProcessFlags& _flags = ProcessFlag::DefaultFlags);
 
-	//! @brief Returns true if the provided process is still alive.
-	static bool isApplicationRunning(OT_PROCESS_HANDLE& _processHandle);
+		//! @brief Will start the application under the given application path with the given command line.
+		//! @param _applicationPath The path the application is located at.
+		//! @param _commandLine The command line that should be used to start the application.
+		//! @param _hProcess The process handle will be written here.
+		//! @param _waitForResponse If true, the function will wait until the process was successfully started.
+		static RunResult runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags = ProcessFlag::DefaultFlags);
+
+		//! @brief Will start the application under the given application path with the given command line.
+		//! @param _applicationPath The path the application is located at.
+		//! @param _commandLine The command line that should be used to start the application.
+		//! @param _hProcess The process handle will be written here.
+		//! @param _waitForResponse If true, the function will wait until the process was successfully started.
+		static RunResult runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags = ProcessFlag::DefaultFlags);
+
+		//! @brief Returns true if the provided process is still alive.
+		static bool isApplicationRunning(OT_PROCESS_HANDLE& _processHandle);
 
 	};
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::SystemProcess::ProcessFlag)

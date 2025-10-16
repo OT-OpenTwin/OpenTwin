@@ -18,19 +18,19 @@
 #include <UserEnv.h>
 
 
-ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath) {
+ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const ProcessFlags& _flags) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return runApplication(strconverter.from_bytes(_applicationPath));
+	return runApplication(strconverter.from_bytes(_applicationPath), _flags);
 }
 
-ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath) {
+ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const ProcessFlags& _flags) {
 	RunResult result;
 #ifdef OT_OS_WINDOWS
 	std::wstring commandLine(L"CMD.exe /c \"");
 	commandLine.append(_applicationPath).append(L"\"");
 
 	OT_PROCESS_HANDLE processHandle;
-	result = runApplication(_applicationPath, commandLine, processHandle);
+	result = runApplication(_applicationPath, commandLine, processHandle, _flags);
 	CloseHandle(processHandle);
 #else
 	assert(0); // Not implemented yet
@@ -39,13 +39,13 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	return result;
 }
 
-ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
+ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return runApplication(strconverter.from_bytes(_applicationPath), strconverter.from_bytes(_commandLine), _processHandle);
+	return runApplication(strconverter.from_bytes(_applicationPath), strconverter.from_bytes(_commandLine), _processHandle, _flags);
 }
 
 #if defined(OT_OS_WINDOWS)
-ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle) {
+ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags) {
 	HANDLE hToken = NULL;
 	BOOL success = OpenProcessToken(GetCurrentProcess(), TOKEN_READ, &hToken);
 	assert(success);
@@ -81,7 +81,13 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	#endif
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
-	const bool createSuccess = CreateProcess(applicationPath, commandline, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE | ABOVE_NORMAL_PRIORITY_CLASS, penv, NULL, &info, &processInfo);
+	DWORD creationFlags = 0;
+	if (_flags & ProcessFlag::UseUnicode) { creationFlags |= CREATE_UNICODE_ENVIRONMENT; }
+	if (_flags & ProcessFlag::CreateNewConsole) { creationFlags |= CREATE_NEW_CONSOLE; }
+	if (_flags & ProcessFlag::DetachedProcess) { creationFlags |= DETACHED_PROCESS; }
+	if (_flags & ProcessFlag::AboveNormalPriority) { creationFlags |= ABOVE_NORMAL_PRIORITY_CLASS; }
+
+	const bool createSuccess = CreateProcess(applicationPath, commandline, NULL, NULL, TRUE, creationFlags, penv, NULL, &info, &processInfo);
 	
 	if (createSuccess) 
 	{
