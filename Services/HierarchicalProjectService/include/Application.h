@@ -62,6 +62,7 @@ private:
 	void handleAddHierarchical();
 	void handleAddContainer();
 	void handleAddDocument();
+	void handleOpenSelectedProject();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -91,9 +92,12 @@ private:
 
 	const std::string c_pageName = "Project";
 	const std::string c_managementGroupName = "Management";
+	const std::string c_selectionGroupName = "Selection";
 
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addHierarchicalButton;
 	ot::ToolBarButtonCfg m_addContainerButton;
 	ot::ToolBarButtonCfg m_addDocumentButton;
+
+	ot::ToolBarButtonCfg m_openSelectedProjectButton;
 };

@@ -76,6 +76,11 @@ Application::Application() :
 	m_addDocumentButton.setButtonLockFlag(ot::LockModelWrite | ot::LockModelRead);
 	m_addDocumentButton.setButtonToolTip("Add a new document.");
 	connectToolBarButton(m_addDocumentButton, this, &Application::handleAddDocument);
+
+	m_openSelectedProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Open Project", "Hierarchical/OpenProject");
+	m_openSelectedProjectButton.setButtonLockFlag(ot::LockModelRead);
+	m_openSelectedProjectButton.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
+	connectToolBarButton(m_openSelectedProjectButton, this, &Application::handleOpenSelectedProject);
 }
 
 Application::~Application() {
@@ -111,6 +116,10 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	_ui->addMenuButton(m_addHierarchicalButton);
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
+
+	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
+
+	_ui->addMenuButton(m_openSelectedProjectButton);
 
 	_ui->switchMenuTab(c_pageName);
 
@@ -230,6 +239,21 @@ void Application::handleAddDocument() {
 
 }
 
+void Application::handleOpenSelectedProject() {
+	const auto& infos = this->getSelectedEntityInfos();
+	if (infos.size() != 1) {
+		OT_LOG_E("Invalid selection");
+		return;
+	}
+
+	if (infos.front().getEntityType() != EntityBlockHierarchicalProjectItem::className()) {
+		OT_LOG_E("Invalid entity type selected");
+		return;
+	}
+
+	this->requestToOpenProject(infos.front());
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Graphics Callbacks
@@ -277,32 +301,55 @@ ot::ReturnMessage Application::handleBlockDoubleClicked(ot::JsonDocument& _doc) 
 // Private: Helper
 
 void Application::updateButtonStates() {
+	auto ui = this->getUiComponent();
+
+	if (!ui) {
+		return;
+	}
+
 	const auto& infos = this->getSelectedEntityInfos();
 	bool canAddChilds = true;
+	bool canOpenProject = (infos.size() == 1);
+	
+	// Check entity selection
 	for (const auto& info : infos) {
 		if (info.getEntityType() != EntityHierarchicalScene::className() &&
 			true
 			) {
 			canAddChilds = false;
 		}
-	}
 
-	auto ui = this->getUiComponent();
-	
-	std::list<std::string> controls;
-	controls.push_back(m_addProjectButton.getFullPath());
-	controls.push_back(m_addHierarchicalButton.getFullPath());
-	controls.push_back(m_addContainerButton.getFullPath());
-	controls.push_back(m_addDocumentButton.getFullPath());
-
-	if (ui) {
-		if (canAddChilds) {
-			ui->setControlsEnabledState(controls, std::list<std::string>()); // Enable all
-		}
-		else {
-			ui->setControlsEnabledState(std::list<std::string>(), controls); // Disable all
+		if (canOpenProject && info.getEntityType() != EntityBlockHierarchicalProjectItem::className()) {
+			canOpenProject = false;
 		}
 	}
+
+	// Prepare lists of controls to enable/disable
+	std::list<std::string> controlsThatAdd;
+	controlsThatAdd.push_back(m_addProjectButton.getFullPath());
+	controlsThatAdd.push_back(m_addHierarchicalButton.getFullPath());
+	controlsThatAdd.push_back(m_addContainerButton.getFullPath());
+	controlsThatAdd.push_back(m_addDocumentButton.getFullPath());
+
+	std::list<std::string> enabledControls;
+	std::list<std::string> disabledControls;
+
+	if (canAddChilds) {
+		enabledControls = std::move(controlsThatAdd);
+	}
+	else {
+		disabledControls = std::move(controlsThatAdd);
+	}
+
+	if (canOpenProject) {
+		enabledControls.push_back(m_openSelectedProjectButton.getFullPath());
+	}
+	else {
+		disabledControls.push_back(m_openSelectedProjectButton.getFullPath());
+	}
+
+	// Set control states
+	ui->setControlsEnabledState(enabledControls, disabledControls);
 }
 
 ot::ReturnMessage Application::requestToOpenProject(const ot::EntityInformation& _entity) {
