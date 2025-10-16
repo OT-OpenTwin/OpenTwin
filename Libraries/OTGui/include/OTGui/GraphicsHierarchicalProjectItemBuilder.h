@@ -84,7 +84,19 @@ namespace ot {
 		void setBackgroundImageData(const std::string& _data) { m_backgroundImage = _data; };
 		void setBackgroundImageMargins(const ot::MarginsD& _margins) { m_backgroundImageMargins = _margins; };
 		
+		void setConnectorSize(double _width, double _height) { m_connectorWidth = _width; m_connectorHeight = _height; };
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
+
 	private:
+		double m_connectorWidth;
+		double m_connectorHeight;
+
+		ot::GraphicsItemCfg* createConnectorItem(ot::ConnectionDirection _direction) const;
+		ot::GraphicsItemCfg* createTitle() const;
+
 		std::string m_name;
 		std::string m_type;
 		std::string m_title;

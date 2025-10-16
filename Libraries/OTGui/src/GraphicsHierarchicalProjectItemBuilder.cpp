@@ -29,118 +29,83 @@
 #include "OTGui/RadialGradientPainter2D.h"
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsItem() const {
-	OTAssertNullptr(m_titleBackgroundPainter);
-	OTAssertNullptr(m_titleForegroundPainter);
 	OTAssert(!m_name.empty(), "No name provided");
-
-	// --- Create a copy of local data ------------------------------------------------
-
-	// Create a copy of the painter
-	ot::Painter2D* painterTitleBack = m_titleBackgroundPainter->createCopy();
-	ot::Painter2D* painterTitleFront = m_titleForegroundPainter->createCopy();
-
-	OTAssertNullptr(painterTitleBack);
-	OTAssertNullptr(painterTitleFront);
 
 	// --- Create items ------------------------------------------------
 
 	// Root
-	ot::GraphicsStackItemCfg* root = new ot::GraphicsStackItemCfg;
+	GraphicsStackItemCfg* root = new GraphicsStackItemCfg;
 	root->setName(m_name);
 	root->setTitle(m_title);
 	root->setToolTip(m_toolTip);
 	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGridTopLeft | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
 
+	// Central Stack
+	GraphicsStackItemCfg* cStack = new GraphicsStackItemCfg;
+	cStack->setName(m_name + "_cStack");
+	cStack->setTitle(m_title);
+	cStack->setToolTip(m_toolTip);
+	cStack->setMargins(m_connectorHeight);
+	cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	root->addItemTop(cStack, true, false);
+
+	// Connector Grid
+	GraphicsGridLayoutItemCfg* conGrid = new GraphicsGridLayoutItemCfg(5, 5);
+	conGrid->setName(m_name + "_conGrid");
+	conGrid->setPosition(-m_connectorHeight, -m_connectorHeight);
+	conGrid->setColumnStretch(1, 1);
+	conGrid->setColumnStretch(3, 1);
+	conGrid->setRowStretch(1, 1);
+	conGrid->setRowStretch(3, 1);
+	conGrid->setSizePolicy(Dynamic);
+	root->addItemBottom(conGrid, false, true);
+
+	// Connectors
+	conGrid->addChildItem(0, 2, createConnectorItem(ot::ConnectUp));
+	conGrid->addChildItem(4, 2, createConnectorItem(ot::ConnectDown));
+	conGrid->addChildItem(2, 0, createConnectorItem(ot::ConnectLeft));
+	conGrid->addChildItem(2, 4, createConnectorItem(ot::ConnectRight));
+
 	// Border
-	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
-	bor->setOutline(ot::PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+	GraphicsRectangularItemCfg* bor = new GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
+	bor->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
-	bor->setSizePolicy(ot::Dynamic);
+	bor->setSizePolicy(Dynamic);
 	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
-	root->addItemTop(bor, false, true);
+	cStack->addItemTop(bor, false, true);
 
 	// Main layout
-	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
+	GraphicsVBoxLayoutItemCfg* mLay = new GraphicsVBoxLayoutItemCfg;
 	mLay->setName(m_name + "_mLay");
-	mLay->setMinimumSize(ot::Size2DD(50., 80.));
+	mLay->setMinimumSize(Size2DD(50., 80.));
 	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
-	root->addItemTop(mLay, true, false);
+	cStack->addItemTop(mLay, true, false);
 
-	// Title: Stack
-	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
-	tStack->setName(m_name + "_tStack");
-	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
-	mLay->addChildItem(tStack, 0);
-
-	// Title: Border
-	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
-	tBor->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
-	tBor->setName(m_name + "_tBor");
-	tBor->setCornerRadius(5);
-	//tBor->setSize(ot::Size2DD(200., 30.));
-	tBor->setSizePolicy(ot::Dynamic);
-	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
-	tStack->addItemTop(tBor, false, true);
-
-	// Title: Layout
-	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
-	tLay->setName(m_name + "_tLay");
-	tLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-	tStack->addItemTop(tLay, true, false);
-
-	// Title: Title
-	ot::GraphicsTextItemCfg* tit = new ot::GraphicsTextItemCfg;
-	tit->setName(m_name + "_tit");
-	tit->setText(m_title);
-	tit->setTextPainter(painterTitleFront);
-	tit->setMinimumSize(ot::Size2DD(10., 22.));
-	tit->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-
-	// Title: Left Corner
-	if (m_leftTitleImagePath.empty()) {
-		tLay->addStrech(1);
-	}
-	else {
-		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
-		titLImg->setName(m_name + "_titLImg");
-		titLImg->setImagePath(m_leftTitleImagePath);
-		titLImg->setFixedSize(16., 16.);
-		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(15., 0., 0., 0.));
-		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-		tLay->addChildItem(titLImg);
-
-		MarginsD titMargins = tit->getMargins();
-		titMargins.setLeft(15.);
-		tit->setMargins(titMargins);
-	}
-
-	tLay->addChildItem(tit);
-	tLay->addStrech(1);
+	// Title
+	mLay->addChildItem(createTitle(), 0);
 
 	// Central layout
-	ot::GraphicsVBoxLayoutItemCfg* cLay = new ot::GraphicsVBoxLayoutItemCfg;
+	GraphicsVBoxLayoutItemCfg* cLay = new GraphicsVBoxLayoutItemCfg;
 	cLay->setName(m_name + "_cLay");
 	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	if (!m_type.empty()) {
-		ot::GraphicsTextItemCfg* typeItm = new GraphicsTextItemCfg("Project Type: " + m_type);
+		GraphicsTextItemCfg* typeItm = new GraphicsTextItemCfg("Project Type: " + m_type);
 		typeItm->setName(m_name + "_ptype");
-		typeItm->setAlignment(ot::AlignLeft);
+		typeItm->setAlignment(AlignLeft);
 		
 		cLay->addChildItem(typeItm);
 	}
 	
-
 	// Create background image
 	if (!m_backgroundImage.empty()) {
-		/*ot::GraphicsImageItemCfg* cImg = new ot::GraphicsImageItemCfg;
+		/*GraphicsImageItemCfg* cImg = new GraphicsImageItemCfg;
 		//cImg->setImagePath(m_backgroundImagePath);
 		cImg->setName(m_name + "_cImg");
 		cImg->setMargins(m_backgroundImageMargins);
-		cImg->setSizePolicy(ot::Dynamic);
-		cImg->setAlignment(ot::AlignCenter);
+		cImg->setSizePolicy(Dynamic);
+		cImg->setAlignment(AlignCenter);
 		cImg->setMaintainAspectRatio(true);
 		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
@@ -157,7 +122,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 
 ot::GraphicsHierarchicalProjectItemBuilder::GraphicsHierarchicalProjectItemBuilder()
 	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
-	m_backgroundImageMargins(5., 2., 2., 2.)
+	m_backgroundImageMargins(5., 2., 2., 2.), m_connectorWidth(5.), m_connectorHeight(2.)
 {
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
@@ -213,4 +178,120 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradie
 	painter->addStop(0.90, ot::Color(255, 255, 255));
 
 	this->setTitleForegroundPainter(painter);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(ot::ConnectionDirection _direction) const {
+	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectableBackground));
+	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+	con->setConnectionDirection(_direction);
+	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	con->setSizePolicy(ot::Preferred);
+
+	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
+
+	// Set name
+	switch (_direction) {
+	case ot::ConnectLeft:
+		con->setName("Left");
+		con->setRadiusX(m_connectorHeight);
+		con->setRadiusY(m_connectorWidth);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
+		break;
+
+	case ot::ConnectUp:
+		con->setName("Top");
+		con->setRadiusX(m_connectorWidth);
+		con->setRadiusY(m_connectorHeight);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
+		break;
+
+	case ot::ConnectRight:
+		con->setName("Right");
+		con->setRadiusX(m_connectorHeight);
+		con->setRadiusY(m_connectorWidth);
+		con->setAdditionalTriggerDistance(0., trigDist, trigDist, trigDist);
+		break;
+
+	case ot::ConnectDown:
+		con->setName("Bottom");
+		con->setRadiusX(m_connectorWidth);
+		con->setRadiusY(m_connectorHeight);
+		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
+		break;
+
+	default:
+		OT_LOG_E("Invalid connection direction (" + std::to_string((int)_direction) + ")");
+		break;
+	}
+
+	return con;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createTitle() const {
+	OTAssertNullptr(m_titleBackgroundPainter);
+	OTAssertNullptr(m_titleForegroundPainter);
+
+	// Create a copy of the painter
+	Painter2D* painterTitleBack = m_titleBackgroundPainter->createCopy();
+	Painter2D* painterTitleFront = m_titleForegroundPainter->createCopy();
+
+	OTAssertNullptr(painterTitleBack);
+	OTAssertNullptr(painterTitleFront);
+
+	// Title: Stack
+	GraphicsStackItemCfg* tStack = new GraphicsStackItemCfg;
+	tStack->setName(m_name + "_tStack");
+	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+
+	// Title: Border
+	GraphicsRectangularItemCfg* tBor = new GraphicsRectangularItemCfg(painterTitleBack);
+	tBor->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+	tBor->setName(m_name + "_tBor");
+	tBor->setCornerRadius(5);
+	//tBor->setSize(Size2DD(200., 30.));
+	tBor->setSizePolicy(Dynamic);
+	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	tStack->addItemTop(tBor, false, true);
+
+	// Title: Layout
+	GraphicsHBoxLayoutItemCfg* tLay = new GraphicsHBoxLayoutItemCfg;
+	tLay->setName(m_name + "_tLay");
+	tLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	tStack->addItemTop(tLay, true, false);
+
+	// Title: Title
+	GraphicsTextItemCfg* tit = new GraphicsTextItemCfg;
+	tit->setName(m_name + "_tit");
+	tit->setText(m_title);
+	tit->setTextPainter(painterTitleFront);
+	tit->setMinimumSize(Size2DD(10., 22.));
+	tit->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+
+	// Title: Left Corner
+	if (m_leftTitleImagePath.empty()) {
+		tLay->addStrech(1);
+	}
+	else {
+		GraphicsImageItemCfg* titLImg = new GraphicsImageItemCfg;
+		titLImg->setName(m_name + "_titLImg");
+		titLImg->setImagePath(m_leftTitleImagePath);
+		titLImg->setFixedSize(16., 16.);
+		titLImg->setAlignment(AlignCenter);
+		titLImg->setMargins(MarginsD(15., 0., 0., 0.));
+		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+		tLay->addChildItem(titLImg);
+
+		MarginsD titMargins = tit->getMargins();
+		titMargins.setLeft(15.);
+		tit->setMargins(titMargins);
+	}
+
+	tLay->addChildItem(tit);
+	tLay->addStrech(1);
+
+	return tStack;
 }
